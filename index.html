@@ -1639,7 +1639,7 @@ button { background: none; border: none; color: inherit; }
          lives in the button, which counts down and then works. */
       tone: 'warning', icon: 'clock', field: 'neutral', cta: 'countdown',
       title: 'Too many code requests',
-      body: 'You can request another code in <b><span data-countdown="number"></span></b>.',
+      body: 'Several codes have already gone to this number.',
       actions: []
     },
     offline: {
@@ -1704,7 +1704,7 @@ button { background: none; border: none; color: inherit; }
       title: 'Too many code requests',
       /* No action. Support cannot lift a security limit, and offering it here
          would send a driver to a dead end while the clock still runs. */
-      body: 'You can request another code in <b><span data-countdown="code"></span></b>.',
+      body: 'Several codes have already gone to this number.',
       actions: []
     },
     offline: {
@@ -2238,10 +2238,8 @@ button { background: none; border: none; color: inherit; }
       /* Rendered first so the countdown's own opening tick can fill both the
          card and the button in the same frame. */
       startCountdown('number', LOCK_SECS, function (left, label) {
-        var slot = el.numberAlert.querySelector('[data-countdown="number"]');
-        if (slot) { slot.textContent = label; }
-        /* The wait belongs in the button, so the driver watches the thing
-           they are waiting for rather than a clock parked in a card. */
+        /* One clock, in the button, because the button is the thing being
+           waited for. The card says why, not when. */
         setBtn(el.phoneCta, false, 'Send code in ' + label);
       }, function () {
         hideAlert(el.numberAlert);
@@ -2622,8 +2620,7 @@ button { background: none; border: none; color: inherit; }
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.resendLimit));
     el.resendBtn.disabled = true;
     startCountdown('code', LOCK_SECS, function (left, label) {
-      var slot = el.codeAlert.querySelector('[data-countdown="code"]');
-      if (slot) { slot.textContent = label; }
+      /* One clock, in the control being waited for. */
       el.resendBtn.textContent = 'Request code in ' + label;
     }, function () {
       el.resendBtn.disabled = false;
@@ -2802,6 +2799,7 @@ button { background: none; border: none; color: inherit; }
   function base(mode, phone) {
     clearTimers();
     applyNet(); setHomeNotice(null); setHomeAction('enter');
+    setOtpTone(null);
     hideStatusPage();
     S.mode = mode || 'signup';
     S.channel = 'whatsapp';
@@ -3621,7 +3619,7 @@ button { background: none; border: none; color: inherit; }
     ['Naming', 'Level prefix, then BEM. a- atoms, m- molecules, o- organisms, t- templates, p- page, u- utilities, d- developer tooling. Element is __, modifier is --. A name states a role, never an appearance: a-btn--primary, not a-btn--blue.'],
     ['Levels', 'An atom cannot be broken down without losing its meaning: a label, an input, a button, an icon. A molecule is a small bond of atoms doing one job, like a label and an input and a helper becoming a field. An organism is a distinct, standalone section made of molecules and atoms, like the sign-up sheet or the hero. A template lays organisms out into a page-level structure with no real content in it, which here is the device frame. A page is a template with real content, which here is the demo itself.'],
     ['Placing something new', 'Four questions, in order, and the first yes decides it. Can I take it apart and still have something that means anything? If no, it is an atom. Is it a handful of atoms bonded to do ONE job? If yes, it is a molecule. Would I point at it and call it a section of the screen? If yes, it is an organism. Is it arranging sections rather than being one? If yes, it is a template. Two habits keep the system honest. First, reach for a variant before a new component: a modifier on an existing atom beats a near-duplicate of it, which is why there is a-btn--primary and not a separate primary button. Second, if you are still unsure, file it at the LOWER level and promote it when a second use appears, because promoting is easy and demoting means finding every caller. A name states a role and never a tone or a moment: this panel had a blocked-panel that also rendered success, and it is o-outcome-panel now.'],
-    ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. The axes are deliberately separate so two of them can be true at once. On a component: data-state is where it is in its own lifecycle (idle, pending, error, valid, filled, locked, active, done); data-tone is the meaning being reported on it (error, warning, success, info); data-valid, data-shake, data-single, data-more and data-heading each carry one boolean fact. On the sheet: data-stage names the step being shown. On the device frame: data-keyboard, data-width. On the document: data-motion, data-text, data-net. Anything beginning data-act, data-panel, data-mode, data-level, data-copy, data-countdown or data-state-id is a hook for script or for tooling, not a styling axis. The rule for adding one: if two conditions can be true at the same time they need two attributes, because one attribute holds one value.'],
+    ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. The axes are deliberately separate so two of them can be true at once. On a component: data-state is where it is in its own lifecycle (idle, pending, error, valid, filled, locked, active, done); data-tone is the meaning being reported on it (error, warning, success, info); data-valid, data-shake, data-single, data-more and data-heading each carry one boolean fact. On the sheet: data-stage names the step being shown. On the device frame: data-keyboard, data-width. On the document: data-motion, data-text, data-net. Anything beginning data-act, data-panel, data-mode, data-level, data-copy or data-state-id is a hook for script or for tooling, not a styling axis. The rule for adding one: if two conditions can be true at the same time they need two attributes, because one attribute holds one value.'],
     ['Tokens', 'A component reads tokens, never raw values. If you need a value that has no token, add the token first.'],
     ['Spacing', 'A 4px base grid: --sp-1 is 4px through --sp-8 at 32px, plus --sp-12 at 48px. Two half-steps, --sp-1h at 6px and --sp-2h at 10px, exist for the insides of small components and never for the rhythm between them. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
     ['Rhythm', 'The sheet carries one scale and each step means one thing. 8 is parts of one thing, a label and its field, a field and its helper. 16 is one group to the next. 24 is a decision or a different route. 32 closes a centred group. The organism owns the rhythm through its gap; nothing in the markup sets spacing, and a looser step is declared as a margin on the element that starts it rather than composed from a base plus a nudge.'],
