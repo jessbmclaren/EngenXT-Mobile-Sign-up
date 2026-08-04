@@ -53,10 +53,7 @@
   --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
   --color-warning-border: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
-  --color-whatsapp:      #25D366;
-  --color-whatsapp-dark: #0B6B5F;               /* 5.51:1 on --color-whatsapp-bg */
-  --color-whatsapp-bg:   #E7F9EF;
-  --color-on-whatsapp:   #05341c;
+  --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
   /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
      the logo, so it must not be darkened to satisfy a text contrast rule. */
   --color-error-text:    #B81510;    /* 4.94:1 on the sheet glass */
@@ -75,7 +72,6 @@
   --color-on-dark-faint:  rgba(255,255,255,0.45);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
-  --color-on-dark-fill-hi: rgba(255,255,255,0.14);
 
   /* Surface and border */
   --color-surface:        #ffffff;
@@ -101,6 +97,18 @@
   --color-hardware:   #000;   /* the physical bezel, not a brand colour */
   --color-switch-track:   #8A91A3;   /* 3:1 against white */
   --color-focus-halo: rgba(255,255,255,0.92);
+
+  /* Android system keyboard. Not app surface: this is the operating system's
+     chrome, so it holds its own palette rather than borrowing EngenXT's. */
+  --kb-surface:    #ECEFF3;
+  --kb-key:        #FFFFFF;
+  --kb-key-alt:    #DCE0E6;
+  --kb-divider:    #D2D7DE;
+  --kb-hint:       #C7CDD6;
+  --kb-text:       #1B1E23;
+  --kb-sub:        #6B7280;
+  --kb-accent:     #1A73E8;
+  --kb-on-accent:  #FFFFFF;
 
   /* Type */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -134,7 +142,6 @@
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
   --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
   --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
-  --shadow-whatsapp:  0 6px 22px rgba(37,211,102,0.35);
   --shadow-card:      0 1px 2px rgba(0,0,0,0.04), 0 4px 20px rgba(22,80,184,0.09);
   --shadow-field:     0 2px 14px var(--color-border-light);
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
@@ -146,6 +153,10 @@
      structural here rather than exceptional, and a scale should be honest. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
   --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+
+  /* Hardware. The status bar keeps its own height token because layout has to
+     stop short of it, and the notch and time are drawn against the same value. */
+  --size-status-bar: 78px;
   --sp-1h: 6px; --sp-2h: 10px; --sp-4h: 18px;
 
   /* Size. Values that are neither spacing nor type. */
@@ -253,23 +264,14 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-surface); color: var(--color-text-primary);
   box-shadow: var(--shadow-btn-white);
 }
-.a-btn--outlineOnDark {
-  min-height: var(--size-target); background: var(--color-on-dark-fill);
-  color: var(--color-text-on-dark);
-  border: 1.5px solid var(--color-on-dark-faint);
-  font-weight: 600;
-}
-.a-btn--outlineOnDark:hover { background: var(--color-on-dark-fill-hi); }
 .a-btn--outline {
   min-height: var(--size-target); background: transparent; color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  /* The AA-checked border, because an outline button on glass is only as
+     visible as its edge. */
+  border: 1px solid var(--color-border-field);
   font-weight: 600;
 }
 .a-btn--outline:hover { background: var(--color-border-light); }
-.a-btn--whatsapp {
-  background: var(--color-whatsapp); color: var(--color-on-whatsapp);
-  box-shadow: var(--shadow-whatsapp);
-}
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
 /* Disabled is driven by the real attribute as well as the ARIA one, so the
    control is honestly inactive rather than merely greyed. */
@@ -306,7 +308,7 @@ button { background: none; border: none; color: inherit; }
 }
 
 /* a-field. Two orthogonal axes: data-state for idle, pending and error,
-   :focus-within for focus, data-valid for validity. Squeezing focus and
+   :focus-within for focus. Squeezing focus and
    valid into one slot made focusing a complete field hide its own tick. */
 .a-field {
   display: flex; align-items: center; gap: var(--sp-3);
@@ -322,7 +324,6 @@ button { background: none; border: none; color: inherit; }
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-12);
 }
-.a-field[data-valid="true"] { border-color: var(--color-primary); }
 .a-field[data-state="error"] {
   border-color: var(--color-error-text); background: var(--color-secondary-bg);
 }
@@ -334,13 +335,6 @@ button { background: none; border: none; color: inherit; }
 }
 /* The ring lives on the field, not the bare input, so it follows the border. */
 .a-field__input:focus { outline: none; }
-/* The trailing slot is the atom's own element, so the atom never has to know
-   which molecule is wrapping it. */
-.a-field__affix {
-  flex-shrink: 0; width: 16px; opacity: 0; transform: scale(.7);
-  transition: opacity var(--dur-fast), transform var(--dur-fast) var(--ease-spring);
-}
-.a-field[data-valid="true"] .a-field__affix { opacity: 1; transform: none; }
 .a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: 500; }
 
 /* a-otp-cell */
@@ -371,15 +365,14 @@ button { background: none; border: none; color: inherit; }
 .a-helper[data-tone="warning"] { color: var(--color-warning); font-weight: 600; }
 /* Tone is never carried by colour alone. The icon is injected by setHelper. */
 .a-helper__icon { flex-shrink: 0; vertical-align: -2px; margin-right: var(--sp-1); }
-
-/* a-badge */
-.a-badge {
-  display: inline-flex; align-items: center; gap: var(--sp-1h);
-  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-pill);
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: -0.1px;
-  background: var(--color-primary-light); color: var(--color-primary-dark);
+/* A consequence is not the error. It gets its own line and its own weight, so
+   "one attempt left" is not read as one sentence with "signing in pauses". */
+.a-helper__note {
+  display: block; margin-top: var(--sp-1);
+  font-weight: 500; color: var(--color-text-secondary);
 }
-.a-badge[data-channel="whatsapp"] { background: var(--color-whatsapp-bg); color: var(--color-whatsapp-dark); }
+.a-helper .a-spinner { vertical-align: -3px; margin-right: var(--sp-2); }
+
 
 /* a-icon-wrap */
 .a-icon-wrap {
@@ -424,7 +417,8 @@ button { background: none; border: none; color: inherit; }
 .m-status-bar {
   position: relative; z-index: var(--z-content); flex-shrink: 0;
   display: flex; align-items: center; justify-content: space-between;
-  padding: max(54px, env(safe-area-inset-top, 0px)) var(--sp-6) 0;
+  padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
+  padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
 }
 .m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
@@ -488,6 +482,9 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: var(--sp-3); margin-bottom: var(--sp-4);
 }
+/* An outcome carries its own heading, so the header keeps only its close
+   control and lets that control hold the right edge on its own. */
+.m-sheet-header[data-heading="none"] { justify-content: flex-end; margin-bottom: 0; }
 .m-sheet-header__title {
   font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
   color: var(--color-text-primary); margin-bottom: var(--sp-1);
@@ -496,7 +493,9 @@ button { background: none; border: none; color: inherit; }
   font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
   min-height: 39px;
 }
-.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: 700; }
+/* The masked number is one token. Breaking it across two lines turns a
+   number the driver is checking against their handset into two fragments. */
+.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: 700; white-space: nowrap; }
 /* The negative margin pulls a 48px target back to the visual box without
    pushing the header down. */
 .m-sheet-header__close {
@@ -510,7 +509,6 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-circle); cursor: pointer;
 }
 .m-sheet-header__close:hover { background: var(--color-border-light); }
-.m-sheet-header__badge { margin-top: var(--sp-2); }
 
 /* m-progress */
 .m-progress {
@@ -551,6 +549,12 @@ button { background: none; border: none; color: inherit; }
 /* The links sit on the same content edge as the cells and the CTA, so their
    horizontal padding goes rather than the row growing to compensate. */
 .m-resend-row .a-link { padding-inline: 0; }
+/* When a state withdraws one of the two, the survivor centres rather than
+   sitting hard left where its partner used to balance it. */
+.m-resend-row[data-single="true"] { justify-content: center; }
+/* Hidden means gone, including from a flex row that would otherwise still
+   reserve its gap. */
+[hidden] { display: none !important; }
 
 /* ══ ORGANISMS ═══════════════════════════════════════════════════════════ */
 
@@ -650,23 +654,45 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   box-shadow: var(--shadow-sheet);
 }
+/* With the keyboard up there is less room, so the rhythm tightens by one step
+   rather than pushing the last control off the bottom. */
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__stage[data-state="active"] { gap: var(--sp-3); }
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__body {
+  padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom, 0px));
+}
 /* With the keyboard up the sheet takes the whole remaining height, which is
-   the full-screen treatment the flow wants at exactly the moment it wants it. */
+   the full-screen treatment the flow wants at exactly the moment it wants it.
+   height, not just max-height: a sheet sized to its content leaves a strip of
+   hero showing between it and the keys, and the last row of controls then sits
+   on top of the hero headline. */
 .t-device-frame[data-keyboard="open"] .o-signup-sheet {
-  max-height: calc(100% - var(--keyboard-inset, 0px));
+  height: calc(100% - var(--keyboard-inset, 0px) - var(--size-status-bar));
+  max-height: calc(100% - var(--keyboard-inset, 0px) - var(--size-status-bar));
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
 }
-/* A stand-in for the on-screen keyboard, so the state can be reviewed. */
-.t-device-frame[data-keyboard="open"]::after {
-  content: 'On-screen keyboard';
+/* t-keyboard. The Android keypad the number and code stages actually raise,
+   drawn rather than described, so the sheet can be judged against the space it
+   really has. Both inputs are inputmode="numeric", so this is the numeric pad
+   Android shows them, not a full alphabetic layout. */
+.t-keyboard {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--z-toast);
-  height: var(--keyboard-inset);
-  display: flex; align-items: center; justify-content: center;
-  background: var(--color-surface-sunken);
-  border-top: var(--hairline) solid var(--color-border);
-  color: var(--color-text-tertiary);
-  font-size: var(--text-micro); font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  height: var(--keyboard-inset, 0px);
+  display: none; overflow: hidden;
+  background: var(--kb-surface);
+  border-top: var(--hairline) solid var(--kb-divider);
+}
+.t-device-frame[data-keyboard="open"] .t-keyboard { display: block; }
+.t-keyboard__svg { display: block; width: 100%; height: 100%; }
+/* These sizes deliberately sit outside the type ramp. The ramp exists so app
+   text answers the driver's text-size setting, and a drawing of Android's own
+   keyboard must not: a real keyboard does not grow when app text does. */
+.t-keyboard__digit {
+  font-family: var(--font-sans); font-size: 21px; font-weight: 400;
+  fill: var(--kb-text); text-anchor: middle;
+}
+.t-keyboard__sub {
+  font-family: var(--font-sans); font-size: 9px; font-weight: 600;
+  letter-spacing: 0.06em; fill: var(--kb-sub); text-anchor: middle;
 }
 /* Without backdrop-filter, which is real on older Android WebViews, a
    translucent panel over a near-black hero is unreadable. Go opaque. */
@@ -680,7 +706,17 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-4) 0 var(--sp-3);
   display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
-.o-signup-sheet__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: clip; }
+/* The scroller fades its bottom edge only while there is something below it,
+   so content cut off by the keyboard announces itself instead of just ending.
+   The flag is set by the same code that measures the keyboard. */
+.o-signup-sheet__scroll {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: clip;
+  scrollbar-width: none;
+}
+.o-signup-sheet__scroll::-webkit-scrollbar { display: none; }
+.o-signup-sheet[data-more="true"] .o-signup-sheet__scroll {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-7)), transparent 100%);
+}
 .o-signup-sheet__body {
   padding: 0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column;
@@ -697,16 +733,33 @@ button { background: none; border: none; color: inherit; }
 /* The helper belongs to the control above it, so it rides tighter. */
 .o-signup-sheet__stage .a-helper { margin-top: calc(var(--sp-4) * -1 + var(--sp-2)); }
 .o-signup-sheet__cta { margin-top: var(--sp-1); }
-.o-signup-sheet__stage .a-link { align-self: center; }
+/* Resend belongs to the cells above it, so it sits on their left edge rather
+   than floating in the centre of the stage. */
+.o-signup-sheet__resend { align-self: flex-start; padding-inline: 0; }
+/* Everything below the cells is a way around the task, not the task, so it
+   is separated from the cells and never given the primary fill. */
+.o-signup-sheet__secondary { margin-top: var(--sp-1); }
+.o-signup-sheet__secondary svg { flex: none; }
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
    states and the success state, and the tone lives on data-tone. */
 .o-outcome-panel { align-items: center; text-align: center; padding-top: var(--sp-2); }
+/* The title takes focus so a screen reader announces the new screen. It is not
+   a tab stop, so no keyboard user ever lands on it by tabbing, and painting a
+   ring around a heading only makes it look like a control. */
+.o-outcome-panel__title:focus,
+.o-outcome-panel__title:focus-visible { outline: none; box-shadow: none; }
 .o-outcome-panel__title { font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px; }
 .o-outcome-panel__body { font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary); }
+.o-outcome-panel__clock {
+  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.6px;
+  color: var(--color-text-primary); font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+/* A supporting offer, not the outcome, so it sits below the clock and quieter
+   than both the title and the number. */
 .o-outcome-panel__meta {
-  font-size: var(--text-caption2); font-weight: 700; color: var(--color-text-primary);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary);
 }
 .o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
@@ -975,6 +1028,21 @@ button { background: none; border: none; color: inherit; }
 }
 .d-copyBtn:hover { background: var(--d-copy-hover); }
 
+/* d-demoHint. Prototype scaffolding sitting inside the device, marked as
+   developer furniture so it is never mistaken for copy that ships. */
+.d-demoHint {
+  margin-top: var(--sp-2);
+  font-size: var(--text-micro); font-weight: 600; letter-spacing: 0.2px;
+  color: var(--color-text-secondary);
+  border-left: 2px dashed var(--color-border-field);
+  padding-left: var(--sp-2);
+}
+.d-demoHint b { color: var(--color-text-primary); font-weight: 800; }
+/* Tooling must not change the layout it is there to help judge. With the
+   keyboard up the space is exactly what is under review, so the hint stands
+   down rather than spending 22dp of it. */
+.t-device-frame[data-keyboard="open"] .d-demoHint { display: none; }
+
 /* Inspector card, docked under the device */
 .d-inspect {
   width: 390px; max-width: 100%; display: none;
@@ -1142,13 +1210,13 @@ button { background: none; border: none; color: inherit; }
         <div class="o-signup-sheet__scroll">
         <div class="o-signup-sheet__body">
 
-          <header class="m-sheet-header">
-            <div>
+          <header class="m-sheet-header" id="sheetHeader">
+            <div id="sheetHeading">
               <h2 class="m-sheet-header__title" id="sheetTitle">Your number</h2>
               <p class="m-sheet-header__sub" id="sheetSub"></p>
-              <p class="m-sheet-header__badge" id="channelBadgeWrap" hidden>
-                <span class="a-badge" id="channelBadge" data-channel="whatsapp"></span>
-              </p>
+              <!-- Prototype only. Never ships, which is why it carries the
+                   developer prefix rather than a product one. -->
+              <p class="d-demoHint" id="demoHint" hidden></p>
             </div>
             <button class="m-sheet-header__close" id="sheetClose" type="button" aria-label="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2" stroke-linecap="round">
@@ -1188,24 +1256,22 @@ button { background: none; border: none; color: inherit; }
 
             <div id="codeAlert" tabindex="-1" hidden></div>
 
-            <div class="m-resend-row">
-              <button class="a-link" id="resendBtn" type="button" disabled>Resend in 0:45</button>
-              <button class="a-link a-link--quiet" id="channelSwitchBtn" type="button">Send by SMS</button>
-            </div>
+            <button class="a-link o-signup-sheet__resend" id="resendBtn" type="button" disabled>Resend code in 0:45</button>
 
-            <button class="a-btn a-btn--primary o-signup-sheet__cta" id="otpCta" type="button">Check my code</button>
-
-            <button class="a-btn a-btn--whatsapp a-btn--sm" id="openWhatsappBtn" type="button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-on-whatsapp)" aria-hidden="true">
+            <button class="a-btn a-btn--outline a-btn--sm o-signup-sheet__secondary" id="openWhatsappBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-whatsapp-dark)" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
               </svg>
               Open WhatsApp
             </button>
 
-            <button class="a-link a-link--quiet" id="backToNumberBtn" type="button">
-              Use a different number
-            </button>
+            <!-- The two ways out of this stage, both quiet, because neither is
+                 the task. The task is the six digits above. -->
+            <div class="m-resend-row">
+              <button class="a-link a-link--quiet" id="channelSwitchBtn" type="button">Send by SMS</button>
+              <button class="a-link a-link--quiet" id="backToNumberBtn" type="button">Use a different number</button>
+            </div>
           </div>
 
           <!-- STAGE · BLOCKED -->
@@ -1213,6 +1279,9 @@ button { background: none; border: none; color: inherit; }
             <span class="a-icon-wrap a-icon-wrap--lg" id="blockedIcon" data-tone="error" aria-hidden="true"></span>
             <h3 class="o-outcome-panel__title" id="blockedTitle" tabindex="-1"></h3>
             <p class="o-outcome-panel__body" id="blockedBody"></p>
+            <!-- The countdown, rendered once. aria-hidden because the wait is
+                 announced in words, not re-read every second. -->
+            <p class="o-outcome-panel__clock" id="blockedClock" aria-hidden="true" hidden></p>
             <p class="o-outcome-panel__meta" id="blockedMeta" hidden></p>
             <div class="o-outcome-panel__actions" id="blockedActions"></div>
           </div>
@@ -1234,6 +1303,64 @@ button { background: none; border: none; color: inherit; }
         </div>
         </div>
       </section>
+
+      <!-- The operating system's keyboard, not the product's. aria-hidden
+           because a real one is never in the accessibility tree of the page
+           it covers. -->
+      <div class="t-keyboard" aria-hidden="true">
+        <svg class="t-keyboard__svg" viewBox="0 0 390 312" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+          <rect width="390" height="312" fill="var(--kb-surface)"/>
+          <line x1="0" y1="38" x2="390" y2="38" stroke="var(--kb-divider)" stroke-width="1"/>
+          <rect x="55.0" y="14" width="46" height="10" rx="5" fill="var(--kb-hint)"/>
+          <rect x="172.0" y="14" width="46" height="10" rx="5" fill="var(--kb-hint)"/>
+          <rect x="289.0" y="14" width="46" height="10" rx="5" fill="var(--kb-hint)"/>
+          <line x1="136.5" y1="10" x2="136.5" y2="28" stroke="var(--kb-divider)" stroke-width="1"/>
+          <line x1="253.5" y1="10" x2="253.5" y2="28" stroke="var(--kb-divider)" stroke-width="1"/>
+          <rect x="8.0" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="52.9" y="78.0" class="t-keyboard__digit">1</text>
+          <rect x="102.8" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="147.6" y="72.0" class="t-keyboard__digit">2</text>
+          <text x="147.6" y="86.0" class="t-keyboard__sub">ABC</text>
+          <rect x="197.5" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="242.4" y="72.0" class="t-keyboard__digit">3</text>
+          <text x="242.4" y="86.0" class="t-keyboard__sub">DEF</text>
+          <rect x="8.0" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="52.9" y="129.0" class="t-keyboard__digit">4</text>
+          <text x="52.9" y="143.0" class="t-keyboard__sub">GHI</text>
+          <rect x="102.8" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="147.6" y="129.0" class="t-keyboard__digit">5</text>
+          <text x="147.6" y="143.0" class="t-keyboard__sub">JKL</text>
+          <rect x="197.5" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="242.4" y="129.0" class="t-keyboard__digit">6</text>
+          <text x="242.4" y="143.0" class="t-keyboard__sub">MNO</text>
+          <rect x="8.0" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="52.9" y="186.0" class="t-keyboard__digit">7</text>
+          <text x="52.9" y="200.0" class="t-keyboard__sub">PQRS</text>
+          <rect x="102.8" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="147.6" y="186.0" class="t-keyboard__digit">8</text>
+          <text x="147.6" y="200.0" class="t-keyboard__sub">TUV</text>
+          <rect x="197.5" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="242.4" y="186.0" class="t-keyboard__digit">9</text>
+          <text x="242.4" y="200.0" class="t-keyboard__sub">WXYZ</text>
+          <rect x="8.0" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="52.9" y="249.0" class="t-keyboard__digit">*</text>
+          <rect x="102.8" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="147.6" y="243.0" class="t-keyboard__digit">0</text>
+          <text x="147.6" y="257.0" class="t-keyboard__sub">+</text>
+          <rect x="197.5" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
+          <text x="242.4" y="249.0" class="t-keyboard__digit">#</text>
+          <rect x="292.2" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key-alt)"/>
+          <g stroke="var(--kb-text)" stroke-width="1.8" fill="none" stroke-linecap="round">
+            <path d="M332.1 61.0 h16 a3 3 0 0 1 3 3 v12 a3 3 0 0 1 -3 3 h-16 l-8 -9 z"/>
+            <path d="M336.1 66.5 l7 7 M343.1 66.5 l-7 7"/>
+          </g>
+          <rect x="292.2" y="158" width="89.8" height="109" rx="8" fill="var(--kb-accent)"/>
+          <g stroke="var(--kb-on-accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M328.1 217.5 h13 v-11 M334.1 211.5 l-6 6 l6 6"/>
+          </g>
+          <rect x="140.0" y="290" width="110" height="4" rx="2" fill="var(--kb-text)" opacity="0.55"/>
+        </svg>
+      </div>
 
       <div class="a-toast" id="toast" role="status"></div>
       <span class="u-visually-hidden" id="announcer" role="status" aria-live="polite"></span>
@@ -1271,9 +1398,15 @@ button { background: none; border: none; color: inherit; }
   var MAX_ATTEMPTS  = 3;
   var MAX_RESENDS   = 3;
   var SLOW_HINT_MS  = 20000;
-  var WA_MANAGER    = 'https://wa.me/27800000000?text=Hi%2C%20which%20number%20did%20you%20register%20for%20me%20on%20EngenXT%3F';
+  var WA_MANAGER    = 'https://wa.me/27800000000?text=';
+  /* The driver should not have to describe a state the app already knows, so
+     each route to a human opens with the message that fits the screen. */
+  var WA_ASK_NUMBER  = WA_MANAGER + encodeURIComponent('Hi, which mobile number did you register for me on EngenXT?');
+  var WA_ASK_UNPAUSE = WA_MANAGER + encodeURIComponent('Hi, EngenXT says my driver access is paused. Please turn it back on when you can.');
+  var WA_ASK_FLEET   = WA_MANAGER + encodeURIComponent("Hi, EngenXT says our company's access is inactive. Please contact Engen.");
   var WA_SUPPORT    = 'https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT.';
   var WA_APP        = 'https://wa.me/';
+  var WHATSAPP_HELPER = "We'll send a code to this number on WhatsApp. A small amount of data is needed.";
 
   /* Numbers that force an outcome, so the flow can be driven by hand. */
   var OUTCOMES = {
@@ -1334,7 +1467,7 @@ button { background: none; border: none; color: inherit; }
          leads. Reaching a human is the fallback, not the first move. */
       actions: [
         { label: 'Try another number', kind: 'primary', act: 'clearNumber' },
-        { label: 'Message my manager', kind: 'outline', href: WA_MANAGER }
+        { label: 'Message my manager', kind: 'outline', href: WA_ASK_NUMBER }
       ]
     },
     suspended: {
@@ -1343,48 +1476,57 @@ button { background: none; border: none; color: inherit; }
       tone: 'warning', icon: 'pause', field: 'neutral', hideCta: true,
       title: 'Your EngenXT access is paused',
       body: 'Your company paused your access. Ask your manager to turn it back on.',
+      /* Only the company can lift this, so no support link is offered. */
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Message my manager', kind: 'primary', href: WA_ASK_UNPAUSE }
       ]
     },
     fleet: {
       tone: 'warning', icon: 'building', field: 'neutral', hideCta: true,
-      title: "Your company's access is inactive",
+      title: "Your company's EngenXT access is inactive",
       body: "Drivers from your company can't sign in right now. Ask your manager to contact Engen.",
+      /* The body asks the manager to call Engen, so a second button sending
+         the driver to Engen would contradict it. */
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
-        { label: 'Contact Engen support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Message my manager', kind: 'primary', href: WA_ASK_FLEET }
       ]
     },
     rate: {
-      tone: 'warning', icon: 'clock', field: 'neutral', hideCta: true,
-      title: 'Wait 15 minutes for a new code',
-      body: 'We have sent too many codes to this number. You can ask again in <b><span data-countdown="number"></span></b>.',
-      actions: [
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
-      ]
+      /* A security limit, not an input error and not an account restriction.
+         There is nothing to ask a human for and nothing to correct, so the
+         card carries no action at all. The wait itself is the action, and it
+         lives in the button, which counts down and then works. */
+      tone: 'warning', icon: 'clock', field: 'neutral', cta: 'countdown',
+      title: 'Too many code requests',
+      body: 'You can request another code in <b><span data-countdown="number"></span></b>.',
+      actions: []
     },
     offline: {
-      tone: 'error', icon: 'wifiOff', field: 'neutral', hideCta: true,
-      title: 'No connection',
-      body: "We couldn't reach EngenXT. Check your signal or data, then try again.",
+      /* Named for the one thing it is. "No connection" could be read as the
+         vehicle, the tracker or Bluetooth by a driver holding a work phone. */
+      tone: 'warning', icon: 'wifiOff', field: 'neutral', hideCta: true,
+      title: 'No internet connection',
+      body: 'Connect to Wi-Fi or mobile data, then try again.',
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retrySend' }
       ]
     },
     server: {
+      /* Titled by what failed for the driver, not by whose fault it was. */
       tone: 'error', icon: 'server', field: 'neutral', hideCta: true,
-      title: 'Something went wrong on our side',
-      body: 'Nothing is wrong with your number or your phone. Wait a moment, then try again.',
+      title: "We couldn't send your code",
+      body: 'Your number is fine. Wait a moment and try again.',
       actions: [
-        { label: 'Try again', kind: 'primary', act: 'retrySend' },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
-      ]
+        { label: 'Try again', kind: 'primary', act: 'retrySend' }
+      ],
+      /* Support appears only once retrying has visibly stopped working, so
+         the first failure keeps a single obvious action. */
+      escalateAfter: 2,
+      escalation: { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
     },
     nowhatsapp: {
       tone: 'info', icon: 'message', field: 'neutral', hideCta: true,
-      title: "That number has no WhatsApp",
+      title: "That number isn't on WhatsApp",
       body: 'We can send your code by SMS instead.',
       actions: [
         { label: 'Send by SMS', kind: 'primary', act: 'sendBySms' },
@@ -1396,80 +1538,123 @@ button { background: none; border: none; color: inherit; }
   var CODE_ALERTS = {
     expired: {
       tone: 'warning', icon: 'clock',
-      title: 'That code has expired',
-      body: "Codes last 5 minutes. Ask for a new one and we'll send it straight away.",
-      actions: [{ label: 'Send a new code', kind: 'primary', act: 'resendNow' }]
+      title: 'Your code has expired',
+      body: 'Codes are valid for 5 minutes. Request a new code to continue.',
+      /* Built from the live channel, because "Send a new code" does not say
+         where the driver should then go looking for it. */
+      actions: function () {
+        return S.channel === 'whatsapp'
+          ? [{ label: 'Send a new WhatsApp code', kind: 'primary', act: 'resendNow' },
+             { label: 'Send by SMS instead', kind: 'outline', act: 'sendBySms' }]
+          : [{ label: 'Send a new SMS code', kind: 'primary', act: 'resendNow' },
+             { label: 'Send on WhatsApp instead', kind: 'outline', act: 'sendByWhatsapp' }];
+      }
     },
     slow: {
       tone: 'info', icon: 'clock',
-      title: 'No code yet',
-      body: 'On a weak signal a code can take a minute to arrive. Check WhatsApp, or ask for it by SMS.',
-      actions: [
-        { label: 'Send by SMS instead', kind: 'primary', act: 'sendBySms' }
-      ]
+      title: 'Still waiting for your code?',
+      body: 'WhatsApp codes can take a minute to arrive on a weak signal. You can wait a little longer or get the code by SMS.',
+      /* The primary carries EngenXT blue, not WhatsApp green. Verifying is the
+         task; the channel is only how the code travels. */
+      actions: [{ label: 'Send code by SMS', kind: 'primary', act: 'sendBySms' }]
     },
     resendLimit: {
       tone: 'warning', icon: 'clock',
-      title: 'Wait 15 minutes for a new code',
-      body: 'Wait <b><span data-countdown="code"></span></b> before asking for another code. If you need to fuel now, message support.',
-      actions: [{ label: 'Contact support', kind: 'outline', href: WA_SUPPORT }]
+      title: 'Too many code requests',
+      /* No action. Support cannot lift a security limit, and offering it here
+         would send a driver to a dead end while the clock still runs. */
+      body: 'You can request another code in <b><span data-countdown="code"></span></b>.',
+      actions: []
     },
     offline: {
-      tone: 'error', icon: 'wifiOff',
-      title: 'No connection',
-      body: "We couldn't check your code. Your digits are still here. Try again when you have signal.",
+      tone: 'warning', icon: 'wifiOff',
+      /* Signal and data are not the same thing, and a driver can have one
+         without the other, so the fix names both. */
+      title: 'No internet connection',
+      body: "We couldn't check your code. Your code is still here. Connect to mobile data or Wi-Fi, then try again.",
       actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }]
     },
     server: {
       tone: 'error', icon: 'server',
-      title: 'Something went wrong on our side',
-      body: 'Your code is still valid. Give it a moment, then try again.',
-      actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }]
+      title: "We couldn't verify your code right now",
+      body: 'Your code is still valid. Wait a moment, then try again.',
+      actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }],
+      escalateAfter: 2,
+      escalation: { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
     },
     smsSent: {
       tone: 'success', icon: 'check',
-      title: 'Sent by SMS',
-      body: 'Check your messages for a 6-digit code. Only the newest code works.',
+      title: 'Code sent by SMS',
+      body: 'Check your messages and enter the newest 6-digit code.',
+      actions: []
+    },
+    waSent: {
+      tone: 'success', icon: 'check',
+      title: 'New code sent on WhatsApp',
+      body: 'Enter the newest code. The one before it no longer works.',
       actions: []
     }
   };
 
+  /* Each of these is a full screen, so its own title is the heading. The sheet
+     header is withdrawn rather than repeated above them.
+
+     Where the company controls the outcome, the driver is sent to the company.
+     Support is offered only where support can actually act, because a button
+     that reaches the wrong desk costs a driver the trip. */
   var BLOCKED = {
     unregistered: {
       tone: 'error', icon: 'search',
       title: "We can't find that number",
-      body: 'Check that you entered the mobile number your company registered for you.',
+      /* This is the one screen where the number requirement itself is the
+         subject, so it is worth naming the country the number belongs to. */
+      body: 'Check that you entered the South African mobile number your company registered for you.',
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
-        { label: 'Start again', kind: 'outline', act: 'restart' }
+        { label: 'Try another number', kind: 'primary', act: 'clearNumber' },
+        { label: 'Message my manager', kind: 'outline', href: WA_ASK_NUMBER }
       ]
     },
     suspended: {
       tone: 'warning', icon: 'pause',
       title: 'Your EngenXT access is paused',
-      body: 'Your company paused your access. Once they turn it back on, sign in with the same number.',
+      body: 'Your company paused your access. Ask your manager to turn it back on. Then sign in again with the same number.',
+      /* Only the company can lift this, so support is not offered. */
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Message my manager', kind: 'primary', href: WA_ASK_UNPAUSE }
       ]
     },
     fleet: {
       tone: 'warning', icon: 'building',
-      title: "Your company's access is inactive",
-      body: 'This is not something you can fix from the app. Your manager needs to contact Engen.',
+      title: "Your company's EngenXT access is inactive",
+      body: "Drivers from your company can't sign in right now. Ask your manager to contact Engen.",
+      /* The body asks the manager to call Engen. Offering the driver a support
+         line as well would contradict the instruction directly above it. */
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Message my manager', kind: 'primary', href: WA_ASK_FLEET }
       ]
     },
     locked: {
-      tone: 'error', icon: 'lock',
-      title: 'Try again in 15 minutes',
-      body: 'There were too many wrong codes for this number, so it is paused. Try again in <b><span data-countdown="blocked"></span></b>. If you need to fuel now, message support.',
+      /* Amber, not red. A cooling-off period is a security measure that ends
+         by itself, not damage the driver has done. */
+      tone: 'warning', icon: 'lock',
+      /* Sign in is what paused, not the number. A driver told their number is
+         paused will reasonably think their phone line has been cut off. */
+      title: 'Sign-in is temporarily paused',
+      /* The clock appears once, in the meta slot below. Repeating it in the
+         sentence made three different renderings of one number. */
+      body: 'Too many incorrect codes were entered. Try again in:',
+      /* Support cannot shorten the lock, but it can help a driver who is at a
+         pump right now, which is a different question and a real one. */
+      meta: 'Need to fuel now? Contact support.',
       actions: [
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT },
-        { label: 'Start again', kind: 'outline', act: 'restart' }
-      ]
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      ],
+      /* When the clock runs out the screen stops explaining and starts
+         offering the only thing the driver wanted. */
+      whenDone: {
+        body: 'You can sign in again now.',
+        actions: [{ label: 'Try again', kind: 'primary', act: 'restart' }]
+      }
     }
   };
 
@@ -1484,17 +1669,17 @@ button { background: none; border: none; color: inherit; }
     statusTitle: $('statusTitle'), statusBody: $('statusBody'), statusActions: $('statusActions'),
     scrim: $('sheetScrim'), sheet: $('sheet'),
     sheetTitle: $('sheetTitle'), sheetSub: $('sheetSub'),
-    channelBadge: $('channelBadge'), channelBadgeWrap: $('channelBadgeWrap'),
+    demoHint: $('demoHint'), sheetHeader: $('sheetHeader'), sheetHeading: $('sheetHeading'),
     progress: $('progress'),
     stageNumber: $('stageNumber'), stageCode: $('stageCode'),
     stageBlocked: $('stageBlocked'), stageSuccess: $('stageSuccess'),
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
-    otpGroup: $('otpGroup'), otpHelper: $('otpHelper'), otpCta: $('otpCta'),
+    otpGroup: $('otpGroup'), otpHelper: $('otpHelper'),
     codeAlert: $('codeAlert'), resendBtn: $('resendBtn'), channelSwitchBtn: $('channelSwitchBtn'),
     openWhatsapp: $('openWhatsappBtn'), backToNumber: $('backToNumberBtn'),
     blockedIcon: $('blockedIcon'), blockedTitle: $('blockedTitle'), blockedBody: $('blockedBody'),
-    blockedMeta: $('blockedMeta'), blockedActions: $('blockedActions'),
+    blockedMeta: $('blockedMeta'), blockedClock: $('blockedClock'), blockedActions: $('blockedActions'),
     successTitle: $('successTitle'), successBody: $('successBody'), successCta: $('successCta'),
     toast: $('toast'), announcer: $('announcer'), caption: $('caption')
   };
@@ -1511,7 +1696,10 @@ button { background: none; border: none; color: inherit; }
     resendsLeft: MAX_RESENDS,
     verifying: false,
     sending: false,
-    dismissArmed: false
+    dismissArmed: false,
+    /* Consecutive failures per kind, so a state can earn an extra action
+       rather than showing every possible one from the first attempt. */
+    fails: {}
   };
 
   var timers = [];
@@ -1569,6 +1757,13 @@ button { background: none; border: none; color: inherit; }
     btn.disabled = !enabled;
   }
   function isOff(btn) { return btn.disabled || btn.getAttribute('aria-disabled') === 'true'; }
+  /* Shallow copy, so a state can be shown with an extra action without the
+     definition itself accumulating one on every failure. */
+  function clone(o) {
+    var out = {};
+    Object.keys(o).forEach(function (k) { out[k] = o[k]; });
+    return out;
+  }
   function setHelper(node, html, tone) {
     var glyph = '';
     if (tone === 'error')   { glyph = '<span class="a-helper__icon">' + icon('alert', 'currentColor', 13) + '</span>'; }
@@ -1600,10 +1795,12 @@ button { background: none; border: none; color: inherit; }
   function phoneDigits() { return nationalDigits(el.phoneInput.value); }
   function phoneComplete() { return phoneDigits().length === 9; }
   function isMobilePrefix(d) { return /^(6|7|8)/.test(d); }
+  /* Bullets, not asterisks. An asterisk reads as a footnote marker and a
+     driver checking the number against their phone should see a mask. */
   function maskedPhone() {
     var d = phoneDigits();
     if (d.length !== 9) { return 'your number'; }
-    return '+27 ' + d.slice(0, 2) + ' *** ' + d.slice(6);
+    return '+27\u00A0' + d.slice(0, 2) + '\u00A0\u2022\u2022\u2022\u00A0' + d.slice(6);
   }
   /* Reformatting rewrites the value, which collapses the caret to the end.
      Restore it to the position holding the same digit count. */
@@ -1636,18 +1833,31 @@ button { background: none; border: none; color: inherit; }
     retrySend: function () { hideAlert(el.numberAlert); submitPhone(); },
     retryVerify: function () { hideAlert(el.codeAlert); submitOtp(); },
     sendBySms: function () { switchChannel('sms'); },
+    sendByWhatsapp: function () { switchChannel('whatsapp'); },
     resendNow: function () { resendCode(); },
     restart: function () { closeSheet(true); },
     retryHome: function () { go('home/default'); }
   };
 
   function actionMarkup(a) {
-    var cls = 'a-btn a-btn--sm a-btn--' +
-      (a.kind === 'primary' ? 'primary' : a.kind === 'whatsapp' ? 'whatsapp' : 'outline');
+    var cls = 'a-btn a-btn--sm a-btn--' + (a.kind === 'primary' ? 'primary' : 'outline');
     if (a.href) {
       return '<a class="' + cls + '" href="' + a.href + '" target="_blank" rel="noopener">' + a.label + '</a>';
     }
     return '<button type="button" class="' + cls + '" data-act="' + a.act + '">' + a.label + '</button>';
+  }
+
+  /* A definition may build its actions from live state, and may earn an extra
+     one once the same failure has repeated. Both are resolved here so every
+     caller renders the same shape. */
+  function resolveDef(def, key) {
+    var out = clone(def);
+    out.actions = typeof def.actions === 'function' ? def.actions() : (def.actions || []);
+    if (def.escalateAfter && key) {
+      S.fails[key] = (S.fails[key] || 0) + 1;
+      if (S.fails[key] >= def.escalateAfter) { out.actions = out.actions.concat([def.escalation]); }
+    }
+    return out;
   }
 
   function renderAlert(host, def) {
@@ -1769,31 +1979,38 @@ button { background: none; border: none; color: inherit; }
     el.progress.style.display = (name === 'blocked') ? 'none' : 'flex';
     var label = document.getElementById('progressLabel');
     if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
-    el.channelBadgeWrap.hidden = (name !== 'code');
-    if (name === 'code') { paintChannelBadge(); }
+    /* Prototype scaffolding, kept out of the product copy so the sentence a
+       driver reads is the sentence that ships. */
+    el.demoHint.hidden = (name !== 'code');
+    el.demoHint.innerHTML = name === 'code' ? 'Prototype: enter <b>123456</b>, or <b>000000</b> to expire it.' : '';
 
     if (name === 'number') {
       el.sheetTitle.textContent = 'Enter your mobile number';
       el.sheetSub.textContent = 'Use the number your company registered for you.';
     } else if (name === 'code') {
-      el.sheetTitle.textContent = S.channel === 'whatsapp' ? 'Check WhatsApp' : 'Check your messages';
-      el.sheetSub.innerHTML = 'We sent a code to <b>' + maskedPhone() + '</b>. In this demo, use <b>123456</b>.';
-    } else if (name === 'blocked') {
-      el.sheetTitle.textContent = "We can't finish this yet";
-      el.sheetSub.textContent = 'Here is what to do next';
-    } else if (name === 'success') {
-      el.sheetTitle.textContent = S.mode === 'signup' ? 'Your account is ready' : 'Welcome back';
-      el.sheetSub.textContent = '';
+      paintChannel();
+      /* One sentence carries the task, the channel and the number, which is
+         what the pill underneath it used to repeat. */
+      el.sheetTitle.textContent = 'Enter your code';
+      el.sheetSub.innerHTML = 'We sent a 6-digit code ' +
+        (S.channel === 'whatsapp' ? 'on WhatsApp' : 'by SMS') +
+        ' to <b>' + maskedPhone() + '</b>.';
     }
+    /* An outcome fills the sheet and carries its own heading. A second, vaguer
+       one above it ("We can't finish this yet") competed with the sentence that
+       actually says what happened, and pushed it down the screen. */
+    var outcome = (name === 'blocked' || name === 'success');
+    el.sheetHeading.hidden = outcome;
+    if (outcome) { el.sheetHeader.setAttribute('data-heading', 'none'); }
+    else { el.sheetHeader.removeAttribute('data-heading'); }
   }
 
-  function paintChannelBadge() {
+  /* Opening WhatsApp is only ever offered when a WhatsApp code is the one
+     waiting to be read. */
+  function paintChannel() {
     var wa = S.channel === 'whatsapp';
-    el.channelBadge.setAttribute('data-channel', S.channel);
-    el.channelBadge.innerHTML = (wa ? waGlyph(13, 'var(--color-whatsapp-dark)') : icon('message', 'var(--color-primary-dark)', 13)) +
-      '<span>' + (wa ? 'Code sent on WhatsApp' : 'Code sent by SMS') + ' · ' + maskedPhone() + '</span>';
     el.channelSwitchBtn.textContent = wa ? 'Send by SMS' : 'Send on WhatsApp';
-    el.openWhatsapp.style.display = wa ? 'flex' : 'none';
+    el.openWhatsapp.hidden = !wa;
   }
 
   /* ════════════════════════════════════════════════════════════════════
@@ -1809,15 +2026,15 @@ button { background: none; border: none; color: inherit; }
     el.phoneField.removeAttribute('data-state');
     el.phoneCta.hidden = false;
     hideAlert(el.numberAlert);
-    setHelper(el.phoneHelper, "We'll send a code to this number on WhatsApp. A small amount of data is needed.");
+    setHelper(el.phoneHelper, WHATSAPP_HELPER);
     paintPhoneValidity();
     setBtn(el.phoneCta, phoneComplete(), 'Continue');
     showStage('number');
   }
 
+  /* Completeness enables the button and nothing else. A tick on nine digits
+     would claim the number is recognised, which only the server knows. */
   function paintPhoneValidity() {
-    if (phoneComplete()) { el.phoneField.setAttribute('data-valid', 'true'); }
-    else { el.phoneField.removeAttribute('data-valid'); }
     setBtn(el.phoneCta, phoneComplete());
   }
 
@@ -1841,16 +2058,33 @@ button { background: none; border: none; color: inherit; }
     /* Either way the helper stops advertising a send that is not happening. */
     setHelper(el.phoneHelper, '');
     el.phoneInput.setAttribute('aria-describedby', 'numberAlert');
-    if (kind === 'rate') {
+
+    /* Repeated identical failures earn an extra way out, one that a first
+       failure has not yet justified. */
+    renderAlert(el.numberAlert, resolveDef(def, 'number:' + kind));
+
+    if (def.cta === 'countdown') {
+      el.phoneCta.hidden = false;
+      /* Rendered first so the countdown's own opening tick can fill both the
+         card and the button in the same frame. */
       startCountdown('number', LOCK_SECS, function (left, label) {
         var slot = el.numberAlert.querySelector('[data-countdown="number"]');
         if (slot) { slot.textContent = label; }
-      }, function () { resetNumberStage(el.phoneInput.value); });
+        /* The wait belongs in the button, so the driver watches the thing
+           they are waiting for rather than a clock parked in a card. */
+        setBtn(el.phoneCta, false, 'Send code in ' + label);
+      }, function () {
+        hideAlert(el.numberAlert);
+        el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
+        setHelper(el.phoneHelper, WHATSAPP_HELPER);
+        setBtn(el.phoneCta, phoneComplete(), 'Send code');
+        announce('You can request another code now.');
+      });
+    } else {
+      /* The card owns the actions, so a dead Continue underneath is noise. */
+      el.phoneCta.hidden = def.hideCta === true;
+      setBtn(el.phoneCta, false, 'Continue');
     }
-    renderAlert(el.numberAlert, def);
-    /* The card owns the actions, so a dead Continue underneath is noise. */
-    el.phoneCta.hidden = def.hideCta === true;
-    setBtn(el.phoneCta, false, 'Continue');
     el.phoneInput.readOnly = false;
     shake(el.stageNumber);
   }
@@ -1885,7 +2119,6 @@ button { background: none; border: none; color: inherit; }
     /* readonly, not disabled, so the number the driver typed stays readable
        and the field keeps its place in the reading order. */
     el.phoneInput.readOnly = true;
-    el.phoneField.removeAttribute('data-valid');
     el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
     setBtn(el.phoneCta, false);
 
@@ -1906,15 +2139,72 @@ button { background: none; border: none; color: inherit; }
       goToCode({ fresh: true });
     });
   }
-  function spinnerMarkup() {
-    return '<svg class="a-spinner" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">' +
-      '<circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.30)" stroke-width="2.5"/>' +
-      '<path d="M11 3a8 8 0 0 1 8 8" stroke="var(--color-text-on-dark)" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  function spinnerMarkup(size, track, arc) {
+    var s = size || 22, r = (s / 22) * 8, c = s / 2;
+    return '<svg class="a-spinner" width="' + s + '" height="' + s + '" viewBox="0 0 ' + s + ' ' + s + '" fill="none" aria-hidden="true">' +
+      '<circle cx="' + c + '" cy="' + c + '" r="' + r + '" stroke="' + (track || 'rgba(255,255,255,0.30)') + '" stroke-width="2.5"/>' +
+      '<path d="M' + c + ' ' + (c - r) + 'a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + r + '" stroke="' +
+      (arc || 'var(--color-text-on-dark)') + '" stroke-width="2.5" stroke-linecap="round"/></svg>';
   }
 
   /* ════════════════════════════════════════════════════════════════════
      STAGE · CODE
+
+     There is no Continue here. Six digits is a complete instruction, so the
+     code is checked the moment the sixth one lands and the driver is spared
+     a tap that only ever confirms what they already finished.
+
+     Everything below the cells is a way around the task rather than the task,
+     so each situation declares which of those ways belong to it. A driver who
+     has lost their connection is not offered a new code, because delivery is
+     not what failed.
      ════════════════════════════════════════════════════════════════════ */
+  var CODE_VIEWS = {
+    /*             resend  whatsapp  channel  back */
+    waiting:     { resend: true,  whatsapp: true,  channel: true,  back: true },
+    sent:        { resend: true,  whatsapp: true,  channel: true,  back: true },
+    wrong:       { resend: true,  whatsapp: true,  channel: true,  back: true },
+    /* The card's own primary is "Send code by SMS", so the link that says the
+       same thing goes rather than sitting beside it as a second opinion. */
+    slow:        { resend: false, whatsapp: true,  channel: false, back: true },
+    /* Requesting is what expired, so the card owns both ways to request. */
+    expired:     { resend: false, whatsapp: false, channel: false, back: true },
+    /* The limit covers both channels, so offering SMS would read as a way
+       round it. Only the clock moves. */
+    resendLimit: { resend: true,  whatsapp: false, channel: false, back: true },
+    /* The code arrived and is still in the boxes. Nothing about delivery
+       helps, so nothing about delivery is shown. */
+    offline:     { resend: false, whatsapp: false, channel: false, back: true },
+    server:      { resend: false, whatsapp: false, channel: false, back: true },
+    /* Confirmed. The screen is leaving, so it stops offering ways to stay. */
+    confirmed:   { resend: false, whatsapp: false, channel: false, back: false }
+  };
+
+  function setCodeView(name) {
+    var v = CODE_VIEWS[name] || CODE_VIEWS.waiting;
+    S.codeView = name;
+    el.resendBtn.hidden = !v.resend;
+    el.openWhatsapp.hidden = !v.whatsapp || S.channel !== 'whatsapp';
+    el.channelSwitchBtn.hidden = !v.channel;
+    el.backToNumber.hidden = !v.back;
+    var row = el.channelSwitchBtn.parentNode;
+    row.hidden = !v.channel && !v.back;
+    /* A row holding one control centres it rather than leaving it stranded
+       against the left edge by a space-between meant for two. */
+    if (v.channel && v.back) { row.removeAttribute('data-single'); }
+    else { row.setAttribute('data-single', 'true'); }
+  }
+
+  /* Verifying is a moment, not a destination, so the controls stay in place
+     and go quiet rather than disappearing and shifting the layout. */
+  function setCodeBusy(busy) {
+    [el.resendBtn, el.openWhatsapp, el.channelSwitchBtn, el.backToNumber].forEach(function (b) {
+      if (busy) { b.setAttribute('data-was-off', b.disabled ? '1' : '0'); b.disabled = true; }
+      else if (b.getAttribute('data-was-off') === '0') { b.disabled = false; }
+      if (!busy) { b.removeAttribute('data-was-off'); }
+    });
+  }
+
   function buildOtp() {
     el.otpGroup.innerHTML = '';
     el.otpGroup.removeAttribute('data-state');
@@ -1923,7 +2213,8 @@ button { background: none; border: none; color: inherit; }
       cell.className = 'a-otp-cell';
       cell.type = 'text';
       cell.inputMode = 'numeric';
-      cell.maxLength = 1;
+      /* No maxLength. The operating system fills the whole code into the
+         first box, and a cap of one silently throws five digits away. */
       cell.autocomplete = i === 0 ? 'one-time-code' : 'off';
       cell.setAttribute('aria-label', 'Digit ' + (i + 1) + ' of 6');
       el.otpGroup.appendChild(cell);
@@ -1943,7 +2234,17 @@ button { background: none; border: none; color: inherit; }
       cell.value = S.otp[i];
       if (S.otp[i]) { cell.setAttribute('data-state', 'filled'); } else { cell.removeAttribute('data-state'); }
     });
-    setBtn(el.otpCta, otpFull() && !S.verifying);
+  }
+
+  /* Autofill and paste both arrive as one string in one box. Spread it. */
+  function fillFrom(index, digits) {
+    for (var i = 0; i < digits.length && index + i < 6; i++) { S.otp[index + i] = digits[i]; }
+    paintOtp();
+    var next = Math.min(index + digits.length, 5);
+    var c = cells()[next];
+    if (c) { c.focus({ preventScroll: true }); }
+    clearTimeout(autoSubmitId);
+    if (otpFull()) { autoSubmitId = setTimeout(submitOtp, 240); }
   }
 
   function goToCode(opts) {
@@ -1954,13 +2255,15 @@ button { background: none; border: none; color: inherit; }
       S.otp = ['', '', '', '', '', ''];
       S.attemptsLeft = MAX_ATTEMPTS;
       S.resendsLeft = MAX_RESENDS;
+      S.fails = {};
     }
     S.verifying = false;
     buildOtp(); paintOtp();
     hideAlert(el.codeAlert);
     setHelper(el.otpHelper, '&nbsp;');
-    setBtn(el.otpCta, false, 'Continue');
     lockOtp(false);
+    setCodeView('waiting');
+    setCodeBusy(false);
     showStage('code');
     if (!quiet) { startResendCooldown(); startSlowHint(); }
     after(320, function () { var c = cells()[0]; if (c) { c.focus({ preventScroll: true }); } });
@@ -1979,8 +2282,9 @@ button { background: none; border: none; color: inherit; }
 
   function onOtpInput(i, cell) {
     var v = cell.value.replace(/\D/g, '');
-    cell.value = v.slice(-1);
-    S.otp[i] = cell.value;
+    if (v.length > 1) { cell.value = ''; fillFrom(i, v.slice(0, 6 - i)); return; }
+    cell.value = v;
+    S.otp[i] = v;
     el.otpGroup.removeAttribute('data-state');
     setHelper(el.otpHelper, '&nbsp;');
     paintOtp();
@@ -2002,42 +2306,58 @@ button { background: none; border: none; color: inherit; }
     var d = text.replace(/\D/g, '').slice(0, 6);
     if (!d) { return; }
     e.preventDefault();
+    /* A pasted code is the whole code, wherever it was dropped. */
     for (var i = 0; i < 6; i++) { S.otp[i] = d[i] || ''; }
-    paintOtp();
-    cells()[Math.min(d.length, 5)].focus({ preventScroll: true });
-    if (otpFull()) { after(240, submitOtp); }
+    fillFrom(0, d);
   }
 
   function submitOtp() {
-    if (S.verifying || isOff(el.otpCta)) { return; }
+    if (S.verifying) { return; }
     if (!otpFull()) {
       el.otpGroup.setAttribute('data-state', 'error');
       setHelper(el.otpHelper, 'Enter all 6 digits.', 'error');
       shake(el.stageCode);
       return;
     }
+    /* Checking says what is happening, next to the thing it is happening to.
+       An unexplained spinner in an empty button says nothing. */
     S.verifying = true;
     hideAlert(el.codeAlert);
-    el.otpCta.innerHTML = spinnerMarkup();
-    setBtn(el.otpCta, false);
+    setHelper(el.otpHelper, spinnerMarkup(14, 'var(--color-border)', 'var(--color-text-secondary)') +
+      '<span>Checking code…</span>');
     lockOtp(true);
+    setCodeBusy(true);
+    stopCountdown('slow');
 
     after(900, function () {
       S.verifying = false;
-      lockOtp(false);
-      el.otpCta.textContent = 'Continue';
+      setCodeBusy(false);
 
-      if (isOffline()) { renderAlert(el.codeAlert, CODE_ALERTS.offline); setBtn(el.otpCta, true); return; }
+      if (isOffline()) { showCodeAlert('offline', 'offline'); return; }
 
       var entered = S.otp.join('');
       if (entered === EXPIRED_CODE) { showCodeExpired(); return; }
-      if (entered !== GOOD_CODE) { showCodeWrong(); return; }
+      if (entered !== GOOD_CODE) { lockOtp(false); showCodeWrong(); return; }
 
+      lockOtp(false);
       el.otpGroup.setAttribute('data-state', 'valid');
-      setHelper(el.otpHelper, 'Code confirmed.', 'success');
+      setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
+      /* The task is finished, so every way back out of it goes now rather
+         than lingering behind the transition. */
+      setCodeView('confirmed');
       stopCountdown('resend'); stopCountdown('slow');
-      after(500, function () { showSuccess(); });
+      after(700, function () { showSuccess(); });
     });
+  }
+
+  /* The verification failed, not the delivery. The digits stay put and stay
+     read only until the driver asks to try again. */
+  function showCodeAlert(kind, view) {
+    lockOtp(true);
+    setHelper(el.otpHelper, '&nbsp;');
+    el.otpGroup.removeAttribute('data-state');
+    setCodeView(view || kind);
+    renderAlert(el.codeAlert, resolveDef(CODE_ALERTS[kind], 'code:' + kind));
   }
 
   function showCodeWrong() {
@@ -2046,38 +2366,49 @@ button { background: none; border: none; color: inherit; }
 
     if (S.attemptsLeft <= 0) { showBlocked('locked'); return; }
 
-    /* The digits stay. One wrong digit should cost one correction, not six. */
-    var msg = S.attemptsLeft === 1
-      ? 'That code is not right. 1 try left, then this number pauses for 15 minutes.'
-      : 'That code is not right. ' + S.attemptsLeft + ' tries left.';
+    /* The error belongs to the code, so the code goes and the driver starts
+       the six digits again with the field they need already focused. */
+    var msg = "That code doesn't match. You have " +
+      (S.attemptsLeft === 1 ? '1 attempt' : S.attemptsLeft + ' attempts') + ' left.';
+    if (S.attemptsLeft === 1) {
+      /* The consequence is a separate sentence, because folding it into the
+         error made it read as though the phone number itself would stop. */
+      msg += '<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
+    }
     setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
     shake(el.stageCode);
-    setBtn(el.otpCta, false);
+    setCodeView('wrong');
+    /* Cleared now, not on a timer. A delayed clear races the driver: they
+       start retyping into cells the timeout is about to empty. */
+    S.otp = ['', '', '', '', '', ''];
+    paintOtp();
+    el.otpGroup.setAttribute('data-state', 'error');
     var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
   }
 
   function showCodeExpired() {
     S.otp = ['', '', '', '', '', ''];
     paintOtp();
-    el.otpGroup.setAttribute('data-state', 'error');
+    /* Neutral, not red. Nothing the driver typed was wrong, it simply aged. */
+    el.otpGroup.removeAttribute('data-state');
+    lockOtp(true);
     setHelper(el.otpHelper, '&nbsp;');
     stopCountdown('resend');
-    el.resendBtn.disabled = true;
-    el.resendBtn.textContent = 'Resend now';
-    renderAlert(el.codeAlert, CODE_ALERTS.expired);
-    setBtn(el.otpCta, false);
+    setCodeView('expired');
+    renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.expired));
   }
 
   /* Resend cooldown */
   function startResendCooldown() {
-    setBtn(el.resendBtn, false);
     el.resendBtn.disabled = true;
     startCountdown('resend', RESEND_SECS, function (left, label) {
-      el.resendBtn.textContent = 'Resend in ' + label;
+      el.resendBtn.textContent = 'Resend code in ' + label;
     }, function () {
       el.resendBtn.disabled = false;
-      el.resendBtn.textContent = 'Resend now';
-      announce('You can ask for a new code now.');
+      /* Once it can be tapped it says where the code will go, because this
+         flow has two channels and "Resend now" names neither. */
+      el.resendBtn.textContent = S.channel === 'whatsapp' ? 'Resend on WhatsApp' : 'Resend by SMS';
+      announce('You can request another code now.');
     });
   }
 
@@ -2086,30 +2417,39 @@ button { background: none; border: none; color: inherit; }
     S.resendsLeft -= 1;
     S.otp = ['', '', '', '', '', ''];
     el.otpGroup.removeAttribute('data-state');
+    lockOtp(false);
     paintOtp();
-    hideAlert(el.codeAlert);
-    setHelper(el.otpHelper, 'New code on its way.', 'success');
+    setHelper(el.otpHelper, '&nbsp;');
+    setCodeView('sent');
+    renderAlert(el.codeAlert, resolveDef(S.channel === 'whatsapp' ? CODE_ALERTS.waSent : CODE_ALERTS.smsSent));
     startResendCooldown();
     startSlowHint();
     var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
-    after(2600, function () { if (S.stage === 'code') { setHelper(el.otpHelper, '&nbsp;'); } });
   }
 
   function showResendLimit() {
-    renderAlert(el.codeAlert, CODE_ALERTS.resendLimit);
+    setCodeView('resendLimit');
+    lockOtp(false);
+    renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.resendLimit));
     el.resendBtn.disabled = true;
     startCountdown('code', LOCK_SECS, function (left, label) {
       var slot = el.codeAlert.querySelector('[data-countdown="code"]');
       if (slot) { slot.textContent = label; }
-      el.resendBtn.textContent = 'Resend in ' + label;
-    }, function () { el.resendBtn.disabled = false; el.resendBtn.textContent = 'Resend now'; hideAlert(el.codeAlert); });
+      el.resendBtn.textContent = 'Request code in ' + label;
+    }, function () {
+      el.resendBtn.disabled = false;
+      el.resendBtn.textContent = S.channel === 'whatsapp' ? 'Resend on WhatsApp' : 'Resend by SMS';
+      hideAlert(el.codeAlert);
+      setCodeView('waiting');
+    });
   }
 
   function startSlowHint() {
     clearTimeout(slowHintId);
     slowHintId = setTimeout(function () {
-      if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden) {
-        renderAlert(el.codeAlert, CODE_ALERTS.slow);
+      if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden && !S.verifying) {
+        setCodeView('slow');
+        renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.slow));
       }
     }, SLOW_HINT_MS);
   }
@@ -2119,22 +2459,30 @@ button { background: none; border: none; color: inherit; }
     S.resendsLeft -= 1;
     stopCountdown('code');
     S.channel = to;
-    paintChannelBadge();
     S.otp = ['', '', '', '', '', ''];
     el.otpGroup.removeAttribute('data-state');
-    paintOtp();
     if (S.stage !== 'code') { goToCode({ fresh: true }); }
     showStage('code');
-    renderAlert(el.codeAlert, to === 'sms' ? CODE_ALERTS.smsSent : {
-      tone: 'success', icon: 'check', title: 'Sent on WhatsApp',
-      body: 'Check WhatsApp for a new 6-digit code. The code we sent by SMS no longer works.', actions: []
-    });
+    lockOtp(false);
+    paintOtp();
+    setHelper(el.otpHelper, '&nbsp;');
+    setCodeView('sent');
+    paintChannel();
+    renderAlert(el.codeAlert, resolveDef(to === 'sms' ? CODE_ALERTS.smsSent : CODE_ALERTS.waSent));
     startResendCooldown();
+    var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
   }
 
   /* ════════════════════════════════════════════════════════════════════
      STAGE · BLOCKED and SUCCESS
      ════════════════════════════════════════════════════════════════════ */
+  function paintBlockedActions(actions) {
+    el.blockedActions.innerHTML = (actions || []).map(function (a) {
+      return actionMarkup({ label: a.label, kind: a.kind, href: a.href, act: a.act });
+    }).join('');
+    wireActs(el.blockedActions);
+  }
+
   function showBlocked(kind) {
     var def = BLOCKED[kind];
     if (!def) { return; }
@@ -2143,22 +2491,29 @@ button { background: none; border: none; color: inherit; }
     el.blockedIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
     el.blockedTitle.textContent = def.title;
     el.blockedBody.innerHTML = def.body;
-    el.blockedMeta.hidden = true;
-    el.blockedActions.innerHTML = (def.actions || []).map(function (a) {
-      return actionMarkup({ label: a.label, kind: a.kind, href: a.href, act: a.act });
-    }).join('');
-    wireActs(el.blockedActions);
+    el.blockedMeta.hidden = !def.meta;
+    el.blockedMeta.textContent = def.meta || '';
+    paintBlockedActions(def.actions);
     showStage('blocked');
     announce(def.title + '. ' + el.blockedBody.textContent);
     after(60, function () { el.blockedTitle.focus({ preventScroll: true }); });
 
     if (kind === 'locked') {
+      /* One clock, rendered once, in a slot of its own. It is aria-hidden and
+         does not sit inside the announced sentence, so a screen reader is not
+         interrupted every second for a quarter of an hour. */
+      el.blockedClock.hidden = false;
       startCountdown('blocked', LOCK_SECS, function (left, label) {
-        var slot = el.blockedBody.querySelector('[data-countdown="blocked"]');
-        if (slot) { slot.textContent = label; }
-        el.blockedMeta.hidden = false;
-        el.blockedMeta.textContent = label;
-      }, function () { resetNumberStage(el.phoneInput.value); });
+        el.blockedClock.textContent = label;
+      }, function () {
+        el.blockedClock.hidden = true;
+        el.blockedBody.textContent = def.whenDone.body;
+        el.blockedMeta.hidden = true;
+        paintBlockedActions(def.whenDone.actions);
+        announce(def.whenDone.body);
+      });
+    } else {
+      el.blockedClock.hidden = true;
     }
   }
 
@@ -2334,8 +2689,9 @@ button { background: none; border: none; color: inherit; }
     'code/verifying':   { label: 'Checking',         run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
-                            clearTimers(); S.verifying = true; lockOtp(true);
-                            el.otpCta.innerHTML = spinnerMarkup(); setBtn(el.otpCta, false);
+                            clearTimers(); S.verifying = true; lockOtp(true); setCodeBusy(true);
+                            setHelper(el.otpHelper, spinnerMarkup(14, 'var(--color-border)', 'var(--color-text-secondary)') +
+                              '<span>Checking code…</span>');
                           } },
     'code/err-wrong':   { label: 'Wrong code',       run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true });
@@ -2346,29 +2702,33 @@ button { background: none; border: none; color: inherit; }
                             clearTimers(); S.attemptsLeft = 2; showCodeWrong();
                           } },
     'code/err-expired': { label: 'Code expired',     run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); showCodeExpired(); } },
-    'code/slow':        { label: 'Slow delivery',    run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); renderAlert(el.codeAlert, CODE_ALERTS.slow); } },
+    'code/slow':        { label: 'Slow delivery',    run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                            setCodeView('slow'); renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.slow));
+                          } },
     'code/resend-ready':{ label: 'Resend available', run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
-                            el.resendBtn.disabled = false; el.resendBtn.textContent = 'Resend now';
+                            el.resendBtn.disabled = false;
+                            el.resendBtn.textContent = 'Resend on WhatsApp';
                           } },
     'code/resend-limit':{ label: 'Resend limit',     run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); S.resendsLeft = 0; showResendLimit(); } },
     'code/sms-sent':    { label: 'Fell back to SMS', run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); switchChannel('sms'); } },
     'code/err-offline': { label: 'No connection',    run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
-                            renderAlert(el.codeAlert, CODE_ALERTS.offline);
+                            showCodeAlert('offline');
                           } },
     'code/err-server':  { label: 'Server error',     run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
-                            renderAlert(el.codeAlert, CODE_ALERTS.server);
+                            showCodeAlert('server');
                           } },
     'code/success':     { label: 'Code confirmed',   run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
                             el.otpGroup.setAttribute('data-state', 'valid');
-                            setHelper(el.otpHelper, 'Code confirmed.', 'success');
-                            setBtn(el.otpCta, true);
+                            setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
+                            setCodeView('confirmed');
                           } },
 
     /* Blocked */
@@ -2438,7 +2798,13 @@ button { background: none; border: none; color: inherit; }
       { key: 'text', label: 'Large text', on: function () { return el.root.getAttribute('data-text') === 'large'; },
         toggle: function () { el.root.setAttribute('data-text', el.root.getAttribute('data-text') === 'large' ? 'default' : 'large'); } },
       { key: 'net', label: 'Offline', on: function () { return isOffline(); },
-        toggle: function () { el.root.setAttribute('data-net', isOffline() ? 'online' : 'offline'); } },
+        /* Toggling back on stands in for the device regaining signal, so it
+           fires the same reconnect path a real device would. */
+        toggle: function () {
+          var back = isOffline();
+          el.root.setAttribute('data-net', back ? 'online' : 'offline');
+          if (back) { onReconnect(); }
+        } },
       { key: 'keyboard', label: 'Keyboard open', on: function () { return el.frame.getAttribute('data-keyboard') === 'open'; },
         toggle: function () {
           if (el.frame.getAttribute('data-keyboard') === 'open') {
@@ -2498,6 +2864,24 @@ button { background: none; border: none; color: inherit; }
     });
   }
 
+  /* Content taller than the sheet is a real possibility once the keyboard
+     takes half the screen, so the sheet says so rather than simply ending. */
+  function markOverflow() {
+    var sc = el.sheet.querySelector('.o-signup-sheet__scroll');
+    if (!sc) { return; }
+    /* Trailing padding is not content. The fade appears only when something
+       readable is below the fold, not for the last few pixels of a gutter. */
+    var more = sc.scrollHeight - sc.clientHeight - sc.scrollTop > 12;
+    if (more) { el.sheet.setAttribute('data-more', 'true'); }
+    else { el.sheet.removeAttribute('data-more'); }
+  }
+  el.sheet.querySelector('.o-signup-sheet__scroll').addEventListener('scroll', markOverflow);
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(markOverflow);
+    ro.observe(el.sheet.querySelector('.o-signup-sheet__body'));
+    ro.observe(el.sheet);
+  }
+
   /* ════════════════════════════════════════════════════════════════════
      WIRING
      ════════════════════════════════════════════════════════════════════ */
@@ -2508,8 +2892,13 @@ button { background: none; border: none; color: inherit; }
       el.phoneInput.removeAttribute('aria-invalid');
       el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
       el.phoneCta.hidden = false;
-      setHelper(el.phoneHelper, "We'll send a code to this number on WhatsApp. A small amount of data is needed.");
+      setHelper(el.phoneHelper, WHATSAPP_HELPER);
       hideAlert(el.numberAlert);
+      /* A different number is a different situation: the send limit and the
+         failure tally both belonged to the old one. */
+      stopCountdown('number');
+      el.phoneCta.textContent = 'Continue';
+      S.fails = {};
     }
     paintPhoneValidity();
   });
@@ -2526,7 +2915,22 @@ button { background: none; border: none; color: inherit; }
     setHelper(el.phoneHelper, 'Enter 9 digits after +27.', 'error');
   });
   el.phoneCta.addEventListener('click', submitPhone);
-  el.otpCta.addEventListener('click', submitOtp);
+
+  /* A driver who walks back into signal should not have to work out that the
+     screen in front of them is now stale. The retry the card offers happens
+     on its own the moment the connection returns. */
+  function onReconnect() {
+    if (isOffline() || S.sending) { return; }
+    if (S.stage === 'number' && !el.numberAlert.hidden &&
+        el.numberAlert.querySelector('[data-act="retrySend"]')) {
+      submitPhone();
+    } else if (S.stage === 'code' && !el.codeAlert.hidden &&
+               el.codeAlert.querySelector('[data-act="retryVerify"]')) {
+      hideAlert(el.codeAlert);
+      submitOtp();
+    }
+  }
+  window.addEventListener('online', onReconnect);
   el.resendBtn.addEventListener('click', function () { if (!el.resendBtn.disabled) { resendCode(); } });
   el.channelSwitchBtn.addEventListener('click', function () { switchChannel(S.channel === 'whatsapp' ? 'sms' : 'whatsapp'); });
   el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
@@ -2586,7 +2990,9 @@ button { background: none; border: none; color: inherit; }
   });
 
   /* Public handle, used by the update overlay button. */
-  window.Demo = { go: go };
+  /* The state list and the live state, exposed for the test harness that
+     drives every state in a real browser rather than reading the source. */
+  window.Demo = { go: go, states: function () { return STATES; }, S: function () { return S; } };
 
   /* ════════════════════════════════════════════════════════════════════
      BOOT
@@ -2712,9 +3118,9 @@ button { background: none; border: none; color: inherit; }
     { name: '.a-btn--onDark', level: 'atom', lines: [
         ['background', 'var(--color-surface)'], ['color', 'var(--color-text-primary)'], ['box-shadow', 'var(--shadow-btn-white)']
       ], states: [['use', 'primary action on the dark hero only']] },
-    { name: '.a-btn--whatsapp', level: 'atom', lines: [
-        ['background', 'var(--color-whatsapp)'], ['color', 'var(--color-on-whatsapp)'],
-        ['box-shadow', 'var(--shadow-whatsapp)']
+    { name: '.o-signup-sheet__secondary', level: 'organism', lines: [
+        ['base', '.a-btn--outline .a-btn--sm'], ['margin-top', 'var(--sp-1)'],
+        ['glyph', 'var(--color-whatsapp-dark)']
       ], states: [['use', 'only for an action that leaves the app for WhatsApp']] },
     { name: '.a-field', level: 'atom', lines: [
         ['min-height', '56px'], ['padding', '0 var(--sp-4)'], ['gap', 'var(--sp-3)'],
@@ -2722,10 +3128,9 @@ button { background: none; border: none; color: inherit; }
         ['background', 'var(--glass-card-bg)'], ['box-shadow', 'var(--shadow-field)']
       ], states: [
         [':focus-within', 'border-color: var(--color-primary) plus a 3px var(--color-primary-12) ring'],
-        ['[data-valid="true"]', 'border-color: var(--color-primary), tick fades in'],
         ['[data-state="error"]', 'border-color: var(--color-error-text); background: var(--color-secondary-bg); aria-invalid on the input'],
         ['[data-state="pending"]', 'opacity .6, input disabled'],
-        ['note', 'focus and validity are separate axes on purpose, so focusing a complete field cannot hide its own tick']
+        ['note', 'focus is :focus-within on the field, so the ring follows the border rather than the bare input']
       ] },
     { name: '.a-otp-cell', level: 'atom', lines: [
         ['flex', '1, max-width 52px'], ['aspect-ratio', '1 / 1'],
@@ -2758,10 +3163,12 @@ button { background: none; border: none; color: inherit; }
         ['--onDark', 'translucent white over the hero, white title']
       ] },
     { name: '.m-phone-field', level: 'molecule', lines: [
-        ['composition', '.a-field + prefix + input + tick'],
+        ['composition', '.a-field + prefix + input'],
         ['prefix', 'flag 20px, +27 at var(--text-body) / 800, 1px divider'],
         ['input', 'var(--text-subhead) / 600, caret var(--color-primary)']
-      ], states: [['affix', 'the tick is .a-field__affix, owned by the atom, revealed on [data-valid="true"]']] },
+      ], states: [
+        ['note', 'no validity tick: nine digits is a complete number, not a recognised one, so only the server can confirm it']
+      ] },
     { name: '.m-otp-group', level: 'molecule', lines: [
         ['display', 'flex, gap 6px, space-between'],
         ['children', 'six .a-otp-cell'],
@@ -2972,7 +3379,7 @@ button { background: none; border: none; color: inherit; }
       ['Placeholder',            '--color-text-tertiary',  card,   4.5, 'field'],
       ['Disabled label',         '--color-text-tertiary',  sunken, 4.5, 'sunken'],
       ['Hero lede',              '--color-on-dark-soft',   hero,   4.5, 'hero'],
-      ['WhatsApp badge',         '--color-whatsapp-dark',  tok('--color-whatsapp-bg'), 4.5, 'badge'],
+      ['WhatsApp glyph',         '--color-whatsapp-dark',  sheet,  4.5, 'sheet'],
       ['Alert body on info',     '--color-text-secondary', tok('--color-primary-light'), 4.5, 'tint'],
       ['Alert body on error',    '--color-text-secondary', tok('--color-secondary-bg'),  4.5, 'tint'],
       ['Alert body on warning',  '--color-text-secondary', tok('--color-warning-bg'),    4.5, 'tint'],
