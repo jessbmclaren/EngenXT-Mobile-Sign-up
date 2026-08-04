@@ -593,9 +593,12 @@ button { background: none; border: none; color: inherit; }
 .o-auth-hero__body {
   position: relative; z-index: var(--z-content); flex: 1;
   display: flex; flex-direction: column;
-  padding: 0 var(--sp-6) max(40px, env(safe-area-inset-bottom, 40px));
+  padding: 0 var(--sp-6) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
 }
+/* 12px binds the 42px hero to its lede. The bind scales with the type it
+   holds: 4 under the sheet's 22px title, 8 under an 18px outcome heading,
+   12 under the hero. Space proportional to type, one rule, three sizes. */
 .o-auth-hero__title {
   margin-top: auto;
   font-size: var(--text-hero); font-weight: 800; color: var(--color-text-on-dark);
@@ -606,7 +609,7 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-on-dark-soft); margin-bottom: var(--sp-8);
 }
 .o-auth-hero__notice { margin-bottom: var(--sp-4); }
-.o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-auth-hero__actions .a-btn { width: 100%; }
 
 /* o-status-page. A blocking status with one recovery action. Used whenever
@@ -762,9 +765,14 @@ button { background: none; border: none; color: inherit; }
   display: flex; gap: var(--sp-2);
   animation: stageIn var(--dur-sheet) var(--ease-out) both;
 }
-.o-signup-sheet__stage[data-state="active"][data-shake="true"] {
-  animation: shakeX var(--dur-slow) ease;
-}
+/* The shake lives on the control the driver can correct, never on the stage.
+   Two animations on one element share one `animation` shorthand, so when the
+   shake ended the shorthand fell back to stageIn and replayed the entrance:
+   the field, the helper, the card and the button faded out and floated back
+   up half a second after the error arrived. Different elements, no shared
+   property, no replay. It also points at the thing that is wrong instead of
+   moving the whole column, including the parts that are fine. */
+[data-shake="true"] { animation: shakeX var(--dur-slow) ease; }
 /* A card about the control above it is the next group along. 8 + 8 = 16. */
 .o-signup-sheet__stage > [id$="Alert"] { margin-top: var(--sp-2); }
 /* A decision, one step clear of a group boundary. 8 + 16 = 24. */
@@ -826,9 +834,39 @@ button { background: none; border: none; color: inherit; }
   position: sticky; top: var(--sp-8);
   max-height: calc(100vh - var(--sp-8) * 2); overflow-y: auto;
   background: var(--color-surface); border-radius: var(--radius-card);
-  padding: var(--sp-4) var(--sp-3);
+  /* No top padding: the switcher supplies its own and sits flush, so it can
+     cover the list scrolling under it rather than letting it show above. */
+  padding: 0 var(--sp-3) var(--sp-4);
   box-shadow: var(--shadow-card);
 }
+/* o-state-nav__switcher. Sticky inside the nav's own scroller, so the way
+   between the two views is never scrolled away in a list this long. */
+.o-state-nav__switcher {
+  position: sticky; top: 0; z-index: var(--z-content);
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1);
+  /* Negative inline margins pull the background out to the nav's edges so
+     nothing shows in the gutters as the list passes underneath. */
+  margin-inline: calc(var(--sp-3) * -1);
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.o-state-nav__tab {
+  min-height: var(--size-target); cursor: pointer;
+  padding: var(--sp-2) var(--sp-1); border-radius: var(--radius-chip);
+  border: 1px solid transparent; background: none;
+  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  color: var(--color-text-secondary);
+  transition: background .15s, color .15s;
+}
+.o-state-nav__tab:hover { background: var(--color-surface-hover); }
+.o-state-nav__tab[data-state="active"] {
+  background: var(--color-primary-light); color: var(--color-primary-dark);
+  border-color: var(--color-primary-12);
+}
+/* The first heading in a view has the switcher above it, so it does not also
+   reach for the separation a heading normally takes from the group before. */
+.o-state-nav__view > .o-state-nav__heading:first-child { margin-top: var(--sp-1); }
 .o-state-nav__heading {
   font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
   text-transform: uppercase; color: var(--color-text-secondary);
@@ -895,6 +933,13 @@ button { background: none; border: none; color: inherit; }
   gap: var(--sp-6); padding: var(--sp-8) var(--sp-6);
 }
 .p-signup-demo__stage { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+/* p-signup-demo__rail. Everything that reads out about the device, stacked
+   beside it and sticky, so the eye never leaves the phone to find the answer. */
+.p-signup-demo__rail {
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  align-self: flex-start; position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - var(--sp-8) * 2);
+}
 .p-signup-demo__caption {
   font-size: var(--text-micro); color: var(--color-text-secondary); text-align: center;
   max-width: 390px; line-height: 1.5;
@@ -903,6 +948,9 @@ button { background: none; border: none; color: inherit; }
 @media (max-width: 900px) {
   .p-signup-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
   .o-state-nav { position: static; width: 100%; max-width: 390px; max-height: none; }
+  /* One column, so the rail stops being a rail and stacks under the device. */
+  .p-signup-demo__rail { position: static; max-height: none; width: 100%; align-items: center; }
+  .d-inspect { width: 100%; max-width: 390px; }
 }
 /* Six squares and five gaps cannot each clear 48px inside 320. The row takes
    the largest size that fits rather than pretending the rule holds. */
@@ -924,7 +972,7 @@ button { background: none; border: none; color: inherit; }
 @keyframes scrimIn   { from { opacity: 0 } to { opacity: 1 } }
 @keyframes scrimOut  { from { opacity: 1 } to { opacity: 0 } }
 @keyframes stageIn   { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
-@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-7px) } 75% { transform: translateX(7px) } }
+@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(calc(var(--sp-1) * -1)) } 75% { transform: translateX(var(--sp-1)) } }
 @keyframes pop       { from { opacity: 0; transform: scale(.5) } to { opacity: 1; transform: scale(1) } }
 @keyframes spin      { to { transform: rotate(360deg) } }
 
@@ -992,9 +1040,8 @@ button { background: none; border: none; color: inherit; }
 }
 
 .d-panel {
-  width: var(--d-panel-width); flex-shrink: 0; align-self: flex-start;
-  position: sticky; top: var(--sp-8);
-  max-height: calc(100vh - 64px); overflow-y: auto;
+  width: var(--d-panel-width); flex-shrink: 0;
+  min-height: 0; overflow-y: auto;
   background: var(--color-surface); border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   display: none;
@@ -1107,7 +1154,7 @@ button { background: none; border: none; color: inherit; }
 
 /* Inspector card, docked under the device */
 .d-inspect {
-  width: 390px; max-width: 100%; display: none;
+  width: 300px; max-width: 100%; flex-shrink: 0; display: none;
   background: var(--d-surface-ink); color: var(--color-text-on-dark); border-radius: var(--radius-card);
   padding: var(--sp-3) var(--sp-4) var(--sp-4);
   box-shadow: var(--shadow-inspect);
@@ -1149,7 +1196,7 @@ button { background: none; border: none; color: inherit; }
 [data-inspect="on"] .d-hoverRing[data-state="visible"] { display: block; }
 
 @media (max-width: 900px) {
-  .d-panel { position: static; width: 100%; max-width: var(--d-panel-width); max-height: none; }
+  .d-panel { width: 100%; max-width: var(--d-panel-width); max-height: none; }
 }
 </style>
 </head>
@@ -1159,6 +1206,17 @@ button { background: none; border: none; color: inherit; }
 
   <!-- ══ STATE NAV ══════════════════════════════════════════════════════ -->
   <nav class="o-state-nav" id="stateNav" aria-label="Prototype states">
+
+    <!-- Sticky, because the state list is long and the way back to the
+         developer controls should never be a scroll away. -->
+    <div class="o-state-nav__switcher" role="tablist" aria-label="Sidebar view">
+      <button class="o-state-nav__tab" id="tabStates" type="button" role="tab"
+              aria-selected="true" aria-controls="viewStates" data-state="active">States</button>
+      <button class="o-state-nav__tab" id="tabNotes" type="button" role="tab"
+              aria-selected="false" aria-controls="viewNotes">Design notes</button>
+    </div>
+
+    <div class="o-state-nav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
     <p class="o-state-nav__heading">Home</p>
     <div id="navHome"></div>
 
@@ -1178,13 +1236,16 @@ button { background: none; border: none; color: inherit; }
     <p class="o-state-nav__heading">Done</p>
     <div id="navDone"></div>
 
-    <div class="o-state-nav__rule"></div>
+    </div>
+
+    <div class="o-state-nav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
     <p class="o-state-nav__heading">Modes</p>
     <div id="navModes"></div>
 
     <div class="o-state-nav__rule"></div>
     <p class="o-state-nav__heading">Key</p>
     <div class="o-key" id="navKey"></div>
+    </div>
   </nav>
 
   <!-- ══ DEVICE ═════════════════════════════════════════════════════════ -->
@@ -1434,6 +1495,12 @@ button { background: none; border: none; color: inherit; }
 
     <p class="p-signup-demo__caption" id="caption">Pick a state on the left, or drive the flow with the numbers in the key.</p>
 
+  </div>
+
+  <!-- The right rail. Readouts belong beside the thing they describe, not under
+       it: docking the inspector below the phone made a driver of the reviewer,
+       hovering at the top of the screen and reading at the bottom. -->
+  <div class="p-signup-demo__rail" id="demoRail">
     <div class="d-inspect" id="inspectCard" aria-hidden="true">
       <div class="d-inspect__head">
         <span class="d-inspect__sel" id="inspectSel">Hover anything in the phone</span>
@@ -1441,9 +1508,8 @@ button { background: none; border: none; color: inherit; }
       </div>
       <div class="d-inspect__grid" id="inspectGrid"></div>
     </div>
+    <aside class="d-panel" id="specPanel" aria-label="Design specification"></aside>
   </div>
-
-  <aside class="d-panel" id="specPanel" aria-label="Design specification"></aside>
 </div>
 
 <script>
@@ -1750,6 +1816,9 @@ button { background: none; border: none; color: inherit; }
     verifying: false,
     sending: false,
     dismissArmed: false,
+    /* True only while the navigator is placing a state directly, so feedback
+       meant for a driver's own action does not fire for a reviewer's click. */
+    jumping: false,
     /* Consecutive failures per kind, so a state can earn an extra action
        rather than showing every possible one from the first attempt. */
     fails: {}
@@ -1793,7 +1862,12 @@ button { background: none; border: none; color: inherit; }
      ════════════════════════════════════════════════════════════════════ */
   function isOffline() { return el.root.getAttribute('data-net') === 'offline'; }
   function announce(msg) { el.announcer.textContent = ''; setTimeout(function () { el.announcer.textContent = msg; }, 60); }
+  /* The shake answers something the driver just did. Jumping straight to a
+     state from the navigator is not something they did, so the sheet stays
+     still: a reviewer stepping down the list was getting a flinch per click
+     for errors nobody had made. */
   function shake(node) {
+    if (S.jumping) { return; }
     node.removeAttribute('data-shake'); void node.offsetWidth; node.setAttribute('data-shake', 'true');
     setTimeout(function () { node.removeAttribute('data-shake'); }, 500);
   }
@@ -2158,7 +2232,7 @@ button { background: none; border: none; color: inherit; }
     }
     if (def.hideCta === true || def.cta === 'countdown') { releaseKeyboard(); }
     el.phoneInput.readOnly = false;
-    shake(el.stageNumber);
+    shake(el.phoneField);
   }
 
   function submitPhone() {
@@ -2170,14 +2244,14 @@ button { background: none; border: none; color: inherit; }
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter a valid mobile number.'
         : 'Enter 9 digits after +27.', 'error');
-      shake(el.stageNumber);
+      shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
       return;
     }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
       setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
-      shake(el.stageNumber);
+      shake(el.phoneField);
       return;
     }
 
@@ -2388,7 +2462,7 @@ button { background: none; border: none; color: inherit; }
     if (!otpFull()) {
       el.otpGroup.setAttribute('data-state', 'error');
       setHelper(el.otpHelper, 'Enter all 6 digits.', 'error');
-      shake(el.stageCode);
+      shake(el.otpGroup);
       return;
     }
     /* Checking says what is happening, next to the thing it is happening to.
@@ -2449,7 +2523,7 @@ button { background: none; border: none; color: inherit; }
       msg += '<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
     }
     setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
-    shake(el.stageCode);
+    shake(el.otpGroup);
     setCodeView('wrong');
     /* Cleared now, not on a timer. A delayed clear races the driver: they
        start retyping into cells the timeout is about to empty. */
@@ -2844,7 +2918,8 @@ button { background: none; border: none; color: inherit; }
     var def = STATES[id];
     if (!def) { return; }
     currentState = id;
-    def.run();
+    S.jumping = true;
+    try { def.run(); } finally { S.jumping = false; }
     setNav(id);
     if (location.hash.slice(1) !== id) { history.replaceState(null, '', '#' + id); }
     el.caption.textContent = id + ' · ' + def.label;
@@ -3257,7 +3332,7 @@ button { background: none; border: none; color: inherit; }
         ['position', 'absolute bottom, full width'], ['max-height', '94%, scrolls'],
         ['border-radius', 'var(--radius-sheet) top corners only'],
         ['background', 'var(--glass-sheet-bg)'], ['backdrop-filter', 'var(--glass-sheet-bd)'],
-        ['box-shadow', 'var(--shadow-sheet)'], ['body padding', '0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom))'],
+        ['box-shadow', 'var(--shadow-sheet)'], ['body padding', '0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom))'],
         ['enter', 'sheetUp var(--dur-sheet) cubic-bezier(0.32,0.72,0,1)']
       ], states: [['stages', 'number | code | blocked | success, one visible at a time']] },
     { name: '.o-auth-hero', level: 'organism', lines: [
@@ -3658,7 +3733,9 @@ button { background: none; border: none; color: inherit; }
     { attr: 'data-grid',    label: '4px grid',            hint: 'check the spacing rhythm' }
   ];
   function buildDevNav() {
-    var nav = document.getElementById('stateNav');
+    /* The developer controls live in the notes view, not at the bottom of the
+       state list where reaching them meant scrolling past thirty-two states. */
+    var nav = document.getElementById('viewNotes');
     var rule = document.createElement('div');
     rule.className = 'o-state-nav__rule';
     var head = document.createElement('p');
@@ -3683,6 +3760,42 @@ button { background: none; border: none; color: inherit; }
       nav.appendChild(b);
     });
   }
+
+  /* ── Sidebar switcher ────────────────────────────────────────────────
+     Two views, one sticky control. Picking a state on the left is a different
+     job from turning on the developer overlays, and the long list should not
+     bury the short one. */
+  function buildSwitcher() {
+    var views = [
+      { tab: 'tabStates', view: 'viewStates' },
+      { tab: 'tabNotes',  view: 'viewNotes'  }
+    ];
+    function show(which) {
+      views.forEach(function (v) {
+        var on = v.tab === which;
+        var tab = document.getElementById(v.tab);
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) { tab.setAttribute('data-state', 'active'); }
+        else { tab.removeAttribute('data-state'); }
+        document.getElementById(v.view).hidden = !on;
+      });
+      /* A switched view starts at its own top, not at the scroll position the
+         previous one happened to be left at. */
+      document.getElementById('stateNav').scrollTop = 0;
+    }
+    views.forEach(function (v) {
+      document.getElementById(v.tab).addEventListener('click', function () { show(v.tab); });
+    });
+    /* Left and right move between tabs, which is what a tablist promises. */
+    document.querySelector('.o-state-nav__switcher').addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') { return; }
+      e.preventDefault();
+      var other = document.getElementById(
+        document.getElementById('tabStates').getAttribute('aria-selected') === 'true' ? 'tabNotes' : 'tabStates');
+      show(other.id); other.focus();
+    });
+  }
+  buildSwitcher();
 
   buildPanel();
   buildDevNav();
