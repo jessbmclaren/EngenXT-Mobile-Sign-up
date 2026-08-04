@@ -1555,9 +1555,23 @@ button { background: none; border: none; color: inherit; }
   var WA_ASK_NUMBER  = WA_MANAGER + encodeURIComponent('Hi, which mobile number did you register for me on EngenXT?');
   var WA_ASK_UNPAUSE = WA_MANAGER + encodeURIComponent('Hi, EngenXT says my driver access is paused. Please turn it back on when you can.');
   var WA_ASK_FLEET   = WA_MANAGER + encodeURIComponent("Hi, EngenXT says our company's access is inactive. Please contact Engen.");
-  var WA_SUPPORT    = 'https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT.';
+  var SUPPORT_TEL   = 'tel:+27800000000';
+  var WA_SUPPORT_N  = 'https://wa.me/27800000000?text=';
+  /* Support opens knowing which screen the driver came from. A generic "I need
+     help signing in" is wrong on the two screens where signing in is not the
+     problem, and it makes the driver explain what the app already knows. */
+  var WA_SUPPORT       = WA_SUPPORT_N + encodeURIComponent('Hi, I need help signing in to EngenXT.');
+  var WA_SUPPORT_LOCK  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT has paused my sign in for 15 minutes and I need to fuel now.');
+  var WA_SUPPORT_DOWN  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT says it is unavailable and I need to fuel now.');
   var WA_APP        = 'https://wa.me/';
-  var WHATSAPP_HELPER = "We'll send a code to this number on WhatsApp. A small amount of data is needed.";
+  /* The helper names the channel the driver is actually on. It used to be a
+     constant that said WhatsApp, so after switching to SMS the number screen
+     contradicted the choice they had just made. */
+  function sendHelper() {
+    return S.channel === 'sms'
+      ? "We'll send a code to this number by SMS."
+      : "We'll send a code to this number on WhatsApp. A small amount of data is needed.";
+  }
 
   /* Numbers that force an outcome, so the flow can be driven by hand. */
   var OUTCOMES = {
@@ -1788,7 +1802,7 @@ button { background: none; border: none; color: inherit; }
          pump right now, which is a different question and a real one. */
       meta: 'Need to fuel now? Contact support.',
       actions: [
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT_LOCK }
       ],
       /* When the clock runs out the screen stops explaining and starts
          offering the only thing the driver wanted. */
@@ -2196,7 +2210,7 @@ button { background: none; border: none; color: inherit; }
     el.phoneField.removeAttribute('data-state');
     el.phoneCta.hidden = false;
     hideAlert(el.numberAlert);
-    setHelper(el.phoneHelper, WHATSAPP_HELPER);
+    setHelper(el.phoneHelper, sendHelper());
     paintPhoneValidity();
     setBtn(el.phoneCta, phoneComplete(), 'Continue');
     showStage('number');
@@ -2244,7 +2258,7 @@ button { background: none; border: none; color: inherit; }
       }, function () {
         hideAlert(el.numberAlert);
         el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
-        setHelper(el.phoneHelper, WHATSAPP_HELPER);
+        setHelper(el.phoneHelper, sendHelper());
         setBtn(el.phoneCta, phoneComplete(), 'Send code');
         announce('You can request another code now.');
       });
@@ -2271,7 +2285,7 @@ button { background: none; border: none; color: inherit; }
     if (d.length !== 9) {
       el.phoneField.setAttribute('data-state', 'error');
       setHelper(el.phoneHelper, d.length === 0
-        ? 'Enter a valid mobile number.'
+        ? 'Enter your mobile number.'
         : 'Enter 9 digits after +27.', 'error');
       shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
@@ -2545,6 +2559,8 @@ button { background: none; border: none; color: inherit; }
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS[kind], 'code:' + kind));
   }
 
+  var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
+
   function showCodeWrong() {
     S.attemptsLeft -= 1;
     setOtpTone('error');
@@ -2605,7 +2621,10 @@ button { background: none; border: none; color: inherit; }
     setOtpTone(null);
     lockOtp(false);
     paintOtp();
-    setHelper(el.otpHelper, '&nbsp;');
+    /* A fresh code does not give back a spent attempt, so the warning about
+       what the next wrong one costs survives the resend. */
+    if (S.attemptsLeft === 1) { setHelper(el.otpHelper, LAST_TRY_NOTE, 'warning'); }
+    else { setHelper(el.otpHelper, '&nbsp;'); }
     setCodeView('sent');
     renderAlert(el.codeAlert, resolveDef(S.channel === 'whatsapp' ? CODE_ALERTS.waSent : CODE_ALERTS.smsSent));
     startResendCooldown();
@@ -2621,7 +2640,7 @@ button { background: none; border: none; color: inherit; }
     el.resendBtn.disabled = true;
     startCountdown('code', LOCK_SECS, function (left, label) {
       /* One clock, in the control being waited for. */
-      el.resendBtn.textContent = 'Request code in ' + label;
+      el.resendBtn.textContent = 'Resend code in ' + label;
     }, function () {
       el.resendBtn.disabled = false;
       el.resendBtn.textContent = S.channel === 'whatsapp' ? 'Resend on WhatsApp' : 'Resend by SMS';
@@ -2745,7 +2764,7 @@ button { background: none; border: none; color: inherit; }
       body: "You can't sign in right now. If you need to fuel, call your manager.",
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retryHome' },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT_DOWN }
       ]
     },
     update: {
@@ -2780,7 +2799,15 @@ button { background: none; border: none; color: inherit; }
       primary.setAttribute('aria-disabled', 'false');
       primary.dataset.action = 'retry';
       help.hidden = false;
-      help.textContent = 'Contact support';
+      /* Offline is the one screen where the usual route is unreachable, so it
+         offers the one that still works without data. */
+      if (isOffline()) {
+        help.textContent = 'Call support';
+        help.href = SUPPORT_TEL;
+      } else {
+        help.textContent = 'Contact support';
+        help.href = WA_SUPPORT_DOWN;
+      }
     } else {
       primary.textContent = 'Continue with mobile number';
       primary.disabled = false;
@@ -2788,6 +2815,7 @@ button { background: none; border: none; color: inherit; }
       primary.dataset.action = 'enter';
       help.hidden = false;
       help.textContent = 'Need help signing in?';
+      help.href = WA_SUPPORT;
     }
   }
 
@@ -3087,7 +3115,7 @@ button { background: none; border: none; color: inherit; }
       el.phoneInput.removeAttribute('aria-invalid');
       el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
       el.phoneCta.hidden = false;
-      setHelper(el.phoneHelper, WHATSAPP_HELPER);
+      setHelper(el.phoneHelper, sendHelper());
       hideAlert(el.numberAlert);
       /* A different number is a different situation: the send limit and the
          failure tally both belonged to the old one. */
