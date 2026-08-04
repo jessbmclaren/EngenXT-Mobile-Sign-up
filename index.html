@@ -152,7 +152,7 @@
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
-  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px; --sp-12: 48px;
 
   /* Hardware. The status bar keeps its own height token because layout has to
      stop short of it, and the notch and time are drawn against the same value. */
@@ -299,7 +299,7 @@ button { background: none; border: none; color: inherit; }
 
 /* a-label */
 .a-label {
-  display: block; margin-bottom: calc(var(--sp-4) * -1 + var(--sp-2));
+  display: block;
   font-size: var(--text-caption); font-weight: 600;
   color: var(--color-text-secondary);
 }
@@ -356,7 +356,7 @@ button { background: none; border: none; color: inherit; }
 
 /* a-helper */
 .a-helper {
-  display: block; margin-top: var(--sp-2);
+  display: block;
   font-size: var(--text-caption2); line-height: 1.5;
   color: var(--color-text-secondary);
 }
@@ -491,7 +491,6 @@ button { background: none; border: none; color: inherit; }
 }
 .m-sheet-header__sub {
   font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
-  min-height: 39px;
 }
 /* The masked number is one token. Breaking it across two lines turns a
    number the driver is checking against their handset into two fragments. */
@@ -514,7 +513,7 @@ button { background: none; border: none; color: inherit; }
 .m-progress {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
-  margin-bottom: var(--sp-4h);
+  margin-bottom: var(--sp-4);
 }
 
 /* m-phone-field */
@@ -552,6 +551,8 @@ button { background: none; border: none; color: inherit; }
 /* When a state withdraws one of the two, the survivor centres rather than
    sitting hard left where its partner used to balance it. */
 .m-resend-row[data-single="true"] { justify-content: center; }
+/* Peers of the secondary above them, one group along. 8 + 8 = 16. */
+.o-signup-sheet__stage > .m-resend-row { margin-top: var(--sp-2); }
 /* Hidden means gone, including from a flex row that would otherwise still
    reserve its gap. */
 [hidden] { display: none !important; }
@@ -654,9 +655,28 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   box-shadow: var(--shadow-sheet);
 }
-/* With the keyboard up there is less room, so the rhythm tightens by one step
-   rather than pushing the last control off the bottom. */
-.t-device-frame[data-keyboard="open"] .o-signup-sheet__stage[data-state="active"] { gap: var(--sp-3); }
+/* THE COMPRESSION ORDER.
+
+   The keyboard takes roughly half the screen, so something has to give. It
+   must not be the base gap: the base gap is what says which things belong
+   together, and that matters most when there is least room to read it.
+
+   So the space comes off what the driver has already finished with, in order,
+   and the ordering below is the order it is given up in.
+
+   1. Tooling. It was never product layout. (.d-demoHint, hidden by its own
+      rule beside the rest of the developer layer.)
+   2. Orientation. A driver who is mid-type knows which step they are on, so
+      the step counter is the least useful height on the screen. */
+.t-device-frame[data-keyboard="open"] .m-progress { display: none; }
+/* 3. Instruction, but only where it has been acted on. On the number stage the
+      subtitle says which number to use and the driver is now typing it. On the
+      code stage it names the channel and the masked number, which is exactly
+      what a driver checks against their handset mid-code, so it stays. */
+.t-device-frame[data-keyboard="open"] .o-signup-sheet[data-stage="number"] .m-sheet-header__sub { display: none; }
+/* 4. Only then the loose steps. */
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__cta,
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__secondary { margin-top: var(--sp-2); }
 .t-device-frame[data-keyboard="open"] .o-signup-sheet__body {
   padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom, 0px));
 }
@@ -718,32 +738,69 @@ button { background: none; border: none; color: inherit; }
   mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-7)), transparent 100%);
 }
 .o-signup-sheet__body {
-  padding: 0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom, 0px));
+  /* The action needs visible room beneath it, and the device's own safe area
+     is on top of that rather than instead of it. max() gave whichever was
+     larger, so on a device with an indicator the button sat on it. */
+  padding: 0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column;
 }
-/* The organism owns the vertical rhythm. Nothing in the markup sets spacing. */
+/* The organism owns the vertical rhythm. Nothing in the markup sets spacing.
+
+   ONE SCALE, THREE MEANINGS. The base gap is the tightest relationship on the
+   stage, and anything looser adds a step to it, so every rendered gap is 8, 16
+   or 24 and each number means one thing:
+
+     8   parts of one thing        label to its field, field to its helper,
+                                   the cells to the line that reports on them
+     16  one group to the next     the control block to the card about it
+     24  a decision, or a different route
+
+   Gaps used to be composed as 16 plus a 4px nudge, which rendered 18 and 20:
+   values close enough to the group step to read as noise rather than meaning. */
 .o-signup-sheet__stage { display: none; flex-direction: column; }
 .o-signup-sheet__stage[data-state="active"] {
-  display: flex; gap: var(--sp-4);
+  display: flex; gap: var(--sp-2);
   animation: stageIn var(--dur-sheet) var(--ease-out) both;
 }
 .o-signup-sheet__stage[data-state="active"][data-shake="true"] {
   animation: shakeX var(--dur-slow) ease;
 }
-/* The helper belongs to the control above it, so it rides tighter. */
-.o-signup-sheet__stage .a-helper { margin-top: calc(var(--sp-4) * -1 + var(--sp-2)); }
-.o-signup-sheet__cta { margin-top: var(--sp-1); }
-/* Resend belongs to the cells above it, so it sits on their left edge rather
-   than floating in the centre of the stage. */
+/* A card about the control above it is the next group along. 8 + 8 = 16. */
+.o-signup-sheet__stage > [id$="Alert"] { margin-top: var(--sp-2); }
+/* A decision, one step clear of a group boundary. 8 + 16 = 24. */
+.o-signup-sheet__cta { margin-top: var(--sp-4); }
+/* Resend belongs to the cells above it: it is what a driver does when the
+   code did not come, so it stays in that cluster at the base gap and sits on
+   their left edge rather than floating in the centre of the stage. */
 .o-signup-sheet__resend { align-self: flex-start; padding-inline: 0; }
-/* Everything below the cells is a way around the task, not the task, so it
-   is separated from the cells and never given the primary fill. */
-.o-signup-sheet__secondary { margin-top: var(--sp-1); }
+/* Below here the driver has left the task and is taking another route, which
+   is a decision, so it earns the same separation the primary action gets. */
+.o-signup-sheet__secondary { margin-top: var(--sp-4); }
 .o-signup-sheet__secondary svg { flex: none; }
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
    states and the success state, and the tone lives on data-tone. */
-.o-outcome-panel { align-items: center; text-align: center; padding-top: var(--sp-2); }
+.o-signup-sheet__stage.o-outcome-panel[data-state="active"] {
+  align-items: center; text-align: center; padding-top: var(--sp-2);
+  /* The base is the tightest relation on the panel: a title and the line that
+     completes it. Everything looser adds to it. */
+  gap: var(--sp-2);
+}
+/* 8 + 16 = 24. The icon is the badge for the title, one group away. */
+.o-outcome-panel__title { margin-top: var(--sp-4); }
+/* 8 + 0 = 8. The body ends "Try again in:" and the clock finishes the
+   sentence, so they are one statement and sit as one. */
+/* 8 + 16 = 24. A different subject: not the wait, but the way round it. */
+.o-outcome-panel__meta { margin-top: var(--sp-4); }
+/* 8 + 24 = 32. The panel is one centred group and the action closes it. */
+.o-outcome-panel__actions { margin-top: var(--sp-6); }
+/* On success the header empties completely, so the group would otherwise start
+   8px under the handle. It gets the same run-in the header used to give it. */
+.o-signup-sheet[data-stage="success"] .o-outcome-panel { padding-top: var(--sp-12); }
+/* 8 + 0 = 8. When the aside is present the button belongs to it, not to the
+   clock. :not([hidden]) because an adjacent sibling still matches when the
+   sibling is display:none. */
+.o-outcome-panel__meta:not([hidden]) + .o-outcome-panel__actions { margin-top: 0; }
 /* The title takes focus so a screen reader announces the new screen. It is not
    a tab stop, so no keyboard user ever lands on it by tabbing, and painting a
    ring around a heading only makes it look like a control. */
@@ -775,13 +832,18 @@ button { background: none; border: none; color: inherit; }
 .o-state-nav__heading {
   font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
   text-transform: uppercase; color: var(--color-text-secondary);
-  padding: var(--sp-2) var(--sp-2) var(--sp-1); margin-top: var(--sp-1);
+  /* --sp-2h matches the items' inline padding exactly, so the label and the
+     list it heads sit on one left edge. */
+  padding: var(--sp-2) var(--sp-2h) var(--sp-1); margin-top: var(--sp-1);
 }
 .o-state-nav__heading:first-child { margin-top: 0; }
 .o-state-nav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
+/* Rows are tight so the list reads as a list. At 6px vertical the gap between
+   two items was 12px against the 10px that bound a group label to its own
+   items, so the label read as just another row. */
 .o-state-nav__item {
   display: block; width: 100%; text-align: left; cursor: pointer;
-  padding: var(--sp-1h) var(--sp-2h); border-radius: var(--radius-chip);
+  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
   font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
   transition: background .15s, color .15s;
 }
@@ -791,7 +853,7 @@ button { background: none; border: none; color: inherit; }
 }
 .o-state-nav__toggle {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
-  width: 100%; cursor: pointer; padding: var(--sp-1h) var(--sp-2h); border-radius: var(--radius-chip);
+  width: 100%; cursor: pointer; padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
   font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
 }
 .o-state-nav__toggle:hover { background: var(--color-surface-hover); }
@@ -812,7 +874,7 @@ button { background: none; border: none; color: inherit; }
 .o-key { padding: var(--sp-2) var(--sp-2h) var(--sp-1); }
 .o-key__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
-  padding: 3px 0; font-size: var(--text-nano); color: var(--color-text-secondary);
+  padding: var(--sp-1) 0; font-size: var(--text-nano); color: var(--color-text-secondary);
 }
 .o-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
 
@@ -1429,7 +1491,6 @@ button { background: none; border: none; color: inherit; }
                '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
     var paths = {
       search:   '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
-      userX:    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5"/><path d="m22 8-5 5"/>',
       pause:    '<circle cx="12" cy="12" r="10"/><path d="M10 9v6"/><path d="M14 9v6"/>',
       building: '<path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 9h2a2 2 0 0 1 2 2v10"/><path d="M9 7h2"/><path d="M9 11h2"/><path d="M9 15h2"/>',
       clock:    '<circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/>',
@@ -1437,21 +1498,12 @@ button { background: none; border: none; color: inherit; }
       server:   '<rect width="18" height="7" x="3" y="4" rx="2"/><rect width="18" height="7" x="3" y="13" rx="2"/><path d="M7 7.5h.01"/><path d="M7 16.5h.01"/>',
       lock:     '<rect width="16" height="11" x="4" y="11" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
       alert:    '<path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
-      info:     '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
       message:  '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
       check:    '<path d="M20 6 9 17l-5-5"/>',
-      phone:    '<rect width="12" height="20" x="6" y="2" rx="2"/><path d="M11 18h2"/>',
       upload:   '<path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>'
     };
     return open + (paths[name] || paths.info) + '</svg>';
   }
-  function waGlyph(size, fill) {
-    var s = size || 14;
-    return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="' + (fill || 'currentColor') + '" aria-hidden="true">' +
-      '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>' +
-      '<path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
-  }
-
   /* ════════════════════════════════════════════════════════════════════
      COPY
      Every account-level failure a driver can hit, with a way out of each.
@@ -1670,6 +1722,7 @@ button { background: none; border: none; color: inherit; }
     scrim: $('sheetScrim'), sheet: $('sheet'),
     sheetTitle: $('sheetTitle'), sheetSub: $('sheetSub'),
     demoHint: $('demoHint'), sheetHeader: $('sheetHeader'), sheetHeading: $('sheetHeading'),
+    sheetClose: $('sheetClose'),
     progress: $('progress'),
     stageNumber: $('stageNumber'), stageCode: $('stageCode'),
     stageBlocked: $('stageBlocked'), stageSuccess: $('stageSuccess'),
@@ -1876,6 +1929,17 @@ button { background: none; border: none; color: inherit; }
     announce(def.title + '. ' + host.querySelector('.m-alert__body').textContent);
   }
   function hideAlert(host) { host.hidden = true; host.innerHTML = ''; }
+
+  /* When a card takes over and owns the actions, the driver has stopped typing.
+     Letting the keyboard stay up would leave it covering the only way out, so
+     focus is released and the keyboard goes with it. On a device this happens
+     because the field is no longer focused; the demo frame is told directly. */
+  function releaseKeyboard() {
+    var a = document.activeElement;
+    if (a && el.sheet.contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName)) { a.blur(); }
+    el.frame.removeAttribute('data-keyboard');
+    el.frame.style.removeProperty('--keyboard-inset');
+  }
   function toneColour(tone) {
     return tone === 'error'   ? 'var(--color-secondary)'
          : tone === 'warning' ? 'var(--color-warning)'
@@ -1963,6 +2027,10 @@ button { background: none; border: none; color: inherit; }
 
   function showStage(name) {
     S.stage = name;
+    /* The stage is published on the sheet so the layout can respond to it,
+       for instance when the keyboard needs space and only some stages can
+       give up their subtitle. */
+    el.sheet.setAttribute('data-stage', name);
     [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked], ['success', el.stageSuccess]]
       .forEach(function (pair) {
         if (pair[0] === name) { pair[1].setAttribute('data-state', 'active'); }
@@ -1976,7 +2044,9 @@ button { background: none; border: none; color: inherit; }
       else if (i === step) { dot.setAttribute('data-state', 'current'); }
       else { dot.removeAttribute('data-state'); }
     });
-    el.progress.style.display = (name === 'blocked') ? 'none' : 'flex';
+    /* An outcome is not a step. Counting to 2 of 2 on a finished journey adds
+       nothing and costs the group the room it wants. */
+    el.progress.style.display = (name === 'blocked' || name === 'success') ? 'none' : 'flex';
     var label = document.getElementById('progressLabel');
     if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
     /* Prototype scaffolding, kept out of the product copy so the sentence a
@@ -2001,6 +2071,7 @@ button { background: none; border: none; color: inherit; }
        actually says what happened, and pushed it down the screen. */
     var outcome = (name === 'blocked' || name === 'success');
     el.sheetHeading.hidden = outcome;
+    el.sheetClose.hidden = (name === 'success');
     if (outcome) { el.sheetHeader.setAttribute('data-heading', 'none'); }
     else { el.sheetHeader.removeAttribute('data-heading'); }
   }
@@ -2085,6 +2156,7 @@ button { background: none; border: none; color: inherit; }
       el.phoneCta.hidden = def.hideCta === true;
       setBtn(el.phoneCta, false, 'Continue');
     }
+    if (def.hideCta === true || def.cta === 'countdown') { releaseKeyboard(); }
     el.phoneInput.readOnly = false;
     shake(el.stageNumber);
   }
@@ -2354,6 +2426,7 @@ button { background: none; border: none; color: inherit; }
      read only until the driver asks to try again. */
   function showCodeAlert(kind, view) {
     lockOtp(true);
+    releaseKeyboard();
     setHelper(el.otpHelper, '&nbsp;');
     el.otpGroup.removeAttribute('data-state');
     setCodeView(view || kind);
@@ -2392,6 +2465,7 @@ button { background: none; border: none; color: inherit; }
     /* Neutral, not red. Nothing the driver typed was wrong, it simply aged. */
     el.otpGroup.removeAttribute('data-state');
     lockOtp(true);
+    releaseKeyboard();
     setHelper(el.otpHelper, '&nbsp;');
     stopCountdown('resend');
     setCodeView('expired');
@@ -2428,6 +2502,7 @@ button { background: none; border: none; color: inherit; }
   }
 
   function showResendLimit() {
+    releaseKeyboard();
     setCodeView('resendLimit');
     lockOtp(false);
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.resendLimit));
@@ -2448,6 +2523,9 @@ button { background: none; border: none; color: inherit; }
     clearTimeout(slowHintId);
     slowHintId = setTimeout(function () {
       if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden && !S.verifying) {
+        /* Twenty seconds without a code means the driver is waiting, not
+           typing, so the keyboard comes down and the card gets the room. */
+        releaseKeyboard();
         setCodeView('slow');
         renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.slow));
       }
@@ -2487,6 +2565,7 @@ button { background: none; border: none; color: inherit; }
     var def = BLOCKED[kind];
     if (!def) { return; }
     clearTimers();
+    releaseKeyboard();
     el.blockedIcon.setAttribute('data-tone', def.tone);
     el.blockedIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
     el.blockedTitle.textContent = def.title;
@@ -2519,12 +2598,13 @@ button { background: none; border: none; color: inherit; }
 
   function showSuccess() {
     clearTimers();
+    releaseKeyboard();
     var signup = S.mode === 'signup';
     el.successTitle.textContent = signup ? 'Your account is ready' : 'Welcome back';
     el.successBody.textContent = signup
       ? 'Next, scan the licence disc of the vehicle you drive.'
       : "You're signed in. Scan the licence disc of the vehicle you drive.";
-    el.successCta.textContent = 'Scan my licence disc';
+    el.successCta.textContent = 'Scan vehicle licence disc';
     el.successCta.onclick = function () { closeSheet(true); };
     showStage('success');
     announce(el.successTitle.textContent + '. ' + el.successBody.textContent);
@@ -2935,7 +3015,6 @@ button { background: none; border: none; color: inherit; }
   el.channelSwitchBtn.addEventListener('click', function () { switchChannel(S.channel === 'whatsapp' ? 'sms' : 'whatsapp'); });
   el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
   el.backToNumber.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
-  el.sheetClose = $('sheetClose');
   el.sheetClose.addEventListener('click', function () { closeSheet(); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
   el.scrim.addEventListener('click', function () { closeSheet(); });
