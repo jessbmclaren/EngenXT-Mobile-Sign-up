@@ -573,12 +573,6 @@ button { background: none; border: none; color: inherit; }
 /* When a state withdraws one of the two, the survivor centres rather than
    sitting hard left where its partner used to balance it. */
 .m-resend-row[data-single="true"] { justify-content: center; }
-/* A prototype that hands over to another one should be walkable in both
-   directions, or the second flow is only reachable by finding the file. */
-.d-stateNav__item--link {
-  display: block; text-decoration: none;
-  color: var(--color-primary-dark); font-weight: 700;
-}
 /* Peers of the secondary above them, one group along. 8 + 8 = 16. */
 .o-signup-sheet__stage > .m-resend-row { margin-top: var(--sp-2); }
 /* Hidden means gone, including from a flex row that would otherwise still
@@ -856,7 +850,9 @@ button { background: none; border: none; color: inherit; }
 }
 .o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
-/* d-stateNav */
+
+/* The card itself. It belongs to the system rather than sitting apart from it,
+   because the inset the rows are measured against is set here. */
 .d-stateNav {
   width: 232px; flex-shrink: 0; align-self: flex-start;
   position: sticky; top: var(--sp-8);
@@ -866,126 +862,123 @@ button { background: none; border: none; color: inherit; }
      cover the list scrolling under it rather than letting it show above. */
   padding: 0 var(--sp-3) var(--sp-4);
   box-shadow: var(--shadow-card);
+  scrollbar-width: thin;
 }
-/* d-stateNav__switcher. Sticky inside the nav's own scroller, so the way
-   between the two views is never scrolled away in a list this long. */
+
+/* ── The sidebar, one row and one heading ─────────────────────────────
+   It had grown five row types: a 48px section, a 28px toggle, a 24px
+   heading, a 23px state and a 20px key line, across three type sizes and
+   two greys for the same kind of thing. Everything in this menu is a row
+   in a list, so there is one row, and what changes between them is what
+   sits at the trailing end.
+
+   These rows are 40px rather than the product's 48. The d- layer is a
+   desktop review surface driven with a mouse and it never ships, which is
+   the exemption the Targets rule already records. */
+.d-stateNav__heading,
+.d-stateNav__flow {
+  padding: var(--sp-3) var(--sp-2h) var(--sp-1);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+.d-stateNav__heading:first-child,
+.d-stateNav__flow:first-child { padding-top: var(--sp-2); }
+
+/* One row. Everything that can be clicked in this menu is this shape. */
+.d-stateNav__group,
+.d-stateNav__toggle,
+.d-stateNav__item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  width: 100%; min-height: 40px;
+  padding: var(--sp-1) var(--sp-2h);
+  border: none; background: none; border-radius: var(--radius-chip);
+  text-align: left; text-decoration: none; cursor: pointer;
+  font-size: var(--text-caption2); font-weight: 600;
+  color: var(--color-text-primary);
+  transition: background .15s, color .15s;
+}
+.d-stateNav__group:hover,
+.d-stateNav__toggle:hover,
+.d-stateNav__item:hover { background: var(--color-surface-hover); }
+
+/* The label takes the room so anything trailing is pushed to the end. Three
+   children on space-between left the count adrift in the middle of the row,
+   related to nothing on either side of it. */
+.d-stateNav__group > span:first-child,
+.d-stateNav__toggle > span:first-child,
+.d-stateNav__item { flex: 1 1 auto; }
+
+/* The trailing cluster: a count and a chevron, or a switch. Quiet, because it
+   is metadata and the name of the thing is what you are reading. */
+.d-stateNav__meta {
+  flex: 0 0 auto; display: flex; align-items: center; gap: var(--sp-1h);
+  color: var(--color-text-tertiary);
+}
+.d-stateNav__count {
+  font-size: var(--text-nano); font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 14px; text-align: right;
+}
+.d-stateNav__chev { flex-shrink: 0; opacity: .55; }
+
+/* One selected state, whatever the row is. */
+.d-stateNav__group[aria-expanded="true"],
+.d-stateNav__item[data-state="active"] {
+  background: var(--color-primary-light); color: var(--color-primary-dark);
+}
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-primary-dark); }
+/* The state you are actually looking at, which is a different thing from the
+   section you have open. */
+.d-stateNav__item[aria-current="true"] {
+  background: var(--color-secondary-12); color: var(--color-error-text); font-weight: 700;
+}
+.d-stateNav__item--link { color: var(--color-primary-dark); font-weight: 700; }
+
+.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
+
+/* The switcher sits on the same rhythm as everything under it. */
 .d-stateNav__switcher {
   position: sticky; top: 0; z-index: var(--z-content);
   display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1);
-  /* Negative inline margins pull the background out to the nav's edges so
-     nothing shows in the gutters as the list passes underneath. */
   margin-inline: calc(var(--sp-3) * -1);
   padding: var(--sp-3) var(--sp-3) var(--sp-2);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-light);
 }
 .d-stateNav__tab {
-  min-height: var(--size-target); cursor: pointer;
-  padding: var(--sp-2) var(--sp-1); border-radius: var(--radius-chip);
+  min-height: 40px; cursor: pointer;
+  padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-chip);
   border: 1px solid transparent; background: none;
-  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  font-size: var(--text-caption2); font-weight: 600;
   color: var(--color-text-secondary);
   transition: background .15s, color .15s;
 }
 .d-stateNav__tab:hover { background: var(--color-surface-hover); }
 .d-stateNav__tab[data-state="active"] {
   background: var(--color-primary-light); color: var(--color-primary-dark);
-  border-color: var(--color-primary-12);
+  border-color: var(--color-primary-12); font-weight: 700;
 }
-/* The first heading in a view has the switcher above it, so it does not also
-   reach for the separation a heading normally takes from the group before. */
-.d-stateNav__view > .d-stateNav__heading:first-child { margin-top: var(--sp-1); }
-.d-stateNav__heading {
-  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
-  text-transform: uppercase; color: var(--color-text-secondary);
-  /* --sp-2h matches the items' inline padding exactly, so the label and the
-     list it heads sit on one left edge. */
-  padding: var(--sp-2) var(--sp-2h) var(--sp-1); margin-top: var(--sp-1);
-}
-.d-stateNav__heading:first-child { margin-top: 0; }
-.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
-/* Rows are tight so the list reads as a list. At 6px vertical the gap between
-   two items was 12px against the 10px that bound a group label to its own
-   items, so the label read as just another row. */
-.d-stateNav__item {
-  display: block; width: 100%; text-align: left; cursor: pointer;
-  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
-  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
-  transition: background .15s, color .15s;
-}
-.d-stateNav__item:hover { background: var(--color-surface-hover); }
-.d-stateNav__item[data-state="active"] {
-  background: var(--color-secondary-12); color: var(--color-error-text); font-weight: 700;
-}
-.d-stateNav__toggle {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
-  width: 100%; cursor: pointer; padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
-  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
-}
-.d-stateNav__toggle:hover { background: var(--color-surface-hover); }
-.d-stateNav__switch {
-  width: 34px; height: var(--sp-5); border-radius: var(--radius-pill);
-  background: var(--color-switch-track); flex-shrink: 0; position: relative; transition: background .18s;
-}
-.d-stateNav__switch::after {
-  content: ""; position: absolute; top: 2px; left: 2px;
-  width: var(--sp-4); height: var(--sp-4); border-radius: var(--radius-circle);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-knob); transition: transform var(--dur-fast) var(--ease-in-out);
-}
-.d-stateNav__toggle[data-state="on"] .d-stateNav__switch { background: var(--color-primary); }
-.d-stateNav__toggle[data-state="on"] .d-stateNav__switch::after { transform: translateX(14px); }
 
-/* d-key, the legend of demo inputs */
-.d-key { padding: var(--sp-2) var(--sp-2h) var(--sp-1); }
+/* The key is a two-column read, not a list of controls, so it is the one
+   thing here that is not a row. It still shares the type and the inset. */
+.d-key { padding: var(--sp-1) var(--sp-2h) var(--sp-2); }
 .d-key__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
-  padding: var(--sp-1) 0; font-size: var(--text-nano); color: var(--color-text-secondary);
+  padding: var(--sp-1) 0;
+  font-size: var(--text-nano); color: var(--color-text-secondary);
 }
-.d-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
+.d-key__code {
+  font-family: var(--font-mono); font-size: var(--text-nano);
+  color: var(--color-text-primary); white-space: nowrap;
+}
 
-/* ── d-stateNav, two levels ───────────────────────────────────────────
-   The list of states outgrew a single column: thirty seven of them under
-   five headings meant scrolling past the whole prototype to reach the end.
-   The sidebar now names the sections and a panel beside it holds the states
-   in the one you opened, which is the shape a long menu wants. */
-.d-stateNav__flow {
-  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
-  text-transform: uppercase; color: var(--color-text-tertiary);
-  padding: var(--sp-2) var(--sp-2h) var(--sp-1); margin-top: var(--sp-2);
+/* The panel's rows are the same rows, so the two read as one menu. */
+.d-flyout__list { padding: var(--sp-2) var(--sp-3) var(--sp-3); }
+.d-flyout__title { font-size: var(--text-caption2); font-weight: 800; color: var(--color-text-primary); }
+.d-flyout__hint {
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  font-size: var(--text-nano); color: var(--color-text-tertiary);
+  border-top: 1px solid var(--color-border-light);
 }
-.d-stateNav__flow:first-of-type { margin-top: 0; }
-.d-stateNav__group {
-  display: flex; align-items: center; gap: var(--sp-2);
-  width: 100%; cursor: pointer; text-align: left;
-  min-height: var(--size-target);
-  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-2h);
-  border-radius: var(--radius-chip);
-  border: none; background: none;
-  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
-  transition: background .15s;
-}
-/* The label takes the room, so the count and the chevron are pushed together
-   at the end. Three children on space-between put the count adrift in the
-   middle of the row, related to nothing on either side of it. */
-.d-stateNav__group > span:first-child { flex: 1 1 auto; }
-.d-stateNav__meta {
-  flex: 0 0 auto; display: flex; align-items: center; gap: var(--sp-1h);
-  color: var(--color-text-tertiary);
-}
-.d-stateNav__group:hover { background: var(--color-surface-hover); }
-/* The open section stays marked while its panel is up, so the sidebar always
-   says which one you are looking at. */
-.d-stateNav__group[aria-expanded="true"] {
-  background: var(--color-primary-light); color: var(--color-primary-dark);
-}
-.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-primary-dark); }
-/* Metadata, not content: it says how many without competing with the name. */
-.d-stateNav__count {
-  font-size: var(--text-nano); font-weight: 700;
-  font-variant-numeric: tabular-nums; min-width: 14px; text-align: right;
-}
-.d-stateNav__chev { flex-shrink: 0; opacity: .55; }
 
 /* d-flyout. The states of the open section. Sticky and scrolling on its own,
    so a long list never drags the page with it. */
@@ -1002,7 +995,6 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-3) var(--sp-2) var(--sp-2) var(--sp-4);
   border-bottom: 1px solid var(--color-border-light);
 }
-.d-flyout__title { font-size: var(--text-caption); font-weight: 800; color: var(--color-text-primary); }
 .d-flyout__close {
   flex-shrink: 0; width: var(--size-target); height: var(--size-target);
   display: flex; align-items: center; justify-content: center;
@@ -1012,19 +1004,9 @@ button { background: none; border: none; color: inherit; }
   margin-right: calc(var(--sp-2) * -1);
 }
 .d-flyout__close:hover { background: var(--color-surface-hover); }
-.d-flyout__list {
-  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-  padding: var(--sp-2) var(--sp-3) var(--sp-3);
-  scrollbar-width: thin;
-}
 /* Selecting a state does not close the panel: stepping through a section is
    the job, and closing after each one would cost two clicks a state. */
 .d-flyout .d-stateNav__item { width: 100%; }
-.d-flyout__hint {
-  padding: var(--sp-2) var(--sp-4) var(--sp-3);
-  font-size: var(--text-nano); color: var(--color-text-tertiary);
-  border-top: 1px solid var(--color-border-light);
-}
 
 @media (max-width: 900px) {
   /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
