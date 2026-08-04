@@ -157,7 +157,7 @@
   /* Hardware. The status bar keeps its own height token because layout has to
      stop short of it, and the notch and time are drawn against the same value. */
   --size-status-bar: 78px;
-  --sp-1h: 6px; --sp-2h: 10px; --sp-4h: 18px;
+  --sp-1h: 6px; --sp-2h: 10px;
 
   /* Size. Values that are neither spacing nor type. */
   --size-otp-cell: 52px;
@@ -292,6 +292,9 @@ button { background: none; border: none; color: inherit; }
 /* Quiet is still a live control, so it differentiates upward from disabled
    rather than sharing its grey. */
 .a-link--quiet { color: var(--color-text-secondary); font-weight: 600; }
+/* Flush drops the inline padding so the label sits on the container's content
+   edge. The vertical padding stays, because the 48px target depends on it. */
+.a-link--flush { padding-inline: 0; }
 .a-link--onDark {
   color: var(--color-text-on-dark); text-decoration: underline;
   text-underline-offset: 3px; text-decoration-color: var(--color-on-dark-faint);
@@ -529,14 +532,18 @@ button { background: none; border: none; color: inherit; }
    gaps fill the content width at 320. Error carries extra border weight as
    well as colour, so the two outcomes differ by more than hue. */
 .m-otp-group { display: flex; gap: var(--sp-1h); justify-content: space-between; }
-.m-otp-group[data-state="valid"] .a-otp-cell {
+/* The group's outcome belongs to every cell in it, so the group propagates a
+   tone to its members and each cell decides what that tone looks like. Two
+   axes on the cell, because a cell can be filled and wrong at the same time:
+   data-state is what the driver typed, data-tone is what came back. */
+.a-otp-cell[data-tone="valid"] {
   border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-success);
 }
-.m-otp-group[data-state="error"] .a-otp-cell {
+.a-otp-cell[data-tone="error"] {
   border-width: 2.5px;
   border-color: var(--color-error-text); background: var(--color-secondary-bg); color: var(--color-error-text);
 }
-.m-otp-group[data-state="locked"] .a-otp-cell { opacity: .45; }
+.a-otp-cell[data-tone="locked"] { opacity: .45; }
 
 /* m-resend-row. Wraps rather than crushing its labels under large text, and
    the negative inline margin pulls the links back onto the content edge that
@@ -545,9 +552,9 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--sp-2); row-gap: var(--sp-2); flex-wrap: wrap;
 }
-/* The links sit on the same content edge as the cells and the CTA, so their
-   horizontal padding goes rather than the row growing to compensate. */
-.m-resend-row .a-link { padding-inline: 0; }
+/* .a-link--flush is the atom's own variant for sitting on a content edge. It
+   is a modifier rather than a rule in the row, because the padding belongs to
+   the link and a molecule must not reach in and cancel it. */
 /* When a state withdraws one of the two, the survivor centres rather than
    sitting hard left where its partner used to balance it. */
 .m-resend-row[data-single="true"] { justify-content: center; }
@@ -780,7 +787,7 @@ button { background: none; border: none; color: inherit; }
 /* Resend belongs to the cells above it: it is what a driver does when the
    code did not come, so it stays in that cluster at the base gap and sits on
    their left edge rather than floating in the centre of the stage. */
-.o-signup-sheet__resend { align-self: flex-start; padding-inline: 0; }
+.o-signup-sheet__resend { align-self: flex-start; }
 /* Below here the driver has left the task and is taking another route, which
    is a decision, so it earns the same separation the primary action gets. */
 .o-signup-sheet__secondary { margin-top: var(--sp-4); }
@@ -828,8 +835,8 @@ button { background: none; border: none; color: inherit; }
 }
 .o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
-/* o-state-nav */
-.o-state-nav {
+/* d-stateNav */
+.d-stateNav {
   width: 232px; flex-shrink: 0; align-self: flex-start;
   position: sticky; top: var(--sp-8);
   max-height: calc(100vh - var(--sp-8) * 2); overflow-y: auto;
@@ -839,9 +846,9 @@ button { background: none; border: none; color: inherit; }
   padding: 0 var(--sp-3) var(--sp-4);
   box-shadow: var(--shadow-card);
 }
-/* o-state-nav__switcher. Sticky inside the nav's own scroller, so the way
+/* d-stateNav__switcher. Sticky inside the nav's own scroller, so the way
    between the two views is never scrolled away in a list this long. */
-.o-state-nav__switcher {
+.d-stateNav__switcher {
   position: sticky; top: 0; z-index: var(--z-content);
   display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1);
   /* Negative inline margins pull the background out to the nav's edges so
@@ -851,7 +858,7 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-light);
 }
-.o-state-nav__tab {
+.d-stateNav__tab {
   min-height: var(--size-target); cursor: pointer;
   padding: var(--sp-2) var(--sp-1); border-radius: var(--radius-chip);
   border: 1px solid transparent; background: none;
@@ -859,62 +866,62 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-secondary);
   transition: background .15s, color .15s;
 }
-.o-state-nav__tab:hover { background: var(--color-surface-hover); }
-.o-state-nav__tab[data-state="active"] {
+.d-stateNav__tab:hover { background: var(--color-surface-hover); }
+.d-stateNav__tab[data-state="active"] {
   background: var(--color-primary-light); color: var(--color-primary-dark);
   border-color: var(--color-primary-12);
 }
 /* The first heading in a view has the switcher above it, so it does not also
    reach for the separation a heading normally takes from the group before. */
-.o-state-nav__view > .o-state-nav__heading:first-child { margin-top: var(--sp-1); }
-.o-state-nav__heading {
+.d-stateNav__view > .d-stateNav__heading:first-child { margin-top: var(--sp-1); }
+.d-stateNav__heading {
   font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
   text-transform: uppercase; color: var(--color-text-secondary);
   /* --sp-2h matches the items' inline padding exactly, so the label and the
      list it heads sit on one left edge. */
   padding: var(--sp-2) var(--sp-2h) var(--sp-1); margin-top: var(--sp-1);
 }
-.o-state-nav__heading:first-child { margin-top: 0; }
-.o-state-nav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
+.d-stateNav__heading:first-child { margin-top: 0; }
+.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
 /* Rows are tight so the list reads as a list. At 6px vertical the gap between
    two items was 12px against the 10px that bound a group label to its own
    items, so the label read as just another row. */
-.o-state-nav__item {
+.d-stateNav__item {
   display: block; width: 100%; text-align: left; cursor: pointer;
   padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
   font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
   transition: background .15s, color .15s;
 }
-.o-state-nav__item:hover { background: var(--color-surface-hover); }
-.o-state-nav__item[data-state="active"] {
+.d-stateNav__item:hover { background: var(--color-surface-hover); }
+.d-stateNav__item[data-state="active"] {
   background: var(--color-secondary-12); color: var(--color-error-text); font-weight: 700;
 }
-.o-state-nav__toggle {
+.d-stateNav__toggle {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
   width: 100%; cursor: pointer; padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-chip);
   font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
 }
-.o-state-nav__toggle:hover { background: var(--color-surface-hover); }
-.o-state-nav__switch {
+.d-stateNav__toggle:hover { background: var(--color-surface-hover); }
+.d-stateNav__switch {
   width: 34px; height: var(--sp-5); border-radius: var(--radius-pill);
   background: var(--color-switch-track); flex-shrink: 0; position: relative; transition: background .18s;
 }
-.o-state-nav__switch::after {
+.d-stateNav__switch::after {
   content: ""; position: absolute; top: 2px; left: 2px;
   width: var(--sp-4); height: var(--sp-4); border-radius: var(--radius-circle);
   background: var(--color-surface);
   box-shadow: var(--shadow-knob); transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.o-state-nav__toggle[data-state="on"] .o-state-nav__switch { background: var(--color-primary); }
-.o-state-nav__toggle[data-state="on"] .o-state-nav__switch::after { transform: translateX(14px); }
+.d-stateNav__toggle[data-state="on"] .d-stateNav__switch { background: var(--color-primary); }
+.d-stateNav__toggle[data-state="on"] .d-stateNav__switch::after { transform: translateX(14px); }
 
-/* o-key, the legend of demo inputs */
-.o-key { padding: var(--sp-2) var(--sp-2h) var(--sp-1); }
-.o-key__row {
+/* d-key, the legend of demo inputs */
+.d-key { padding: var(--sp-2) var(--sp-2h) var(--sp-1); }
+.d-key__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
   padding: var(--sp-1) 0; font-size: var(--text-nano); color: var(--color-text-secondary);
 }
-.o-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
+.d-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
 
 /* ══ TEMPLATES ═══════════════════════════════════════════════════════════ */
 .t-device-frame {
@@ -947,7 +954,7 @@ button { background: none; border: none; color: inherit; }
 
 @media (max-width: 900px) {
   .p-signup-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
-  .o-state-nav { position: static; width: 100%; max-width: 390px; max-height: none; }
+  .d-stateNav { position: static; width: 100%; max-width: 390px; max-height: none; }
   /* One column, so the rail stops being a rail and stacks under the device. */
   .p-signup-demo__rail { position: static; max-height: none; width: 100%; align-items: center; }
   .d-inspect { width: 100%; max-width: 390px; }
@@ -960,7 +967,7 @@ button { background: none; border: none; color: inherit; }
 @media (max-width: 440px) {
   .p-signup-demo { padding: 0; gap: 0; }
   .t-device-frame { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
-  .o-state-nav { max-width: none; border-radius: 0; }
+  .d-stateNav { max-width: none; border-radius: 0; }
 }
 
 /* ══ MOTION ══════════════════════════════════════════════════════════════ */
@@ -1205,46 +1212,46 @@ button { background: none; border: none; color: inherit; }
 <div class="p-signup-demo">
 
   <!-- ══ STATE NAV ══════════════════════════════════════════════════════ -->
-  <nav class="o-state-nav" id="stateNav" aria-label="Prototype states">
+  <nav class="d-stateNav" id="stateNav" aria-label="Prototype states">
 
     <!-- Sticky, because the state list is long and the way back to the
          developer controls should never be a scroll away. -->
-    <div class="o-state-nav__switcher" role="tablist" aria-label="Sidebar view">
-      <button class="o-state-nav__tab" id="tabStates" type="button" role="tab"
+    <div class="d-stateNav__switcher" role="tablist" aria-label="Sidebar view">
+      <button class="d-stateNav__tab" id="tabStates" type="button" role="tab"
               aria-selected="true" aria-controls="viewStates" data-state="active">States</button>
-      <button class="o-state-nav__tab" id="tabNotes" type="button" role="tab"
+      <button class="d-stateNav__tab" id="tabNotes" type="button" role="tab"
               aria-selected="false" aria-controls="viewNotes">Design notes</button>
     </div>
 
-    <div class="o-state-nav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
-    <p class="o-state-nav__heading">Home</p>
+    <div class="d-stateNav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
+    <p class="d-stateNav__heading">Home</p>
     <div id="navHome"></div>
 
-    <div class="o-state-nav__rule"></div>
-    <p class="o-state-nav__heading">Number</p>
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Number</p>
     <div id="navNumber"></div>
 
-    <div class="o-state-nav__rule"></div>
-    <p class="o-state-nav__heading">Code</p>
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Code</p>
     <div id="navCode"></div>
 
-    <div class="o-state-nav__rule"></div>
-    <p class="o-state-nav__heading">Blocked</p>
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Blocked</p>
     <div id="navBlocked"></div>
 
-    <div class="o-state-nav__rule"></div>
-    <p class="o-state-nav__heading">Done</p>
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Done</p>
     <div id="navDone"></div>
 
     </div>
 
-    <div class="o-state-nav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
-    <p class="o-state-nav__heading">Modes</p>
+    <div class="d-stateNav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
+    <p class="d-stateNav__heading">Modes</p>
     <div id="navModes"></div>
 
-    <div class="o-state-nav__rule"></div>
-    <p class="o-state-nav__heading">Key</p>
-    <div class="o-key" id="navKey"></div>
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Key</p>
+    <div class="d-key" id="navKey"></div>
     </div>
   </nav>
 
@@ -1379,7 +1386,7 @@ button { background: none; border: none; color: inherit; }
 
             <div id="codeAlert" tabindex="-1" hidden></div>
 
-            <button class="a-link o-signup-sheet__resend" id="resendBtn" type="button" disabled>Resend code in 0:45</button>
+            <button class="a-link a-link--flush o-signup-sheet__resend" id="resendBtn" type="button" disabled>Resend code in 0:45</button>
 
             <button class="a-btn a-btn--outline a-btn--sm o-signup-sheet__secondary" id="openWhatsappBtn" type="button">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-whatsapp-dark)" aria-hidden="true">
@@ -1392,8 +1399,8 @@ button { background: none; border: none; color: inherit; }
             <!-- The two ways out of this stage, both quiet, because neither is
                  the task. The task is the six digits above. -->
             <div class="m-resend-row">
-              <button class="a-link a-link--quiet" id="channelSwitchBtn" type="button">Send by SMS</button>
-              <button class="a-link a-link--quiet" id="backToNumberBtn" type="button">Use a different number</button>
+              <button class="a-link a-link--quiet a-link--flush" id="channelSwitchBtn" type="button">Send by SMS</button>
+              <button class="a-link a-link--quiet a-link--flush" id="backToNumberBtn" type="button">Use a different number</button>
             </div>
           </div>
 
@@ -2113,11 +2120,6 @@ button { background: none; border: none; color: inherit; }
 
     /* Header and progress follow the stage. */
     var step = name === 'number' ? 0 : name === 'code' ? 1 : 2;
-    Array.prototype.forEach.call(el.progress.children, function (dot, i) {
-      if (i < step) { dot.setAttribute('data-state', 'done'); }
-      else if (i === step) { dot.setAttribute('data-state', 'current'); }
-      else { dot.removeAttribute('data-state'); }
-    });
     /* An outcome is not a step. Counting to 2 of 2 on a finished journey adds
        nothing and costs the group the room it wants. */
     el.progress.style.display = (name === 'blocked' || name === 'success') ? 'none' : 'flex';
@@ -2353,7 +2355,7 @@ button { background: none; border: none; color: inherit; }
 
   function buildOtp() {
     el.otpGroup.innerHTML = '';
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     for (var i = 0; i < 6; i++) {
       var cell = document.createElement('input');
       cell.className = 'a-otp-cell';
@@ -2373,6 +2375,15 @@ button { background: none; border: none; color: inherit; }
     });
   }
   function cells() { return Array.prototype.slice.call(el.otpGroup.querySelectorAll('.a-otp-cell')); }
+  /* The group keeps its own attribute so a selector can still ask about the
+     whole row, and hands the same tone to each cell so the atom paints itself. */
+  function setOtpTone(tone) {
+    if (tone) { el.otpGroup.setAttribute('data-state', tone); }
+    else { el.otpGroup.removeAttribute('data-state'); }
+    cells().forEach(function (c) {
+      if (tone) { c.setAttribute('data-tone', tone); } else { c.removeAttribute('data-tone'); }
+    });
+  }
   function otpFull() { return S.otp.join('').length === 6; }
 
   function paintOtp() {
@@ -2422,8 +2433,8 @@ button { background: none; border: none; color: inherit; }
       c.readOnly = locked;
       if (locked) { c.setAttribute('aria-disabled', 'true'); } else { c.removeAttribute('aria-disabled'); }
     });
-    if (locked) { el.otpGroup.setAttribute('data-state', 'locked'); }
-    else if (el.otpGroup.getAttribute('data-state') === 'locked') { el.otpGroup.removeAttribute('data-state'); }
+    if (locked) { setOtpTone('locked'); }
+    else if (el.otpGroup.getAttribute('data-state') === 'locked') { setOtpTone(null); }
   }
 
   function onOtpInput(i, cell) {
@@ -2431,7 +2442,7 @@ button { background: none; border: none; color: inherit; }
     if (v.length > 1) { cell.value = ''; fillFrom(i, v.slice(0, 6 - i)); return; }
     cell.value = v;
     S.otp[i] = v;
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     setHelper(el.otpHelper, '&nbsp;');
     paintOtp();
     if (cell.value && i < 5) { cells()[i + 1].focus({ preventScroll: true }); }
@@ -2460,7 +2471,7 @@ button { background: none; border: none; color: inherit; }
   function submitOtp() {
     if (S.verifying) { return; }
     if (!otpFull()) {
-      el.otpGroup.setAttribute('data-state', 'error');
+      setOtpTone('error');
       setHelper(el.otpHelper, 'Enter all 6 digits.', 'error');
       shake(el.otpGroup);
       return;
@@ -2486,7 +2497,7 @@ button { background: none; border: none; color: inherit; }
       if (entered !== GOOD_CODE) { lockOtp(false); showCodeWrong(); return; }
 
       lockOtp(false);
-      el.otpGroup.setAttribute('data-state', 'valid');
+      setOtpTone('valid');
       setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
       /* The task is finished, so every way back out of it goes now rather
          than lingering behind the transition. */
@@ -2502,14 +2513,14 @@ button { background: none; border: none; color: inherit; }
     lockOtp(true);
     releaseKeyboard();
     setHelper(el.otpHelper, '&nbsp;');
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     setCodeView(view || kind);
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS[kind], 'code:' + kind));
   }
 
   function showCodeWrong() {
     S.attemptsLeft -= 1;
-    el.otpGroup.setAttribute('data-state', 'error');
+    setOtpTone('error');
 
     if (S.attemptsLeft <= 0) { showBlocked('locked'); return; }
 
@@ -2529,7 +2540,7 @@ button { background: none; border: none; color: inherit; }
        start retyping into cells the timeout is about to empty. */
     S.otp = ['', '', '', '', '', ''];
     paintOtp();
-    el.otpGroup.setAttribute('data-state', 'error');
+    setOtpTone('error');
     var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
   }
 
@@ -2537,7 +2548,7 @@ button { background: none; border: none; color: inherit; }
     S.otp = ['', '', '', '', '', ''];
     paintOtp();
     /* Neutral, not red. Nothing the driver typed was wrong, it simply aged. */
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     lockOtp(true);
     releaseKeyboard();
     setHelper(el.otpHelper, '&nbsp;');
@@ -2564,7 +2575,7 @@ button { background: none; border: none; color: inherit; }
     if (S.resendsLeft <= 0) { showResendLimit(); return; }
     S.resendsLeft -= 1;
     S.otp = ['', '', '', '', '', ''];
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     lockOtp(false);
     paintOtp();
     setHelper(el.otpHelper, '&nbsp;');
@@ -2612,7 +2623,7 @@ button { background: none; border: none; color: inherit; }
     stopCountdown('code');
     S.channel = to;
     S.otp = ['', '', '', '', '', ''];
-    el.otpGroup.removeAttribute('data-state');
+    setOtpTone(null);
     if (S.stage !== 'code') { goToCode({ fresh: true }); }
     showStage('code');
     lockOtp(false);
@@ -2880,7 +2891,7 @@ button { background: none; border: none; color: inherit; }
     'code/success':     { label: 'Code confirmed',   run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
-                            el.otpGroup.setAttribute('data-state', 'valid');
+                            setOtpTone('valid');
                             setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
                             setCodeView('confirmed');
                           } },
@@ -2927,7 +2938,7 @@ button { background: none; border: none; color: inherit; }
 
   function setNav(id) {
     currentState = id;
-    Array.prototype.forEach.call(document.querySelectorAll('.o-state-nav__item'), function (b) {
+    Array.prototype.forEach.call(document.querySelectorAll('.d-stateNav__item'), function (b) {
       if (b.dataset.stateId === id) { b.setAttribute('data-state', 'active'); b.setAttribute('aria-current', 'true'); }
       else { b.removeAttribute('data-state'); b.removeAttribute('aria-current'); }
     });
@@ -2939,7 +2950,7 @@ button { background: none; border: none; color: inherit; }
       NAV_GROUPS[host].forEach(function (id) {
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'o-state-nav__item';
+        b.className = 'd-stateNav__item';
         b.textContent = STATES[id].label;
         b.dataset.stateId = id;
         b.addEventListener('click', function () { go(id); });
@@ -2980,9 +2991,9 @@ button { background: none; border: none; color: inherit; }
     MODES.forEach(function (m) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'o-state-nav__toggle';
+      b.className = 'd-stateNav__toggle';
       b.dataset.mode = m.key;
-      b.innerHTML = '<span>' + m.label + '</span><span class="o-state-nav__switch"></span>';
+      b.innerHTML = '<span>' + m.label + '</span><span class="d-stateNav__switch"></span>';
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () { m.toggle(); syncModes(); });
       modesHost.appendChild(b);
@@ -3005,7 +3016,7 @@ button { background: none; border: none; color: inherit; }
       ['any other code', 'Wrong']
     ];
     $('navKey').innerHTML = keyRows.map(function (r) {
-      return '<div class="o-key__row"><span class="o-key__code">' + r[0] + '</span><span>' + r[1] + '</span></div>';
+      return '<div class="d-key__row"><span class="d-key__code">' + r[0] + '</span><span>' + r[1] + '</span></div>';
     }).join('');
   }
 
@@ -3128,7 +3139,7 @@ button { background: none; border: none; color: inherit; }
     if (tag === 'INPUT') { return; }
     if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') &&
         document.activeElement && document.activeElement.classList &&
-        document.activeElement.classList.contains('o-state-nav__item')) {
+        document.activeElement.classList.contains('d-stateNav__item')) {
       var ids = Object.keys(STATES);
       var i = ids.indexOf(currentState);
       if (i === -1) { i = 0; }
@@ -3211,7 +3222,10 @@ button { background: none; border: none; color: inherit; }
     if (n.indexOf('--shadow-') === 0) { return 'elevation'; }
     if (n.indexOf('--text-') === 0 || n.indexOf('--font-') === 0) { return 'type'; }
     if (n.indexOf('--ease-') === 0 || n.indexOf('--dur-') === 0) { return 'motion'; }
-    if (n.indexOf('--color-') === 0 || n.indexOf('--glass-') === 0) { return 'colour'; }
+    if (n.indexOf('--color-') === 0 || n.indexOf('--glass-') === 0 ||
+        n.indexOf('--gradient-') === 0) { return 'colour'; }
+    if (n.indexOf('--size-') === 0 || n.indexOf('--z-') === 0 ||
+        n.indexOf('--kb-') === 0 || n === '--hairline') { return 'layout'; }
     return 'other';
   }
   function subOf(n) {
@@ -3221,6 +3235,7 @@ button { background: none; border: none; color: inherit; }
     if (/^--color-(surface)/.test(n)) { return 'Surface'; }
     if (/^--color-border/.test(n)) { return 'Border'; }
     if (/^--glass-/.test(n)) { return 'Glass'; }
+    if (/^--gradient-/.test(n)) { return 'Gradient'; }
     return 'Other';
   }
 
@@ -3258,8 +3273,185 @@ button { background: none; border: none; color: inherit; }
 
   /* ── Component recipes, the part a dev builds from ───────────────── */
   var RECIPES = [
+    /* ── Atoms ──────────────────────────────────────────────────────── */
+    { name: '.a-label', level: 'atom', lines: [
+        ['display', 'block'],
+        ['font', 'var(--text-caption) / 600'],
+        ['color', 'var(--color-text-secondary)']
+      ], states: [
+        ['spacing', 'none of its own. The organism’s gap places it 8px above its field, which is the "parts of one thing" step.'],
+        ['a11y', 'always a real <label for>, never a floating placeholder, so the field keeps its name when it is filled.']
+      ] },
+    { name: '.a-link', level: 'atom', lines: [
+        ['min-height', 'var(--size-target)'],
+        ['padding', 'var(--sp-2) var(--sp-1)'],
+        ['font', 'var(--text-footnote) / 600, letter-spacing -0.1px'],
+        ['color', 'var(--color-primary-dark)'],
+        ['font-variant-numeric', 'tabular-nums, so a countdown does not jitter as its digits change']
+      ], states: [
+        ['--quiet', 'color: var(--color-text-secondary). Still live, so it differentiates upward from disabled rather than sharing its grey.'],
+        ['--flush', 'padding-inline: 0, for a link sitting on a container’s content edge. The vertical padding stays because the 48px target depends on it.'],
+        ['--onDark', 'color: var(--color-text-on-dark), underlined at 3px offset for the hero.'],
+        [':disabled', 'color: var(--color-text-tertiary), weight drops to 500.'],
+        ['a11y', 'a button element unless it truly navigates. Disabled uses the real attribute, so it leaves the focus order.']
+      ] },
+    { name: '.a-icon-wrap', level: 'atom', lines: [
+        ['size', '40px, or 64px with --lg'],
+        ['border-radius', 'var(--radius-card-sm), or var(--radius-circle) with --lg'],
+        ['background', 'var(--color-primary-light)'],
+        ['border', '1px solid var(--color-primary-08)']
+      ], states: [
+        ['[data-tone="error"]', 'var(--color-secondary-bg) on var(--color-secondary-12)'],
+        ['[data-tone="warning"]', 'var(--color-warning-bg) on var(--color-warning-border)'],
+        ['[data-tone="success"]', 'var(--color-success-bg) on var(--color-success-20)'],
+        ['[data-motion="pop"]', 'animation: pop .5s var(--ease-spring). Collapses to a still frame under reduced motion.'],
+        ['a11y', 'aria-hidden. The tone it carries is always also in the words beside it.']
+      ] },
+    { name: '.a-spinner', level: 'atom', lines: [
+        ['animation', 'spin .7s linear infinite'],
+        ['built by', 'spinnerMarkup(size, track, arc), so the same atom serves a filled button and a helper line']
+      ], states: [
+        ['reduced motion', 'the blanket rule freezes it; pair it with a word, never leave it alone to mean "working".'],
+        ['a11y', 'aria-hidden. The status it reports is announced through the helper text beside it.']
+      ] },
+    { name: '.a-scrim', level: 'atom', lines: [
+        ['position', 'absolute inset 0'],
+        ['z-index', 'var(--z-scrim)'],
+        ['background', 'var(--color-scrim)']
+      ], states: [
+        ['[data-state="opening"]', 'scrimIn var(--dur-base)'],
+        ['[data-state="closing"]', 'scrimOut .22s'],
+        ['note', 'a single-declaration overlay with no children, which is why it is an atom and not an organism.']
+      ] },
+    { name: '.a-toast', level: 'atom', lines: [
+        ['position', 'absolute, inset var(--sp-6), bottom 96px'],
+        ['background', 'var(--color-text-primary)'],
+        ['color', 'var(--color-text-on-dark)'],
+        ['radius', 'var(--radius-card-sm)'],
+        ['shadow', 'var(--shadow-toast)']
+      ], states: [
+        ['[data-state="visible"]', 'opacity 1'],
+        ['a11y', 'role="status". It never carries the only copy of anything a driver must act on.']
+      ] },
+    { name: '.a-handle', level: 'atom', lines: [
+        ['size', '36 x 5'], ['radius', 'var(--radius-pill)'], ['background', 'var(--color-handle)']
+      ], states: [['a11y', 'decorative. Its 48px drag target is the grab area around it, not the bar.']] },
+    { name: '.a-notch', level: 'atom', lines: [
+        ['size', '126 x 34'], ['background', 'var(--color-hardware)'],
+        ['radius', '0 0 var(--radius-notch) var(--radius-notch)']
+      ], states: [['note', 'device hardware, not product. It exists so the design can be judged against a real screen.']] },
+
+    /* ── Molecules ──────────────────────────────────────────────────── */
+    { name: '.m-sheet-header', level: 'molecule', lines: [
+        ['layout', 'flex, align-items flex-start, space-between, gap var(--sp-3)'],
+        ['margin-bottom', 'var(--sp-4)'],
+        ['__title', 'var(--text-title) / 800, letter-spacing -0.5px, margin-bottom var(--sp-1)'],
+        ['__sub', 'var(--text-caption) / 1.5, var(--color-text-secondary). Its <b> is nowrap so a masked number never breaks across lines.'],
+        ['__close', 'var(--size-target) square, glyph pushed to the trailing edge']
+      ], states: [
+        ['[data-heading="none"]', 'justify-content: flex-end, margin-bottom 0. Used on the outcome stages, where the panel carries its own heading and a second one above it would compete.'],
+        ['bind', 'title to sub is 4px. The bind scales with its type: 4 here, 8 under an 18px outcome heading, 12 under the 42px hero.']
+      ] },
+    { name: '.m-status-bar', level: 'molecule', lines: [
+        ['layout', 'flex, space-between'],
+        ['padding-top', 'max(var(--size-status-bar) - 24px, env(safe-area-inset-top))'],
+        ['__time', 'var(--text-body) / 600'],
+        ['__icons', 'gap var(--sp-1h)']
+      ], states: [
+        ['[data-tone="onDark"]', '__time takes var(--color-on-dark-strong)'],
+        ['note', 'device chrome. --size-status-bar is the height the sheet stops short of when the keyboard is up.']
+      ] },
+    { name: '.m-brand-lockup', level: 'molecule', lines: [
+        ['layout', 'flex, align-items center, gap var(--sp-2h)'],
+        ['__mark', '36 square, var(--color-secondary), var(--radius-card-sm)'],
+        ['__name', 'var(--text-title) / 900. Its <em> is the brand red, not italic.'],
+        ['__tag', 'var(--text-micro) / 500, uppercase, letter-spacing 1.5px, var(--color-on-dark-faint)']
+      ], states: [['use', 'the hero only. It is the one place the brand speaks at full size.']] },
+    { name: '.m-progress', level: 'molecule', lines: [
+        ['font', 'var(--text-micro) / 700, uppercase, letter-spacing 0.08em'],
+        ['colour', 'var(--color-text-secondary)'],
+        ['margin-bottom', 'var(--sp-4)']
+      ], states: [
+        ['hidden on', 'the blocked and success stages. An outcome is not a step.'],
+        ['hidden when', 'the keyboard is open. A driver mid-type knows which step they are on, and it is the least useful height on the screen.']
+      ] },
+    { name: '.m-resend-row', level: 'molecule', lines: [
+        ['layout', 'flex, space-between, gap var(--sp-2), flex-wrap wrap, row-gap var(--sp-2)'],
+        ['children', 'two .a-link .a-link--quiet .a-link--flush']
+      ], states: [
+        ['[data-single="true"]', 'justify-content: center, set when a state withdraws one of the two so the survivor is not stranded left.'],
+        ['why wrap', 'at 125% text the pair needs more width than 320dp gives, and wrapping beats crushing the labels.']
+      ] },
+    { name: '.m-notch', level: 'molecule', lines: [
+        ['position', 'absolute, top 0, full width, height 50px'],
+        ['layout', 'flex, justify-content center'],
+        ['contains', '.a-notch']
+      ], states: [['note', 'it bonds the notch atom to a position rather than adding appearance, which is the whole of its job.']] },
+
+    /* ── Organisms ──────────────────────────────────────────────────── */
+    { name: '.o-outcome-panel', level: 'organism', lines: [
+        ['layout', 'align-items center, text-align center, padding-top var(--sp-2), gap var(--sp-2)'],
+        ['__title', 'var(--text-heading) / 800, margin-top var(--sp-4) so the icon sits 24px away'],
+        ['__body', 'var(--text-caption) / 1.6, var(--color-text-secondary), 8px under the title'],
+        ['__clock', 'var(--text-title) / 800, tabular-nums, line-height 1.1'],
+        ['__meta', 'var(--text-caption2) / 500, margin-top var(--sp-4)'],
+        ['__actions', 'column, gap var(--sp-2), margin-top var(--sp-6)']
+      ], states: [
+        ['rhythm', 'icon 24, title 8, body 8, clock 24, meta 8, actions. The title, sentence and clock are one statement; the meta and its button are the aside.'],
+        ['__meta + __actions', 'margin-top 0 when the meta is present, because then the button belongs to the aside and not to the clock. :not([hidden]) because an adjacent sibling still matches when the sibling is display:none.'],
+        ['name', 'it renders the blocked states and the success state, so it is named for its role and the tone lives on data-tone.'],
+        ['a11y', 'the title takes tabindex="-1" and focus so a screen reader announces the new screen. Its focus ring is suppressed because it is not a tab stop.']
+      ] },
+    { name: '.o-status-page', level: 'organism', lines: [
+        ['position', 'absolute inset 0, z-index var(--z-overlay), padding var(--sp-6)'],
+        ['__panel', 'var(--color-surface), var(--radius-sheet), padding var(--sp-7) var(--sp-6), centred'],
+        ['__title', 'var(--text-heading) / 800, margin var(--sp-4) 0 var(--sp-2)'],
+        ['__body', 'var(--text-caption) / 1.6, margin-bottom var(--sp-5)'],
+        ['__actions', 'column, gap var(--sp-2)']
+      ], states: [
+        ['[data-state="visible"]', 'display: flex'],
+        ['use', 'a blocking technical status: maintenance, or a required update. One explanation and one action, never an account choice, because an account choice is not the answer to a technical fault.']
+      ] },
+
+    /* ── Templates and page ─────────────────────────────────────────── */
+    { name: '.t-device-frame', level: 'template', lines: [
+        ['size', '390 x 844, or 320 x 720 with [data-width="320"]'],
+        ['radius', 'var(--radius-phone)'],
+        ['overflow', 'hidden, so nothing decorative escapes the screen'],
+        ['shadow', 'var(--shadow-phone)']
+      ], states: [
+        ['[data-keyboard="open"]', 'shows .t-keyboard, sizes the sheet to 100% minus --keyboard-inset minus --size-status-bar, and runs the compression order: tooling, then the step counter, then an instruction that has been acted on, then the loose steps. Never the base gap.'],
+        ['[data-width="320"]', 'tightens the sheet’s inline padding to var(--sp-3) and the code cells to var(--sp-1), because six squares and five gaps cannot each clear 48px inside 320.'],
+        ['note', 'the template is the page-level structure. Everything that varies by device lives here, not in the components inside it.']
+      ] },
+    { name: '.t-keyboard', level: 'template', lines: [
+        ['position', 'absolute, bottom 0, height var(--keyboard-inset)'],
+        ['background', 'var(--kb-surface)'],
+        ['__svg', 'the numeric keypad, drawn, scaled with preserveAspectRatio xMidYMax meet'],
+        ['palette', '--kb-surface, --kb-key, --kb-key-alt, --kb-divider, --kb-hint, --kb-text, --kb-sub, --kb-accent, --kb-on-accent']
+      ], states: [
+        ['why a numeric pad', 'both inputs in the flow are inputmode="numeric", so this is the keyboard Android actually raises for them.'],
+        ['type exemption', '__digit at 21px and __sub at 9px sit outside the ramp on purpose. A real keyboard does not grow when app text does.'],
+        ['a11y', 'aria-hidden. A real keyboard is never in the accessibility tree of the page it covers.']
+      ] },
+    { name: '.p-signup-demo', level: 'page', lines: [
+        ['layout', 'flex, align-items flex-start, centred, gap var(--sp-6), padding var(--sp-8) var(--sp-6)'],
+        ['columns', 'the state navigator, the device stage, then the readout rail'],
+        ['__rail', 'column, gap var(--sp-4), sticky at var(--sp-8), holding the inspector and the spec panel'],
+        ['__caption', 'var(--text-micro), var(--color-text-secondary), max-width 390px']
+      ], states: [
+        ['under 900px', 'stacks to one column and the rail stops being a rail'],
+        ['under 440px', 'the frame goes full-bleed at 100dvh with no radius or shadow'],
+        ['note', 'the page is the only place real content meets the system. Everything around the device is tooling and carries d-.']
+      ] },
+    { name: '.u-visually-hidden', level: 'utility', lines: [
+        ['technique', 'position absolute, 1px box, clip rect(0 0 0 0), white-space nowrap, border 0']
+      ], states: [
+        ['use', 'text that must be spoken but not seen: the step count, and the #announcer live region.'],
+        ['never', 'display:none or visibility:hidden for this. Both remove the text from the accessibility tree, which is the opposite of the intent.']
+      ] },
     { name: '.a-btn--primary', level: 'atom', lines: [
-        ['min-height', '56px'], ['border-radius', 'var(--radius-pill)'],
+        ['min-height', 'var(--size-control)'], ['border-radius', 'var(--radius-pill)'],
         ['background', 'var(--gradient-primary)'],
         ['color', 'var(--color-text-on-dark)'],
         ['font', 'var(--text-subhead) / 700, letter-spacing -0.3px'],
@@ -3273,11 +3465,11 @@ button { background: none; border: none; color: inherit; }
         ['background', 'var(--color-surface)'], ['color', 'var(--color-text-primary)'], ['box-shadow', 'var(--shadow-btn-white)']
       ], states: [['use', 'primary action on the dark hero only']] },
     { name: '.o-signup-sheet__secondary', level: 'organism', lines: [
-        ['base', '.a-btn--outline .a-btn--sm'], ['margin-top', 'var(--sp-1)'],
+        ['base', '.a-btn--outline .a-btn--sm'], ['margin-top', 'var(--sp-4)'],
         ['glyph', 'var(--color-whatsapp-dark)']
       ], states: [['use', 'only for an action that leaves the app for WhatsApp']] },
     { name: '.a-field', level: 'atom', lines: [
-        ['min-height', '56px'], ['padding', '0 var(--sp-4)'], ['gap', 'var(--sp-3)'],
+        ['min-height', 'var(--size-control)'], ['padding', '0 var(--sp-4)'], ['gap', 'var(--sp-3)'],
         ['border', '1.5px solid var(--color-border-field)'], ['border-radius', 'var(--radius-card)'],
         ['background', 'var(--glass-card-bg)'], ['box-shadow', 'var(--shadow-field)']
       ], states: [
@@ -3346,14 +3538,20 @@ button { background: none; border: none; color: inherit; }
 
   var RULES = [
     ['Naming', 'Level prefix, then BEM. a- atoms, m- molecules, o- organisms, t- templates, p- page, u- utilities, d- developer tooling. Element is __, modifier is --. A name states a role, never an appearance: a-btn--primary, not a-btn--blue.'],
-    ['Levels', 'An atom cannot be broken down without losing its meaning. A molecule is a small bond of atoms with one job. An organism is a standalone section. If you are unsure, file it lower and promote it when a second use appears.'],
-    ['State', 'Never a class. Always a data attribute the CSS keys off: data-state, data-tone, data-channel. JavaScript sets attributes, it never builds class strings.'],
+    ['Levels', 'An atom cannot be broken down without losing its meaning: a label, an input, a button, an icon. A molecule is a small bond of atoms doing one job, like a label and an input and a helper becoming a field. An organism is a distinct, standalone section made of molecules and atoms, like the sign-up sheet or the hero. A template lays organisms out into a page-level structure with no real content in it, which here is the device frame. A page is a template with real content, which here is the demo itself.'],
+    ['Placing something new', 'Four questions, in order, and the first yes decides it. Can I take it apart and still have something that means anything? If no, it is an atom. Is it a handful of atoms bonded to do ONE job? If yes, it is a molecule. Would I point at it and call it a section of the screen? If yes, it is an organism. Is it arranging sections rather than being one? If yes, it is a template. Two habits keep the system honest. First, reach for a variant before a new component: a modifier on an existing atom beats a near-duplicate of it, which is why there is a-btn--primary and not a separate primary button. Second, if you are still unsure, file it at the LOWER level and promote it when a second use appears, because promoting is easy and demoting means finding every caller. A name states a role and never a tone or a moment: this panel had a blocked-panel that also rendered success, and it is o-outcome-panel now.'],
+    ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. The axes are deliberately separate so two of them can be true at once. On a component: data-state is where it is in its own lifecycle (idle, pending, error, valid, filled, locked, active, done); data-tone is the meaning being reported on it (error, warning, success, info); data-valid, data-shake, data-single, data-more and data-heading each carry one boolean fact. On the sheet: data-stage names the step being shown. On the device frame: data-keyboard, data-width. On the document: data-motion, data-text, data-net. Anything beginning data-act, data-panel, data-mode, data-level, data-copy, data-countdown or data-state-id is a hook for script or for tooling, not a styling axis. The rule for adding one: if two conditions can be true at the same time they need two attributes, because one attribute holds one value.'],
     ['Tokens', 'A component reads tokens, never raw values. If you need a value that has no token, add the token first.'],
-    ['Spacing', 'A 4px base grid, --sp-1 through --sp-8. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
-    ['Composition', 'An organism composes molecules, a molecule composes atoms. Nothing reaches into another component with a descendant selector.'],
+    ['Spacing', 'A 4px base grid: --sp-1 is 4px through --sp-8 at 32px, plus --sp-12 at 48px. Two half-steps, --sp-1h at 6px and --sp-2h at 10px, exist for the insides of small components and never for the rhythm between them. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
+    ['Rhythm', 'The sheet carries one scale and each step means one thing. 8 is parts of one thing, a label and its field, a field and its helper. 16 is one group to the next. 24 is a decision or a different route. 32 closes a centred group. The organism owns the rhythm through its gap; nothing in the markup sets spacing, and a looser step is declared as a margin on the element that starts it rather than composed from a base plus a nudge.'],
+    ['Composition', 'An organism composes molecules, a molecule composes atoms. A parent may PLACE a child, because layout belongs to the container: where it sits, how much room it takes, whether it shows at all. A parent may never RESTYLE a child\'s insides. Colour, type, padding, radius and border stay with the component that owns them, and a child that needs to look different in a context carries a modifier for it. That is why the links on a content edge take a-link--flush rather than the row cancelling their padding.'],
     ['Motion', 'Durations and easings come from tokens, and every animation collapses to a still frame under prefers-reduced-motion.'],
-    ['Targets', 'Every interactive control is at least 48px in its smallest dimension, including quiet text links.'],
+    ['Targets', 'Every interactive control in the PRODUCT is at least 48px in its smallest dimension, including quiet text links: .a-link carries min-height var(--size-target) and its padding is what makes the number up. Two documented exceptions. The six code cells are 53px wide at 390dp but must shrink at 320, where six squares and five gaps cannot each clear 48 inside 320 minus the gutters, so the row takes the largest size that fits rather than pretending the rule holds. The d- layer is exempt: it is a desktop review surface driven with a mouse and it never ships.'],
     ['Colour', 'Never carries meaning alone. Every error pairs the colour with an icon and a sentence.'],
+    ['Responsive', 'Three sizes, and the component decides, not the window. The frame is 390 x 844 by default and 320 x 720 under [data-width="320"], where the sheet tightens its inline padding to var(--sp-3) and the code cells to var(--sp-1). The page stacks to one column under 900px and goes full bleed at 100dvh under 440px. Text size is the user\'s, not ours: [data-text="large"] repoints the whole type ramp on the root, so every component that reads var(--text-*) grows without knowing it did. Test at 320 and at large text together, because that is the pair that breaks things.'],
+    ['Keyboard', 'The on-screen keyboard is part of the layout, not something that happens to it. --keyboard-inset is set from visualViewport on a device and by the Keyboard toggle here, and the sheet sizes itself to what is left, minus --size-status-bar so the status bar stays visible. When space runs out it is given up in a fixed order: tooling first, then the step counter, then an instruction the driver has already acted on, then the loose spacing steps. Never the base gap: the base gap is what says which things belong together, and that matters most when there is least room to read it. Any state where a card takes over the actions releases focus, because a keyboard covering the only way out is worse than no keyboard.'],
+    ['High contrast', 'Under @media (forced-colors: active) the system replaces every colour, so any state signalled by colour alone disappears. The code cells and the field re-state their outcome with an outline instead: solid for valid, dashed for error. If you add a state that is currently only a background or a border colour, add its forced-colors treatment in the same commit.'],
+    ['Accessibility', 'Per component, not as an afterthought. An icon-only control takes a real label. A decorative element is aria-hidden, including the drawn keyboard and every tone icon. Errors are announced once, through the #announcer live region, never twice by also carrying role="alert". Countdowns are aria-hidden so a screen reader is not interrupted every second for a quarter of an hour. A field\'s error is tied to it with aria-describedby and aria-invalid, and both clear on input. When a stage becomes an outcome, focus moves to its title so the new screen is announced. The sheet traps focus while it is open, sets the hero inert, and returns focus to the control that opened it.'],
     ['Contrast', 'Text clears 4.5:1, large text and non-text clear 3:1. The measured pairs are in this panel. If you change a colour, remeasure it.'],
     ['The d- layer', 'This panel, the state navigator, the overlays and the inspector are tooling. They never ship. The boundary runs one way: tooling reads product tokens because it documents them, but no product component may read a --d- token.']
   ];
@@ -3363,7 +3561,7 @@ button { background: none; border: none; color: inherit; }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
   function renderColour() {
-    var subs = ['Brand', 'Semantic', 'Text', 'Surface', 'Border', 'Glass', 'Other'];
+    var subs = ['Brand', 'Semantic', 'Text', 'Surface', 'Border', 'Glass', 'Gradient', 'Other'];
     var html = '';
     subs.forEach(function (sub) {
       var list = TOKENS.filter(function (t) { return groupOf(t.name) === 'colour' && subOf(t.name) === sub; });
@@ -3387,6 +3585,35 @@ button { background: none; border: none; color: inherit; }
         '<span class="d-row__value">' + t.raw + '</span>'
       );
     }).join('');
+  }
+  /* Sizes, stacking order, the hairline and the keyboard palette. These are
+     structural rather than decorative, and every one of them was previously
+     declared and rendered nowhere, including --size-control and
+     --gradient-primary, which the component recipes tell you to use. */
+  function renderLayout() {
+    var subs = [
+      ['Size', function (n) { return n.indexOf('--size-') === 0 || n === '--hairline'; },
+        'Fixed dimensions the layout depends on. --size-target is the 48px floor for anything interactive.'],
+      ['Stacking order', function (n) { return n.indexOf('--z-') === 0; },
+        'Every z-index in the file comes from here, so the layering is a list you can read rather than a set of numbers to guess at.'],
+      ['Android keyboard', function (n) { return n.indexOf('--kb-') === 0; },
+        'The operating system\'s own chrome, drawn so the sheet can be judged against the space it really has. Deliberately not the product palette: it is not ours to style.']
+    ];
+    var html = '';
+    subs.forEach(function (sub) {
+      var list = TOKENS.filter(function (t) { return groupOf(t.name) === 'layout' && sub[1](t.name); });
+      if (!list.length) { return; }
+      html += '<p class="d-section__title" style="margin-top:var(--sp-4);">' + sub[0] + '</p>';
+      html += '<p class="d-section__note">' + sub[2] + '</p>';
+      html += list.map(function (t) {
+        var swatch = t.name.indexOf('--kb-') === 0
+          ? '<span class="d-row__swatch" style="background:var(' + t.name + ');"></span>'
+          : '<span class="d-row__bar" style="width:' + (/px$/.test(t.raw) ? Math.min(parseInt(t.raw, 10), 96) + 'px' : '4px') + ';"></span>';
+        return row(swatch + '<span class="d-row__name">' + t.name + '</span>' +
+                   '<span class="d-row__value">' + esc(t.raw) + '</span>');
+      }).join('');
+    });
+    return html;
   }
   function renderRadius() {
     return TOKENS.filter(function (t) { return groupOf(t.name) === 'radius'; }).map(function (t) {
@@ -3595,6 +3822,7 @@ button { background: none; border: none; color: inherit; }
     { id: 'motion',    label: 'Motion',     render: renderMotion },
     { id: 'contrast',  label: 'Contrast',   render: renderContrast },
     { id: 'recipes',   label: 'Components', render: renderRecipes },
+    { id: 'layout',    label: 'Layout',     render: renderLayout },
     { id: 'rules',     label: 'Rules',      render: renderRules }
   ];
 
@@ -3737,18 +3965,18 @@ button { background: none; border: none; color: inherit; }
        state list where reaching them meant scrolling past thirty-two states. */
     var nav = document.getElementById('viewNotes');
     var rule = document.createElement('div');
-    rule.className = 'o-state-nav__rule';
+    rule.className = 'd-stateNav__rule';
     var head = document.createElement('p');
-    head.className = 'o-state-nav__heading';
+    head.className = 'd-stateNav__heading';
     head.textContent = 'Developer';
     nav.appendChild(rule); nav.appendChild(head);
 
     TOGGLES.forEach(function (t) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'o-state-nav__toggle';
+      b.className = 'd-stateNav__toggle';
       b.title = t.hint;
-      b.innerHTML = '<span>' + t.label + '</span><span class="o-state-nav__switch"></span>';
+      b.innerHTML = '<span>' + t.label + '</span><span class="d-stateNav__switch"></span>';
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () {
         var on = root.getAttribute(t.attr) === 'on';
@@ -3787,7 +4015,7 @@ button { background: none; border: none; color: inherit; }
       document.getElementById(v.tab).addEventListener('click', function () { show(v.tab); });
     });
     /* Left and right move between tabs, which is what a tablist promises. */
-    document.querySelector('.o-state-nav__switcher').addEventListener('keydown', function (e) {
+    document.querySelector('.d-stateNav__switcher').addEventListener('keydown', function (e) {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') { return; }
       e.preventDefault();
       var other = document.getElementById(
