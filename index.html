@@ -1053,7 +1053,13 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: flex-start; justify-content: flex-start;
   gap: var(--sp-6); padding: var(--sp-8) var(--sp-6);
 }
-.p-signup-demo__stage { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+/* The nav holds the left edge and the phone centres in whatever is left, so
+   the thing you reach for stays put and the thing you are looking at sits in
+   the middle of the space it has. */
+.p-signup-demo__stage {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+}
 /* p-signup-demo__rail. Everything that reads out about the device, stacked
    beside it and sticky, so the eye never leaves the phone to find the answer. */
 .p-signup-demo__rail {

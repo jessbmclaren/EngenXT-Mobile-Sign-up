@@ -36,14 +36,15 @@
    loads, nothing is sent anywhere.
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* ══ TOKENS ══════════════════════════════════════════════════════════════ */
 :root {
-  
+  /* Brand */
   --color-primary:       #1650B8;
   --color-primary-dark:  #0D3A8A;
   --color-primary-light: #EEF3FF;
   --color-primary-08: rgba(22,80,184,0.08);
   --color-primary-12: rgba(22,80,184,0.12);
-  --color-primary-30: rgba(22,80,184,0.30);   
+  --color-primary-30: rgba(22,80,184,0.30);   /* gradient stop and button shadow */
 
   --color-secondary:     #E2231A;
   --color-secondary-bg:  #FDEEEE;
@@ -56,25 +57,26 @@
   --color-tertiary-04: rgba(61,188,212,0.04);
   --color-tertiary-18: rgba(61,188,212,0.18);
 
-  
-  --color-success:       #166832;    
+  /* Semantic */
+  --color-success:       #166832;    /* 5.09:1 on the sheet glass */
   --color-success-bg:    #E8F5EE;
   --color-success-20: rgba(22,104,50,0.20);
-  --color-warning:       #9C4708;    
+  --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
-  --color-warning-border: rgba(156,71,8,0.25);  
-  --color-whatsapp-dark: #0B6B5F;               
-  
-  --color-error-text:    #B81510;    
+  --color-warning-border: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
+  --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
+  /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
+     the logo, so it must not be darkened to satisfy a text contrast rule. */
+  --color-error-text:    #B81510;    /* 4.94:1 on the sheet glass */
 
-  
+  /* Text */
   --color-text-primary:   #0d1e2a;
-  --color-text-secondary: #4C5973;   
-  --color-text-tertiary:  #6C6C70;   
-  --color-text-muted:     #b0bcd0;   
+  --color-text-secondary: #4C5973;   /* 5.03:1 on the sheet glass */
+  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.79:1 on sunken */
+  --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
   --color-text-on-dark:   #ffffff;
 
-  
+  /* On-dark ramp, for anything sitting on the hero */
   --color-on-dark-strong: rgba(255,255,255,0.85);
   --color-on-dark-mid:    rgba(255,255,255,0.72);
   --color-on-dark-soft:   rgba(255,255,255,0.60);
@@ -82,32 +84,33 @@
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
 
-  
+  /* Surface and border */
   --color-surface:        #ffffff;
   --color-surface-sunken: #F2F2F7;
   --color-surface-page:   #e4e6eb;
   --color-surface-hover:  #f5f5f5;
   --color-border:         rgba(0,0,0,0.08);
   --color-border-light:   rgba(0,0,0,0.06);
-  --color-border-field:   rgba(0,0,0,0.45);   
+  --color-border-field:   rgba(0,0,0,0.45);   /* 3.2:1 against the field fill */
   --color-scrim:          rgba(0,0,0,0.45);
   --color-scrim-deep:     rgba(10,22,40,0.72);
 
-  
+  /* Hero */
   --color-hero-1: #0a1628;
   --color-hero-2: #0d2040;
   --color-hero-3: #0a1830;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 
-  
+  /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
   --color-handle:     rgba(0,0,0,0.25);
-  --color-hardware:   #000;   
-  --color-switch-track:   #8A91A3;   
+  --color-hardware:   #000;   /* the physical bezel, not a brand colour */
+  --color-switch-track:   #8A91A3;   /* 3:1 against white */
   --color-focus-halo: rgba(255,255,255,0.92);
 
-  
+  /* Android system keyboard. Not app surface: this is the operating system's
+     chrome, so it holds its own palette rather than borrowing EngenXT's. */
   --kb-surface:    #ECEFF3;
   --kb-key:        #FFFFFF;
   --kb-key-alt:    #DCE0E6;
@@ -118,7 +121,7 @@
   --kb-accent:     #1A73E8;
   --kb-on-accent:  #FFFFFF;
 
-  
+  /* Type */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono: "SF Mono","Menlo",monospace;
   --text-hero:     42px;
@@ -134,9 +137,9 @@
   --text-micro:    11px;
   --text-nano:     10px;
 
-  
+  /* Radius */
   --radius-pill:   999px;
-  --radius-phone:  47px;   
+  --radius-phone:  47px;   /* the real corner at 390pt */
   --radius-notch:  22px;
   --radius-sheet:  28px;
   --radius-card:   16px;
@@ -144,7 +147,7 @@
   --radius-chip:   10px;
   --radius-circle: 50%;
 
-  
+  /* Elevation. One light source, from above. */
   --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
   --shadow-sheet:     inset 0 var(--hairline) 0 rgba(255,255,255,0.65),
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
@@ -158,21 +161,25 @@
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
 
-  
+  /* Space. A 4px base with three half steps, because 6, 10 and 18 are
+     structural here rather than exceptional, and a scale should be honest. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
   --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px; --sp-12: 48px;
 
-  
+  /* Hardware. The status bar keeps its own height token because layout has to
+     stop short of it, and the notch and time are drawn against the same value. */
   --size-status-bar: 78px;
   --sp-1h: 6px; --sp-2h: 10px;
 
-  
+  /* Size. Values that are neither spacing nor type. */
   --size-otp-cell: 52px;
-  --size-control:  56px;   
-  --size-target:   48px;   
+  --size-control:  56px;   /* primary control height */
+  --size-target:   48px;   /* minimum tap target */
   --hairline:      0.5px;
 
-  
+  /* Stacking. The only dimension where components genuinely couple, so it is
+     the one that most needed a scale. Hardware sits above everything the app
+     can draw. */
   --z-base:     0;
   --z-content:  2;
   --z-scrim:    9;
@@ -180,17 +187,18 @@
   --z-overlay:  30;
   --z-toast:    40;
   --z-hardware: 50;
-  
+  /* Tooling overlays sit between the app and the hardware, never above it. */
   --z-tool:     45;
   --z-tool-top: 60;
 
-  
+  /* Glass. Near opaque, because the sheet sits over a near-black hero and
+     0.72 alpha put every piece of secondary text below 2.5:1. */
   --glass-sheet-bg: rgba(228,235,250,0.35);
   --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
   --glass-card-bg:  rgba(255,255,255,0.62);
 
-  
+  /* Motion */
   --ease-out:      cubic-bezier(0.16,1,0.3,1);
   --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
   --ease-emphasis: cubic-bezier(0.32,0.72,0,1);
@@ -200,6 +208,31 @@
   --dur-sheet: 0.38s;
   --dur-slow:  0.42s;
 }
+
+:root {
+  /* Developer layer tokens. Separate from the product scale on purpose:
+     the boundary runs one way: tooling reads product tokens because it
+     documents them, but no product component may read a --d- token. */
+  --d-level-atom:      #2563EB;
+  --d-level-molecule:  #7C3AED;
+  --d-level-organism:  #059669;
+  --d-level-template:  #B45309;
+  --d-surface-ink:     var(--color-text-primary);
+  --d-accent-token:    #7DD3FC;
+  --d-accent-missing:  #FCA5A5;
+  --d-accent-inspect:  #38BDF8;
+  --d-inspect-fill:    rgba(56,189,248,0.12);
+  --d-inspect-edge:    rgba(0,0,0,0.35);
+  --d-grid-line:       rgba(226,35,26,0.16);
+  --d-grid-line-soft:  rgba(226,35,26,0.10);
+  --d-copy-hover:      #E2EAFB;
+  --d-rule:            #f4f5f7;
+  --d-on-ink-soft:     rgba(255,255,255,0.45);
+  --d-on-ink-line:     rgba(255,255,255,0.14);
+  --d-panel-width:     420px;
+}
+
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   min-height: 100vh;
@@ -715,7 +748,13 @@ body {
   display: flex; align-items: flex-start; justify-content: flex-start;
   gap: var(--sp-6); padding: var(--sp-8) var(--sp-6);
 }
-.p-onboard-demo__stage { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+/* The nav holds the left edge and the phone centres in whatever is left, so
+   the thing you reach for stays put and the thing you are looking at sits in
+   the middle of the space it has. */
+.p-onboard-demo__stage {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+}
 .p-onboard-demo__caption {
   font-size: var(--text-micro); color: var(--color-text-secondary); text-align: center;
   max-width: 390px; line-height: 1.5;
