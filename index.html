@@ -433,6 +433,14 @@ button { background: none; border: none; color: inherit; }
 .m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
+/* Connection state, shown where a phone shows it. Without this data-net was a
+   flag with no rendering, so Offline looked broken until you tried to send. */
+.m-status-bar__net {
+  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
+}
+[data-net="offline"] .m-status-bar__net { display: inline; }
+[data-net="offline"] .m-status-bar__signal { opacity: .35; }
 
 /* m-notch */
 .m-notch {
@@ -1280,8 +1288,9 @@ button { background: none; border: none; color: inherit; }
 
         <div class="m-status-bar" data-tone="onDark" aria-hidden="true">
           <span class="m-status-bar__time">9:41</span>
+            <span class="m-status-bar__net">No service</span>
           <span class="m-status-bar__icons">
-            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <svg class="m-status-bar__signal" width="17" height="12" viewBox="0 0 17 12" fill="none">
               <rect x="0" y="7" width="3" height="5" rx="1" fill="var(--color-on-dark-strong)"/>
               <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="var(--color-on-dark-strong)"/>
               <rect x="9" y="2" width="3" height="10" rx="1" fill="var(--color-on-dark-strong)"/>
@@ -1875,6 +1884,13 @@ button { background: none; border: none; color: inherit; }
      SMALL HELPERS
      ════════════════════════════════════════════════════════════════════ */
   function isOffline() { return el.root.getAttribute('data-net') === 'offline'; }
+  /* The reviewer's own Offline setting, which is a MODE and outlives any state
+     they jump to. A demo state may put the device offline for its own sake, but
+     it must restore the mode afterwards rather than assuming online: resetting
+     to online on every jump silently switched the toggle off the moment anyone
+     clicked a state, which made Offline look broken. */
+  var userNet = 'online';
+  function applyNet(net) { el.root.setAttribute('data-net', net || userNet); syncModes(); }
   function announce(msg) { el.announcer.textContent = ''; setTimeout(function () { el.announcer.textContent = msg; }, 60); }
   /* The shake answers something the driver just did. Jumping straight to a
      state from the navigator is not something they did, so the sheet stays
@@ -2245,7 +2261,13 @@ button { background: none; border: none; color: inherit; }
   }
 
   function submitPhone() {
-    if (S.sending || isOff(el.phoneCta)) { return; }
+    /* Guard on the send itself, not on the button. When a card takes over it
+       hides and disables Continue, and reading that button meant Try again and
+       the automatic retry on reconnect both did nothing: the recovery was
+       blocked by the control it had replaced. Pressing Enter on an incomplete
+       number now reaches the length check and gets told what is wrong, instead
+       of silently doing nothing. */
+    if (S.sending) { return; }
     var d = phoneDigits();
 
     if (d.length !== 9) {
@@ -2779,8 +2801,7 @@ button { background: none; border: none; color: inherit; }
      ════════════════════════════════════════════════════════════════════ */
   function base(mode, phone) {
     clearTimers();
-    el.root.setAttribute('data-net', 'online'); syncModes();
-    setHomeNotice(null); setHomeAction('enter');
+    applyNet(); setHomeNotice(null); setHomeAction('enter');
     hideStatusPage();
     S.mode = mode || 'signup';
     S.channel = 'whatsapp';
@@ -2795,7 +2816,7 @@ button { background: none; border: none; color: inherit; }
   }
   function home(notice, action, status) {
     clearTimers(); closeSheetNow();
-    if (notice !== 'offline') { el.root.setAttribute('data-net', 'online'); syncModes(); }
+    applyNet(notice === 'offline' ? 'offline' : null);
     setHomeNotice(notice); setHomeAction(action || 'enter');
     if (status && STATUS[status]) { showStatusPage(status); }
     else { hideStatusPage(); }
@@ -2824,7 +2845,7 @@ button { background: none; border: none; color: inherit; }
   var STATES = {
     /* Home */
     'home/default':     { label: 'Ready',              run: function () { home(null, 'enter'); } },
-    'home/offline':     { label: 'No internet',        run: function () { home('offline', 'retry'); el.root.setAttribute('data-net', 'offline'); syncModes(); } },
+    'home/offline':     { label: 'No internet',        run: function () { home('offline', 'retry'); } },
     'home/maintenance': { label: 'Unavailable',        run: function () { home(null, 'enter', 'maintenance'); } },
     'home/update':      { label: 'Update required',    run: function () { home(null, 'enter', 'update'); } },
 
@@ -2975,7 +2996,10 @@ button { background: none; border: none; color: inherit; }
            fires the same reconnect path a real device would. */
         toggle: function () {
           var back = isOffline();
-          el.root.setAttribute('data-net', back ? 'online' : 'offline');
+          userNet = back ? 'online' : 'offline';
+          applyNet();
+          /* Going back online is the reviewer standing in for a device that
+             regained signal, so it takes the same path a device would. */
           if (back) { onReconnect(); }
         } },
       { key: 'keyboard', label: 'Keyboard open', on: function () { return el.frame.getAttribute('data-keyboard') === 'open'; },
@@ -3514,10 +3538,13 @@ button { background: none; border: none; color: inherit; }
         ['font', '22px / 700, centred'], ['border', '1.5px solid var(--color-border-field)'],
         ['border-radius', 'var(--radius-card-sm)'], ['background', 'var(--color-surface-sunken)']
       ], states: [
+        ['two axes', 'data-state is what the driver typed, data-tone is what came back. A cell can be filled and wrong at the same time, so they are separate attributes and one attribute holds one value.'],
         ['[data-state="filled"]', 'border + text var(--color-primary), bg var(--color-primary-light)'],
-        ['group [data-state="valid"]', 'success tones'],
-        ['group [data-state="error"]', 'error tones plus 2.5px border, so the two outcomes differ by more than hue'],
-        ['group [data-state="locked"]', 'readonly + aria-disabled, never disabled, which would evict focus']
+        ['[data-tone="valid"]', 'border-color and color var(--color-success), bg var(--color-success-bg)'],
+        ['[data-tone="error"]', 'border-width 2.5px, border-color and color var(--color-error-text), bg var(--color-secondary-bg). Weight as well as hue, so the two outcomes differ by more than colour.'],
+        ['[data-tone="locked"]', 'opacity .45. The cell goes readonly with aria-disabled, never disabled, which would evict focus mid-task.'],
+        ['[aria-disabled="true"]', 'opacity .55'],
+        ['forced colours', 'valid and error re-state themselves as an outline, solid and dashed, because the system discards every colour cue.']
       ] },
     { name: '.a-helper', level: 'atom', lines: [
         ['font-size', 'var(--text-caption2)'], ['line-height', '1.5'],
@@ -3534,9 +3561,10 @@ button { background: none; border: none; color: inherit; }
         ['body', 'var(--text-caption2) / 1.55, var(--color-text-secondary)'],
         ['actions', 'stacked .a-btn--sm, full width']
       ], states: [
-        ['[data-tone="error"]', 'bg var(--color-secondary-bg), border var(--color-secondary-25)'],
-        ['[data-tone="warning"]', 'bg var(--color-warning-bg), border var(--color-warning-border)'],
-        ['[data-tone="success"]', 'bg var(--color-success-bg), border var(--color-success-20)'],
+        ['copy the guard', 'every tone rule is written :not(.m-alert--onDark)[data-tone="…"]. An unguarded tone selector is (0,2,0) and beats the --onDark modifier at (0,1,0), which paints white text on a pale tint. That is how both home notices once became blank boxes.'],
+        [':not(--onDark)[data-tone="error"]', 'bg var(--color-secondary-bg), border var(--color-secondary-25)'],
+        [':not(--onDark)[data-tone="warning"]', 'bg var(--color-warning-bg), border var(--color-warning-border)'],
+        [':not(--onDark)[data-tone="success"]', 'bg var(--color-success-bg), border var(--color-success-20)'],
         ['--onDark', 'translucent white over the hero, white title']
       ] },
     { name: '.m-phone-field', level: 'molecule', lines: [
@@ -3550,10 +3578,13 @@ button { background: none; border: none; color: inherit; }
         ['note', 'no validity tick: nine digits is a complete number, not a recognised one, so only the server can confirm it']
       ] },
     { name: '.m-otp-group', level: 'molecule', lines: [
-        ['display', 'flex, gap 6px, space-between'],
+        ['layout', 'flex, space-between, gap var(--sp-1h)'],
         ['children', 'six .a-otp-cell'],
         ['role', 'group, labelled "6 digit code"']
-      ], states: [['[data-state]', 'valid | error | locked, cascades to every cell']] },
+      ], states: [
+        ['[data-state]', 'valid | error | locked. The group keeps the attribute so lockOtp and any whole-row selector can ask about it, and setOtpTone mirrors the same value onto every cell as data-tone.'],
+        ['not a cascade', 'there is no descendant selector here outside forced colours. The group propagates the tone; each cell decides what that tone looks like. A molecule setting an atom\'s border and background would be reaching into it.']
+      ] },
     { name: '.a-btn', level: 'atom', lines: [
         ['base', 'the shared shape every variant builds on: flex centred, gap var(--sp-2), var(--radius-pill), cursor pointer, no border'],
         ['variants', '--primary, --outline, --outlineOnDark, --onDark, --sm. Reach for one of these before adding a button.'],
