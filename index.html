@@ -1627,7 +1627,10 @@ button { background: none; border: none; color: inherit; }
       check:    '<path d="M20 6 9 17l-5-5"/>',
       upload:   '<path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>'
     };
-    return open + (paths[name] || paths.info) + '</svg>';
+    /* A missing icon must be visible, not silently absent. The fallback used
+       to be paths.info, which was removed as unused, so an unknown name
+       rendered the string "undefined" into the markup. */
+    return open + (paths[name] || paths.alert) + '</svg>';
   }
   /* ════════════════════════════════════════════════════════════════════
      COPY
@@ -1874,7 +1877,12 @@ button { background: none; border: none; color: inherit; }
     resendsLeft: MAX_RESENDS,
     verifying: false,
     sending: false,
+    /* When the lock lifts, in epoch milliseconds. It outlives the sheet on
+       purpose: a lock a driver can clear by closing and reopening is not a
+       lock, and a server would not forget. */
+    lockedUntil: 0,
     dismissArmed: false,
+    switching: false,
     /* True only while the navigator is placing a state directly, so feedback
        meant for a driver's own action does not fire for a reviewer's click. */
     jumping: false,
@@ -2079,6 +2087,10 @@ button { background: none; border: none; color: inherit; }
     if (a && el.sheet.contains(a) && /^(INPUT|TEXTAREA)$/.test(a.tagName)) { a.blur(); }
     el.frame.removeAttribute('data-keyboard');
     el.frame.style.removeProperty('--keyboard-inset');
+    /* The Keyboard switch in the sidebar reads this attribute, so it has to be
+       told, or it goes on saying the keyboard is up after the product has put
+       it away. */
+    if (typeof syncModes === 'function') { syncModes(); }
   }
   function toneColour(tone) {
     return tone === 'error'   ? 'var(--color-secondary)'
@@ -2341,6 +2353,9 @@ button { background: none; border: none; color: inherit; }
       paintPhoneValidity();
 
       if (isOffline()) { showNumberError('offline'); return; }
+      /* A lock the driver can clear by closing the sheet is not a lock. The
+         server would still be counting, so the prototype does too. */
+      if (S.lockedUntil > Date.now()) { showBlocked('locked'); return; }
       /* The server resolves new against returning, which is why the home
          screen does not ask the driver to. */
       var outcome = OUTCOMES[d] || 'ok';
@@ -2685,7 +2700,13 @@ button { background: none; border: none; color: inherit; }
   }
 
   function switchChannel(to) {
+    /* Guard the operation, not the button: this is reachable from a card
+       action as well as the quiet link, and a double tap used to spend two of
+       the three code requests before the first confirmation had been read. */
+    if (S.switching || S.channel === to) { return; }
     if (S.resendsLeft <= 0) { showResendLimit(); return; }
+    S.switching = true;
+    after(600, function () { S.switching = false; });
     S.resendsLeft -= 1;
     stopCountdown('code');
     S.channel = to;
@@ -2730,13 +2751,17 @@ button { background: none; border: none; color: inherit; }
     after(60, function () { el.blockedTitle.focus({ preventScroll: true }); });
 
     if (kind === 'locked') {
+      if (!S.lockedUntil || S.lockedUntil < Date.now()) {
+        S.lockedUntil = Date.now() + LOCK_SECS * 1000;
+      }
       /* One clock, rendered once, in a slot of its own. It is aria-hidden and
          does not sit inside the announced sentence, so a screen reader is not
          interrupted every second for a quarter of an hour. */
       el.blockedClock.hidden = false;
-      startCountdown('blocked', LOCK_SECS, function (left, label) {
+      startCountdown('blocked', Math.max(1, Math.round((S.lockedUntil - Date.now()) / 1000)), function (left, label) {
         el.blockedClock.textContent = label;
       }, function () {
+        S.lockedUntil = 0;
         el.blockedClock.hidden = true;
         el.blockedBody.textContent = def.whenDone.body;
         el.blockedMeta.hidden = true;
