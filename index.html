@@ -8,21 +8,27 @@
 <style>
 /* ══════════════════════════════════════════════════════════════════════════
    ENGENXT · HOME AND SIGN UP
-   Naming: atomic design levels as prefixes, BEM for structure,
-           data-* attributes for runtime state.
 
-     tokens   CSS custom properties      --color-primary
-     atoms    a-                         a-btn, a-field, a-otp-cell
-     molecules m-                        m-phone-field, m-alert
-     organisms o-                        o-auth-hero, o-signup-sheet
-     templates t-                        t-device-frame, t-auth-screen
-     pages     p-                        p-signup-demo
-     utilities u-                        u-visually-hidden
+   Atomic design levels as prefixes, BEM for structure, data-* attributes for
+   runtime state. State is never a class.
 
-   State is never a class. It is an attribute:
-     data-state   idle | pending | valid | error | locked | expired
-     data-tone    error | warning | success | info
-     data-channel whatsapp | sms
+     tokens     CSS custom properties    --color-primary
+     atoms      a-                       a-btn, a-field, a-otp-cell
+     molecules  m-                       m-phone-field, m-alert
+     organisms  o-                       o-auth-hero, o-signup-sheet
+     templates  t-                       t-device-frame, t-keyboard
+     pages      p-                       p-signup-demo
+     utilities  u-                       u-visually-hidden
+     developer  d-                       d-panel, d-stateNav, d-inspect
+                                         Tooling. Never ships. No product
+                                         component may read a --d- token.
+
+   THE FULL SPECIFICATION IS IN THE PANEL, not here. Turn on Design specs in
+   the sidebar for every token, every component recipe with its states and its
+   accessibility contract, the measured contrast pairs, and the rules. This
+   header is a map, deliberately not a second copy: a manifest in a comment
+   goes stale silently, and this one had, naming a template that no longer
+   exists and an attribute that never did.
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ══ TOKENS ══════════════════════════════════════════════════════════════ */
@@ -147,6 +153,7 @@
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
   --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
   --shadow-toast:     0 4px 20px rgba(0,0,0,0.30);
+  --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
 
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
@@ -439,7 +446,7 @@ button { background: none; border: none; color: inherit; }
   width: 36px; height: 36px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: var(--color-secondary); border-radius: var(--radius-chip);
-  box-shadow: 0 4px 16px var(--color-secondary-40);
+  box-shadow: var(--shadow-brand);
 }
 .m-brand-lockup__name {
   font-size: var(--text-title); font-weight: 900; color: var(--color-text-on-dark);
@@ -1047,13 +1054,13 @@ button { background: none; border: none; color: inherit; }
 }
 
 .d-panel {
-  width: var(--d-panel-width); flex-shrink: 0;
-  min-height: 0; overflow-y: auto;
+  width: var(--d-panel-width); flex: 1 1 auto;
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   background: var(--color-surface); border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   display: none;
 }
-[data-spec="on"] .d-panel { display: block; }
+[data-spec="on"] .d-panel { display: flex; flex-direction: column; }
 
 .d-panel__head {
   position: sticky; top: 0; z-index: var(--z-content);
@@ -3250,17 +3257,41 @@ button { background: none; border: none; color: inherit; }
     var c = getComputedStyle(probe).color;
     return c === 'rgb(0, 0, 0)' && !/black|#000|rgb\(0,\s*0,\s*0/.test(v) ? '' : c;
   }
-  var MAPS = { colour: {}, spacing: {}, radius: {}, type: {}, elevation: {}, motion: {} };
+  /* A custom property's declared TEXT and the browser's SERIALISED form of the
+     same value are different strings. "0 6px 16px rgba(22,80,184,0.30)" comes
+     back as "rgba(22, 80, 184, 0.3) 0px 6px 16px 0px": the colour moves to the
+     front, lengths gain units, the alpha loses a zero. Keying the map on the
+     declared text meant nothing ever matched, so the inspector reported "no
+     token" for all ten shadows and both gradients, which are exactly the values
+     a developer cannot eyeball and most needs named.
+
+     So resolve each token through the probe and key the map on what the
+     browser says, which is the same string the inspector will later read off a
+     real element. */
+  function serialised(prop, value) {
+    probe.style[prop] = '';
+    probe.style[prop] = value;
+    return getComputedStyle(probe)[prop];
+  }
+  var MAPS = { colour: {}, spacing: {}, radius: {}, type: {}, elevation: {}, motion: {}, image: {} };
   TOKENS.forEach(function (t) {
     var g = groupOf(t.name);
     var live = getComputedStyle(root).getPropertyValue(t.name).trim();
-    if (g === 'colour') {
+    if (t.name.indexOf('--gradient-') === 0) {
+      var img = serialised('backgroundImage', 'var(' + t.name + ')');
+      if (img && img !== 'none' && !MAPS.image[img]) { MAPS.image[img] = t.name; }
+      return;
+    }
+    if (g === 'colour' || t.name.indexOf('--kb-') === 0) {
       var n = normColour(live);
       if (n && !MAPS.colour[n]) { MAPS.colour[n] = t.name; }
     } else if (g === 'spacing') { MAPS.spacing[live] = t.name; }
     else if (g === 'radius') { MAPS.radius[live] = t.name; }
     else if (g === 'type' && /px$/.test(live)) { MAPS.type[live] = t.name; }
-    else if (g === 'elevation') { MAPS.elevation[live.replace(/\s+/g, ' ')] = t.name; }
+    else if (g === 'elevation') {
+      var sh = serialised('boxShadow', 'var(' + t.name + ')');
+      if (sh && sh !== 'none' && !MAPS.elevation[sh]) { MAPS.elevation[sh] = t.name; }
+    }
     else if (g === 'motion') { MAPS.motion[live] = t.name; }
   });
 
@@ -3509,10 +3540,13 @@ button { background: none; border: none; color: inherit; }
         ['--onDark', 'translucent white over the hero, white title']
       ] },
     { name: '.m-phone-field', level: 'molecule', lines: [
-        ['composition', '.a-field + prefix + input'],
-        ['prefix', 'flag 20px, +27 at var(--text-body) / 800, 1px divider'],
+        ['composition', '.a-field .m-phone-field on one element, then __prefix and .a-field__input inside it'],
+        ['__flag', 'var(--text-large)'],
+        ['__code', 'var(--text-body) / 800, with a 1px divider after it'],
+        ['__prefix', 'flex, align-items center, gap var(--sp-2), flex-shrink 0'],
         ['input', 'var(--text-subhead) / 600, caret var(--color-primary)']
       ], states: [
+        ['the block has no rule of its own, on purpose', 'all of its appearance comes from .a-field, which it shares an element with. m-phone-field is the namespace its __ parts hang off, not a second box. Copy both classes onto one element or you get an unstyled field.'],
         ['note', 'no validity tick: nine digits is a complete number, not a recognised one, so only the server can confirm it']
       ] },
     { name: '.m-otp-group', level: 'molecule', lines: [
@@ -3520,13 +3554,29 @@ button { background: none; border: none; color: inherit; }
         ['children', 'six .a-otp-cell'],
         ['role', 'group, labelled "6 digit code"']
       ], states: [['[data-state]', 'valid | error | locked, cascades to every cell']] },
+    { name: '.a-btn', level: 'atom', lines: [
+        ['base', 'the shared shape every variant builds on: flex centred, gap var(--sp-2), var(--radius-pill), cursor pointer, no border'],
+        ['variants', '--primary, --outline, --outlineOnDark, --onDark, --sm. Reach for one of these before adding a button.'],
+        ['--outline', 'min-height var(--size-target), transparent, 1px solid var(--color-border-field), var(--color-text-secondary) at 600'],
+        ['--sm', 'min-height var(--size-target), var(--text-footnote)']
+      ], states: [
+        ['[aria-disabled="true"], :disabled', 'var(--color-surface-sunken) on var(--color-text-tertiary), no shadow, no active transform'],
+        ['a11y', 'the real disabled attribute is set alongside the ARIA one, so the control leaves the focus order rather than merely looking grey']
+      ] },
     { name: '.o-signup-sheet', level: 'organism', lines: [
-        ['position', 'absolute bottom, full width'], ['max-height', '94%, scrolls'],
+        ['position', 'absolute, left 0 right 0, bottom var(--keyboard-inset, 0)'],
+        ['max-height', 'calc(94dvh - var(--keyboard-inset, 0))'],
+        ['scrolling', 'the sheet does not scroll, __scroll does. The grab handle stays put and the stage animation cannot create real scroll range.'],
         ['border-radius', 'var(--radius-sheet) top corners only'],
         ['background', 'var(--glass-sheet-bg)'], ['backdrop-filter', 'var(--glass-sheet-bd)'],
         ['box-shadow', 'var(--shadow-sheet)'], ['body padding', '0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom))'],
         ['enter', 'sheetUp var(--dur-sheet) cubic-bezier(0.32,0.72,0,1)']
-      ], states: [['stages', 'number | code | blocked | success, one visible at a time']] },
+      ], states: [
+        ['stages', 'number | code | blocked | success, one visible at a time, published on the sheet as data-stage so the layout can respond to it'],
+        ['[data-more="true"]', 'a mask fades the bottom of __scroll when there is readable content below the fold. Trailing padding does not count, so the fade means something.'],
+        ['keyboard', 'under [data-keyboard="open"] on the frame the sheet takes height 100% minus --keyboard-inset minus --size-status-bar, so it sits on the keys and stops below the status bar. That is also the full-screen treatment the flow wants, at exactly the moment it wants it.'],
+        ['rhythm', '__stage owns the vertical spacing: gap var(--sp-2) as the base, __cta at margin-top var(--sp-4) for 24, __secondary the same, alert hosts at var(--sp-2) for 16.']
+      ] },
     { name: '.o-auth-hero', level: 'organism', lines: [
         ['background', 'var(--gradient-hero)'],
         ['composition', 'orbs + notch + status bar + brand lockup + hero copy + actions'],
@@ -3890,12 +3940,33 @@ button { background: none; border: none; color: inherit; }
   function line(k, v) {
     return '<span class="d-inspect__k">' + k + '</span><span class="d-inspect__v">' + v + '</span>';
   }
+  /* A value can have no token of its own and still be entirely made of them:
+     a one-off decorative gradient whose every stop is a colour token is not
+     the same defect as a hardcoded colour, and saying "no token" for both
+     trains a developer to ignore the warning that matters. */
+  function composedOf(raw) {
+    var found = [], seen = {};
+    String(raw).replace(/rgba?\([^)]*\)/g, function (c) {
+      /* transparent computes to rgba(0, 0, 0, 0). It is the absence of a
+         colour, not an untokenised one, so it neither resolves nor counts
+         against the value. */
+      if (/^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/.test(c)) { return c; }
+      var t = MAPS.colour[normColour(c)];
+      if (t && !seen[t]) { seen[t] = 1; found.push(t); }
+      else if (!t) { found.push(null); }
+      return c;
+    });
+    return found.length && found.every(Boolean) ? found : null;
+  }
   function val(kind, raw) {
     if (!raw || raw === 'none' || raw === '0px' || raw === 'normal' || raw === 'rgba(0, 0, 0, 0)') {
       return '<span style="opacity:.4">' + esc(raw || 'not set') + '</span>';
     }
     var t = tokenFor(kind, raw);
-    return t ? esc(raw) + ' <em>' + t + '</em>' : esc(raw) + ' <b>no token</b>';
+    if (t) { return esc(raw) + ' <em>' + t + '</em>'; }
+    var parts = composedOf(raw);
+    if (parts) { return esc(String(raw).slice(0, 30)) + '… <em>built from ' + parts.join(' + ') + '</em>'; }
+    return esc(raw) + ' <b>no token</b>';
   }
 
   function inspect(node) {
@@ -3907,6 +3978,19 @@ button { background: none; border: none; color: inherit; }
     selEl.innerHTML = (lvl ? '<span class="d-recipe__level" data-level="' + lvl + '" style="margin-right:6px;">' + lvl + '</span>' : '') +
       '&lt;' + node.tagName.toLowerCase() + '&gt; ' + esc(cls || node.id || '');
 
+    /* The inspector reports on the PRODUCT. Tooling has its own palette and
+       its own rules, so flagging it for missing product tokens is noise that
+       trains a developer to ignore the warning that matters. */
+    if (/(^|\s)d-/.test(cls)) {
+      gridEl.innerHTML = line('note', 'Developer tooling. Not part of the design, and not held to the product tokens.');
+      selEl.innerHTML = '&lt;' + node.tagName.toLowerCase() + '&gt; ' + esc(cls || node.id || '');
+      ring.setAttribute('data-state', 'visible');
+      var fr0 = frame.getBoundingClientRect();
+      ring.style.left = (rect.left - fr0.left) + 'px'; ring.style.top = (rect.top - fr0.top) + 'px';
+      ring.style.width = rect.width + 'px'; ring.style.height = rect.height + 'px';
+      return;
+    }
+
     var pad = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft];
     var padTokens = pad.map(function (p) { return tokenFor('spacing', p) || p; }).join(' ');
     var rows = [
@@ -3914,14 +3998,23 @@ button { background: none; border: none; color: inherit; }
       line('padding', pad.join(' ') + (padTokens !== pad.join(' ') ? ' <em>' + padTokens + '</em>' : '')),
       line('gap', val('spacing', cs.gap || cs.columnGap)),
       line('radius', val('radius', cs.borderTopLeftRadius)),
-      line('font', val('type', cs.fontSize) + ' / ' + cs.fontWeight + ' / lh ' + cs.lineHeight),
+      line('font', (node.textContent || '').trim()
+            ? val('type', cs.fontSize) + ' / ' + cs.fontWeight + ' / lh ' + cs.lineHeight
+            : '<span style="opacity:.4">no text of its own</span>'),
       line('color', val('colour', cs.color)),
-      line('background', val('colour', cs.backgroundColor)),
+      /* A gradient lands in background-image, not background-color, so reading
+         only the colour reported "transparent" for every gradient-filled
+         surface, including the primary button and the whole hero. */
+      line('background', cs.backgroundImage && cs.backgroundImage !== 'none'
+            ? (MAPS.image[cs.backgroundImage]
+                ? '<em>' + MAPS.image[cs.backgroundImage] + '</em>'
+                : val('image', cs.backgroundImage))
+            : val('colour', cs.backgroundColor)),
       line('border', cs.borderTopWidth === '0px' ? '<span style="opacity:.4">not set</span>'
             : cs.borderTopWidth + ' ' + val('colour', cs.borderTopColor)),
       line('shadow', cs.boxShadow === 'none' ? '<span style="opacity:.4">not set</span>'
             : (tokenFor('elevation', cs.boxShadow) ? '<em>' + tokenFor('elevation', cs.boxShadow) + '</em>'
-               : '<b>no token</b> ' + esc(cs.boxShadow.slice(0, 46) + '…')))
+               : val('elevation', cs.boxShadow)))
     ];
     var state = node.getAttribute && (node.getAttribute('data-state') || node.getAttribute('data-tone'));
     if (state) { rows.unshift(line('state', '<em>' + esc(state) + '</em>')); }
