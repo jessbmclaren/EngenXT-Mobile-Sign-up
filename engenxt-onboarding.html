@@ -81,6 +81,16 @@
   --color-on-dark-mid:    rgba(255,255,255,0.72);
   --color-on-dark-soft:   rgba(255,255,255,0.60);
   --color-on-dark-faint:  rgba(255,255,255,0.45);
+  /* The primary is too dark to read on the hero, so the dark screens get a
+     lifted version of it. The steps mirror --color-on-dark-* above: strong and
+     soft carry text, line draws an edge, fill sits behind an icon.
+     Soft is 0.90 rather than 0.80 because 0.80 composites to 4.40:1 on the
+     lightest stop of the hero, which is under AA for the small uppercase
+     labels this colour is for. */
+  --color-accent-on-dark:        #639EFF;
+  --color-accent-on-dark-soft:   rgba(99,158,255,0.90);
+  --color-accent-on-dark-line:   rgba(99,158,255,0.28);
+  --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
 
@@ -465,18 +475,19 @@ body {
    because it cannot be broken down without ceasing to mean anything. */
 .a-medal {
   position: relative; flex-shrink: 0;
-  width: 132px; height: 132px;
+  width: 156px; height: 156px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
   background: var(--color-on-dark-fill);
-  border: 1.5px solid var(--color-on-dark-faint);
+  border: 1.5px solid var(--color-accent-on-dark-line);
+  box-shadow: 0 0 44px var(--color-primary-30);
 }
-/* The ring reads as an achievement without a second colour. */
+/* Two rings, both in the accent: a solid edge and a dashed orbit outside it. */
 .a-medal::before {
   content: ""; position: absolute; inset: -10px;
   border-radius: var(--radius-circle);
-  border: 1.5px dashed var(--color-on-dark-faint);
+  border: 1.5px dashed var(--color-accent-on-dark-line);
 }
 .a-medal__value {
   font-size: var(--text-hero); font-weight: 800; line-height: 1;
@@ -501,6 +512,153 @@ body {
 }
 [data-motion="reduced"] .a-confetti { display: none; }
 
+/* The moment a point lands. One ring out of the graphic, which says that
+   something just happened without reaching for a second colour. */
+.a-medal__wave {
+  position: absolute; inset: -10px;
+  border-radius: var(--radius-circle);
+  border: 1.5px solid var(--color-accent-on-dark-line);
+  opacity: 0; pointer-events: none;
+}
+.a-medal__wave[data-state="out"] { animation: medalWave var(--dur-slow) var(--ease-out) both; }
+@keyframes medalWave {
+  from { transform: scale(0.86); opacity: 0.75; }
+  to   { transform: scale(1.42); opacity: 0; }
+}
+/* The bolt sits above the number rather than beside it, so the column reads
+   top to bottom as symbol, amount, unit. */
+.a-medal__bolt { font-size: var(--text-large); line-height: 1; margin-bottom: var(--sp-1); }
+
+/* a-meter. A track and a fill. It cannot be broken down further without
+   ceasing to say "this far along", so it is an atom. */
+.a-meter {
+  width: 100%; height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-on-dark-fill);
+  overflow: hidden;
+}
+.a-meter__fill {
+  height: 100%; width: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-accent-on-dark) 0%,
+              var(--color-tertiary) 100%);
+  box-shadow: 0 0 12px var(--color-primary-30);
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+/* m-earn-row. One line of the receipt: what was earned, and what it was
+   worth. An icon, a label and a value bonded into one job, so a molecule. */
+.m-earn-row {
+  width: 100%;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: left;
+}
+.m-earn-row__label {
+  flex: 1 1 auto; min-width: 0;
+  font-size: var(--text-caption); font-weight: 600;
+  color: var(--color-text-on-dark);
+}
+/* Never shrinks: the amount is the point of the row, so the label wraps
+   before the value does. */
+.m-earn-row__pill {
+  flex-shrink: 0;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-on-dark-fill);
+  border: 1px solid var(--color-on-dark-faint);
+  font-size: var(--text-caption2); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--color-on-dark-soft);
+  transition: color var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+/* Landed, meaning its points are now in the total above. */
+.m-earn-row[data-state="landed"] .m-earn-row__pill {
+  color: var(--color-text-on-dark); border-color: var(--color-on-dark-line);
+}
+
+/* m-reward-goal. The meter, the thing it counts towards and how far off it
+   is. A bar with no target is decoration, and the target is the part that
+   brings a driver back. */
+.m-reward-goal {
+  width: 100%;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: left;
+}
+/* Wraps rather than crushes: at 320dp with large text the two labels need
+   more than one line between them. */
+.m-reward-goal__head {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+.m-reward-goal__title {
+  flex: 1 1 auto;
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-on-dark-soft);
+}
+.m-reward-goal__value {
+  font-size: var(--text-caption2); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--color-accent-on-dark);
+}
+/* The scale is the set of targets the meter is measured against, so it sits
+   directly under the track it belongs to. */
+.m-reward-goal__scale {
+  display: flex; justify-content: space-between;
+  font-size: var(--text-nano); font-variant-numeric: tabular-nums;
+  color: var(--color-on-dark-mid);
+}
+.m-reward-goal__next {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--color-on-dark-faint);
+  font-size: var(--text-caption2); font-weight: 600;
+  color: var(--color-on-dark-soft);
+}
+
+/* On the dark screen the light icon plate would be a white square, so the
+   wrap takes the same on-dark treatment as everything else here. */
+.a-icon-wrap--onDark {
+  background: var(--color-accent-on-dark-fill);
+  border-color: var(--color-accent-on-dark-line);
+}
+
+/* The colour behind the dark. Three soft fields drift under the content, so
+   the screen reads as depth rather than a flat navy panel. Decorative, so it
+   is hidden from assistive tech and takes no pointer events. */
+.o-onboard__orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: var(--z-base); }
+.o-onboard__orb { position: absolute; border-radius: var(--radius-circle); }
+.o-onboard__orb--a {
+  top: -90px; right: -70px; width: 340px; height: 340px;
+  background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
+  animation: orbDriftA 9s var(--ease-in-out) infinite;
+}
+.o-onboard__orb--b {
+  top: 34%; left: -80px; width: 260px; height: 260px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
+  animation: orbDriftB 11s var(--ease-in-out) 1.5s infinite;
+}
+.o-onboard__orb--c {
+  bottom: 8%; right: -50px; width: 220px; height: 220px;
+  background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
+  animation: orbDriftC 13s var(--ease-in-out) 3s infinite;
+}
+@keyframes orbDriftA { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-18px,22px) } }
+@keyframes orbDriftB { 0%,100% { transform: translate(0,0) } 50% { transform: translate(20px,-16px) } }
+@keyframes orbDriftC { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-14px,-20px) } }
+/* Everything the driver reads sits in front of the colour. */
+.o-onboard--reward > *:not(.o-onboard__orbs) { position: relative; z-index: var(--z-content); }
+
 /* o-onboard. A full screen of its own, because the sign-up sheet has finished
    its job and a sheet over a hero would say the flow is still in progress. */
 .o-onboard {
@@ -514,7 +672,16 @@ body {
 /* The device's own chrome stays on top of an app screen, the way it does on a
    phone. Without this the surface covered the clock and the battery. */
 .m-notch, .m-status-bar { z-index: var(--z-tool-top); }
-.o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: center; }
+.o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: stretch; }
+.o-onboard--reward .o-onboard__eyebrow,
+.o-onboard--reward .o-onboard__title { text-align: center; }
+.o-onboard--reward .o-onboard__eyebrow { color: var(--color-accent-on-dark-soft); }
+/* Tighter than the task screen: this one carries a ring, three rows and a
+   card, and at 390x844 the action was otherwise a scroll away. */
+.o-onboard--reward .o-onboard__title { margin-top: var(--sp-4); }
+.o-onboard--reward .o-onboard__spacer { flex-basis: var(--sp-5); min-height: var(--sp-5); }
+/* The blocks under the medal are a list, evenly spaced. */
+.o-onboard__earned { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
 .o-onboard--task   { background: var(--color-surface-page); }
 
 .o-onboard__eyebrow {
@@ -568,66 +735,75 @@ body {
   border: 1px solid var(--color-primary-08);
 }
 
-
-/* The card itself. It belongs to the system rather than sitting apart from it,
-   because the inset the rows are measured against is set here. */
-.d-stateNav {
-  width: 232px; flex-shrink: 0; align-self: flex-start;
-  position: sticky; top: var(--sp-8);
-  max-height: calc(100vh - var(--sp-8) * 2); overflow-y: auto;
-  background: var(--color-surface); border-radius: var(--radius-card);
-  /* No top padding: the switcher supplies its own and sits flush, so it can
-     cover the list scrolling under it rather than letting it show above. */
-  padding: 0 var(--sp-3) var(--sp-4);
-  box-shadow: var(--shadow-card);
-  scrollbar-width: thin;
+@media (max-width: 900px) {
+  /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
+  .d-flyout {
+    left: var(--sp-4); right: var(--sp-4); width: auto;
+    bottom: var(--sp-4); top: auto; max-height: 60vh;
+  }
 }
 
-/* ── The sidebar, one row and one heading ─────────────────────────────
-   It had grown five row types: a 48px section, a 28px toggle, a 24px
-   heading, a 23px state and a 20px key line, across three type sizes and
-   two greys for the same kind of thing. Everything in this menu is a row
-   in a list, so there is one row, and what changes between them is what
-   sits at the trailing end.
 
-   These rows are 40px rather than the product's 48. The d- layer is a
-   desktop review surface driven with a mouse and it never ships, which is
-   the exemption the Targets rule already records. */
+/* ── The sidebar, two panes on one surface ────────────────────────────
+   Sections on the left, the states of the highlighted one on the right, a
+   hairline between them. One card, not a card and a floating panel: a menu
+   that detaches from the thing that opened it has to be positioned, flipped,
+   dismissed and kept out of the way, and none of that work buys anything the
+   join does not already give you.
+
+   The right pane always holds something, so the menu is never a list of
+   closed doors. It follows hover as well as click, because on a surface this
+   size the pointer is already the fastest way to look around, and it follows
+   focus too, so the keyboard sees the same thing the mouse does. */
+.d-stateNav {
+  display: grid; grid-template-columns: 216px 264px;
+  align-self: flex-start; flex-shrink: 0;
+  position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - var(--sp-8) * 2);
+  background: var(--color-surface); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.d-stateNav__left {
+  display: flex; flex-direction: column;
+  min-height: 0; overflow-y: auto; scrollbar-width: thin;
+  padding: 0 var(--sp-2) var(--sp-3);
+  border-right: 1px solid var(--color-border-light);
+}
+.d-stateNav__right {
+  min-height: 0; overflow-y: auto; scrollbar-width: thin;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+}
+
+/* One heading, wherever it appears. */
 .d-stateNav__heading,
 .d-stateNav__flow {
-  padding: var(--sp-3) var(--sp-2h) var(--sp-1);
-  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
+  padding: var(--sp-3) var(--sp-2) var(--sp-1);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.9px;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
-.d-stateNav__heading:first-child,
-.d-stateNav__flow:first-child { padding-top: var(--sp-2); }
+.d-stateNav__flow:first-child { padding-top: var(--sp-3); }
 
-/* One row. Everything that can be clicked in this menu is this shape. */
+/* One row. Everything clickable in this menu is this shape, and only the
+   trailing end changes: a count and a chevron, or a switch, or nothing. */
 .d-stateNav__group,
 .d-stateNav__toggle,
 .d-stateNav__item {
   display: flex; align-items: center; gap: var(--sp-2);
-  width: 100%; min-height: 40px;
-  padding: var(--sp-1) var(--sp-2h);
+  width: 100%; min-height: 38px;
+  padding: var(--sp-1) var(--sp-2);
   border: none; background: none; border-radius: var(--radius-chip);
   text-align: left; text-decoration: none; cursor: pointer;
   font-size: var(--text-caption2); font-weight: 600;
   color: var(--color-text-primary);
-  transition: background .15s, color .15s;
+  transition: background .14s ease, color .14s ease;
 }
+.d-stateNav__group > span:first-child,
+.d-stateNav__toggle > span:first-child { flex: 1 1 auto; }
 .d-stateNav__group:hover,
 .d-stateNav__toggle:hover,
 .d-stateNav__item:hover { background: var(--color-surface-hover); }
 
-/* The label takes the room so anything trailing is pushed to the end. Three
-   children on space-between left the count adrift in the middle of the row,
-   related to nothing on either side of it. */
-.d-stateNav__group > span:first-child,
-.d-stateNav__toggle > span:first-child,
-.d-stateNav__item { flex: 1 1 auto; }
-
-/* The trailing cluster: a count and a chevron, or a switch. Quiet, because it
-   is metadata and the name of the thing is what you are reading. */
 .d-stateNav__meta {
   flex: 0 0 auto; display: flex; align-items: center; gap: var(--sp-1h);
   color: var(--color-text-tertiary);
@@ -636,49 +812,63 @@ body {
   font-size: var(--text-nano); font-weight: 700;
   font-variant-numeric: tabular-nums; min-width: 14px; text-align: right;
 }
-.d-stateNav__chev { flex-shrink: 0; opacity: .55; }
+.d-stateNav__chev { flex-shrink: 0; opacity: .5; }
 
-/* One selected state, whatever the row is. */
-.d-stateNav__group[aria-expanded="true"],
-.d-stateNav__item[data-state="active"] {
-  background: var(--color-primary-light); color: var(--color-primary-dark);
+/* The section being read. A filled row rather than a coloured one, because
+   the accent is spent on the state you are actually looking at. */
+.d-stateNav__group[aria-expanded="true"] {
+  background: var(--color-surface-sunken); color: var(--color-text-primary);
 }
-.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-primary-dark); }
-/* The state you are actually looking at, which is a different thing from the
-   section you have open. */
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-text-secondary); }
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__chev { opacity: .9; }
+
+/* The one thing on screen. It gets the only strong colour in the menu. */
 .d-stateNav__item[aria-current="true"] {
-  background: var(--color-secondary-12); color: var(--color-error-text); font-weight: 700;
+  background: var(--color-primary-light); color: var(--color-primary-dark); font-weight: 700;
 }
 .d-stateNav__item--link { color: var(--color-primary-dark); font-weight: 700; }
 
-.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
+/* The right pane's own heading and lead, which say what the section is for
+   rather than only listing what is in it. */
+.d-stateNav__paneTitle {
+  font-size: var(--text-caption); font-weight: 800; letter-spacing: -0.2px;
+  color: var(--color-text-primary);
+}
+.d-stateNav__paneLead {
+  margin-top: var(--sp-1); margin-bottom: var(--sp-4);
+  font-size: var(--text-nano); line-height: 1.55; color: var(--color-text-secondary);
+}
+.d-stateNav__paneLabel {
+  padding: 0 var(--sp-2) var(--sp-1);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
 
-/* The switcher sits on the same rhythm as everything under it. */
+.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) var(--sp-2); }
+
+/* The switcher sits above the left column only, so the two panes stay level. */
 .d-stateNav__switcher {
   position: sticky; top: 0; z-index: var(--z-content);
   display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1);
-  margin-inline: calc(var(--sp-3) * -1);
-  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  margin-inline: calc(var(--sp-2) * -1);
+  padding: var(--sp-3) var(--sp-2) var(--sp-2);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-light);
 }
 .d-stateNav__tab {
-  min-height: 40px; cursor: pointer;
-  padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-chip);
+  min-height: 34px; cursor: pointer;
+  padding: var(--sp-1) var(--sp-1); border-radius: var(--radius-chip);
   border: 1px solid transparent; background: none;
-  font-size: var(--text-caption2); font-weight: 600;
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.2px;
   color: var(--color-text-secondary);
-  transition: background .15s, color .15s;
+  transition: background .14s ease, color .14s ease;
 }
 .d-stateNav__tab:hover { background: var(--color-surface-hover); }
 .d-stateNav__tab[data-state="active"] {
-  background: var(--color-primary-light); color: var(--color-primary-dark);
-  border-color: var(--color-primary-12); font-weight: 700;
+  background: var(--color-surface-sunken); color: var(--color-text-primary);
 }
 
-/* The key is a two-column read, not a list of controls, so it is the one
-   thing here that is not a row. It still shares the type and the inset. */
-.d-key { padding: var(--sp-1) var(--sp-2h) var(--sp-2); }
+.d-key { padding: var(--sp-1) var(--sp-2) var(--sp-2); }
 .d-key__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
   padding: var(--sp-1) 0;
@@ -689,49 +879,10 @@ body {
   color: var(--color-text-primary); white-space: nowrap;
 }
 
-/* The panel's rows are the same rows, so the two read as one menu. */
-.d-flyout__list { padding: var(--sp-2) var(--sp-3) var(--sp-3); }
-.d-flyout__title { font-size: var(--text-caption2); font-weight: 800; color: var(--color-text-primary); }
-.d-flyout__hint {
-  padding: var(--sp-2) var(--sp-4) var(--sp-3);
-  font-size: var(--text-nano); color: var(--color-text-tertiary);
-  border-top: 1px solid var(--color-border-light);
-}
-
-/* d-flyout. The states of the open section. Sticky and scrolling on its own,
-   so a long list never drags the page with it. */
-.d-flyout {
-  position: fixed; z-index: var(--z-tool-top);
-  width: 260px; max-height: min(70vh, 560px);
-  display: flex; flex-direction: column;
-  background: var(--color-surface); border-radius: var(--radius-card);
-  box-shadow: var(--shadow-overlay);
-  overflow: hidden;
-}
-.d-flyout__head {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-2) var(--sp-2) var(--sp-4);
-  border-bottom: 1px solid var(--color-border-light);
-}
-.d-flyout__close {
-  flex-shrink: 0; width: var(--size-target); height: var(--size-target);
-  display: flex; align-items: center; justify-content: center;
-  border: none; background: none; cursor: pointer; border-radius: var(--radius-circle);
-  /* The glyph is pushed to the trailing edge so the 48px target does not
-     shove the title inwards. */
-  margin-right: calc(var(--sp-2) * -1);
-}
-.d-flyout__close:hover { background: var(--color-surface-hover); }
-/* Selecting a state does not close the panel: stepping through a section is
-   the job, and closing after each one would cost two clicks a state. */
-.d-flyout .d-stateNav__item { width: 100%; }
-
-@media (max-width: 900px) {
-  /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
-  .d-flyout {
-    left: var(--sp-4); right: var(--sp-4); width: auto;
-    bottom: var(--sp-4); top: auto; max-height: 60vh;
-  }
+@media (max-width: 1100px) {
+  /* Not enough width for two panes beside a phone, so they stack. */
+  .d-stateNav { grid-template-columns: 1fr; max-height: none; position: static; }
+  .d-stateNav__left { border-right: none; border-bottom: 1px solid var(--color-border-light); }
 }
 
 /* ══ PAGE ════════════════════════════════════════════════════════════════ */
@@ -770,24 +921,31 @@ body {
 
   <!-- ══ STATE NAV, tooling ═══════════════════════════════════════════ -->
   <nav class="d-stateNav" id="stateNav" aria-label="Prototype states">
-    <div class="d-stateNav__switcher" role="tablist" aria-label="Sidebar view">
-      <button class="d-stateNav__tab" id="tabStates" type="button" role="tab"
-              aria-selected="true" aria-controls="viewStates" data-state="active">States</button>
-      <button class="d-stateNav__tab" id="tabNotes" type="button" role="tab"
-              aria-selected="false" aria-controls="viewNotes">Design notes</button>
+    <div class="d-stateNav__left">
+      <div class="d-stateNav__switcher" role="tablist" aria-label="Sidebar view">
+        <button class="d-stateNav__tab" id="tabStates" type="button" role="tab"
+                aria-selected="true" aria-controls="viewStates" data-state="active">States</button>
+        <button class="d-stateNav__tab" id="tabNotes" type="button" role="tab"
+                aria-selected="false" aria-controls="viewNotes">Design notes</button>
+      </div>
+
+      <div class="d-stateNav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
+        <div id="navSections"></div>
+      </div>
+
+      <div class="d-stateNav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
+        <p class="d-stateNav__heading">Modes</p>
+        <div id="navModes"></div>
+        <div class="d-stateNav__rule"></div>
+        <p class="d-stateNav__heading">Where this sits</p>
+        <div class="d-key" id="navKey"></div>
+      </div>
     </div>
 
-    <div class="d-stateNav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
-      <div id="navSections"></div>
-    </div>
-
-    <div class="d-stateNav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
-      <p class="d-stateNav__heading">Modes</p>
-      <div id="navModes"></div>
-      <div class="d-stateNav__rule"></div>
-      <p class="d-stateNav__heading">Where this sits</p>
-      <div class="d-key" id="navKey"></div>
-    </div>
+    <!-- The states of whichever section is highlighted. It always holds one,
+         so the menu is never a row of closed doors, and there is no floating
+         layer to position, flip or dismiss. -->
+    <div class="d-stateNav__right" id="navRight" aria-live="polite"></div>
   </nav>
 
   <!-- ══ DEVICE ═══════════════════════════════════════════════════════ -->
@@ -815,21 +973,70 @@ body {
       <!-- SCREEN ONE · the reward, acknowledged before anything is asked -->
       <section class="o-onboard o-onboard--reward" id="rewardScreen"
                aria-labelledby="rewardTitle" hidden>
-        <p class="o-onboard__eyebrow">Welcome reward</p>
+        <div class="o-onboard__orbs" aria-hidden="true">
+          <div class="o-onboard__orb o-onboard__orb--a"></div>
+          <div class="o-onboard__orb o-onboard__orb--b"></div>
+          <div class="o-onboard__orb o-onboard__orb--c"></div>
+        </div>
+        <p class="o-onboard__eyebrow">Sign-up complete</p>
         <div class="o-onboard__stage">
-          <div class="a-medal" id="rewardMedal" role="img" aria-label="10 starter points earned">
-            <span class="a-medal__value">10</span>
+          <div class="a-medal" id="rewardMedal" role="img"
+               aria-label="50 points earned for signing up">
+            <span class="a-medal__wave" id="rewardWave" aria-hidden="true"></span>
+            <span class="a-medal__bolt" aria-hidden="true">⚡</span>
+            <span class="a-medal__value" id="rewardValue">0</span>
             <span class="a-medal__unit">pts</span>
           </div>
           <canvas class="a-confetti" id="rewardConfetti" aria-hidden="true"></canvas>
         </div>
-        <h1 class="o-onboard__title" id="rewardTitle" tabindex="-1">Welcome to EngenXT</h1>
-        <p class="o-onboard__body">
-          You earned 10 starter points. Your points count towards airtime and data rewards.
-        </p>
+        <h1 class="o-onboard__title" id="rewardTitle" tabindex="-1">You&rsquo;re signed up</h1>
+
+        <!-- What the points were for. The medal is the total, these are the
+             three things that made it. -->
+        <div class="o-onboard__earned">
+        <div class="m-earn-row" id="earnRow1">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9"/></svg></span>
+          <span class="m-earn-row__label">Number verified</span>
+          <span class="m-earn-row__pill">+20 pts</span>
+        </div>
+        <div class="m-earn-row" id="earnRow2">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg></span>
+          <span class="m-earn-row__label">Account created</span>
+          <span class="m-earn-row__pill">+20 pts</span>
+        </div>
+        <div class="m-earn-row" id="earnRow3">
+          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
+          <span class="m-earn-row__label">Ready to fuel</span>
+          <span class="m-earn-row__pill">+10 pts</span>
+        </div>
+
+          <!-- What the points are for. The medal is a score, this says what
+               the score buys and how far off it is. -->
+          <div class="m-reward-goal" id="rewardGoal">
+            <div class="m-reward-goal__head">
+              <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1A10 10 0 0 1 4.9 4.9"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg></span>
+              <span class="m-reward-goal__title">Data reward</span>
+              <span class="m-reward-goal__value" id="rewardGoalValue">0.05 GB of 5 GB</span>
+            </div>
+            <div class="a-meter" id="rewardMeter" role="progressbar"
+                 aria-valuemin="0" aria-valuemax="5000" aria-valuenow="50"
+                 aria-valuetext="50 of 5 000 points, 0.05 of 5 gigabytes"
+                 aria-label="Data earned so far">
+              <div class="a-meter__fill" id="rewardMeterFill"></div>
+            </div>
+            <div class="m-reward-goal__scale" aria-hidden="true">
+              <span>0</span><span>1 GB</span><span>2 GB</span>
+              <span>3 GB</span><span>4 GB</span><span>5 GB</span>
+            </div>
+            <p class="m-reward-goal__next" id="rewardNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark-soft)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+              <span>950 points to your first 1 GB</span>
+            </p>
+          </div>
+        </div>
+
         <div class="o-onboard__spacer"></div>
         <div class="o-onboard__actions">
-          <button class="a-btn a-btn--onDark" id="rewardCta" type="button">Continue</button>
+          <button class="a-btn a-btn--primary" id="rewardCta" type="button">Continue</button>
         </div>
       </section>
 
@@ -868,6 +1075,10 @@ body {
     root: root, frame: frame,
     reward: $('rewardScreen'), rewardTitle: $('rewardTitle'), rewardMedal: $('rewardMedal'),
     rewardConfetti: $('rewardConfetti'), rewardCta: $('rewardCta'),
+    rewardValue: $('rewardValue'), rewardWave: $('rewardWave'),
+    rewardGoalValue: $('rewardGoalValue'), rewardMeter: $('rewardMeter'),
+    rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'),
+    earnRows: [$('earnRow1'), $('earnRow2'), $('earnRow3')],
     vehicle: $('vehicleScreen'), vehicleTitle: $('vehicleTitle'), vehicleBody: $('vehicleBody'),
     vehicleNote: $('vehicleNote'), vehicleArt: $('vehicleArt'), vehicleBack: $('vehicleBack'),
     vehicleActions: $('vehicleActions'),
@@ -881,7 +1092,16 @@ body {
      ════════════════════════════════════════════════════════════════════ */
   var S = {
     userType: 'new-driver',      // new-driver | returning-driver
-    starterPoints: 10,
+    /* Signing up is worth 50, the same as it is in the full app, and the
+       three rows on screen are what makes it up. Change these and the total,
+       the meter, the goal line and the announcement all follow. */
+    earned: [
+      { row: 0, label: 'Number verified', pts: 20 },
+      { row: 1, label: 'Account created', pts: 20 },
+      { row: 2, label: 'Ready to fuel',   pts: 10 }
+    ],
+    ptsPerGb: 1000,
+    gbCap: 5,
     vehicleLinked: false,
     step: 'signup-reward',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
@@ -920,49 +1140,85 @@ body {
       return;
     }
     var canvas = el.rewardConfetti;
-    var box = el.rewardMedal.getBoundingClientRect();
-    if (!box.width) { return; }
-    /* Three times the graphic, but never wider than the screen it is on: a
+    var stage = canvas.parentNode;
+    var medal = el.rewardMedal.getBoundingClientRect();
+    var frame = stage.getBoundingClientRect();
+    if (!medal.width || !frame.width) { return; }
+
+    /* Square, three times the graphic, and never wider than the screen: a
        fixed multiple put half the burst outside a 320dp frame, so the smallest
        phone got the least celebration. */
     var room = el.frame.clientWidth - 8;
-    var span = Math.min(Math.round(box.width * 3), room);
+    var span = Math.min(Math.round(medal.width * 3), room);
     var w = canvas.width  = span;
     var h = canvas.height = span;
     canvas.style.width  = w + 'px';
     canvas.style.height = h + 'px';
-    canvas.style.left = Math.round((box.width  - w) / 2) + 'px';
-    canvas.style.top  = Math.round((box.height - h) / 2) + 'px';
+    /* Placed against the stage, which is what it is positioned inside, and
+       centred on the ring rather than on the stage: offsetting by the medal's
+       own width put the burst most of a phone to the left of the ring it was
+       meant to come out of. */
+    canvas.style.right = 'auto';
+    canvas.style.bottom = 'auto';
+    canvas.style.left = Math.round((medal.left - frame.left) + medal.width / 2 - w / 2) + 'px';
+    canvas.style.top  = Math.round((medal.top  - frame.top)  + medal.height / 2 - h / 2) + 'px';
     var ctx = canvas.getContext('2d');
     if (!ctx) { return; }
 
     var cs = getComputedStyle(root);
     var palette = ['--color-primary', '--color-secondary', '--color-warning',
-                   '--color-success', '--color-text-on-dark']
+                   '--color-success', '--color-text-on-dark',
+                   '--color-accent-on-dark', '--color-tertiary']
       .map(function (n) { return cs.getPropertyValue(n).trim(); });
 
+    /* Two rings rather than one. An even ring reads as a diagram, so the inner
+       ring is dense and slow and the outer one is sparse and fast, and both
+       are nudged off the spoke so no two pieces travel the same line. */
     var bits = [];
-    for (var i = 0; i < 26; i++) {
-      var a = (Math.PI * 2 * i) / 26 + (i % 3) * 0.12;
-      var speed = 2.6 + (i % 5) * 0.55;
-      bits.push({ x: w / 2, y: h / 2, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - 1.2,
-                  size: 3 + (i % 3), spin: (i % 7) * 0.14, colour: palette[i % palette.length] });
+    var RINGS = [{ n: 32, speed: 2.3, spread: 1.1, size: 3 },
+                 { n: 20, speed: 4.0, spread: 1.5, size: 4 }];
+    var seed = 0;
+    /* Deterministic, so the burst is the same every time it is reviewed and a
+       screenshot of it does not change under the reviewer. */
+    function wobble() {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
     }
-    var start = null, DURATION = 1200;
+    RINGS.forEach(function (ring) {
+      for (var i = 0; i < ring.n; i++) {
+        var a = (Math.PI * 2 * i) / ring.n + wobble() * 0.5;
+        var speed = ring.speed + wobble() * ring.spread;
+        bits.push({
+          x: w / 2, y: h / 2,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed - 3,     /* thrown upward, then gravity takes it */
+          size: ring.size + Math.round(wobble() * 3),
+          spin: wobble() * Math.PI, spinRate: 0.06 + wobble() * 0.16,
+          colour: palette[(i + ring.n) % palette.length]
+        });
+      }
+    });
+
+    var start = null, DURATION = 1500;
     function frameStep(t) {
       if (start === null) { start = t; }
       var elapsed = t - start;
       ctx.clearRect(0, 0, w, h);
       if (elapsed > DURATION) { canvas.width = 0; return; }
-      var fade = 1 - elapsed / DURATION;
+      /* Holds full strength for the first half, so the burst is seen before it
+         starts leaving. */
+      var p = elapsed / DURATION;
+      var fade = p < 0.5 ? 1 : 1 - (p - 0.5) / 0.5;
       bits.forEach(function (b) {
-        b.x += b.vx; b.y += b.vy; b.vy += 0.12; b.spin += 0.08;
+        b.x += b.vx; b.y += b.vy;
+        b.vx *= 0.965; b.vy = b.vy * 0.965 + 0.22;
+        b.spin += b.spinRate;
         ctx.save();
         ctx.globalAlpha = Math.max(0, fade);
         ctx.translate(b.x, b.y);
         ctx.rotate(b.spin);
         ctx.fillStyle = b.colour;
-        ctx.fillRect(-b.size / 2, -b.size / 2, b.size, b.size * 1.6);
+        ctx.fillRect(-b.size / 2, -b.size / 2, b.size, b.size * 1.7);
         ctx.restore();
       });
       requestAnimationFrame(frameStep);
@@ -978,16 +1234,101 @@ body {
     el.vehicle.hidden = true; el.vehicle.removeAttribute('data-state');
   }
 
+  /* Total points, and everything on the screen that is derived from it. */
+  function rewardTotal() {
+    return S.earned.reduce(function (n, e) { return n + e.pts; }, 0);
+  }
+  /* Grouped in threes with a space, which is how a number this size is written
+     here and keeps 1 000 from reading as 1.000. */
+  function groupPts(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  function paintGoal(points) {
+    var gb = points / S.ptsPerGb;
+    var capPts = S.ptsPerGb * S.gbCap;
+    var nextGb = Math.min(S.gbCap, Math.floor(gb) + 1);
+    var toNext = Math.max(0, nextGb * S.ptsPerGb - points);
+    el.rewardGoalValue.textContent =
+      Math.min(gb, S.gbCap).toFixed(2) + ' GB of ' + S.gbCap + ' GB';
+    el.rewardMeter.setAttribute('aria-valuenow', points);
+    el.rewardMeter.setAttribute('aria-valuetext',
+      groupPts(points) + ' of ' + groupPts(capPts) + ' points, ' +
+      gb.toFixed(2) + ' of ' + S.gbCap + ' gigabytes');
+    el.rewardNext.lastElementChild.textContent = gb >= S.gbCap
+      ? 'You have earned the full ' + S.gbCap + ' GB'
+      : groupPts(toNext) + ' points to ' + (nextGb === 1 ? 'your first 1 GB' : nextGb + ' GB');
+    return Math.min(100, points / capPts * 100);
+  }
+
+  /* Put the screen in its finished state with nothing moving. This is the
+     whole screen under reduced motion, and the frame every beat is heading
+     towards otherwise. */
+  function settleReward() {
+    var total = rewardTotal();
+    el.rewardValue.textContent = total;
+    el.earnRows.forEach(function (r) { if (r) { r.setAttribute('data-state', 'landed'); } });
+    var pct = paintGoal(total);
+    el.rewardMeterFill.style.width = pct + '%';
+    setMeterFloor(total);
+  }
+
+  /* The total is earned rather than printed: each row lands, its value goes
+     quiet-to-solid, and the number above steps up by that much. A driver sees
+     the score being built out of things that happened. */
+  /* At fifty points the fill is three pixels wide, which reads as an empty bar
+     and so as something broken rather than something early. It never drops
+     below a visible sliver once there is anything to show. Nothing is
+     overstated by it: the exact figure sits directly above the track. */
+  function setMeterFloor(points) {
+    el.rewardMeterFill.style.minWidth = points > 0 ? 'var(--sp-2)' : '0';
+  }
+
+  function playReward() {
+    el.rewardValue.textContent = '0';
+    el.earnRows.forEach(function (r) { if (r) { r.removeAttribute('data-state'); } });
+    el.rewardMeterFill.style.transition = 'none';
+    el.rewardMeterFill.style.width = '0%';
+    setMeterFloor(0);
+    paintGoal(0);
+
+    if (prefersReduced()) {
+      el.rewardMeterFill.style.transition = '';
+      settleReward();
+      return;
+    }
+
+    var running = 0;
+    S.earned.forEach(function (e, i) {
+      after(360 + i * 260, function () {
+        var row = el.earnRows[e.row];
+        if (row) { row.setAttribute('data-state', 'landed'); }
+        running += e.pts;
+        el.rewardValue.textContent = running;
+        el.rewardWave.removeAttribute('data-state');
+        /* Restart the ring: an attribute set twice in a row does not replay an
+           animation until the element has been reflowed without it. */
+        void el.rewardWave.offsetWidth;
+        el.rewardWave.setAttribute('data-state', 'out');
+      });
+    });
+    after(360 + S.earned.length * 260 + 180, function () {
+      el.rewardMeterFill.style.transition = '';
+      el.rewardMeterFill.style.width = paintGoal(rewardTotal()) + '%';
+      setMeterFloor(rewardTotal());
+    });
+  }
+
   function showReward() {
     clearTimers(); hideAll();
     S.step = 'signup-reward';
     el.statusBar.setAttribute('data-tone', 'onDark');
     el.reward.hidden = false;
     el.reward.setAttribute('data-state', 'visible');
-    announce('Welcome to EngenXT. You earned ' + S.starterPoints + ' starter points.');
+    announce('You are signed up. You earned ' + rewardTotal() + ' points.');
     after(60, function () { el.rewardTitle.focus({ preventScroll: true }); });
-    /* After focus, so the burst cannot interrupt the announcement. */
+    /* After focus, so neither the burst nor the counting interrupts the
+       announcement. */
     after(240, playConfetti);
+    playReward();
   }
 
   var VEHICLE = {
@@ -1133,140 +1474,75 @@ body {
   }
 
 
-  /* ── The section panel ────────────────────────────────────────────────
-     A long menu behaves better as two levels than as one column: the sidebar
-     names the sections, and the panel holds the states of whichever one you
-     opened. The behaviours are the ones people already expect from a menu
-     like this, and each is here for a reason:
 
-       Escape closes it            a keyboard user must never be trapped
-       clicking outside closes it  the commonest way people dismiss a layer
-       the trigger toggles it      pressing the same thing again undoes it
-       choosing a state does NOT   stepping through a section is the job, and
-                                   closing each time would cost two clicks
-       focus moves in, and back    so the keyboard does not lose its place
-       aria-expanded on the trigger so assistive tech is told what happened */
-  var flyout = {
-    el: null, list: null, title: null, openFor: null, returnTo: null
-  };
+  /* ── The two panes ────────────────────────────────────────────────────
+     Sections on the left, the states of the highlighted one on the right.
+     There is nothing to open or dismiss: the right pane always holds a
+     section, so the menu is never a row of closed doors, and there is no
+     floating layer to position, flip or click away from.
 
-  function buildFlyout() {
-    var host = document.createElement('div');
-    host.className = 'd-flyout';
-    host.id = 'navFlyout';
-    host.setAttribute('role', 'dialog');
-    host.setAttribute('aria-label', 'States in this section');
-    host.hidden = true;
-    host.innerHTML =
-      '<div class="d-flyout__head">' +
-        '<p class="d-flyout__title" id="flyoutTitle"></p>' +
-        '<button type="button" class="d-flyout__close" id="flyoutClose" aria-label="Close this section">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" ' +
-          'stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
-          '<path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
-        '</button>' +
-      '</div>' +
-      '<div class="d-flyout__list" id="flyoutList"></div>' +
-      '<p class="d-flyout__hint">Escape closes. Picking a state leaves this open.</p>';
-    document.body.appendChild(host);
-    flyout.el = host;
-    flyout.list = host.querySelector('#flyoutList');
-    flyout.title = host.querySelector('#flyoutTitle');
-    host.querySelector('#flyoutClose').addEventListener('click', function () { closeFlyout(true); });
+     A section is highlighted by hover, by focus and by click, so the pointer
+     and the keyboard see the same thing. Hover only previews; it never
+     changes what is on the phone. */
+  var pane = { openFor: null, hoverTimer: null };
 
-    /* Outside means outside both the panel and the button that opened it,
-       or the trigger would close and immediately reopen. */
-    document.addEventListener('pointerdown', function (e) {
-      if (flyout.el.hidden) { return; }
-      if (flyout.el.contains(e.target)) { return; }
-      if (e.target.closest && e.target.closest('.d-stateNav__group')) { return; }
-      closeFlyout(false);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !flyout.el.hidden) { e.preventDefault(); closeFlyout(true); }
-    });
-    window.addEventListener('resize', function () {
-      if (!flyout.el.hidden) { placeFlyout(); }
-    });
+  function paneLead(flow, key, label, count) {
+    return { title: label, count: count,
+             lead: (LEADS[key] || 'States in ' + label + '.') };
   }
+
+  function showSection(flow, key, label, ids, awayRows) {
+    var right = document.getElementById('navRight');
+    if (!right) { return; }
+    /* A section belonging to the other file carries an away: prefix on its
+       row, so the row is matched on that rather than on the bare key. */
+    var mark = awayRows ? 'away:' + key : key;
+    pane.openFor = mark;
+    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
+      b.setAttribute('aria-expanded', b.dataset.group === mark ? 'true' : 'false');
+    });
+
+    var n = awayRows ? awayRows.length : ids.length;
+    var html = '<p class="d-stateNav__paneTitle">' + label + '</p>' +
+               '<p class="d-stateNav__paneLead">' + (LEADS[key] || '') + '</p>' +
+               '<p class="d-stateNav__paneLabel">' + n + (n === 1 ? ' state' : ' states') + '</p>';
+    if (awayRows) {
+      /* Another file's states are links, because reaching one means loading
+         that file, and a link is the honest control for something that
+         navigates. */
+      html += awayRows.map(function (r) {
+        return '<a class="d-stateNav__item" href="' + flow.file + '#' + r[0] + '">' + r[1] + '</a>';
+      }).join('');
+    } else {
+      html += ids.map(function (id) {
+        return '<button type="button" class="d-stateNav__item" data-state-id="' + id + '">' +
+               STATE_LABEL(id) + '</button>';
+      }).join('');
+    }
+    right.innerHTML = html;
+    right.querySelectorAll('[data-state-id]').forEach(function (b) {
+      b.addEventListener('click', function () { go(b.dataset.stateId); });
+    });
+    setNav(currentState);
+    right.scrollTop = 0;
+  }
+
+  /* Hover previews after a beat, so dragging the pointer across the list on
+     the way somewhere else does not flicker through every section. */
+  function hoverSection(fn) {
+    clearTimeout(pane.hoverTimer);
+    pane.hoverTimer = setTimeout(fn, 90);
+  }
+
+
 
   /* Beside the section that opened it, nudged so it never runs off the
      bottom of the window. */
-  function placeFlyout() {
-    var trigger = document.querySelector('.d-stateNav__group[aria-expanded="true"]');
-    if (!trigger) { return; }
-    var t = trigger.getBoundingClientRect();
-    var box = flyout.el.getBoundingClientRect();
-    var top = Math.max(8, Math.min(t.top, window.innerHeight - box.height - 8));
-    flyout.el.style.top = top + 'px';
 
-    /* Beside the section, wherever that does not cover the phone. A panel over
-       the screen you have just chosen is worse than no panel, because looking
-       at the screen is the entire job.
 
-       Three places, in order of preference: the gap between the sidebar and
-       the phone, the space to the left of the sidebar, and the space past the
-       phone. Left alignment removed the second of those, which is why there
-       has to be a third. */
-    var device = document.getElementById('deviceFrame');
-    var nav = document.getElementById('stateNav').getBoundingClientRect();
-    var dev = device ? device.getBoundingClientRect() : null;
-    var right = t.right + 12;
-    var fits = function (x) {
-      if (x < 8 || x + box.width > window.innerWidth - 8) { return false; }
-      return !dev || x + box.width <= dev.left + 1 || x >= dev.right - 1;
-    };
-    var choice = [right, nav.left - box.width - 12, dev ? dev.right + 12 : right].filter(fits)[0];
-    flyout.el.style.left = Math.round(choice === undefined ? right : choice) + 'px';
-  }
-
-  function openFlyout(group, label, ids, viaKeyboard) {
-    var trigger = document.querySelector('.d-stateNav__group[data-group="' + group + '"]');
-    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
-      b.setAttribute('aria-expanded', b === trigger ? 'true' : 'false');
-    });
-    flyout.openFor = group;
-    flyout.returnTo = trigger;
-    flyout.title.textContent = label;
-    flyout.list.innerHTML = '';
-    ids.forEach(function (id) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'd-stateNav__item';
-      b.textContent = STATES[id].label;
-      b.dataset.stateId = id;
-      b.addEventListener('click', function () { go(id); });
-      flyout.list.appendChild(b);
-    });
-    flyout.el.hidden = false;
-    placeFlyout();
-    setNav(currentState);
-    /* Move focus in only when the keyboard opened it. A mouse user is already
-       looking at the panel and about to click; giving them a focus ring on the
-       first item is noise, and taking focus off what they were doing is worse. */
-    if (viaKeyboard) {
-      var first = flyout.list.querySelector('.d-stateNav__item');
-      if (first) { first.focus({ preventScroll: true }); }
-    }
-  }
-
-  function closeFlyout(restoreFocus) {
-    if (flyout.el.hidden) { return; }
-    flyout.el.hidden = true;
-    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
-      b.setAttribute('aria-expanded', 'false');
-    });
-    if (restoreFocus && flyout.returnTo) { flyout.returnTo.focus({ preventScroll: true }); }
-    flyout.openFor = null;
-  }
 
   /* A click made by pressing Enter or Space reports detail 0, which is how the
      browser tells us the pointer was not involved. */
-  function toggleFlyout(group, label, ids, ev) {
-    var viaKeyboard = !!ev && ev.detail === 0;
-    if (flyout.openFor === group) { closeFlyout(viaKeyboard); return; }
-    openFlyout(group, label, ids, viaKeyboard);
-  }
 
 
   var currentState = null;
@@ -1276,6 +1552,7 @@ body {
     currentState = id;
     def.run();
     setNav(id);
+    revealCurrentSection();
     if (location.hash.slice(1) !== id) { history.replaceState(null, '', '#' + id); }
     el.caption.textContent = id + ' · ' + def.label;
   }
@@ -1298,6 +1575,20 @@ body {
      build step. It is a short list and it is the price of no build. If it
      drifts, the link still works and only the count is stale, which is the
      mildest way for a thing like this to be wrong. */
+  /* What a section is for, rather than only what is in it. A menu that only
+     lists names makes you open every one to find out which you wanted. */
+  var LEADS = {
+    navHome:    'What a driver sees before they start, and the three things that can stop them.',
+    navNumber:  'Entering the number their company registered, and everything that can come back.',
+    navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
+    navBlocked: 'Full screens for a driver who cannot get past this from here.',
+    navDone:    'The end of sign-up, which hands over to the welcome flow.',
+    'new':       'A driver who has just signed up: the reward, then the vehicle.',
+    'returning': 'Someone who has been here before and skips the welcome.',
+    'route':     'The two entry points sign-up hands over to.'
+  };
+  function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
+
   var FLOWS = [
     {
       file: 'engenxt-signup.html',
@@ -1374,31 +1665,21 @@ body {
     }
   };
 
-  function openAwayFlyout(flow, key, label, ev) {
-    var group = 'away:' + key;
-    var trigger = document.querySelector('.d-stateNav__group[data-group="' + group + '"]');
-    if (flyout.openFor === group) { closeFlyout(!!ev && ev.detail === 0); return; }
-    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
-      b.setAttribute('aria-expanded', b === trigger ? 'true' : 'false');
-    });
-    flyout.openFor = group;
-    flyout.returnTo = trigger;
-    flyout.title.textContent = label;
-    flyout.list.innerHTML = '';
-    var rows = (AWAY_STATES[flow.file] || {})[key] || [];
-    rows.forEach(function (row) {
-      var a = document.createElement('a');
-      a.className = 'd-stateNav__item';
-      a.href = flow.file + '#' + row[0];
-      a.textContent = row[1];
-      flyout.list.appendChild(a);
-    });
-    flyout.el.hidden = false;
-    placeFlyout();
-    if (ev && ev.detail === 0) {
-      var first = flyout.list.querySelector('.d-stateNav__item');
-      if (first) { first.focus({ preventScroll: true }); }
+
+  function showAwaySection(flow, key, label) {
+    showSection(flow, key, label, null, (AWAY_STATES[flow.file] || {})[key] || []);
+  }
+
+  /* Which section owns the state on the phone, so the menu can follow it.
+     The two files derive their section ids differently, so buildNav records
+     them here rather than this reading either file's map. */
+  function revealCurrentSection() {
+    var keys = Object.keys(SECTION_REVEAL), want = null, i;
+    for (i = 0; i < keys.length; i++) {
+      if (SECTION_REVEAL[keys[i]].ids.indexOf(currentState) !== -1) { want = keys[i]; break; }
     }
+    if (!want) { want = keys[0]; }
+    if (want && pane.openFor !== want) { SECTION_REVEAL[want].reveal(); }
   }
 
   function sectionButton(label, count) {
@@ -1417,8 +1698,9 @@ body {
     return b;
   }
 
+  var SECTION_REVEAL = {};
+
   function buildNav() {
-    buildFlyout();
     var host = document.getElementById('navSections');
     host.innerHTML = '';
     FLOWS.forEach(function (flow) {
@@ -1433,13 +1715,24 @@ body {
         var ids = mine ? Object.keys(STATES).filter(function (k) { return STATES[k].group === key; }) : null;
         var b = sectionButton(label, mine ? ids.length : sec[2]);
         b.dataset.group = (mine ? '' : 'away:') + key;
-        b.addEventListener('click', function (ev) {
-          if (mine) { toggleFlyout(key, label, ids, ev); }
-          else { openAwayFlyout(flow, key, label, ev); }
-        });
+        var reveal = function () {
+          if (mine) { showSection(flow, key, label, ids, null); }
+          else { showAwaySection(flow, key, label); }
+        };
+        b.addEventListener('click', reveal);
+        b.addEventListener('focus', reveal);
+        b.addEventListener('mouseenter', function () { hoverSection(reveal); });
+        b.addEventListener('mouseleave', function () { clearTimeout(pane.hoverTimer); });
         host.appendChild(b);
+        /* Only this file's sections can be opened here, so only they are
+           candidates for what the pane shows on load. */
+        if (mine) { SECTION_REVEAL[key] = { reveal: reveal, ids: ids }; }
       });
     });
+    /* The pane opens on the section you are actually in, so a deep link lands
+       with the menu already showing where it put you, and the menu is never a
+       row of closed doors. */
+    revealCurrentSection();
     document.getElementById('navKey').innerHTML =
       ['Sign-up finishes in engenxt-signup.html',
        'A new driver arrives here on its last step',
