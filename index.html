@@ -1732,8 +1732,8 @@ button { background: none; border: none; color: inherit; }
     },
     slow: {
       tone: 'info', icon: 'clock',
-      title: 'Still waiting for your code?',
-      body: 'WhatsApp codes can take a minute to arrive on a weak signal. You can wait a little longer or get the code by SMS.',
+      title: 'Your code has not arrived yet',
+      body: 'Codes can be slow to arrive on a weak signal. You can keep waiting, or get this one by SMS.',
       /* The primary carries EngenXT blue, not WhatsApp green. Verifying is the
          task; the channel is only how the code travels. */
       actions: [{ label: 'Send code by SMS', kind: 'primary', act: 'sendBySms' }]
@@ -2541,9 +2541,17 @@ button { background: none; border: none; color: inherit; }
     var d = text.replace(/\D/g, '').slice(0, 6);
     if (!d) { return; }
     e.preventDefault();
-    /* A pasted code is the whole code, wherever it was dropped. */
-    for (var i = 0; i < 6; i++) { S.otp[i] = d[i] || ''; }
-    fillFrom(0, d);
+    /* Six digits is the whole code, wherever it was dropped, so it replaces
+       what is there. Fewer than six is a fragment and fills from where the
+       driver put it, because silently deleting digits they had already typed
+       is worse than pasting into the wrong place. */
+    if (d.length === 6) {
+      for (var i = 0; i < 6; i++) { S.otp[i] = d[i]; }
+      fillFrom(0, d);
+      return;
+    }
+    var at = cells().indexOf(document.activeElement);
+    fillFrom(at < 0 ? 0 : at, d);
   }
 
   function submitOtp() {
@@ -2596,7 +2604,7 @@ button { background: none; border: none; color: inherit; }
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS[kind], 'code:' + kind));
   }
 
-  var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
+  var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Another incorrect code will pause sign-in for 15 minutes.</span>';
 
   function showCodeWrong() {
     S.attemptsLeft -= 1;
@@ -2611,7 +2619,7 @@ button { background: none; border: none; color: inherit; }
     if (S.attemptsLeft === 1) {
       /* The consequence is a separate sentence, because folding it into the
          error made it read as though the phone number itself would stop. */
-      msg += '<span class="a-helper__note">Another incorrect code will pause sign in for 15 minutes.</span>';
+      msg += '<span class="a-helper__note">Another incorrect code will pause sign-in for 15 minutes.</span>';
     }
     setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
     shake(el.otpGroup);
@@ -2643,6 +2651,9 @@ button { background: none; border: none; color: inherit; }
     startCountdown('resend', RESEND_SECS, function (left, label) {
       el.resendBtn.textContent = 'Resend code in ' + label;
     }, function () {
+      /* Nothing left to spend means the button must not offer to spend it.
+         Re-enabling here baited the one tap that starts the fifteen minutes. */
+      if (S.resendsLeft <= 0) { showResendLimit(); return; }
       el.resendBtn.disabled = false;
       /* Once it can be tapped it says where the code will go, because this
          flow has two channels and "Resend now" names neither. */
@@ -2689,7 +2700,10 @@ button { background: none; border: none; color: inherit; }
   function startSlowHint() {
     clearTimeout(slowHintId);
     slowHintId = setTimeout(function () {
-      if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden && !S.verifying) {
+      var typing = S.otp.join('') !== '';
+      var reporting = el.otpHelper.getAttribute('data-tone');
+      if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden && !S.verifying &&
+          !typing && !reporting) {
         /* Twenty seconds without a code means the driver is waiting, not
            typing, so the keyboard comes down and the card gets the room. */
         releaseKeyboard();
@@ -2808,7 +2822,7 @@ button { background: none; border: none; color: inherit; }
       /* Do not claim existing approvals still work. Signing in is how a driver
          reaches an approval, so if sign in is down the approval is out of reach
          too, and a driver at a pump would act on that promise and be stranded. */
-      body: "You can't sign in right now. If you need to fuel, call your manager.",
+      body: "You can't sign in right now. If you need to fuel, ask your manager.",
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retryHome' },
         { label: 'Contact support', kind: 'outline', href: WA_SUPPORT_DOWN }
@@ -2948,6 +2962,15 @@ button { background: none; border: none; color: inherit; }
     'number/err-nowhatsapp': { label: 'Not on WhatsApp',    run: function () { base('signup', '825555555'); showNumberError('nowhatsapp'); } },
     'number/err-offline':    { label: 'No connection',      run: function () { base('signup', '821234567'); showNumberError('offline'); } },
     'number/err-server':     { label: 'Server error',       run: function () { base('signup', '829999999'); showNumberError('server'); } },
+    /* The escalated twin. Support appears only once retrying has visibly
+       failed, so the state has to be reachable on its own: clicking the first
+       one twice now renders the same screen twice, which is what a navigator
+       should do. */
+    'number/err-server-2':   { label: 'Server error, again', run: function () {
+                                 base('signup', '829999999');
+                                 S.fails['number:server'] = 1;
+                                 showNumberError('server');
+                               } },
 
     /* Code */
     'code/idle':        { label: 'Waiting for code', run: function () { base('signup', '821234567'); goToCode({ fresh: true }); } },
@@ -3030,6 +3053,10 @@ button { background: none; border: none; color: inherit; }
     var def = STATES[id];
     if (!def) { return; }
     currentState = id;
+    /* Placing a state is not living through it. The escalation tally counts
+       repeated failures a driver actually hit, so jumping to the same state
+       twice must not make it look like it happened twice. */
+    S.fails = {};
     S.jumping = true;
     try { def.run(); } finally { S.jumping = false; }
     setNav(id);
