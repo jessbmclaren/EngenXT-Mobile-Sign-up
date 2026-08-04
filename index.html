@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="en-ZA" data-motion="system" data-text="default" data-net="online">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EngenXT · Home and sign up · Every state</title>
+
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   ENGENXT · HOME AND SIGN UP
+   Naming: atomic design levels as prefixes, BEM for structure,
+           data-* attributes for runtime state.
+
+     tokens   CSS custom properties      --color-primary
+     atoms    a-                         a-btn, a-field, a-otp-cell
+     molecules m-                        m-phone-field, m-alert
+     organisms o-                        o-auth-hero, o-signup-sheet
+     templates t-                        t-device-frame, t-auth-screen
+     pages     p-                        p-signup-demo
+     utilities u-                        u-visually-hidden
+
+   State is never a class. It is an attribute:
+     data-state   idle | pending | valid | error | locked | expired
+     data-tone    error | warning | success | info
+     data-channel whatsapp | sms
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ TOKENS ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --color-primary:       #1650B8;
+  --color-primary-dark:  #0D3A8A;
+  --color-primary-light: #EEF3FF;
+  --color-primary-08: rgba(22,80,184,0.08);
+  --color-primary-12: rgba(22,80,184,0.12);
+  --color-primary-30: rgba(22,80,184,0.30);   /* gradient stop and button shadow */
+
+  --color-secondary:     #E2231A;
+  --color-secondary-bg:  #FDEEEE;
+  --color-secondary-12: rgba(226,35,26,0.12);
+  --color-secondary-25: rgba(226,35,26,0.25);
+  --color-secondary-40: rgba(226,35,26,0.40);
+  --color-secondary-04: rgba(226,35,26,0.04);
+  --color-secondary-18: rgba(226,35,26,0.18);
+
+  --color-tertiary-04: rgba(61,188,212,0.04);
+  --color-tertiary-18: rgba(61,188,212,0.18);
+
+  /* Semantic */
+  --color-success:       #166832;    /* 5.09:1 on the sheet glass */
+  --color-success-bg:    #E8F5EE;
+  --color-success-20: rgba(22,104,50,0.20);
+  --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
+  --color-warning-bg:    #FDF1E3;
+  --color-warning-border: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
+  --color-whatsapp:      #25D366;
+  --color-whatsapp-dark: #0B6B5F;               /* 5.51:1 on --color-whatsapp-bg */
+  --color-whatsapp-bg:   #E7F9EF;
+  --color-on-whatsapp:   #05341c;
+  /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
+     the logo, so it must not be darkened to satisfy a text contrast rule. */
+  --color-error-text:    #B81510;    /* 4.94:1 on the sheet glass */
+
+  /* Text */
+  --color-text-primary:   #0d1e2a;
+  --color-text-secondary: #4C5973;   /* 5.03:1 on the sheet glass */
+  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.79:1 on sunken */
+  --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
+  --color-text-on-dark:   #ffffff;
+
+  /* On-dark ramp, for anything sitting on the hero */
+  --color-on-dark-strong: rgba(255,255,255,0.85);
+  --color-on-dark-mid:    rgba(255,255,255,0.72);
+  --color-on-dark-soft:   rgba(255,255,255,0.60);
+  --color-on-dark-faint:  rgba(255,255,255,0.45);
+  --color-on-dark-line:   rgba(255,255,255,0.18);
+  --color-on-dark-fill:   rgba(255,255,255,0.10);
+  --color-on-dark-fill-hi: rgba(255,255,255,0.14);
+
+  /* Surface and border */
+  --color-surface:        #ffffff;
+  --color-surface-sunken: #F2F2F7;
+  --color-surface-page:   #e4e6eb;
+  --color-surface-hover:  #f5f5f5;
+  --color-border:         rgba(0,0,0,0.08);
+  --color-border-light:   rgba(0,0,0,0.06);
+  --color-border-field:   rgba(0,0,0,0.45);   /* 3.2:1 against the field fill */
+  --color-scrim:          rgba(0,0,0,0.45);
+  --color-scrim-deep:     rgba(10,22,40,0.72);
+
+  /* Hero */
+  --color-hero-1: #0a1628;
+  --color-hero-2: #0d2040;
+  --color-hero-3: #0a1830;
+  --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+
+  /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
+  --color-focus:      var(--color-primary-dark);
+  --color-handle:     rgba(0,0,0,0.25);
+  --color-hardware:   #000;   /* the physical bezel, not a brand colour */
+  --color-switch-track:   #8A91A3;   /* 3:1 against white */
+  --color-focus-halo: rgba(255,255,255,0.92);
+
+  /* Type */
+  --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-mono: "SF Mono","Menlo",monospace;
+  --text-hero:     42px;
+  --text-title:    22px;
+  --text-large:    20px;
+  --text-heading:  18px;
+  --text-subhead:  17px;
+  --text-callout:  16px;
+  --text-body:     15px;
+  --text-footnote: 14px;
+  --text-caption:  13px;
+  --text-caption2: 12px;
+  --text-micro:    11px;
+  --text-nano:     10px;
+
+  /* Radius */
+  --radius-pill:   999px;
+  --radius-phone:  47px;   /* the real corner at 390pt */
+  --radius-notch:  22px;
+  --radius-sheet:  28px;
+  --radius-card:   16px;
+  --radius-card-sm:12px;
+  --radius-chip:   10px;
+  --radius-circle: 50%;
+
+  /* Elevation. One light source, from above. */
+  --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
+  --shadow-sheet:     inset 0 var(--hairline) 0 rgba(255,255,255,0.65),
+                      0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
+  --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
+  --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
+  --shadow-whatsapp:  0 6px 22px rgba(37,211,102,0.35);
+  --shadow-card:      0 1px 2px rgba(0,0,0,0.04), 0 4px 20px rgba(22,80,184,0.09);
+  --shadow-field:     0 2px 14px var(--color-border-light);
+  --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
+  --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
+  --shadow-toast:     0 4px 20px rgba(0,0,0,0.30);
+  --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
+
+  /* Space. A 4px base with three half steps, because 6, 10 and 18 are
+     structural here rather than exceptional, and a scale should be honest. */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+  --sp-1h: 6px; --sp-2h: 10px; --sp-4h: 18px;
+
+  /* Size. Values that are neither spacing nor type. */
+  --size-otp-cell: 52px;
+  --size-control:  56px;   /* primary control height */
+  --size-target:   48px;   /* minimum tap target */
+  --hairline:      0.5px;
+
+  /* Stacking. The only dimension where components genuinely couple, so it is
+     the one that most needed a scale. Hardware sits above everything the app
+     can draw. */
+  --z-base:     0;
+  --z-content:  2;
+  --z-scrim:    9;
+  --z-sheet:    10;
+  --z-overlay:  30;
+  --z-toast:    40;
+  --z-hardware: 50;
+  /* Tooling overlays sit between the app and the hardware, never above it. */
+  --z-tool:     45;
+  --z-tool-top: 60;
+
+  /* Glass. Near opaque, because the sheet sits over a near-black hero and
+     0.72 alpha put every piece of secondary text below 2.5:1. */
+  --glass-sheet-bg: rgba(228,235,250,0.35);
+  --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
+  --glass-sheet-fallback: #E4EBFA;
+  /* The rendered composite of the glass over the hero. backdrop-filter cannot
+     be computed from the tokens, so this is measured from the painted page and
+     must be re-measured whenever --glass-sheet-bg or -bd changes. */
+  --glass-sheet-measured: #D4DAE9;
+  --glass-card-bg:  rgba(255,255,255,0.62);
+
+  /* Motion */
+  --ease-out:      cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
+  --ease-emphasis: cubic-bezier(0.32,0.72,0,1);
+  --ease-spring:   cubic-bezier(.34,1.4,.64,1);
+  --dur-fast:  0.12s;
+  --dur-base:  0.30s;
+  --dur-sheet: 0.38s;
+  --dur-slow:  0.42s;
+}
+
+/* Large text mode re-points the ramp. Components read tokens, so they follow. */
+[data-text="large"] {
+  --text-hero:     46px;
+  --text-title:    24px;
+  --text-large:    22px;
+  --text-heading:  20px;
+  --text-subhead:  19px;
+  --text-callout:  18px;
+  --text-body:     17px;
+  --text-footnote: 16px;
+  --text-caption:  15px;
+  --text-caption2: 14px;
+  --text-micro:    13px;
+  --text-nano:     12px;
+  --size-otp-cell: 60px;   /* the square has to keep containing its glyph */
+}
+
+/* ══ BASE ════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: var(--color-surface-page);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text-primary);
+}
+input, button, a { font-family: inherit; }
+button { background: none; border: none; color: inherit; }
+
+/* One focus ring for the whole file. Two tone, so the dark core reads on the
+   light sheet and the light halo reads on the near-black hero. */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--color-focus-halo);
+}
+
+/* ══ UTILITIES ═══════════════════════════════════════════════════════════ */
+.u-visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ══ ATOMS ═══════════════════════════════════════════════════════════════ */
+
+/* a-btn */
+.a-btn {
+  width: 100%; min-height: var(--size-control);
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-subhead); font-weight: 700; letter-spacing: -0.3px;
+  text-decoration: none; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-in-out),
+              box-shadow var(--dur-fast) var(--ease-in-out),
+              background var(--dur-base), color var(--dur-base), border-color var(--dur-base);
+}
+.a-btn:active { transform: scale(0.97); transition-duration: .1s; }
+.a-btn--primary {
+  background: var(--gradient-primary);
+  color: var(--color-text-on-dark); box-shadow: var(--shadow-btn);
+}
+.a-btn--onDark {
+  background: var(--color-surface); color: var(--color-text-primary);
+  box-shadow: var(--shadow-btn-white);
+}
+.a-btn--outlineOnDark {
+  min-height: var(--size-target); background: var(--color-on-dark-fill);
+  color: var(--color-text-on-dark);
+  border: 1.5px solid var(--color-on-dark-faint);
+  font-weight: 600;
+}
+.a-btn--outlineOnDark:hover { background: var(--color-on-dark-fill-hi); }
+.a-btn--outline {
+  min-height: var(--size-target); background: transparent; color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  font-weight: 600;
+}
+.a-btn--outline:hover { background: var(--color-border-light); }
+.a-btn--whatsapp {
+  background: var(--color-whatsapp); color: var(--color-on-whatsapp);
+  box-shadow: var(--shadow-whatsapp);
+}
+.a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
+/* Disabled is driven by the real attribute as well as the ARIA one, so the
+   control is honestly inactive rather than merely greyed. */
+.a-btn[aria-disabled="true"], .a-btn:disabled {
+  background: var(--color-surface-sunken); color: var(--color-text-tertiary);
+  border-color: transparent; box-shadow: none; cursor: default;
+}
+.a-btn[aria-disabled="true"]:active, .a-btn:disabled:active { transform: none; }
+
+/* a-link */
+.a-link {
+  min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
+  font-variant-numeric: tabular-nums;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--text-footnote); font-weight: 600; letter-spacing: -0.1px;
+  color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
+}
+/* Quiet is still a live control, so it differentiates upward from disabled
+   rather than sharing its grey. */
+.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; }
+.a-link--onDark {
+  color: var(--color-text-on-dark); text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-color: var(--color-on-dark-faint);
+}
+
+/* a-label */
+.a-label {
+  display: block; margin-bottom: calc(var(--sp-4) * -1 + var(--sp-2));
+  font-size: var(--text-caption); font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.a-link:disabled, .a-link[disabled] {
+  color: var(--color-text-tertiary); font-weight: 500; cursor: default;
+}
+
+/* a-field. Two orthogonal axes: data-state for idle, pending and error,
+   :focus-within for focus, data-valid for validity. Squeezing focus and
+   valid into one slot made focusing a complete field hide its own tick. */
+.a-field {
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: var(--size-control); padding: 0 var(--sp-4);
+  background: var(--glass-card-bg);
+  border: 1.5px solid var(--color-border-field);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-field);
+  transition: border-color var(--dur-base), background var(--dur-base),
+              box-shadow var(--dur-base), opacity var(--dur-base);
+}
+.a-field:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-12);
+}
+.a-field[data-valid="true"] { border-color: var(--color-primary); }
+.a-field[data-state="error"] {
+  border-color: var(--color-error-text); background: var(--color-secondary-bg);
+}
+.a-field[data-state="pending"] { opacity: .6; }
+.a-field__input {
+  flex: 1; min-width: 0; border: none; background: transparent;
+  font-size: var(--text-subhead); font-weight: 600;
+  color: var(--color-text-primary); caret-color: var(--color-primary);
+}
+/* The ring lives on the field, not the bare input, so it follows the border. */
+.a-field__input:focus { outline: none; }
+/* The trailing slot is the atom's own element, so the atom never has to know
+   which molecule is wrapping it. */
+.a-field__affix {
+  flex-shrink: 0; width: 16px; opacity: 0; transform: scale(.7);
+  transition: opacity var(--dur-fast), transform var(--dur-fast) var(--ease-spring);
+}
+.a-field[data-valid="true"] .a-field__affix { opacity: 1; transform: none; }
+.a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: 500; }
+
+/* a-otp-cell */
+.a-otp-cell {
+  flex: 1; min-width: 0; max-width: var(--size-otp-cell); aspect-ratio: 1 / 1;
+  text-align: center; font-size: var(--text-title); font-weight: 700;
+  color: var(--color-text-primary);
+  background: var(--color-surface-sunken);
+  border: 1.5px solid var(--color-border-field);
+  border-radius: var(--radius-card-sm);
+  padding: 0; appearance: none;
+  caret-color: var(--color-primary);
+  transition: border-color .15s, background .15s, color .15s;
+}
+.a-otp-cell[data-state="filled"] {
+  border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary);
+}
+.a-otp-cell[aria-disabled="true"] { opacity: .55; }
+
+/* a-helper */
+.a-helper {
+  display: block; margin-top: var(--sp-2);
+  font-size: var(--text-caption2); line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+.a-helper[data-tone="error"]   { color: var(--color-error-text); font-weight: 600; }
+.a-helper[data-tone="success"] { color: var(--color-success); font-weight: 600; }
+.a-helper[data-tone="warning"] { color: var(--color-warning); font-weight: 600; }
+/* Tone is never carried by colour alone. The icon is injected by setHelper. */
+.a-helper__icon { flex-shrink: 0; vertical-align: -2px; margin-right: var(--sp-1); }
+
+/* a-badge */
+.a-badge {
+  display: inline-flex; align-items: center; gap: var(--sp-1h);
+  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-pill);
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: -0.1px;
+  background: var(--color-primary-light); color: var(--color-primary-dark);
+}
+.a-badge[data-channel="whatsapp"] { background: var(--color-whatsapp-bg); color: var(--color-whatsapp-dark); }
+
+/* a-icon-wrap */
+.a-icon-wrap {
+  width: 40px; height: 40px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-card-sm);
+  background: var(--color-primary-light); border: 1px solid var(--color-primary-08);
+}
+.a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+.a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); border-color: var(--color-secondary-12); }
+.a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-border); }
+.a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
+
+/* a-handle. 5px is a deliberate hairline bar thickness, not a grid value. */
+.a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
+
+/* a-scrim */
+.a-scrim {
+  position: absolute; inset: 0; z-index: var(--z-scrim);
+  background: var(--color-scrim); display: none;
+}
+
+/* a-spinner */
+.a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
+
+
+/* a-notch, a-toast */
+.a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
+.a-toast {
+  position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
+  background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
+  font-size: var(--text-caption); font-weight: 600; line-height: 1.45;
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
+  box-shadow: var(--shadow-toast);
+  opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
+}
+.a-toast[data-state="visible"] { opacity: 1; }
+
+/* ══ MOLECULES ═══════════════════════════════════════════════════════════ */
+
+/* m-status-bar */
+.m-status-bar {
+  position: relative; z-index: var(--z-content); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: max(54px, env(safe-area-inset-top, 0px)) var(--sp-6) 0;
+}
+.m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
+.m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
+.m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
+
+/* m-notch */
+.m-notch {
+  position: absolute; top: 0; left: 0; right: 0; height: 50px; z-index: var(--z-hardware);
+  display: flex; justify-content: center; pointer-events: none;
+}
+
+/* m-brand-lockup */
+.m-brand-lockup { display: flex; align-items: center; gap: var(--sp-2h); }
+.m-brand-lockup__mark {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-secondary); border-radius: var(--radius-chip);
+  box-shadow: 0 4px 16px var(--color-secondary-40);
+}
+.m-brand-lockup__name {
+  font-size: var(--text-title); font-weight: 900; color: var(--color-text-on-dark);
+  letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
+}
+.m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
+.m-brand-lockup__tag {
+  font-size: var(--text-micro); font-weight: 500; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--color-on-dark-faint);
+}
+
+/* m-alert.
+   The tone rules are scoped away from the onDark modifier. Without :not() the
+   tone selector (0,2,0) beats the modifier (0,1,0) and paints white text on a
+   pale tint, which is how both home notices became blank boxes. */
+.m-alert {
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-4); border-radius: var(--radius-card);
+  background: var(--color-primary-light); border: 1px solid var(--color-primary-12);
+}
+.m-alert:not(.m-alert--onDark)[data-tone="info"]    { background: var(--color-primary-light); border-color: var(--color-primary-12); }
+.m-alert:not(.m-alert--onDark)[data-tone="error"]   { background: var(--color-secondary-bg); border-color: var(--color-secondary-25); }
+.m-alert:not(.m-alert--onDark)[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-border); }
+.m-alert:not(.m-alert--onDark)[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
+.m-alert__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
+.m-alert__icon { flex-shrink: 0; margin-top: -1px; }  /* optical, against cap height */
+.m-alert__title {
+  font-size: var(--text-footnote); font-weight: 700; line-height: 1.35;
+  color: var(--color-text-primary); margin-bottom: 3px;
+}
+.m-alert__body { font-size: var(--text-caption2); line-height: 1.55; color: var(--color-text-secondary); }
+.m-alert__body b { color: var(--color-text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-alert__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
+.m-alert--onDark {
+  background: var(--color-on-dark-fill); border-color: var(--color-on-dark-line);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+.m-alert--onDark .m-alert__title { color: var(--color-text-on-dark); }
+.m-alert--onDark .m-alert__body  { color: var(--color-on-dark-mid); }
+
+/* m-sheet-header */
+.m-sheet-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-4);
+}
+.m-sheet-header__title {
+  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
+  color: var(--color-text-primary); margin-bottom: var(--sp-1);
+}
+.m-sheet-header__sub {
+  font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
+  min-height: 39px;
+}
+.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: 700; }
+/* The negative margin pulls a 48px target back to the visual box without
+   pushing the header down. */
+.m-sheet-header__close {
+  flex-shrink: 0;
+  width: var(--size-target); height: var(--size-target);
+  margin-top: calc(var(--sp-1) * -1);
+  /* The glyph is pushed to the button's trailing edge so it lands on the same
+     gutter the title starts from, which a centred 48px box would miss by 16px.
+     No negative margin, so the header can never overflow the sheet. */
+  display: flex; align-items: center; justify-content: flex-end;
+  border-radius: var(--radius-circle); cursor: pointer;
+}
+.m-sheet-header__close:hover { background: var(--color-border-light); }
+.m-sheet-header__badge { margin-top: var(--sp-2); }
+
+/* m-progress */
+.m-progress {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-4h);
+}
+
+/* m-phone-field */
+.m-phone-field__prefix {
+  display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0;
+  padding-right: var(--sp-3); border-right: 1px solid var(--color-primary-12);
+}
+.m-phone-field__flag { font-size: var(--text-large); line-height: 1; }
+.m-phone-field__code { font-size: var(--text-body); font-weight: 800; }
+
+
+/* m-otp-group. 6px between cells is optical, tuned so six squares and five
+   gaps fill the content width at 320. Error carries extra border weight as
+   well as colour, so the two outcomes differ by more than hue. */
+.m-otp-group { display: flex; gap: var(--sp-1h); justify-content: space-between; }
+.m-otp-group[data-state="valid"] .a-otp-cell {
+  border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-success);
+}
+.m-otp-group[data-state="error"] .a-otp-cell {
+  border-width: 2.5px;
+  border-color: var(--color-error-text); background: var(--color-secondary-bg); color: var(--color-error-text);
+}
+.m-otp-group[data-state="locked"] .a-otp-cell { opacity: .45; }
+
+/* m-resend-row. Wraps rather than crushing its labels under large text, and
+   the negative inline margin pulls the links back onto the content edge that
+   the cells and the CTA hold. */
+.m-resend-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-2); row-gap: var(--sp-2); flex-wrap: wrap;
+}
+/* The links sit on the same content edge as the cells and the CTA, so their
+   horizontal padding goes rather than the row growing to compensate. */
+.m-resend-row .a-link { padding-inline: 0; }
+
+/* ══ ORGANISMS ═══════════════════════════════════════════════════════════ */
+
+/* o-auth-hero */
+.o-auth-hero {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--gradient-hero);
+}
+.o-auth-hero__orbs { position: absolute; inset: 0; z-index: var(--z-base); overflow: hidden; pointer-events: none; }
+.o-auth-hero__orb { position: absolute; border-radius: var(--radius-circle); }
+.o-auth-hero__orb--a {
+  top: -80px; right: -60px; width: 360px; height: 360px;
+  background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
+  animation: orbFloatA 9s ease-in-out infinite;
+}
+.o-auth-hero__orb--aInner {
+  top: 40%; right: -40px; width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, transparent 70%);
+}
+.o-auth-hero__orb--b {
+  top: 180px; left: -60px; width: 260px; height: 260px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
+  animation: orbFloatB 11s ease-in-out infinite 1.5s;
+}
+.o-auth-hero__orb--c {
+  bottom: 200px; right: -30px; width: 200px; height: 200px;
+  background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
+  animation: orbFloatC 13s ease-in-out infinite 3s;
+}
+.o-auth-hero__brand { position: relative; z-index: var(--z-content); flex-shrink: 0; padding: var(--sp-7) var(--sp-6) 0; }
+/* margin-top:auto on the first child rather than justify-content:flex-end,
+   because flex-end plus overflow pushes the overflow past the top edge into
+   a region the scroll container does not reach. */
+.o-auth-hero__body {
+  position: relative; z-index: var(--z-content); flex: 1;
+  display: flex; flex-direction: column;
+  padding: 0 var(--sp-6) max(40px, env(safe-area-inset-bottom, 40px));
+  overflow-y: auto;
+}
+.o-auth-hero__title {
+  margin-top: auto;
+  font-size: var(--text-hero); font-weight: 800; color: var(--color-text-on-dark);
+  line-height: 1.08; letter-spacing: -1.6px; margin-bottom: var(--sp-3);
+}
+.o-auth-hero__lede {
+  font-size: var(--text-body); font-weight: 400; line-height: 1.6;
+  color: var(--color-on-dark-soft); margin-bottom: var(--sp-8);
+}
+.o-auth-hero__notice { margin-bottom: var(--sp-4); }
+.o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.o-auth-hero__actions .a-btn { width: 100%; }
+
+/* o-status-page. A blocking status with one recovery action. Used whenever
+   the problem is technical, because an account choice is not the answer. */
+.o-status-page {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; align-items: center; justify-content: center;
+  padding: var(--sp-6);
+  background: var(--color-scrim-deep);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.o-status-page[data-state="visible"] { display: flex; }
+.o-status-page__panel {
+  width: 100%; background: var(--color-surface); border-radius: var(--radius-sheet);
+  padding: var(--sp-7) var(--sp-6); text-align: center;
+  box-shadow: var(--shadow-overlay);
+}
+.o-status-page__icon { margin-inline: auto; }
+.o-status-page__title {
+  font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px;
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+.o-status-page__body {
+  font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-5);
+}
+.o-status-page__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* o-signup-sheet. The sheet does not scroll, its scroller does, so the grab
+   handle stays put and the horizontal travel of the stage animation cannot
+   create real scroll range. */
+.o-signup-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--z-sheet);
+  max-height: 94%; max-height: 94dvh; overflow: hidden;
+  display: none; flex-direction: column;
+  background: var(--glass-sheet-bg);
+  backdrop-filter: var(--glass-sheet-bd); -webkit-backdrop-filter: var(--glass-sheet-bd);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  box-shadow: var(--shadow-sheet);
+  transition: height var(--dur-sheet) var(--ease-emphasis);
+}
+/* Without backdrop-filter, which is real on older Android WebViews, a
+   translucent panel over a near-black hero is unreadable. Go opaque. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  /* No filter means no lift, so the tint alone would sit at 0.35 over a
+     near-black hero. Go fully opaque instead of merely lighter. */
+  .o-signup-sheet { background: var(--glass-sheet-fallback); }
+}
+.o-signup-sheet__grab {
+  width: 100%; flex-shrink: 0; min-height: var(--size-target);
+  padding: var(--sp-4) 0 var(--sp-3);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.o-signup-sheet__scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: clip; }
+.o-signup-sheet__body {
+  padding: 0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column;
+}
+/* The organism owns the vertical rhythm. Nothing in the markup sets spacing. */
+.o-signup-sheet__stage { display: none; flex-direction: column; }
+.o-signup-sheet__stage[data-state="active"] {
+  display: flex; gap: var(--sp-4);
+  animation: stageIn var(--dur-sheet) var(--ease-out) both;
+}
+.o-signup-sheet__stage[data-state="active"][data-shake="true"] {
+  animation: shakeX var(--dur-slow) ease;
+}
+/* The helper belongs to the control above it, so it rides tighter. */
+.o-signup-sheet__stage .a-helper { margin-top: calc(var(--sp-4) * -1 + var(--sp-2)); }
+.o-signup-sheet__cta { margin-top: var(--sp-1); }
+.o-signup-sheet__stage .a-link { align-self: center; }
+
+/* o-outcome-panel. Named for its role, not its tone: it renders the blocked
+   states and the success state, and the tone lives on data-tone. */
+.o-outcome-panel { align-items: center; text-align: center; padding-top: var(--sp-2); }
+.o-outcome-panel__title { font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px; }
+.o-outcome-panel__body { font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary); }
+.o-outcome-panel__meta {
+  font-size: var(--text-caption2); font-weight: 700; color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* o-state-nav */
+.o-state-nav {
+  width: 232px; flex-shrink: 0; align-self: flex-start;
+  position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - var(--sp-8) * 2); overflow-y: auto;
+  background: var(--color-surface); border-radius: var(--radius-card);
+  padding: var(--sp-4) var(--sp-3);
+  box-shadow: var(--shadow-card);
+}
+.o-state-nav__heading {
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--color-text-secondary);
+  padding: var(--sp-2) var(--sp-2) var(--sp-1); margin-top: var(--sp-1);
+}
+.o-state-nav__heading:first-child { margin-top: 0; }
+.o-state-nav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) 0; }
+.o-state-nav__item {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: var(--sp-1h) var(--sp-2h); border-radius: var(--radius-chip);
+  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
+  transition: background .15s, color .15s;
+}
+.o-state-nav__item:hover { background: var(--color-surface-hover); }
+.o-state-nav__item[data-state="active"] {
+  background: var(--color-secondary-12); color: var(--color-error-text); font-weight: 700;
+}
+.o-state-nav__toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  width: 100%; cursor: pointer; padding: var(--sp-1h) var(--sp-2h); border-radius: var(--radius-chip);
+  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
+}
+.o-state-nav__toggle:hover { background: var(--color-surface-hover); }
+.o-state-nav__switch {
+  width: 34px; height: var(--sp-5); border-radius: var(--radius-pill);
+  background: var(--color-switch-track); flex-shrink: 0; position: relative; transition: background .18s;
+}
+.o-state-nav__switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: var(--sp-4); height: var(--sp-4); border-radius: var(--radius-circle);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-knob); transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.o-state-nav__toggle[data-state="on"] .o-state-nav__switch { background: var(--color-primary); }
+.o-state-nav__toggle[data-state="on"] .o-state-nav__switch::after { transform: translateX(14px); }
+
+/* o-key, the legend of demo inputs */
+.o-key { padding: var(--sp-2) var(--sp-2h) var(--sp-1); }
+.o-key__row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
+  padding: 3px 0; font-size: var(--text-nano); color: var(--color-text-secondary);
+}
+.o-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
+
+/* ══ TEMPLATES ═══════════════════════════════════════════════════════════ */
+.t-device-frame {
+  position: relative; flex-shrink: 0;
+  width: 390px; height: 844px;
+  border-radius: var(--radius-phone); overflow: hidden;
+  box-shadow: var(--shadow-phone);
+  transition: width .25s var(--ease-out), height .25s var(--ease-out);
+}
+.t-device-frame[data-width="320"] { width: 320px; height: 720px; }
+
+/* ══ PAGE ════════════════════════════════════════════════════════════════ */
+.p-signup-demo {
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: var(--sp-6); padding: var(--sp-8) var(--sp-6);
+}
+.p-signup-demo__stage { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.p-signup-demo__caption {
+  font-size: var(--text-micro); color: var(--color-text-secondary); text-align: center;
+  max-width: 390px; line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .p-signup-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
+  .o-state-nav { position: static; width: 100%; max-width: 390px; max-height: none; }
+}
+/* Six squares and five gaps cannot each clear 48px inside 320. The row takes
+   the largest size that fits rather than pretending the rule holds. */
+.t-device-frame[data-width="320"] .o-signup-sheet__body { padding-inline: var(--sp-3); }
+.t-device-frame[data-width="320"] .m-otp-group { gap: var(--sp-1); }
+
+@media (max-width: 440px) {
+  .p-signup-demo { padding: 0; gap: 0; }
+  .t-device-frame { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+  .o-state-nav { max-width: none; border-radius: 0; }
+}
+
+/* ══ MOTION ══════════════════════════════════════════════════════════════ */
+@keyframes orbFloatA { 0%,100% { transform: scale(1) translateY(0); opacity: 1 }  50% { transform: scale(1.05) translateY(-8px); opacity: .85 } }
+@keyframes orbFloatB { 0%,100% { transform: scale(1) translateX(0); opacity: .9 } 50% { transform: scale(1.08) translateX(6px); opacity: 1 } }
+@keyframes orbFloatC { 0%,100% { transform: scale(1) translateY(0) }               40% { transform: scale(.94) translateY(10px) } }
+@keyframes sheetUp   { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+@keyframes sheetDown { from { transform: translateY(0); opacity: 1 }    to { transform: translateY(100%); opacity: 0 } }
+@keyframes scrimIn   { from { opacity: 0 } to { opacity: 1 } }
+@keyframes scrimOut  { from { opacity: 1 } to { opacity: 0 } }
+@keyframes stageIn   { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-7px) } 75% { transform: translateX(7px) } }
+@keyframes pop       { from { opacity: 0; transform: scale(.5) } to { opacity: 1; transform: scale(1) } }
+@keyframes spin      { to { transform: rotate(360deg) } }
+
+/* State drives motion, not classes. One emphasis curve for the sheet and the
+   scrim, so the two surfaces move as one object. */
+.o-signup-sheet[data-state="opening"] { animation: sheetUp var(--dur-sheet) var(--ease-emphasis) forwards; }
+.o-signup-sheet[data-state="closing"] { animation: sheetDown .28s var(--ease-emphasis) forwards; }
+.a-scrim[data-state="opening"] { animation: scrimIn var(--dur-base) ease forwards; }
+.a-scrim[data-state="closing"] { animation: scrimOut .22s ease forwards; }
+.a-icon-wrap[data-motion="pop"] { animation: pop .5s var(--ease-spring) both; }
+
+/* Every animation collapses to a still frame when motion is reduced,
+   whether that comes from the OS or from the demo toggle. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+[data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
+  animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+}
+
+/* Forced colours discard every background and border colour, which is every
+   cue the OTP group has. Re-express its states structurally. */
+@media (forced-colors: active) {
+  .a-otp-cell { border-width: 2px; }
+  .a-otp-cell[data-state="filled"] { border-width: 3px; }
+  .m-otp-group[data-state="valid"] .a-otp-cell { outline: 2px solid; outline-offset: 2px; }
+  .m-otp-group[data-state="error"] .a-otp-cell { outline: 2px dashed; outline-offset: 2px; }
+  .a-btn[aria-disabled="true"], .a-btn:disabled { opacity: .5; }
+  .a-field[data-state="error"] { outline: 2px dashed; outline-offset: 2px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DEVELOPER LAYER · d-
+   Not part of the product. This is the handoff tooling: the token reference,
+   the composition overlay, the 4px grid and the element inspector.
+   It is prefixed d- and kept out of the atomic layers on purpose, so nobody
+   ships it by accident.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Developer layer tokens. Separate from the product scale on purpose:
+     the boundary runs one way: tooling reads product tokens because it
+     documents them, but no product component may read a --d- token. */
+  --d-level-atom:      #2563EB;
+  --d-level-molecule:  #7C3AED;
+  --d-level-organism:  #059669;
+  --d-level-template:  #B45309;
+  --d-surface-ink:     var(--color-text-primary);
+  --d-accent-token:    #7DD3FC;
+  --d-accent-missing:  #FCA5A5;
+  --d-accent-inspect:  #38BDF8;
+  --d-inspect-fill:    rgba(56,189,248,0.12);
+  --d-inspect-edge:    rgba(0,0,0,0.35);
+  --d-grid-line:       rgba(226,35,26,0.16);
+  --d-grid-line-soft:  rgba(226,35,26,0.10);
+  --d-copy-hover:      #E2EAFB;
+  --d-rule:            #f4f5f7;
+  --d-on-ink-soft:     rgba(255,255,255,0.45);
+  --d-on-ink-line:     rgba(255,255,255,0.14);
+  --d-panel-width:     420px;
+}
+
+.d-panel {
+  width: var(--d-panel-width); flex-shrink: 0; align-self: flex-start;
+  position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - 64px); overflow-y: auto;
+  background: var(--color-surface); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  display: none;
+}
+[data-spec="on"] .d-panel { display: block; }
+
+.d-panel__head {
+  position: sticky; top: 0; z-index: var(--z-content);
+  background: var(--color-surface); border-bottom: 1px solid var(--color-border-light);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+}
+.d-panel__title { font-size: var(--text-callout); font-weight: 800; letter-spacing: -0.3px; }
+.d-panel__lede { font-size: var(--text-micro); color: var(--color-text-secondary); line-height: 1.5; margin-top: 3px; }
+.d-panel__tabs { display: flex; gap: var(--sp-1); margin-top: var(--sp-3); flex-wrap: wrap; }
+.d-tab {
+  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-pill); cursor: pointer;
+  font-size: var(--text-micro); font-weight: 700;
+  background: var(--color-surface-sunken); color: var(--color-text-secondary);
+}
+.d-tab[data-state="active"] { background: var(--color-primary); color: var(--color-text-on-dark); }
+
+.d-section { padding: var(--sp-4); border-bottom: 1px solid var(--color-border-light); }
+.d-section[hidden] { display: none; }
+.d-section__title {
+  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--sp-3);
+}
+.d-section__note {
+  font-size: var(--text-micro); line-height: 1.55; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-3);
+}
+
+/* Token rows */
+.d-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-1h) 0; border-bottom: 1px solid var(--d-rule);
+}
+.d-row:last-child { border-bottom: none; }
+.d-row__swatch {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: var(--radius-chip);
+  border: 1px solid var(--color-border); background-clip: padding-box;
+}
+.d-row__name {
+  flex: 1; min-width: 0;
+  font-family: var(--font-mono); font-size: var(--text-micro);
+  color: var(--color-text-primary); word-break: break-all;
+}
+.d-row__value {
+  font-family: var(--font-mono); font-size: var(--text-nano);
+  color: var(--color-text-secondary); text-align: right; flex-shrink: 0; max-width: 46%;
+  word-break: break-all;
+}
+.d-row__bar { height: 12px; border-radius: 3px; background: var(--color-primary); flex-shrink: 0; }
+.d-row__radius {
+  width: 44px; height: 34px; flex-shrink: 0;
+  border: 2px solid var(--color-primary); border-right: none; border-bottom: none;
+  background: var(--color-primary-light);
+}
+
+.d-typeSample { color: var(--color-text-primary); line-height: 1.15; }
+.d-shadowSample {
+  width: 56px; height: 34px; flex-shrink: 0; border-radius: var(--radius-card-sm); background: var(--color-surface);
+}
+
+/* Component recipes */
+.d-recipe { border: 1px solid var(--color-border); border-radius: var(--radius-card-sm); margin-bottom: var(--sp-3); overflow: hidden; }
+.d-recipe__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); background: var(--color-surface-sunken);
+}
+.d-recipe__name { font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 700; }
+.d-recipe__level {
+  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase;
+  padding: 2px var(--sp-1h); border-radius: var(--radius-pill); color: var(--color-text-on-dark);
+}
+.d-recipe__level[data-level="atom"]     { background: var(--d-level-atom); }
+.d-recipe__level[data-level="molecule"] { background: var(--d-level-molecule); }
+.d-recipe__level[data-level="organism"] { background: var(--d-level-organism); }
+.d-recipe__level[data-level="template"] { background: var(--d-level-template); }
+.d-recipe__body { padding: var(--sp-2) var(--sp-3) var(--sp-3); }
+.d-recipe__line {
+  display: flex; gap: var(--sp-2); padding: 3px 0;
+  font-family: var(--font-mono); font-size: var(--text-nano); line-height: 1.5;
+}
+.d-recipe__key { color: var(--color-text-secondary); flex-shrink: 0; width: 96px; }
+.d-recipe__val { color: var(--color-text-primary); word-break: break-all; }
+.d-recipe__states { margin-top: var(--sp-2); padding-top: var(--sp-2); border-top: 1px dashed var(--color-border); }
+
+.d-copyBtn {
+  padding: 5px 10px; border-radius: var(--radius-chip); cursor: pointer;
+  font-size: var(--text-nano); font-weight: 700;
+  background: var(--color-primary-light); color: var(--color-primary-dark);
+}
+.d-copyBtn:hover { background: var(--d-copy-hover); }
+
+/* Inspector card, docked under the device */
+.d-inspect {
+  width: 390px; max-width: 100%; display: none;
+  background: var(--d-surface-ink); color: var(--color-text-on-dark); border-radius: var(--radius-card);
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  box-shadow: var(--shadow-inspect);
+}
+[data-inspect="on"] .d-inspect { display: block; }
+.d-inspect__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding-bottom: var(--sp-2); margin-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--d-on-ink-line);
+}
+.d-inspect__sel { font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 700; word-break: break-all; }
+.d-inspect__hint { font-size: var(--text-nano); color: var(--d-on-ink-soft); flex-shrink: 0; }
+.d-inspect__grid { display: grid; grid-template-columns: 82px 1fr; gap: 2px var(--sp-2); }
+.d-inspect__k { font-size: var(--text-nano); color: var(--d-on-ink-soft); font-family: var(--font-mono); }
+.d-inspect__v { font-size: var(--text-nano); color: var(--color-text-on-dark); font-family: var(--font-mono); word-break: break-all; }
+.d-inspect__v em { font-style: normal; color: var(--d-accent-token); }
+.d-inspect__v b   { font-weight: 400; color: var(--d-accent-missing); }
+
+/* Overlays inside the device */
+[data-layers="on"] .t-device-frame [class*="a-"],
+[data-layers="on"] .t-device-frame [class*="m-"],
+[data-layers="on"] .t-device-frame [class*="o-"] { outline: 1px solid var(--d-level-atom); }
+[data-layers="on"] .t-device-frame [class^="m-"], [data-layers="on"] .t-device-frame [class*=" m-"] { outline-color: var(--d-level-molecule); }
+[data-layers="on"] .t-device-frame [class^="o-"], [data-layers="on"] .t-device-frame [class*=" o-"] { outline-color: var(--d-level-organism); }
+
+.d-gridOverlay {
+  position: absolute; inset: 0; z-index: var(--z-tool); pointer-events: none; display: none;
+  background-image:
+    repeating-linear-gradient(to bottom, var(--d-grid-line) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(to right,  var(--d-grid-line-soft) 0 1px, transparent 1px 4px);
+}
+[data-grid="on"] .d-gridOverlay { display: block; }
+
+.d-hoverRing {
+  position: absolute; z-index: var(--z-tool-top); pointer-events: none; display: none;
+  border: 1px solid var(--d-accent-inspect); background: var(--d-inspect-fill);
+  box-shadow: 0 0 0 1px var(--d-inspect-edge);
+}
+[data-inspect="on"] .d-hoverRing[data-state="visible"] { display: block; }
+
+@media (max-width: 900px) {
+  .d-panel { position: static; width: 100%; max-width: var(--d-panel-width); max-height: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="p-signup-demo">
+
+  <!-- ══ STATE NAV ══════════════════════════════════════════════════════ -->
+  <nav class="o-state-nav" id="stateNav" aria-label="Prototype states">
+    <p class="o-state-nav__heading">Home</p>
+    <div id="navHome"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Number</p>
+    <div id="navNumber"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Code</p>
+    <div id="navCode"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Blocked</p>
+    <div id="navBlocked"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Done</p>
+    <div id="navDone"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Modes</p>
+    <div id="navModes"></div>
+
+    <div class="o-state-nav__rule"></div>
+    <p class="o-state-nav__heading">Key</p>
+    <div class="o-key" id="navKey"></div>
+  </nav>
+
+  <!-- ══ DEVICE ═════════════════════════════════════════════════════════ -->
+  <div class="p-signup-demo__stage">
+    <div class="t-device-frame" id="deviceFrame">
+
+      <!-- HOME -->
+      <section class="o-auth-hero" id="authHero" aria-label="EngenXT home">
+        <div class="o-auth-hero__orbs" aria-hidden="true">
+          <div class="o-auth-hero__orb o-auth-hero__orb--a">
+            <div class="o-auth-hero__orb o-auth-hero__orb--aInner"></div>
+          </div>
+          <div class="o-auth-hero__orb o-auth-hero__orb--b"></div>
+          <div class="o-auth-hero__orb o-auth-hero__orb--c"></div>
+        </div>
+
+        <div class="m-notch" aria-hidden="true"><div class="a-notch"></div></div>
+
+        <div class="m-status-bar" data-tone="onDark" aria-hidden="true">
+          <span class="m-status-bar__time">9:41</span>
+          <span class="m-status-bar__icons">
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+              <rect x="0" y="7" width="3" height="5" rx="1" fill="var(--color-on-dark-strong)"/>
+              <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="var(--color-on-dark-strong)"/>
+              <rect x="9" y="2" width="3" height="10" rx="1" fill="var(--color-on-dark-strong)"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1" fill="var(--color-on-dark-strong)"/>
+            </svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="var(--color-on-dark-faint)"/>
+              <rect x="1.5" y="1.5" width="18" height="9" rx="2.5" fill="var(--color-on-dark-strong)"/>
+              <path d="M22.5 4.2L22.5 7.8C23.4 7.4 23.4 4.6 22.5 4.2Z" fill="var(--color-on-dark-faint)"/>
+            </svg>
+          </span>
+        </div>
+
+        <div class="o-auth-hero__brand">
+          <div class="m-brand-lockup">
+            <span class="m-brand-lockup__mark" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/>
+                <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+                <path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>
+              </svg>
+            </span>
+            <span>
+              <p class="m-brand-lockup__name">Engen<em>XT</em></p>
+              <p class="m-brand-lockup__tag">Driver rewards</p>
+            </span>
+          </div>
+        </div>
+
+        <div class="o-auth-hero__body">
+          <h1 class="o-auth-hero__title">Fill up at Engen.<br>Earn airtime and data.</h1>
+          <p class="o-auth-hero__lede">Your manager has added you to EngenXT. Continue with the mobile number they registered for you.</p>
+
+          <div class="o-auth-hero__notice" id="homeNotice" role="status" hidden></div>
+
+          <div class="o-auth-hero__actions">
+            <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Continue with mobile number</button>
+            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">Need help signing in?</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATUS PAGE. Full screen, one status, one obvious action. -->
+      <div class="o-status-page" id="statusPage" role="alertdialog" aria-labelledby="statusTitle">
+        <div class="o-status-page__panel">
+          <span class="a-icon-wrap a-icon-wrap--lg o-status-page__icon" id="statusIcon" data-tone="warning" aria-hidden="true"></span>
+          <h2 class="o-status-page__title" id="statusTitle" tabindex="-1"></h2>
+          <p class="o-status-page__body" id="statusBody"></p>
+          <div class="o-status-page__actions" id="statusActions"></div>
+        </div>
+      </div>
+
+      <!-- SHEET -->
+      <div class="a-scrim" id="sheetScrim"></div>
+
+      <section class="o-signup-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <!-- Not a button. It duplicated the close control and sat ahead of it
+             in the tab order, so it is pointer affordance only. -->
+        <div class="o-signup-sheet__grab" id="sheetGrab" aria-hidden="true">
+          <span class="a-handle"></span>
+        </div>
+
+        <div class="o-signup-sheet__scroll">
+        <div class="o-signup-sheet__body">
+
+          <header class="m-sheet-header">
+            <div>
+              <h2 class="m-sheet-header__title" id="sheetTitle">Your number</h2>
+              <p class="m-sheet-header__sub" id="sheetSub"></p>
+              <p class="m-sheet-header__badge" id="channelBadgeWrap" hidden>
+                <span class="a-badge" id="channelBadge" data-channel="whatsapp"></span>
+              </p>
+            </div>
+            <button class="m-sheet-header__close" id="sheetClose" type="button" aria-label="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2" stroke-linecap="round">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+              </svg>
+            </button>
+          </header>
+
+          <p class="m-progress" id="progress"><span id="progressLabel">Step 1 of 2</span></p>
+
+          <!-- STAGE · NUMBER -->
+          <div class="o-signup-sheet__stage" id="stageNumber">
+            <label class="a-label" for="phoneInput">Mobile number</label>
+            <div class="a-field m-phone-field" id="phoneField">
+              <span class="m-phone-field__prefix" aria-hidden="true">
+                <span class="m-phone-field__flag">🇿🇦</span>
+                <span class="m-phone-field__code">+27</span>
+              </span>
+              <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric"
+                     autocomplete="tel-national" placeholder="82 123 4567"
+                     aria-describedby="phoneHelper">
+            </div>
+            <span class="a-helper" id="phoneHelper" role="status"></span>
+
+            <div id="numberAlert" tabindex="-1" hidden></div>
+
+            <button class="a-btn a-btn--primary o-signup-sheet__cta" id="phoneCta" type="button">
+              Continue
+            </button>
+          </div>
+
+          <!-- STAGE · CODE -->
+          <div class="o-signup-sheet__stage" id="stageCode">
+            <div class="m-otp-group" id="otpGroup" role="group" aria-label="6-digit code"
+                 aria-describedby="otpHelper"></div>
+            <span class="a-helper" id="otpHelper" role="status">&nbsp;</span>
+
+            <div id="codeAlert" tabindex="-1" hidden></div>
+
+            <div class="m-resend-row">
+              <button class="a-link" id="resendBtn" type="button" disabled>Resend in 0:45</button>
+              <button class="a-link a-link--quiet" id="channelSwitchBtn" type="button">Send by SMS</button>
+            </div>
+
+            <button class="a-btn a-btn--primary o-signup-sheet__cta" id="otpCta" type="button">Check my code</button>
+
+            <button class="a-btn a-btn--whatsapp a-btn--sm" id="openWhatsappBtn" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-on-whatsapp)" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+              </svg>
+              Open WhatsApp
+            </button>
+
+            <button class="a-link a-link--quiet" id="backToNumberBtn" type="button">
+              Use a different number
+            </button>
+          </div>
+
+          <!-- STAGE · BLOCKED -->
+          <div class="o-signup-sheet__stage o-outcome-panel" id="stageBlocked">
+            <span class="a-icon-wrap a-icon-wrap--lg" id="blockedIcon" data-tone="error" aria-hidden="true"></span>
+            <h3 class="o-outcome-panel__title" id="blockedTitle" tabindex="-1"></h3>
+            <p class="o-outcome-panel__body" id="blockedBody"></p>
+            <p class="o-outcome-panel__meta" id="blockedMeta" hidden></p>
+            <div class="o-outcome-panel__actions" id="blockedActions"></div>
+          </div>
+
+          <!-- STAGE · SUCCESS -->
+          <div class="o-signup-sheet__stage o-outcome-panel" id="stageSuccess">
+            <span class="a-icon-wrap a-icon-wrap--lg" data-tone="success" data-motion="pop" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </span>
+            <h3 class="o-outcome-panel__title" id="successTitle" tabindex="-1"></h3>
+            <p class="o-outcome-panel__body" id="successBody"></p>
+            <div class="o-outcome-panel__actions">
+              <button class="a-btn a-btn--primary" id="successCta" type="button"></button>
+            </div>
+          </div>
+
+        </div>
+        </div>
+      </section>
+
+      <div class="a-toast" id="toast" role="status"></div>
+      <span class="u-visually-hidden" id="announcer" role="status" aria-live="polite"></span>
+
+      <!-- Developer overlays, outside the product layers on purpose -->
+      <div class="d-gridOverlay" aria-hidden="true"></div>
+      <div class="d-hoverRing" id="hoverRing" aria-hidden="true"></div>
+    </div>
+
+    <p class="p-signup-demo__caption" id="caption">Pick a state on the left, or drive the flow with the numbers in the key.</p>
+
+    <div class="d-inspect" id="inspectCard" aria-hidden="true">
+      <div class="d-inspect__head">
+        <span class="d-inspect__sel" id="inspectSel">Hover anything in the phone</span>
+        <span class="d-inspect__hint" id="inspectHint">P pins</span>
+      </div>
+      <div class="d-inspect__grid" id="inspectGrid"></div>
+    </div>
+  </div>
+
+  <aside class="d-panel" id="specPanel" aria-label="Design specification"></aside>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ════════════════════════════════════════════════════════════════════
+     CONFIG
+     ════════════════════════════════════════════════════════════════════ */
+  var GOOD_CODE     = '123456';
+  var EXPIRED_CODE  = '000000';
+  var RESEND_SECS   = 45;
+  var LOCK_SECS     = 15 * 60;
+  var MAX_ATTEMPTS  = 3;
+  var MAX_RESENDS   = 3;
+  var SLOW_HINT_MS  = 20000;
+  var WA_MANAGER    = 'https://wa.me/27800000000?text=Hi%2C%20which%20number%20did%20you%20register%20for%20me%20on%20EngenXT%3F';
+  var WA_SUPPORT    = 'https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT.';
+  var WA_APP        = 'https://wa.me/';
+
+  /* Numbers that force an outcome, so the flow can be driven by hand. */
+  var OUTCOMES = {
+    '821234567': 'ok',
+    '820000000': 'unregistered',
+    '821111111': 'returning',
+    '822222222': 'suspended',
+    '823333333': 'fleet',
+    '824444444': 'rate',
+    '825555555': 'nowhatsapp',
+    '829999999': 'server'
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
+     ICONS
+     ════════════════════════════════════════════════════════════════════ */
+  function icon(name, colour, size) {
+    var s = size || 20, c = colour || 'currentColor';
+    var open = '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + c +
+               '" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+    var paths = {
+      search:   '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+      userX:    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5"/><path d="m22 8-5 5"/>',
+      pause:    '<circle cx="12" cy="12" r="10"/><path d="M10 9v6"/><path d="M14 9v6"/>',
+      building: '<path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 9h2a2 2 0 0 1 2 2v10"/><path d="M9 7h2"/><path d="M9 11h2"/><path d="M9 15h2"/>',
+      clock:    '<circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/>',
+      wifiOff:  '<path d="M12 20h.01"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 3.5-2.3"/><path d="M2 8.8a16 16 0 0 1 6-3.6"/><path d="M14 5.5a16 16 0 0 1 8 3.3"/><path d="m2 2 20 20"/>',
+      server:   '<rect width="18" height="7" x="3" y="4" rx="2"/><rect width="18" height="7" x="3" y="13" rx="2"/><path d="M7 7.5h.01"/><path d="M7 16.5h.01"/>',
+      lock:     '<rect width="16" height="11" x="4" y="11" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+      alert:    '<path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+      info:     '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+      message:  '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+      check:    '<path d="M20 6 9 17l-5-5"/>',
+      phone:    '<rect width="12" height="20" x="6" y="2" rx="2"/><path d="M11 18h2"/>',
+      upload:   '<path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>'
+    };
+    return open + (paths[name] || paths.info) + '</svg>';
+  }
+  function waGlyph(size, fill) {
+    var s = size || 14;
+    return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="' + (fill || 'currentColor') + '" aria-hidden="true">' +
+      '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>' +
+      '<path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     COPY
+     Every account-level failure a driver can hit, with a way out of each.
+     The manager registers the driver's number, so an unknown number is a
+     routine event and gets a designed state rather than a generic error.
+     ════════════════════════════════════════════════════════════════════ */
+  var NUMBER_ERRORS = {
+    unregistered: {
+      tone: 'error', icon: 'search',
+      title: "We can't find that number",
+      body: "Your manager adds drivers to EngenXT. Ask them which number they used for you, then enter that one.",
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Try another number', kind: 'outline', act: 'clearNumber' }
+      ]
+    },
+    suspended: {
+      tone: 'warning', icon: 'pause',
+      title: 'Your account is paused',
+      body: 'Your manager paused your profile. Ask them to switch it back on.',
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Get help', kind: 'outline', act: 'blockSuspended' }
+      ]
+    },
+    fleet: {
+      tone: 'warning', icon: 'building',
+      title: "EngenXT is off for your company",
+      body: 'No driver at your company can sign in. Your manager needs to sort this out with Engen.',
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Get help', kind: 'outline', act: 'blockFleet' }
+      ]
+    },
+    rate: {
+      tone: 'warning', icon: 'clock',
+      title: 'Wait 15 minutes for a new code',
+      body: 'We have sent too many codes to this number. You can ask again in <b><span data-countdown="number"></span></b>.',
+      actions: [
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      ]
+    },
+    offline: {
+      tone: 'error', icon: 'wifiOff',
+      title: 'No connection',
+      body: "We couldn't reach EngenXT. Check your signal or data, then try again.",
+      actions: [
+        { label: 'Try again', kind: 'primary', act: 'retrySend' }
+      ]
+    },
+    server: {
+      tone: 'error', icon: 'server',
+      title: 'Something went wrong on our side',
+      body: 'Nothing is wrong with your number or your phone. Wait a moment, then try again.',
+      actions: [
+        { label: 'Try again', kind: 'primary', act: 'retrySend' },
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      ]
+    },
+    nowhatsapp: {
+      tone: 'info', icon: 'message',
+      title: "That number has no WhatsApp",
+      body: 'We can send your code by SMS instead.',
+      actions: [
+        { label: 'Send by SMS', kind: 'primary', act: 'sendBySms' },
+        { label: 'Try another number', kind: 'outline', act: 'clearNumber' }
+      ]
+    }
+  };
+
+  var CODE_ALERTS = {
+    expired: {
+      tone: 'warning', icon: 'clock',
+      title: 'That code has expired',
+      body: "Codes last 5 minutes. Ask for a new one and we'll send it straight away.",
+      actions: [{ label: 'Send a new code', kind: 'primary', act: 'resendNow' }]
+    },
+    slow: {
+      tone: 'info', icon: 'clock',
+      title: 'No code yet',
+      body: 'On a weak signal a code can take a minute to arrive. Check WhatsApp, or ask for it by SMS.',
+      actions: [
+        { label: 'Send by SMS instead', kind: 'primary', act: 'sendBySms' }
+      ]
+    },
+    resendLimit: {
+      tone: 'warning', icon: 'clock',
+      title: 'Wait 15 minutes for a new code',
+      body: 'Wait <b><span data-countdown="code"></span></b> before asking for another code. If you need to fuel now, message support.',
+      actions: [{ label: 'Contact support', kind: 'outline', href: WA_SUPPORT }]
+    },
+    offline: {
+      tone: 'error', icon: 'wifiOff',
+      title: 'No connection',
+      body: "We couldn't check your code. Your digits are still here. Try again when you have signal.",
+      actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }]
+    },
+    server: {
+      tone: 'error', icon: 'server',
+      title: 'Something went wrong on our side',
+      body: 'Your code is still valid. Give it a moment, then try again.',
+      actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }]
+    },
+    smsSent: {
+      tone: 'success', icon: 'check',
+      title: 'Sent by SMS',
+      body: 'Check your messages for a 6-digit code. Only the newest code works.',
+      actions: []
+    }
+  };
+
+  var BLOCKED = {
+    unregistered: {
+      tone: 'error', icon: 'search',
+      title: "We can't find that number",
+      body: 'Your manager adds drivers to EngenXT. Ask them which number they used for you, then start again with that one.',
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Start again', kind: 'outline', act: 'restart' }
+      ]
+    },
+    suspended: {
+      tone: 'warning', icon: 'pause',
+      title: 'Your account is paused',
+      body: 'Your manager paused your profile. Once they switch it back on, sign in with the same number.',
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      ]
+    },
+    fleet: {
+      tone: 'warning', icon: 'building',
+      title: "EngenXT is off for your company",
+      body: 'This is not something you can fix from the app. Your manager needs to contact Engen.',
+      actions: [
+        { label: 'Message my manager', kind: 'primary', href: WA_MANAGER },
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      ]
+    },
+    locked: {
+      tone: 'error', icon: 'lock',
+      title: 'Try again in 15 minutes',
+      body: 'There were too many wrong codes for this number, so it is paused. Try again in <b><span data-countdown="blocked"></span></b>. If you need to fuel now, message support.',
+      actions: [
+        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT },
+        { label: 'Start again', kind: 'outline', act: 'restart' }
+      ]
+    }
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
+     ELEMENTS
+     ════════════════════════════════════════════════════════════════════ */
+  function $(id) { return document.getElementById(id); }
+  var el = {
+    root: document.documentElement,
+    frame: $('deviceFrame'), hero: $('authHero'), homeNotice: $('homeNotice'),
+    statusPage: $('statusPage'), statusIcon: $('statusIcon'),
+    statusTitle: $('statusTitle'), statusBody: $('statusBody'), statusActions: $('statusActions'),
+    scrim: $('sheetScrim'), sheet: $('sheet'),
+    sheetTitle: $('sheetTitle'), sheetSub: $('sheetSub'),
+    channelBadge: $('channelBadge'), channelBadgeWrap: $('channelBadgeWrap'),
+    progress: $('progress'),
+    stageNumber: $('stageNumber'), stageCode: $('stageCode'),
+    stageBlocked: $('stageBlocked'), stageSuccess: $('stageSuccess'),
+    phoneField: $('phoneField'), phoneInput: $('phoneInput'),
+    phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
+    otpGroup: $('otpGroup'), otpHelper: $('otpHelper'), otpCta: $('otpCta'),
+    codeAlert: $('codeAlert'), resendBtn: $('resendBtn'), channelSwitchBtn: $('channelSwitchBtn'),
+    openWhatsapp: $('openWhatsappBtn'), backToNumber: $('backToNumberBtn'),
+    blockedIcon: $('blockedIcon'), blockedTitle: $('blockedTitle'), blockedBody: $('blockedBody'),
+    blockedMeta: $('blockedMeta'), blockedActions: $('blockedActions'),
+    successTitle: $('successTitle'), successBody: $('successBody'), successCta: $('successCta'),
+    toast: $('toast'), announcer: $('announcer'), caption: $('caption')
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
+     RUNTIME STATE
+     ════════════════════════════════════════════════════════════════════ */
+  var S = {
+    mode: 'signup',        // signup | signin
+    stage: 'closed',       // closed | number | code | blocked | success
+    channel: 'whatsapp',   // whatsapp | sms
+    otp: ['', '', '', '', '', ''],
+    attemptsLeft: MAX_ATTEMPTS,
+    resendsLeft: MAX_RESENDS,
+    verifying: false,
+    sending: false,
+    dismissArmed: false
+  };
+
+  var timers = [];
+  var slowHintId = null;
+  var autoSubmitId = null;
+  function after(ms, fn) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+  function clearTimers() {
+    timers.forEach(clearTimeout); timers = [];
+    clearTimeout(slowHintId); slowHintId = null;
+    clearTimeout(autoSubmitId); autoSubmitId = null;
+    S.dismissArmed = false;
+    stopAllCountdowns();
+  }
+
+  /* ── Countdowns run off a timestamp, so backgrounding the tab cannot
+        make them lie. ─────────────────────────────────────────────── */
+  var countdowns = {};
+  function startCountdown(key, seconds, render, onDone) {
+    stopCountdown(key);
+    var endsAt = Date.now() + seconds * 1000;
+    function tick() {
+      var left = Math.max(0, Math.round((endsAt - Date.now()) / 1000));
+      render(left, fmtClock(left));
+      if (left <= 0) { stopCountdown(key); if (onDone) { onDone(); } }
+    }
+    tick();
+    countdowns[key] = setInterval(tick, 1000);
+  }
+  function stopCountdown(key) { if (countdowns[key]) { clearInterval(countdowns[key]); delete countdowns[key]; } }
+  function stopAllCountdowns() { Object.keys(countdowns).forEach(stopCountdown); }
+  function fmtClock(secs) {
+    var m = Math.floor(secs / 60), s = secs % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     SMALL HELPERS
+     ════════════════════════════════════════════════════════════════════ */
+  function isOffline() { return el.root.getAttribute('data-net') === 'offline'; }
+  function announce(msg) { el.announcer.textContent = ''; setTimeout(function () { el.announcer.textContent = msg; }, 60); }
+  function shake(node) {
+    node.removeAttribute('data-shake'); void node.offsetWidth; node.setAttribute('data-shake', 'true');
+    setTimeout(function () { node.removeAttribute('data-shake'); }, 500);
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.setAttribute('data-state', 'visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.toast.removeAttribute('data-state'); }, 2600);
+  }
+  function setBtn(btn, enabled, label) {
+    if (label !== undefined) { btn.textContent = label; }
+    btn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+    btn.disabled = !enabled;
+  }
+  function isOff(btn) { return btn.disabled || btn.getAttribute('aria-disabled') === 'true'; }
+  function setHelper(node, html, tone) {
+    var glyph = '';
+    if (tone === 'error')   { glyph = '<span class="a-helper__icon">' + icon('alert', 'currentColor', 13) + '</span>'; }
+    if (tone === 'warning') { glyph = '<span class="a-helper__icon">' + icon('clock', 'currentColor', 13) + '</span>'; }
+    if (tone === 'success') { glyph = '<span class="a-helper__icon">' + icon('check', 'currentColor', 13) + '</span>'; }
+    node.innerHTML = glyph + html;
+    if (tone) { node.setAttribute('data-tone', tone); } else { node.removeAttribute('data-tone'); }
+  }
+
+  function digitsOf(v) { return (v || '').replace(/\D/g, ''); }
+
+  /* Accepts 082…, 82…, +2782…, 002782… and lands on the national 10 digits. */
+  /* The prefix beside the field already says +27, so the field holds the
+     national number without its leading zero. Pasting +27, 0027 or 0 all
+     land on the same nine digits. */
+  function nationalDigits(raw) {
+    var d = digitsOf(raw);
+    if (d.indexOf('0027') === 0) { d = d.slice(4); }
+    else if (d.indexOf('27') === 0 && d.length > 9) { d = d.slice(2); }
+    if (d.indexOf('0') === 0) { d = d.slice(1); }
+    return d.slice(0, 9);
+  }
+  function formatPhone(raw) {
+    var d = nationalDigits(raw);
+    if (d.length <= 2) { return d; }
+    if (d.length <= 5) { return d.slice(0, 2) + ' ' + d.slice(2); }
+    return d.slice(0, 2) + ' ' + d.slice(2, 5) + ' ' + d.slice(5);
+  }
+  function phoneDigits() { return nationalDigits(el.phoneInput.value); }
+  function phoneComplete() { return phoneDigits().length === 9; }
+  function isMobilePrefix(d) { return /^(6|7|8)/.test(d); }
+  function maskedPhone() {
+    var d = phoneDigits();
+    if (d.length !== 9) { return 'your number'; }
+    return '+27 ' + d.slice(0, 2) + ' *** ' + d.slice(6);
+  }
+  /* Reformatting rewrites the value, which collapses the caret to the end.
+     Restore it to the position holding the same digit count. */
+  function reformatPhone(input) {
+    var caret = input.selectionStart;
+    var before = digitsOf(input.value.slice(0, caret)).length;
+    var out = formatPhone(input.value);
+    input.value = out;
+    var pos = 0, seen = 0;
+    while (pos < out.length && seen < before) {
+      if (/\d/.test(out[pos])) { seen++; }
+      pos++;
+    }
+    try { input.setSelectionRange(pos, pos); } catch (e) {}
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     ACTION RENDERER
+     Alerts and blocked panels declare their actions. This builds them.
+     ════════════════════════════════════════════════════════════════════ */
+  var ACTS = {
+    clearNumber: function () { resetNumberStage(); el.phoneInput.focus({ preventScroll: true }); },
+    retrySend: function () { hideAlert(el.numberAlert); submitPhone(); },
+    retryVerify: function () { hideAlert(el.codeAlert); submitOtp(); },
+    sendBySms: function () { switchChannel('sms'); },
+    resendNow: function () { resendCode(); },
+    restart: function () { closeSheet(true); },
+    retryHome: function () { go('home/default'); },
+    blockSuspended: function () { showBlocked('suspended'); },
+    blockFleet: function () { showBlocked('fleet'); }
+  };
+
+  function actionMarkup(a) {
+    var cls = 'a-btn a-btn--sm a-btn--' +
+      (a.kind === 'primary' ? 'primary' : a.kind === 'whatsapp' ? 'whatsapp' : 'outline');
+    if (a.href) {
+      return '<a class="' + cls + '" href="' + a.href + '" target="_blank" rel="noopener">' + a.label + '</a>';
+    }
+    return '<button type="button" class="' + cls + '" data-act="' + a.act + '">' + a.label + '</button>';
+  }
+
+  function renderAlert(host, def) {
+    var actions = (def.actions || []).map(actionMarkup).join('');
+    host.innerHTML =
+      '<div class="m-alert" data-tone="' + def.tone + '">' +
+        '<div class="m-alert__top">' +
+          '<span class="m-alert__icon">' + icon(def.icon, toneColour(def.tone)) + '</span>' +
+          '<span><p class="m-alert__title">' + def.title + '</p>' +
+          '<p class="m-alert__body">' + def.body + '</p></span>' +
+        '</div>' +
+        (actions ? '<div class="m-alert__actions">' + actions + '</div>' : '') +
+      '</div>';
+    host.hidden = false;
+    wireActs(host);
+    announce(def.title + '. ' + host.querySelector('.m-alert__body').textContent);
+  }
+  function hideAlert(host) { host.hidden = true; host.innerHTML = ''; }
+  function toneColour(tone) {
+    return tone === 'error'   ? 'var(--color-secondary)'
+         : tone === 'warning' ? 'var(--color-warning)'
+         : tone === 'success' ? 'var(--color-success)'
+         : 'var(--color-primary)';
+  }
+  function wireActs(host) {
+    Array.prototype.forEach.call(host.querySelectorAll('[data-act]'), function (b) {
+      b.addEventListener('click', function () { var fn = ACTS[b.getAttribute('data-act')]; if (fn) { fn(); } });
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     SHEET AND STAGES
+     ════════════════════════════════════════════════════════════════════ */
+  var FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  var returnFocusTo = null;
+
+  function trapFocus(e) {
+    if (e.key !== 'Tab' || S.stage === 'closed') { return; }
+    var items = Array.prototype.filter.call(
+      el.sheet.querySelectorAll(FOCUSABLE),
+      function (n) { return n.offsetParent !== null; }
+    );
+    if (!items.length) { return; }
+    var first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    else if (!el.sheet.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  }
+  document.addEventListener('keydown', trapFocus);
+
+  function setBackgroundInert(on) {
+    try { el.hero.inert = on; } catch (e) {}
+    el.hero.setAttribute('aria-hidden', on ? 'true' : 'false');
+  }
+
+  function openSheet(mode) {
+    S.mode = mode || 'signup';
+    returnFocusTo = document.activeElement;
+    if (S.stage === 'closed') {
+      setBackgroundInert(true);
+      el.scrim.style.display = 'block';
+      el.scrim.setAttribute('data-state', 'opening');
+      el.sheet.style.display = 'flex';
+      el.sheet.setAttribute('data-state', 'opening');
+    }
+  }
+
+  function closeSheet(force) {
+    if (S.stage === 'closed') { return; }
+    if (!force && !S.dismissArmed) {
+      var partialNumber = S.stage === 'number' && phoneDigits().length > 0 && !phoneComplete();
+      var midCode = S.stage === 'code';
+      if (partialNumber || midCode) {
+        S.dismissArmed = true;
+        toast(midCode
+          ? 'Tap again to close. You will need a new code.'
+          : 'Tap again to close. Your number will not be saved.');
+        after(4000, function () { S.dismissArmed = false; });
+        return;
+      }
+    }
+    S.dismissArmed = false;
+    clearTimers();
+    S.stage = 'closed';
+    setBackgroundInert(false);
+    if (returnFocusTo && returnFocusTo.focus) { returnFocusTo.focus({ preventScroll: true }); }
+    returnFocusTo = null;
+    el.scrim.setAttribute('data-state', 'closing');
+    el.sheet.setAttribute('data-state', 'closing');
+    setTimeout(function () {
+      if (S.stage === 'closed') { el.scrim.style.display = 'none'; el.sheet.style.display = 'none'; }
+    }, 300);
+    setNav('home/default');
+  }
+
+  function closeSheetNow() {
+    clearTimers();
+    S.stage = 'closed'; S.dismissArmed = false;
+    el.scrim.removeAttribute('data-state');
+    el.sheet.removeAttribute('data-state');
+    el.scrim.style.display = 'none'; el.sheet.style.display = 'none';
+  }
+
+  function showStage(name) {
+    S.stage = name;
+    [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked], ['success', el.stageSuccess]]
+      .forEach(function (pair) {
+        if (pair[0] === name) { pair[1].setAttribute('data-state', 'active'); }
+        else { pair[1].removeAttribute('data-state'); }
+      });
+
+    /* Header and progress follow the stage. */
+    var step = name === 'number' ? 0 : name === 'code' ? 1 : 2;
+    Array.prototype.forEach.call(el.progress.children, function (dot, i) {
+      if (i < step) { dot.setAttribute('data-state', 'done'); }
+      else if (i === step) { dot.setAttribute('data-state', 'current'); }
+      else { dot.removeAttribute('data-state'); }
+    });
+    el.progress.style.display = (name === 'blocked') ? 'none' : 'flex';
+    var label = document.getElementById('progressLabel');
+    if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
+    el.channelBadgeWrap.hidden = (name !== 'code');
+    if (name === 'code') { paintChannelBadge(); }
+
+    if (name === 'number') {
+      el.sheetTitle.textContent = 'Enter your mobile number';
+      el.sheetSub.textContent = 'Use the number your company registered for you.';
+    } else if (name === 'code') {
+      el.sheetTitle.textContent = S.channel === 'whatsapp' ? 'Check WhatsApp' : 'Check your messages';
+      el.sheetSub.innerHTML = 'We sent a code to <b>' + maskedPhone() + '</b>. In this demo, use <b>123456</b>.';
+    } else if (name === 'blocked') {
+      el.sheetTitle.textContent = "We can't finish this yet";
+      el.sheetSub.textContent = 'Here is what to do next';
+    } else if (name === 'success') {
+      el.sheetTitle.textContent = S.mode === 'signup' ? 'Your account is ready' : 'Welcome back';
+      el.sheetSub.textContent = '';
+    }
+  }
+
+  function paintChannelBadge() {
+    var wa = S.channel === 'whatsapp';
+    el.channelBadge.setAttribute('data-channel', S.channel);
+    el.channelBadge.innerHTML = (wa ? waGlyph(13, 'var(--color-whatsapp-dark)') : icon('message', 'var(--color-primary-dark)', 13)) +
+      '<span>' + (wa ? 'Code sent on WhatsApp' : 'Code sent by SMS') + ' · ' + maskedPhone() + '</span>';
+    el.channelSwitchBtn.textContent = wa ? 'Send by SMS' : 'Send on WhatsApp';
+    el.openWhatsapp.style.display = wa ? 'flex' : 'none';
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     STAGE · NUMBER
+     ════════════════════════════════════════════════════════════════════ */
+  function resetNumberStage(value) {
+    clearTimers();
+    S.sending = false;
+    el.phoneInput.value = value ? formatPhone(value) : '';
+    el.phoneInput.readOnly = false;
+    el.phoneInput.removeAttribute('aria-invalid');
+    el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
+    el.phoneField.removeAttribute('data-state');
+    hideAlert(el.numberAlert);
+    setHelper(el.phoneHelper, "We'll send a code to this number on WhatsApp. A small amount of data is needed.");
+    paintPhoneValidity();
+    setBtn(el.phoneCta, phoneComplete(), 'Continue');
+    showStage('number');
+  }
+
+  function paintPhoneValidity() {
+    if (phoneComplete()) { el.phoneField.setAttribute('data-valid', 'true'); }
+    else { el.phoneField.removeAttribute('data-valid'); }
+    setBtn(el.phoneCta, phoneComplete());
+  }
+
+  function showNumberError(kind) {
+    var def = NUMBER_ERRORS[kind];
+    if (!def) { return; }
+    el.phoneField.setAttribute('data-state', 'error');
+    el.phoneInput.setAttribute('aria-invalid', 'true');
+    el.phoneInput.setAttribute('aria-describedby', 'phoneHelper numberAlert');
+    if (kind === 'rate') {
+      startCountdown('number', LOCK_SECS, function (left, label) {
+        var slot = el.numberAlert.querySelector('[data-countdown="number"]');
+        if (slot) { slot.textContent = label; }
+      }, function () { resetNumberStage(el.phoneInput.value); });
+    }
+    renderAlert(el.numberAlert, def);
+    setBtn(el.phoneCta, false, 'Continue');
+    el.phoneInput.readOnly = false;
+    shake(el.stageNumber);
+  }
+
+  function submitPhone() {
+    if (S.sending || isOff(el.phoneCta)) { return; }
+    var d = phoneDigits();
+
+    if (d.length !== 9) {
+      el.phoneField.setAttribute('data-state', 'error');
+      setHelper(el.phoneHelper, d.length === 0
+        ? 'Enter a valid mobile number.'
+        : 'Enter 9 digits after +27.', 'error');
+      shake(el.stageNumber);
+      el.phoneInput.focus({ preventScroll: true });
+      return;
+    }
+    if (!isMobilePrefix(d)) {
+      el.phoneField.setAttribute('data-state', 'error');
+      setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
+      shake(el.stageNumber);
+      return;
+    }
+
+    /* Pending */
+    S.sending = true;
+    hideAlert(el.numberAlert);
+    setHelper(el.phoneHelper, S.channel === 'whatsapp'
+      ? 'Sending a code on WhatsApp…'
+      : 'Sending a code by SMS…');
+    el.phoneField.setAttribute('data-state', 'pending');
+    /* readonly, not disabled, so the number the driver typed stays readable
+       and the field keeps its place in the reading order. */
+    el.phoneInput.readOnly = true;
+    el.phoneField.removeAttribute('data-valid');
+    el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
+    setBtn(el.phoneCta, false);
+
+    after(900, function () {
+      S.sending = false;
+      el.phoneInput.readOnly = false;
+      el.phoneField.removeAttribute('data-state');
+      el.phoneCta.textContent = 'Continue';
+      paintPhoneValidity();
+
+      if (isOffline()) { showNumberError('offline'); return; }
+      /* The server resolves new against returning, which is why the home
+         screen does not ask the driver to. */
+      var outcome = OUTCOMES[d] || 'ok';
+      if (outcome === 'returning') { S.mode = 'signin'; outcome = 'ok'; }
+      else if (outcome === 'ok') { S.mode = 'signup'; }
+      if (outcome !== 'ok') { showNumberError(outcome); return; }
+      goToCode({ fresh: true });
+    });
+  }
+  function spinnerMarkup() {
+    return '<svg class="a-spinner" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">' +
+      '<circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.30)" stroke-width="2.5"/>' +
+      '<path d="M11 3a8 8 0 0 1 8 8" stroke="var(--color-text-on-dark)" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     STAGE · CODE
+     ════════════════════════════════════════════════════════════════════ */
+  function buildOtp() {
+    el.otpGroup.innerHTML = '';
+    el.otpGroup.removeAttribute('data-state');
+    for (var i = 0; i < 6; i++) {
+      var cell = document.createElement('input');
+      cell.className = 'a-otp-cell';
+      cell.type = 'text';
+      cell.inputMode = 'numeric';
+      cell.maxLength = 1;
+      cell.autocomplete = i === 0 ? 'one-time-code' : 'off';
+      cell.setAttribute('aria-label', 'Digit ' + (i + 1) + ' of 6');
+      el.otpGroup.appendChild(cell);
+    }
+    cells().forEach(function (cell, i) {
+      cell.addEventListener('input', function () { onOtpInput(i, cell); });
+      cell.addEventListener('keydown', function (e) { onOtpKey(i, e); });
+      cell.addEventListener('paste', onOtpPaste);
+      cell.addEventListener('focus', function () { cell.select(); });
+    });
+  }
+  function cells() { return Array.prototype.slice.call(el.otpGroup.querySelectorAll('.a-otp-cell')); }
+  function otpFull() { return S.otp.join('').length === 6; }
+
+  function paintOtp() {
+    cells().forEach(function (cell, i) {
+      cell.value = S.otp[i];
+      if (S.otp[i]) { cell.setAttribute('data-state', 'filled'); } else { cell.removeAttribute('data-state'); }
+    });
+    setBtn(el.otpCta, otpFull() && !S.verifying);
+  }
+
+  function goToCode(opts) {
+    opts = opts || {};
+    clearTimers();
+    var quiet = opts.quiet === true;
+    if (opts.fresh) {
+      S.otp = ['', '', '', '', '', ''];
+      S.attemptsLeft = MAX_ATTEMPTS;
+      S.resendsLeft = MAX_RESENDS;
+    }
+    S.verifying = false;
+    buildOtp(); paintOtp();
+    hideAlert(el.codeAlert);
+    setHelper(el.otpHelper, '&nbsp;');
+    setBtn(el.otpCta, false, 'Continue');
+    lockOtp(false);
+    showStage('code');
+    if (!quiet) { startResendCooldown(); startSlowHint(); }
+    after(320, function () { var c = cells()[0]; if (c) { c.focus({ preventScroll: true }); } });
+  }
+
+  /* readonly rather than disabled, because disabling the focused cell drops
+     focus to the body in the middle of the task. */
+  function lockOtp(locked) {
+    cells().forEach(function (c) {
+      c.readOnly = locked;
+      if (locked) { c.setAttribute('aria-disabled', 'true'); } else { c.removeAttribute('aria-disabled'); }
+    });
+    if (locked) { el.otpGroup.setAttribute('data-state', 'locked'); }
+    else if (el.otpGroup.getAttribute('data-state') === 'locked') { el.otpGroup.removeAttribute('data-state'); }
+  }
+
+  function onOtpInput(i, cell) {
+    var v = cell.value.replace(/\D/g, '');
+    cell.value = v.slice(-1);
+    S.otp[i] = cell.value;
+    el.otpGroup.removeAttribute('data-state');
+    setHelper(el.otpHelper, '&nbsp;');
+    paintOtp();
+    if (cell.value && i < 5) { cells()[i + 1].focus({ preventScroll: true }); }
+    clearTimeout(autoSubmitId);
+    if (otpFull()) { autoSubmitId = setTimeout(submitOtp, 240); }
+  }
+  function onOtpKey(i, e) {
+    if (e.key === 'Backspace' && !S.otp[i] && i > 0) {
+      e.preventDefault(); clearTimeout(autoSubmitId);
+      S.otp[i - 1] = ''; paintOtp(); cells()[i - 1].focus({ preventScroll: true });
+    }
+    if (e.key === 'ArrowLeft' && i > 0) { cells()[i - 1].focus({ preventScroll: true }); }
+    if (e.key === 'ArrowRight' && i < 5) { cells()[i + 1].focus({ preventScroll: true }); }
+    if (e.key === 'Enter') { e.preventDefault(); submitOtp(); }
+  }
+  function onOtpPaste(e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text') || '';
+    var d = text.replace(/\D/g, '').slice(0, 6);
+    if (!d) { return; }
+    e.preventDefault();
+    for (var i = 0; i < 6; i++) { S.otp[i] = d[i] || ''; }
+    paintOtp();
+    cells()[Math.min(d.length, 5)].focus({ preventScroll: true });
+    if (otpFull()) { after(240, submitOtp); }
+  }
+
+  function submitOtp() {
+    if (S.verifying || isOff(el.otpCta)) { return; }
+    if (!otpFull()) {
+      el.otpGroup.setAttribute('data-state', 'error');
+      setHelper(el.otpHelper, 'Enter all 6 digits.', 'error');
+      shake(el.stageCode);
+      return;
+    }
+    S.verifying = true;
+    hideAlert(el.codeAlert);
+    el.otpCta.innerHTML = spinnerMarkup();
+    setBtn(el.otpCta, false);
+    lockOtp(true);
+
+    after(900, function () {
+      S.verifying = false;
+      lockOtp(false);
+      el.otpCta.textContent = 'Continue';
+
+      if (isOffline()) { renderAlert(el.codeAlert, CODE_ALERTS.offline); setBtn(el.otpCta, true); return; }
+
+      var entered = S.otp.join('');
+      if (entered === EXPIRED_CODE) { showCodeExpired(); return; }
+      if (entered !== GOOD_CODE) { showCodeWrong(); return; }
+
+      el.otpGroup.setAttribute('data-state', 'valid');
+      setHelper(el.otpHelper, 'Code confirmed.', 'success');
+      stopCountdown('resend'); stopCountdown('slow');
+      after(500, function () { showSuccess(); });
+    });
+  }
+
+  function showCodeWrong() {
+    S.attemptsLeft -= 1;
+    el.otpGroup.setAttribute('data-state', 'error');
+
+    if (S.attemptsLeft <= 0) { showBlocked('locked'); return; }
+
+    /* The digits stay. One wrong digit should cost one correction, not six. */
+    var msg = S.attemptsLeft === 1
+      ? 'That code is not right. 1 try left, then this number pauses for 15 minutes.'
+      : 'That code is not right. ' + S.attemptsLeft + ' tries left.';
+    setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
+    shake(el.stageCode);
+    setBtn(el.otpCta, false);
+    var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
+  }
+
+  function showCodeExpired() {
+    S.otp = ['', '', '', '', '', ''];
+    paintOtp();
+    el.otpGroup.setAttribute('data-state', 'error');
+    setHelper(el.otpHelper, '&nbsp;');
+    stopCountdown('resend');
+    el.resendBtn.disabled = true;
+    el.resendBtn.textContent = 'Resend now';
+    renderAlert(el.codeAlert, CODE_ALERTS.expired);
+    setBtn(el.otpCta, false);
+  }
+
+  /* Resend cooldown */
+  function startResendCooldown() {
+    setBtn(el.resendBtn, false);
+    el.resendBtn.disabled = true;
+    startCountdown('resend', RESEND_SECS, function (left, label) {
+      el.resendBtn.textContent = 'Resend in ' + label;
+    }, function () {
+      el.resendBtn.disabled = false;
+      el.resendBtn.textContent = 'Resend now';
+      announce('You can ask for a new code now.');
+    });
+  }
+
+  function resendCode() {
+    if (S.resendsLeft <= 0) { showResendLimit(); return; }
+    S.resendsLeft -= 1;
+    S.otp = ['', '', '', '', '', ''];
+    el.otpGroup.removeAttribute('data-state');
+    paintOtp();
+    hideAlert(el.codeAlert);
+    setHelper(el.otpHelper, 'New code on its way.', 'success');
+    startResendCooldown();
+    startSlowHint();
+    var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
+    after(2600, function () { if (S.stage === 'code') { setHelper(el.otpHelper, '&nbsp;'); } });
+  }
+
+  function showResendLimit() {
+    renderAlert(el.codeAlert, CODE_ALERTS.resendLimit);
+    el.resendBtn.disabled = true;
+    startCountdown('code', LOCK_SECS, function (left, label) {
+      var slot = el.codeAlert.querySelector('[data-countdown="code"]');
+      if (slot) { slot.textContent = label; }
+      el.resendBtn.textContent = 'Resend in ' + label;
+    }, function () { el.resendBtn.disabled = false; el.resendBtn.textContent = 'Resend now'; hideAlert(el.codeAlert); });
+  }
+
+  function startSlowHint() {
+    clearTimeout(slowHintId);
+    slowHintId = setTimeout(function () {
+      if (S.stage === 'code' && !otpFull() && el.codeAlert.hidden) {
+        renderAlert(el.codeAlert, CODE_ALERTS.slow);
+      }
+    }, SLOW_HINT_MS);
+  }
+
+  function switchChannel(to) {
+    if (S.resendsLeft <= 0) { showResendLimit(); return; }
+    S.resendsLeft -= 1;
+    stopCountdown('code');
+    S.channel = to;
+    paintChannelBadge();
+    S.otp = ['', '', '', '', '', ''];
+    el.otpGroup.removeAttribute('data-state');
+    paintOtp();
+    if (S.stage !== 'code') { goToCode({ fresh: true }); }
+    showStage('code');
+    renderAlert(el.codeAlert, to === 'sms' ? CODE_ALERTS.smsSent : {
+      tone: 'success', icon: 'check', title: 'Sent on WhatsApp',
+      body: 'Check WhatsApp for a new 6-digit code. The code we sent by SMS no longer works.', actions: []
+    });
+    startResendCooldown();
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     STAGE · BLOCKED and SUCCESS
+     ════════════════════════════════════════════════════════════════════ */
+  function showBlocked(kind) {
+    var def = BLOCKED[kind];
+    if (!def) { return; }
+    clearTimers();
+    el.blockedIcon.setAttribute('data-tone', def.tone);
+    el.blockedIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
+    el.blockedTitle.textContent = def.title;
+    el.blockedBody.innerHTML = def.body;
+    el.blockedMeta.hidden = true;
+    el.blockedActions.innerHTML = (def.actions || []).map(function (a) {
+      return actionMarkup({ label: a.label, kind: a.kind, href: a.href, act: a.act });
+    }).join('');
+    wireActs(el.blockedActions);
+    showStage('blocked');
+    announce(def.title + '. ' + el.blockedBody.textContent);
+    after(60, function () { el.blockedTitle.focus({ preventScroll: true }); });
+
+    if (kind === 'locked') {
+      startCountdown('blocked', LOCK_SECS, function (left, label) {
+        var slot = el.blockedBody.querySelector('[data-countdown="blocked"]');
+        if (slot) { slot.textContent = label; }
+        el.blockedMeta.hidden = false;
+        el.blockedMeta.textContent = label;
+      }, function () { resetNumberStage(el.phoneInput.value); });
+    }
+  }
+
+  function showSuccess() {
+    clearTimers();
+    var signup = S.mode === 'signup';
+    el.successTitle.textContent = signup ? 'Your account is ready' : 'Welcome back';
+    el.successBody.textContent = signup
+      ? 'Next, scan the licence disc of the vehicle you drive.'
+      : "You're signed in. Scan the licence disc of the vehicle you drive.";
+    el.successCta.textContent = 'Scan my licence disc';
+    el.successCta.onclick = function () { closeSheet(true); };
+    showStage('success');
+    announce(el.successTitle.textContent + '. ' + el.successBody.textContent);
+    after(60, function () { el.successTitle.focus({ preventScroll: true }); });
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     HOME NOTICES
+     ════════════════════════════════════════════════════════════════════ */
+  var HOME_NOTICES = {
+    offline: {
+      tone: 'error', icon: 'wifiOff',
+      title: "You're offline",
+      body: 'Connect to Wi-Fi or mobile data to continue.', actions: []
+    },
+  };
+
+  /* Full screen status. When the problem is technical the driver gets one
+     explanation and one action, never an account choice. */
+  var STATUS = {
+    maintenance: {
+      tone: 'warning', icon: 'alert',
+      title: 'EngenXT is temporarily unavailable',
+      body: "You can't sign in right now. Existing fuel approvals can still be used.",
+      actions: [
+        { label: 'Try again', kind: 'primary', act: 'retryHome' },
+        { label: 'Get help', kind: 'outline', href: WA_SUPPORT }
+      ]
+    },
+    update: {
+      tone: 'warning', icon: 'upload',
+      title: 'Update EngenXT to continue',
+      body: 'Update to the latest version to sign in and keep using EngenXT.',
+      actions: [
+        { label: 'Update app', kind: 'primary', act: 'retryHome' }
+      ]
+    }
+  };
+  function setHomeNotice(kind) {
+    if (!kind) { el.homeNotice.hidden = true; el.homeNotice.innerHTML = ''; return; }
+    var def = HOME_NOTICES[kind];
+    el.homeNotice.innerHTML =
+      '<div class="m-alert m-alert--onDark" data-tone="' + def.tone + '">' +
+        '<div class="m-alert__top">' +
+          '<span class="m-alert__icon">' + icon(def.icon, 'var(--color-text-on-dark)') + '</span>' +
+          '<span><p class="m-alert__title">' + def.title + '</p>' +
+          '<p class="m-alert__body">' + def.body + '</p></span>' +
+        '</div></div>';
+    el.homeNotice.hidden = false;
+  }
+  /* The home screen has exactly one action. When something blocks entry the
+     action is replaced by the recovery, never left on screen looking dead. */
+  function setHomeAction(kind) {
+    var primary = $('homePrimary');
+    var help = $('homeHelp');
+    if (kind === 'retry') {
+      primary.textContent = 'Try again';
+      primary.disabled = false;
+      primary.setAttribute('aria-disabled', 'false');
+      primary.dataset.action = 'retry';
+      help.hidden = false;
+      help.textContent = 'Contact support';
+    } else {
+      primary.textContent = 'Continue with mobile number';
+      primary.disabled = false;
+      primary.setAttribute('aria-disabled', 'false');
+      primary.dataset.action = 'enter';
+      help.hidden = false;
+      help.textContent = 'Need help signing in?';
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     STATE MAP
+     Nav jumps and organic events go through the same functions, so a
+     state you jump to and a state you reach cannot drift apart.
+     ════════════════════════════════════════════════════════════════════ */
+  function base(mode, phone) {
+    clearTimers();
+    el.root.setAttribute('data-net', 'online'); syncModes();
+    setHomeNotice(null); setHomeAction('enter');
+    hideStatusPage();
+    S.mode = mode || 'signup';
+    S.channel = 'whatsapp';
+    closeSheetNow();
+    openSheetNow();
+    resetNumberStage(phone);
+  }
+  function openSheetNow() {
+    el.scrim.style.display = 'block'; el.scrim.setAttribute('data-state', 'opening');
+    el.sheet.style.display = 'flex'; el.sheet.setAttribute('data-state', 'opening');
+    S.stage = 'number';
+  }
+  function home(notice, action, status) {
+    clearTimers(); closeSheetNow();
+    if (notice !== 'offline') { el.root.setAttribute('data-net', 'online'); syncModes(); }
+    setHomeNotice(notice); setHomeAction(action || 'enter');
+    if (status && STATUS[status]) { showStatusPage(status); }
+    else { hideStatusPage(); }
+  }
+
+  function showStatusPage(kind) {
+    var def = STATUS[kind];
+    el.statusIcon.setAttribute('data-tone', def.tone);
+    el.statusIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
+    el.statusTitle.textContent = def.title;
+    el.statusBody.textContent = def.body;
+    el.statusActions.innerHTML = (def.actions || []).map(actionMarkup).join('');
+    wireActs(el.statusActions);
+    el.statusPage.setAttribute('data-state', 'visible');
+    el.statusPage.setAttribute('aria-modal', 'true');
+    setBackgroundInert(true);
+    announce(def.title + '. ' + def.body);
+    after(60, function () { el.statusTitle.focus({ preventScroll: true }); });
+  }
+  function hideStatusPage() {
+    el.statusPage.removeAttribute('data-state');
+    el.statusPage.removeAttribute('aria-modal');
+    setBackgroundInert(false);
+  }
+
+  var STATES = {
+    /* Home */
+    'home/default':     { label: 'Ready',              run: function () { home(null, 'enter'); } },
+    'home/offline':     { label: 'No internet',        run: function () { home('offline', 'retry'); el.root.setAttribute('data-net', 'offline'); syncModes(); } },
+    'home/maintenance': { label: 'Unavailable',        run: function () { home(null, 'enter', 'maintenance'); } },
+    'home/update':      { label: 'Update required',    run: function () { home(null, 'enter', 'update'); } },
+
+    /* Number */
+    'number/empty':          { label: 'Empty',              run: function () { base('signup'); } },
+    'number/partial':        { label: 'Part typed',         run: function () { base('signup', '82 12'); paintPhoneValidity(); } },
+    'number/valid':          { label: 'Valid',              run: function () { base('signup', '821234567'); paintPhoneValidity(); } },
+    'number/sending':        { label: 'Sending',            run: function () {
+                                 base('signup', '821234567');
+                                 el.phoneField.setAttribute('data-state', 'pending');
+                                 el.phoneInput.readOnly = true;
+                                 el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
+                                 setBtn(el.phoneCta, false);
+                                 setHelper(el.phoneHelper, 'Sending a code on WhatsApp…');
+                               } },
+    'number/err-format':     { label: 'Too few digits',     run: function () { base('signup', '82 12'); submitPhone(); } },
+    'number/err-landline':   { label: 'Landline entered',   run: function () { base('signup', '111234567'); submitPhone(); } },
+    'number/err-unregistered': { label: 'Not registered',   run: function () { base('signup', '820000000'); showNumberError('unregistered'); } },
+    'number/err-suspended':  { label: 'Driver paused',      run: function () { base('signup', '822222222'); showNumberError('suspended'); } },
+    'number/err-fleet':      { label: 'Company inactive',   run: function () { base('signup', '823333333'); showNumberError('fleet'); } },
+    'number/err-rate':       { label: 'Rate limited',       run: function () { base('signup', '824444444'); showNumberError('rate'); } },
+    'number/err-nowhatsapp': { label: 'Not on WhatsApp',    run: function () { base('signup', '825555555'); showNumberError('nowhatsapp'); } },
+    'number/err-offline':    { label: 'No connection',      run: function () { base('signup', '821234567'); showNumberError('offline'); } },
+    'number/err-server':     { label: 'Server error',       run: function () { base('signup', '829999999'); showNumberError('server'); } },
+
+    /* Code */
+    'code/idle':        { label: 'Waiting for code', run: function () { base('signup', '821234567'); goToCode({ fresh: true }); } },
+    'code/partial':     { label: 'Part entered',     run: function () { base('signup', '821234567'); goToCode({ fresh: true }); S.otp = ['1','2','3','','','']; paintOtp(); } },
+    'code/verifying':   { label: 'Checking',         run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true });
+                            S.otp = ['1','2','3','4','5','6']; paintOtp();
+                            clearTimers(); S.verifying = true; lockOtp(true);
+                            el.otpCta.innerHTML = spinnerMarkup(); setBtn(el.otpCta, false);
+                          } },
+    'code/err-wrong':   { label: 'Wrong code',       run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true });
+                            clearTimers(); S.attemptsLeft = 3; showCodeWrong();
+                          } },
+    'code/err-last':    { label: 'One try left',     run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true });
+                            clearTimers(); S.attemptsLeft = 2; showCodeWrong();
+                          } },
+    'code/err-expired': { label: 'Code expired',     run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); showCodeExpired(); } },
+    'code/slow':        { label: 'Slow delivery',    run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); renderAlert(el.codeAlert, CODE_ALERTS.slow); } },
+    'code/resend-ready':{ label: 'Resend available', run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                            el.resendBtn.disabled = false; el.resendBtn.textContent = 'Resend now';
+                          } },
+    'code/resend-limit':{ label: 'Resend limit',     run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); S.resendsLeft = 0; showResendLimit(); } },
+    'code/sms-sent':    { label: 'Fell back to SMS', run: function () { base('signup', '821234567'); goToCode({ fresh: true, quiet: true }); switchChannel('sms'); } },
+    'code/err-offline': { label: 'No connection',    run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                            S.otp = ['1','2','3','4','5','6']; paintOtp();
+                            renderAlert(el.codeAlert, CODE_ALERTS.offline);
+                          } },
+    'code/err-server':  { label: 'Server error',     run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                            S.otp = ['1','2','3','4','5','6']; paintOtp();
+                            renderAlert(el.codeAlert, CODE_ALERTS.server);
+                          } },
+    'code/success':     { label: 'Code confirmed',   run: function () {
+                            base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                            S.otp = ['1','2','3','4','5','6']; paintOtp();
+                            el.otpGroup.setAttribute('data-state', 'valid');
+                            setHelper(el.otpHelper, 'Code confirmed.', 'success');
+                            setBtn(el.otpCta, true);
+                          } },
+
+    /* Blocked */
+    'blocked/unregistered': { label: 'Not registered',  run: function () { base('signup', '820000000'); showBlocked('unregistered'); } },
+    'blocked/suspended':    { label: 'Driver paused',   run: function () { base('signup', '822222222'); showBlocked('suspended'); } },
+    'blocked/fleet':        { label: 'Company inactive',run: function () { base('signup', '823333333'); showBlocked('fleet'); } },
+    'blocked/locked':       { label: 'Locked 15 min',   run: function () { base('signup', '821234567'); showBlocked('locked'); } },
+
+    /* Done */
+    'success/signup': { label: 'Signed up', run: function () { base('signup', '821234567'); showSuccess(); } },
+    'success/signin': { label: 'Signed in', run: function () { base('signin', '821234567'); showSuccess(); } }
+  };
+
+  var NAV_GROUPS = {
+    navHome:    ['home/default', 'home/offline', 'home/maintenance', 'home/update'],
+    navNumber:  ['number/empty', 'number/partial', 'number/valid', 'number/sending',
+                 'number/err-format', 'number/err-landline', 'number/err-unregistered',
+                 'number/err-suspended', 'number/err-fleet',
+                 'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server'],
+    navCode:    ['code/idle', 'code/partial', 'code/verifying', 'code/err-wrong', 'code/err-last',
+                 'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
+                 'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
+    navBlocked: ['blocked/unregistered', 'blocked/suspended', 'blocked/fleet', 'blocked/locked'],
+    navDone:    ['success/signup', 'success/signin']
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
+     NAV, MODES AND DEEP LINKS
+     ════════════════════════════════════════════════════════════════════ */
+  var currentState = 'home/default';
+
+  function go(id) {
+    var def = STATES[id];
+    if (!def) { return; }
+    currentState = id;
+    def.run();
+    setNav(id);
+    if (location.hash.slice(1) !== id) { history.replaceState(null, '', '#' + id); }
+    el.caption.textContent = id + ' · ' + def.label;
+  }
+
+  function setNav(id) {
+    currentState = id;
+    Array.prototype.forEach.call(document.querySelectorAll('.o-state-nav__item'), function (b) {
+      if (b.dataset.stateId === id) { b.setAttribute('data-state', 'active'); b.setAttribute('aria-current', 'true'); }
+      else { b.removeAttribute('data-state'); b.removeAttribute('aria-current'); }
+    });
+  }
+
+  function buildNav() {
+    Object.keys(NAV_GROUPS).forEach(function (host) {
+      var wrap = $(host);
+      NAV_GROUPS[host].forEach(function (id) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'o-state-nav__item';
+        b.textContent = STATES[id].label;
+        b.dataset.stateId = id;
+        b.addEventListener('click', function () { go(id); });
+        wrap.appendChild(b);
+      });
+    });
+
+    var MODES = [
+      { key: 'motion', label: 'Reduced motion', on: function () { return el.root.getAttribute('data-motion') === 'reduced'; },
+        toggle: function () { el.root.setAttribute('data-motion', el.root.getAttribute('data-motion') === 'reduced' ? 'system' : 'reduced'); } },
+      { key: 'text', label: 'Large text', on: function () { return el.root.getAttribute('data-text') === 'large'; },
+        toggle: function () { el.root.setAttribute('data-text', el.root.getAttribute('data-text') === 'large' ? 'default' : 'large'); } },
+      { key: 'net', label: 'Offline', on: function () { return isOffline(); },
+        toggle: function () { el.root.setAttribute('data-net', isOffline() ? 'online' : 'offline'); } },
+      { key: 'width', label: 'Narrow, 320px', on: function () { return el.frame.getAttribute('data-width') === '320'; },
+        toggle: function () {
+          if (el.frame.getAttribute('data-width') === '320') { el.frame.removeAttribute('data-width'); }
+          else { el.frame.setAttribute('data-width', '320'); }
+        } }
+    ];
+    var modesHost = $('navModes');
+    MODES.forEach(function (m) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'o-state-nav__toggle';
+      b.dataset.mode = m.key;
+      b.innerHTML = '<span>' + m.label + '</span><span class="o-state-nav__switch"></span>';
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () { m.toggle(); syncModes(); });
+      modesHost.appendChild(b);
+    });
+    window.__modes = MODES;
+    syncModes();
+
+    var keyRows = [
+      ['82 123 4567', 'Works'],
+      ['82 000 0000', 'Not registered'],
+      ['082 111 1111', 'Returning driver'],
+      ['82 222 2222', 'Driver paused'],
+      ['82 333 3333', 'Company off'],
+      ['82 444 4444', 'Rate limited'],
+      ['82 555 5555', 'No WhatsApp'],
+      ['82 999 9999', 'Server error'],
+      ['11 123 4567', 'Landline'],
+      ['code 123456', 'Correct'],
+      ['code 000000', 'Expired'],
+      ['any other code', 'Wrong']
+    ];
+    $('navKey').innerHTML = keyRows.map(function (r) {
+      return '<div class="o-key__row"><span class="o-key__code">' + r[0] + '</span><span>' + r[1] + '</span></div>';
+    }).join('');
+  }
+
+  function syncModes() {
+    (window.__modes || []).forEach(function (m) {
+      var b = document.querySelector('[data-mode="' + m.key + '"]');
+      if (!b) { return; }
+      var on = m.on();
+      if (on) { b.setAttribute('data-state', 'on'); } else { b.removeAttribute('data-state'); }
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     WIRING
+     ════════════════════════════════════════════════════════════════════ */
+  el.phoneInput.addEventListener('input', function () {
+    el.phoneInput.value = formatPhone(el.phoneInput.value);
+    if (el.phoneField.getAttribute('data-state') === 'error') {
+      el.phoneField.removeAttribute('data-state');
+      setHelper(el.phoneHelper, "We'll send your code on WhatsApp. It uses a small amount of data.");
+      hideAlert(el.numberAlert);
+    }
+    paintPhoneValidity();
+  });
+  el.phoneInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); submitPhone(); }
+  });
+  /* Nothing is wrong until the driver has finished, so validation waits for
+     them to leave the field rather than scolding them mid-number. */
+  el.phoneInput.addEventListener('blur', function () {
+    var d = phoneDigits();
+    if (S.sending || d.length === 0 || phoneComplete()) { return; }
+    el.phoneField.setAttribute('data-state', 'error');
+    el.phoneInput.setAttribute('aria-invalid', 'true');
+    setHelper(el.phoneHelper, 'Enter 9 digits after +27.', 'error');
+  });
+  el.phoneCta.addEventListener('click', submitPhone);
+  el.otpCta.addEventListener('click', submitOtp);
+  el.resendBtn.addEventListener('click', function () { if (!el.resendBtn.disabled) { resendCode(); } });
+  el.channelSwitchBtn.addEventListener('click', function () { switchChannel(S.channel === 'whatsapp' ? 'sms' : 'whatsapp'); });
+  el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
+  el.backToNumber.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
+  el.sheetClose = $('sheetClose');
+  el.sheetClose.addEventListener('click', function () { closeSheet(); });
+  $('sheetGrab').addEventListener('click', function () { closeSheet(); });
+  el.scrim.addEventListener('click', function () { closeSheet(); });
+
+  /* One entry action. What it does depends on what is blocking entry. */
+  $('homePrimary').addEventListener('click', function () {
+    var btn = $('homePrimary');
+    if (isOff(btn)) { return; }
+    if (btn.dataset.action === 'retry') { go('home/default'); return; }
+    openSheet();
+    resetNumberStage();
+    after(360, function () { el.phoneInput.focus({ preventScroll: true }); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && S.stage !== 'closed') { closeSheet(true); }
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT') { return; }
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') &&
+        document.activeElement && document.activeElement.classList &&
+        document.activeElement.classList.contains('o-state-nav__item')) {
+      var ids = Object.keys(STATES);
+      var i = ids.indexOf(currentState);
+      if (i === -1) { i = 0; }
+      var next = e.key === 'ArrowDown' ? (i + 1) % ids.length : (i - 1 + ids.length) % ids.length;
+      e.preventDefault();
+      go(ids[next]);
+    }
+  });
+
+  window.addEventListener('hashchange', function () {
+    var id = location.hash.slice(1);
+    if (STATES[id] && id !== currentState) { go(id); }
+  });
+
+  /* Public handle, used by the update overlay button. */
+  window.Demo = { go: go };
+
+  /* ════════════════════════════════════════════════════════════════════
+     BOOT
+     ════════════════════════════════════════════════════════════════════ */
+  buildNav();
+  buildOtp();
+  var initial = location.hash.slice(1);
+  go(STATES[initial] ? initial : 'home/default');
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   DEVELOPER LAYER · handoff tooling
+   Separate from the product script on purpose. Delete this block and the
+   d- styles and the prototype still works exactly the same.
+
+   Four things a front-end developer gets from this:
+     1. Token reference    every colour, space, radius, type step, shadow and
+                           duration, read live out of the stylesheet, so it
+                           can never go stale.
+     2. Component recipes  the exact declarations per component, with states.
+     3. Inspector          hover anything, see which token each computed value
+                           resolves to. Anything that resolves to nothing is
+                           flagged red, which doubles as a drift audit.
+     4. Overlays           composition outlines by atomic level, and a 4px grid.
+   ══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var root = document.documentElement;
+  var frame = document.getElementById('deviceFrame');
+  var panel = document.getElementById('specPanel');
+  var ring = document.getElementById('hoverRing');
+
+  /* ── Read the tokens straight out of the :root rule ──────────────── */
+  function readTokens() {
+    var out = [];
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var rules;
+      try { rules = document.styleSheets[i].cssRules; } catch (e) { continue; }
+      for (var j = 0; j < rules.length; j++) {
+        var r = rules[j];
+        if (!r.style || r.selectorText !== ':root') { continue; }
+        for (var k = 0; k < r.style.length; k++) {
+          var name = r.style[k];
+          if (name.indexOf('--') !== 0) { continue; }
+          out.push({ name: name, raw: r.style.getPropertyValue(name).trim() });
+        }
+      }
+    }
+    return out;
+  }
+  var TOKENS = readTokens();
+  /* The tooling tokens are not part of the product scale, so they are counted
+     and exported separately. */
+  var PRODUCT_TOKENS = TOKENS.filter(function (t) { return t.name.indexOf('--d-') !== 0; });
+
+  function groupOf(n) {
+    if (n.indexOf('--sp-') === 0) { return 'spacing'; }
+    if (n.indexOf('--radius-') === 0) { return 'radius'; }
+    if (n.indexOf('--shadow-') === 0) { return 'elevation'; }
+    if (n.indexOf('--text-') === 0 || n.indexOf('--font-') === 0) { return 'type'; }
+    if (n.indexOf('--ease-') === 0 || n.indexOf('--dur-') === 0) { return 'motion'; }
+    if (n.indexOf('--color-') === 0 || n.indexOf('--glass-') === 0) { return 'colour'; }
+    return 'other';
+  }
+  function subOf(n) {
+    if (/^--color-(primary|secondary|tertiary|whatsapp)/.test(n)) { return 'Brand'; }
+    if (/^--color-(success|warning)/.test(n)) { return 'Semantic'; }
+    if (/^--color-text/.test(n)) { return 'Text'; }
+    if (/^--color-(surface)/.test(n)) { return 'Surface'; }
+    if (/^--color-border/.test(n)) { return 'Border'; }
+    if (/^--glass-/.test(n)) { return 'Glass'; }
+    return 'Other';
+  }
+
+  /* ── Reverse lookup: computed value back to a token name ─────────── */
+  var probe = document.createElement('span');
+  probe.style.display = 'none';
+  document.body.appendChild(probe);
+  function normColour(v) {
+    if (!v) { return ''; }
+    probe.style.color = '';
+    probe.style.color = v;
+    var c = getComputedStyle(probe).color;
+    return c === 'rgb(0, 0, 0)' && !/black|#000|rgb\(0,\s*0,\s*0/.test(v) ? '' : c;
+  }
+  var MAPS = { colour: {}, spacing: {}, radius: {}, type: {}, elevation: {}, motion: {} };
+  TOKENS.forEach(function (t) {
+    var g = groupOf(t.name);
+    var live = getComputedStyle(root).getPropertyValue(t.name).trim();
+    if (g === 'colour') {
+      var n = normColour(live);
+      if (n && !MAPS.colour[n]) { MAPS.colour[n] = t.name; }
+    } else if (g === 'spacing') { MAPS.spacing[live] = t.name; }
+    else if (g === 'radius') { MAPS.radius[live] = t.name; }
+    else if (g === 'type' && /px$/.test(live)) { MAPS.type[live] = t.name; }
+    else if (g === 'elevation') { MAPS.elevation[live.replace(/\s+/g, ' ')] = t.name; }
+    else if (g === 'motion') { MAPS.motion[live] = t.name; }
+  });
+
+  function tokenFor(kind, value) {
+    if (!value) { return null; }
+    if (kind === 'colour') { return MAPS.colour[normColour(value)] || null; }
+    var v = String(value).trim().replace(/\s+/g, ' ');
+    return MAPS[kind] ? (MAPS[kind][v] || null) : null;
+  }
+
+  /* ── Component recipes, the part a dev builds from ───────────────── */
+  var RECIPES = [
+    { name: '.a-btn--primary', level: 'atom', lines: [
+        ['min-height', '56px'], ['border-radius', 'var(--radius-pill)'],
+        ['background', 'var(--gradient-primary)'],
+        ['color', 'var(--color-text-on-dark)'],
+        ['font', 'var(--text-subhead) / 700, letter-spacing -0.3px'],
+        ['box-shadow', 'var(--shadow-btn)'],
+        ['transition', 'transform var(--dur-fast) var(--ease-in-out)']
+      ], states: [
+        [':active', 'transform: scale(0.97)'],
+        ['[aria-disabled="true"], :disabled', 'background: var(--color-surface-sunken); color: var(--color-text-tertiary); box-shadow: none. The real disabled attribute is set too, so the control is inactive, not merely grey.']
+      ] },
+    { name: '.a-btn--onDark', level: 'atom', lines: [
+        ['background', 'var(--color-surface)'], ['color', 'var(--color-text-primary)'], ['box-shadow', 'var(--shadow-btn-white)']
+      ], states: [['use', 'primary action on the dark hero only']] },
+    { name: '.a-btn--whatsapp', level: 'atom', lines: [
+        ['background', 'var(--color-whatsapp)'], ['color', 'var(--color-on-whatsapp)'],
+        ['box-shadow', 'var(--shadow-whatsapp)']
+      ], states: [['use', 'only for an action that leaves the app for WhatsApp']] },
+    { name: '.a-field', level: 'atom', lines: [
+        ['min-height', '56px'], ['padding', '0 var(--sp-4)'], ['gap', 'var(--sp-3)'],
+        ['border', '1.5px solid var(--color-border-field)'], ['border-radius', 'var(--radius-card)'],
+        ['background', 'var(--glass-card-bg)'], ['box-shadow', 'var(--shadow-field)']
+      ], states: [
+        [':focus-within', 'border-color: var(--color-primary) plus a 3px var(--color-primary-12) ring'],
+        ['[data-valid="true"]', 'border-color: var(--color-primary), tick fades in'],
+        ['[data-state="error"]', 'border-color: var(--color-error-text); background: var(--color-secondary-bg); aria-invalid on the input'],
+        ['[data-state="pending"]', 'opacity .6, input disabled'],
+        ['note', 'focus and validity are separate axes on purpose, so focusing a complete field cannot hide its own tick']
+      ] },
+    { name: '.a-otp-cell', level: 'atom', lines: [
+        ['flex', '1, max-width 52px'], ['aspect-ratio', '1 / 1'],
+        ['font', '22px / 700, centred'], ['border', '1.5px solid var(--color-border-field)'],
+        ['border-radius', 'var(--radius-card-sm)'], ['background', 'var(--color-surface-sunken)']
+      ], states: [
+        ['[data-state="filled"]', 'border + text var(--color-primary), bg var(--color-primary-light)'],
+        ['group [data-state="valid"]', 'success tones'],
+        ['group [data-state="error"]', 'error tones plus 2.5px border, so the two outcomes differ by more than hue'],
+        ['group [data-state="locked"]', 'readonly + aria-disabled, never disabled, which would evict focus']
+      ] },
+    { name: '.a-helper', level: 'atom', lines: [
+        ['font-size', 'var(--text-caption2)'], ['line-height', '1.5'],
+        ['color', 'var(--color-text-secondary)'], ['margin-top', 'var(--sp-2)']
+      ], states: [
+        ['[data-tone="error"]', 'var(--color-error-text), weight 600, plus an alert glyph'],
+        ['[data-tone="warning"]', 'var(--color-warning), weight 600'],
+        ['[data-tone="success"]', 'var(--color-success), weight 600']
+      ] },
+    { name: '.m-alert', level: 'molecule', lines: [
+        ['padding', 'var(--sp-4)'], ['border-radius', 'var(--radius-card)'], ['gap', 'var(--sp-3)'],
+        ['icon', '20px stroke 1.9, tone coloured'],
+        ['title', 'var(--text-footnote) / 700'],
+        ['body', 'var(--text-caption2) / 1.55, var(--color-text-secondary)'],
+        ['actions', 'stacked .a-btn--sm, full width']
+      ], states: [
+        ['[data-tone="error"]', 'bg var(--color-secondary-bg), border var(--color-secondary-25)'],
+        ['[data-tone="warning"]', 'bg var(--color-warning-bg), border var(--color-warning-border)'],
+        ['[data-tone="success"]', 'bg var(--color-success-bg), border var(--color-success-20)'],
+        ['--onDark', 'translucent white over the hero, white title']
+      ] },
+    { name: '.m-phone-field', level: 'molecule', lines: [
+        ['composition', '.a-field + prefix + input + tick'],
+        ['prefix', 'flag 20px, +27 at var(--text-body) / 800, 1px divider'],
+        ['input', 'var(--text-subhead) / 600, caret var(--color-primary)']
+      ], states: [['affix', 'the tick is .a-field__affix, owned by the atom, revealed on [data-valid="true"]']] },
+    { name: '.m-otp-group', level: 'molecule', lines: [
+        ['display', 'flex, gap 6px, space-between'],
+        ['children', 'six .a-otp-cell'],
+        ['role', 'group, labelled "6 digit code"']
+      ], states: [['[data-state]', 'valid | error | locked, cascades to every cell']] },
+    { name: '.o-signup-sheet', level: 'organism', lines: [
+        ['position', 'absolute bottom, full width'], ['max-height', '94%, scrolls'],
+        ['border-radius', 'var(--radius-sheet) top corners only'],
+        ['background', 'var(--glass-sheet-bg)'], ['backdrop-filter', 'var(--glass-sheet-bd)'],
+        ['box-shadow', 'var(--shadow-sheet)'], ['body padding', '0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom))'],
+        ['enter', 'sheetUp var(--dur-sheet) cubic-bezier(0.32,0.72,0,1)']
+      ], states: [['stages', 'number | code | blocked | success, one visible at a time']] },
+    { name: '.o-auth-hero', level: 'organism', lines: [
+        ['background', 'var(--gradient-hero)'],
+        ['composition', 'orbs + notch + status bar + brand lockup + hero copy + actions'],
+        ['title', 'var(--text-hero) / 800, line-height 1.08, tracking -1.6px'],
+        ['lede', 'var(--text-body) / 400, line-height 1.6, white 60%'],
+        ['body padding', '0 var(--sp-6) max(40px, safe-area)']
+      ], states: [['notice slot', 'optional .m-alert--onDark above the actions']] }
+  ];
+
+  var RULES = [
+    ['Naming', 'Level prefix, then BEM. a- atoms, m- molecules, o- organisms, t- templates, p- page, u- utilities, d- developer tooling. Element is __, modifier is --. A name states a role, never an appearance: a-btn--primary, not a-btn--blue.'],
+    ['Levels', 'An atom cannot be broken down without losing its meaning. A molecule is a small bond of atoms with one job. An organism is a standalone section. If you are unsure, file it lower and promote it when a second use appears.'],
+    ['State', 'Never a class. Always a data attribute the CSS keys off: data-state, data-tone, data-channel. JavaScript sets attributes, it never builds class strings.'],
+    ['Tokens', 'A component reads tokens, never raw values. If you need a value that has no token, add the token first.'],
+    ['Spacing', 'A 4px base grid, --sp-1 through --sp-8. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
+    ['Composition', 'An organism composes molecules, a molecule composes atoms. Nothing reaches into another component with a descendant selector.'],
+    ['Motion', 'Durations and easings come from tokens, and every animation collapses to a still frame under prefers-reduced-motion.'],
+    ['Targets', 'Every interactive control is at least 48px in its smallest dimension, including quiet text links.'],
+    ['Colour', 'Never carries meaning alone. Every error pairs the colour with an icon and a sentence.'],
+    ['Contrast', 'Text clears 4.5:1, large text and non-text clear 3:1. The measured pairs are in this panel. If you change a colour, remeasure it.'],
+    ['The d- layer', 'This panel, the state navigator, the overlays and the inspector are tooling. They never ship. The boundary runs one way: tooling reads product tokens because it documents them, but no product component may read a --d- token.']
+  ];
+
+  /* ── Render the panel ────────────────────────────────────────────── */
+  function row(inner) { return '<div class="d-row">' + inner + '</div>'; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+  function renderColour() {
+    var subs = ['Brand', 'Semantic', 'Text', 'Surface', 'Border', 'Glass', 'Other'];
+    var html = '';
+    subs.forEach(function (sub) {
+      var list = TOKENS.filter(function (t) { return groupOf(t.name) === 'colour' && subOf(t.name) === sub; });
+      if (!list.length) { return; }
+      html += '<p class="d-section__title" style="margin-top:var(--sp-4);">' + sub + '</p>';
+      html += list.map(function (t) {
+        return row(
+          '<span class="d-row__swatch" style="background:var(' + t.name + ');"></span>' +
+          '<span class="d-row__name">' + t.name + '</span>' +
+          '<span class="d-row__value">' + esc(t.raw) + '</span>'
+        );
+      }).join('');
+    });
+    return html;
+  }
+  function renderSpacing() {
+    return TOKENS.filter(function (t) { return groupOf(t.name) === 'spacing'; }).map(function (t) {
+      return row(
+        '<span class="d-row__bar" style="width:' + t.raw + ';"></span>' +
+        '<span class="d-row__name">' + t.name + '</span>' +
+        '<span class="d-row__value">' + t.raw + '</span>'
+      );
+    }).join('');
+  }
+  function renderRadius() {
+    return TOKENS.filter(function (t) { return groupOf(t.name) === 'radius'; }).map(function (t) {
+      return row(
+        '<span class="d-row__radius" style="border-top-left-radius:' + t.raw + ';"></span>' +
+        '<span class="d-row__name">' + t.name + '</span>' +
+        '<span class="d-row__value">' + t.raw + '</span>'
+      );
+    }).join('');
+  }
+  function renderType() {
+    return TOKENS.filter(function (t) { return groupOf(t.name) === 'type'; }).map(function (t) {
+      var isSize = /px$/.test(t.raw);
+      var sample = isSize
+        ? '<span class="d-typeSample" style="font-size:' + t.raw + ';font-weight:700;">Ag</span>'
+        : '<span class="d-typeSample" style="font-size:13px;">Aa</span>';
+      return row(
+        '<span style="width:56px;flex-shrink:0;overflow:hidden;">' + sample + '</span>' +
+        '<span class="d-row__name">' + t.name + '</span>' +
+        '<span class="d-row__value">' + esc(t.raw) + '</span>'
+      );
+    }).join('');
+  }
+  function renderElevation() {
+    return TOKENS.filter(function (t) { return groupOf(t.name) === 'elevation'; }).map(function (t) {
+      return row(
+        '<span class="d-shadowSample" style="box-shadow:var(' + t.name + ');"></span>' +
+        '<span class="d-row__name">' + t.name + '</span>' +
+        '<span class="d-row__value">' + esc(t.raw) + '</span>'
+      );
+    }).join('');
+  }
+  function renderMotion() {
+    return TOKENS.filter(function (t) { return groupOf(t.name) === 'motion'; }).map(function (t) {
+      return row('<span class="d-row__name">' + t.name + '</span><span class="d-row__value">' + esc(t.raw) + '</span>');
+    }).join('');
+  }
+  function renderRecipes() {
+    return RECIPES.map(function (r) {
+      return '<div class="d-recipe">' +
+        '<div class="d-recipe__head"><span class="d-recipe__name">' + r.name + '</span>' +
+        '<span class="d-recipe__level" data-level="' + r.level + '">' + r.level + '</span></div>' +
+        '<div class="d-recipe__body">' +
+        r.lines.map(function (l) {
+          return '<div class="d-recipe__line"><span class="d-recipe__key">' + l[0] + '</span>' +
+                 '<span class="d-recipe__val">' + esc(l[1]) + '</span></div>';
+        }).join('') +
+        (r.states && r.states.length
+          ? '<div class="d-recipe__states">' + r.states.map(function (s) {
+              return '<div class="d-recipe__line"><span class="d-recipe__key">' + esc(s[0]) + '</span>' +
+                     '<span class="d-recipe__val">' + esc(s[1]) + '</span></div>';
+            }).join('') + '</div>'
+          : '') +
+        '</div></div>';
+    }).join('');
+  }
+  function renderRules() {
+    return RULES.map(function (r) {
+      return '<div style="margin-bottom:var(--sp-3);">' +
+        '<p style="font-size:var(--text-micro);font-weight:800;margin-bottom:2px;">' + r[0] + '</p>' +
+        '<p style="font-size:var(--text-micro);line-height:1.55;color:var(--color-text-secondary);">' + r[1] + '</p>' +
+      '</div>';
+    }).join('');
+  }
+
+
+  /* ── Contrast, computed live ──────────────────────────────────────
+     The rules tab claims the measured pairs are in this panel, so they
+     are measured here rather than asserted in a comment. Values are
+     resolved from the live tokens and composited where a surface is
+     translucent, which is the only way the sheet's numbers are honest. */
+  function toRgb(v) {
+    probe.style.color = '';
+    probe.style.color = v;
+    var m = getComputedStyle(probe).color.match(/[\d.]+/g);
+    return m ? [+m[0], +m[1], +m[2], m[3] === undefined ? 1 : +m[3]] : [0, 0, 0, 1];
+  }
+  function tok(name) { return toRgb(getComputedStyle(root).getPropertyValue(name).trim()); }
+  function composite(fg, bg) {
+    var a = fg[3];
+    return [fg[0] * a + bg[0] * (1 - a), fg[1] * a + bg[1] * (1 - a), fg[2] * a + bg[2] * (1 - a), 1];
+  }
+  function relLum(c) {
+    function f(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  }
+  function contrast(fg, bg) {
+    var a = relLum(fg), b = relLum(bg);
+    return ((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05));
+  }
+  function renderContrast() {
+    var hero   = tok('--color-hero-3');
+    /* The sheet's filter lifts its own backdrop, which no formula can predict,
+       so the surface here is the measured one rather than a composite. */
+    var sheet  = tok('--glass-sheet-measured');
+    var card   = composite(tok('--glass-card-bg'), sheet);
+    var sunken = tok('--color-surface-sunken');
+    var pairs = [
+      ['Helper, default',        '--color-text-secondary', sheet,  4.5, 'sheet'],
+      ['Helper, error',          '--color-error-text',     sheet,  4.5, 'sheet'],
+      ['Helper, warning',        '--color-warning',        sheet,  4.5, 'sheet'],
+      ['Helper, success',        '--color-success',        sheet,  4.5, 'sheet'],
+      ['Sheet subtitle',         '--color-text-secondary', sheet,  4.5, 'sheet'],
+      ['Outcome body',           '--color-text-secondary', sheet,  4.5, 'sheet'],
+      ['Resend link',            '--color-primary-dark',   sheet,  4.5, 'sheet'],
+      ['Quiet link',             '--color-text-secondary', sheet,  4.5, 'sheet'],
+      ['Field text',             '--color-text-primary',   card,   4.5, 'field'],
+      ['Placeholder',            '--color-text-tertiary',  card,   4.5, 'field'],
+      ['Disabled label',         '--color-text-tertiary',  sunken, 4.5, 'sunken'],
+      ['Hero lede',              '--color-on-dark-soft',   hero,   4.5, 'hero'],
+      ['WhatsApp badge',         '--color-whatsapp-dark',  tok('--color-whatsapp-bg'), 4.5, 'badge'],
+      ['Alert body on info',     '--color-text-secondary', tok('--color-primary-light'), 4.5, 'tint'],
+      ['Alert body on error',    '--color-text-secondary', tok('--color-secondary-bg'),  4.5, 'tint'],
+      ['Alert body on warning',  '--color-text-secondary', tok('--color-warning-bg'),    4.5, 'tint'],
+      ['Alert body on success',  '--color-text-secondary', tok('--color-success-bg'),    4.5, 'tint'],
+      ['Field border',           '--color-border-field',   card,   3.0, 'field']
+    ];
+    var rows = pairs.map(function (pr) {
+      var fg = tok(pr[1]);
+      if (fg[3] < 1) { fg = composite(fg, pr[2]); }
+      var r = contrast(fg, pr[2]);
+      var ok = r >= pr[3];
+      return '<div class="d-row">' +
+        '<span class="d-row__swatch" style="background:' +
+          'rgb(' + Math.round(pr[2][0]) + ',' + Math.round(pr[2][1]) + ',' + Math.round(pr[2][2]) + ');' +
+          'color:var(' + pr[1] + ');display:flex;align-items:center;justify-content:center;' +
+          'font-size:13px;font-weight:700;">Aa</span>' +
+        '<span class="d-row__name">' + pr[0] + '<br><span style="opacity:.55">' + pr[1] + ' on ' + pr[4] + '</span></span>' +
+        '<span class="d-row__value" style="color:' + (ok ? 'var(--color-success)' : 'var(--color-error-text)') + '">' +
+          r.toFixed(2) + ':1<br><span style="opacity:.7">needs ' + pr[3].toFixed(1) + '</span></span>' +
+      '</div>';
+    }).join('');
+    var fails = pairs.filter(function (pr) {
+      var fg = tok(pr[1]);
+      if (fg[3] < 1) { fg = composite(fg, pr[2]); }
+      return contrast(fg, pr[2]) < pr[3];
+    }).length;
+    return '<p class="d-section__note">Read from the live tokens. The sheet surface is the ' +
+      'measured rendered composite, because its backdrop-filter cannot be derived from the ' +
+      'tokens. Text needs 4.5:1, non-text and large text need 3:1. ' +
+      (fails ? '<b>' + fails + ' failing.</b>' : 'All passing.') + '</p>' + rows;
+  }
+
+  var TABS = [
+    { id: 'colour',    label: 'Colour',     render: renderColour },
+    { id: 'spacing',   label: 'Spacing',    render: renderSpacing },
+    { id: 'radius',    label: 'Radius',     render: renderRadius },
+    { id: 'type',      label: 'Type',       render: renderType },
+    { id: 'elevation', label: 'Elevation',  render: renderElevation },
+    { id: 'motion',    label: 'Motion',     render: renderMotion },
+    { id: 'contrast',  label: 'Contrast',   render: renderContrast },
+    { id: 'recipes',   label: 'Components', render: renderRecipes },
+    { id: 'rules',     label: 'Rules',      render: renderRules }
+  ];
+
+  function buildPanel() {
+    panel.innerHTML =
+      '<div class="d-panel__head">' +
+        '<p class="d-panel__title">Design specification</p>' +
+        '<p class="d-panel__lede">Colour, spacing, radius, type, elevation and motion are read live ' +
+        'from the stylesheet and cannot drift. The component recipes below are hand written, so treat ' +
+        'the stylesheet as the source of truth if the two ever disagree. ' +
+        PRODUCT_TOKENS.length + ' product tokens, ' + (TOKENS.length - PRODUCT_TOKENS.length) +
+        ' tooling tokens.</p>' +
+        '<div class="d-panel__tabs" id="dTabs">' +
+          TABS.map(function (t, i) {
+            return '<button type="button" class="d-tab" data-tab="' + t.id + '"' +
+                   (i === 0 ? ' data-state="active"' : '') + '>' + t.label + '</button>';
+          }).join('') +
+        '</div>' +
+        '<div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3);">' +
+          '<button type="button" class="d-copyBtn" data-copy="css">Copy tokens as CSS</button>' +
+          '<button type="button" class="d-copyBtn" data-copy="json">Copy as JSON</button>' +
+        '</div>' +
+      '</div>' +
+      TABS.map(function (t, i) {
+        return '<div class="d-section" data-panel="' + t.id + '"' + (i === 0 ? '' : ' hidden') + '>' +
+               '<p class="d-section__title">' + t.label + '</p>' + t.render() + '</div>';
+      }).join('');
+
+    panel.querySelectorAll('.d-tab').forEach(function (b) {
+      b.addEventListener('click', function () {
+        panel.querySelectorAll('.d-tab').forEach(function (x) { x.removeAttribute('data-state'); });
+        b.setAttribute('data-state', 'active');
+        panel.querySelectorAll('[data-panel]').forEach(function (s) {
+          s.hidden = s.getAttribute('data-panel') !== b.getAttribute('data-tab');
+        });
+        panel.scrollTop = 0;
+      });
+    });
+    panel.querySelectorAll('[data-copy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var out = b.getAttribute('data-copy') === 'json'
+          ? JSON.stringify(PRODUCT_TOKENS.reduce(function (a, t) { a[t.name] = t.raw; return a; }, {}), null, 2)
+          : ':root {\n' + PRODUCT_TOKENS.map(function (t) { return '  ' + t.name + ': ' + t.raw + ';'; }).join('\n') + '\n}';
+        navigator.clipboard.writeText(out).then(function () {
+          var was = b.textContent; b.textContent = 'Copied';
+          setTimeout(function () { b.textContent = was; }, 1400);
+        });
+      });
+    });
+  }
+
+  /* ── Inspector ───────────────────────────────────────────────────── */
+  var pinned = false;
+  var selEl = document.getElementById('inspectSel');
+  var gridEl = document.getElementById('inspectGrid');
+  var hintEl = document.getElementById('inspectHint');
+
+  function levelOf(cls) {
+    if (/(^|\s)a-/.test(cls)) { return 'atom'; }
+    if (/(^|\s)m-/.test(cls)) { return 'molecule'; }
+    if (/(^|\s)o-/.test(cls)) { return 'organism'; }
+    if (/(^|\s)t-/.test(cls)) { return 'template'; }
+    return '';
+  }
+  function line(k, v) {
+    return '<span class="d-inspect__k">' + k + '</span><span class="d-inspect__v">' + v + '</span>';
+  }
+  function val(kind, raw) {
+    if (!raw || raw === 'none' || raw === '0px' || raw === 'normal' || raw === 'rgba(0, 0, 0, 0)') {
+      return '<span style="opacity:.4">' + esc(raw || 'not set') + '</span>';
+    }
+    var t = tokenFor(kind, raw);
+    return t ? esc(raw) + ' <em>' + t + '</em>' : esc(raw) + ' <b>no token</b>';
+  }
+
+  function inspect(node) {
+    if (!node || node === frame) { return; }
+    var cs = getComputedStyle(node);
+    var rect = node.getBoundingClientRect();
+    var cls = node.className && node.className.baseVal !== undefined ? node.className.baseVal : (node.className || '');
+    var lvl = levelOf(' ' + cls);
+    selEl.innerHTML = (lvl ? '<span class="d-recipe__level" data-level="' + lvl + '" style="margin-right:6px;">' + lvl + '</span>' : '') +
+      '&lt;' + node.tagName.toLowerCase() + '&gt; ' + esc(cls || node.id || '');
+
+    var pad = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft];
+    var padTokens = pad.map(function (p) { return tokenFor('spacing', p) || p; }).join(' ');
+    var rows = [
+      line('box', Math.round(rect.width) + ' × ' + Math.round(rect.height)),
+      line('padding', pad.join(' ') + (padTokens !== pad.join(' ') ? ' <em>' + padTokens + '</em>' : '')),
+      line('gap', val('spacing', cs.gap || cs.columnGap)),
+      line('radius', val('radius', cs.borderTopLeftRadius)),
+      line('font', val('type', cs.fontSize) + ' / ' + cs.fontWeight + ' / lh ' + cs.lineHeight),
+      line('color', val('colour', cs.color)),
+      line('background', val('colour', cs.backgroundColor)),
+      line('border', cs.borderTopWidth === '0px' ? '<span style="opacity:.4">not set</span>'
+            : cs.borderTopWidth + ' ' + val('colour', cs.borderTopColor)),
+      line('shadow', cs.boxShadow === 'none' ? '<span style="opacity:.4">not set</span>'
+            : (tokenFor('elevation', cs.boxShadow) ? '<em>' + tokenFor('elevation', cs.boxShadow) + '</em>'
+               : '<b>no token</b> ' + esc(cs.boxShadow.slice(0, 46) + '…')))
+    ];
+    var state = node.getAttribute && (node.getAttribute('data-state') || node.getAttribute('data-tone'));
+    if (state) { rows.unshift(line('state', '<em>' + esc(state) + '</em>')); }
+    gridEl.innerHTML = rows.join('');
+
+    var fr = frame.getBoundingClientRect();
+    ring.style.left = (rect.left - fr.left) + 'px';
+    ring.style.top = (rect.top - fr.top) + 'px';
+    ring.style.width = rect.width + 'px';
+    ring.style.height = rect.height + 'px';
+    ring.setAttribute('data-state', 'visible');
+  }
+
+  frame.addEventListener('mouseover', function (e) {
+    if (root.getAttribute('data-inspect') !== 'on' || pinned) { return; }
+    inspect(e.target);
+  });
+  frame.addEventListener('mouseleave', function () {
+    if (pinned) { return; }
+    ring.removeAttribute('data-state');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (root.getAttribute('data-inspect') !== 'on') { return; }
+    if (e.key === 'p' || e.key === 'P') {
+      var tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT') { return; }
+      pinned = !pinned;
+      hintEl.textContent = pinned ? 'pinned, P releases' : 'P pins';
+    }
+  });
+
+  /* ── Nav additions ───────────────────────────────────────────────── */
+  var TOGGLES = [
+    { attr: 'data-spec',    label: 'Design specs',        hint: 'token reference and component recipes' },
+    { attr: 'data-inspect', label: 'Inspect elements',    hint: 'hover for tokens, P pins' },
+    { attr: 'data-layers',  label: 'Composition outlines',hint: 'atom, molecule, organism' },
+    { attr: 'data-grid',    label: '4px grid',            hint: 'check the spacing rhythm' }
+  ];
+  function buildDevNav() {
+    var nav = document.getElementById('stateNav');
+    var rule = document.createElement('div');
+    rule.className = 'o-state-nav__rule';
+    var head = document.createElement('p');
+    head.className = 'o-state-nav__heading';
+    head.textContent = 'Developer';
+    nav.appendChild(rule); nav.appendChild(head);
+
+    TOGGLES.forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'o-state-nav__toggle';
+      b.title = t.hint;
+      b.innerHTML = '<span>' + t.label + '</span><span class="o-state-nav__switch"></span>';
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () {
+        var on = root.getAttribute(t.attr) === 'on';
+        if (on) { root.removeAttribute(t.attr); b.removeAttribute('data-state'); }
+        else { root.setAttribute(t.attr, 'on'); b.setAttribute('data-state', 'on'); }
+        b.setAttribute('aria-pressed', on ? 'false' : 'true');
+        if (t.attr === 'data-inspect' && on) { pinned = false; ring.removeAttribute('data-state'); }
+      });
+      nav.appendChild(b);
+    });
+  }
+
+  buildPanel();
+  buildDevNav();
+})();
+</script>
+</body>
+</html>
