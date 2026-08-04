@@ -1174,6 +1174,28 @@ button { background: none; border: none; color: inherit; }
    down rather than spending 22dp of it. */
 .t-device-frame[data-keyboard="open"] .d-demoHint { display: none; }
 
+/* d-check. The prototype's own rules, run against the live page. */
+.d-check {
+  display: flex; gap: var(--sp-2); align-items: flex-start;
+  padding: var(--sp-2) 0; border-bottom: 1px solid var(--color-border-light);
+}
+.d-check__mark {
+  flex-shrink: 0; width: 18px; text-align: center;
+  font-size: var(--text-caption); font-weight: 800; line-height: 1.5;
+}
+.d-check[data-result="pass"] .d-check__mark { color: var(--color-success); }
+.d-check[data-result="fail"] .d-check__mark { color: var(--color-error-text); }
+.d-check[data-result="warn"] .d-check__mark { color: var(--color-warning); }
+.d-check[data-result="skip"] .d-check__mark { color: var(--color-text-tertiary); }
+.d-check__body { font-size: var(--text-micro); line-height: 1.5; color: var(--color-text-secondary); }
+.d-check__body b { color: var(--color-text-primary); }
+.d-check__detail { display: block; color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-nano); }
+.d-check__tally {
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  padding: var(--sp-2) 0 var(--sp-3);
+}
+.d-check__tally b { color: var(--color-error-text); }
+
 /* Inspector card, docked under the device */
 .d-inspect {
   width: 300px; max-width: 100%; flex-shrink: 0; display: none;
@@ -3920,6 +3942,213 @@ button { background: none; border: none; color: inherit; }
       '</p>' + rows;
   }
 
+  /* ── Self-check ───────────────────────────────────────────────────────
+     The rules this file states about itself, executable. Every check runs
+     against the live DOM in the browser you are reading this in: no build, no
+     runner, no install, and nothing to keep in sync with the prototype
+     because it IS the prototype.
+
+     This exists because the checks that verified this file used to live in a
+     scratch directory. Anything that can be deleted separately from the thing
+     it verifies will eventually disagree with it, and then stop being run. */
+  var CHECKS = [
+    ['Spacing', 'every rendered gap is on the scale', function () {
+      var ok = [4, 8, 16, 24, 32], bad = [];
+      var stage = document.querySelector('.o-signup-sheet__stage[data-state="active"]');
+      if (!stage) { return { skip: 'open the sheet to check the stage rhythm' }; }
+      var kids = [].slice.call(stage.children).filter(function (n) { return n.offsetParent !== null && !n.hidden; });
+      var prev = null;
+      kids.forEach(function (k) {
+        var b = k.getBoundingClientRect();
+        if (prev !== null) {
+          var g = Math.round(b.top - prev);
+          if (ok.indexOf(g) < 0) { bad.push(g + 'px above .' + (k.className || '').split(' ')[0]); }
+        }
+        prev = b.bottom;
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : kids.length - 1 + ' gaps, all on 4 / 8 / 16 / 24 / 32' };
+    }],
+
+    ['Tokens', 'no component paints a value that has no token', function () {
+      var bad = [];
+      [].forEach.call(frame.querySelectorAll('*'), function (n) {
+        var cls = (n.className || '').toString();
+        if (/(^|\s)d-/.test(cls) || n.offsetParent === null) { return; }
+        var cs = getComputedStyle(n);
+        if (cs.boxShadow !== 'none' && !tokenFor('elevation', cs.boxShadow) && !composedOf(cs.boxShadow)) {
+          bad.push('.' + cls.split(' ')[0] + ' shadow');
+        }
+        if (cs.backgroundImage !== 'none' && !MAPS.image[cs.backgroundImage] && !composedOf(cs.backgroundImage)) {
+          bad.push('.' + cls.split(' ')[0] + ' background');
+        }
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.slice(0, 4).join(', ') : 'every painted value names a token' };
+    }],
+
+    ['Targets', 'every product control clears 48px', function () {
+      var bad = [];
+      [].forEach.call(frame.querySelectorAll('button, a, input'), function (n) {
+        if (n.offsetParent === null || n.hidden) { return; }
+        var cls = (n.className || '').toString();
+        if (/(^|\s)d-/.test(cls)) { return; }
+        /* The code cells are the documented exception: six squares and five
+           gaps cannot each clear 48 inside 320 minus the gutters. */
+        if (/a-otp-cell/.test(cls)) { return; }
+        /* A target is the region that responds to a tap, not the element that
+           receives focus. An input inside a field is 21px of text in a 56px
+           box, and tapping anywhere in that box focuses it, so the field is
+           what has to clear 48. */
+        var hit = n.closest ? (n.closest('.a-field') || n) : n;
+        var b = hit.getBoundingClientRect();
+        if (Math.min(b.width, b.height) < 47.5) {
+          bad.push((n.id || cls.split(' ')[0]) + ' ' + Math.round(b.width) + 'x' + Math.round(b.height));
+        }
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : 'all at or above var(--size-target)' };
+    }],
+
+    ['State', 'runtime state is an attribute, never a class', function () {
+      var bad = [];
+      [].forEach.call(document.querySelectorAll('[class]'), function (n) {
+        var m = (n.className || '').toString().match(/\b(is|has)-[\w-]+/g);
+        if (m) { bad = bad.concat(m); }
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : 'no is- or has- classes anywhere' };
+    }],
+
+    ['Naming', 'every class declares its atomic level', function () {
+      var bad = {};
+      [].forEach.call(document.querySelectorAll('[class]'), function (n) {
+        (n.getAttribute('class') || '').split(/\s+/).forEach(function (c) {
+          if (c && !/^[amoptud]-/.test(c)) { bad[c] = 1; }
+        });
+      });
+      var list = Object.keys(bad);
+      return { pass: !list.length, detail: list.length ? list.slice(0, 5).join(', ') : 'a- m- o- t- p- u- d- only' };
+    }],
+
+    ['Components', 'every component has a recipe in this panel', function () {
+      var documented = {};
+      RECIPES.forEach(function (r) { documented[r.name.slice(1).split('__')[0].split('--')[0]] = 1; });
+      var missing = {};
+      [].forEach.call(document.querySelectorAll('[class]'), function (n) {
+        (n.getAttribute('class') || '').split(/\s+/).forEach(function (c) {
+          if (/^[amoptu]-/.test(c)) {
+            var block = c.split('__')[0].split('--')[0];
+            if (!documented[block]) { missing[block] = 1; }
+          }
+        });
+      });
+      var list = Object.keys(missing);
+      return { pass: !list.length, detail: list.length ? list.join(', ') : Object.keys(documented).length + ' documented' };
+    }],
+
+    ['Tokens', 'no token is declared and never used', function () {
+      var declared = {}, used = {};
+      [].forEach.call(document.styleSheets, function (sh) {
+        var rules; try { rules = sh.cssRules; } catch (e) { return; }
+        [].forEach.call(rules, function (r) {
+          if (!r.style) { return; }
+          [].forEach.call(r.style, function (p) { if (p.indexOf('--') === 0) { declared[p] = 1; } });
+          var t = r.cssText || '';
+          (t.match(/var\((--[\w-]+)/g) || []).forEach(function (v) { used[v.slice(4)] = 1; });
+        });
+      });
+      /* Tokens are also consumed from markup: the WhatsApp glyph and the
+         drawn keypad fill from var() on SVG attributes, which no stylesheet
+         rule mentions. */
+      (document.documentElement.innerHTML.match(/var\((--[\w-]+)/g) || []).forEach(function (v) {
+        used[v.slice(4)] = 1;
+      });
+      var dead = Object.keys(declared).filter(function (d) { return !used[d]; });
+      return { pass: !dead.length, detail: dead.length ? dead.join(', ') : Object.keys(declared).length + ' tokens, all consumed' };
+    }],
+
+    ['Accessibility', 'every icon-only control is named', function () {
+      var bad = [];
+      [].forEach.call(frame.querySelectorAll('button, a'), function (n) {
+        if (n.offsetParent === null) { return; }
+        var text = (n.textContent || '').trim();
+        var name = n.getAttribute('aria-label') || n.getAttribute('title');
+        if (!text && !name) { bad.push(n.id || (n.className || '').toString().split(' ')[0] || n.tagName); }
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : 'every control has an accessible name' };
+    }],
+
+    ['Accessibility', 'decorative things are hidden from assistive tech', function () {
+      var bad = [];
+      [].forEach.call(frame.querySelectorAll('.a-icon-wrap, .m-notch, .m-status-bar, .t-keyboard, .o-auth-hero__orbs'), function (n) {
+        if (n.getAttribute('aria-hidden') !== 'true') { bad.push((n.className || '').toString().split(' ')[0]); }
+      });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : 'notch, status bar, keyboard, orbs and tone icons all aria-hidden' };
+    }],
+
+    ['States', 'every state in the navigator resolves', function () {
+      var st = (window.Demo && window.Demo.states) ? window.Demo.states() : null;
+      if (!st) { return { skip: 'the demo API is not exposed' }; }
+      var bad = Object.keys(st).filter(function (k) { return typeof st[k].run !== 'function'; });
+      return { pass: !bad.length, detail: bad.length ? bad.join(', ') : Object.keys(st).length + ' states, all runnable' };
+    }],
+
+    ['Recovery', 'no state offers a route it has just said is unavailable', function () {
+      /* The offline screens must not hand a driver a link that needs the
+         connection they have just been told is missing. */
+      var bad = [];
+      if (root.getAttribute('data-net') === 'offline') {
+        var help = document.getElementById('homeHelp');
+        if (help && help.offsetParent !== null && /^https?:/.test(help.getAttribute('href') || '')) {
+          bad.push('home help is a web link while offline');
+        }
+        [].forEach.call(document.querySelectorAll('#numberAlert a, #codeAlert a, #blockedActions a'), function (a) {
+          if (a.offsetParent !== null && /^https?:/.test(a.getAttribute('href') || '')) {
+            bad.push(a.textContent.trim() + ' needs the network');
+          }
+        });
+      }
+      return { pass: !bad.length,
+               detail: root.getAttribute('data-net') === 'offline'
+                 ? (bad.length ? bad.join(', ') : 'offline routes are reachable without data')
+                 : 'turn Offline on to check this one' };
+    }],
+
+    ['Placeholders', 'no demo stand-in is left where real data belongs', function () {
+      var found = [];
+      var links = [].map.call(document.querySelectorAll('a[href^="https://wa.me"], a[href^="tel:"]'),
+                              function (a) { return a.getAttribute('href'); }).join(' ');
+      if (/27800000000/.test(links + document.documentElement.innerHTML)) {
+        found.push('the support and manager number is still 27800000000');
+      }
+      if (document.getElementById('demoHint') && !document.getElementById('demoHint').hidden) {
+        found.push('the demo code hint is on screen');
+      }
+      /* A warning, not a failure: this is a prototype and the stand-ins are
+         meant to be here. It fails only so nobody ships them by accident. */
+      return { warn: found.length > 0, pass: !found.length, detail: found.length ? found.join(', ') : 'none' };
+    }]
+  ];
+
+  function renderChecks() {
+    var html = '<p class="d-section__note">These run against the live page, right now, in this browser. ' +
+      'They are the rules on the Rules tab, executable. Reopen this tab after a change to run them again.</p>';
+    var pass = 0, fail = 0, warn = 0;
+    var rows = CHECKS.map(function (c) {
+      var r;
+      try { r = c[2](); } catch (e) { r = { pass: false, detail: 'check threw: ' + e.message }; }
+      var mark, cls;
+      if (r.skip) { mark = '–'; cls = 'skip'; }
+      else if (r.warn) { mark = '!'; cls = 'warn'; warn++; }
+      else if (r.pass) { mark = '✓'; cls = 'pass'; pass++; }
+      else { mark = '✕'; cls = 'fail'; fail++; }
+      return '<div class="d-check" data-result="' + cls + '">' +
+        '<span class="d-check__mark">' + mark + '</span>' +
+        '<span class="d-check__body"><b>' + c[0] + '</b> · ' + c[1] +
+        '<span class="d-check__detail">' + esc(r.skip || r.detail || '') + '</span></span></div>';
+    }).join('');
+    return html + '<p class="d-check__tally">' + pass + ' passing' +
+      (warn ? ', ' + warn + ' to check before this ships' : '') +
+      (fail ? ', <b>' + fail + ' failing</b>' : '') + '</p>' + rows;
+  }
+
   var TABS = [
     { id: 'colour',    label: 'Colour',     render: renderColour },
     { id: 'spacing',   label: 'Spacing',    render: renderSpacing },
@@ -3930,6 +4159,7 @@ button { background: none; border: none; color: inherit; }
     { id: 'contrast',  label: 'Contrast',   render: renderContrast },
     { id: 'recipes',   label: 'Components', render: renderRecipes },
     { id: 'layout',    label: 'Layout',     render: renderLayout },
+    { id: 'checks',    label: 'Self-check', render: renderChecks, live: true },
     { id: 'rules',     label: 'Rules',      render: renderRules }
   ];
 
@@ -3958,8 +4188,19 @@ button { background: none; border: none; color: inherit; }
                '<p class="d-section__title">' + t.label + '</p>' + t.render() + '</div>';
       }).join('');
 
+    /* A tab whose content measures the page cannot be rendered once at boot.
+       Tokens do not change, so those tabs stay cached; anything marked live is
+       rebuilt each time it is opened, which is the only way its answer can be
+       about the screen you are actually looking at. */
     panel.querySelectorAll('.d-tab').forEach(function (b) {
       b.addEventListener('click', function () {
+        var def = TABS.filter(function (t) { return t.id === b.getAttribute('data-tab'); })[0];
+        if (def && def.live) {
+          var host = panel.querySelector('[data-panel="' + def.id + '"]');
+          if (host) {
+            host.innerHTML = '<p class="d-section__title">' + def.label + '</p>' + def.render();
+          }
+        }
         panel.querySelectorAll('.d-tab').forEach(function (x) { x.removeAttribute('data-state'); });
         b.setAttribute('data-state', 'active');
         panel.querySelectorAll('[data-panel]').forEach(function (s) {
