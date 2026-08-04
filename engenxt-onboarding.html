@@ -744,6 +744,104 @@ body {
   color: var(--color-success);
 }
 
+/* m-vehicle-picker. Which of your vehicles you are driving today. One job,
+   so a molecule, and it changes shape with how many there are: one vehicle
+   needs no picker at all, a few are faster to recognise as pictures than to
+   read as a list, and past a certain number no row is scannable and the
+   honest answer is a search field. */
+.m-vehicle-picker { display: flex; flex-direction: column; gap: var(--sp-3); }
+.m-vehicle-picker__head { display: flex; align-items: center; gap: var(--sp-2); }
+.m-vehicle-picker__title {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+.m-vehicle-picker__count {
+  margin-left: auto;
+  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+/* Scrolls sideways on its own so the page never does. The gutters are negative
+   margins, so the first and last chip can sit against the screen edge and the
+   row reads as continuing rather than ending. */
+.m-vehicle-picker__row {
+  display: flex; gap: var(--sp-3);
+  overflow-x: auto; scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  margin-inline: calc(var(--sp-5) * -1);
+  padding-inline: var(--sp-5);
+  padding-block: var(--sp-1);
+}
+.m-vehicle-picker__row::-webkit-scrollbar { display: none; }
+.m-vehicle-picker__empty {
+  font-size: var(--text-caption); color: var(--color-text-secondary);
+  padding-block: var(--sp-2);
+}
+
+/* a-vehicle-chip. A vehicle, said twice: the shape you spot it by and the
+   registration you know it by.
+
+   The picture alone was not enough. A driver here is not choosing a class of
+   vehicle, they are choosing THEIR vehicle, and two Hiluxes draw the same
+   silhouette. Four vehicles came out as two pictures and nine came out as
+   four, so picking the right one meant tapping to find out. The registration
+   is the thing that is actually different, so it is on the chip. */
+.a-vehicle-chip {
+  flex-shrink: 0; scroll-snap-align: center;
+  width: 80px; padding: 0;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-1h);
+  border: none; background: none; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.a-vehicle-chip:active { transform: scale(0.95); }
+.a-vehicle-chip__disc {
+  position: relative;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-circle);
+  border: 2px solid transparent;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--dur-base) var(--ease-out),
+              background var(--dur-base) var(--ease-out);
+}
+.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__disc {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.a-vehicle-chip__plate {
+  font-size: var(--text-nano); font-weight: 700; white-space: nowrap;
+  font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
+}
+.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__plate { color: var(--color-primary-dark); }
+/* The ring is a colour, so the tick is the second cue and the choice is never
+   carried by hue alone. */
+.a-vehicle-chip__tick {
+  position: absolute; top: -2px; right: -2px;
+  width: 22px; height: 22px;
+  display: none; align-items: center; justify-content: center;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-surface-page);
+}
+.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__tick { display: flex; }
+
+/* a-search. A field that filters what is under it. */
+.a-search { position: relative; display: flex; align-items: center; }
+.a-search__icon {
+  position: absolute; left: var(--sp-3); display: flex;
+  color: var(--color-text-tertiary); pointer-events: none;
+}
+.a-search__input {
+  width: 100%; min-height: var(--size-target);
+  padding: var(--sp-2) var(--sp-3) var(--sp-2) calc(var(--sp-3) * 2 + 18px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-field);
+  background: var(--color-surface);
+  font-size: var(--text-caption); color: var(--color-text-primary);
+  font-family: inherit;
+}
+.a-search__input::placeholder { color: var(--color-text-tertiary); }
+
 /* m-vehicle-card. The one thing a driver checks before pulling in, so it is
    the only card on this screen that takes the brand gradient. */
 .m-vehicle-card {
@@ -1255,12 +1353,33 @@ body {
             </span>
           </div>
 
+          <!-- Which vehicle is being driven today. Hidden entirely when there
+               is only one, because a choice of one is not a choice. -->
+          <div class="m-vehicle-picker" id="homePicker" role="radiogroup"
+               aria-labelledby="homePickerTitle" hidden>
+            <div class="m-vehicle-picker__head">
+              <span class="m-vehicle-picker__title" id="homePickerTitle">Driving today</span>
+              <span class="m-vehicle-picker__count" id="homePickerCount"></span>
+            </div>
+            <!-- Only once the row is too long to scan. -->
+            <label class="a-search" id="homeSearchWrap" hidden>
+              <span class="u-visually-hidden">Search your vehicles</span>
+              <span class="a-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></span>
+              <input class="a-search__input" id="homeSearch" type="search"
+                     placeholder="Search by registration or model" autocomplete="off">
+            </label>
+            <div class="m-vehicle-picker__row" id="homePickerRow"></div>
+            <p class="m-vehicle-picker__empty" id="homePickerEmpty" hidden>
+              No vehicle matches that.
+            </p>
+          </div>
+
           <button class="m-vehicle-card" type="button" id="homeVehicle">
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
             <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__label">Vehicle linked</span>
-              <span class="m-vehicle-card__plate">CA 123-456</span>
-              <span class="m-vehicle-card__model">Ford Transit Custom 2.0TDCi</span>
+              <span class="m-vehicle-card__label" id="homeVehicleLabel">Vehicle linked</span>
+              <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
+              <span class="m-vehicle-card__model" id="homeVehicleModel">Ford Transit Custom 2.0TDCi</span>
             </span>
             <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
@@ -1332,6 +1451,11 @@ body {
     vehicleActions: $('vehicleActions'),
     home: $('homeScreen'), homeName: $('homeName'), homeGreeting: $('homeGreeting'),
     homePoints: $('homePoints'), homeVehicle: $('homeVehicle'),
+    homeVehicleLabel: $('homeVehicleLabel'), homeVehiclePlate: $('homeVehiclePlate'),
+    homeVehicleModel: $('homeVehicleModel'),
+    homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
+    homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
+    homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
     announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar')
   };
 
@@ -1353,6 +1477,7 @@ body {
     ptsPerGb: 1000,
     gbCap: 5,
     vehicleLinked: false,
+    vehicles: [], activeVehicle: 0,
     step: 'signup-reward',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
@@ -1582,6 +1707,122 @@ body {
     playReward();
   }
 
+  /* ── The driver's vehicles ─────────────────────────────────────────────
+     A fleet driver is not always in the same vehicle, so home has to answer
+     "which one today" before anything else on it means much.
+
+     The picker changes shape with how many there are, because the right
+     control genuinely differs: one vehicle is not a choice and gets no picker,
+     a handful are recognised faster as pictures than read as text, and beyond
+     a row you can scan, pictures stop helping and a search field starts. */
+  var SEARCH_FROM = 6;
+
+  /* A yard's worth of vehicles to draw a demo fleet from. Registrations follow
+     the South African province letters a driver would actually read off a
+     windscreen disc. */
+  var FLEET = [
+    { plate: 'CA 123-456', make: 'Ford',          model: 'Transit Custom 2.0TDCi', type: 'van' },
+    { plate: 'CA 214-887', make: 'Toyota',        model: 'Hilux 2.4GD-6',          type: 'bakkie' },
+    { plate: 'CJ 60-114',  make: 'Isuzu',         model: 'D-Max 250',              type: 'bakkie' },
+    { plate: 'ND 77-902',  make: 'Hyundai',       model: 'H-1 Panel Van',          type: 'van' },
+    { plate: 'CA 445-201', make: 'Toyota',        model: 'Corolla Quest',          type: 'car' },
+    { plate: 'GP 118-774', make: 'Mercedes-Benz', model: 'Sprinter 316',           type: 'truck' },
+    { plate: 'CA 902-336', make: 'Nissan',        model: 'NP200',                  type: 'bakkie' },
+    { plate: 'CJ 33-518',  make: 'Volkswagen',    model: 'Crafter 35',             type: 'truck' },
+    { plate: 'CA 660-047', make: 'Suzuki',        model: 'Swift GL',               type: 'car' }
+  ];
+
+  var VEHICLE_ART = {
+    van:   '<path d="M2 16V9.5a1.5 1.5 0 0 1 1.5-1.5H13v8"/><path d="M13 10h3.6a2 2 0 0 1 1.6.8L21 14.5V16"/><path d="M2 16h1.6M9 16h5.4M19.4 16H22"/><circle cx="6.4" cy="16.6" r="2"/><circle cx="17.2" cy="16.6" r="2"/>',
+    bakkie:'<path d="M2 15.5V11a1.5 1.5 0 0 1 1.5-1.5h5L11 6.5h3.5a1.5 1.5 0 0 1 1.5 1.5v7.5"/><path d="M16 12.5h4a2 2 0 0 1 2 2v1"/><path d="M2 15.5h1.4M8.6 15.5h4M18 15.5h4"/><circle cx="6" cy="16" r="2"/><circle cx="16" cy="16" r="2"/>',
+    car:   '<path d="M3 15.5v-3l2.2-4A2 2 0 0 1 7 7.5h8.6a2 2 0 0 1 1.8 1.1l2 4.4v2.5"/><path d="M3 12.5h16.4"/><path d="M3 15.5h1.4M9 15.5h5M18 15.5h3"/><circle cx="6.6" cy="16" r="2"/><circle cx="16" cy="16" r="2"/>',
+    truck: '<path d="M2 15V7.5A1.5 1.5 0 0 1 3.5 6H12v9"/><path d="M12 9h4.2a2 2 0 0 1 1.7 1L21 14v1"/><path d="M2 15h1.6M8.4 15h5.2M18.4 15H22"/><circle cx="6" cy="15.6" r="2"/><circle cx="16.4" cy="15.6" r="2"/>',
+    bike:  '<circle cx="5.5" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="M8.5 16h6.5l-2.4-5H9"/><path d="M13 11l1.6-3H17"/>'
+  };
+
+  function vehicleArt(type, size, stroke) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
+           'stroke="' + stroke + '" stroke-width="1.7" stroke-linecap="round" ' +
+           'stroke-linejoin="round" aria-hidden="true">' +
+           (VEHICLE_ART[type] || VEHICLE_ART.van) + '</svg>';
+  }
+
+  function activeVehicle() { return S.vehicles[S.activeVehicle] || null; }
+
+  function paintVehicleCard() {
+    var v = activeVehicle();
+    el.homeVehicle.hidden = !v;
+    if (!v) { return; }
+    el.homeVehicleLabel.hidden = S.vehicles.length > 1;
+    el.homeVehicleLabel.textContent = 'Vehicle linked';
+    el.homeVehiclePlate.textContent = v.plate;
+    el.homeVehicleModel.textContent = v.make + ' ' + v.model;
+    el.homeVehicle.querySelector('.m-vehicle-card__art').innerHTML =
+      vehicleArt(v.type, 24, 'var(--color-text-on-dark)');
+  }
+
+  function paintPicker() {
+    var many = S.vehicles.length > 1;
+    el.homePicker.hidden = !many;
+    if (!many) { el.homeVehicle.hidden = !activeVehicle(); paintVehicleCard(); return; }
+
+    var searchable = S.vehicles.length >= SEARCH_FROM;
+    el.homeSearchWrap.hidden = !searchable;
+    if (!searchable) { el.homeSearch.value = ''; }
+
+    var q = (el.homeSearch.value || '').trim().toLowerCase();
+    var shown = S.vehicles.filter(function (v) {
+      return !q || (v.plate + ' ' + v.make + ' ' + v.model).toLowerCase().indexOf(q) !== -1;
+    });
+    el.homePickerCount.textContent = q
+      ? shown.length + ' of ' + S.vehicles.length
+      : S.vehicles.length + ' vehicles';
+    el.homePickerEmpty.hidden = shown.length > 0;
+
+    el.homePickerRow.innerHTML = shown.map(function (v) {
+      var i = S.vehicles.indexOf(v);
+      var on = i === S.activeVehicle;
+      return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
+             ' aria-checked="' + on + '" tabindex="' + (on ? '0' : '-1') + '"' +
+             ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model + '">' +
+             '<span class="a-vehicle-chip__disc">' +
+             vehicleArt(v.type, 28, on ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)') +
+             '<span class="a-vehicle-chip__tick">' +
+             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
+             'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+             '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></span>' +
+             '<span class="a-vehicle-chip__plate">' + v.plate + '</span></button>';
+    }).join('');
+
+    Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'), function (b) {
+      b.addEventListener('click', function () { chooseVehicle(Number(b.dataset.vehicle)); });
+      /* A radio group is one tab stop, and the arrows move within it. */
+      b.addEventListener('keydown', function (ev) {
+        var step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
+        if (!step) { return; }
+        ev.preventDefault();
+        var all = Array.prototype.slice.call(el.homePickerRow.querySelectorAll('[data-vehicle]'));
+        var at = all.indexOf(b);
+        var next = all[(at + step + all.length) % all.length];
+        if (next) { chooseVehicle(Number(next.dataset.vehicle), true); }
+      });
+    });
+    paintVehicleCard();
+  }
+
+  function chooseVehicle(i, viaKeyboard) {
+    if (!S.vehicles[i]) { return; }
+    S.activeVehicle = i;
+    paintPicker();
+    var chip = el.homePickerRow.querySelector('[data-vehicle="' + i + '"]');
+    if (chip) {
+      chip.scrollIntoView({ block: 'nearest', inline: 'center' });
+      if (viaKeyboard) { chip.focus({ preventScroll: true }); }
+    }
+    var v = S.vehicles[i];
+    announce('Driving ' + v.plate + ', ' + v.make + ' ' + v.model + '.');
+  }
+
   /* The app the flow lands in. A driver who has just signed up has the fifty
      points they watched land, not the balance of someone who has been filling
      up for months, so the figure comes from the same place the reward screen
@@ -1593,7 +1834,10 @@ body {
     el.homePoints.textContent =
       groupPts(S.userType === 'new-driver' ? rewardTotal() : 2450) + ' pts';
     /* The card claims a linked vehicle, so it is only shown when there is one. */
-    el.homeVehicle.hidden = !S.vehicleLinked;
+    if (!S.vehicleLinked) { S.vehicles = []; }
+    el.homeSearch.value = '';
+    paintPicker();
+    el.homeVehicle.hidden = !S.vehicleLinked || !activeVehicle();
     el.home.hidden = false;
     el.home.setAttribute('data-state', 'visible');
     announce('Home. ' + el.homeGreeting.textContent + ', David.');
@@ -1677,6 +1921,8 @@ body {
     finish:        function () { showHome(); }
   };
 
+  el.homeSearch.addEventListener('input', paintPicker);
+
   el.rewardCta.addEventListener('click', function () { showVehicle('link'); });
   /* Nothing beyond this screen is built yet. Saying so out loud beats a
      control that looks live and does nothing when it is tapped. */
@@ -1698,10 +1944,12 @@ body {
      Every state is reachable directly, and reaching it directly renders the
      same thing as arriving at it through the flow.
      ════════════════════════════════════════════════════════════════════ */
-  function reset(userType, linked) {
+  function reset(userType, linked, fleetSize) {
     S.userType = userType;
     S.vehicleLinked = !!linked;
     S.confettiPlayed = false;
+    S.vehicles = linked ? FLEET.slice(0, fleetSize || 1) : [];
+    S.activeVehicle = 0;
   }
 
   var STATES = {
@@ -1716,7 +1964,11 @@ body {
     'vehicle-linked':     { group: 'new', label: 'Linked',
       run: function () { reset('new-driver', true); showVehicle('linked'); } },
     'home':               { group: 'new', label: 'Home',
-      run: function () { reset('new-driver', true); showHome(); } },
+      run: function () { reset('new-driver', true, 1); showHome(); } },
+    'home-few-vehicles':  { group: 'new', label: 'Home, a few vehicles',
+      run: function () { reset('returning-driver', true, 4); showHome(); } },
+    'home-many-vehicles': { group: 'new', label: 'Home, a whole fleet',
+      run: function () { reset('returning-driver', true, 9); showHome(); } },
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle yet',
       run: function () { reset('returning-driver', false); route(); } },
     'returning-with-vehicle':    { group: 'returning', label: 'Vehicle already linked',
