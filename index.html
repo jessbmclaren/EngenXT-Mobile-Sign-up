@@ -573,6 +573,12 @@ button { background: none; border: none; color: inherit; }
 /* When a state withdraws one of the two, the survivor centres rather than
    sitting hard left where its partner used to balance it. */
 .m-resend-row[data-single="true"] { justify-content: center; }
+/* A prototype that hands over to another one should be walkable in both
+   directions, or the second flow is only reachable by finding the file. */
+.d-stateNav__item--link {
+  display: block; text-decoration: none;
+  color: var(--color-primary-dark); font-weight: 700;
+}
 /* Peers of the secondary above them, one group along. 8 + 8 = 16. */
 .o-signup-sheet__stage > .m-resend-row { margin-top: var(--sp-2); }
 /* Hidden means gone, including from a flex row that would otherwise still
@@ -1280,6 +1286,9 @@ button { background: none; border: none; color: inherit; }
     <p class="d-stateNav__heading">Done</p>
     <div id="navDone"></div>
 
+    <div class="d-stateNav__rule"></div>
+    <p class="d-stateNav__heading">Other flow</p>
+    <a class="d-stateNav__item d-stateNav__item--link" href="engenxt-onboarding.html">Welcome and link a vehicle &rarr;</a>
     </div>
 
     <div class="d-stateNav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
@@ -2792,11 +2801,21 @@ button { background: none; border: none; color: inherit; }
     releaseKeyboard();
     var signup = S.mode === 'signup';
     el.successTitle.textContent = signup ? 'Your account is ready' : 'Welcome back';
+    /* The next screen is the welcome reward, not the scanner, so this stops
+       naming the scanner. It used to promise a licence disc two screens before
+       the driver reaches one. */
     el.successBody.textContent = signup
-      ? 'Next, scan the licence disc of the vehicle you drive.'
-      : "You're signed in. Scan the licence disc of the vehicle you drive.";
-    el.successCta.textContent = 'Scan vehicle licence disc';
-    el.successCta.onclick = function () { closeSheet(true); };
+      ? 'You can start using EngenXT now.'
+      : "You're signed in.";
+    el.successCta.textContent = 'Continue';
+    /* Hand over to the ROUTER rather than to a screen. Sign up knows who the
+       driver is; the onboarding flow owns the decision about where that person
+       should land, and keeping that decision in one place is why a returning
+       driver cannot accidentally be shown a starter reward. */
+    el.successCta.onclick = function () {
+      window.location.href = 'engenxt-onboarding.html#' +
+        (signup ? 'route/new-driver' : 'route/returning-no-vehicle');
+    };
     showStage('success');
     announce(el.successTitle.textContent + '. ' + el.successBody.textContent);
     after(60, function () { el.successTitle.focus({ preventScroll: true }); });
