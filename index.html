@@ -944,6 +944,96 @@ button { background: none; border: none; color: inherit; }
 }
 .d-key__code { font-family: var(--font-mono); font-size: var(--text-nano); color: var(--color-text-primary); white-space: nowrap; }
 
+/* ── d-stateNav, two levels ───────────────────────────────────────────
+   The list of states outgrew a single column: thirty seven of them under
+   five headings meant scrolling past the whole prototype to reach the end.
+   The sidebar now names the sections and a panel beside it holds the states
+   in the one you opened, which is the shape a long menu wants. */
+.d-stateNav__flow {
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+  padding: var(--sp-2) var(--sp-2h) var(--sp-1); margin-top: var(--sp-2);
+}
+.d-stateNav__flow:first-of-type { margin-top: 0; }
+.d-stateNav__group {
+  display: flex; align-items: center; gap: var(--sp-2);
+  width: 100%; cursor: pointer; text-align: left;
+  min-height: var(--size-target);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-2h);
+  border-radius: var(--radius-chip);
+  border: none; background: none;
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  transition: background .15s;
+}
+/* The label takes the room, so the count and the chevron are pushed together
+   at the end. Three children on space-between put the count adrift in the
+   middle of the row, related to nothing on either side of it. */
+.d-stateNav__group > span:first-child { flex: 1 1 auto; }
+.d-stateNav__meta {
+  flex: 0 0 auto; display: flex; align-items: center; gap: var(--sp-1h);
+  color: var(--color-text-tertiary);
+}
+.d-stateNav__group:hover { background: var(--color-surface-hover); }
+/* The open section stays marked while its panel is up, so the sidebar always
+   says which one you are looking at. */
+.d-stateNav__group[aria-expanded="true"] {
+  background: var(--color-primary-light); color: var(--color-primary-dark);
+}
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-primary-dark); }
+/* Metadata, not content: it says how many without competing with the name. */
+.d-stateNav__count {
+  font-size: var(--text-nano); font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 14px; text-align: right;
+}
+.d-stateNav__chev { flex-shrink: 0; opacity: .55; }
+
+/* d-flyout. The states of the open section. Sticky and scrolling on its own,
+   so a long list never drags the page with it. */
+.d-flyout {
+  position: fixed; z-index: var(--z-tool-top);
+  width: 260px; max-height: min(70vh, 560px);
+  display: flex; flex-direction: column;
+  background: var(--color-surface); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-overlay);
+  overflow: hidden;
+}
+.d-flyout__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-2) var(--sp-2) var(--sp-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+.d-flyout__title { font-size: var(--text-caption); font-weight: 800; color: var(--color-text-primary); }
+.d-flyout__close {
+  flex-shrink: 0; width: var(--size-target); height: var(--size-target);
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: none; cursor: pointer; border-radius: var(--radius-circle);
+  /* The glyph is pushed to the trailing edge so the 48px target does not
+     shove the title inwards. */
+  margin-right: calc(var(--sp-2) * -1);
+}
+.d-flyout__close:hover { background: var(--color-surface-hover); }
+.d-flyout__list {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+  scrollbar-width: thin;
+}
+/* Selecting a state does not close the panel: stepping through a section is
+   the job, and closing after each one would cost two clicks a state. */
+.d-flyout .d-stateNav__item { width: 100%; }
+.d-flyout__hint {
+  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  font-size: var(--text-nano); color: var(--color-text-tertiary);
+  border-top: 1px solid var(--color-border-light);
+}
+
+@media (max-width: 900px) {
+  /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
+  .d-flyout {
+    left: var(--sp-4); right: var(--sp-4); width: auto;
+    bottom: var(--sp-4); top: auto; max-height: 60vh;
+  }
+}
+
 /* ══ TEMPLATES ═══════════════════════════════════════════════════════════ */
 .t-device-frame {
   position: relative; flex-shrink: 0;
@@ -1267,28 +1357,10 @@ button { background: none; border: none; color: inherit; }
     </div>
 
     <div class="d-stateNav__view" id="viewStates" role="tabpanel" aria-labelledby="tabStates">
-    <p class="d-stateNav__heading">Home</p>
-    <div id="navHome"></div>
-
-    <div class="d-stateNav__rule"></div>
-    <p class="d-stateNav__heading">Number</p>
-    <div id="navNumber"></div>
-
-    <div class="d-stateNav__rule"></div>
-    <p class="d-stateNav__heading">Code</p>
-    <div id="navCode"></div>
-
-    <div class="d-stateNav__rule"></div>
-    <p class="d-stateNav__heading">Blocked</p>
-    <div id="navBlocked"></div>
-
-    <div class="d-stateNav__rule"></div>
-    <p class="d-stateNav__heading">Done</p>
-    <div id="navDone"></div>
-
-    <div class="d-stateNav__rule"></div>
-    <p class="d-stateNav__heading">Other flow</p>
-    <a class="d-stateNav__item d-stateNav__item--link" href="engenxt-onboarding.html">Welcome and link a vehicle &rarr;</a>
+      <p class="d-stateNav__flow">This flow</p>
+      <div id="navSections"></div>
+      <p class="d-stateNav__flow">Other flows</p>
+      <a class="d-stateNav__item d-stateNav__item--link" href="engenxt-onboarding.html">Welcome and link a vehicle &rarr;</a>
     </div>
 
     <div class="d-stateNav__view" id="viewNotes" role="tabpanel" aria-labelledby="tabNotes" hidden>
@@ -3091,18 +3163,161 @@ button { background: none; border: none; color: inherit; }
     });
   }
 
+
+  /* ── The section panel ────────────────────────────────────────────────
+     A long menu behaves better as two levels than as one column: the sidebar
+     names the sections, and the panel holds the states of whichever one you
+     opened. The behaviours are the ones people already expect from a menu
+     like this, and each is here for a reason:
+
+       Escape closes it            a keyboard user must never be trapped
+       clicking outside closes it  the commonest way people dismiss a layer
+       the trigger toggles it      pressing the same thing again undoes it
+       choosing a state does NOT   stepping through a section is the job, and
+                                   closing each time would cost two clicks
+       focus moves in, and back    so the keyboard does not lose its place
+       aria-expanded on the trigger so assistive tech is told what happened */
+  var flyout = {
+    el: null, list: null, title: null, openFor: null, returnTo: null
+  };
+
+  function buildFlyout() {
+    var host = document.createElement('div');
+    host.className = 'd-flyout';
+    host.id = 'navFlyout';
+    host.setAttribute('role', 'dialog');
+    host.setAttribute('aria-label', 'States in this section');
+    host.hidden = true;
+    host.innerHTML =
+      '<div class="d-flyout__head">' +
+        '<p class="d-flyout__title" id="flyoutTitle"></p>' +
+        '<button type="button" class="d-flyout__close" id="flyoutClose" aria-label="Close this section">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" ' +
+          'stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
+          '<path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="d-flyout__list" id="flyoutList"></div>' +
+      '<p class="d-flyout__hint">Escape closes. Picking a state leaves this open.</p>';
+    document.body.appendChild(host);
+    flyout.el = host;
+    flyout.list = host.querySelector('#flyoutList');
+    flyout.title = host.querySelector('#flyoutTitle');
+    host.querySelector('#flyoutClose').addEventListener('click', function () { closeFlyout(true); });
+
+    /* Outside means outside both the panel and the button that opened it,
+       or the trigger would close and immediately reopen. */
+    document.addEventListener('pointerdown', function (e) {
+      if (flyout.el.hidden) { return; }
+      if (flyout.el.contains(e.target)) { return; }
+      if (e.target.closest && e.target.closest('.d-stateNav__group')) { return; }
+      closeFlyout(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !flyout.el.hidden) { e.preventDefault(); closeFlyout(true); }
+    });
+    window.addEventListener('resize', function () {
+      if (!flyout.el.hidden) { placeFlyout(); }
+    });
+  }
+
+  /* Beside the section that opened it, nudged so it never runs off the
+     bottom of the window. */
+  function placeFlyout() {
+    var trigger = document.querySelector('.d-stateNav__group[aria-expanded="true"]');
+    if (!trigger) { return; }
+    var t = trigger.getBoundingClientRect();
+    var box = flyout.el.getBoundingClientRect();
+    var top = Math.max(8, Math.min(t.top, window.innerHeight - box.height - 8));
+    flyout.el.style.top = top + 'px';
+
+    /* Beside the section, on whichever side does not cover the phone. A panel
+       that hides the screen you have just chosen is worse than no panel: the
+       whole job is looking at the state. */
+    var device = document.getElementById('deviceFrame');
+    var right = t.right + 12;
+    var wouldCoverDevice = device && (right + box.width > device.getBoundingClientRect().left);
+    var nav = document.getElementById('stateNav').getBoundingClientRect();
+    var left = nav.left - box.width - 12;
+    flyout.el.style.left = Math.round(wouldCoverDevice && left > 8 ? left : right) + 'px';
+  }
+
+  function openFlyout(group, label, ids, viaKeyboard) {
+    var trigger = document.querySelector('.d-stateNav__group[data-group="' + group + '"]');
+    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
+      b.setAttribute('aria-expanded', b === trigger ? 'true' : 'false');
+    });
+    flyout.openFor = group;
+    flyout.returnTo = trigger;
+    flyout.title.textContent = label;
+    flyout.list.innerHTML = '';
+    ids.forEach(function (id) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'd-stateNav__item';
+      b.textContent = STATES[id].label;
+      b.dataset.stateId = id;
+      b.addEventListener('click', function () { go(id); });
+      flyout.list.appendChild(b);
+    });
+    flyout.el.hidden = false;
+    placeFlyout();
+    setNav(currentState);
+    /* Move focus in only when the keyboard opened it. A mouse user is already
+       looking at the panel and about to click; giving them a focus ring on the
+       first item is noise, and taking focus off what they were doing is worse. */
+    if (viaKeyboard) {
+      var first = flyout.list.querySelector('.d-stateNav__item');
+      if (first) { first.focus({ preventScroll: true }); }
+    }
+  }
+
+  function closeFlyout(restoreFocus) {
+    if (flyout.el.hidden) { return; }
+    flyout.el.hidden = true;
+    document.querySelectorAll('.d-stateNav__group').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+    });
+    if (restoreFocus && flyout.returnTo) { flyout.returnTo.focus({ preventScroll: true }); }
+    flyout.openFor = null;
+  }
+
+  /* A click made by pressing Enter or Space reports detail 0, which is how the
+     browser tells us the pointer was not involved. */
+  function toggleFlyout(group, label, ids, ev) {
+    var viaKeyboard = !!ev && ev.detail === 0;
+    if (flyout.openFor === group) { closeFlyout(viaKeyboard); return; }
+    openFlyout(group, label, ids, viaKeyboard);
+  }
+
+
+  var SECTION_LABELS = {
+    navHome: 'Home', navNumber: 'Number', navCode: 'Code',
+    navBlocked: 'Blocked', navDone: 'Done'
+  };
+
   function buildNav() {
-    Object.keys(NAV_GROUPS).forEach(function (host) {
-      var wrap = $(host);
-      NAV_GROUPS[host].forEach(function (id) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'd-stateNav__item';
-        b.textContent = STATES[id].label;
-        b.dataset.stateId = id;
-        b.addEventListener('click', function () { go(id); });
-        wrap.appendChild(b);
-      });
+    buildFlyout();
+    var host = $('navSections');
+    host.innerHTML = '';
+    Object.keys(NAV_GROUPS).forEach(function (key) {
+      var ids = NAV_GROUPS[key];
+      var label = SECTION_LABELS[key] || key;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'd-stateNav__group';
+      b.dataset.group = key;
+      b.setAttribute('aria-expanded', 'false');
+      b.setAttribute('aria-haspopup', 'true');
+      b.innerHTML = '<span>' + label + '</span>' +
+        '<span class="d-stateNav__meta">' +
+          '<span class="d-stateNav__count">' + ids.length + '</span>' +
+          '<svg class="d-stateNav__chev" width="13" height="13" viewBox="0 0 24 24" fill="none" ' +
+          'stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" ' +
+          'aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
+        '</span>';
+      b.addEventListener('click', function (ev) { toggleFlyout(key, label, ids, ev); });
+      host.appendChild(b);
     });
 
     var MODES = [
