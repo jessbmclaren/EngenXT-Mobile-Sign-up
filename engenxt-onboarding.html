@@ -274,6 +274,11 @@ body {
 .a-btn {
   width: 100%; min-height: var(--size-control);
   display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  /* A button carries a 2px outset border from the browser unless it is told
+     otherwise, and this was never telling it. On the dark screens a dark ring
+     on a dark background hid it for months. On a blue button against light grey
+     it is the first thing you see. Variants that want a border declare one. */
+  border: none;
   border-radius: var(--radius-pill);
   font-size: var(--text-subhead); font-weight: 700; letter-spacing: -0.3px;
   text-decoration: none; cursor: pointer;
@@ -323,11 +328,14 @@ body {
   width: 40px; height: 40px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm);
-  background: var(--color-primary-light); border: 1px solid var(--color-primary-08);
+  /* A fill, not an outline. The tone tints already separate the plate from the
+     surface, and the ring on top of them read as a border on the icon rather
+     than as a plate behind it. */
+  background: var(--color-primary-light); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
-.a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); border-color: var(--color-secondary-12); }
-.a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-border); }
+.a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
+.a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
 .a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
 .a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
 .a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
