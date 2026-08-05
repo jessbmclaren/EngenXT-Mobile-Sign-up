@@ -2381,6 +2381,15 @@ body {
       }).join('') + '</div>';
   }
 
+  /* A hash typed into the bar, or arrived at with the back button, is a
+     request for that state. Without this the address changes and the screen
+     does not, so a link pasted into an already-open tab looks broken. The
+     other two prototypes have always done this; this one was missed. */
+  window.addEventListener('hashchange', function () {
+    var id = location.hash.slice(1);
+    if (STATES[id] && id !== currentState) { go(id); }
+  });
+
   buildNav(); buildModes(); buildSwitcher(); buildPanel();
   var initial = location.hash.slice(1);
   go(STATES[initial] ? initial : 'signup-reward');
