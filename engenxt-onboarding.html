@@ -721,25 +721,25 @@ body {
    the screen reads as depth rather than a flat navy panel. Decorative, so it
    is hidden from assistive tech and takes no pointer events. */
 .o-onboard__orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: var(--z-base); }
+/* The three washes behind this screen are static. They used to drift about
+   20px on 9, 11 and 13 second loops, which is below the amplitude anyone
+   consciously notices, so it bought nothing visible while holding three
+   composited layers alive on the one screen where a driver forms their
+   impression of how fast the app is. The colour is the point, not the
+   movement. */
 .o-onboard__orb { position: absolute; border-radius: var(--radius-circle); }
 .o-onboard__orb--a {
   top: -90px; right: -70px; width: 340px; height: 340px;
   background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
-  animation: orbDriftA 9s var(--ease-in-out) infinite;
 }
 .o-onboard__orb--b {
   top: 34%; left: -80px; width: 260px; height: 260px;
   background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
-  animation: orbDriftB 11s var(--ease-in-out) 1.5s infinite;
 }
 .o-onboard__orb--c {
   bottom: 8%; right: -50px; width: 220px; height: 220px;
   background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
-  animation: orbDriftC 13s var(--ease-in-out) 3s infinite;
 }
-@keyframes orbDriftA { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-18px,22px) } }
-@keyframes orbDriftB { 0%,100% { transform: translate(0,0) } 50% { transform: translate(20px,-16px) } }
-@keyframes orbDriftC { 0%,100% { transform: translate(0,0) } 50% { transform: translate(-14px,-20px) } }
 /* Everything the driver reads sits in front of the colour. */
 .o-onboard--reward > *:not(.o-onboard__orbs) { position: relative; z-index: var(--z-content); }
 
@@ -813,14 +813,33 @@ body {
   transition: background var(--dur-fast) var(--ease-in-out);
 }
 .a-icon-btn:hover { background: var(--color-surface-hover); }
-/* Ringed in the surface colour so it reads as sitting on the bell rather
-   than being part of it. */
-.a-icon-btn__dot {
-  position: absolute; top: 9px; right: 10px;
-  width: 9px; height: 9px; border-radius: var(--radius-circle);
+/* a-badge. Something here needs you.
+
+   One atom for both jobs. A bare dot says "something", a number says how much,
+   and they are the same object at two sizes rather than two components that
+   drift apart. Ringed in the surface colour so it reads as sitting on the
+   control rather than being part of it.
+
+   The count is never the only way to know. Whatever carries a badge also says
+   so in its accessible name, because a red disc is invisible to a screen
+   reader and ambiguous to anyone who cannot pick red out of a dark bar. */
+.a-badge {
+  position: absolute; top: 6px; right: 8px;
+  min-width: 9px; height: 9px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-pill);
   background: var(--color-secondary);
   box-shadow: 0 0 0 2px var(--color-surface-sunken);
+  font-size: var(--text-nano); font-weight: 800; line-height: 1;
+  color: var(--color-text-on-dark); font-variant-numeric: tabular-nums;
 }
+/* With a number in it, it needs room to be read. */
+.a-badge[data-count] {
+  top: 2px; right: 2px;
+  min-width: 17px; height: 17px; padding: 0 4px;
+}
+/* On the bar the ring has to match what the bar is made of, not the page. */
+.o-tab-bar .a-badge { box-shadow: 0 0 0 2px var(--glass-bar-bg); }
 
 /* a-avatar. A person, reduced to the one letter that fits. */
 .a-avatar {
@@ -1545,6 +1564,9 @@ body {
   color: var(--color-text-tertiary);
 }
 .o-tab-bar__icon {
+  /* The badge anchors here, not to the tab, so it sits on the glyph rather
+     than out by the label. */
+  position: relative;
   width: 44px; height: 26px;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-pill);
@@ -1663,21 +1685,55 @@ body {
    simply runs the two blocks together. */
 .o-fuel__spacer { flex: 1 1 var(--sp-6); min-height: var(--sp-4); }
 
-/* m-fuel-detail. What the code is good for, in the order it gets questioned:
-   which vehicle, how much, how long. Small, because none of it is the point
-   until somebody disputes the point. */
-.m-fuel-detail { width: 100%; display: flex; flex-direction: column; }
-.m-fuel-detail__row {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: var(--sp-3); padding: var(--sp-2h) 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--text-footnote); text-align: left;
+/* m-place. Where the code works, said quietly under the code itself. It is a
+   place and not a figure, so it does not sit in the row of figures below: a
+   station name is three words long and would be the only cell there anyone had
+   to read rather than glance at. */
+.m-place {
+  display: inline-flex; align-items: center; gap: var(--sp-1h);
+  margin-top: calc(var(--sp-3) * -1);
+  font-size: var(--text-footnote); font-weight: 600;
+  color: var(--color-text-secondary);
 }
-.m-fuel-detail__row:last-child { border-bottom: none; }
-.m-fuel-detail__key { flex-shrink: 0; color: var(--color-text-secondary); }
-.m-fuel-detail__val {
-  min-width: 0; text-align: right; font-weight: 700;
-  color: var(--color-text-primary);
+.m-place__pin { display: flex; flex-shrink: 0; }
+
+/* m-fuel-figures. What the code is good for, in the order it gets questioned:
+   which vehicle, how much, how long.
+
+   Three figures across one row, each with its label under it. This was four
+   rows of a key beside a value, which is a settings screen, and a settings
+   screen is read line by line. Three figures side by side are taken in at
+   once, which is what somebody standing at a pump is doing: they are not
+   reading the screen, they are checking it.
+
+   Sized to their content and pushed apart rather than given a third each. A
+   plate is twice the width of a time, and three equal columns would break the
+   plate over two lines to leave white space beside the clock. */
+.m-fuel-figures {
+  width: 100%;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--color-border);
+}
+/* Reversed, so the markup reads label then figure and the screen shows figure
+   then label. A screen reader says "Vehicle, CA 123-456" and an eye lands on
+   the plate. */
+/* Each cell states its own alignment. The screen is centred, so a cell left to
+   inherit puts its label in the middle of a figure that starts at the edge. */
+.m-fuel-figures__cell {
+  display: flex; flex-direction: column-reverse; gap: 2px; min-width: 0;
+  align-items: flex-start; text-align: left;
+}
+.m-fuel-figures__cell:nth-child(2) { align-items: center; text-align: center; }
+.m-fuel-figures__cell:last-child   { align-items: flex-end; text-align: right; }
+.m-fuel-figures__value {
+  font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+}
+.m-fuel-figures__label {
+  font-size: var(--text-caption2); font-weight: 600;
+  color: var(--color-text-secondary);
 }
 /* Quiet, and outside the scroll, so calling the fill off is always available
    and never the thing a thumb finds first. */
@@ -1998,7 +2054,7 @@ body {
             <span class="m-app-bar__actions">
               <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications, 1 unread" data-unbuilt="Notifications">
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 19a1.8 1.8 0 0 0 3 0"/></svg>
-                <span class="a-icon-btn__dot" aria-hidden="true"></span>
+                <span class="a-badge" aria-hidden="true"></span>
               </button>
               <button class="a-avatar" type="button" id="homeAvatar" aria-label="Your account, David" data-unbuilt="Your account">D</button>
             </span>
@@ -2137,8 +2193,8 @@ body {
             <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
             <span>Fuel</span>
           </button>
-          <button class="o-tab-bar__tab" type="button" data-tab="history">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg></span>
+          <button class="o-tab-bar__tab" type="button" data-tab="history" aria-label="History, 2 new">
+            <span class="o-tab-bar__icon"><span class="a-badge" data-count="2" aria-hidden="true">2</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg></span>
             <span>History</span>
           </button>
           <button class="o-tab-bar__tab" type="button" data-tab="account">
@@ -2238,24 +2294,30 @@ body {
             <span class="u-visually-hidden" id="fuelCodeSpoken">Code 4 8 2 1 0 7</span>
           </p>
 
+          <!-- Where the code works, directly under the code, because it is
+               what the code is scoped to rather than one fact among four. -->
+          <p class="m-place">
+            <span class="m-place__pin" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s7-6.2 7-11.2a7 7 0 1 0-14 0c0 5 7 11.2 7 11.2Z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
+            <span id="fuelStation">Engen Bryanston</span>
+          </p>
+
           <div class="o-fuel__spacer" aria-hidden="true"></div>
 
-          <div class="m-fuel-detail">
-            <div class="m-fuel-detail__row">
-              <span class="m-fuel-detail__key">Station</span>
-              <span class="m-fuel-detail__val" id="fuelStation">Engen Bryanston</span>
+          <!-- Label before figure in the markup, figure above label on the
+               screen. Read aloud it is "Vehicle, CA 123-456"; read at arm's
+               length it is the figure first. -->
+          <div class="m-fuel-figures">
+            <div class="m-fuel-figures__cell">
+              <span class="m-fuel-figures__label">Vehicle</span>
+              <span class="m-fuel-figures__value" id="fuelVehicle">CA 123-456</span>
             </div>
-            <div class="m-fuel-detail__row">
-              <span class="m-fuel-detail__key">Vehicle</span>
-              <span class="m-fuel-detail__val" id="fuelVehicle">CA 123-456</span>
+            <div class="m-fuel-figures__cell">
+              <span class="m-fuel-figures__label">Up to</span>
+              <span class="m-fuel-figures__value">60 L</span>
             </div>
-            <div class="m-fuel-detail__row">
-              <span class="m-fuel-detail__key">Up to</span>
-              <span class="m-fuel-detail__val">60 L</span>
-            </div>
-            <div class="m-fuel-detail__row">
-              <span class="m-fuel-detail__key">Valid until</span>
-              <span class="m-fuel-detail__val">10:11</span>
+            <div class="m-fuel-figures__cell">
+              <span class="m-fuel-figures__label">Valid until</span>
+              <span class="m-fuel-figures__value">10:11</span>
             </div>
           </div>
 
@@ -2470,6 +2532,10 @@ body {
      SCREENS
      ════════════════════════════════════════════════════════════════════ */
   function hideAll() {
+    /* Every route off the code screen goes through here as well as through
+       hideFuel, including picking a state from the menu, so the hold is let go
+       in the one place nothing can get past. */
+    releaseScreen();
     el.reward.hidden = true;  el.reward.removeAttribute('data-state');
     el.home.hidden = true;    el.home.removeAttribute('data-state');
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
@@ -3253,10 +3319,45 @@ body {
     showStations(true);
   }
 
+  /* ── Keeping the screen up ────────────────────────────────────────────
+     While a code is showing, the phone is being looked at rather than used, so
+     the operating system's idea of idle is wrong: it dims, then it locks, and
+     it does it in the middle of somebody keying six digits into a pump. Held
+     awake for exactly as long as the code is up and released the moment it
+     comes down, because a screen held awake for a screen nobody is reading is
+     a battery a driver needs at the end of a shift.
+
+     Brightness is the other half of this and the web cannot touch it. A native
+     build would lift it here and put it back on release.
+
+     Everything about it is optional. It is unsupported on some browsers, it is
+     refused when the tab is not visible, and it is dropped by the system
+     whenever it likes. Nothing on this screen depends on it, so nothing here
+     tells a driver when it did not happen. */
+  var wakeLock = null;
+  function holdScreenAwake() {
+    if (!('wakeLock' in navigator) || wakeLock) { return; }
+    navigator.wakeLock.request('screen').then(function (lock) {
+      wakeLock = lock;
+      lock.addEventListener('release', function () { wakeLock = null; });
+    }).catch(function () { /* refused or unsupported, and it does not matter */ });
+  }
+  function releaseScreen() {
+    if (!wakeLock) { return; }
+    wakeLock.release().catch(function () {});
+    wakeLock = null;
+  }
+  /* A lock does not survive the tab going away, so it is taken again on the way
+     back, but only if the code is still the thing on screen. */
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && S.step === 'fuel') { holdScreenAwake(); }
+  });
+
   /* `arriving` when a driver got here by asking. Landing on it from the menu
      is not a journey, so it is instant. */
   function showFuel(arriving) {
     S.step = 'fuel';
+    holdScreenAwake();
     var v = activeVehicle();
     el.fuelCode.textContent = fuelCodeShown();
     el.fuelCodeSpoken.textContent = 'Code ' + fuelCodeSpoken();
@@ -3288,6 +3389,7 @@ body {
      way back to the code is the largest control on the screen. Focus lands on
      whichever face now holds the action's slot. */
   function hideFuel() {
+    releaseScreen();
     el.fuel.hidden = true;
     el.fuel.removeAttribute('data-state');
     S.step = 'home';

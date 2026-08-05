@@ -714,11 +714,16 @@ button { background: none; border: none; color: inherit; }
   background: var(--gradient-hero);
 }
 .o-auth-hero__orbs { position: absolute; inset: 0; z-index: var(--z-base); overflow: hidden; pointer-events: none; }
+/* The three washes behind this screen are static. They used to drift about
+   20px on 9, 11 and 13 second loops, which is below the amplitude anyone
+   consciously notices, so it bought nothing visible while holding three
+   composited layers alive on the one screen where a driver forms their
+   impression of how fast the app is. The colour is the point, not the
+   movement. */
 .o-auth-hero__orb { position: absolute; border-radius: var(--radius-circle); }
 .o-auth-hero__orb--a {
   top: -80px; right: -60px; width: 360px; height: 360px;
   background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
-  animation: orbFloatA 9s ease-in-out infinite;
 }
 .o-auth-hero__orb--aInner {
   top: 40%; right: -40px; width: 180px; height: 180px;
@@ -727,12 +732,10 @@ button { background: none; border: none; color: inherit; }
 .o-auth-hero__orb--b {
   top: 180px; left: -60px; width: 260px; height: 260px;
   background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
-  animation: orbFloatB 11s ease-in-out infinite 1.5s;
 }
 .o-auth-hero__orb--c {
   bottom: 200px; right: -30px; width: 200px; height: 200px;
   background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
-  animation: orbFloatC 13s ease-in-out infinite 3s;
 }
 .o-auth-hero__brand { position: relative; z-index: var(--z-content); flex-shrink: 0; padding: var(--sp-7) var(--sp-6) 0; }
 /* margin-top:auto on the first child rather than justify-content:flex-end,
@@ -756,26 +759,41 @@ button { background: none; border: none; color: inherit; }
   font-size: var(--text-body); font-weight: 400; line-height: 1.6;
   color: var(--color-on-dark-soft); margin-bottom: var(--sp-8);
 }
-/* The hero copy sits at the bottom of the frame, which is where the sheet
-   rises to, so on the six shorter sheets the top edge landed part way down the
-   headline and sliced it: 94 to 114 pixels of a 136 pixel line covered, leaving
-   the tops of the letters showing and nothing else. That reads as broken text
-   rather than as one surface in front of another.
+/* The hero copy is pinned to the bottom of the frame, which is exactly where
+   the sheet rises to. On the shorter sheets the top edge landed part way down
+   the headline and sliced it, and hiding it left 40 per cent of the screen
+   holding nothing at all while the one sentence explaining the product was
+   thrown away.
 
-   It steps back instead of being cut. The words have done their job by the time
-   a driver is typing a number, and what belongs behind glass is the colour, not
-   half a sentence. */
-.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title,
-.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__lede {
-  opacity: 0;
-  transition: opacity var(--dur-base) var(--ease-out);
-}
+   So it moves rather than hides. With a sheet up the copy goes to the top of
+   the space instead of the bottom of it: the promise stays legible above the
+   glass, which is precisely when a driver is deciding whether this is worth the
+   data it costs, and nothing is ever cut. */
 .o-auth-hero__title, .o-auth-hero__lede {
+  transition: opacity var(--dur-base) var(--ease-out),
+              margin var(--dur-sheet) var(--ease-emphasis);
+}
+.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title {
+  /* Clear of the lockup rather than flush against it: margin-top:0 removed the
+     push to the bottom and left the headline sitting on "DRIVER REWARDS". */
+  margin-top: var(--sp-6);
+  font-size: var(--text-title); line-height: 1.2; letter-spacing: -0.6px;
+}
+/* The button and the help link are what opened the sheet. Leaving them behind
+   it floats a dead control in the middle of the screen, and a driver who taps
+   it is tapping the thing they have already done. */
+.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__actions {
+  opacity: 0; pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out);
 }
-/* Without :has, nothing is hidden and the layering is exactly as it was. A
-   headline behind glass is a smaller problem than a headline that vanished for
-   a reason the browser could not express. */
+/* The lede explains the step the driver is now standing in, so once the sheet
+   is doing that job it is the same thing said twice. */
+.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__lede { opacity: 0; }
+/* A driver who cannot get in is not being sold anything, so the promise goes
+   and the sheet takes the room instead. */
+.t-device-frame:has(.o-signup-sheet[data-stage="blocked"]) .o-auth-hero__title { opacity: 0; }
+.o-signup-sheet[data-stage="blocked"] { min-height: 62%; }
+/* Without :has, the copy stays where it always was and nothing is hidden. */
 .o-auth-hero__notice { margin-bottom: var(--sp-4); }
 .o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-auth-hero__actions .a-btn { width: 100%; }
@@ -1211,9 +1229,6 @@ button { background: none; border: none; color: inherit; }
 }
 
 /* ══ MOTION ══════════════════════════════════════════════════════════════ */
-@keyframes orbFloatA { 0%,100% { transform: scale(1) translateY(0); opacity: 1 }  50% { transform: scale(1.05) translateY(-8px); opacity: .85 } }
-@keyframes orbFloatB { 0%,100% { transform: scale(1) translateX(0); opacity: .9 } 50% { transform: scale(1.08) translateX(6px); opacity: 1 } }
-@keyframes orbFloatC { 0%,100% { transform: scale(1) translateY(0) }               40% { transform: scale(.94) translateY(10px) } }
 @keyframes sheetUp   { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 @keyframes sheetDown { from { transform: translateY(0); opacity: 1 }    to { transform: translateY(100%); opacity: 0 } }
 @keyframes scrimIn   { from { opacity: 0 } to { opacity: 1 } }
