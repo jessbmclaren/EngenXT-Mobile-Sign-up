@@ -958,6 +958,81 @@ body {
    allowed to reach the same place. */
 .o-home__fuel { width: 100%; }
 
+/* a-seam. The handover from the reward to the app.
+
+   These two screens are the darkest and the lightest surfaces in the product,
+   and one used to replace the other in a single frame. That reads as a reload
+   rather than as progress, and on a forecourt at full brightness it is a flash
+   in the face, which is a comfort problem rather than a matter of taste.
+
+   The layer sits behind both screens and carries the page colour, so nothing
+   has to animate a gradient. The reward fades out over it and home fades in,
+   overlapping rather than queueing. */
+.a-seam {
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--color-surface-page);
+  opacity: 0; pointer-events: none;
+}
+.a-seam[data-state="crossing"] {
+  opacity: 1;
+  transition: opacity 260ms var(--ease-emphasis);
+}
+/* Both screens are display:none until their state says otherwise, so a state
+   that only sets opacity would never be on screen to fade. */
+.o-onboard[data-state="leaving"] {
+  display: flex;
+  opacity: 0; transform: translateY(-8px);
+  transition: opacity 180ms var(--ease-in-out), transform 180ms var(--ease-in-out);
+}
+.o-home[data-state="arriving"] { display: flex; opacity: 0; transform: translateY(10px); }
+.o-home[data-state="visible"] {
+  opacity: 1; transform: none;
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+/* Reduced motion keeps the cross-fade and drops the movement. This is a
+   deliberate exception to collapsing everything to a still frame: a cross-fade
+   contains no motion, and the people most likely to have asked for less of it
+   are the people a full-screen flash is worst for. Cutting hard here would
+   make the moment worse for exactly the person the setting protects. */
+[data-motion="reduced"] .o-onboard[data-state="leaving"],
+[data-motion="reduced"] .o-home[data-state="arriving"] { transform: none; }
+[data-motion="reduced"] .a-seam[data-state="crossing"] { transition-duration: 160ms; }
+@media (prefers-reduced-motion: reduce) {
+  .o-onboard[data-state="leaving"], .o-home[data-state="arriving"] { transform: none; }
+}
+
+/* a-skeleton. The shape of something that has not arrived.
+
+   Between the code being accepted and home being usable, the app really does
+   have to fetch who the driver is, which vehicles their manager assigned, the
+   litre entitlement and the points balance. That wait is real, and the choice
+   is where to spend it. A loading screen makes the driver wait outside the app.
+   A skeleton lets them watch it arrive, and the parts that need no data, the
+   greeting and the way out, are usable immediately.
+
+   Only the blocks that genuinely wait get one. A skeleton over something that
+   was never loading is a lie about latency. */
+.a-skeleton {
+  position: relative; overflow: hidden;
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-pill);
+  color: transparent !important;
+}
+.a-skeleton * { visibility: hidden; }
+.a-skeleton::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%,
+              rgba(255,255,255,0.55) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: skeletonSweep 1.1s var(--ease-in-out) infinite;
+}
+@keyframes skeletonSweep { to { transform: translateX(100%); } }
+/* Still, not absent. The block keeps its shape so the layout is honest, and
+   the sweep stops, because the sweep is the part that moves. */
+[data-motion="reduced"] .a-skeleton::after,
+.a-skeleton[data-still="true"]::after { animation: none; opacity: 0; }
+
 /* m-list-row. A destination on one line: icon, what it is, where it goes.
    For the things that deserve a place on home without deserving the action. */
 .m-list-row {
@@ -1265,6 +1340,11 @@ body {
   <div class="p-onboard-demo__stage">
     <div class="t-device-frame" id="deviceFrame">
 
+      <!-- The seam between the reward and the app. It carries the surface
+           colour so neither screen has to tween a gradient, and it sits behind
+           both of them. -->
+      <div class="a-seam" id="seam" aria-hidden="true"></div>
+
       <div class="m-notch" aria-hidden="true"><div class="a-notch"></div></div>
       <div class="m-status-bar" data-tone="onDark" aria-hidden="true" id="statusBar">
         <span class="m-status-bar__time">9:41</span>
@@ -1513,7 +1593,8 @@ body {
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
     homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
     homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
-    announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar')
+    announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar'),
+    seam: $('seam')
   };
   el.homeFuel = el.home.querySelector('[data-tile="fuel"]');
 
@@ -2052,7 +2133,10 @@ body {
      points they watched land, not the balance of someone who has been filling
      up for months, so the figure comes from the same place the reward screen
      read it from. */
-  function showHome() {
+  /* `arriving` when the driver crossed the seam from the reward, so home fades
+     up rather than appearing. Landing here directly from a link or the menu is
+     not a journey, so it is instant. */
+  function showHome(arriving) {
     clearTimers(); hideAll();
     S.step = 'home';
     el.statusBar.removeAttribute('data-tone');
@@ -2075,7 +2159,15 @@ body {
     el.homeLitres.hidden = !S.vehicleLinked;
     el.homeFuel.setAttribute('aria-disabled', S.vehicleLinked ? 'false' : 'true');
     el.home.hidden = false;
-    el.home.setAttribute('data-state', 'visible');
+    if (arriving && !prefersReduced()) {
+      el.home.setAttribute('data-state', 'arriving');
+      /* Next frame, so the browser has a start value to animate from. */
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { el.home.setAttribute('data-state', 'visible'); });
+      });
+    } else {
+      el.home.setAttribute('data-state', 'visible');
+    }
     /* Behind the focus move rather than racing it. A focus change flushes a
        pending polite message on the platform this is built for, so announcing
        at 60ms and moving focus on the same tick lost the announcement. */
@@ -2086,6 +2178,34 @@ body {
     }
     after(60, function () { el.homeName.focus({ preventScroll: true }); });
     after(500, function () { announce(greeting); });
+    /* Only a driver arriving from sign-up waits: they are the one whose vehicle
+       list, entitlement and balance have never been fetched. Someone opening the
+       app again has all of it already, so faking a wait for them would be a lie
+       about how fast the app is. */
+    if (S.userType === 'new-driver' && S.step === 'home') { loadHomeData(); }
+  }
+
+  /* The blocks that depend on a fetch, and nothing else. The greeting, the fuel
+     action and the way out are usable from the first frame, because none of
+     them is waiting for anything. */
+  var LOADS = ['homePoints', 'homeLitres', 'homePicker', 'homeVehicleEmpty', 'homeVehicle'];
+
+  function setLoading(on) {
+    LOADS.forEach(function (id) {
+      var node = document.getElementById(id);
+      if (!node || node.hidden) { return; }
+      if (on) { node.classList.add('a-skeleton'); }
+      else { node.classList.remove('a-skeleton'); }
+    });
+  }
+
+  function loadHomeData() {
+    if (prefersReduced()) { return; }   /* a still skeleton that never sweeps is just a delay */
+    setLoading(true);
+    after(620, function () {
+      setLoading(false);
+      announce('Your vehicles are ready.');
+    });
   }
 
 
@@ -2110,7 +2230,32 @@ body {
     }, 400);
   });
 
-  el.rewardCta.addEventListener('click', showHome);
+  /* Continue is the one place this seam is crossed in the flow, so it is the
+     one place it is animated. Jumping straight to #home from the menu still
+     lands instantly, because a reviewer picking a state is not travelling. */
+  el.rewardCta.addEventListener('click', function () {
+    if (prefersReduced()) {
+      /* Still a cross-fade, just a shorter one, and nothing moves. */
+      el.seam.setAttribute('data-state', 'crossing');
+      after(160, function () { showHome(true); el.seam.removeAttribute('data-state'); });
+      return;
+    }
+    el.reward.setAttribute('data-state', 'leaving');
+    after(60, function () { el.seam.setAttribute('data-state', 'crossing'); });
+    /* Half way through the fade, so the clock is never ink on near black. */
+    after(160, function () { el.statusBar.removeAttribute('data-tone'); });
+    after(200, function () {
+      showHome(true);
+      /* Registered after showHome, because showHome clears every pending timer
+         and would otherwise cancel this one, leaving the seam up for good.
+
+         It comes down only once home is opaque enough to have replaced it.
+         Dropping it the moment home started arriving left one frame where the
+         reward was gone, home was still at zero and the seam had already
+         lifted, so the crossing flashed through to the empty frame beneath. */
+      after(320, function () { el.seam.removeAttribute('data-state'); });
+    });
+  });
   el.homeVehicleEmpty.addEventListener('click', function () {
     var first = el.homePickerRow.querySelector('[data-vehicle]');
     if (first) { first.focus(); }

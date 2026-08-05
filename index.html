@@ -846,7 +846,6 @@ button { background: none; border: none; color: inherit; }
 .o-outcome-panel__actions { margin-top: var(--sp-6); }
 /* On success the header empties completely, so the group would otherwise start
    8px under the handle. It gets the same run-in the header used to give it. */
-.o-signup-sheet[data-stage="success"] .o-outcome-panel { padding-top: var(--sp-12); }
 /* 8 + 0 = 8. When the aside is present the button belongs to it, not to the
    clock. :not([hidden]) because an adjacent sibling still matches when the
    sibling is display:none. */
@@ -1538,19 +1537,11 @@ button { background: none; border: none; color: inherit; }
             <div class="o-outcome-panel__actions" id="blockedActions"></div>
           </div>
 
-          <!-- STAGE · SUCCESS -->
-          <div class="o-signup-sheet__stage o-outcome-panel" id="stageSuccess">
-            <span class="a-icon-wrap a-icon-wrap--lg" data-tone="success" data-motion="pop" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 6 9 17l-5-5"/>
-              </svg>
-            </span>
-            <h3 class="o-outcome-panel__title" id="successTitle" tabindex="-1"></h3>
-            <p class="o-outcome-panel__body" id="successBody"></p>
-            <div class="o-outcome-panel__actions">
-              <button class="a-btn a-btn--primary" id="successCta" type="button"></button>
-            </div>
-          </div>
+          <!-- There is no success stage. Sign-up used to end on a sheet saying
+               the account was ready, with a Continue button, immediately before
+               a second screen saying the same thing with a medal. The
+               confirmation lives on the code field, which the driver is already
+               looking at, and the app arrives on its own. -->
 
         </div>
         </div>
@@ -1937,7 +1928,7 @@ button { background: none; border: none; color: inherit; }
     sheetClose: $('sheetClose'),
     progress: $('progress'),
     stageNumber: $('stageNumber'), stageCode: $('stageCode'),
-    stageBlocked: $('stageBlocked'), stageSuccess: $('stageSuccess'),
+    stageBlocked: $('stageBlocked'),
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
     otpGroup: $('otpGroup'), otpHelper: $('otpHelper'),
@@ -1945,7 +1936,6 @@ button { background: none; border: none; color: inherit; }
     openWhatsapp: $('openWhatsappBtn'), backToNumber: $('backToNumberBtn'),
     blockedIcon: $('blockedIcon'), blockedTitle: $('blockedTitle'), blockedBody: $('blockedBody'),
     blockedMeta: $('blockedMeta'), blockedClock: $('blockedClock'), blockedActions: $('blockedActions'),
-    successTitle: $('successTitle'), successBody: $('successBody'), successCta: $('successCta'),
     toast: $('toast'), announcer: $('announcer'), caption: $('caption')
   };
 
@@ -2267,7 +2257,7 @@ button { background: none; border: none; color: inherit; }
        for instance when the keyboard needs space and only some stages can
        give up their subtitle. */
     el.sheet.setAttribute('data-stage', name);
-    [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked], ['success', el.stageSuccess]]
+    [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked]]
       .forEach(function (pair) {
         if (pair[0] === name) { pair[1].setAttribute('data-state', 'active'); }
         else { pair[1].removeAttribute('data-state'); }
@@ -2668,12 +2658,23 @@ button { background: none; border: none; color: inherit; }
 
       lockOtp(false);
       setOtpTone('valid');
-      setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
+      setHelper(el.otpHelper, 'Code confirmed', 'success');
       /* The task is finished, so every way back out of it goes now rather
          than lingering behind the transition. */
       setCodeView('confirmed');
       stopCountdown('resend'); stopCountdown('slow');
-      after(700, function () { showSuccess(); });
+      /* Straight into the app, rather than through a screen that says the
+         account is ready and waits to be told to continue.
+
+         There used to be a full sheet here: a green tick, "Your account is
+         ready", and a Continue button, immediately followed by a second screen
+         congratulating the driver again with a medal. Two celebrations and two
+         taps for one act. The confirmation belongs on the field the driver just
+         typed into, which already has it, and the app should simply arrive.
+
+         The beat is long enough to read the field turning green and no longer.
+         It is not a loading screen: nothing is being waited for. */
+      after(700, handOver);
     });
   }
 
@@ -2871,29 +2872,19 @@ button { background: none; border: none; color: inherit; }
     }
   }
 
-  function showSuccess() {
+  /* Where sign-up ends. It hands over to the ROUTER rather than to a screen:
+     sign-up knows who the driver is, and the welcome flow owns the decision
+     about where that person lands, which is why a returning driver cannot be
+     shown a starter reward by accident.
+
+     This is the whole of the end of sign-up now. There is no screen here. */
+  function handOver() {
     clearTimers();
     releaseKeyboard();
     var signup = S.mode === 'signup';
-    el.successTitle.textContent = signup ? 'Your account is ready' : 'Welcome back';
-    /* The next screen is the welcome reward, not the scanner, so this stops
-       naming the scanner. It used to promise a licence disc two screens before
-       the driver reaches one. */
-    el.successBody.textContent = signup
-      ? 'You can start using EngenXT now.'
-      : "You're signed in.";
-    el.successCta.textContent = 'Continue';
-    /* Hand over to the ROUTER rather than to a screen. Sign up knows who the
-       driver is; the onboarding flow owns the decision about where that person
-       should land, and keeping that decision in one place is why a returning
-       driver cannot accidentally be shown a starter reward. */
-    el.successCta.onclick = function () {
-      window.location.href = 'engenxt-onboarding.html#' +
-        (signup ? 'route/new-driver' : 'route/returning-no-vehicle');
-    };
-    showStage('success');
-    announce(el.successTitle.textContent + '. ' + el.successBody.textContent);
-    after(60, function () { el.successTitle.focus({ preventScroll: true }); });
+    announce(signup ? 'Signed up. Opening EngenXT.' : 'Signed in. Opening EngenXT.');
+    window.location.href = 'engenxt-onboarding.html#' +
+      (signup ? 'route/new-driver' : 'route/returning-no-vehicle');
   }
 
   /* ════════════════════════════════════════════════════════════════════
@@ -3110,7 +3101,7 @@ button { background: none; border: none; color: inherit; }
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
                             setOtpTone('valid');
-                            setHelper(el.otpHelper, 'Code confirmed. Taking you to the next step…', 'success');
+                            setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
                             setCodeView('confirmed');
                           } },
 
@@ -3121,8 +3112,21 @@ button { background: none; border: none; color: inherit; }
     'blocked/locked':       { label: 'Locked 15 min',   run: function () { base('signup', '821234567'); showBlocked('locked'); } },
 
     /* Done */
-    'success/signup': { label: 'Signed up', run: function () { base('signup', '821234567'); showSuccess(); } },
-    'success/signin': { label: 'Signed in', run: function () { base('signin', '821234567'); showSuccess(); } }
+    /* The last thing sign-up shows, which is the code field confirming itself.
+       These do not navigate: a menu state that walks the reviewer out of the
+       file is not a state you can look at. The helper says where it goes. */
+    'success/signup': { label: 'Signed up, opens the welcome reward', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('valid'); setCodeView('confirmed');
+                          setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
+                        } },
+    'success/signin': { label: 'Signed in, opens home', run: function () {
+                          base('signin', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('valid'); setCodeView('confirmed');
+                          setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
+                        } }
   };
 
   var NAV_GROUPS = {
