@@ -1011,6 +1011,15 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-phone);
   transition: width .25s var(--ease-out), height .25s var(--ease-out);
 }
+/* Real devices, in points, which is what a phone lays out in and what CSS
+   pixels already are. 390 x 844 is the modern standard iPhone. 375 x 812 is the
+   size a great many designs are still drawn at, and it is also the iPhone SE
+   generation a driver is far more likely to be holding than a new handset.
+   360 x 800 is not an iPhone at all: it is the single most common Android
+   viewport, which for a South African fleet is the one that matters most.
+   320 is not a current phone, it is the floor, kept as a stress test. */
+.t-device-frame[data-width="375"] { width: 375px; height: 812px; }
+.t-device-frame[data-width="360"] { width: 360px; height: 800px; }
 .t-device-frame[data-width="320"] { width: 320px; height: 720px; }
 
 
@@ -3568,6 +3577,27 @@ button { background: none; border: none; color: inherit; }
        row of closed doors. */
     revealCurrentSection();
 
+  /* Cycles the frame through real device sizes rather than toggling one
+     alternative. A binary "narrow, 320" only ever answered whether the layout
+     survived the floor, and never whether it was right on the sizes people
+     actually hold. */
+  var DEVICES = [
+    { w: null,  label: '390 x 844, standard iPhone' },
+    { w: '375', label: '375 x 812, smaller iPhone' },
+    { w: '360', label: '360 x 800, common Android' },
+    { w: '320', label: '320 x 720, the floor' }
+  ];
+  function deviceAt() {
+    var cur = el.frame.getAttribute('data-width');
+    for (var i = 0; i < DEVICES.length; i++) { if (DEVICES[i].w === cur) { return i; } }
+    return 0;
+  }
+  function cycleDevice() {
+    var next = DEVICES[(deviceAt() + 1) % DEVICES.length];
+    if (next.w) { el.frame.setAttribute('data-width', next.w); }
+    else { el.frame.removeAttribute('data-width'); }
+  }
+
     var MODES = [
       { key: 'motion', label: 'Reduced motion', on: function () { return el.root.getAttribute('data-motion') === 'reduced'; },
         toggle: function () { el.root.setAttribute('data-motion', el.root.getAttribute('data-motion') === 'reduced' ? 'system' : 'reduced'); } },
@@ -3594,11 +3624,9 @@ button { background: none; border: none; color: inherit; }
             el.frame.style.setProperty('--keyboard-inset', '336px');
           }
         } },
-      { key: 'width', label: 'Narrow, 320px', on: function () { return el.frame.getAttribute('data-width') === '320'; },
-        toggle: function () {
-          if (el.frame.getAttribute('data-width') === '320') { el.frame.removeAttribute('data-width'); }
-          else { el.frame.setAttribute('data-width', '320'); }
-        } }
+
+      { key: 'width', label: function () { return 'Size, ' + DEVICES[deviceAt()].label; },
+        on: function () { return deviceAt() !== 0; }, toggle: cycleDevice }
     ];
     var modesHost = $('navModes');
     MODES.forEach(function (m) {
@@ -3606,7 +3634,9 @@ button { background: none; border: none; color: inherit; }
       b.type = 'button';
       b.className = 'd-stateNav__toggle';
       b.dataset.mode = m.key;
-      b.innerHTML = '<span>' + m.label + '</span><span class="d-stateNav__switch"></span>';
+      var text = typeof m.label === 'function' ? m.label() : m.label;
+      b.innerHTML = '<span class="d-stateNav__toggleLabel">' + text + '</span>' +
+                    '<span class="d-stateNav__switch"></span>';
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () { m.toggle(); syncModes(); });
       modesHost.appendChild(b);
@@ -3640,6 +3670,12 @@ button { background: none; border: none; color: inherit; }
       var on = m.on();
       if (on) { b.setAttribute('data-state', 'on'); } else { b.removeAttribute('data-state'); }
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      /* A control that cycles has to say where it is now, not what it was
+         called when the menu was built. */
+      if (typeof m.label === 'function') {
+        var lbl = b.querySelector('.d-stateNav__toggleLabel');
+        if (lbl) { lbl.textContent = m.label(); }
+      }
     });
   }
 

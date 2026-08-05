@@ -426,6 +426,15 @@ body {
   box-shadow: var(--shadow-phone);
   transition: width .25s var(--ease-out), height .25s var(--ease-out);
 }
+/* Real devices, in points, which is what a phone lays out in and what CSS
+   pixels already are. 390 x 844 is the modern standard iPhone. 375 x 812 is the
+   size a great many designs are still drawn at, and it is also the iPhone SE
+   generation a driver is far more likely to be holding than a new handset.
+   360 x 800 is not an iPhone at all: it is the single most common Android
+   viewport, which for a South African fleet is the one that matters most.
+   320 is not a current phone, it is the floor, kept as a stress test. */
+.t-device-frame[data-width="375"] { width: 375px; height: 812px; }
+.t-device-frame[data-width="360"] { width: 360px; height: 800px; }
 .t-device-frame[data-width="320"] { width: 320px; height: 720px; }
 @keyframes pop       { from { opacity: 0; transform: scale(.5) } to { opacity: 1; transform: scale(1) } }
 @keyframes spin      { to { transform: rotate(360deg) } }
@@ -1081,6 +1090,18 @@ body {
   letter-spacing: normal; color: var(--color-text-primary);
 }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__note { color: var(--color-text-secondary); }
+/* Asked for a fill with nothing chosen. The answer to that is up here, not
+   down at the button, so the empty slot is what lights up. It is a prompt and
+   not an error, so it is the brand colour rather than the error colour, and it
+   lets go on its own.
+
+   A transition rather than a keyframe animation, because an animation freezes
+   on its first frame under reduced motion and would leave the ring up for
+   good. */
+.m-vehicle-card[data-ask="on"] {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-08);
+}
 
 /* The action, at the weight of the reason the app exists. It was a half-width
    tile under a "Quick access" heading, beside a second tile, above roughly
@@ -1101,7 +1122,118 @@ body {
   background: linear-gradient(to top, var(--color-surface-page), transparent);
   pointer-events: none;
 }
-.o-home__fuel { width: 100%; }
+.o-home__fuel { width: 100%; position: relative; }
+
+/* ── The invitation ───────────────────────────────────────────────────
+   The moment a vehicle is linked, the one thing left to do becomes possible,
+   and the control says so itself rather than sitting there waiting to be
+   found. A driver looking at the van they just picked has their eyes at the
+   top of the screen, and this is at the bottom.
+
+   Two rings, half a beat apart, leaving the edge of the pill and thinning as
+   they travel. One ring reads as a blip and a button that changes colour reads
+   as an alarm; a pair moving outward reads as something offering itself, which
+   is what this is. The second ring is what makes it breathe rather than tick:
+   the first is still fading when the next sets off, so the edge is never
+   completely still and never completely loud.
+
+   Each ring is an edge that moves, not a glow that grows. The distance is
+   animated on the inset so every side travels the same sixteen pixels: this
+   pill is six times wider than it is tall, so a scaled ring would go twenty
+   pixels sideways and three vertically and read as a stretch rather than as
+   something radiating. The line is hairline thin and carries a soft cast, so
+   what leaves the button is closer to a ripple on water than to a highlight
+   round a control.
+
+   Sixteen is the whole of the room there is. The action sits in twenty pixels
+   of side padding and sixteen above the bar, so the ring reaches the edge of
+   its own space and stops, rather than being cut off by something else.
+
+   Three beats and then it stops for good. An invitation that never stops
+   asking is not an invitation, and the rest of the screen still has to be
+   readable. It also stops the instant a driver goes anywhere near it, because
+   once it has been seen it has done its job. */
+.o-home__fuel[data-pulse="on"]::before,
+.o-home__fuel[data-pulse="on"]::after {
+  content: ''; position: absolute; inset: 0;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 0 0 16px var(--color-primary-12);
+  pointer-events: none; opacity: 0;
+  animation: fuelInvite 2.2s var(--ease-out) 3 both;
+}
+.o-home__fuel[data-pulse="on"]::after { animation-delay: 0.55s; }
+@keyframes fuelInvite {
+  0%        { inset: 0;     opacity: 0.55; }
+  60%, 100% { inset: -16px; opacity: 0; }
+}
+/* Nothing to collapse to a still frame: an invitation is the movement. Held
+   at its first frame it would be a permanent blue band round the button. */
+[data-motion="reduced"] .o-home__fuel[data-pulse="on"]::before,
+[data-motion="reduced"] .o-home__fuel[data-pulse="on"]::after { display: none; }
+
+/* ── Asking for a fill ────────────────────────────────────────────────
+   The wait happens inside the control that started it. Pressing the button
+   does not take a driver anywhere: the button itself becomes the wait, so
+   nobody has to look around the screen for what they just pressed.
+
+   Everything above goes quiet for the length of it, which leaves exactly one
+   live thing on the screen and says plainly that the app is busy with the one
+   thing that was asked of it. */
+.o-home__scroll { transition: opacity var(--dur-base) var(--ease-out); }
+.o-home[data-fuel="pending"] .o-home__scroll { opacity: 0.45; pointer-events: none; }
+/* Declared after the disabled rule on purpose. The control is not available
+   while it is authorising, but greying it out would say the request had failed
+   rather than that it is in flight. */
+.o-home__fuel[data-state="pending"] {
+  background: var(--gradient-primary);
+  color: var(--color-text-on-dark);
+  box-shadow: var(--shadow-btn);
+  cursor: default;
+}
+.o-home__fuel[data-state="pending"]:active { transform: none; }
+
+/* ── m-live-bar ───────────────────────────────────────────────────────
+   What the action becomes while a fill is authorised. It takes the button's
+   slot rather than appearing beside it, so home keeps its height and the thing
+   a driver is in the middle of is always exactly where they left it.
+
+   A code is needed more than once. It is read at the pump, and then read again
+   when the attendant asks for it a second time, so the way back to it has to be
+   the most obvious control on home for as long as the fill is open. */
+.m-live-bar {
+  width: 100%; min-height: var(--size-control);
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--color-success-20);
+  border-radius: var(--radius-pill);
+  background: var(--color-success-bg);
+  text-align: left; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.m-live-bar:active { transform: scale(0.985); }
+/* Alive rather than decorative: the one thing on home that is still happening.
+   It settles to a solid dot under reduced motion, which still reads as a
+   status light and not as a stray mark. */
+.m-live-bar__dot {
+  flex-shrink: 0; width: 10px; height: 10px;
+  border-radius: var(--radius-circle); background: var(--color-success);
+  animation: livePulse 1.8s var(--ease-in-out) infinite;
+}
+@keyframes livePulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
+.m-live-bar__body { flex: 1 1 auto; min-width: 0; }
+.m-live-bar__title {
+  display: block; font-size: var(--text-footnote); font-weight: 800;
+  letter-spacing: -0.2px; color: var(--color-success);
+}
+.m-live-bar__sub {
+  display: block; font-size: var(--text-caption2);
+  color: var(--color-text-secondary);
+}
+.m-live-bar__cta {
+  flex-shrink: 0; font-size: var(--text-caption); font-weight: 700;
+  color: var(--color-success);
+}
 
 /* a-seam. The handover from the reward to the app.
 
@@ -1278,6 +1410,91 @@ body {
    tall screen and is simply the next thing along on a short one. */
 .o-onboard__spacer { flex: 1 1 var(--sp-8); min-height: var(--sp-8); }
 .o-onboard__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* ══ THE FILL ═════════════════════════════════════════════════════════
+   The one screen in this product that somebody other than the driver has to
+   read. An attendant stands a metre away in daylight, so the code is set at
+   hero size in the mono face on the plainest surface the system owns. Nothing
+   competes with it: no glass, no bloom, no gradient behind a number a stranger
+   has to key into a pump.
+
+   It takes the whole screen rather than rising as a sheet, because this is the
+   moment the phone stops being the driver's own and becomes something they
+   hold out at arm's length. */
+.o-fuel {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  background: var(--color-surface);
+}
+.o-fuel[data-state="arriving"], .o-fuel[data-state="visible"] { display: flex; }
+.o-fuel[data-state="arriving"] { opacity: 0; transform: translateY(var(--sp-5)); }
+.o-fuel[data-state="visible"] {
+  opacity: 1; transform: none;
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-sheet) var(--ease-emphasis);
+}
+[data-motion="reduced"] .o-fuel[data-state="arriving"] { transform: none; }
+.o-fuel__scroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(var(--size-status-bar) + var(--sp-1)) var(--sp-5) var(--sp-5);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: var(--sp-4);
+}
+/* The way out sits where a driver's thumb is not, because closing this screen
+   by accident at a pump means asking for the code again in front of somebody
+   waiting for it. */
+.o-fuel__bar { width: 100%; display: flex; justify-content: flex-end; }
+.o-fuel__title:focus, .o-fuel__title:focus-visible { outline: none; box-shadow: none; }
+.o-fuel__title {
+  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
+  color: var(--color-text-primary);
+}
+.o-fuel__lead {
+  margin-top: calc(var(--sp-3) * -1);
+  font-size: var(--text-body); color: var(--color-text-secondary);
+  max-width: 28ch;
+}
+
+/* a-code. The figure somebody reads off the screen. Grouped in twos because
+   six digits called across a forecourt are said in pairs, and tabular so the
+   number does not shuffle sideways while it is being checked digit by digit.
+   The visible text is grouped and the spoken label is not, because a screen
+   reader saying "forty-eight twenty-one" is a different number. */
+.a-code {
+  width: 100%;
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+  font-family: var(--font-mono); font-size: var(--text-hero); font-weight: 700;
+  letter-spacing: 1px; font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+/* The code sits high where a held-out phone is read, and what it is good for
+   sits low where it is looked up. The gap between them is flexible, so a tall
+   screen does not strand the detail in the middle of nothing and a short one
+   simply runs the two blocks together. */
+.o-fuel__spacer { flex: 1 1 var(--sp-6); min-height: var(--sp-4); }
+
+/* m-fuel-detail. What the code is good for, in the order it gets questioned:
+   which vehicle, how much, how long. Small, because none of it is the point
+   until somebody disputes the point. */
+.m-fuel-detail { width: 100%; display: flex; flex-direction: column; }
+.m-fuel-detail__row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-3); padding: var(--sp-2h) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-footnote); text-align: left;
+}
+.m-fuel-detail__row:last-child { border-bottom: none; }
+.m-fuel-detail__key { flex-shrink: 0; color: var(--color-text-secondary); }
+.m-fuel-detail__val {
+  min-width: 0; text-align: right; font-weight: 700;
+  color: var(--color-text-primary);
+}
+/* Quiet, and outside the scroll, so calling the fill off is always available
+   and never the thing a thumb finds first. */
+.o-fuel__action { flex-shrink: 0; padding: var(--sp-3) var(--sp-5) var(--sp-6); }
 
 @media (max-width: 900px) {
   /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
@@ -1710,7 +1927,18 @@ body {
              a picker was on screen. An action a driver needs at a forecourt
              does not get to depend on how many vehicles they were assigned. -->
         <div class="o-home__action">
-          <button class="a-btn a-btn--primary o-home__fuel" type="button" data-tile="fuel">I want to fuel</button>
+          <button class="a-btn a-btn--primary o-home__fuel" type="button" id="homeFuel">I want to fuel</button>
+          <!-- The action's second face, in the action's own slot. Home does not
+               reflow when a fill goes live under a thumb already on its way to
+               the control, and there is never a moment where both are up. -->
+          <button class="m-live-bar" type="button" id="homeLive" hidden>
+            <span class="m-live-bar__dot" aria-hidden="true"></span>
+            <span class="m-live-bar__body">
+              <span class="m-live-bar__title">Fuel approved</span>
+              <span class="m-live-bar__sub" id="homeLiveSub">CA 123-456 &middot; up to 60 L</span>
+            </span>
+            <span class="m-live-bar__cta" aria-hidden="true">Show code</span>
+          </button>
         </div>
 
         <nav class="o-tab-bar" aria-label="Sections">
@@ -1731,6 +1959,57 @@ body {
             <span>Account</span>
           </button>
         </nav>
+      </section>
+
+      <!-- SCREEN THREE · the fill.
+           Home is still underneath and is still the way back, so this is laid
+           over it rather than instead of it. -->
+      <section class="o-fuel" id="fuelScreen" aria-labelledby="fuelTitle" hidden>
+        <div class="o-fuel__scroll">
+
+          <div class="o-fuel__bar">
+            <button class="a-icon-btn" type="button" id="fuelClose" aria-label="Close, the code stays on home">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+
+          <span class="a-icon-wrap a-icon-wrap--lg" data-tone="success" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+          </span>
+
+          <h1 class="o-fuel__title" id="fuelTitle" tabindex="-1">Approved</h1>
+          <p class="o-fuel__lead">Show this at the pump.</p>
+
+          <!-- Two versions of one number. A paragraph takes no accessible name,
+               so the spoken form is a real element beside the printed one
+               rather than a label nobody would read out. -->
+          <p class="a-code">
+            <span id="fuelCode" aria-hidden="true">48 21 07</span>
+            <span class="u-visually-hidden" id="fuelCodeSpoken">Code 4 8 2 1 0 7</span>
+          </p>
+
+          <div class="o-fuel__spacer" aria-hidden="true"></div>
+
+          <div class="m-fuel-detail">
+            <div class="m-fuel-detail__row">
+              <span class="m-fuel-detail__key">Vehicle</span>
+              <span class="m-fuel-detail__val" id="fuelVehicle">CA 123-456</span>
+            </div>
+            <div class="m-fuel-detail__row">
+              <span class="m-fuel-detail__key">Up to</span>
+              <span class="m-fuel-detail__val">60 L</span>
+            </div>
+            <div class="m-fuel-detail__row">
+              <span class="m-fuel-detail__key">Valid until</span>
+              <span class="m-fuel-detail__val">10:11</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="o-fuel__action">
+          <button class="a-btn a-btn--outline" type="button" id="fuelCancel">Cancel this request</button>
+        </div>
       </section>
 
       <span class="u-visually-hidden" id="announcer" role="status" aria-live="polite"></span>
@@ -1777,7 +2056,11 @@ body {
     announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar'),
     seam: $('seam')
   };
-  el.homeFuel = el.home.querySelector('[data-tile="fuel"]');
+  el.homeFuel = $('homeFuel');
+  el.homeLive = $('homeLive'); el.homeLiveSub = $('homeLiveSub');
+  el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelCode = $('fuelCode');
+  el.fuelVehicle = $('fuelVehicle'); el.fuelClose = $('fuelClose'); el.fuelCancel = $('fuelCancel');
+  el.fuelCodeSpoken = $('fuelCodeSpoken');
 
   /* ════════════════════════════════════════════════════════════════════
      MOCK STATE
@@ -1801,6 +2084,9 @@ body {
     gbCap: 5,
     vehicleLinked: false,
     vehicles: [], activeVehicle: 0,
+    /* idle | pending | live. What the fuel action is currently showing, and
+       the only thing on home that outlives the screen you are looking at. */
+    fuel: 'idle',
     step: 'signup-reward',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
@@ -1926,6 +2212,7 @@ body {
   function hideAll() {
     el.reward.hidden = true;  el.reward.removeAttribute('data-state');
     el.home.hidden = true;    el.home.removeAttribute('data-state');
+    el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
   }
 
   /* Total points, and everything on the screen that is derived from it. */
@@ -2348,6 +2635,10 @@ body {
     var v = S.vehicles[i];
     announce('Driving ' + v.plate + ', ' + v.make + ' ' + v.model + '.' +
              (first ? ' Your next fill goes on this vehicle.' : ''));
+    /* The first pick is the moment fuelling becomes possible. Swapping vans
+       after that changes which vehicle it goes on, not whether it can happen,
+       so the button has nothing new to say. */
+    if (first) { pulseFuel(); }
   }
 
   /* The app the flow lands in. A driver who has just signed up has the fifty
@@ -2382,7 +2673,7 @@ body {
        of them were false: an entitlement of sixty litres, and an invitation to
        go and fuel, above a note saying the driver has no vehicle. */
     el.homeLitres.hidden = !S.vehicleLinked;
-    el.homeFuel.setAttribute('aria-disabled', S.vehicleLinked ? 'false' : 'true');
+    paintFuelAction();
     el.home.hidden = false;
     if (arriving && !prefersReduced()) {
       el.home.setAttribute('data-state', 'arriving');
@@ -2403,6 +2694,10 @@ body {
     }
     after(60, function () { el.homeName.focus({ preventScroll: true }); });
     after(500, function () { announce(greeting); });
+    /* A driver with one vehicle never picks it, so their invitation comes on
+       arrival. Behind the greeting, so the button is not moving while the
+       screen is still being read. */
+    if (activeVehicle()) { after(700, pulseFuel); }
     /* Only a driver arriving from sign-up waits: they are the one whose vehicle
        list, entitlement and balance have never been fetched. Someone opening the
        app again has all of it already, so faking a wait for them would be a lie
@@ -2432,6 +2727,186 @@ body {
       announce('Your vehicles are ready.');
     });
   }
+
+  /* ── The fill ─────────────────────────────────────────────────────────
+     Three moments, and only one of them is a screen. Asking is the button
+     changing under the thumb that pressed it. Waiting is the same button.
+     Only the approved code goes somewhere new, because it is the only part
+     of this a second person has to read.
+
+     Nothing here reaches a pump, authorises anything or expires. */
+
+  /* Fixed, because a state you cannot screenshot twice is not a state. The
+     clock on this phone reads 9:41 and a forecourt authorisation is good for
+     half an hour, so the window is drawn from the same place. */
+  var FUEL_CODE   = '482107';
+  var FUEL_LITRES = '60 L';
+  /* Grouped in twos to be read out, ungrouped to be spoken. "48 21" said by a
+     screen reader is "forty-eight twenty-one", which is not the code. */
+  function fuelCodeShown()  { return FUEL_CODE.replace(/(\d{2})(?=\d)/g, '$1 '); }
+  function fuelCodeSpoken() { return FUEL_CODE.split('').join(' '); }
+
+  var SPINNER =
+    '<svg class="a-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="9" stroke="var(--color-on-dark-line)" stroke-width="2.6"/>' +
+      '<path d="M21 12a9 9 0 0 0-9-9" stroke="var(--color-text-on-dark)" stroke-width="2.6" stroke-linecap="round"/>' +
+    '</svg>';
+
+  /* One slot, three faces, and exactly one of them up at a time. The button is
+     never hidden behind the live bar or the other way round, because two
+     controls for the same job in the same place is how a driver ends up
+     pressing the one that is not there. */
+  function paintFuelAction() {
+    var live = S.fuel === 'live';
+    var v = activeVehicle();
+    el.homeFuel.hidden = live;
+    el.homeLive.hidden = !live;
+    if (live) {
+      var plate = v ? v.plate : '';
+      el.homeLiveSub.textContent = plate + ' · up to ' + FUEL_LITRES;
+      /* Said once as a sentence rather than left to be assembled out of a dot,
+         a title and a call to action by anyone listening to it. */
+      el.homeLive.setAttribute('aria-label',
+        'Fuel approved for ' + plate + ', up to ' + FUEL_LITRES + '. Show the code.');
+    }
+    if (S.fuel === 'pending') {
+      el.homeFuel.innerHTML = SPINNER + '<span>Authorising</span>';
+      el.homeFuel.setAttribute('data-state', 'pending');
+      el.homeFuel.setAttribute('aria-busy', 'true');
+      el.homeFuel.setAttribute('aria-disabled', 'true');
+      el.home.setAttribute('data-fuel', 'pending');
+      return;
+    }
+    el.homeFuel.textContent = 'I want to fuel';
+    el.homeFuel.removeAttribute('data-state');
+    el.homeFuel.removeAttribute('aria-busy');
+    el.homeFuel.setAttribute('aria-disabled', S.vehicleLinked ? 'false' : 'true');
+    el.home.removeAttribute('data-fuel');
+  }
+
+  /* Only ever from the moment the action becomes possible: the driver picks a
+     van, or lands on home already holding one. Not on every repaint, and not
+     when they swap between vans, because by then the button has already been
+     offered and offering it again is nagging. */
+  function pulseFuel() {
+    /* Taken off and put back on the next frame, so a second invitation is a
+       second animation rather than an attribute that was already there. */
+    el.homeFuel.removeAttribute('data-pulse');
+    requestAnimationFrame(function () {
+      if (S.fuel !== 'idle' || !S.vehicleLinked || !activeVehicle()) { return; }
+      if (el.home.hidden) { return; }
+      el.homeFuel.setAttribute('data-pulse', 'on');
+      /* Cleared once the last ring has gone, so the attribute never outlives
+         the thing it describes. Three beats of 2.2s, the second ring set off
+         0.55s late, and a frame either side. */
+      after(2200 * 3 + 550 + 100, stopPulse);
+    });
+  }
+  function stopPulse() { el.homeFuel.removeAttribute('data-pulse'); }
+  /* Seen is enough. Focus counts as well as touch, because a keyboard arriving
+     at the button has found it by definition. */
+  el.homeFuel.addEventListener('pointerenter', stopPulse);
+  el.homeFuel.addEventListener('pointerdown', stopPulse);
+  el.homeFuel.addEventListener('focus', stopPulse);
+
+  function requestFuel() {
+    if (S.fuel !== 'idle') { return; }
+    stopPulse();
+    if (!S.vehicleLinked) {
+      announce('You cannot fuel until your manager assigns a vehicle.');
+      return;
+    }
+    /* Assigned and chosen are not the same thing, and the app cannot guess
+       which van somebody walked up to this morning. The question goes back to
+       where the answer is rather than appearing as an error at the bottom of
+       the screen, under the thumb that has just left the button. */
+    if (!activeVehicle()) {
+      announce('Choose which vehicle you are driving first.');
+      /* Focus alone is not an answer. A programmatic focus does not draw a ring
+         for anyone who arrived by touch, so the prompt is also something you can
+         see, on the slot that is waiting to be filled. */
+      el.homeVehicleEmpty.setAttribute('data-ask', 'on');
+      el.homeVehicleEmpty.scrollIntoView({ block: 'nearest' });
+      after(1800, function () { el.homeVehicleEmpty.removeAttribute('data-ask'); });
+      var first = el.homePickerRow.querySelector('[data-vehicle]');
+      if (first) { first.focus(); }
+      return;
+    }
+    S.fuel = 'pending';
+    paintFuelAction();
+    announce('Authorising your fill.');
+    /* As long as the authorisation takes and no longer. Under reduced motion
+       there is no wait at all, for the same reason the skeleton is skipped:
+       a still spinner is not a wait, it is a delay with a frozen graphic on
+       top of it. */
+    after(prefersReduced() ? 0 : 900, function () {
+      S.fuel = 'live';
+      paintFuelAction();
+      showFuel(true);
+    });
+  }
+
+  /* `arriving` when a driver got here by asking. Landing on it from the menu
+     is not a journey, so it is instant. */
+  function showFuel(arriving) {
+    S.step = 'fuel';
+    var v = activeVehicle();
+    el.fuelCode.textContent = fuelCodeShown();
+    el.fuelCodeSpoken.textContent = 'Code ' + fuelCodeSpoken();
+    /* The plate and nothing else. The make and model are how a driver picks a
+       van out of a yard, and this screen is read standing beside one, where the
+       plate is the only part of it written on the vehicle itself. */
+    if (v) { el.fuelVehicle.textContent = v.plate; }
+    el.fuel.hidden = false;
+    if (arriving && !prefersReduced()) {
+      el.fuel.setAttribute('data-state', 'arriving');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { el.fuel.setAttribute('data-state', 'visible'); });
+      });
+    } else {
+      el.fuel.setAttribute('data-state', 'visible');
+    }
+    after(60, function () { el.fuelTitle.focus({ preventScroll: true }); });
+    /* Behind the focus move rather than racing it, and the digits are spoken
+       one at a time, because this is the number somebody is about to key in. */
+    after(500, function () {
+      announce('Approved. Code ' + fuelCodeSpoken() + '. Show this at the pump.');
+    });
+  }
+
+  /* Closing is not cancelling. The fill stays open and home says so, so the
+     way back to the code is the largest control on the screen. Focus lands on
+     whichever face now holds the action's slot. */
+  function hideFuel() {
+    el.fuel.hidden = true;
+    el.fuel.removeAttribute('data-state');
+    S.step = 'home';
+    paintFuelAction();
+    after(60, function () {
+      (S.fuel === 'live' ? el.homeLive : el.homeFuel).focus({ preventScroll: true });
+    });
+  }
+
+  el.homeFuel.addEventListener('click', function () {
+    if (el.homeFuel.getAttribute('aria-disabled') === 'true') {
+      announce('You cannot fuel until your manager assigns a vehicle.');
+      return;
+    }
+    requestFuel();
+  });
+  el.homeLive.addEventListener('click', function () { showFuel(true); });
+  el.fuelClose.addEventListener('click', hideFuel);
+  el.fuelCancel.addEventListener('click', function () {
+    S.fuel = 'idle';
+    hideFuel();
+    announce('Request cancelled. Nothing has been authorised.');
+  });
+  /* Escape closes it the way the close button does, because a screen laid over
+     another one has to be dismissible from the keyboard. It never cancels: a
+     stray key press must not call off a fill somebody is standing at. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && S.step === 'fuel') { hideFuel(); }
+  });
 
 
 
@@ -2544,6 +3019,9 @@ body {
     S.userType = userType;
     S.vehicleLinked = !!linked;
     S.confettiPlayed = false;
+    /* A fill belongs to a session, and picking a state starts a new one. The
+       three fuelling states set it again after this runs. */
+    S.fuel = 'idle';
     S.vehicles = !S.vehicleLinked ? []
                : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
                : makeFleet(fleet || 1);
@@ -2600,7 +3078,35 @@ body {
     'home-many-vehicles': { group: 'returning', label: 'Nine vehicles',
       run: function () { reset('returning-driver', true, 9); showHome(); } },
     'home-thousand-vehicles': { group: 'returning', label: 'A thousand vehicles',
-      run: function () { reset('returning-driver', true, 1000); showHome(); } }
+      run: function () { reset('returning-driver', true, 1000); showHome(); } },
+
+    /* Reached by asking, and each one reachable on its own. A driver at a pump
+       is a returning driver with a van, so that is the setting all three carry:
+       nothing here is about the first ninety seconds of an account.
+
+       clearTimers after showHome, because home queues its own greeting and its
+       own focus move, and neither belongs to a state whose point is the screen
+       laid over it. */
+    'fuel-requesting': { group: 'fuelling', label: 'Authorising',
+      run: function () {
+        reset('returning-driver', true, 1); showHome(); clearTimers();
+        S.fuel = 'pending'; paintFuelAction();
+      } },
+    'fuel-approved':   { group: 'fuelling', label: 'Approved, the code',
+      run: function () {
+        reset('returning-driver', true, 1); showHome(); clearTimers();
+        S.fuel = 'live'; paintFuelAction(); showFuel();
+      } },
+    'fuel-live':       { group: 'fuelling', label: 'Home, fill still open',
+      run: function () {
+        reset('returning-driver', true, 1); showHome(); clearTimers();
+        S.fuel = 'live'; paintFuelAction();
+      } },
+    'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing chosen',
+      run: function () {
+        reset('returning-driver', true, 4); showHome(); clearTimers();
+        requestFuel();
+      } }
   };
 
   /* Sign-up hands over by name, so those names keep working. They were a third
@@ -2760,7 +3266,8 @@ body {
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
-    'returning':    'The same fleets, with the vehicles they have actually been in leading.'
+    'returning':    'The same fleets, with the vehicles they have actually been in leading.',
+    'fuelling':     'Asking for a fill, the code that comes back, and home while it is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -2781,7 +3288,8 @@ body {
       label: 'Welcome',
       sections: [
         ['after-signup', 'After sign-up'],
-        ['returning',    'Returning driver']
+        ['returning',    'Returning driver'],
+        ['fuelling',     'Fuelling']
       ]
     }
   ];
@@ -2815,6 +3323,12 @@ body {
         ['home-five-vans', 'Five vans'],
         ['home-many-vehicles', 'Nine vehicles'],
         ['home-thousand-vehicles', 'A thousand vehicles']
+      ],
+      'fuelling': [
+        ['fuel-requesting', 'Authorising'],
+        ['fuel-approved', 'Approved, the code'],
+        ['fuel-live', 'Home, fill still open'],
+        ['fuel-no-vehicle', 'Asked with nothing chosen']
       ]
     },
     'engenxt-signup.html': {
@@ -2925,6 +3439,27 @@ body {
       }).join('');
   }
 
+  /* Cycles the frame through real device sizes rather than toggling one
+     alternative. A binary "narrow, 320" only ever answered whether the layout
+     survived the floor, and never whether it was right on the sizes people
+     actually hold. */
+  var DEVICES = [
+    { w: null,  label: '390 x 844, standard iPhone' },
+    { w: '375', label: '375 x 812, smaller iPhone' },
+    { w: '360', label: '360 x 800, common Android' },
+    { w: '320', label: '320 x 720, the floor' }
+  ];
+  function deviceAt() {
+    var cur = frame.getAttribute('data-width');
+    for (var i = 0; i < DEVICES.length; i++) { if (DEVICES[i].w === cur) { return i; } }
+    return 0;
+  }
+  function cycleDevice() {
+    var next = DEVICES[(deviceAt() + 1) % DEVICES.length];
+    if (next.w) { frame.setAttribute('data-width', next.w); }
+    else { frame.removeAttribute('data-width'); }
+  }
+
   var MODES = [
     { key: 'motion', label: 'Reduced motion',
       on: function () { return root.getAttribute('data-motion') === 'reduced'; },
@@ -2936,12 +3471,9 @@ body {
       toggle: function () {
         root.setAttribute('data-text', root.getAttribute('data-text') === 'large' ? 'default' : 'large');
       } },
-    { key: 'width', label: 'Narrow, 320px',
-      on: function () { return frame.getAttribute('data-width') === '320'; },
-      toggle: function () {
-        if (frame.getAttribute('data-width') === '320') { frame.removeAttribute('data-width'); }
-        else { frame.setAttribute('data-width', '320'); }
-      } },
+    { key: 'width', label: function () { return 'Size, ' + DEVICES[deviceAt()].label; },
+      on: function () { return deviceAt() !== 0; },
+      toggle: cycleDevice },
     { key: 'spec', label: 'Design specs',
       on: function () { return root.getAttribute('data-spec') === 'on'; },
       toggle: function () {
@@ -2962,12 +3494,19 @@ body {
       var on = m.on();
       if (on) { b.setAttribute('data-state', 'on'); } else { b.removeAttribute('data-state'); }
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      /* A control that cycles has to say where it is now, not what it was
+         called when the menu was built. */
+      if (typeof m.label === 'function') {
+        var lbl = b.querySelector('.d-stateNav__toggleLabel');
+        if (lbl) { lbl.textContent = m.label(); }
+      }
     });
   }
   function buildModes() {
     document.getElementById('navModes').innerHTML = MODES.map(function (m) {
+      var text = typeof m.label === 'function' ? m.label() : m.label;
       return '<button type="button" class="d-stateNav__toggle" data-mode="' + m.key + '"' +
-             ' aria-pressed="false"><span>' + m.label + '</span>' +
+             ' aria-pressed="false"><span class="d-stateNav__toggleLabel">' + text + '</span>' +
              '<span class="d-stateNav__switch"></span></button>';
     }).join('');
     document.querySelectorAll('[data-mode]').forEach(function (b) {
