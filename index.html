@@ -433,6 +433,30 @@ button { background: none; border: none; color: inherit; }
   border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary);
 }
 .a-otp-cell[aria-disabled="true"] { opacity: .55; }
+/* Focus lands on the cell's own edge, the way .a-field already does it, rather
+   than as a ring floating around it.
+
+   The global :focus-visible is written for controls that draw no edge of their
+   own: a 3px outline held 2px clear, plus a 6px halo. Put that around a cell
+   that already has a 1.5px border and a 48px square carries four concentric
+   shapes with a gap between them. It read as a box inside a box, which is the
+   sort of thing you notice before you notice the digit you typed. One edge, one
+   halo, concentric by construction because a box-shadow follows the radius. */
+.a-otp-cell:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-12);
+}
+/* Focus must not overwrite what the cell is telling you. Focusing a cell that
+   is in error turned it blue and the error was gone. */
+.a-otp-cell[data-tone="error"]:focus-visible {
+  border-color: var(--color-error-text);
+  box-shadow: 0 0 0 3px var(--color-secondary-12);
+}
+.a-otp-cell[data-tone="valid"]:focus-visible {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px var(--color-success-20);
+}
 
 /* a-helper */
 .a-helper {

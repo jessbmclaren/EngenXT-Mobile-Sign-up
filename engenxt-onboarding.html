@@ -1001,6 +1001,14 @@ body {
   font-family: inherit;
 }
 .a-search__input::placeholder { color: var(--color-text-tertiary); }
+/* Same rule as every other control that draws its own edge: focus lands on the
+   border, with one concentric halo, instead of a detached ring sitting outside
+   a border the field already has. */
+.a-search__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-12);
+}
 
 /* m-vehicle-card. The one thing a driver checks before pulling in, so it is
    the only card on this screen that takes the brand gradient. */
