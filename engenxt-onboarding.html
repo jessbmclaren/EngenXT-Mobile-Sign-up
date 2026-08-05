@@ -788,6 +788,11 @@ body {
   font-size: var(--text-caption); color: var(--color-text-secondary);
   padding-block: var(--sp-2);
 }
+/* Quieter than the empty state, because it reports rather than interrupts:
+   the row is working, it just does not end where the fleet does. */
+.m-vehicle-picker__note {
+  font-size: var(--text-caption2); color: var(--color-text-tertiary);
+}
 
 /* a-vehicle-chip. A vehicle, said twice: the shape you spot it by and the
    registration you know it by.
@@ -1338,6 +1343,9 @@ body {
                      placeholder="Search by registration or model" autocomplete="off">
             </label>
             <div class="m-vehicle-picker__row" id="homePickerRow"></div>
+            <!-- How much of the fleet the row is not showing. Only when the
+                 row has actually been cut short. -->
+            <p class="m-vehicle-picker__note" id="homePickerNote" hidden></p>
             <p class="m-vehicle-picker__empty" id="homePickerEmpty" hidden>
               No vehicle matches that.
             </p>
@@ -1426,6 +1434,7 @@ body {
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
+    homePickerNote: $('homePickerNote'),
     homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
     announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar')
   };
@@ -1581,8 +1590,9 @@ body {
     return S.earned.reduce(function (n, e) { return n + e.pts; }, 0);
   }
   /* Grouped in threes with a space, which is how a number this size is written
-     here and keeps 1 000 from reading as 1.000. */
-  function groupPts(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+     here and keeps 1 000 from reading as 1.000. Points and vehicle counts both
+     go through it, because a thousand of either is read the same way. */
+  function groupNum(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 
   function paintGoal(points) {
     var gb = points / S.ptsPerGb;
@@ -1593,11 +1603,11 @@ body {
       Math.min(gb, S.gbCap).toFixed(2) + ' GB of ' + S.gbCap + ' GB';
     el.rewardMeter.setAttribute('aria-valuenow', points);
     el.rewardMeter.setAttribute('aria-valuetext',
-      groupPts(points) + ' of ' + groupPts(capPts) + ' points, ' +
+      groupNum(points) + ' of ' + groupNum(capPts) + ' points, ' +
       gb.toFixed(2) + ' of ' + S.gbCap + ' gigabytes');
     el.rewardNext.lastElementChild.textContent = gb >= S.gbCap
       ? 'You have earned the full ' + S.gbCap + ' GB'
-      : groupPts(toNext) + ' points to ' + (nextGb === 1 ? 'your first 1 GB' : nextGb + ' GB');
+      : groupNum(toNext) + ' points to ' + (nextGb === 1 ? 'your first 1 GB' : nextGb + ' GB');
     return Math.min(100, points / capPts * 100);
   }
 
@@ -1683,6 +1693,18 @@ body {
      a row you can scan, pictures stop helping and a search field starts. */
   var SEARCH_FROM = 6;
 
+  /* Past this many, the row stops trying to hold the fleet. A driver dragging
+     through hundreds of chips is not picking, they are looking for something,
+     and looking for something is what the search field is for. The row shows
+     the start of the fleet, says how much it is not showing, and the search
+     reaches the rest.
+
+     The vehicles table in the organise-vehicles prototype makes the same trade
+     at desk scale: it lists the first hundred of however many there are and
+     prints "first 100 listed" beside the true count, rather than rendering a
+     thousand rows nobody will read. */
+  var ROW_CAP = 12;
+
   /* A yard's worth of vehicles to draw a demo fleet from. Registrations follow
      the South African province letters a driver would actually read off a
      windscreen disc. */
@@ -1697,6 +1719,54 @@ body {
     { plate: 'CJ 33-518',  make: 'Volkswagen',    model: 'Crafter 35',             type: 'truck' },
     { plate: 'CA 660-047', make: 'Suzuki',        model: 'Swift GL',               type: 'car' }
   ];
+
+  /* One driver, five vans. A depot that runs a single class of vehicle is the
+     ordinary case rather than an exotic one, and it is the case the pictures
+     are worst at: five vans draw five identical silhouettes, and two of these
+     are the same model with consecutive plates. The registration on the chip
+     is the only thing telling them apart, which is exactly why it is there. */
+  var VANS = [
+    { plate: 'CA 118-402', make: 'Ford',          model: 'Transit Custom 2.0TDCi', type: 'van' },
+    { plate: 'CA 118-403', make: 'Ford',          model: 'Transit Custom 2.0TDCi', type: 'van' },
+    { plate: 'CA 274-115', make: 'Hyundai',       model: 'H-1 Panel Van',          type: 'van' },
+    { plate: 'CJ 51-880',  make: 'Mercedes-Benz', model: 'Sprinter 316',           type: 'van' },
+    { plate: 'CA 903-664', make: 'Volkswagen',    model: 'Crafter 35',             type: 'van' }
+  ];
+
+  /* A fleet too big to type out, for the driver at a company that runs one.
+     Built rather than authored, and built identically every time: a prototype
+     that shuffles its own data cannot be screenshotted twice and compared, and
+     a state you cannot return to is not a state.
+
+     The digits are scattered rather than counted up. Numbering them in order
+     gave a thousand registrations that all began the same way, so searching
+     "CJ 1" returned most of the fleet and searching anything else returned
+     none of it, which tells you nothing about whether the search works. The
+     stride is prime and the span is not, so every vehicle still lands on its
+     own number and no two share a registration. */
+  var PROVINCES = ['CA', 'CJ', 'CY', 'CL', 'ND', 'NP', 'GP', 'EC', 'NW', 'FS'];
+  var PLATE_SPAN = 900 * 900;      /* nnn-nnn, each group 100 to 999 */
+  var PLATE_STRIDE = 7919;         /* prime, so it visits every number once */
+
+  function makeFleet(n) {
+    if (n <= FLEET.length) { return FLEET.slice(0, n); }
+    var out = FLEET.slice();
+    var taken = {};
+    FLEET.forEach(function (v) { taken[v.plate] = true; });
+    for (var k = out.length, seq = k; out.length < n; k++, seq++) {
+      var base = FLEET[k % FLEET.length];
+      var id = (seq * PLATE_STRIDE) % PLATE_SPAN;
+      var plate = PROVINCES[k % PROVINCES.length] + ' ' +
+                  (100 + Math.floor(id / 900)) + '-' + (100 + id % 900);
+      /* A generated registration that collides with an authored one is a
+         thousand-to-one, and one duplicate is enough to make the picker point
+         at the wrong vehicle. Step past it rather than hope. */
+      if (taken[plate]) { k--; continue; }
+      taken[plate] = true;
+      out.push({ plate: plate, make: base.make, model: base.model, type: base.type });
+    }
+    return out;
+  }
 
   var VEHICLE_ART = {
     van:   '<path d="M2 16V9.5a1.5 1.5 0 0 1 1.5-1.5H13v8"/><path d="M13 10h3.6a2 2 0 0 1 1.6.8L21 14.5V16"/><path d="M2 16h1.6M9 16h5.4M19.4 16H22"/><circle cx="6.4" cy="16.6" r="2"/><circle cx="17.2" cy="16.6" r="2"/>',
@@ -1737,16 +1807,45 @@ body {
     if (!searchable) { el.homeSearch.value = ''; }
 
     var q = (el.homeSearch.value || '').trim().toLowerCase();
-    var shown = S.vehicles.filter(function (v) {
-      return !q || (v.plate + ' ' + v.make + ' ' + v.model).toLowerCase().indexOf(q) !== -1;
-    });
-    el.homePickerCount.textContent = q
-      ? shown.length + ' of ' + S.vehicles.length
-      : S.vehicles.length + ' vehicles';
-    el.homePickerEmpty.hidden = shown.length > 0;
+    /* The position travels with the vehicle rather than being looked up again
+       per chip. Searching a thousand vehicles and then scanning the thousand
+       once per match is the same work done a thousand times over. */
+    var matches = [];
+    for (var n = 0; n < S.vehicles.length; n++) {
+      var vh = S.vehicles[n];
+      if (!q || (vh.plate + ' ' + vh.make + ' ' + vh.model).toLowerCase().indexOf(q) !== -1) {
+        matches.push({ v: vh, i: n });
+      }
+    }
 
-    el.homePickerRow.innerHTML = shown.map(function (v) {
-      var i = S.vehicles.indexOf(v);
+    var shown = matches.slice(0, ROW_CAP);
+    /* Whatever the cap or the search would have done, the vehicle being driven
+       stays in the row. A picker that drops your own answer off the end reads
+       as having forgotten it. */
+    if (matches.length && !shown.some(function (m) { return m.i === S.activeVehicle; })) {
+      var active = null;
+      for (var a = 0; a < matches.length; a++) {
+        if (matches[a].i === S.activeVehicle) { active = matches[a]; break; }
+      }
+      if (active) { shown = [active].concat(shown.slice(0, ROW_CAP - 1)); }
+    }
+
+    el.homePickerCount.textContent = q
+      ? groupNum(matches.length) + ' of ' + groupNum(S.vehicles.length)
+      : groupNum(S.vehicles.length) + ' vehicles';
+    el.homePickerEmpty.hidden = matches.length > 0;
+
+    /* Say what is not on screen. A row that quietly stops at twelve of a
+       thousand looks like the whole fleet, and a driver who cannot find their
+       van in it concludes they have not been given one. */
+    var over = matches.length - shown.length;
+    el.homePickerNote.hidden = over <= 0;
+    el.homePickerNote.textContent = q
+      ? 'Showing ' + shown.length + '. Narrow the search to see the rest.'
+      : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
+
+    el.homePickerRow.innerHTML = shown.map(function (m) {
+      var v = m.v, i = m.i;
       var on = i === S.activeVehicle;
       return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
              ' aria-checked="' + on + '" tabindex="' + (on ? '0' : '-1') + '"' +
@@ -1798,7 +1897,7 @@ body {
     S.step = 'home';
     el.statusBar.removeAttribute('data-tone');
     el.homePoints.textContent =
-      groupPts(S.userType === 'new-driver' ? rewardTotal() : 2450) + ' pts';
+      groupNum(S.userType === 'new-driver' ? rewardTotal() : 2450) + ' pts';
     /* The card claims a linked vehicle, so it is only shown when there is one. */
     if (!S.vehicleLinked) { S.vehicles = []; }
     el.homeSearch.value = '';
@@ -1834,23 +1933,39 @@ body {
      Every state is reachable directly, and reaching it directly renders the
      same thing as arriving at it through the flow.
      ════════════════════════════════════════════════════════════════════ */
-  function reset(userType, linked, fleetSize) {
+  /* The third argument is either how many vehicles the driver has been given,
+     drawn from the demo yard, or the exact set to give them when the point of
+     the state is which vehicles they are rather than how many. */
+  function reset(userType, linked, fleet) {
     S.userType = userType;
     S.vehicleLinked = !!linked;
     S.confettiPlayed = false;
-    S.vehicles = linked ? FLEET.slice(0, fleetSize || 1) : [];
+    S.vehicles = !S.vehicleLinked ? []
+               : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
+               : makeFleet(fleet || 1);
     S.activeVehicle = 0;
   }
 
+  /* What a driver arrives from sign-up with. Assignment happens on the manager's
+     side and it happens before the driver ever opens this, so by the time the
+     reward screen hands over there are vehicles waiting. Arriving to an empty
+     screen that blames the manager was the flow describing a step that had
+     already been done. */
+  var ASSIGNED_ON_ARRIVAL = 3;
+
   var STATES = {
     'signup-reward':      { group: 'new', label: 'Reward',
-      run: function () { reset('new-driver', false); showReward(); } },
+      run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
     'home':               { group: 'new', label: 'Home',
       run: function () { reset('new-driver', true, 1); showHome(); } },
     'home-few-vehicles':  { group: 'new', label: 'Home, a few vehicles',
       run: function () { reset('returning-driver', true, 4); showHome(); } },
+    'home-five-vans':     { group: 'new', label: 'Home, five vans',
+      run: function () { reset('returning-driver', true, VANS); showHome(); } },
     'home-many-vehicles': { group: 'new', label: 'Home, a whole fleet',
       run: function () { reset('returning-driver', true, 9); showHome(); } },
+    'home-thousand-vehicles': { group: 'new', label: 'Home, a thousand vehicles',
+      run: function () { reset('returning-driver', true, 1000); showHome(); } },
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle assigned',
       run: function () { reset('returning-driver', false); route(); } },
     'returning-with-vehicle':    { group: 'returning', label: 'Vehicles assigned',
@@ -1862,7 +1977,7 @@ body {
        are separate from the screen states above because a screen state is a
        thing to look at and an entry point is a question to answer. */
     'route/new-driver': { group: 'route', label: 'Arrive: new driver',
-      run: function () { reset('new-driver', false); route(); } },
+      run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); route(); } },
     'route/returning-no-vehicle': { group: 'route', label: 'Arrive: returning, no vehicle',
       run: function () { reset('returning-driver', false); route(); } },
     'route/returning-with-vehicle': { group: 'route', label: 'Arrive: returning, with a vehicle',
@@ -1990,7 +2105,7 @@ body {
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
-    'new':       'A driver who has just signed up: the reward, then the vehicle.',
+    'new':       'A driver who has just signed up: the reward, then the app, at every size of fleet.',
     'returning': 'Someone who has been here before and skips the welcome.',
     'route':     'The two entry points sign-up hands over to.'
   };
@@ -2012,7 +2127,7 @@ body {
       file: 'engenxt-onboarding.html',
       label: 'Welcome',
       sections: [
-        ['new',       'New driver',            4],
+        ['new',       'New driver',            6],
         ['returning', 'Returning driver',      2],
         ['route',     'Arriving from sign-up', 3]
       ]
@@ -2037,7 +2152,9 @@ body {
         ['signup-reward', 'Reward'],
         ['home', 'Home'],
         ['home-few-vehicles', 'Home, a few vehicles'],
-        ['home-many-vehicles', 'Home, a whole fleet']
+        ['home-five-vans', 'Home, five vans'],
+        ['home-many-vehicles', 'Home, a whole fleet'],
+        ['home-thousand-vehicles', 'Home, a thousand vehicles']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],
