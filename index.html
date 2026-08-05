@@ -49,6 +49,11 @@
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
 
+  /* The base the two steps below are alpha of. It was never declared, and the
+     reward meter's fill asks for it, so the fill's gradient was invalid and the
+     bar rendered as nothing at all. An undefined custom property fails without
+     a word, which is how a designed element goes missing and stays missing. */
+  --color-tertiary:    #3DBCD4;
   --color-tertiary-04: rgba(61,188,212,0.04);
   --color-tertiary-18: rgba(61,188,212,0.18);
 
@@ -159,6 +164,11 @@
   --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
   --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
   --shadow-card:      0 1px 2px rgba(0,0,0,0.04), 0 4px 20px rgba(22,80,184,0.09);
+  /* A second step, for a control inside a row you glance past rather than a
+     destination you aim at. One blur used at two sizes is not a scale: the
+     same 20px on a 64px object reads far heavier than on a card three times
+     its area, so the chips optically floated above the tiles. */
+  --shadow-card-sm:   0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(22,80,184,0.07);
   --shadow-field:     0 2px 14px var(--color-border-light);
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
   --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
@@ -1359,7 +1369,11 @@ button { background: none; border: none; color: inherit; }
     <!-- The states of whichever section is highlighted. It always holds one,
          so the menu is never a row of closed doors, and there is no floating
          layer to position, flip or dismiss. -->
-    <div class="d-stateNav__right" id="navRight" aria-live="polite"></div>
+    <!-- Not a live region. Its whole contents are replaced on click, on focus
+         and on hover, so announcing it politely meant tabbing the section list
+         recited every listing in full. The state you land on is announced
+         through the announcer instead, which says one sentence. -->
+    <div class="d-stateNav__right" id="navRight"></div>
   </nav>
 
   <!-- ══ DEVICE ═════════════════════════════════════════════════════════ -->
@@ -3116,7 +3130,11 @@ button { background: none; border: none; color: inherit; }
     navNumber:  ['number/empty', 'number/partial', 'number/valid', 'number/sending',
                  'number/err-format', 'number/err-landline', 'number/err-unregistered',
                  'number/err-suspended', 'number/err-fleet',
-                 'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server'],
+                 'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server',
+                 /* Defined in STATES and listed by nothing, so the one screen
+                    where "Contact support" first appears was reachable only by
+                    typing its hash. */
+                 'number/err-server-2'],
     navCode:    ['code/idle', 'code/partial', 'code/verifying', 'code/err-wrong', 'code/err-last',
                  'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
                  'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
@@ -3165,6 +3183,16 @@ button { background: none; border: none; color: inherit; }
      and the keyboard see the same thing. Hover only previews; it never
      changes what is on the phone. */
   var pane = { openFor: null, hoverTimer: null };
+  /* A preview that never ends is not a preview. Leaving the menu puts the
+     pane back on the section the phone is actually showing. */
+  (function () {
+    var nav = document.getElementById('stateNav');
+    if (!nav) { return; }
+    nav.addEventListener('mouseleave', function () {
+      clearTimeout(pane.hoverTimer);
+      revealCurrentSection();
+    });
+  })();
 
   function paneLead(flow, key, label, count) {
     return { title: label, count: count,
@@ -3245,9 +3273,8 @@ button { background: none; border: none; color: inherit; }
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
-    'new':       'A driver who has just signed up: the reward, then the app, at every size of fleet.',
-    'returning': 'Someone who has been here before and skips the welcome.',
-    'route':     'The two entry points sign-up hands over to.'
+    'after-signup': 'The reward, then the app the flow lands in.',
+    'returning':    'Someone who has been here before, at every size of fleet.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3267,9 +3294,8 @@ button { background: none; border: none; color: inherit; }
       file: 'engenxt-onboarding.html',
       label: 'Welcome',
       sections: [
-        ['new',       'New driver',            6],
-        ['returning', 'Returning driver',      2],
-        ['route',     'Arriving from sign-up', 3]
+        ['after-signup', 'After sign-up'],
+        ['returning',    'Returning driver']
       ]
     }
   ];
@@ -3294,22 +3320,17 @@ button { background: none; border: none; color: inherit; }
      the honest control for something that navigates. */
   var AWAY_STATES = {
     'engenxt-onboarding.html': {
-      'new': [
-        ['signup-reward', 'Reward'],
-        ['home', 'Home'],
-        ['home-few-vehicles', 'Home, a few vehicles'],
-        ['home-five-vans', 'Home, five vans'],
-        ['home-many-vehicles', 'Home, a whole fleet'],
-        ['home-thousand-vehicles', 'Home, a thousand vehicles']
+      'after-signup': [
+        ['signup-reward', 'Reward, 50 points'],
+        ['home', 'Home, one vehicle']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],
-        ['returning-with-vehicle', 'Vehicles assigned']
-      ],
-      'route': [
-        ['route/new-driver', 'Arrive: new driver'],
-        ['route/returning-no-vehicle', 'Arrive: returning, no vehicle'],
-        ['route/returning-with-vehicle', 'Arrive: returning, with a vehicle']
+        ['returning-with-vehicle', 'One vehicle'],
+        ['home-few-vehicles', 'Four vehicles'],
+        ['home-five-vans', 'Five vans'],
+        ['home-many-vehicles', 'Nine vehicles'],
+        ['home-thousand-vehicles', 'A thousand vehicles']
       ]
     },
     'engenxt-signup.html': {
@@ -3320,7 +3341,8 @@ button { background: none; border: none; color: inherit; }
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
                    ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
                    ['number/err-rate','Rate limited'],['number/err-nowhatsapp','Not on WhatsApp'],
-                   ['number/err-offline','No connection'],['number/err-server','Server error']],
+                   ['number/err-offline','No connection'],['number/err-server','Server error'],
+                   ['number/err-server-2','Server error, again']],
       navCode:    [['code/idle','Waiting for code'],['code/partial','Part entered'],
                    ['code/verifying','Checking'],['code/err-wrong','Wrong code'],
                    ['code/err-last','One try left'],['code/err-expired','Code expired'],
@@ -3330,7 +3352,8 @@ button { background: none; border: none; color: inherit; }
                    ['code/success','Code confirmed']],
       navBlocked: [['blocked/unregistered','Not registered'],['blocked/suspended','Driver paused'],
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
-      navDone:    [['success/signup','Signed up'],['success/signin','Signed in']]
+      navDone:    [['success/signup','Signed up, opens the welcome reward'],
+                   ['success/signin','Signed in, opens home']]
     }
   };
 
@@ -3382,7 +3405,11 @@ button { background: none; border: none; color: inherit; }
         var key = sec[0], label = sec[1];
         var mine = isThisFlow(flow);
         var ids = mine ? NAV_GROUPS[key] : null;
-        var b = sectionButton(label, mine ? ids.length : sec[2]);
+        /* The count is read from the manifest rather than typed beside it.
+           Hand-written integers drifted the moment a state was added, and a
+           menu that says 13 above a list of 14 is a menu you stop trusting. */
+        var away = (AWAY_STATES[flow.file] || {})[key] || [];
+        var b = sectionButton(label, mine ? ids.length : away.length);
         b.dataset.group = (mine ? '' : 'away:') + key;
         if (!mine) { b.dataset.file = flow.file; }
         var reveal = function () {
@@ -3393,6 +3420,9 @@ button { background: none; border: none; color: inherit; }
         b.addEventListener('focus', reveal);
         b.addEventListener('mouseenter', function () { hoverSection(reveal); });
         b.addEventListener('mouseleave', function () { clearTimeout(pane.hoverTimer); });
+        /* Hover only previews, so the preview has to end. Clearing the timer
+           alone left the pane showing whatever the pointer last passed over,
+           which is not where the reviewer is. */
         host.appendChild(b);
         /* Only this file's sections can be opened here, so only they are
            candidates for what the pane shows on load. */
@@ -3611,6 +3641,17 @@ button { background: none; border: none; color: inherit; }
   /* ════════════════════════════════════════════════════════════════════
      BOOT
      ════════════════════════════════════════════════════════════════════ */
+  /* A state nobody lists is a state nobody reviews, which is exactly how
+     number/err-server-2 stayed invisible. */
+  (function auditStates() {
+    var listed = {};
+    Object.keys(NAV_GROUPS).forEach(function (k) {
+      NAV_GROUPS[k].forEach(function (id) { listed[id] = true; });
+    });
+    var orphans = Object.keys(STATES).filter(function (k) { return !listed[k]; });
+    if (orphans.length) { console.warn('States in no menu section:', orphans.join(', ')); }
+  })();
+
   buildNav();
   buildOtp();
   var initial = location.hash.slice(1);

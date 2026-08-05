@@ -54,6 +54,11 @@
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
 
+  /* The base the two steps below are alpha of. It was never declared, and the
+     reward meter's fill asks for it, so the fill's gradient was invalid and the
+     bar rendered as nothing at all. An undefined custom property fails without
+     a word, which is how a designed element goes missing and stays missing. */
+  --color-tertiary:    #3DBCD4;
   --color-tertiary-04: rgba(61,188,212,0.04);
   --color-tertiary-18: rgba(61,188,212,0.18);
 
@@ -164,6 +169,11 @@
   --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
   --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
   --shadow-card:      0 1px 2px rgba(0,0,0,0.04), 0 4px 20px rgba(22,80,184,0.09);
+  /* A second step, for a control inside a row you glance past rather than a
+     destination you aim at. One blur used at two sizes is not a scale: the
+     same 20px on a 64px object reads far heavier than on a card three times
+     its area, so the chips optically floated above the tiles. */
+  --shadow-card-sm:   0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(22,80,184,0.07);
   --shadow-field:     0 2px 14px var(--color-border-light);
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
   --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
@@ -716,9 +726,11 @@ body {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
+/* The driver knows their own name. It was the largest thing on a screen whose
+   job is fuelling, so it comes down a step and gives the weight to the work. */
 .o-home__name {
-  font-size: var(--text-hero); font-weight: 900; line-height: 1;
-  letter-spacing: -2px; color: var(--color-text-primary);
+  font-size: var(--text-title); font-weight: 800; line-height: 1.05;
+  letter-spacing: -1px; color: var(--color-text-primary);
 }
 .o-home__name:focus, .o-home__name:focus-visible { outline: none; box-shadow: none; }
 
@@ -735,14 +747,16 @@ body {
   font-size: var(--text-caption); font-weight: 700;
   color: var(--color-text-primary);
 }
-.m-stat-pill[data-tone="points"] {
-  background: var(--color-warning-bg); border-color: var(--color-warning-border);
-  color: var(--color-warning);
-}
-.m-stat-pill[data-tone="approved"] {
-  background: var(--color-success-bg); border-color: var(--color-success-20);
-  color: var(--color-success);
-}
+/* Both pills sit on the neutral base and only their icon carries a hue. They
+   were dressed in the warning and success sets, the same tokens the sign-up
+   flow uses to tell a driver they cannot get in. Home carries no status, so a
+   driver scanning it for a problem was landing on their own points balance.
+   The tokens mean something in this repo, and they meant it somewhere else. */
+.m-stat-pill[data-tone="points"] .m-stat-pill__icon { color: var(--color-warning); }
+.m-stat-pill[data-tone="approved"] .m-stat-pill__icon { color: var(--color-success); }
+/* The entitlement is the figure that decides whether a driver can fill up, so
+   it takes its weight from type rather than from an alert colour. */
+.m-stat-pill__figure { font-size: var(--text-callout); font-weight: 800; }
 
 /* m-vehicle-picker. Which of your vehicles you are driving today. One job,
    so a molecule, and it changes shape with how many there are: one vehicle
@@ -752,11 +766,17 @@ body {
 /* m-empty-note. Why the thing you expected to see is not there. A screen
    with a hole in it and no explanation is worse than a screen that says
    plainly that nothing has been assigned yet. */
+/* It also carries the way out. Explaining that a manager assigns the vehicles
+   and then leaving the driver on the screen was an answer to a question they
+   had not asked, on the screen every returning sign-in lands on. */
 .m-empty-note {
   padding: var(--sp-4);
   border-radius: var(--radius-card);
   background: var(--color-surface);
   border: 1px dashed var(--color-border-field);
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3);
+}
+.m-empty-note__text {
   font-size: var(--text-caption); line-height: 1.55;
   color: var(--color-text-secondary);
 }
@@ -766,6 +786,14 @@ body {
 .m-vehicle-picker__title {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
+}
+/* While it is still a question it is asked properly, not set in the grey the
+   rest of the file reserves for placeholder and disabled text. Once a vehicle
+   is chosen it drops back to a label, because a question that has been
+   answered is a stale question. */
+.m-vehicle-picker__title[data-ask="true"] {
+  letter-spacing: normal; text-transform: none;
+  font-size: var(--text-caption); color: var(--color-text-primary);
 }
 .m-vehicle-picker__count {
   margin-left: auto;
@@ -779,8 +807,11 @@ body {
   display: flex; gap: var(--sp-3);
   overflow-x: auto; scrollbar-width: none;
   scroll-snap-type: x proximity;
+  /* The bleed stays, so the row reads as continuing past the edge. The inset
+     comes back to the gutter everything else on the screen uses, which also
+     leaves a slice of the next tile showing rather than landing it flush. */
   margin-inline: calc(var(--sp-5) * -1);
-  padding-inline: var(--sp-5);
+  padding-inline: var(--sp-3);
   padding-block: var(--sp-1);
 }
 .m-vehicle-picker__row::-webkit-scrollbar { display: none; }
@@ -794,46 +825,48 @@ body {
   font-size: var(--text-caption2); color: var(--color-text-tertiary);
 }
 
-/* a-vehicle-chip. A vehicle, said twice: the shape you spot it by and the
-   registration you know it by.
+/* a-vehicle-chip. A vehicle, named by the thing that tells it apart.
 
-   The picture alone was not enough. A driver here is not choosing a class of
-   vehicle, they are choosing THEIR vehicle, and two Hiluxes draw the same
-   silhouette. Four vehicles came out as two pictures and nine came out as
-   four, so picking the right one meant tapping to find out. The registration
-   is the thing that is actually different, so it is on the chip. */
+   It used to be a 64px circle holding a silhouette, with the registration at
+   10px underneath it. That had the weighting backwards. A driver is not
+   choosing a class of vehicle, they are choosing THEIR vehicle, and five vans
+   draw five identical silhouettes, so the picture is the caption and the
+   registration is the content. The plate now sets the size of the tile and the
+   drawing rides above it at 16px, saying only which kind of thing it is. */
 .a-vehicle-chip {
-  flex-shrink: 0; scroll-snap-align: center;
-  width: 80px; padding: 0;
-  display: flex; flex-direction: column; align-items: center; gap: var(--sp-1h);
-  border: none; background: none; cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-in-out);
-}
-.a-vehicle-chip:active { transform: scale(0.95); }
-.a-vehicle-chip__disc {
   position: relative;
-  width: 64px; height: 64px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius-circle);
-  border: 2px solid transparent;
+  flex-shrink: 0; scroll-snap-align: center;
+  /* Grows with its own text rather than clipping it, so a long registration at
+     200% browser zoom takes its own width instead of crossing into the chip
+     beside it. */
+  min-width: 100px; max-width: 168px; min-height: 56px;
+  padding: var(--sp-2) var(--sp-2h);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border-radius: var(--radius-card-sm);
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--dur-base) var(--ease-out),
-              background var(--dur-base) var(--ease-out);
+  box-shadow: var(--shadow-card-sm);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-in-out),
+              border-color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
 }
-.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__disc {
+.a-vehicle-chip:active { transform: scale(0.97); }
+.a-vehicle-chip[aria-checked="true"] {
   border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  background: var(--color-primary);
 }
+.a-vehicle-chip__art { display: flex; opacity: 0.9; }
 .a-vehicle-chip__plate {
-  font-size: var(--text-nano); font-weight: 700; white-space: nowrap;
-  font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
+  font-size: var(--text-body); font-weight: 700; line-height: 1.25;
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+  text-align: center;
 }
-.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__plate { color: var(--color-primary-dark); }
-/* The ring is a colour, so the tick is the second cue and the choice is never
+.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__plate { color: var(--color-text-on-dark); }
+/* The fill is a colour, so the tick is the second cue and the choice is never
    carried by hue alone. */
 .a-vehicle-chip__tick {
-  position: absolute; top: -2px; right: -2px;
+  position: absolute; top: -6px; right: -6px;
   width: 22px; height: 22px;
   display: none; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
@@ -897,26 +930,49 @@ body {
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm); background: var(--color-on-dark-fill);
 }
-
-.o-home__section {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--color-text-tertiary);
-  margin-bottom: calc(var(--sp-5) * -1 + var(--sp-2));
+/* What choosing this vehicle actually decides. The card named a vehicle and
+   left the driver to infer why it mattered. */
+.m-vehicle-card__note {
+  display: block; margin-top: var(--sp-1h);
+  font-size: var(--text-caption2); color: var(--color-on-dark-soft);
 }
-/* Two up, and they stay two up: at 320dp a single column would push the bar
-   off the bottom of a short phone. */
-.o-home__tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
-.m-quick-tile {
-  display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2);
-  padding: var(--sp-4) var(--sp-3);
+
+/* The same card before a choice has been made: same size, same place, so the
+   screen does not jump when the driver picks one, and the question is asked
+   where its answer will appear. */
+.m-vehicle-card[data-state="empty"] {
+  background: none; box-shadow: none;
+  border: 1px dashed var(--color-border-field);
+}
+.m-vehicle-card[data-state="empty"] .m-vehicle-card__art { background: var(--color-surface-sunken); }
+.m-vehicle-card[data-state="empty"] .m-vehicle-card__plate {
+  font-size: var(--text-callout); font-weight: 700;
+  letter-spacing: normal; color: var(--color-text-primary);
+}
+.m-vehicle-card[data-state="empty"] .m-vehicle-card__note { color: var(--color-text-secondary); }
+
+/* The action, at the weight of the reason the app exists. It was a half-width
+   tile under a "Quick access" heading, beside a second tile, above roughly
+   240dp of nothing, carrying the same drawing as the Fuel tab directly
+   underneath it. A tab is navigation and a button is the action, and they are
+   allowed to reach the same place. */
+.o-home__fuel { width: 100%; }
+
+/* m-list-row. A destination on one line: icon, what it is, where it goes.
+   For the things that deserve a place on home without deserving the action. */
+.m-list-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: 48px; padding: var(--sp-2h) var(--sp-3);
   border: none; border-radius: var(--radius-card);
-  background: var(--color-surface); box-shadow: var(--shadow-card);
-  text-align: left; cursor: pointer;
+  background: var(--color-surface); box-shadow: var(--shadow-card-sm);
+  text-align: left; cursor: pointer; width: 100%;
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.m-quick-tile:active { transform: scale(0.985); }
-.m-quick-tile__title { font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary); }
-.m-quick-tile__sub   { font-size: var(--text-caption2); color: var(--color-text-secondary); }
+.m-list-row:active { transform: scale(0.985); }
+.m-list-row__body { flex: 1 1 auto; min-width: 0; }
+.m-list-row__title { display: block; font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary); }
+.m-list-row__sub   { display: block; font-size: var(--text-caption2); color: var(--color-text-secondary); }
+.m-list-row__chev  { flex-shrink: 0; display: flex; }
 
 /* o-tab-bar. A standalone section of the interface rather than one control,
    so it is an organism. It never scrolls: it is how you leave wherever you
@@ -1198,7 +1254,11 @@ body {
     <!-- The states of whichever section is highlighted. It always holds one,
          so the menu is never a row of closed doors, and there is no floating
          layer to position, flip or dismiss. -->
-    <div class="d-stateNav__right" id="navRight" aria-live="polite"></div>
+    <!-- Not a live region. Its whole contents are replaced on click, on focus
+         and on hover, so announcing it politely meant tabbing the section list
+         recited every listing in full. The state you land on is announced
+         through the announcer instead, which says one sentence. -->
+    <div class="d-stateNav__right" id="navRight"></div>
   </nav>
 
   <!-- ══ DEVICE ═══════════════════════════════════════════════════════ -->
@@ -1244,23 +1304,12 @@ body {
         </div>
         <h1 class="o-onboard__title" id="rewardTitle" tabindex="-1">You&rsquo;re signed up</h1>
 
-        <!-- What the points were for. The medal is the total, these are the
-             three things that made it. -->
+        <!-- What the points were for. One act, one row. -->
         <div class="o-onboard__earned">
         <div class="m-earn-row" id="earnRow1">
           <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9"/></svg></span>
-          <span class="m-earn-row__label">Number verified</span>
-          <span class="m-earn-row__pill">+20 pts</span>
-        </div>
-        <div class="m-earn-row" id="earnRow2">
-          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></svg></span>
-          <span class="m-earn-row__label">Account created</span>
-          <span class="m-earn-row__pill">+20 pts</span>
-        </div>
-        <div class="m-earn-row" id="earnRow3">
-          <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
-          <span class="m-earn-row__label">Ready to fuel</span>
-          <span class="m-earn-row__pill">+10 pts</span>
+          <span class="m-earn-row__label">Signing up</span>
+          <span class="m-earn-row__pill">+50 pts</span>
         </div>
 
           <!-- What the points are for. The medal is a score, this says what
@@ -1269,11 +1318,11 @@ body {
             <div class="m-reward-goal__head">
               <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1A10 10 0 0 1 4.9 4.9"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg></span>
               <span class="m-reward-goal__title">Data reward</span>
-              <span class="m-reward-goal__value" id="rewardGoalValue">0.05 GB of 5 GB</span>
+              <span class="m-reward-goal__value" id="rewardGoalValue">50 MB of 5 GB</span>
             </div>
             <div class="a-meter" id="rewardMeter" role="progressbar"
                  aria-valuemin="0" aria-valuemax="5000" aria-valuenow="50"
-                 aria-valuetext="50 of 5 000 points, 0.05 of 5 gigabytes"
+                 aria-valuetext="50 of 5 000 points, 50 MB of 5 GB"
                  aria-label="Data earned so far">
               <div class="a-meter__fill" id="rewardMeterFill"></div>
             </div>
@@ -1303,11 +1352,11 @@ body {
               <span class="m-brand-lockup__name">Engen<em>XT</em></span>
             </span>
             <span class="m-app-bar__actions">
-              <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications, 1 unread">
+              <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications, 1 unread" data-unbuilt="Notifications">
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.5 19a1.8 1.8 0 0 0 3 0"/></svg>
                 <span class="a-icon-btn__dot" aria-hidden="true"></span>
               </button>
-              <button class="a-avatar" type="button" id="homeAvatar" aria-label="Your account, David">D</button>
+              <button class="a-avatar" type="button" id="homeAvatar" aria-label="Your account, David" data-unbuilt="Your account">D</button>
             </span>
           </div>
 
@@ -1318,19 +1367,22 @@ body {
 
           <div class="o-home__stats">
             <span class="m-stat-pill" data-tone="points">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z"/></svg>
+              <span class="m-stat-pill__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z"/></svg></span>
               <span id="homePoints">2 450 pts</span>
             </span>
-            <span class="m-stat-pill" data-tone="approved">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9"/></svg>
-              <span>60L approved</span>
+            <span class="m-stat-pill" data-tone="approved" id="homeLitres">
+              <span class="m-stat-pill__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9"/></svg></span>
+              <span><span class="m-stat-pill__figure">60 L</span> per fill</span>
             </span>
           </div>
 
           <!-- Which vehicle is being driven today. Hidden entirely when there
-               is only one, because a choice of one is not a choice. -->
-          <div class="m-vehicle-picker" id="homePicker" role="radiogroup"
-               aria-labelledby="homePickerTitle" hidden>
+               is only one, because a choice of one is not a choice.
+
+               The radiogroup sits on the row rather than on this wrapper. The
+               wrapper also owns the heading, the search field, the cap note and
+               the empty message, and none of those are radios. -->
+          <div class="m-vehicle-picker" id="homePicker" hidden>
             <div class="m-vehicle-picker__head">
               <span class="m-vehicle-picker__title" id="homePickerTitle">Driving today</span>
               <span class="m-vehicle-picker__count" id="homePickerCount"></span>
@@ -1342,42 +1394,62 @@ body {
               <input class="a-search__input" id="homeSearch" type="search"
                      placeholder="Search by registration or model" autocomplete="off">
             </label>
-            <div class="m-vehicle-picker__row" id="homePickerRow"></div>
+            <div class="m-vehicle-picker__row" id="homePickerRow" role="radiogroup"
+                 aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></div>
             <!-- How much of the fleet the row is not showing. Only when the
                  row has actually been cut short. -->
             <p class="m-vehicle-picker__note" id="homePickerNote" hidden></p>
             <p class="m-vehicle-picker__empty" id="homePickerEmpty" hidden>
               No vehicle matches that.
             </p>
+            <!-- What the search did, for anyone who cannot see the row change.
+                 Written only from the search path, on a debounce, so it never
+                 speaks on arrival and never collides with the greeting. -->
+            <span class="u-visually-hidden" id="homePickerStatus" role="status"></span>
           </div>
 
-          <p class="m-empty-note" id="homeNoVehicle" hidden>
-            No vehicle yet. Your manager assigns the vehicles you are allowed to fuel.
-          </p>
+          <!-- Every returning sign-in lands here, so this is an ordinary screen
+               and not an edge case. It says what is true and offers the one
+               thing a driver can actually do about it. -->
+          <div class="m-empty-note" id="homeNoVehicle" hidden>
+            <p class="m-empty-note__text">No vehicle assigned yet. You cannot fuel until your manager adds one.</p>
+            <button class="a-btn a-btn--outline a-btn--sm" type="button" id="homeAskManager">Message my manager</button>
+          </div>
 
-          <button class="m-vehicle-card" type="button" id="homeVehicle">
+          <button class="m-vehicle-card" type="button" id="homeVehicle" data-unbuilt="Vehicle details">
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
             <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__label" id="homeVehicleLabel">Vehicle linked</span>
+              <span class="m-vehicle-card__label" id="homeVehicleLabel">Driving today</span>
               <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
               <span class="m-vehicle-card__model" id="homeVehicleModel">Ford Transit Custom 2.0TDCi</span>
+              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
             </span>
             <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
 
-          <p class="o-home__section">Quick access</p>
-          <div class="o-home__tiles">
-            <button class="m-quick-tile" type="button" data-tile="fuel">
-              <span class="a-icon-wrap" data-tone="error"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-secondary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
-              <span class="m-quick-tile__title">I want to fuel</span>
-              <span class="m-quick-tile__sub">Find a station</span>
-            </button>
-            <button class="m-quick-tile" type="button" data-tile="rewards">
-              <span class="a-icon-wrap" data-tone="warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z"/></svg></span>
-              <span class="m-quick-tile__title">Rewards</span>
-              <span class="m-quick-tile__sub">Points and streaks</span>
-            </button>
-          </div>
+          <!-- The card's slot when nothing has been chosen. Same size and the
+               same place, so the screen does not reflow when a driver picks
+               one, and the question is asked where the answer will appear. -->
+          <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
+            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V9.5a1.5 1.5 0 0 1 1.5-1.5H13v8"/><path d="M13 10h3.6a2 2 0 0 1 1.6.8L21 14.5V16"/><path d="M2 16h1.6M9 16h5.4M19.4 16H22"/><circle cx="6.4" cy="16.6" r="2"/><circle cx="17.2" cy="16.6" r="2"/></svg></span>
+            <span class="m-vehicle-card__body">
+              <span class="m-vehicle-card__plate">Choose your vehicle</span>
+              <span class="m-vehicle-card__note">Your next fill goes on the one you pick.</span>
+            </span>
+          </button>
+
+          <!-- The reason the app exists, at the weight that says so. It was two
+               half-width tiles under a "Quick access" heading, one of them
+               carrying the same drawing as the Fuel tab directly beneath it. -->
+          <button class="a-btn a-btn--primary o-home__fuel" type="button" data-tile="fuel">I want to fuel</button>
+          <button class="m-list-row" type="button" data-tile="rewards">
+            <span class="a-icon-wrap" data-tone="warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z"/></svg></span>
+            <span class="m-list-row__body">
+              <span class="m-list-row__title">Rewards</span>
+              <span class="m-list-row__sub">Points and data</span>
+            </span>
+            <span class="m-list-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+          </button>
         </div>
 
         <nav class="o-tab-bar" aria-label="Sections">
@@ -1426,7 +1498,9 @@ body {
     rewardValue: $('rewardValue'), rewardWave: $('rewardWave'),
     rewardGoalValue: $('rewardGoalValue'), rewardMeter: $('rewardMeter'),
     rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'),
-    earnRows: [$('earnRow1'), $('earnRow2'), $('earnRow3')],
+    /* One row now. The array stays because the sequence indexes it by e.row,
+       so a second earning event only has to be added to S.earned and here. */
+    earnRows: [$('earnRow1')],
     home: $('homeScreen'), homeName: $('homeName'), homeGreeting: $('homeGreeting'),
     homePoints: $('homePoints'), homeVehicle: $('homeVehicle'),
     homeVehicleLabel: $('homeVehicleLabel'), homeVehiclePlate: $('homeVehiclePlate'),
@@ -1434,10 +1508,14 @@ body {
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
-    homePickerNote: $('homePickerNote'),
+    homePickerNote: $('homePickerNote'), homePickerTitle: $('homePickerTitle'),
+    homePickerStatus: $('homePickerStatus'),
+    homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
+    homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
     homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
     announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar')
   };
+  el.homeFuel = el.home.querySelector('[data-tile="fuel"]');
 
   /* ════════════════════════════════════════════════════════════════════
      MOCK STATE
@@ -1446,13 +1524,16 @@ body {
      ════════════════════════════════════════════════════════════════════ */
   var S = {
     userType: 'new-driver',      // new-driver | returning-driver
-    /* Signing up is worth 50, the same as it is in the full app, and the
-       three rows on screen are what makes it up. Change these and the total,
-       the meter, the goal line and the announcement all follow. */
+    /* Signing up is worth 50, the same as it is in the full app. Change this
+       and the total, the meter, the goal line and the announcement all follow.
+
+       It was three rows: number verified, account created, ready to fuel. One
+       act split three ways to make the receipt look fuller. The third row was
+       also untrue, because a driver has vehicles assigned at this point and has
+       not chosen one, so they are not ready to fuel. Once that row had to go
+       there was nothing holding the split up. */
     earned: [
-      { row: 0, label: 'Number verified', pts: 20 },
-      { row: 1, label: 'Account created', pts: 20 },
-      { row: 2, label: 'Ready to fuel',   pts: 10 }
+      { row: 0, label: 'Signing up', pts: 50 }
     ],
     ptsPerGb: 1000,
     gbCap: 5,
@@ -1594,17 +1675,25 @@ body {
      go through it, because a thousand of either is read the same way. */
   function groupNum(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 
+  /* Data the way it is bought here. Under a gigabyte people say megabytes, so
+     "0.05 GB" was the least readable way to write fifty of them. Above a
+     gigabyte the decimal is what everyone reads, so it stays. */
+  function dataLabel(gb) {
+    return gb < 1 ? Math.round(gb * 1000) + ' MB'
+                  : (Math.round(gb * 100) / 100) + ' GB';
+  }
+
   function paintGoal(points) {
     var gb = points / S.ptsPerGb;
     var capPts = S.ptsPerGb * S.gbCap;
     var nextGb = Math.min(S.gbCap, Math.floor(gb) + 1);
     var toNext = Math.max(0, nextGb * S.ptsPerGb - points);
     el.rewardGoalValue.textContent =
-      Math.min(gb, S.gbCap).toFixed(2) + ' GB of ' + S.gbCap + ' GB';
+      dataLabel(Math.min(gb, S.gbCap)) + ' of ' + S.gbCap + ' GB';
     el.rewardMeter.setAttribute('aria-valuenow', points);
     el.rewardMeter.setAttribute('aria-valuetext',
       groupNum(points) + ' of ' + groupNum(capPts) + ' points, ' +
-      gb.toFixed(2) + ' of ' + S.gbCap + ' gigabytes');
+      dataLabel(gb) + ' of ' + S.gbCap + ' GB');
     el.rewardNext.lastElementChild.textContent = gb >= S.gbCap
       ? 'You have earned the full ' + S.gbCap + ' GB'
       : groupNum(toNext) + ' points to ' + (nextGb === 1 ? 'your first 1 GB' : nextGb + ' GB');
@@ -1789,14 +1878,31 @@ body {
 
   function activeVehicle() { return S.vehicles[S.activeVehicle] || null; }
 
+  /* The card, and the slot it leaves when nothing has been chosen. Exactly one
+     of the two is ever on screen, so the block below the picker keeps its
+     height and the page does not jump under a thumb already on its way to the
+     next control. */
   function paintVehicleCard() {
     var v = activeVehicle();
+    var assigned = S.vehicleLinked && S.vehicles.length > 0;
     el.homeVehicle.hidden = !v;
+    el.homeVehicleEmpty.hidden = !!v || !assigned;
     if (!v) { return; }
-    el.homeVehicleLabel.hidden = S.vehicles.length > 1;
-    el.homeVehicleLabel.textContent = 'Vehicle linked';
+    /* The eyebrow used to hide itself whenever there was more than one vehicle,
+       so it showed where nothing was ambiguous and vanished where a driver had
+       just picked one van out of nine. It says the same thing in every shape.
+
+       "Vehicle linked" named a step the driver never performs, from screens
+       that no longer exist. The picker already owns "Driving today", and one
+       object with two names is what this repo exists to prevent. */
+    el.homeVehicleLabel.hidden = false;
+    el.homeVehicleLabel.textContent = 'Driving today';
     el.homeVehiclePlate.textContent = v.plate;
     el.homeVehicleModel.textContent = v.make + ' ' + v.model;
+    /* Said once, deliberately, rather than left to be read off three separate
+       lines by a screen reader. */
+    el.homeVehicle.setAttribute('aria-label',
+      'Driving today, ' + v.plate + ', ' + v.make + ' ' + v.model);
     el.homeVehicle.querySelector('.m-vehicle-card__art').innerHTML =
       vehicleArt(v.type, 24, 'var(--color-text-on-dark)');
   }
@@ -1834,8 +1940,17 @@ body {
       if (active) { shown = [active].concat(shown.slice(0, ROW_CAP - 1)); }
     }
 
+    /* While it is still a question, ask it. A heading reading "Driving today"
+       above an answer nobody has given was labelling an empty box. */
+    var asking = S.activeVehicle === NONE;
+    el.homePickerTitle.textContent = asking ? 'Which vehicle today?' : 'Driving today';
+    if (asking) { el.homePickerTitle.setAttribute('data-ask', 'true'); }
+    else { el.homePickerTitle.removeAttribute('data-ask'); }
+    el.homePickerRow.setAttribute('aria-required', asking ? 'true' : 'false');
+
+    /* A bare fraction with no noun. The count says what it is counting. */
     el.homePickerCount.textContent = q
-      ? groupNum(matches.length) + ' of ' + groupNum(S.vehicles.length)
+      ? groupNum(matches.length) + ' of ' + groupNum(S.vehicles.length) + ' vehicles'
       : groupNum(S.vehicles.length) + ' vehicles';
     el.homePickerEmpty.hidden = matches.length > 0;
 
@@ -1845,7 +1960,10 @@ body {
     var over = matches.length - shown.length;
     el.homePickerNote.hidden = over <= 0;
     el.homePickerNote.textContent = q
-      ? 'Showing ' + shown.length + '. Narrow the search to see the rest.'
+      /* It used to say "narrow the search to see the rest", which is the
+         opposite of what narrowing does. */
+      ? 'Showing ' + shown.length + ' of ' + groupNum(matches.length) +
+        ' matches. Type more of the registration to narrow it.'
       : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
 
     el.homePickerRow.innerHTML = shown.map(function (m, at) {
@@ -1859,13 +1977,14 @@ body {
       return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
              ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
              ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model + '">' +
-             '<span class="a-vehicle-chip__disc">' +
-             vehicleArt(v.type, 28, on ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)') +
+             '<span class="a-vehicle-chip__art">' +
+             vehicleArt(v.type, 16, on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)') +
+             '</span>' +
+             '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' +
              '<span class="a-vehicle-chip__tick">' +
              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
              'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-             '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></span>' +
-             '<span class="a-vehicle-chip__plate">' + v.plate + '</span></button>';
+             '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></button>';
     }).join('');
 
     Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'), function (b) {
@@ -1884,17 +2003,49 @@ body {
     paintVehicleCard();
   }
 
+  /* Choosing repaints the chips in place rather than rebuilding the row.
+
+     It used to call paintPicker, which rewrites the row's innerHTML, which
+     destroys the very node the driver is standing on. Focus landed on the body
+     on every pointer tap and on every screen-reader activation, because the
+     restore only ran when the caller passed viaKeyboard and the click listener
+     never did. Choosing also cannot change which chips are shown: the chip
+     being tapped is by definition already in the row, so there is nothing to
+     re-filter and nothing to reorder. */
+  function repaintChips() {
+    Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'),
+      function (b, at) {
+        var i = Number(b.dataset.vehicle);
+        var on = i === S.activeVehicle;
+        var v = S.vehicles[i];
+        b.setAttribute('aria-checked', on ? 'true' : 'false');
+        b.tabIndex = (on || (S.activeVehicle === NONE && at === 0)) ? 0 : -1;
+        var art = b.querySelector('.a-vehicle-chip__art');
+        if (art && v) {
+          art.innerHTML = vehicleArt(v.type, 16,
+            on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)');
+        }
+      });
+  }
+
   function chooseVehicle(i, viaKeyboard) {
     if (!S.vehicles[i]) { return; }
+    var first = S.activeVehicle === NONE;
     S.activeVehicle = i;
-    paintPicker();
+    repaintChips();
+    paintVehicleCard();
+    /* The heading stops asking once it has an answer. */
+    el.homePickerTitle.textContent = 'Driving today';
+    el.homePickerTitle.removeAttribute('data-ask');
+    el.homePickerRow.setAttribute('aria-required', 'false');
     var chip = el.homePickerRow.querySelector('[data-vehicle="' + i + '"]');
     if (chip) {
       chip.scrollIntoView({ block: 'nearest', inline: 'center' });
       if (viaKeyboard) { chip.focus({ preventScroll: true }); }
     }
     var v = S.vehicles[i];
-    announce('Driving ' + v.plate + ', ' + v.make + ' ' + v.model + '.');
+    announce('Driving ' + v.plate + ', ' + v.make + ' ' + v.model + '.' +
+             (first ? ' Your next fill goes on this vehicle.' : ''));
   }
 
   /* The app the flow lands in. A driver who has just signed up has the fifty
@@ -1911,34 +2062,82 @@ body {
        chosen. Assigned and chosen are not the same thing. */
     if (!S.vehicleLinked) { S.vehicles = []; }
     el.homeSearch.value = '';
+    el.homePickerStatus.textContent = '';
     paintPicker();
-    el.homeVehicle.hidden = !S.vehicleLinked || !activeVehicle();
     /* Tied to whether the manager has assigned anything, not to whether the
        card is up. Hanging it off the card put "your manager assigns the
        vehicles you are allowed to fuel" in front of a driver who had four of
        them and simply had not picked one yet. */
     el.homeNoVehicle.hidden = S.vehicleLinked;
+    /* With nothing assigned the screen was making three claims at once and two
+       of them were false: an entitlement of sixty litres, and an invitation to
+       go and fuel, above a note saying the driver has no vehicle. */
+    el.homeLitres.hidden = !S.vehicleLinked;
+    el.homeFuel.setAttribute('aria-disabled', S.vehicleLinked ? 'false' : 'true');
     el.home.hidden = false;
     el.home.setAttribute('data-state', 'visible');
-    announce('Home. ' + el.homeGreeting.textContent + ', David.');
+    /* Behind the focus move rather than racing it. A focus change flushes a
+       pending polite message on the platform this is built for, so announcing
+       at 60ms and moving focus on the same tick lost the announcement. */
+    var greeting = 'Home. ' + el.homeGreeting.textContent + ', David.';
+    if (S.vehicleLinked && S.activeVehicle === NONE && S.vehicles.length > 1) {
+      greeting += ' Choose which of your ' + groupNum(S.vehicles.length) +
+                  ' vehicles you are driving today.';
+    }
     after(60, function () { el.homeName.focus({ preventScroll: true }); });
+    after(500, function () { announce(greeting); });
   }
 
 
 
 
 
-  el.homeSearch.addEventListener('input', paintPicker);
+  /* The row keeps up with the keys, and what the search did is said separately
+     on a delay. Announcing on every keystroke interrupts the typing it is
+     describing, and announcing from paintPicker would speak on arrival and
+     collide with the greeting. */
+  var searchSaid = null;
+  el.homeSearch.addEventListener('input', function () {
+    paintPicker();
+    clearTimeout(searchSaid);
+    searchSaid = setTimeout(function () {
+      var q = (el.homeSearch.value || '').trim();
+      if (!q) { el.homePickerStatus.textContent = ''; return; }
+      var shown = el.homePickerRow.querySelectorAll('[data-vehicle]').length;
+      el.homePickerStatus.textContent = shown
+        ? el.homePickerCount.textContent + ' match. Showing ' + shown + '.'
+        : 'No vehicle matches that.';
+    }, 400);
+  });
 
   el.rewardCta.addEventListener('click', showHome);
+  el.homeVehicleEmpty.addEventListener('click', function () {
+    var first = el.homePickerRow.querySelector('[data-vehicle]');
+    if (first) { first.focus(); }
+  });
+  /* A driver with nothing assigned cannot fix that from here, but they can ask
+     the person who can. The same shape the sign-up flow already uses for a
+     driver it has to turn away. */
+  var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
+  el.homeAskManager.addEventListener('click', function () {
+    announce('Message ready: ' + ASK_MANAGER);
+  });
   /* Nothing beyond this screen is built yet. Saying so out loud beats a
-     control that looks live and does nothing when it is tapped. */
+     control that looks live and does nothing when it is tapped.
+
+     The name is read from data-unbuilt first. Scraping textContent announced
+     "Vehicle linked is not built yet." off a span that was meant to be hidden,
+     and "That is not built yet." off any icon-only button, because an icon has
+     no text to scrape. Tiles and tabs already read correctly, so they keep the
+     fallback. */
   Array.prototype.forEach.call(
     el.home.querySelectorAll('[data-tile], [data-tab], #homeBell, #homeAvatar, #homeVehicle'),
     function (b) {
       b.addEventListener('click', function () {
         if (b.getAttribute('aria-current') === 'page') { return; }
-        announce((b.textContent.trim().split('\n')[0] || 'That') + ' is not built yet.');
+        var name = b.getAttribute('data-unbuilt') ||
+                   b.textContent.trim().split('\n')[0] || 'That';
+        announce(name + ' is not built yet.');
       });
     });
 
@@ -1971,35 +2170,44 @@ body {
      already been done. */
   var ASSIGNED_ON_ARRIVAL = 3;
 
+  /* Grouped by who the driver is, and the grouping is now true.
+
+     Four of these sat under "New driver" while calling reset('returning-driver'),
+     so the menu offered a driver who had just watched fifty points land and
+     then rendered a balance of 2 450 under a thousand vehicles. The heading was
+     the thing that was wrong, so the rows moved rather than the data: a fleet
+     of nine belongs to someone who has been here a while. */
   var STATES = {
-    'signup-reward':      { group: 'new', label: 'Reward',
+    'signup-reward':      { group: 'after-signup', label: 'Reward, 50 points',
       run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
-    'home':               { group: 'new', label: 'Home',
+    'home':               { group: 'after-signup', label: 'Home, one vehicle',
       run: function () { reset('new-driver', true, 1); showHome(); } },
-    'home-few-vehicles':  { group: 'new', label: 'Home, a few vehicles',
-      run: function () { reset('returning-driver', true, 4); showHome(); } },
-    'home-five-vans':     { group: 'new', label: 'Home, five vans',
-      run: function () { reset('returning-driver', true, VANS); showHome(); } },
-    'home-many-vehicles': { group: 'new', label: 'Home, a whole fleet',
-      run: function () { reset('returning-driver', true, 9); showHome(); } },
-    'home-thousand-vehicles': { group: 'new', label: 'Home, a thousand vehicles',
-      run: function () { reset('returning-driver', true, 1000); showHome(); } },
+
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle assigned',
       run: function () { reset('returning-driver', false); route(); } },
-    'returning-with-vehicle':    { group: 'returning', label: 'Vehicles assigned',
-      run: function () { reset('returning-driver', true, 4); route(); } },
+    'returning-with-vehicle':    { group: 'returning', label: 'One vehicle',
+      run: function () { reset('returning-driver', true, 1); route(); } },
+    'home-few-vehicles':  { group: 'returning', label: 'Four vehicles',
+      run: function () { reset('returning-driver', true, 4); showHome(); } },
+    'home-five-vans':     { group: 'returning', label: 'Five vans',
+      run: function () { reset('returning-driver', true, VANS); showHome(); } },
+    'home-many-vehicles': { group: 'returning', label: 'Nine vehicles',
+      run: function () { reset('returning-driver', true, 9); showHome(); } },
+    'home-thousand-vehicles': { group: 'returning', label: 'A thousand vehicles',
+      run: function () { reset('returning-driver', true, 1000); showHome(); } }
+  };
 
-    /* Router entry points, not screens. Sign-up hands over to one of these and
-       the decision about where the driver lands is made here, in one place, so
-       a returning driver cannot be shown a starter reward by accident. They
-       are separate from the screen states above because a screen state is a
-       thing to look at and an entry point is a question to answer. */
-    'route/new-driver': { group: 'route', label: 'Arrive: new driver',
-      run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); route(); } },
-    'route/returning-no-vehicle': { group: 'route', label: 'Arrive: returning, no vehicle',
-      run: function () { reset('returning-driver', false); route(); } },
-    'route/returning-with-vehicle': { group: 'route', label: 'Arrive: returning, with a vehicle',
-      run: function () { reset('returning-driver', true); route(); } }
+  /* Sign-up hands over by name, so those names keep working. They were a third
+     menu section called "Arriving from sign-up", which listed three rows that
+     rendered exactly the two screens already listed above. An entry point is a
+     question, not a screen, so it belongs in the code and not in a menu of
+     things to look at. The handover is instead visible where a reviewer looks
+     for it, on the last rows of the sign-up flow.
+
+     route/returning-with-vehicle is gone. Nothing ever handed over to it. */
+  var ALIAS = {
+    'route/new-driver': 'signup-reward',
+    'route/returning-no-vehicle': 'returning-without-vehicle'
   };
 
   /* The one rule that decides where a driver lands. A returning driver has
@@ -2025,6 +2233,16 @@ body {
      and the keyboard see the same thing. Hover only previews; it never
      changes what is on the phone. */
   var pane = { openFor: null, hoverTimer: null };
+  /* A preview that never ends is not a preview. Leaving the menu puts the
+     pane back on the section the phone is actually showing. */
+  (function () {
+    var nav = document.getElementById('stateNav');
+    if (!nav) { return; }
+    nav.addEventListener('mouseleave', function () {
+      clearTimeout(pane.hoverTimer);
+      revealCurrentSection();
+    });
+  })();
 
   function paneLead(flow, key, label, count) {
     return { title: label, count: count,
@@ -2086,14 +2304,26 @@ body {
 
 
   var currentState = null;
-  function go(id) {
+  /* `replace` for the three callers that are not a navigation the reviewer
+     performed: the first load, a hash the browser has already moved to, and
+     the arrow stepper. Everything else pushes, so the back button walks back
+     through the states rather than leaving the prototype on the first press,
+     which is what it did when every call replaced. */
+  function go(id, replace) {
+    var asked = id;
+    id = ALIAS[id] || id;
     var def = STATES[id];
     if (!def) { return; }
     currentState = id;
     def.run();
     setNav(id);
     revealCurrentSection();
-    if (location.hash.slice(1) !== id) { history.replaceState(null, '', '#' + id); }
+    /* The requested name stays in the address, so a handover link from sign-up
+       keeps reading as the entry point it is. */
+    if (location.hash.slice(1) !== asked) {
+      if (replace) { history.replaceState(null, '', '#' + asked); }
+      else { history.pushState(null, '', '#' + asked); }
+    }
     el.caption.textContent = id + ' · ' + def.label;
   }
   function setNav(id) {
@@ -2123,9 +2353,8 @@ body {
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
-    'new':       'A driver who has just signed up: the reward, then the app, at every size of fleet.',
-    'returning': 'Someone who has been here before and skips the welcome.',
-    'route':     'The two entry points sign-up hands over to.'
+    'after-signup': 'The reward, then the app the flow lands in.',
+    'returning':    'Someone who has been here before, at every size of fleet.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -2145,9 +2374,8 @@ body {
       file: 'engenxt-onboarding.html',
       label: 'Welcome',
       sections: [
-        ['new',       'New driver',            6],
-        ['returning', 'Returning driver',      2],
-        ['route',     'Arriving from sign-up', 3]
+        ['after-signup', 'After sign-up'],
+        ['returning',    'Returning driver']
       ]
     }
   ];
@@ -2166,22 +2394,17 @@ body {
      the honest control for something that navigates. */
   var AWAY_STATES = {
     'engenxt-onboarding.html': {
-      'new': [
-        ['signup-reward', 'Reward'],
-        ['home', 'Home'],
-        ['home-few-vehicles', 'Home, a few vehicles'],
-        ['home-five-vans', 'Home, five vans'],
-        ['home-many-vehicles', 'Home, a whole fleet'],
-        ['home-thousand-vehicles', 'Home, a thousand vehicles']
+      'after-signup': [
+        ['signup-reward', 'Reward, 50 points'],
+        ['home', 'Home, one vehicle']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],
-        ['returning-with-vehicle', 'Vehicles assigned']
-      ],
-      'route': [
-        ['route/new-driver', 'Arrive: new driver'],
-        ['route/returning-no-vehicle', 'Arrive: returning, no vehicle'],
-        ['route/returning-with-vehicle', 'Arrive: returning, with a vehicle']
+        ['returning-with-vehicle', 'One vehicle'],
+        ['home-few-vehicles', 'Four vehicles'],
+        ['home-five-vans', 'Five vans'],
+        ['home-many-vehicles', 'Nine vehicles'],
+        ['home-thousand-vehicles', 'A thousand vehicles']
       ]
     },
     'engenxt-signup.html': {
@@ -2192,7 +2415,8 @@ body {
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
                    ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
                    ['number/err-rate','Rate limited'],['number/err-nowhatsapp','Not on WhatsApp'],
-                   ['number/err-offline','No connection'],['number/err-server','Server error']],
+                   ['number/err-offline','No connection'],['number/err-server','Server error'],
+                   ['number/err-server-2','Server error, again']],
       navCode:    [['code/idle','Waiting for code'],['code/partial','Part entered'],
                    ['code/verifying','Checking'],['code/err-wrong','Wrong code'],
                    ['code/err-last','One try left'],['code/err-expired','Code expired'],
@@ -2202,7 +2426,8 @@ body {
                    ['code/success','Code confirmed']],
       navBlocked: [['blocked/unregistered','Not registered'],['blocked/suspended','Driver paused'],
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
-      navDone:    [['success/signup','Signed up'],['success/signin','Signed in']]
+      navDone:    [['success/signup','Signed up, opens the welcome reward'],
+                   ['success/signin','Signed in, opens home']]
     }
   };
 
@@ -2254,7 +2479,11 @@ body {
         var key = sec[0], label = sec[1];
         var mine = isThisFlow(flow);
         var ids = mine ? Object.keys(STATES).filter(function (k) { return STATES[k].group === key; }) : null;
-        var b = sectionButton(label, mine ? ids.length : sec[2]);
+        /* The count is read from the manifest rather than typed beside it.
+           Hand-written integers drifted the moment a state was added, and a
+           menu that says 13 above a list of 14 is a menu you stop trusting. */
+        var away = (AWAY_STATES[flow.file] || {})[key] || [];
+        var b = sectionButton(label, mine ? ids.length : away.length);
         b.dataset.group = (mine ? '' : 'away:') + key;
         var reveal = function () {
           if (mine) { showSection(flow, key, label, ids, null); }
@@ -2264,6 +2493,9 @@ body {
         b.addEventListener('focus', reveal);
         b.addEventListener('mouseenter', function () { hoverSection(reveal); });
         b.addEventListener('mouseleave', function () { clearTimeout(pane.hoverTimer); });
+        /* Hover only previews, so the preview has to end. Clearing the timer
+           alone left the pane showing whatever the pointer last passed over,
+           which is not where the reviewer is. */
         host.appendChild(b);
         /* Only this file's sections can be opened here, so only they are
            candidates for what the pane shows on load. */
@@ -2381,18 +2613,43 @@ body {
       }).join('') + '</div>';
   }
 
-  /* A hash typed into the bar, or arrived at with the back button, is a
-     request for that state. Without this the address changes and the screen
-     does not, so a link pasted into an already-open tab looks broken. The
-     other two prototypes have always done this; this one was missed. */
-  window.addEventListener('hashchange', function () {
-    var id = location.hash.slice(1);
-    if (STATES[id] && id !== currentState) { go(id); }
-  });
+  /* A hash typed into the bar, or arrived at with back or forward, is a request
+     for that state. Without this the address changes and the screen does not,
+     so a link pasted into an already-open tab looks broken.
+
+     Both events are listened for because they answer different things: pushing
+     a state and then going back fires popstate, while editing the fragment by
+     hand fires hashchange. Whichever arrives first does the work and the other
+     finds it already done. Neither writes history, they are reporting a move
+     the browser has already made. */
+  function fromAddress() {
+    var asked = location.hash.slice(1);
+    var id = ALIAS[asked] || asked;
+    if (STATES[id] && id !== currentState) { go(asked, true); }
+  }
+  window.addEventListener('hashchange', fromAddress);
+  window.addEventListener('popstate', fromAddress);
+
+  /* A state nobody lists is a state nobody reviews. The sign-up file had one
+     for who knows how long, reachable only by typing its hash. Say so at boot
+     rather than wait for someone to count. */
+  (function auditStates() {
+    var listed = {};
+    FLOWS.forEach(function (f) {
+      if (!isThisFlow(f)) { return; }
+      f.sections.forEach(function (sec) {
+        Object.keys(STATES).forEach(function (k) {
+          if (STATES[k].group === sec[0]) { listed[k] = true; }
+        });
+      });
+    });
+    var orphans = Object.keys(STATES).filter(function (k) { return !listed[k]; });
+    if (orphans.length) { console.warn('States in no menu section:', orphans.join(', ')); }
+  })();
 
   buildNav(); buildModes(); buildSwitcher(); buildPanel();
   var initial = location.hash.slice(1);
-  go(STATES[initial] ? initial : 'signup-reward');
+  go((STATES[initial] || ALIAS[initial]) ? initial : 'signup-reward', true);
 
   window.Demo = { go: go, states: function () { return STATES; }, S: function () { return S; } };
 })();
