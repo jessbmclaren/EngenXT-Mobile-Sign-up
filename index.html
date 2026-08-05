@@ -489,6 +489,35 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-primary-light); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+/* The mark on a screen that stops someone.
+
+   A driver who cannot get in is not reading a field label, they are working out
+   whether this is their problem or their manager's, and the answer wants to be
+   legible from arm's length before a word is read. The tinted disc did that job
+   at the size of a list icon, on a panel with half a screen of air above it.
+
+   It is given presence rather than a picture. An illustration per state would
+   mean eight of them to draw, keep on brand and ship to drivers who are signing
+   up precisely because their data is expensive, and it would drift from the
+   system the moment a tone was added. Two rings of the tone colour, thinning
+   outward, cost nothing, theme themselves and say the same thing. */
+.a-icon-wrap--mark {
+  width: 88px; height: 88px;
+  position: relative;
+}
+.a-icon-wrap--mark::before,
+.a-icon-wrap--mark::after {
+  content: ''; position: absolute; border-radius: var(--radius-circle);
+  border: 1px solid currentColor; pointer-events: none;
+}
+.a-icon-wrap--mark::before { inset: -10px; opacity: 0.30; }
+.a-icon-wrap--mark::after  { inset: -22px; opacity: 0.14; }
+.a-icon-wrap--mark svg { width: 38px; height: 38px; }
+/* The rings take the tone's own colour, so a paused account rings amber and a
+   dead end rings red without a second set of rules. */
+.a-icon-wrap--mark[data-tone="error"]   { color: var(--color-secondary); }
+.a-icon-wrap--mark[data-tone="warning"] { color: var(--color-warning); }
+.a-icon-wrap--mark[data-tone="success"] { color: var(--color-success); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
 .a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
 .a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
@@ -1538,7 +1567,7 @@ button { background: none; border: none; color: inherit; }
       <!-- STATUS PAGE. Full screen, one status, one obvious action. -->
       <div class="o-status-page" id="statusPage" role="alertdialog" aria-labelledby="statusTitle">
         <div class="o-status-page__panel">
-          <span class="a-icon-wrap a-icon-wrap--lg o-status-page__icon" id="statusIcon" data-tone="warning" aria-hidden="true"></span>
+          <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark o-status-page__icon" id="statusIcon" data-tone="warning" aria-hidden="true"></span>
           <h2 class="o-status-page__title" id="statusTitle" tabindex="-1"></h2>
           <p class="o-status-page__body" id="statusBody"></p>
           <div class="o-status-page__actions" id="statusActions"></div>
@@ -1624,7 +1653,7 @@ button { background: none; border: none; color: inherit; }
 
           <!-- STAGE · BLOCKED -->
           <div class="o-signup-sheet__stage o-outcome-panel" id="stageBlocked">
-            <span class="a-icon-wrap a-icon-wrap--lg" id="blockedIcon" data-tone="error" aria-hidden="true"></span>
+            <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark" id="blockedIcon" data-tone="error" aria-hidden="true"></span>
             <h3 class="o-outcome-panel__title" id="blockedTitle" tabindex="-1"></h3>
             <p class="o-outcome-panel__body" id="blockedBody"></p>
             <!-- The countdown, rendered once. aria-hidden because the wait is
