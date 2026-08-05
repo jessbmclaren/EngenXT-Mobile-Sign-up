@@ -1279,6 +1279,182 @@ body {
   .o-onboard[data-state="leaving"], .o-home[data-state="arriving"] { transform: none; }
 }
 
+/* ══ STATIONS ═════════════════════════════════════════════════════════
+   Where the fill will happen. Map above, list below, and the list is the
+   control: the map answers "where", the list answers "which", and on a phone
+   held in one hand the list is the half you can actually reach. */
+.o-stations {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  background: var(--color-surface-page);
+}
+.o-stations[data-state="visible"] { display: flex; }
+.o-stations[data-state="arriving"] { display: flex; opacity: 0; transform: translateY(10px); }
+.o-stations[data-state="visible"] {
+  opacity: 1; transform: none;
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+[data-motion="reduced"] .o-stations[data-state="arriving"] { transform: none; }
+
+.o-stations__map { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.o-stations__plan { position: absolute; inset: 0; width: 100%; height: 100%; }
+.o-stations__pins { position: absolute; inset: 0; pointer-events: none; }
+/* The bar floats on the map rather than sitting in a band above it, so the
+   map keeps its full height on a short phone. */
+.o-stations__bar {
+  position: absolute; top: calc(var(--size-status-bar) + var(--sp-2));
+  left: var(--sp-3); right: var(--sp-3);
+  display: flex; align-items: center; gap: var(--sp-2);
+}
+.o-stations__filters {
+  display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none;
+  padding-block: var(--sp-1);
+}
+.o-stations__filters::-webkit-scrollbar { display: none; }
+.o-stations__locate { position: absolute; right: var(--sp-3); bottom: var(--sp-3); }
+.a-icon-btn--onMap {
+  background: var(--glass-bar-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
+  box-shadow: var(--shadow-card); color: var(--color-text-primary);
+}
+.a-icon-btn--onMap:hover { background: var(--color-surface); }
+
+/* a-filter-chip. Sorting, not choosing. It takes the same selected treatment as
+   the vehicle chip, because a driver has already learned that here: filled
+   primary means this one is on. */
+.a-filter-chip {
+  flex-shrink: 0; min-height: 36px; padding: 0 var(--sp-3h, var(--sp-3));
+  display: inline-flex; align-items: center; gap: var(--sp-1h);
+  border: 1px solid var(--glass-panel-line); border-radius: var(--radius-pill);
+  background: var(--glass-bar-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
+  box-shadow: var(--shadow-card-sm);
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  cursor: pointer; white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.a-filter-chip[aria-pressed="true"] {
+  background: var(--color-primary); border-color: var(--color-primary);
+  color: var(--color-text-on-dark);
+}
+
+/* a-here. The driver. The only mark on the map that is not a station, so it is
+   the only one that is not a pin. */
+.a-here {
+  position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-surface), 0 0 0 9px var(--color-primary-18);
+}
+
+/* a-pin. A station on the map. It is a button, because everything a driver can
+   choose from should be reachable from either half of this screen. */
+.a-pin {
+  position: absolute; margin: -34px 0 0 -14px;
+  width: 28px; height: 34px; padding: 0;
+  border: none; background: none; cursor: pointer; pointer-events: auto;
+  color: var(--color-primary);
+  transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.a-pin[aria-pressed="true"] { color: var(--color-primary-dark); transform: scale(1.18); z-index: 2; }
+/* A station the manager has not approved is on the map, because it is still a
+   petrol station and pretending otherwise would send a driver looking for it.
+   It just is not one of theirs. */
+.a-pin[data-allowed="false"] { color: var(--color-text-tertiary); }
+
+.o-stations__sheet {
+  flex-shrink: 0; max-height: 54%;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-5) var(--sp-4);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--glass-panel-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
+  border-top: 1px solid var(--glass-panel-line);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.10);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .o-stations__sheet { background: var(--color-surface); }
+}
+.a-grabber {
+  align-self: center; width: 36px; height: 4px; flex-shrink: 0;
+  border-radius: var(--radius-pill); background: var(--color-border-strong);
+}
+.o-stations__list {
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  overflow-y: auto; min-height: 0;
+  margin-inline: calc(var(--sp-5) * -1); padding-inline: var(--sp-5);
+}
+.o-stations__group {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+  padding-top: var(--sp-2);
+}
+
+/* m-station. One station: what it is called, why it is worth knowing, how far.
+   The reference had every card filled in brand blue, which makes none of them
+   the answer. Here the surface is quiet and the blue means chosen, the same
+   rule the vehicle chips already follow. */
+.m-station {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%; min-height: var(--size-target); padding: var(--sp-3);
+  border: 1px solid transparent; border-radius: var(--radius-card);
+  background: var(--glass-inset-bg); box-shadow: var(--shadow-card-sm);
+  text-align: left; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-in-out),
+              background var(--dur-fast) var(--ease-out);
+}
+.m-station:active { transform: scale(0.99); }
+.m-station[aria-checked="true"] {
+  background: var(--gradient-primary); border-color: var(--color-primary);
+  box-shadow: var(--shadow-btn);
+}
+.m-station__art {
+  flex-shrink: 0; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-card-sm);
+  background: var(--color-primary-light); color: var(--color-primary);
+}
+.m-station[aria-checked="true"] .m-station__art {
+  background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
+}
+.m-station__body { flex: 1 1 auto; min-width: 0; }
+.m-station__name {
+  display: block; font-size: var(--text-callout); font-weight: 700;
+  color: var(--color-text-primary);
+}
+.m-station__note {
+  display: block; margin-top: 1px;
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.m-station[aria-checked="true"] .m-station__name { color: var(--color-text-on-dark); }
+.m-station[aria-checked="true"] .m-station__note { color: var(--color-on-dark-soft); }
+/* Distance is the thing being compared down the list, so it is set to line up
+   figure under figure. */
+.m-station__km {
+  flex-shrink: 0; text-align: right;
+  font-size: var(--text-callout); font-weight: 800;
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+}
+.m-station__km small {
+  display: block; font-size: var(--text-nano); font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+.m-station[aria-checked="true"] .m-station__km { color: var(--color-text-on-dark); }
+.m-station[aria-checked="true"] .m-station__km small { color: var(--color-on-dark-soft); }
+/* Not on the company's list. Shown rather than hidden, because a driver who can
+   see the forecourt from where they stand needs to know it is not an option
+   before they drive onto it, not after. */
+.m-station[data-allowed="false"] {
+  background: none; box-shadow: none; border-color: var(--color-border);
+  cursor: not-allowed;
+}
+.m-station[data-allowed="false"] .m-station__art {
+  background: var(--color-surface-sunken); color: var(--color-text-tertiary);
+}
+.m-station[data-allowed="false"] .m-station__name,
+.m-station[data-allowed="false"] .m-station__km { color: var(--color-text-secondary); }
+
 /* a-skeleton. The shape of something that has not arrived.
 
    Between the code being accepted and home being usable, the app really does
@@ -1961,7 +2137,70 @@ body {
         </nav>
       </section>
 
-      <!-- SCREEN THREE · the fill.
+      <!-- SCREEN THREE · where.
+           A code is issued against a station, so the station is chosen before
+           the code exists rather than after it. Home stays underneath.
+
+           The map is drawn, not fetched. A tile server is an external request,
+           which this prototype cannot make over file:// and would be the first
+           raster asset in the project. What a driver needs from it here is
+           where the pins sit relative to each other and to them, and a drawing
+           carries that at a fraction of the weight. -->
+      <section class="o-stations" id="stationsScreen" aria-labelledby="stationsTitle" hidden>
+
+        <div class="o-stations__map">
+          <svg class="o-stations__plan" viewBox="0 0 390 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="390" height="460" fill="var(--color-surface-sunken)"/>
+            <g fill="var(--color-border-light)">
+              <rect x="24" y="40" width="92" height="70" rx="6"/><rect x="140" y="26" width="120" height="58" rx="6"/>
+              <rect x="286" y="52" width="86" height="84" rx="6"/><rect x="34" y="150" width="70" height="96" rx="6"/>
+              <rect x="132" y="120" width="104" height="76" rx="6"/><rect x="262" y="168" width="96" height="70" rx="6"/>
+              <rect x="46" y="286" width="110" height="84" rx="6"/><rect x="192" y="252" width="82" height="112" rx="6"/>
+              <rect x="300" y="278" width="72" height="96" rx="6"/><rect x="96" y="396" width="140" height="52" rx="6"/>
+            </g>
+            <g stroke="var(--color-surface)" fill="none" stroke-linecap="round">
+              <path d="M0 128 H390" stroke-width="13"/><path d="M0 264 H390" stroke-width="9"/>
+              <path d="M124 0 V460" stroke-width="11"/><path d="M276 0 V460" stroke-width="8"/>
+              <path d="M0 386 H390" stroke-width="7"/><path d="M52 0 V460" stroke-width="6"/>
+            </g>
+            <path d="M0 196 C110 178 190 250 390 214" stroke="var(--color-warning-bg)" stroke-width="9" fill="none"/>
+          </svg>
+
+          <!-- Where the driver is. One dot, and it is the only thing on the map
+               that is not a station. -->
+          <span class="a-here" style="left:47%;top:56%" aria-hidden="true"></span>
+          <div class="o-stations__pins" id="stationPins"></div>
+
+          <div class="o-stations__bar">
+            <button class="a-icon-btn a-icon-btn--onMap" type="button" id="stationsBack" aria-label="Back to home">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="o-stations__filters" id="stationFilters" role="group" aria-label="Sort stations"></div>
+          </div>
+
+          <button class="a-icon-btn a-icon-btn--onMap o-stations__locate" type="button" id="stationsLocate" aria-label="Centre on me">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4"/><path d="M12 1.5V4M12 20v2.5M1.5 12H4M20 12h2.5"/></svg>
+          </button>
+        </div>
+
+        <!-- The list is the control. The map says where, the list says which,
+             and on a phone held in one hand the list is the half you can reach. -->
+        <div class="o-stations__sheet">
+          <span class="a-grabber" aria-hidden="true"></span>
+          <h1 class="u-visually-hidden" id="stationsTitle">Choose a station</h1>
+          <label class="a-search">
+            <span class="u-visually-hidden">Search stations</span>
+            <span class="a-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></span>
+            <input class="a-search__input" id="stationSearch" type="search"
+                   placeholder="Search suburb or station" autocomplete="off">
+          </label>
+          <div class="o-stations__list" id="stationList" role="radiogroup" aria-labelledby="stationsTitle"></div>
+          <p class="m-vehicle-picker__empty" id="stationEmpty" hidden>No station matches that.</p>
+          <span class="u-visually-hidden" id="stationStatus" role="status"></span>
+        </div>
+      </section>
+
+      <!-- SCREEN FOUR · the fill.
            Home is still underneath and is still the way back, so this is laid
            over it rather than instead of it. -->
       <section class="o-fuel" id="fuelScreen" aria-labelledby="fuelTitle" hidden>
@@ -1991,6 +2230,10 @@ body {
           <div class="o-fuel__spacer" aria-hidden="true"></div>
 
           <div class="m-fuel-detail">
+            <div class="m-fuel-detail__row">
+              <span class="m-fuel-detail__key">Station</span>
+              <span class="m-fuel-detail__val" id="fuelStation">Engen Bryanston</span>
+            </div>
             <div class="m-fuel-detail__row">
               <span class="m-fuel-detail__key">Vehicle</span>
               <span class="m-fuel-detail__val" id="fuelVehicle">CA 123-456</span>
@@ -2061,6 +2304,11 @@ body {
   el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelCode = $('fuelCode');
   el.fuelVehicle = $('fuelVehicle'); el.fuelClose = $('fuelClose'); el.fuelCancel = $('fuelCancel');
   el.fuelCodeSpoken = $('fuelCodeSpoken');
+  el.stations = $('stationsScreen'); el.stationList = $('stationList');
+  el.stationPins = $('stationPins'); el.stationFilters = $('stationFilters');
+  el.stationSearch = $('stationSearch'); el.stationEmpty = $('stationEmpty');
+  el.stationStatus = $('stationStatus'); el.stationsBack = $('stationsBack');
+  el.fuelStation = $('fuelStation');
 
   /* ════════════════════════════════════════════════════════════════════
      MOCK STATE
@@ -2088,6 +2336,7 @@ body {
        the only thing on home that outlives the screen you are looking at. */
     fuel: 'idle',
     step: 'signup-reward',
+    station: null, stationSort: 'near',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
 
@@ -2213,6 +2462,7 @@ body {
     el.reward.hidden = true;  el.reward.removeAttribute('data-state');
     el.home.hidden = true;    el.home.removeAttribute('data-state');
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
+    el.stations.hidden = true; el.stations.removeAttribute('data-state');
   }
 
   /* Total points, and everything on the screen that is derived from it. */
@@ -2809,6 +3059,160 @@ body {
   el.homeFuel.addEventListener('pointerdown', stopPulse);
   el.homeFuel.addEventListener('focus', stopPulse);
 
+  /* ── The stations ─────────────────────────────────────────────────────
+     A fleet driver does not choose from every forecourt in the city, they
+     choose from the ones their company allows, and the difference is the whole
+     point of the screen. The rest are still drawn, because a station a driver
+     can see from where they are standing has to be visibly not an option
+     before they drive onto it rather than after.
+
+     Positions are percentages of the map, fixed, so the pins and the list agree
+     and the screen can be screenshotted twice. */
+  var STATIONS = [
+    { id: 'fourways',  name: 'Engen Fourways',    km: 6.2,  x: 32, y: 12,
+      note: 'You have fuelled here once. Approved.', allowed: true },
+    { id: 'roodekop',  name: 'Engen Roodekop',    km: 14.6, x: 78, y: 34,
+      note: 'Cheapest allowed. More points per fill.', allowed: true },
+    { id: 'bryanston', name: 'Engen Bryanston',   km: 2.1,  x: 36, y: 47,
+      note: 'Nearest to you. Open 24 hours.', allowed: true },
+    { id: 'rivonia',   name: 'Engen Rivonia',     km: 3.8,  x: 62, y: 41,
+      note: 'Open 24 hours.', allowed: true },
+    { id: 'woodmead',  name: 'Engen Woodmead',    km: 8.9,  x: 71, y: 22,
+      note: 'Open 24 hours. Diesel and petrol.', allowed: true },
+    { id: 'randburg',  name: 'Engen Randburg',    km: 5.4,  x: 18, y: 58,
+      note: 'Not on your company list.', allowed: false },
+    { id: 'sandton',   name: 'Engen Sandton City', km: 4.5, x: 52, y: 66,
+      note: 'Not on your company list.', allowed: false }
+  ];
+
+  var STATION_SORTS = [
+    { key: 'near',  label: 'Nearest',      by: function (a, b) { return a.km - b.km; } },
+    { key: 'open',  label: 'Open 24 hours', by: function (a, b) {
+        var oa = /24 hours/.test(a.note) ? 0 : 1, ob = /24 hours/.test(b.note) ? 0 : 1;
+        return oa - ob || a.km - b.km; } },
+    { key: 'known', label: 'Been here before', by: function (a, b) {
+        var ka = /fuelled here/.test(a.note) ? 0 : 1, kb = /fuelled here/.test(b.note) ? 0 : 1;
+        return ka - kb || a.km - b.km; } }
+  ];
+
+  function paintStations() {
+    var q = (el.stationSearch.value || '').trim().toLowerCase();
+    var sort = STATION_SORTS.filter(function (s) { return s.key === S.stationSort; })[0] || STATION_SORTS[0];
+
+    el.stationFilters.innerHTML = STATION_SORTS.map(function (s) {
+      return '<button class="a-filter-chip" type="button" data-sort="' + s.key + '"' +
+             ' aria-pressed="' + (s.key === S.stationSort) + '">' + s.label + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(el.stationFilters.querySelectorAll('[data-sort]'), function (b) {
+      b.addEventListener('click', function () { S.stationSort = b.dataset.sort; paintStations(); });
+    });
+
+    var matches = STATIONS.filter(function (st) {
+      return !q || st.name.toLowerCase().indexOf(q) !== -1;
+    }).slice().sort(sort.by);
+    var allowed = matches.filter(function (s) { return s.allowed; });
+    var rest    = matches.filter(function (s) { return !s.allowed; });
+    el.stationEmpty.hidden = matches.length > 0;
+
+    var pump = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/>' +
+      '<path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg>';
+
+    function row(st) {
+      var on = st.id === S.station;
+      return '<button class="m-station" type="button" role="radio" data-station="' + st.id + '"' +
+             ' aria-checked="' + on + '" data-allowed="' + st.allowed + '"' +
+             (st.allowed ? '' : ' aria-disabled="true"') +
+             ' tabindex="' + (on || (!S.station && st === allowed[0]) ? '0' : '-1') + '">' +
+             '<span class="m-station__art">' + pump + '</span>' +
+             '<span class="m-station__body">' +
+             '<span class="m-station__name">' + st.name + '</span>' +
+             '<span class="m-station__note">' + st.note + '</span></span>' +
+             '<span class="m-station__km">' + st.km.toFixed(1) + '<small>km</small></span></button>';
+    }
+
+    el.stationList.innerHTML =
+      (allowed.length ? '<p class="o-stations__group">Allowed stations</p>' + allowed.map(row).join('') : '') +
+      (rest.length ? '<p class="o-stations__group">Not on your company list</p>' + rest.map(row).join('') : '');
+
+    Array.prototype.forEach.call(el.stationList.querySelectorAll('[data-station]'), function (b) {
+      b.addEventListener('click', function () { chooseStation(b.dataset.station); });
+    });
+
+    el.stationPins.innerHTML = STATIONS.map(function (st) {
+      return '<button class="a-pin" type="button" data-pin="' + st.id + '"' +
+             ' data-allowed="' + st.allowed + '" aria-pressed="' + (st.id === S.station) + '"' +
+             ' style="left:' + st.x + '%;top:' + st.y + '%"' +
+             ' aria-label="' + st.name + ', ' + st.km.toFixed(1) + ' kilometres' +
+             (st.allowed ? '' : ', not on your company list') + '">' +
+             '<svg width="28" height="34" viewBox="0 0 28 34" fill="none" aria-hidden="true">' +
+             '<path d="M14 33C14 33 26 21.4 26 13A12 12 0 1 0 2 13c0 8.4 12 20 12 20z" fill="currentColor"/>' +
+             '<circle cx="14" cy="13" r="5.4" fill="var(--color-surface)"/></svg></button>';
+    }).join('');
+    Array.prototype.forEach.call(el.stationPins.querySelectorAll('[data-pin]'), function (b) {
+      b.addEventListener('click', function () { chooseStation(b.dataset.pin); });
+    });
+  }
+
+  function chooseStation(id) {
+    var st = STATIONS.filter(function (s) { return s.id === id; })[0];
+    if (!st) { return; }
+    if (!st.allowed) {
+      announce(st.name + ' is not on your company list. Ask your manager to add it.');
+      return;
+    }
+    S.station = id;
+    paintStations();
+    announce(st.name + ' chosen, ' + st.km.toFixed(1) + ' kilometres. Authorising your fill.');
+    /* Choosing is the answer to the only question this screen asks, so it does
+       not need a second confirming tap. */
+    after(prefersReduced() ? 0 : 260, authoriseFill);
+  }
+
+  function stationName() {
+    var st = STATIONS.filter(function (s) { return s.id === S.station; })[0];
+    return st ? st.name : STATIONS[0].name;
+  }
+
+  function showStations(arriving) {
+    S.step = 'stations';
+    el.stationSearch.value = '';
+    el.stationStatus.textContent = '';
+    S.station = null;
+    paintStations();
+    el.stations.hidden = false;
+    if (arriving && !prefersReduced()) {
+      el.stations.setAttribute('data-state', 'arriving');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { el.stations.setAttribute('data-state', 'visible'); });
+      });
+    } else {
+      el.stations.setAttribute('data-state', 'visible');
+    }
+    after(500, function () {
+      announce('Choose a station. ' + STATIONS.filter(function (s) { return s.allowed; }).length +
+               ' are allowed for your company.');
+    });
+  }
+
+  function hideStations() {
+    el.stations.hidden = true;
+    el.stations.removeAttribute('data-state');
+  }
+
+  /* The authorisation itself, once the station is known. */
+  function authoriseFill() {
+    hideStations();
+    S.fuel = 'pending';
+    paintFuelAction();
+    after(prefersReduced() ? 0 : 900, function () {
+      S.fuel = 'live';
+      paintFuelAction();
+      showFuel(true);
+    });
+  }
+
   function requestFuel() {
     if (S.fuel !== 'idle') { return; }
     stopPulse();
@@ -2832,18 +3236,10 @@ body {
       if (first) { first.focus(); }
       return;
     }
-    S.fuel = 'pending';
-    paintFuelAction();
-    announce('Authorising your fill.');
-    /* As long as the authorisation takes and no longer. Under reduced motion
-       there is no wait at all, for the same reason the skeleton is skipped:
-       a still spinner is not a wait, it is a delay with a frozen graphic on
-       top of it. */
-    after(prefersReduced() ? 0 : 900, function () {
-      S.fuel = 'live';
-      paintFuelAction();
-      showFuel(true);
-    });
+    /* Where before how much. A code is issued against a station, so the station
+       is answered first rather than assumed and corrected afterwards. The
+       authorisation itself has not changed, it just starts one screen later. */
+    showStations(true);
   }
 
   /* `arriving` when a driver got here by asking. Landing on it from the menu
@@ -2857,6 +3253,9 @@ body {
        van out of a yard, and this screen is read standing beside one, where the
        plate is the only part of it written on the vehicle itself. */
     if (v) { el.fuelVehicle.textContent = v.plate; }
+    /* The code is issued against the station that was chosen, so the screen
+       says which one rather than leaving the driver to remember. */
+    el.fuelStation.textContent = stationName();
     el.fuel.hidden = false;
     if (arriving && !prefersReduced()) {
       el.fuel.setAttribute('data-state', 'arriving');
@@ -2956,6 +3355,16 @@ body {
       after(320, function () { el.seam.removeAttribute('data-state'); });
     });
   });
+  /* Backing out is not cancelling a fill, because no fill has started yet. It
+     simply puts the driver back where they pressed. */
+  el.stationsBack.addEventListener('click', function () {
+    hideStations();
+    S.step = 'home';
+    announce('Back on home. No fill was requested.');
+    el.homeFuel.focus({ preventScroll: true });
+  });
+  el.stationSearch.addEventListener('input', paintStations);
+
   el.homeVehicleEmpty.addEventListener('click', function () {
     var first = el.homePickerRow.querySelector('[data-vehicle]');
     if (first) { first.focus(); }
