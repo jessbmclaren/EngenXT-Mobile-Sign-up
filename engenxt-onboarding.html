@@ -99,6 +99,11 @@
   --color-accent-on-dark:        #639EFF;
   --color-accent-on-dark-soft:   rgba(99,158,255,0.90);
   --color-accent-on-dark-line:   rgba(99,158,255,0.28);
+  /* Points, on a dark surface. The warning amber is mixed for white and
+     goes muddy on navy, so this is its on-dark twin. It is the same hue the
+     star carries wherever points are shown. */
+  --color-points-on-dark:      #FFB454;
+  --color-points-on-dark-35:   rgba(255,180,84,0.35);
   --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
@@ -588,12 +593,24 @@ body {
   background: var(--color-on-dark-fill);
   overflow: hidden;
 }
+/* The bar is the conversion, so it is coloured like one: it starts in the
+   points amber and ends in the data cyan, and the fill uncovers where the
+   driver has got to. Fifty points is the very start of that, so what shows is
+   the points colour, which is the honest picture.
+
+   The gradient is sized to the whole track rather than to the fill, through
+   --meter-span. Left to size itself, a 20px fill squeezed the entire spectrum
+   into 20px and every driver saw the finished colour on their first day. */
 .a-meter__fill {
   height: 100%; width: 0;
   border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--color-accent-on-dark) 0%,
+  background-image: linear-gradient(90deg,
+              var(--color-points-on-dark) 0%,
+              var(--color-accent-on-dark) 48%,
               var(--color-tertiary) 100%);
-  box-shadow: 0 0 12px var(--color-primary-30);
+  background-size: var(--meter-span, 100%) 100%;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px var(--color-points-on-dark-35);
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -1925,6 +1942,7 @@ body {
     var pct = paintGoal(total);
     el.rewardMeterFill.style.width = pct + '%';
     setMeterFloor(total);
+    sizeMeterSpan();
   }
 
   /* The total is earned rather than printed: each row lands, its value goes
@@ -1935,7 +1953,22 @@ body {
      below a visible sliver once there is anything to show. Nothing is
      overstated by it: the exact figure sits directly above the track. */
   function setMeterFloor(points) {
-    el.rewardMeterFill.style.minWidth = points > 0 ? 'var(--sp-2)' : '0';
+    /* Eight pixels on a six pixel bar is a dot, not a bar, and a dot reads as a
+       stray mark rather than as a start. Twenty is a short segment you can see
+       the colour of. On a 390 track that is under seven per cent against a true
+       one per cent, which the figure directly above it states exactly. */
+    el.rewardMeterFill.style.minWidth = points > 0 ? 'var(--sp-5)' : '0';
+  }
+
+  /* The gradient has to span the track, not the fill, so it is measured. Kept
+     current on resize because the demo can be switched between device widths
+     and a stale span would show the wrong colour at the wrong point. */
+  function sizeMeterSpan() {
+    var w = el.rewardMeter ? el.rewardMeter.clientWidth : 0;
+    if (w) { el.rewardMeterFill.style.setProperty('--meter-span', w + 'px'); }
+  }
+  if (window.ResizeObserver && el.rewardMeter) {
+    new ResizeObserver(sizeMeterSpan).observe(el.rewardMeter);
   }
 
   function playReward() {
