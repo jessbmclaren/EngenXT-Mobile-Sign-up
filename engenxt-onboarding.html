@@ -1693,6 +1693,10 @@ body {
      a row you can scan, pictures stop helping and a search field starts. */
   var SEARCH_FROM = 6;
 
+  /* No vehicle chosen. A driver with a choice in front of them starts here,
+     not on whichever vehicle happened to be first in the list. */
+  var NONE = -1;
+
   /* Past this many, the row stops trying to hold the fleet. A driver dragging
      through hundreds of chips is not picking, they are looking for something,
      and looking for something is what the search field is for. The row shows
@@ -1844,11 +1848,16 @@ body {
       ? 'Showing ' + shown.length + '. Narrow the search to see the rest.'
       : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
 
-    el.homePickerRow.innerHTML = shown.map(function (m) {
+    el.homePickerRow.innerHTML = shown.map(function (m, at) {
       var v = m.v, i = m.i;
       var on = i === S.activeVehicle;
+      /* A radio group is one tab stop, and that stop is the chosen radio. With
+         nothing chosen there is no such radio, so the first one takes the tab
+         stop. Keying it off `on` alone left every chip at tabindex -1 and put
+         the whole picker out of reach of the keyboard. */
+      var tabStop = on || (S.activeVehicle === NONE && at === 0);
       return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
-             ' aria-checked="' + on + '" tabindex="' + (on ? '0' : '-1') + '"' +
+             ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
              ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model + '">' +
              '<span class="a-vehicle-chip__disc">' +
              vehicleArt(v.type, 28, on ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)') +
@@ -1898,12 +1907,17 @@ body {
     el.statusBar.removeAttribute('data-tone');
     el.homePoints.textContent =
       groupNum(S.userType === 'new-driver' ? rewardTotal() : 2450) + ' pts';
-    /* The card claims a linked vehicle, so it is only shown when there is one. */
+    /* The card names the vehicle being driven, so it waits until one has been
+       chosen. Assigned and chosen are not the same thing. */
     if (!S.vehicleLinked) { S.vehicles = []; }
     el.homeSearch.value = '';
     paintPicker();
     el.homeVehicle.hidden = !S.vehicleLinked || !activeVehicle();
-    el.homeNoVehicle.hidden = !el.homeVehicle.hidden;
+    /* Tied to whether the manager has assigned anything, not to whether the
+       card is up. Hanging it off the card put "your manager assigns the
+       vehicles you are allowed to fuel" in front of a driver who had four of
+       them and simply had not picked one yet. */
+    el.homeNoVehicle.hidden = S.vehicleLinked;
     el.home.hidden = false;
     el.home.setAttribute('data-state', 'visible');
     announce('Home. ' + el.homeGreeting.textContent + ', David.');
@@ -1943,7 +1957,11 @@ body {
     S.vehicles = !S.vehicleLinked ? []
                : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
                : makeFleet(fleet || 1);
-    S.activeVehicle = 0;
+    /* Nothing is chosen for the driver. Being assigned four vehicles does not
+       mean you are in the first one, and the app cannot know which yard you
+       walked into this morning. One vehicle is the exception, because there is
+       no choice to make and picking it for them is not a guess. */
+    S.activeVehicle = S.vehicles.length === 1 ? 0 : NONE;
   }
 
   /* What a driver arrives from sign-up with. Assignment happens on the manager's
