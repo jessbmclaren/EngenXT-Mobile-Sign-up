@@ -3413,7 +3413,8 @@ button { background: none; border: none; color: inherit; }
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
-    'returning':    'The same fleets, with the vehicles they have actually been in leading.'
+    'returning':    'The same fleets, with the vehicles they have actually been in leading.',
+    'fuelling':     'Choosing where, the code that comes back, and home while the fill is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3434,7 +3435,8 @@ button { background: none; border: none; color: inherit; }
       label: 'Welcome',
       sections: [
         ['after-signup', 'After sign-up'],
-        ['returning',    'Returning driver']
+        ['returning',    'Returning driver'],
+        ['fuelling',     'Fuelling']
       ]
     }
   ];
@@ -3466,6 +3468,14 @@ button { background: none; border: none; color: inherit; }
         ['new-five-vans', 'Five vans'],
         ['new-nine-vehicles', 'Nine vehicles'],
         ['new-thousand-vehicles', 'A thousand vehicles']
+      ],
+      'fuelling': [
+        ['fuel-stations', 'Choosing a station'],
+        ['fuel-stations-searched', 'Station search, no match'],
+        ['fuel-requesting', 'Authorising'],
+        ['fuel-approved', 'Approved, the code'],
+        ['fuel-live', 'Home, fill still open'],
+        ['fuel-no-vehicle', 'Asked with nothing chosen']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],

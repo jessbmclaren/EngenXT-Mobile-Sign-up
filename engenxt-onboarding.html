@@ -1298,7 +1298,16 @@ body {
 
 .o-stations__map { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .o-stations__plan { position: absolute; inset: 0; width: 100%; height: 100%; }
-.o-stations__pins { position: absolute; inset: 0; pointer-events: none; }
+/* Pins live in the part of the map that is actually visible. Positioned against
+   the whole map, the northern ones sat under the notch and the status bar,
+   where a pin is not a pin, it is a rumour. The band clears the chrome at the
+   top and the sheet's shadow at the bottom, so a station is never drawn
+   somewhere a driver cannot see or tap it. */
+.o-stations__pins {
+  position: absolute; inset: 128px var(--sp-4) var(--sp-5);
+  pointer-events: none;
+}
+@media (max-height: 760px) { .o-stations__pins { inset-block-start: 112px; } }
 /* The bar floats on the map rather than sitting in a band above it, so the
    map keeps its full height on a short phone. */
 .o-stations__bar {
@@ -1308,7 +1317,9 @@ body {
 }
 .o-stations__filters {
   display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none;
-  padding-block: var(--sp-1);
+  /* Room past the last chip, so it can scroll clear of the edge rather than
+     stopping flush against it and reading as cut off. */
+  padding: var(--sp-1) var(--sp-4) var(--sp-1) 0;
 }
 .o-stations__filters::-webkit-scrollbar { display: none; }
 .o-stations__locate { position: absolute; right: var(--sp-3); bottom: var(--sp-3); }
@@ -3090,7 +3101,7 @@ body {
     { key: 'open',  label: 'Open 24 hours', by: function (a, b) {
         var oa = /24 hours/.test(a.note) ? 0 : 1, ob = /24 hours/.test(b.note) ? 0 : 1;
         return oa - ob || a.km - b.km; } },
-    { key: 'known', label: 'Been here before', by: function (a, b) {
+    { key: 'known', label: 'Been here', by: function (a, b) {
         var ka = /fuelled here/.test(a.note) ? 0 : 1, kb = /fuelled here/.test(b.note) ? 0 : 1;
         return ka - kb || a.km - b.km; } }
   ];
@@ -3496,6 +3507,13 @@ body {
        clearTimers after showHome, because home queues its own greeting and its
        own focus move, and neither belongs to a state whose point is the screen
        laid over it. */
+    'fuel-stations':   { group: 'fuelling', label: 'Choosing a station',
+      run: function () { reset('returning-driver', true, 4); S.activeVehicle = 0;
+                         showHome(); showStations(false); } },
+    'fuel-stations-searched': { group: 'fuelling', label: 'Station search, no match',
+      run: function () { reset('returning-driver', true, 4); S.activeVehicle = 0;
+                         showHome(); showStations(false);
+                         el.stationSearch.value = 'zzz'; paintStations(); } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
       run: function () {
         reset('returning-driver', true, 1); showHome(); clearTimers();
@@ -3676,7 +3694,7 @@ body {
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
-    'fuelling':     'Asking for a fill, the code that comes back, and home while it is open.'
+    'fuelling':     'Choosing where, the code that comes back, and home while the fill is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3734,6 +3752,8 @@ body {
         ['home-thousand-vehicles', 'A thousand vehicles']
       ],
       'fuelling': [
+        ['fuel-stations', 'Choosing a station'],
+        ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
