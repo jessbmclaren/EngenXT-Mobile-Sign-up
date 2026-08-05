@@ -109,6 +109,13 @@
   --color-surface-page:   #e4e6eb;
   --color-surface-hover:  #f5f5f5;
   --color-border:         rgba(0,0,0,0.08);
+  /* For an edge that has to survive daylight. The 8% line is right between
+     two calm surfaces and disappears where a fixed bar meets the content
+     scrolling under it, which is the one place the edge is load bearing. */
+  --color-border-strong:  rgba(0,0,0,0.14);
+  /* The bar's glass. Denser than the panel because labels sit directly on
+     it and whatever scrolls underneath must not lift them. */
+  --glass-bar-bg:         rgba(255,255,255,0.78);
   --color-border-light:   rgba(0,0,0,0.06);
   --color-border-field:   rgba(0,0,0,0.45);   /* 3.2:1 against the field fill */
   --color-scrim:          rgba(0,0,0,0.45);

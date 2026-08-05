@@ -114,6 +114,13 @@
   --color-surface-page:   #e4e6eb;
   --color-surface-hover:  #f5f5f5;
   --color-border:         rgba(0,0,0,0.08);
+  /* For an edge that has to survive daylight. The 8% line is right between
+     two calm surfaces and disappears where a fixed bar meets the content
+     scrolling under it, which is the one place the edge is load bearing. */
+  --color-border-strong:  rgba(0,0,0,0.14);
+  /* The bar's glass. Denser than the panel because labels sit directly on
+     it and whatever scrolls underneath must not lift them. */
+  --glass-bar-bg:         rgba(255,255,255,0.78);
   --color-border-light:   rgba(0,0,0,0.06);
   --color-border-field:   rgba(0,0,0,0.45);   /* 3.2:1 against the field fill */
   --color-scrim:          rgba(0,0,0,0.45);
@@ -1182,11 +1189,26 @@ body {
 /* o-tab-bar. A standalone section of the interface rather than one control,
    so it is an organism. It never scrolls: it is how you leave wherever you
    are, and a way out that moves is not a way out. */
+/* Glass, like everything else that floats over the page. It was the one fully
+   opaque surface left once home went to glass, so it read as a slab bolted to
+   the bottom rather than as part of the screen. Content genuinely passes under
+   it, which is the exact case glass is for.
+
+   Denser than the panel above it, because labels sit directly on this one and
+   a bar you read has to hold its contrast over whatever scrolls beneath. The
+   line is a touch stronger than the shared border for the same reason the
+   sign-up flow strengthens its hairlines: at 8% black in direct sun the bar
+   dissolves into the content it is meant to sit above. */
 .o-tab-bar {
   flex-shrink: 0; display: flex;
   padding: var(--sp-2) var(--sp-2) calc(var(--sp-2) + env(safe-area-inset-bottom, 0px));
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
+  background: var(--glass-bar-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd);
+  backdrop-filter: var(--glass-panel-bd);
+  border-top: 1px solid var(--color-border-strong);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .o-tab-bar { background: var(--color-surface); }
 }
 .o-tab-bar__tab {
   flex: 1 1 0; min-height: var(--size-target);
