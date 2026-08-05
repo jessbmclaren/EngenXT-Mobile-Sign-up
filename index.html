@@ -703,6 +703,26 @@ button { background: none; border: none; color: inherit; }
   font-size: var(--text-body); font-weight: 400; line-height: 1.6;
   color: var(--color-on-dark-soft); margin-bottom: var(--sp-8);
 }
+/* The hero copy sits at the bottom of the frame, which is where the sheet
+   rises to, so on the six shorter sheets the top edge landed part way down the
+   headline and sliced it: 94 to 114 pixels of a 136 pixel line covered, leaving
+   the tops of the letters showing and nothing else. That reads as broken text
+   rather than as one surface in front of another.
+
+   It steps back instead of being cut. The words have done their job by the time
+   a driver is typing a number, and what belongs behind glass is the colour, not
+   half a sentence. */
+.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title,
+.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__lede {
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.o-auth-hero__title, .o-auth-hero__lede {
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+/* Without :has, nothing is hidden and the layering is exactly as it was. A
+   headline behind glass is a smaller problem than a headline that vanished for
+   a reason the browser could not express. */
 .o-auth-hero__notice { margin-bottom: var(--sp-4); }
 .o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-auth-hero__actions .a-btn { width: 100%; }
