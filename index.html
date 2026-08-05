@@ -795,6 +795,25 @@ button { background: none; border: none; color: inherit; }
 .o-signup-sheet[data-stage="blocked"] { min-height: 62%; }
 /* Without :has, the copy stays where it always was and nothing is hidden. */
 .o-auth-hero__notice { margin-bottom: var(--sp-4); }
+/* m-figure. A labelled number, for when the number is the point.
+
+   Two of them side by side, so a driver can compare the versions without
+   reading the sentence above them, and read either one out to their manager
+   without hunting through prose for it. */
+.m-figure-row { display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4); }
+.m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.m-figure__key {
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+.m-figure__val {
+  font-size: var(--text-large); font-weight: 800;
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+}
+/* On the dark hero the same component takes the on-dark pair. */
+.m-alert__meta { display: flex; gap: var(--sp-5); margin-top: var(--sp-2h); }
+.m-alert__meta .m-figure__key { color: var(--color-on-dark-soft); }
+.m-alert__meta .m-figure__val { font-size: var(--text-callout); color: var(--color-text-on-dark); }
 .o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-auth-hero__actions .a-btn { width: 100%; }
 
@@ -999,6 +1018,11 @@ button { background: none; border: none; color: inherit; }
    ring around a heading only makes it look like a control. */
 .o-outcome-panel__title:focus,
 .o-outcome-panel__title:focus-visible { outline: none; box-shadow: none; }
+/* Same for the status page's heading. It is focused by script so the screen is
+   announced, which is not the same as a driver having navigated to it, and a
+   ring drawn round a heading nobody moved to reads as a control. The sibling
+   panel already did this and this one was missed. */
+.o-status-page__title:focus-visible { outline: none; box-shadow: none; }
 .o-outcome-panel__title { font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px; }
 .o-outcome-panel__body { font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary); }
 .o-outcome-panel__clock {
@@ -1594,6 +1618,7 @@ button { background: none; border: none; color: inherit; }
           <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark o-status-page__icon" id="statusIcon" data-tone="warning" aria-hidden="true"></span>
           <h2 class="o-status-page__title" id="statusTitle" tabindex="-1"></h2>
           <p class="o-status-page__body" id="statusBody"></p>
+          <div class="m-figure-row" id="statusMeta" hidden></div>
           <div class="o-status-page__actions" id="statusActions"></div>
         </div>
       </div>
@@ -2072,7 +2097,7 @@ button { background: none; border: none; color: inherit; }
     root: document.documentElement,
     frame: $('deviceFrame'), hero: $('authHero'), homeNotice: $('homeNotice'),
     statusPage: $('statusPage'), statusIcon: $('statusIcon'),
-    statusTitle: $('statusTitle'), statusBody: $('statusBody'), statusActions: $('statusActions'),
+    statusTitle: $('statusTitle'), statusMeta: $('statusMeta'), statusBody: $('statusBody'), statusActions: $('statusActions'),
     scrim: $('sheetScrim'), sheet: $('sheet'),
     sheetTitle: $('sheetTitle'), sheetSub: $('sheetSub'),
     demoHint: $('demoHint'), sheetHeader: $('sheetHeader'), sheetHeading: $('sheetHeading'),
@@ -3041,6 +3066,10 @@ button { background: none; border: none; color: inherit; }
   /* ════════════════════════════════════════════════════════════════════
      HOME NOTICES
      ════════════════════════════════════════════════════════════════════ */
+  /* What is on the phone, and what the server will accept. Front of house
+     only: nothing here reads a real build number. */
+  var APP_VERSION = { installed: '2.4.1', required: '2.6.0' };
+
   var HOME_NOTICES = {
     offline: {
       tone: 'error', icon: 'wifiOff',
@@ -3067,7 +3096,16 @@ button { background: none; border: none; color: inherit; }
     update: {
       tone: 'warning', icon: 'upload',
       title: 'Update EngenXT to continue',
-      body: 'Update to the latest version to sign in and keep using EngenXT.',
+      /* "Update to the latest version" is a instruction with nothing in it. A
+         driver cannot tell whether they already did this last week, cannot say
+         which version they are on when they ring their manager, and cannot tell
+         a real prompt from one that has been stuck on screen for a month. Both
+         numbers, so the sentence is checkable. */
+      body: 'Signing in needs a newer version than the one on this phone.',
+      meta: [
+        { key: 'Installed', val: APP_VERSION.installed },
+        { key: 'Required',  val: APP_VERSION.required }
+      ],
       actions: [
         { label: 'Update app', kind: 'primary', act: 'retryHome' }
       ]
@@ -3081,7 +3119,14 @@ button { background: none; border: none; color: inherit; }
         '<div class="m-alert__top">' +
           '<span class="m-alert__icon">' + icon(def.icon, 'var(--color-text-on-dark)') + '</span>' +
           '<span><p class="m-alert__title">' + def.title + '</p>' +
-          '<p class="m-alert__body">' + def.body + '</p></span>' +
+          '<p class="m-alert__body">' + def.body + '</p>' +
+          /* Figures a driver can read at a glance or repeat down a phone,
+             rather than dig out of a sentence. */
+          (def.meta ? '<span class="m-alert__meta">' + def.meta.map(function (m) {
+            return '<span class="m-figure"><span class="m-figure__key">' + m.key +
+                   '</span><span class="m-figure__val">' + m.val + '</span></span>';
+          }).join('') + '</span>' : '') +
+          '</span>' +
         '</div></div>';
     el.homeNotice.hidden = false;
   }
@@ -3151,6 +3196,13 @@ button { background: none; border: none; color: inherit; }
     el.statusIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
     el.statusTitle.textContent = def.title;
     el.statusBody.textContent = def.body;
+    /* Figures a driver can read at a glance or repeat down a phone to their
+       manager, rather than dig out of a sentence. */
+    el.statusMeta.innerHTML = (def.meta || []).map(function (m) {
+      return '<span class="m-figure"><span class="m-figure__key">' + m.key +
+             '</span><span class="m-figure__val">' + m.val + '</span></span>';
+    }).join('');
+    el.statusMeta.hidden = !(def.meta && def.meta.length);
     el.statusActions.innerHTML = (def.actions || []).map(actionMarkup).join('');
     wireActs(el.statusActions);
     el.statusPage.setAttribute('data-state', 'visible');

@@ -442,12 +442,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important; animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+    animation-delay: 0s !important;
+    transition-duration: .001ms !important; transition-delay: 0s !important;
   }
 }
 [data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
   animation-duration: .001ms !important; animation-iteration-count: 1 !important;
-  transition-duration: .001ms !important;
+  animation-delay: 0s !important;
+  transition-duration: .001ms !important; transition-delay: 0s !important;
 }
 .d-panel {
   width: var(--d-panel-width); flex: 1 1 auto;
@@ -1630,6 +1632,116 @@ body {
    It takes the whole screen rather than rising as a sheet, because this is the
    moment the phone stops being the driver's own and becomes something they
    hold out at arm's length. */
+/* ══ THE CHECK ═══════════════════════════════════════════════════════════
+   Between choosing a station and getting a code. Its job is not to make a
+   driver confirm what they just tapped, it is to say whether this fill will
+   be paid for, and why.
+
+   It is reachable in both answers. A screen that can only say yes teaches
+   nothing: the rule is learned on the day it stops you, so a station that is
+   not on the company list opens this screen too and is refused here, in words,
+   rather than swallowed by an announcement on the map. */
+.o-check {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  background: var(--color-surface);
+}
+.o-check[data-state="arriving"], .o-check[data-state="visible"] { display: flex; }
+.o-check[data-state="arriving"] { opacity: 0; transform: translateY(var(--sp-5)); }
+.o-check[data-state="visible"] {
+  opacity: 1; transform: none;
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-sheet) var(--ease-emphasis);
+}
+[data-motion="reduced"] .o-check[data-state="arriving"] { transform: none; }
+.o-check__scroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(var(--size-status-bar) + var(--sp-1)) var(--sp-5) var(--sp-5);
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-4);
+}
+.o-check__bar { width: 100%; display: flex; }
+/* The station is the answer to the question the map asked, so it is the
+   biggest thing here. */
+.o-check__station {
+  font-size: var(--text-hero); font-weight: 900; line-height: 1.02;
+  letter-spacing: -1.6px; color: var(--color-text-primary);
+}
+.o-check__station:focus, .o-check__station:focus-visible { outline: none; box-shadow: none; }
+.o-check__km { font-size: var(--text-caption); color: var(--color-text-secondary); }
+.o-check__why {
+  font-size: var(--text-caption); line-height: 1.55; color: var(--color-text-secondary);
+  max-width: 34ch;
+}
+.o-check__action {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5) calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* m-verdict. The answer, said as a word and a shape at once, so the colour is
+   never the only thing carrying it. */
+.m-verdict {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-1h) var(--sp-3) var(--sp-1h) var(--sp-1h);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption); font-weight: 700;
+}
+.m-verdict__mark {
+  width: 26px; height: 26px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-circle);
+}
+.o-check[data-verdict="clear"] .m-verdict {
+  background: var(--color-success-bg); color: var(--color-success);
+}
+.o-check[data-verdict="clear"] .m-verdict__mark { background: var(--color-success); }
+.o-check[data-verdict="block"] .m-verdict {
+  background: var(--color-secondary-bg); color: var(--color-error-text);
+}
+.o-check[data-verdict="block"] .m-verdict__mark { background: var(--color-error-text); }
+
+/* m-fact. One line of the thing being authorised: what it is, and its value.
+   Not ticked, because a tick means checked and these are declarations the app
+   is making, not tests it has run. */
+.m-fact {
+  width: 100%;
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: var(--sp-1) var(--sp-3);
+  padding-block: var(--sp-2h);
+  border-top: 1px solid var(--color-border-light);
+}
+.m-fact__name {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+.m-fact__value {
+  font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.m-fact__sub {
+  width: 100%;
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
+}
+/* The fact grows a control when it has no value yet. It scrolls sideways like
+   the picker on home and bleeds to the screen gutter for the same reason: a row
+   cut flush at the edge looks like the whole fleet. */
+.m-fact__pick {
+  width: 100%;
+  display: flex; gap: var(--sp-2h);
+  overflow-x: auto; scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  margin-inline: calc(var(--sp-5) * -1);
+  padding-inline: var(--sp-5);
+  padding-block: var(--sp-1);
+}
+.m-fact__pick::-webkit-scrollbar { display: none; }
+.m-fact__pick > * { scroll-snap-align: start; }
+.m-fact__note {
+  width: 100%;
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
+}
+
 .o-fuel {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
@@ -2270,6 +2382,55 @@ body {
       <!-- SCREEN FOUR · the fill.
            Home is still underneath and is still the way back, so this is laid
            over it rather than instead of it. -->
+      <!-- Between the map and the code. It answers one question, will this fill
+           be paid for, and it answers it either way. -->
+      <section class="o-check" id="checkScreen" aria-labelledby="checkStation" hidden>
+        <div class="o-check__scroll">
+
+          <div class="o-check__bar">
+            <button class="a-icon-btn" type="button" id="checkBack" aria-label="Back to the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+          </div>
+
+          <p class="m-verdict" id="checkVerdict">
+            <span class="m-verdict__mark" id="checkMark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
+            <span id="checkVerdictText">Your company pays here</span>
+          </p>
+
+          <h1 class="o-check__station" id="checkStation" tabindex="-1">Engen Bryanston</h1>
+          <p class="o-check__km" id="checkKm">2.1 km away</p>
+
+          <!-- Only shown when the answer is no, because a driver who has been
+               stopped needs the reason and the way out, and a driver who has
+               not needs neither. -->
+          <p class="o-check__why" id="checkWhy" hidden></p>
+
+          <!-- What is being authorised. Two lines, both of which a driver can
+               check against the vehicle in front of them. -->
+          <div class="m-fact">
+            <span class="m-fact__name">Vehicle</span>
+            <span class="m-fact__value" id="checkPlate">CA 123-456</span>
+            <span class="m-fact__sub" id="checkModel">Ford Transit Custom</span>
+            <!-- Asked here when it was not answered on home, because this is
+                 the last screen before a code exists and a code without a
+                 vehicle is not a thing the app can issue. -->
+            <div class="m-fact__pick" id="checkPick" role="radiogroup"
+                 aria-label="Which vehicle are you driving" hidden></div>
+            <p class="m-fact__note" id="checkPickNote" hidden></p>
+          </div>
+          <div class="m-fact">
+            <span class="m-fact__name">Fuel</span>
+            <span class="m-fact__value">Up to 60 L</span>
+          </div>
+        </div>
+
+        <!-- The plate rides inside the button, so the vehicle is part of the
+             thing being tapped rather than a line above it that can be skipped. -->
+        <div class="o-check__action">
+          <button class="a-btn a-btn--primary" type="button" id="checkGo">Get code</button>
+          <button class="a-btn a-btn--outline" type="button" id="checkOther">Choose another station</button>
+        </div>
+      </section>
+
       <section class="o-fuel" id="fuelScreen" aria-labelledby="fuelTitle" hidden>
         <div class="o-fuel__scroll">
 
@@ -2361,6 +2522,11 @@ body {
     homePoints: $('homePoints'), homeVehicle: $('homeVehicle'),
     homeVehicleLabel: $('homeVehicleLabel'), homeVehiclePlate: $('homeVehiclePlate'),
     homeVehicleModel: $('homeVehicleModel'),
+    check: $('checkScreen'), checkStation: $('checkStation'), checkKm: $('checkKm'),
+    checkVerdict: $('checkVerdict'), checkVerdictText: $('checkVerdictText'),
+    checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkPlate: $('checkPlate'),
+    checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
+    checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
@@ -2538,6 +2704,7 @@ body {
     releaseScreen();
     el.reward.hidden = true;  el.reward.removeAttribute('data-state');
     el.home.hidden = true;    el.home.removeAttribute('data-state');
+    el.check.hidden = true;    el.check.removeAttribute('data-state');
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
     el.stations.hidden = true; el.stations.removeAttribute('data-state');
   }
@@ -2817,6 +2984,39 @@ body {
       vehicleArt(v.type, 24, 'currentColor');
   }
 
+  /* One chip, drawn in one place. Home asks this question and so does the
+     check screen, and two copies of a control this specific is how they end up
+     disagreeing about what a chosen vehicle looks like.
+
+     `at` is the chip's position in whichever row it is being drawn into, and it
+     only decides the tab stop. */
+  function vehicleChip(v, i, at) {
+    var on = i === S.activeVehicle;
+    /* A radio group is one tab stop, and that stop is the chosen radio. With
+       nothing chosen there is no such radio, so the first one takes the tab
+       stop. Keying it off `on` alone left every chip at tabindex -1 and put
+       the whole picker out of reach of the keyboard. */
+    var tabStop = on || (S.activeVehicle === NONE && at === 0);
+    /* When they were last in it, said on the chip. It is the fastest way to
+       recognise your own vehicle out of a fleet, faster than the make and
+       much faster than the picture, and it is the whole reason a returning
+       driver's picker is different from a new one's. */
+    var when = v.lastDriven
+      ? '<span class="a-vehicle-chip__when">' + v.lastDriven + '</span>' : '';
+    return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
+           ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
+           ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model +
+           (v.lastDriven ? ', last driven ' + v.lastDriven.toLowerCase() : '') + '">' +
+           '<span class="a-vehicle-chip__art">' +
+           vehicleArt(v.type, 16, on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)') +
+           '</span>' +
+           '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' + when +
+           '<span class="a-vehicle-chip__tick">' +
+           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
+           'stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+           '<path d="M20 6 9 17l-5-5"/></svg></span></button>';
+  }
+
   function paintPicker() {
     var many = S.vehicles.length > 1;
     el.homePicker.hidden = !many;
@@ -2894,31 +3094,7 @@ body {
         : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
 
     el.homePickerRow.innerHTML = shown.map(function (m, at) {
-      var v = m.v, i = m.i;
-      var on = i === S.activeVehicle;
-      /* A radio group is one tab stop, and that stop is the chosen radio. With
-         nothing chosen there is no such radio, so the first one takes the tab
-         stop. Keying it off `on` alone left every chip at tabindex -1 and put
-         the whole picker out of reach of the keyboard. */
-      var tabStop = on || (S.activeVehicle === NONE && at === 0);
-      /* When they were last in it, said on the chip. It is the fastest way to
-         recognise your own vehicle out of a fleet, faster than the make and
-         much faster than the picture, and it is the whole reason a returning
-         driver's picker is different from a new one's. */
-      var when = v.lastDriven
-        ? '<span class="a-vehicle-chip__when">' + v.lastDriven + '</span>' : '';
-      return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
-             ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
-             ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model +
-             (v.lastDriven ? ', last driven ' + v.lastDriven.toLowerCase() : '') + '">' +
-             '<span class="a-vehicle-chip__art">' +
-             vehicleArt(v.type, 16, on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)') +
-             '</span>' +
-             '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' + when +
-             '<span class="a-vehicle-chip__tick">' +
-             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
-             'stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-             '<path d="M20 6 9 17l-5-5"/></svg></span></button>';
+      return vehicleChip(m.v, m.i, at);
     }).join('');
 
     Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'), function (b) {
@@ -3253,16 +3429,148 @@ body {
   function chooseStation(id) {
     var st = STATIONS.filter(function (s) { return s.id === id; })[0];
     if (!st) { return; }
-    if (!st.allowed) {
-      announce(st.name + ' is not on your company list. Ask your manager to add it.');
-      return;
-    }
     S.station = id;
     paintStations();
-    announce(st.name + ' chosen, ' + st.km.toFixed(1) + ' kilometres. Authorising your fill.');
-    /* Choosing is the answer to the only question this screen asks, so it does
-       not need a second confirming tap. */
-    after(prefersReduced() ? 0 : 260, authoriseFill);
+    /* Both answers go to the same screen. A station that is not on the list
+       used to be refused here by an announcement nobody sees, which meant the
+       rule could only be learned by never hitting it. Being stopped, in words,
+       on a screen you have to read past, is the lesson. */
+    after(prefersReduced() ? 0 : 200, function () { showCheck(id, true); });
+  }
+
+  /* ── The check ─────────────────────────────────────────────────────────
+     Between the map and the code. It answers one question, will this fill be
+     paid for, and it answers it either way.
+
+     The map used to refuse a station that was not on the company list with an
+     announcement nobody sees, which meant the rule could only ever be learned
+     by not hitting it. The refusal happens here instead, in words, on a screen
+     the driver has to read past. Being stopped is the lesson. */
+  var CHECK_TICK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+  var CHECK_CROSS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>';
+
+  var CHECK = {
+    clear: { verdict: 'Your company pays here', mark: 'tick' },
+    block: { verdict: 'Your company will not pay here', mark: 'cross' }
+  };
+
+  function stationById(id) {
+    return STATIONS.filter(function (st) { return st.id === id; })[0] || null;
+  }
+
+  function showCheck(id, arriving) {
+    var st = stationById(id);
+    var v = activeVehicle();
+    if (!st) { return; }
+    clearTimers();
+    hideAll();
+    S.step = 'check';
+    S.checking = id;
+    var clear = !!st.allowed;
+    var face = clear ? CHECK.clear : CHECK.block;
+
+    el.check.setAttribute('data-verdict', clear ? 'clear' : 'block');
+    el.checkVerdictText.textContent = face.verdict;
+    el.checkMark.innerHTML = clear ? CHECK_TICK : CHECK_CROSS;
+    el.checkStation.textContent = st.name;
+    el.checkKm.textContent = st.km.toFixed(1) + ' km away';
+
+    /* A refusal that does not say what to do next is a dead end, and a driver
+       at a dead end goes looking for a way round it. */
+    el.checkWhy.hidden = clear;
+    el.checkWhy.textContent = clear ? ''
+      : 'Your company chooses which stations it pays for. Only your manager can add this one.';
+
+    /* The vehicle rides inside the button as well as above it, so the plate is
+       part of the thing being tapped rather than a line that can be skipped. */
+    el.checkPlate.textContent = v ? v.plate : 'Not chosen yet';
+    el.checkModel.textContent = v ? v.make + ' ' + v.model : '';
+    el.checkModel.hidden = !v;
+    paintCheckPick(clear);
+    el.checkGo.hidden = !clear;
+    /* Nothing to get a code for yet, so the button says what is missing rather
+       than offering something it cannot do. It stays in the focus order and
+       still answers, because a control that vanishes takes the explanation with
+       it. */
+    el.checkGo.setAttribute('aria-disabled', v ? 'false' : 'true');
+    el.checkGo.textContent = v ? 'Get code for ' + v.plate : 'Pick a vehicle first';
+    el.checkOther.textContent = clear ? 'Choose another station' : 'Choose a station on the list';
+
+    el.check.hidden = false;
+    if (arriving && !prefersReduced()) {
+      el.check.setAttribute('data-state', 'arriving');
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        el.check.setAttribute('data-state', 'visible');
+      }); });
+    } else {
+      el.check.setAttribute('data-state', 'visible');
+    }
+    after(60, function () { el.checkStation.focus({ preventScroll: true }); });
+    after(500, function () {
+      announce(st.name + '. ' + face.verdict + '.' +
+               (clear && v ? ' Up to 60 litres on ' + v.plate + '.' : '') +
+               (clear ? '' : ' ' + el.checkWhy.textContent));
+    });
+  }
+
+  /* The row this screen grows when the question was never answered on home.
+     It is the picker's chips and nothing else: no search, no recency note, no
+     cap message. A driver standing at a forecourt with the station already
+     chosen is picking between the two or three they actually drive, and the
+     apparatus that makes a thousand vehicles findable belongs on the screen
+     that has room for it. Past the cap, the row says so and home is still one
+     press of Back away. */
+  function paintCheckPick(clear) {
+    var v = activeVehicle();
+    var show = clear && !v && S.vehicles.length > 0;
+    el.checkPick.hidden = !show;
+    el.checkPickNote.hidden = true;
+    if (!show) { return; }
+
+    /* The ones they have actually been in lead, for the same reason they lead
+       on home: it is the fastest way to recognise your own vehicle. */
+    var recent = [], rest = [];
+    S.vehicles.forEach(function (vh, i) { (vh.lastDriven ? recent : rest).push({ v: vh, i: i }); });
+    var ordered = recent.concat(rest);
+    var shown = ordered.slice(0, ROW_CAP);
+    el.checkPick.innerHTML = shown.map(function (m, at) {
+      return vehicleChip(m.v, m.i, at);
+    }).join('');
+
+    var over = ordered.length - shown.length;
+    el.checkPickNote.hidden = over <= 0;
+    el.checkPickNote.textContent =
+      'Showing ' + shown.length + '. Go back to home to search the other ' + groupNum(over) + '.';
+
+    Array.prototype.forEach.call(el.checkPick.querySelectorAll('[data-vehicle]'), function (b) {
+      b.addEventListener('click', function () {
+        chooseVehicle(Number(b.dataset.vehicle));
+        /* Repainted in place rather than pushed anywhere. The driver answered a
+           question on this screen, so this screen is where the answer appears,
+           and the button they were reaching for is now the one that works. */
+        showCheck(S.checking);
+        after(60, function () { el.checkGo.focus({ preventScroll: true }); });
+      });
+      b.addEventListener('keydown', function (ev) {
+        var step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
+        if (!step) { return; }
+        ev.preventDefault();
+        var all = Array.prototype.slice.call(el.checkPick.querySelectorAll('[data-vehicle]'));
+        var at = all.indexOf(b) + step;
+        if (at < 0) { at = all.length - 1; }
+        if (at >= all.length) { at = 0; }
+        all[at].focus();
+      });
+    });
+  }
+
+  function hideCheck() {
+    el.check.hidden = true;
+    el.check.removeAttribute('data-state');
   }
 
   function stationName() {
@@ -3270,11 +3578,11 @@ body {
     return st ? st.name : STATIONS[0].name;
   }
 
-  function showStations(arriving) {
+  function showStations(arriving, keepChoice) {
     S.step = 'stations';
-    el.stationSearch.value = '';
+    if (!keepChoice) { el.stationSearch.value = ''; }
     el.stationStatus.textContent = '';
-    S.station = null;
+    if (!keepChoice) { S.station = null; }
     paintStations();
     el.stations.hidden = false;
     if (arriving && !prefersReduced()) {
@@ -3315,25 +3623,16 @@ body {
       announce('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
-    /* Assigned and chosen are not the same thing, and the app cannot guess
-       which van somebody walked up to this morning. The question goes back to
-       where the answer is rather than appearing as an error at the bottom of
-       the screen, under the thumb that has just left the button. */
-    if (!activeVehicle()) {
-      announce('Choose which vehicle you are driving first.');
-      /* Focus alone is not an answer. A programmatic focus does not draw a ring
-         for anyone who arrived by touch, so the prompt is also something you can
-         see, on the slot that is waiting to be filled. */
-      el.homeVehicleEmpty.setAttribute('data-ask', 'on');
-      el.homeVehicleEmpty.scrollIntoView({ block: 'nearest' });
-      after(1800, function () { el.homeVehicleEmpty.removeAttribute('data-ask'); });
-      var first = el.homePickerRow.querySelector('[data-vehicle]');
-      if (first) { first.focus(); }
-      return;
-    }
-    /* Where before how much. A code is issued against a station, so the station
-       is answered first rather than assumed and corrected afterwards. The
-       authorisation itself has not changed, it just starts one screen later. */
+    /* Straight to the map, whether or not a van has been picked.
+       This used to refuse and send the driver back up the screen to the picker.
+       It was the right rule enforced in the wrong place: pressing the one
+       button the app exists for and having nothing open is indistinguishable
+       from a broken button, and the driver who has not chosen a van is exactly
+       the driver least sure the app is working.
+
+       The rule has not gone anywhere. A code is issued against a vehicle, so it
+       still cannot be issued without one, and the check screen is where that is
+       held, because it is the last point at which the answer still matters. */
     showStations(true);
   }
 
@@ -3436,6 +3735,7 @@ body {
      stray key press must not call off a fill somebody is standing at. */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && S.step === 'fuel') { hideFuel(); }
+    if (e.key === 'Escape' && S.step === 'check') { hideCheck(); showStations(false, true); }
   });
 
 
@@ -3488,6 +3788,29 @@ body {
   });
   /* Backing out is not cancelling a fill, because no fill has started yet. It
      simply puts the driver back where they pressed. */
+  el.checkGo.addEventListener('click', function () {
+    /* Says what is missing rather than doing nothing, because a control that
+       looks live and is not is the fault this whole change exists to remove. */
+    if (el.checkGo.getAttribute('aria-disabled') === 'true') {
+      announce('Pick which vehicle you are driving to get a code.');
+      var first = el.checkPick.querySelector('[data-vehicle]');
+      if (first) { first.focus(); }
+      return;
+    }
+    hideCheck();
+    authoriseFill();
+  });
+  /* Back to the map with the choice intact, because the driver is changing
+     their mind about a station, not starting the search again. */
+  el.checkOther.addEventListener('click', function () {
+    hideCheck();
+    showStations(false, true);
+  });
+  el.checkBack.addEventListener('click', function () {
+    hideCheck();
+    showStations(false, true);
+  });
+
   el.stationsBack.addEventListener('click', function () {
     hideStations();
     S.step = 'home';
@@ -3634,6 +3957,10 @@ body {
       run: function () { reset('returning-driver', true, 4); S.activeVehicle = 0;
                          showHome(); showStations(false);
                          el.stationSearch.value = 'zzz'; paintStations(); } },
+    'fuel-check':      { group: 'fuelling', label: 'Check before the code',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('bryanston'); } },
+    'fuel-check-blocked': { group: 'fuelling', label: 'Check, station refused',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('randburg'); } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
       run: function () {
         reset('returning-driver', true, 1); showHome(); clearTimers();
