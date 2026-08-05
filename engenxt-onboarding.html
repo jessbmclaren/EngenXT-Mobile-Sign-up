@@ -1355,7 +1355,7 @@ body {
    the vehicle chip, because a driver has already learned that here: filled
    primary means this one is on. */
 .a-filter-chip {
-  flex-shrink: 0; min-height: 36px; padding: 0 var(--sp-3h, var(--sp-3));
+  flex-shrink: 0; min-height: 36px; padding: 0 var(--sp-3);
   display: inline-flex; align-items: center; gap: var(--sp-1h);
   border: 1px solid var(--glass-panel-line); border-radius: var(--radius-pill);
   background: var(--glass-bar-bg);
@@ -1591,6 +1591,50 @@ body {
    phone. Without this the surface covered the clock and the battery. */
 .m-notch, .m-status-bar { z-index: var(--z-tool-top); }
 .o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: stretch; }
+
+/* ══ THE CHECK ════════════════════════════════════════════════════════
+   Five questions, answered where the driver can watch them being answered.
+   It replaces a spinner, so it is not decoration: the same 900ms is now
+   spent saying what is being checked instead of saying nothing. */
+.o-onboard--check { background: var(--gradient-hero); align-items: stretch; }
+.o-check__list { display: flex; flex-direction: column; gap: var(--sp-2h); }
+
+/* m-check. One question and its answer. */
+.m-check {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: left;
+  /* Waiting to be answered. Each one arrives as its answer does, so the list
+     is a sequence of results rather than a block that appears finished. */
+  opacity: 0; transform: translateY(6px);
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+.m-check[data-state="in"] { opacity: 1; transform: none; }
+.m-check__mark {
+  flex-shrink: 0; width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-circle);
+  border: 1.5px solid var(--color-success);
+  color: var(--color-success);
+}
+/* A refusal is the same row with the other answer, so the layout never moves
+   and the driver reads the list the same way whichever way it goes. */
+.m-check[data-ok="false"] .m-check__mark {
+  border-color: var(--color-secondary); color: var(--color-secondary);
+}
+.m-check__body { flex: 1 1 auto; min-width: 0; }
+.m-check__title {
+  display: block; font-size: var(--text-callout); font-weight: 700;
+  color: var(--color-text-on-dark);
+}
+.m-check__sub {
+  display: block; margin-top: 1px;
+  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+}
 .o-onboard--reward .o-onboard__eyebrow,
 .o-onboard--reward .o-onboard__title { text-align: center; }
 .o-onboard--reward .o-onboard__eyebrow { color: var(--color-accent-on-dark-soft); }
@@ -2379,7 +2423,23 @@ body {
         </div>
       </section>
 
-      <!-- SCREEN FOUR · the fill.
+      <!-- SCREEN FOUR · the check.
+           The authorisation used to be 900ms of spinner. It is really five
+           separate questions being answered, and a driver who is about to hand
+           a code to an attendant is entitled to see which ones passed. It also
+           gives every possible refusal somewhere to live: a check that fails is
+           a row that fails, not a screen somebody has to design later. -->
+      <section class="o-onboard o-onboard--check" id="checkScreen" aria-labelledby="checkTitle" hidden>
+        <p class="o-onboard__eyebrow">Fuel check</p>
+        <h1 class="o-onboard__title" id="checkTitle" tabindex="-1">Checking your fill</h1>
+        <div class="o-check__list" id="checkList"></div>
+        <div class="o-onboard__spacer"></div>
+        <div class="o-onboard__actions">
+          <button class="a-btn a-btn--primary" id="checkCta" type="button" disabled>Show attendant card</button>
+        </div>
+      </section>
+
+      <!-- SCREEN FIVE · the fill.
            Home is still underneath and is still the way back, so this is laid
            over it rather than instead of it. -->
       <!-- Between the map and the code. It answers one question, will this fill
@@ -2548,6 +2608,8 @@ body {
   el.stationSearch = $('stationSearch'); el.stationEmpty = $('stationEmpty');
   el.stationStatus = $('stationStatus'); el.stationsBack = $('stationsBack');
   el.fuelStation = $('fuelStation');
+  el.check = $('checkScreen'); el.checkTitle = $('checkTitle');
+  el.checkList = $('checkList'); el.checkCta = $('checkCta');
 
   /* ════════════════════════════════════════════════════════════════════
      MOCK STATE
@@ -2707,6 +2769,7 @@ body {
     el.check.hidden = true;    el.check.removeAttribute('data-state');
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
     el.stations.hidden = true; el.stations.removeAttribute('data-state');
+    el.check.hidden = true;    el.check.removeAttribute('data-state');
   }
 
   /* Total points, and everything on the screen that is derived from it. */
@@ -3604,16 +3667,83 @@ body {
     el.stations.removeAttribute('data-state');
   }
 
+  /* ── The check ────────────────────────────────────────────────────────
+     What the authorisation is actually made of. Five questions, and a driver
+     about to hand a code to an attendant is entitled to see which ones were
+     asked. Written as data because every one of them can fail, and a failed
+     check should be this row with the other answer rather than a screen
+     somebody has to invent later. */
+  function fuelChecks() {
+    var v = activeVehicle();
+    return [
+      { ok: true, title: "You're in the right area",
+        sub: stationName() + ' is approved for you' },
+      { ok: true, title: 'Your account has enough funds',
+        sub: 'Budget available for this fill' },
+      { ok: true, title: 'Right day, right time',
+        sub: 'Your company allows fuelling right now' },
+      { ok: true, title: 'Your vehicle is confirmed',
+        sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate : 'No vehicle chosen' },
+      { ok: true, title: '60 L approved for this fill',
+        sub: 'Your company limit for this vehicle' }
+    ];
+  }
+
+  var TICK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+  var CROSS = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  function showCheck() {
+    S.step = 'check';
+    var checks = fuelChecks();
+    var allOk = checks.every(function (c) { return c.ok; });
+
+    el.checkTitle.textContent = 'Checking your fill';
+    el.checkCta.disabled = true;
+    el.checkList.innerHTML = checks.map(function (c) {
+      return '<div class="m-check" data-ok="' + c.ok + '" role="listitem">' +
+             '<span class="m-check__mark">' + (c.ok ? TICK : CROSS) + '</span>' +
+             '<span class="m-check__body">' +
+             '<span class="m-check__title">' + c.title + '</span>' +
+             '<span class="m-check__sub">' + c.sub + '</span></span></div>';
+    }).join('');
+    el.checkList.setAttribute('role', 'list');
+    el.check.hidden = false;
+    el.check.setAttribute('data-state', 'visible');
+    after(60, function () { el.checkTitle.focus({ preventScroll: true }); });
+
+    /* Each answer arrives as it is answered. Under reduced motion the list is
+       simply already answered, which is the same information without the
+       staging: a still sequence is a delay, not a sequence. */
+    var rows = el.checkList.querySelectorAll('.m-check');
+    var step = prefersReduced() ? 0 : 220;
+    Array.prototype.forEach.call(rows, function (r, i) {
+      after(step * i, function () { r.setAttribute('data-state', 'in'); });
+    });
+    var done = step * rows.length;
+    after(done, function () {
+      el.checkTitle.textContent = allOk ? "You're cleared to fuel." : 'You cannot fuel here';
+      el.checkCta.disabled = !allOk;
+      announce(allOk
+        ? "You're cleared to fuel at " + stationName() + '. Show the attendant card.'
+        : 'You cannot fuel here. Read the checks for the reason.');
+    });
+  }
+
+  function hideCheck() {
+    el.check.hidden = true;
+    el.check.removeAttribute('data-state');
+  }
+
   /* The authorisation itself, once the station is known. */
   function authoriseFill() {
     hideStations();
     S.fuel = 'pending';
     paintFuelAction();
-    after(prefersReduced() ? 0 : 900, function () {
-      S.fuel = 'live';
-      paintFuelAction();
-      showFuel(true);
-    });
+    showCheck();
   }
 
   function requestFuel() {
@@ -3818,6 +3948,14 @@ body {
     el.homeFuel.focus({ preventScroll: true });
   });
   el.stationSearch.addEventListener('input', paintStations);
+  /* The card is what the attendant reads, so it is a deliberate second tap
+     rather than something that appears while the driver is still reading. */
+  el.checkCta.addEventListener('click', function () {
+    hideCheck();
+    S.fuel = 'live';
+    paintFuelAction();
+    showFuel(true);
+  });
 
   el.homeVehicleEmpty.addEventListener('click', function () {
     var first = el.homePickerRow.querySelector('[data-vehicle]');
