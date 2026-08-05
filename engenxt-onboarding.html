@@ -863,6 +863,13 @@ body {
   text-align: center;
 }
 .a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__plate { color: var(--color-text-on-dark); }
+/* Quieter than the registration, because it helps you find the chip and is not
+   the thing you are choosing. */
+.a-vehicle-chip__when {
+  font-size: var(--text-nano); font-weight: 600; line-height: 1.3;
+  color: var(--color-text-tertiary); white-space: nowrap;
+}
+.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__when { color: var(--color-on-dark-soft); }
 /* The fill is a colour, so the tick is the second cue and the choice is never
    carried by hue alone. */
 .a-vehicle-chip__tick {
@@ -2009,10 +2016,24 @@ body {
       }
     }
 
-    var shown = matches.slice(0, ROW_CAP);
-    /* Whatever the cap or the search would have done, the vehicle being driven
-       stays in the row. A picker that drops your own answer off the end reads
-       as having forgotten it. */
+    /* What the driver has actually been in, most recent first. A returning
+       driver at a company with a thousand trucks does not browse a thousand
+       trucks: they are in the one they were in yesterday, or they search. */
+    var recent = matches.filter(function (m) { return m.v.lastDriven; });
+    var rest = matches.filter(function (m) { return !m.v.lastDriven; });
+
+    /* Recents lead when there are any. Past the row's capacity they are the
+       only thing worth showing, because the twelve arbitrary registrations
+       after them are no more likely to be the right one than the other
+       nine hundred and eighty five. Inside the capacity the whole fleet still
+       fits, so hiding any of it would be withholding for no reason. */
+    var recentsOnly = !q && recent.length > 0 && matches.length > ROW_CAP;
+    var ordered = recentsOnly ? recent : recent.concat(rest);
+    var shown = ordered.slice(0, ROW_CAP);
+
+    /* Whatever the cap, the search or the recency rule would have done, the
+       vehicle being driven stays in the row. A picker that drops your own
+       answer off the end reads as having forgotten it. */
     if (matches.length && !shown.some(function (m) { return m.i === S.activeVehicle; })) {
       var active = null;
       for (var a = 0; a < matches.length; a++) {
@@ -2035,9 +2056,10 @@ body {
       : groupNum(S.vehicles.length) + ' vehicles';
     el.homePickerEmpty.hidden = matches.length > 0;
 
-    /* Say what is not on screen. A row that quietly stops at twelve of a
-       thousand looks like the whole fleet, and a driver who cannot find their
-       van in it concludes they have not been given one. */
+    /* Say what is not on screen, and say why these are the ones that are. A row
+       that quietly stops at twelve of a thousand looks like the whole fleet,
+       and a driver who cannot find their van in it concludes they have not been
+       given one. */
     var over = matches.length - shown.length;
     el.homePickerNote.hidden = over <= 0;
     el.homePickerNote.textContent = q
@@ -2045,7 +2067,9 @@ body {
          opposite of what narrowing does. */
       ? 'Showing ' + shown.length + ' of ' + groupNum(matches.length) +
         ' matches. Type more of the registration to narrow it.'
-      : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
+      : recentsOnly
+        ? 'The ones you have driven. Search to reach the other ' + groupNum(over) + '.'
+        : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
 
     el.homePickerRow.innerHTML = shown.map(function (m, at) {
       var v = m.v, i = m.i;
@@ -2055,13 +2079,20 @@ body {
          stop. Keying it off `on` alone left every chip at tabindex -1 and put
          the whole picker out of reach of the keyboard. */
       var tabStop = on || (S.activeVehicle === NONE && at === 0);
+      /* When they were last in it, said on the chip. It is the fastest way to
+         recognise your own vehicle out of a fleet, faster than the make and
+         much faster than the picture, and it is the whole reason a returning
+         driver's picker is different from a new one's. */
+      var when = v.lastDriven
+        ? '<span class="a-vehicle-chip__when">' + v.lastDriven + '</span>' : '';
       return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
              ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
-             ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model + '">' +
+             ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model +
+             (v.lastDriven ? ', last driven ' + v.lastDriven.toLowerCase() : '') + '">' +
              '<span class="a-vehicle-chip__art">' +
              vehicleArt(v.type, 16, on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)') +
              '</span>' +
-             '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' +
+             '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' + when +
              '<span class="a-vehicle-chip__tick">' +
              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
              'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -2294,6 +2325,27 @@ body {
   /* The third argument is either how many vehicles the driver has been given,
      drawn from the demo yard, or the exact set to give them when the point of
      the state is which vehicles they are rather than how many. */
+  /* How many of a returning driver's vehicles they have actually been in
+     lately, and when. Deterministic, because a state you cannot screenshot
+     twice is not a state.
+
+     Three is the useful number. A driver who swaps vans is usually cycling
+     round a handful, and past three the list stops being "the one I was in
+     yesterday" and becomes another thing to read. */
+  var RECENT_WHEN = ['Yesterday', 'Monday', 'Last week'];
+
+  function markRecent(vehicles, userType) {
+    /* A driver who signed up ninety seconds ago has been in none of them. The
+       fleet is the same size either way, because fleet size belongs to the
+       company, not to how long the driver has had the app. */
+    if (userType === 'new-driver') { return vehicles; }
+    return vehicles.map(function (v, i) {
+      return i < RECENT_WHEN.length
+        ? { plate: v.plate, make: v.make, model: v.model, type: v.type, lastDriven: RECENT_WHEN[i] }
+        : v;
+    });
+  }
+
   function reset(userType, linked, fleet) {
     S.userType = userType;
     S.vehicleLinked = !!linked;
@@ -2301,6 +2353,7 @@ body {
     S.vehicles = !S.vehicleLinked ? []
                : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
                : makeFleet(fleet || 1);
+    S.vehicles = markRecent(S.vehicles, userType);
     /* Nothing is chosen for the driver. Being assigned four vehicles does not
        mean you are in the first one, and the app cannot know which yard you
        walked into this morning. One vehicle is the exception, because there is
@@ -2315,18 +2368,32 @@ body {
      already been done. */
   var ASSIGNED_ON_ARRIVAL = 3;
 
-  /* Grouped by who the driver is, and the grouping is now true.
+  /* Two axes, and they are independent.
 
-     Four of these sat under "New driver" while calling reset('returning-driver'),
-     so the menu offered a driver who had just watched fifty points land and
-     then rendered a balance of 2 450 under a thousand vehicles. The heading was
-     the thing that was wrong, so the rows moved rather than the data: a fleet
-     of nine belongs to someone who has been here a while. */
+     How many vehicles a driver has belongs to the company they drive for. A
+     driver who signed up ninety seconds ago at a company running a thousand
+     trucks has a thousand trucks, so every fleet size appears under both
+     headings. Filing the big fleets under "returning" only was reading fleet
+     size as a measure of how long someone had had the app.
+
+     What actually differs is history. A returning driver has vehicles they have
+     been in, and those lead the picker, which at a thousand is the difference
+     between a usable screen and a search box. A new driver has been in none of
+     them yet, so there is nothing to lead with and the row simply starts at the
+     beginning of the fleet. */
   var STATES = {
     'signup-reward':      { group: 'after-signup', label: 'Reward, 50 points',
       run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
-    'home':               { group: 'after-signup', label: 'Home, one vehicle',
+    'home':               { group: 'after-signup', label: 'One vehicle',
       run: function () { reset('new-driver', true, 1); showHome(); } },
+    'new-four-vehicles':  { group: 'after-signup', label: 'Four vehicles',
+      run: function () { reset('new-driver', true, 4); showHome(); } },
+    'new-five-vans':      { group: 'after-signup', label: 'Five vans',
+      run: function () { reset('new-driver', true, VANS); showHome(); } },
+    'new-nine-vehicles':  { group: 'after-signup', label: 'Nine vehicles',
+      run: function () { reset('new-driver', true, 9); showHome(); } },
+    'new-thousand-vehicles': { group: 'after-signup', label: 'A thousand vehicles',
+      run: function () { reset('new-driver', true, 1000); showHome(); } },
 
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle assigned',
       run: function () { reset('returning-driver', false); route(); } },
@@ -2498,8 +2565,8 @@ body {
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
-    'after-signup': 'The reward, then the app the flow lands in.',
-    'returning':    'Someone who has been here before, at every size of fleet.'
+    'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
+    'returning':    'The same fleets, with the vehicles they have actually been in leading.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -2541,7 +2608,11 @@ body {
     'engenxt-onboarding.html': {
       'after-signup': [
         ['signup-reward', 'Reward, 50 points'],
-        ['home', 'Home, one vehicle']
+        ['home', 'One vehicle'],
+        ['new-four-vehicles', 'Four vehicles'],
+        ['new-five-vans', 'Five vans'],
+        ['new-nine-vehicles', 'Nine vehicles'],
+        ['new-thousand-vehicles', 'A thousand vehicles']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],

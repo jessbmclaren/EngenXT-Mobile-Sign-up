@@ -3277,8 +3277,8 @@ button { background: none; border: none; color: inherit; }
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
-    'after-signup': 'The reward, then the app the flow lands in.',
-    'returning':    'Someone who has been here before, at every size of fleet.'
+    'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
+    'returning':    'The same fleets, with the vehicles they have actually been in leading.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3326,7 +3326,11 @@ button { background: none; border: none; color: inherit; }
     'engenxt-onboarding.html': {
       'after-signup': [
         ['signup-reward', 'Reward, 50 points'],
-        ['home', 'Home, one vehicle']
+        ['home', 'One vehicle'],
+        ['new-four-vehicles', 'Four vehicles'],
+        ['new-five-vans', 'Five vans'],
+        ['new-nine-vehicles', 'Nine vehicles'],
+        ['new-thousand-vehicles', 'A thousand vehicles']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],
