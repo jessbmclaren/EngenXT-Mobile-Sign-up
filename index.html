@@ -48,6 +48,10 @@
   --color-secondary-40: rgba(226,35,26,0.40);
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
+  /* The faintest step, for a wash rather than a surface. Declared because
+     an undefined custom property takes its whole declaration down with it,
+     silently, which is how the reward meter went missing. */
+  --color-secondary-05: rgba(226,35,26,0.05);
 
   /* The base the two steps below are alpha of. It was never declared, and the
      reward meter's fill asks for it, so the fill's gradient was invalid and the
@@ -134,6 +138,10 @@
   /* Type */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono: "SF Mono","Menlo",monospace;
+  /* Between the title and the hero. A greeting set light at this size reads
+     as someone speaking; the same words at 22px read as a field label, and
+     at 42px they read as a headline. */
+  --text-display:  30px;
   --text-hero:     42px;
   --text-title:    22px;
   --text-large:    20px;
@@ -212,6 +220,31 @@
   --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
   --glass-card-bg:  rgba(255,255,255,0.62);
+
+  /* Light glass, for a panel sitting on the page rather than over the hero.
+     The sheet tokens above are tuned for a near-black backdrop and go milky on
+     a light one, so this is a second, measured pair rather than a reuse.
+
+     0.55 over the page grey lands the panel at roughly #F4F5F8, which holds
+     --color-text-primary at 14.6:1 and --color-text-secondary at 6.2:1, so the
+     glass never costs a contrast ratio. The line is what makes it read as glass
+     rather than as a flat translucent box: a lit top edge, nothing else. */
+  --glass-panel-bg:   rgba(255,255,255,0.55);
+  --glass-panel-bd:   blur(28px) saturate(180%);
+  --glass-panel-line: rgba(255,255,255,0.70);
+  /* The card nested inside a panel. Denser than its parent, because the thing
+     inside the glass has to sit on top of it rather than dissolve into it. */
+  --glass-inset-bg:   rgba(255,255,255,0.78);
+
+  /* The bloom behind home. Three of the brand hues at low alpha, so the page
+     has depth without the screen carrying a picture, and nothing under it ever
+     drops below its measured contrast. Colour, not decoration: the same three
+     hues the product is built from. */
+  --gradient-bloom:
+    radial-gradient(58% 42% at 22% 26%, var(--color-primary-12) 0%, transparent 70%),
+    radial-gradient(52% 38% at 82% 34%, var(--color-tertiary-18) 0%, transparent 68%),
+    radial-gradient(64% 40% at 62% 12%, var(--color-secondary-05) 0%, transparent 72%),
+    radial-gradient(70% 45% at 38% 58%, var(--color-warning-bg) 0%, transparent 66%);
 
   /* Motion */
   --ease-out:      cubic-bezier(0.16,1,0.3,1);

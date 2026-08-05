@@ -53,6 +53,10 @@
   --color-secondary-40: rgba(226,35,26,0.40);
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
+  /* The faintest step, for a wash rather than a surface. Declared because
+     an undefined custom property takes its whole declaration down with it,
+     silently, which is how the reward meter went missing. */
+  --color-secondary-05: rgba(226,35,26,0.05);
 
   /* The base the two steps below are alpha of. It was never declared, and the
      reward meter's fill asks for it, so the fill's gradient was invalid and the
@@ -139,6 +143,10 @@
   /* Type */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono: "SF Mono","Menlo",monospace;
+  /* Between the title and the hero. A greeting set light at this size reads
+     as someone speaking; the same words at 22px read as a field label, and
+     at 42px they read as a headline. */
+  --text-display:  30px;
   --text-hero:     42px;
   --text-title:    22px;
   --text-large:    20px;
@@ -217,6 +225,31 @@
   --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
   --glass-card-bg:  rgba(255,255,255,0.62);
+
+  /* Light glass, for a panel sitting on the page rather than over the hero.
+     The sheet tokens above are tuned for a near-black backdrop and go milky on
+     a light one, so this is a second, measured pair rather than a reuse.
+
+     0.55 over the page grey lands the panel at roughly #F4F5F8, which holds
+     --color-text-primary at 14.6:1 and --color-text-secondary at 6.2:1, so the
+     glass never costs a contrast ratio. The line is what makes it read as glass
+     rather than as a flat translucent box: a lit top edge, nothing else. */
+  --glass-panel-bg:   rgba(255,255,255,0.55);
+  --glass-panel-bd:   blur(28px) saturate(180%);
+  --glass-panel-line: rgba(255,255,255,0.70);
+  /* The card nested inside a panel. Denser than its parent, because the thing
+     inside the glass has to sit on top of it rather than dissolve into it. */
+  --glass-inset-bg:   rgba(255,255,255,0.78);
+
+  /* The bloom behind home. Three of the brand hues at low alpha, so the page
+     has depth without the screen carrying a picture, and nothing under it ever
+     drops below its measured contrast. Colour, not decoration: the same three
+     hues the product is built from. */
+  --gradient-bloom:
+    radial-gradient(58% 42% at 22% 26%, var(--color-primary-12) 0%, transparent 70%),
+    radial-gradient(52% 38% at 82% 34%, var(--color-tertiary-18) 0%, transparent 68%),
+    radial-gradient(64% 40% at 62% 12%, var(--color-secondary-05) 0%, transparent 72%),
+    radial-gradient(70% 45% at 38% 58%, var(--color-warning-bg) 0%, transparent 66%);
 
   /* Motion */
   --ease-out:      cubic-bezier(0.16,1,0.3,1);
@@ -687,10 +720,47 @@ body {
   background: var(--color-surface-page);
 }
 .o-home[data-state="visible"] { display: flex; }
+/* The bloom. It sits behind everything and scrolls with nothing, so the screen
+   has depth while the content stays flat and legible. Static: three colours
+   drifting slowly behind a work tool is movement nobody asked for, and it costs
+   composited layers on the phone this is built for. */
+.o-home::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gradient-bloom);
+  pointer-events: none;
+}
+.o-home > * { position: relative; z-index: var(--z-content); }
 .o-home__scroll {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5) var(--sp-5);
-  display: flex; flex-direction: column; gap: var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+/* Everything a driver reaches for sits at the bottom, within a thumb. The gap
+   above it is not empty space for its own sake: it is where the bloom shows,
+   and it is what keeps the controls off the top of a tall phone. */
+.o-home__stack {
+  margin-top: auto;
+  display: flex; flex-direction: column; gap: var(--sp-2h);
+}
+
+/* m-glass-panel. A group of related things on one pane of glass, with the
+   thing you act on nested inside it rather than beside it. The nesting is the
+   point: the picker and the vehicle it produces are one object, and stacking
+   them as two cards said they were two. */
+.m-glass-panel {
+  padding: var(--sp-4);
+  border-radius: var(--radius-sheet);
+  background: var(--glass-panel-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd);
+  backdrop-filter: var(--glass-panel-bd);
+  border: 1px solid var(--glass-panel-line);
+  box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+/* No backdrop-filter, no glass: fall back to a solid surface rather than to a
+   translucent panel over a gradient, which is where text goes unreadable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .m-glass-panel { background: var(--color-surface); }
 }
 
 /* m-app-bar. The mark, the name and the two things reachable from anywhere. */
@@ -729,16 +799,16 @@ body {
   font-size: var(--text-callout); font-weight: 800; cursor: pointer;
 }
 
-.o-home__greeting { display: flex; flex-direction: column; gap: var(--sp-1); }
-.o-home__eyebrow {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--color-text-tertiary);
-}
-/* The driver knows their own name. It was the largest thing on a screen whose
-   job is fuelling, so it comes down a step and gives the weight to the work. */
+/* The greeting is a sentence, so it is set as one: two lines, light, in the
+   ink colour, at the size of something you read rather than something you are
+   shouted at. It was an uppercase letterspaced label above a heavy name, which
+   is a filing system's idea of a greeting. */
+.o-home__greeting { display: flex; flex-direction: column; }
+.o-home__eyebrow,
 .o-home__name {
-  font-size: var(--text-title); font-weight: 800; line-height: 1.05;
-  letter-spacing: -1px; color: var(--color-text-primary);
+  font-size: var(--text-display); font-weight: 300; line-height: 1.18;
+  letter-spacing: -0.6px; color: var(--color-text-primary);
+  text-transform: none;
 }
 .o-home__name:focus, .o-home__name:focus-visible { outline: none; box-shadow: none; }
 
@@ -815,11 +885,12 @@ body {
   display: flex; gap: var(--sp-3);
   overflow-x: auto; scrollbar-width: none;
   scroll-snap-type: x proximity;
-  /* The bleed stays, so the row reads as continuing past the edge. The inset
-     comes back to the gutter everything else on the screen uses, which also
-     leaves a slice of the next tile showing rather than landing it flush. */
-  margin-inline: calc(var(--sp-5) * -1);
-  padding-inline: var(--sp-3);
+  /* The bleed stays, so the row reads as continuing past the edge, but it is
+     measured against whatever contains it. It was cut to the screen gutter,
+     and once the picker moved inside a panel with a smaller inset the row
+     overshot its own container and the last chip was clipped by the glass. */
+  margin-inline: calc(var(--sp-4) * -1);
+  padding-inline: var(--sp-4);
   padding-block: var(--sp-1);
 }
 .m-vehicle-picker__row::-webkit-scrollbar { display: none; }
@@ -909,12 +980,17 @@ body {
 
 /* m-vehicle-card. The one thing a driver checks before pulling in, so it is
    the only card on this screen that takes the brand gradient. */
+/* Nested inside the panel, so it is a denser pane of the same glass rather than
+   a second card beside it. It used to be a filled brand-blue slab, which made
+   the vehicle the loudest thing on the screen and left the fuel action, which
+   is what the driver came for, quieter than the thing it acts on. The blue now
+   belongs to the action alone. */
 .m-vehicle-card {
   display: flex; align-items: center; gap: var(--sp-3);
-  width: 100%; padding: var(--sp-4);
+  width: 100%; padding: var(--sp-3);
   border: none; border-radius: var(--radius-card);
-  background: var(--gradient-primary); box-shadow: var(--shadow-btn);
-  color: var(--color-text-on-dark); text-align: left; cursor: pointer;
+  background: var(--glass-inset-bg);
+  color: var(--color-text-primary); text-align: left; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
 .m-vehicle-card:active { transform: scale(0.985); }
@@ -922,42 +998,50 @@ body {
 .m-vehicle-card__label,
 .m-vehicle-card__plate,
 .m-vehicle-card__model { display: block; }
+/* The eyebrow is redundant once the card sits under the picker's own heading,
+   so it stops shouting and just orients. */
 .m-vehicle-card__label {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--color-on-dark-soft);
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-vehicle-card__plate {
   margin-top: 2px;
-  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.4px;
+  font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+  color: var(--color-text-primary);
 }
 .m-vehicle-card__model {
   margin-top: 2px;
-  font-size: var(--text-caption2); color: var(--color-on-dark-soft);
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .m-vehicle-card__chev {
   flex-shrink: 0; width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius-circle); background: var(--color-on-dark-fill);
+  border-radius: var(--radius-circle); background: var(--color-surface-sunken);
+  color: var(--color-text-secondary);
 }
 .m-vehicle-card__art {
-  flex-shrink: 0; width: 48px; height: 48px;
+  flex-shrink: 0; width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius-card-sm); background: var(--color-on-dark-fill);
+  border-radius: var(--radius-card-sm); background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 /* What choosing this vehicle actually decides. The card named a vehicle and
    left the driver to infer why it mattered. */
 .m-vehicle-card__note {
   display: block; margin-top: var(--sp-1h);
-  font-size: var(--text-caption2); color: var(--color-on-dark-soft);
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
 }
 
 /* The same card before a choice has been made: same size, same place, so the
    screen does not jump when the driver picks one, and the question is asked
    where its answer will appear. */
 .m-vehicle-card[data-state="empty"] {
-  background: none; box-shadow: none;
+  background: none;
   border: 1px dashed var(--color-border-field);
+}
+.m-vehicle-card[data-state="empty"] .m-vehicle-card__art {
+  background: var(--color-surface-sunken); color: var(--color-text-secondary);
 }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__art { background: var(--color-surface-sunken); }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__plate {
@@ -970,7 +1054,21 @@ body {
    tile under a "Quick access" heading, beside a second tile, above roughly
    240dp of nothing, carrying the same drawing as the Fuel tab directly
    underneath it. A tab is navigation and a button is the action, and they are
-   allowed to reach the same place. */
+   allowed to reach the same place.
+
+   It sits outside the scrolling column so it is always where the thumb is, and
+   the content behind it dissolves into the page rather than being sliced off by
+   a hard edge. */
+.o-home__action {
+  flex-shrink: 0;
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  position: relative;
+}
+.o-home__action::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: var(--sp-6);
+  background: linear-gradient(to top, var(--color-surface-page), transparent);
+  pointer-events: none;
+}
 .o-home__fuel { width: 100%; }
 
 /* a-seam. The handover from the reward to the app.
@@ -1455,8 +1553,10 @@ body {
             </span>
           </div>
 
+          <!-- One sentence over two lines. The comma is on the first line
+               because that is where it falls when you say it. -->
           <div class="o-home__greeting">
-            <p class="o-home__eyebrow" id="homeGreeting">Good morning</p>
+            <p class="o-home__eyebrow" id="homeGreeting">Good morning,</p>
             <h1 class="o-home__name" id="homeName" tabindex="-1">David</h1>
           </div>
 
@@ -1470,6 +1570,16 @@ body {
               <span><span class="m-stat-pill__figure">60 L</span> per fill</span>
             </span>
           </div>
+
+          <!-- Everything a driver reaches for, gathered at the bottom of the
+               screen. Above it the bloom shows through, which is the point:
+               a work tool that puts its controls under the thumb and its
+               breathing room where nobody has to reach. -->
+          <div class="o-home__stack">
+
+          <!-- The picker and the vehicle it produces are one object, so they
+               sit on one pane of glass with the card nested inside it. -->
+          <div class="m-glass-panel" id="homePanel">
 
           <!-- Which vehicle is being driven today. Hidden entirely when there
                is only one, because a choice of one is not a choice.
@@ -1503,6 +1613,30 @@ body {
             <span class="u-visually-hidden" id="homePickerStatus" role="status"></span>
           </div>
 
+          <button class="m-vehicle-card" type="button" id="homeVehicle" data-unbuilt="Vehicle details">
+            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
+            <span class="m-vehicle-card__body">
+              <span class="m-vehicle-card__label" id="homeVehicleLabel">Driving today</span>
+              <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
+              <span class="m-vehicle-card__model" id="homeVehicleModel">Ford Transit Custom 2.0TDCi</span>
+              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
+            </span>
+            <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+          </button>
+
+          <!-- The card's slot when nothing has been chosen. Same size and the
+               same place, so the screen does not reflow when a driver picks
+               one, and the question is asked where the answer will appear. -->
+          <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
+            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V9.5a1.5 1.5 0 0 1 1.5-1.5H13v8"/><path d="M13 10h3.6a2 2 0 0 1 1.6.8L21 14.5V16"/><path d="M2 16h1.6M9 16h5.4M19.4 16H22"/><circle cx="6.4" cy="16.6" r="2"/><circle cx="17.2" cy="16.6" r="2"/></svg></span>
+            <span class="m-vehicle-card__body">
+              <span class="m-vehicle-card__plate">Choose your vehicle</span>
+              <span class="m-vehicle-card__note">Your next fill goes on the one you pick.</span>
+            </span>
+          </button>
+
+          </div><!-- /m-glass-panel -->
+
           <!-- Every returning sign-in lands here, so this is an ordinary screen
                and not an edge case. It says what is true and offers the one
                thing a driver can actually do about it. -->
@@ -1511,32 +1645,6 @@ body {
             <button class="a-btn a-btn--outline a-btn--sm" type="button" id="homeAskManager">Message my manager</button>
           </div>
 
-          <button class="m-vehicle-card" type="button" id="homeVehicle" data-unbuilt="Vehicle details">
-            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/><path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg></span>
-            <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__label" id="homeVehicleLabel">Driving today</span>
-              <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
-              <span class="m-vehicle-card__model" id="homeVehicleModel">Ford Transit Custom 2.0TDCi</span>
-              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
-            </span>
-            <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
-          </button>
-
-          <!-- The card's slot when nothing has been chosen. Same size and the
-               same place, so the screen does not reflow when a driver picks
-               one, and the question is asked where the answer will appear. -->
-          <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
-            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V9.5a1.5 1.5 0 0 1 1.5-1.5H13v8"/><path d="M13 10h3.6a2 2 0 0 1 1.6.8L21 14.5V16"/><path d="M2 16h1.6M9 16h5.4M19.4 16H22"/><circle cx="6.4" cy="16.6" r="2"/><circle cx="17.2" cy="16.6" r="2"/></svg></span>
-            <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__plate">Choose your vehicle</span>
-              <span class="m-vehicle-card__note">Your next fill goes on the one you pick.</span>
-            </span>
-          </button>
-
-          <!-- The reason the app exists, at the weight that says so. It was two
-               half-width tiles under a "Quick access" heading, one of them
-               carrying the same drawing as the Fuel tab directly beneath it. -->
-          <button class="a-btn a-btn--primary o-home__fuel" type="button" data-tile="fuel">I want to fuel</button>
           <button class="m-list-row" type="button" data-tile="rewards">
             <span class="a-icon-wrap" data-tone="warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.6 9.7l5.8-.8z"/></svg></span>
             <span class="m-list-row__body">
@@ -1545,6 +1653,17 @@ body {
             </span>
             <span class="m-list-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
+
+          </div><!-- /o-home__stack -->
+        </div>
+
+        <!-- The reason the app exists, and the one control that never scrolls.
+             It sat at the end of the scrolling column, which put it under the
+             thumb on a 390 and pushed it to the very bottom edge of a 320 once
+             a picker was on screen. An action a driver needs at a forecourt
+             does not get to depend on how many vehicles they were assigned. -->
+        <div class="o-home__action">
+          <button class="a-btn a-btn--primary o-home__fuel" type="button" data-tile="fuel">I want to fuel</button>
         </div>
 
         <nav class="o-tab-bar" aria-label="Sections">
@@ -1604,7 +1723,7 @@ body {
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
     homePickerNote: $('homePickerNote'), homePickerTitle: $('homePickerTitle'),
-    homePickerStatus: $('homePickerStatus'),
+    homePickerStatus: $('homePickerStatus'), homePanel: $('homePanel'),
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
     homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
     homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
@@ -2000,7 +2119,7 @@ body {
     el.homeVehicle.setAttribute('aria-label',
       'Driving today, ' + v.plate + ', ' + v.make + ' ' + v.model);
     el.homeVehicle.querySelector('.m-vehicle-card__art').innerHTML =
-      vehicleArt(v.type, 24, 'var(--color-text-on-dark)');
+      vehicleArt(v.type, 24, 'currentColor');
   }
 
   function paintPicker() {
@@ -2192,6 +2311,10 @@ body {
        vehicles you are allowed to fuel" in front of a driver who had four of
        them and simply had not picked one yet. */
     el.homeNoVehicle.hidden = S.vehicleLinked;
+    /* The glass is the container for the vehicle block, so with no vehicles
+       there is nothing for it to contain and an empty pane of glass is just
+       a smudge on the screen. */
+    el.homePanel.hidden = !S.vehicleLinked;
     /* With nothing assigned the screen was making three claims at once and two
        of them were false: an entitlement of sixty litres, and an invitation to
        go and fuel, above a note saying the driver has no vehicle. */
