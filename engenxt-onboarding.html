@@ -1489,6 +1489,44 @@ body {
   border-color: var(--color-on-dark-line); color: var(--color-text-on-dark);
 }
 
+/* a-shutter. The driver's own capture.
+
+   The scanner reads by itself, which is right: somebody holding a phone up to a
+   windscreen in the sun should not also be hunting for a button. But a lens that
+   keeps missing turns that into a screen nobody can get past, and the way out
+   used to be typing a registration, which proved nothing about where the driver
+   was standing.
+
+   This is still the camera reading the disc. All that moves is who decides the
+   moment, so the rule that only a scan confirms a vehicle is untouched. It
+   appears after two failed reads rather than from the start, because offering a
+   shutter to somebody the camera is about to serve is noise. */
+.a-shutter {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-4);
+  border: none; background: none; cursor: pointer;
+}
+.a-shutter__ring {
+  width: 60px; height: 60px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-circle);
+  border: 3px solid var(--color-text-on-dark);
+  transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.a-shutter__ring::after {
+  content: ''; width: 46px; height: 46px;
+  border-radius: var(--radius-circle);
+  background: var(--color-text-on-dark);
+}
+.a-shutter:active .a-shutter__ring { transform: scale(0.92); }
+[data-motion="reduced"] .a-shutter__ring { transition: none; }
+.a-shutter__label {
+  max-width: 32ch;
+  font-size: var(--text-caption); font-weight: 600; line-height: 1.35;
+  color: var(--color-on-dark-soft); text-align: center;
+}
+
 /* m-vehicle-opt. One assigned vehicle, chosen or not.
 
    A card rather than a row: the registration is what a driver matches against
@@ -1837,7 +1875,21 @@ body {
   align-self: center; width: 36px; height: 4px; flex-shrink: 0;
   border-radius: var(--radius-pill); background: var(--color-border-strong);
 }
+/* The wrapper the search, the list and the empty note share.
+
+   It had no rule at all, so it was a plain block inside a flex column sheet.
+   That is the classic way a scroller stops scrolling: the list below has
+   overflow-y and min-height already, but an unconstrained block parent gives it
+   no height to scroll within, so it grew to its content instead and the sheet
+   clipped the overflow. Three of the seven stations rendered below the phone,
+   nothing moved when you dragged, and the last one could not be tapped at all,
+   on the screen whose only job is choosing where to fuel. */
+.o-stations__browse {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
 .o-stations__list {
+  flex: 1 1 auto;
   display: flex; flex-direction: column; gap: var(--sp-2);
   overflow-y: auto; min-height: 0;
   margin-inline: calc(var(--sp-5) * -1); padding-inline: var(--sp-5);
@@ -2025,61 +2077,14 @@ body {
    It replaces a spinner, so it is not decoration: the same 900ms is now
    spent saying what is being checked instead of saying nothing. */
 
-/* a-gate. The brand mark inside a ring that closes as the checks are answered.
-
-   Five questions, so five segments, each lighting as its answer lands. The ring
-   is not a spinner dressed up: a spinner says "wait", and this says "four of
-   five, and here is the fifth". When one fails the ring stops there and turns
-   to the brand red, so the answer is legible from arm's length before a word
-   of it has been read.
-
-   The mark is EngenXT's own. What is being granted is permission from this
-   company, and a driver holding a phone up on a forecourt should be holding up
-   something obviously theirs. */
-.a-gate {
-  position: relative; align-self: center;
-  /* Held open. As a flex item in a column its height was shrinkable, so it
-     collapsed to the mark inside it and the ring came out the same size as the
-     thing it is supposed to be drawn around. */
-  flex-shrink: 0;
-  width: 132px; height: 132px; margin-bottom: var(--sp-4);
-  display: grid; place-items: center;
-}
-.a-gate__ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.a-gate__track { fill: none; stroke: var(--color-border); stroke-width: 3; }
-/* Unanswered, answered, refused. This screen is a light surface, so the ring
-   takes the light palette: the on-dark pair it was first drawn in was very
-   nearly white on white. */
-.a-gate__seg {
-  fill: none; stroke: var(--color-border-strong); stroke-width: 4; stroke-linecap: round;
-  transition: stroke var(--dur-base) var(--ease-out);
-}
-.a-gate__seg[data-state="pass"] { stroke: var(--color-success); }
-.a-gate__seg[data-state="fail"] { stroke: var(--color-secondary); }
-.a-gate__mark {
-  width: 68px; height: 68px;
-  display: grid; place-items: center;
-  border-radius: var(--radius-circle);
-  background: var(--gradient-primary);
-  color: var(--color-text-on-dark);
-  box-shadow: var(--shadow-btn);
-  transition: background var(--dur-slow) var(--ease-out),
-              box-shadow var(--dur-slow) var(--ease-out);
-}
-/* Refused, so the mark carries the brand red rather than the brand blue. The
-   colour of the thing in the middle is the fastest read on the screen. */
-.o-check[data-verdict="block"] .a-gate__mark {
-  background: linear-gradient(135deg, var(--color-secondary) 0%, #A5140E 100%);
-  box-shadow: 0 6px 16px var(--color-secondary-30);
-}
 
 /* The receipt of what the ring counted. */
-.o-check__checks { display: flex; flex-direction: column; gap: var(--sp-1h); margin-top: var(--sp-4); }
+.o-check__checks { display: flex; flex-direction: column; gap: var(--sp-1h); }
 
 /* m-check. One question and its answer. */
 .m-check {
   display: flex; align-items: flex-start; gap: var(--sp-3);
-  padding: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   border-radius: var(--radius-card);
   background: var(--color-surface-sunken);
   border: 1px solid var(--color-border);
@@ -2171,11 +2176,14 @@ body {
 .o-onboard__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
 /* ══ THE FILL ═════════════════════════════════════════════════════════
-   The one screen in this product that somebody other than the driver has to
-   read. An attendant stands a metre away in daylight, so the code is set at
-   hero size in the mono face on the plainest surface the system owns. Nothing
-   competes with it: no glass, no bloom, no gradient behind a number a stranger
-   has to key into a pump.
+   The one screen in this product that a machine has to read. It used to be six
+   digits at hero size in the mono face, sized for an attendant standing a metre
+   away in daylight and keying them into a till. Nobody keys anything now: the
+   square is scanned.
+
+   Nothing competes with it. No glass, no bloom, no gradient, and no brand tint
+   on the square itself, because a scanner wants contrast and this is the only
+   element in the file whose audience is not a person.
 
    It takes the whole screen rather than rising as a sheet, because this is the
    moment the phone stops being the driver's own and becomes something they
@@ -2204,26 +2212,39 @@ body {
 [data-motion="reduced"] .o-check[data-state="arriving"] { transform: none; }
 .o-check__scroll {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-  padding: calc(var(--size-status-bar) + var(--sp-1)) var(--sp-5) var(--sp-5);
-  display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-4);
+  /* The status-bar clearance stays: every screen in the file uses it and the
+     back button would otherwise sit under the clock. Everything below it is
+     tightened instead. */
+  padding: calc(var(--size-status-bar) + var(--sp-1)) var(--sp-5) var(--sp-3);
+  /* One flat 16px between eight blocks that are not equally related. The facts
+     and the checks carry their own rules and marks, so the gap was doing the
+     separating twice. */
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2);
 }
+/* 320 has 124px less height than 390 and was given exactly the same rhythm. */
+.t-device-frame[data-width="320"] .o-check__scroll { gap: var(--sp-1h); }
 .o-check__bar { width: 100%; display: flex; }
 /* The station is the answer to the question the map asked, so it is the
    biggest thing here. */
 .o-check__station {
-  font-size: var(--text-hero); font-weight: 900; line-height: 1.02;
-  letter-spacing: -1.6px; color: var(--color-text-primary);
+  /* Display, not hero. At 42px the longest station name wrapped to two lines on
+     a 320dp phone, which cost 55px on the width with the least room to give. It
+     is still the biggest thing on the screen by a wide margin. */
+  font-size: var(--text-display); font-weight: 900; line-height: 1.05;
+  letter-spacing: -1px; color: var(--color-text-primary);
 }
 .o-check__station:focus, .o-check__station:focus-visible { outline: none; box-shadow: none; }
 .o-check__km { font-size: var(--text-caption); color: var(--color-text-secondary); }
 .o-check__why {
-  font-size: var(--text-caption); line-height: 1.55; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary);
   max-width: 34ch;
 }
 .o-check__action {
   flex-shrink: 0;
-  display: flex; flex-direction: column; gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-5) calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  /* Both buttons keep their own heights, so the 48dp target rule is untouched.
+     Only the bar's own padding gives. */
+  display: flex; flex-direction: column; gap: var(--sp-1h);
+  padding: var(--sp-2) var(--sp-5) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border-light);
 }
 
@@ -2256,7 +2277,8 @@ body {
   width: 100%;
   display: flex; align-items: baseline; justify-content: space-between;
   flex-wrap: wrap; gap: var(--sp-1) var(--sp-3);
-  padding-block: var(--sp-2h);
+  /* The border-top is what divides these rows, not the padding. */
+  padding-block: var(--sp-1h);
   border-top: 1px solid var(--color-border-light);
 }
 .m-fact__name {
@@ -2292,10 +2314,17 @@ body {
   text-align: center; gap: var(--sp-4);
 }
 /* The way out sits where a driver's thumb is not, because closing this screen
-   by accident at a pump means asking for the code again in front of somebody
+   by accident at a pump means asking for the QR again in front of somebody
    waiting for it. */
 .o-fuel__bar { width: 100%; display: flex; justify-content: flex-end; }
 .o-fuel__title:focus, .o-fuel__title:focus-visible { outline: none; box-shadow: none; }
+.o-fuel__tick {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px; margin-right: var(--sp-2);
+  vertical-align: -5px;
+  border-radius: var(--radius-circle);
+  background: var(--color-success); color: #FFFFFF;
+}
 .o-fuel__title {
   font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
   color: var(--color-text-primary);
@@ -2306,20 +2335,28 @@ body {
   max-width: 28ch;
 }
 
-/* a-code. The figure somebody reads off the screen. Grouped in twos because
-   six digits called across a forecourt are said in pairs, and tabular so the
-   number does not shuffle sideways while it is being checked digit by digit.
-   The visible text is grouped and the spoken label is not, because a screen
-   reader saying "forty-eight twenty-one" is a different number. */
-.a-code {
-  width: 100%;
-  padding: var(--sp-4) var(--sp-3);
+/* a-qr. The square a till reads.
+
+   Pure black on pure white with its own quiet zone, and never tinted with the
+   brand. Everything else on this screen is styled to belong to EngenXT; this
+   one is machine readable first, and a scanner wants all the contrast it can
+   get. It keeps its white card in dark mode for the same reason: the thing
+   being read is not the thing being themed.
+
+   Squared by aspect-ratio rather than a fixed height, so the width cap is the
+   only number that has to change on a narrow phone. */
+.a-qr {
+  width: 100%; max-width: 260px; aspect-ratio: 1;
+  padding: var(--sp-2);
   border-radius: var(--radius-card);
-  background: var(--color-surface-sunken);
-  font-family: var(--font-mono); font-size: var(--text-hero); font-weight: 700;
-  letter-spacing: 1px; font-variant-numeric: tabular-nums;
-  color: var(--color-text-primary);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-card-sm);
 }
+.a-qr__svg { display: block; width: 100%; height: 100%; }
+/* A media query cannot see the device frame, because the frame is a div inside
+   a desktop page. The attribute is how every other narrow-phone rule in this
+   file is written. */
+.t-device-frame[data-width="320"] .a-qr { max-width: 208px; }
 
 /* The code sits high where a held-out phone is read, and what it is good for
    sits low where it is looked up. The gap between them is flexible, so a tall
@@ -2327,7 +2364,7 @@ body {
    simply runs the two blocks together. */
 .o-fuel__spacer { flex: 1 1 var(--sp-6); min-height: var(--sp-4); }
 
-/* m-place. Where the code works, said quietly under the code itself. It is a
+/* m-place. Where the QR works, said quietly under the QR itself. It is a
    place and not a figure, so it does not sit in the row of figures below: a
    station name is three words long and would be the only cell there anyone had
    to read rather than glance at. */
@@ -2339,7 +2376,7 @@ body {
 }
 .m-place__pin { display: flex; flex-shrink: 0; }
 
-/* m-fuel-figures. What the code is good for, in the order it gets questioned:
+/* m-fuel-figures. What the QR is good for, in the order it gets questioned:
    which vehicle, how much, how long.
 
    Three figures across one row, each with its label under it. This was four
@@ -2385,14 +2422,22 @@ body {
 }
 /* A way out that is not a decision. Quiet, centred, and never the width of the
    thing it sits under. */
+/* a-quiet-link. A secondary action that is deliberately not a button.
+
+   It took --color-on-dark-soft, which is white at 60%, the colour for a control
+   sitting on a dark surface. Both places it is used are white. The confirm panel
+   happened to override the colour, so only one of the two showed the fault, and
+   it showed it completely: "Cancel this request" measured 1.00:1 against the
+   fuel screen behind it. White on white, on the one control a driver reaches for
+   when they need to stop a fill. */
 .a-quiet-link {
   align-self: center; padding: var(--sp-2) var(--sp-3);
   border: none; background: none; cursor: pointer;
   font-size: var(--text-caption); font-weight: 600;
-  color: var(--color-on-dark-soft); text-decoration: underline;
+  color: var(--color-text-secondary); text-decoration: underline;
   text-underline-offset: 3px;
 }
-.a-quiet-link:hover { color: var(--color-text-on-dark); }
+.a-quiet-link:hover { color: var(--color-text-primary); }
 
 /* m-confirm. Asked before something cannot be undone. */
 .m-confirm {
@@ -2415,7 +2460,7 @@ body {
   font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
   margin-bottom: var(--sp-2);
 }
-.m-confirm .a-quiet-link { color: var(--color-text-secondary); }
+/* Only the hover differs now that the atom itself is on a light surface. */
 .m-confirm .a-quiet-link:hover { color: var(--color-error-text); }
 
 @media (max-width: 900px) {
@@ -2863,7 +2908,7 @@ body {
               <span class="m-live-bar__title">Fuel approved</span>
               <span class="m-live-bar__sub" id="homeLiveSub">CA 123-456 &middot; up to 60 L</span>
             </span>
-            <span class="m-live-bar__cta" aria-hidden="true">Show code</span>
+            <span class="m-live-bar__cta" aria-hidden="true">Show QR</span>
           </button>
         </div>
 
@@ -2936,15 +2981,26 @@ body {
         </div>
 
         <div class="o-scan__modes" id="scanModes" role="group" aria-label="What to scan"></div>
+
+        <!-- The driver's own shutter, revealed only once the camera has failed
+             to take the read on its own. Filled by paintScan. -->
+        <button class="a-shutter" type="button" id="scanShutter" hidden>
+          <span class="a-shutter__ring" aria-hidden="true"></span>
+          <span class="a-shutter__label" id="scanShutterLabel">Line the disc up and press when it looks clear</span>
+        </button>
+
+        <!-- One button. "Try number plate instead" used to sit here doing
+             exactly what the two chips above it do, which is switch what is
+             being read, and at 320dp the pair of them pushed the last resort
+             clean off the bottom of the screen. -->
         <div class="o-scan__actions">
-          <button class="a-btn a-btn--outline" type="button" id="scanOther">Try number plate instead</button>
           <button class="a-btn a-btn--outline" type="button" id="scanType">Ask your manager</button>
         </div>
       </section>
 
       <!-- SCREEN THREE · where.
            A code is issued against a station, so the station is chosen before
-           the code exists rather than after it. Home stays underneath.
+           the QR exists rather than after it. Home stays underneath.
 
            The map is drawn, not fetched. A tile server is an external request,
            which this prototype cannot make over file:// and would be the first
@@ -3044,7 +3100,7 @@ body {
       <!-- SCREEN FIVE · the fill.
            Home is still underneath and is still the way back, so this is laid
            over it rather than instead of it. -->
-      <!-- Between the map and the code. It answers one question, will this fill
+      <!-- Between the map and the QR. It answers one question, will this fill
            be paid for, and it answers it either way. -->
       <section class="o-check" id="checkScreen" aria-labelledby="checkStation" hidden>
         <div class="o-check__scroll">
@@ -3053,25 +3109,6 @@ body {
             <button class="a-icon-btn" type="button" id="checkBack" aria-label="Back to the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
           </div>
 
-          <!-- The gate. Five questions are being asked, so the ring is drawn in
-               five segments and each one lights as its answer lands. The motion
-               is the clearance rather than a decoration on top of it: when a
-               check fails the ring stops at that segment and goes to the brand
-               red, so a driver knows they have been stopped before they have
-               read a word.
-
-               The mark in the middle is the brand's, because the thing granting
-               permission is EngenXT, and a driver holding this up at a forecourt
-               should be holding up something obviously ours. -->
-          <div class="a-gate" id="checkGate" aria-hidden="true">
-            <svg class="a-gate__ring" viewBox="0 0 120 120">
-              <circle class="a-gate__track" cx="60" cy="60" r="53"/>
-              <g class="a-gate__segs" id="checkSegs"></g>
-            </svg>
-            <span class="a-gate__mark">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>
-            </span>
-          </div>
 
           <p class="m-verdict" id="checkVerdict">
             <span class="m-verdict__mark" id="checkMark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
@@ -3108,7 +3145,7 @@ body {
         <!-- The plate rides inside the button, so the vehicle is part of the
              thing being tapped rather than a line above it that can be skipped. -->
         <div class="o-check__action">
-          <button class="a-btn a-btn--primary" type="button" id="checkGo">Get code</button>
+          <button class="a-btn a-btn--primary" type="button" id="checkGo">Get a QR</button>
           <button class="a-btn a-btn--outline" type="button" id="checkOther">Choose another station</button>
         </div>
       </section>
@@ -3117,28 +3154,26 @@ body {
         <div class="o-fuel__scroll">
 
           <div class="o-fuel__bar">
-            <button class="a-icon-btn" type="button" id="fuelClose" aria-label="Close, the code stays on home">
+            <button class="a-icon-btn" type="button" id="fuelClose" aria-label="Close, the QR stays on home">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
 
-          <span class="a-icon-wrap a-icon-wrap--lg" data-tone="success" aria-hidden="true">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          </span>
+          <!-- The tick rides in the heading rather than above it. A 64px mark
+               and the word "Approved" say one thing twice, and the square below
+               is what the driver is holding the phone up for. -->
+          <h1 class="o-fuel__title" id="fuelTitle" tabindex="-1">
+            <span class="o-fuel__tick" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </span>Approved</h1>
+          <p class="o-fuel__lead">Show this to the attendant. Their till scans it.</p>
 
-          <h1 class="o-fuel__title" id="fuelTitle" tabindex="-1">Approved</h1>
-          <p class="o-fuel__lead">Show this at the pump.</p>
+          <!-- Drawn, not fetched. Filled by showFuel, because what it encodes
+               depends on the fill it belongs to. -->
+          <div class="a-qr" id="fuelQr" role="img" aria-label=""></div>
 
-          <!-- Two versions of one number. A paragraph takes no accessible name,
-               so the spoken form is a real element beside the printed one
-               rather than a label nobody would read out. -->
-          <p class="a-code">
-            <span id="fuelCode" aria-hidden="true">48 21 07</span>
-            <span class="u-visually-hidden" id="fuelCodeSpoken">Code 4 8 2 1 0 7</span>
-          </p>
-
-          <!-- Where the code works, directly under the code, because it is
-               what the code is scoped to rather than one fact among four. -->
+          <!-- Where the QR works, directly under it, because it is what the
+               authorisation is scoped to rather than one fact among four. -->
           <p class="m-place">
             <span class="m-place__pin" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span id="fuelStation">Engen Bryanston</span>
@@ -3182,7 +3217,7 @@ body {
           <div class="m-confirm__panel">
             <h2 class="m-confirm__title" id="fuelConfirmTitle" tabindex="-1"></h2>
             <p class="m-confirm__body" id="fuelConfirmBody"></p>
-            <button class="a-btn a-btn--primary" type="button" id="fuelKeep">Keep the code</button>
+            <button class="a-btn a-btn--primary" type="button" id="fuelKeep">Keep it</button>
             <button class="a-quiet-link" type="button" id="fuelDrop">Cancel it</button>
           </div>
         </div>
@@ -3226,9 +3261,10 @@ body {
     checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkPlate: $('checkPlate'),
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'),
-    checkSegs: $('checkSegs'), checkList: $('checkList'),
+    checkList: $('checkList'),
     scan: $('scanScreen'), scanNoteTitle: $('scanNoteTitle'), scanNoteBody: $('scanNoteBody'),
-    scanModes: $('scanModes'), scanLine: $('scanLine'), scanOther: $('scanOther'),
+    scanModes: $('scanModes'), scanLine: $('scanLine'),
+    scanShutter: $('scanShutter'), scanShutterLabel: $('scanShutterLabel'),
     scanType: $('scanType'), scanClose: $('scanClose'), scanTorch: $('scanTorch'),
     step: $('stepScreen'), stepMark: $('stepMark'), stepTitle: $('stepTitle'),
     stepBody: $('stepBody'), stepGroup: $('stepGroup'), stepGo: $('stepGo'),
@@ -3252,9 +3288,8 @@ body {
   };
   el.homeFuel = $('homeFuel');
   el.homeLive = $('homeLive'); el.homeLiveSub = $('homeLiveSub');
-  el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelCode = $('fuelCode');
+  el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelQr = $('fuelQr');
   el.fuelVehicle = $('fuelVehicle'); el.fuelClose = $('fuelClose'); el.fuelCancel = $('fuelCancel');
-  el.fuelCodeSpoken = $('fuelCodeSpoken');
   el.fuelDone = $('fuelDone'); el.fuelConfirm = $('fuelConfirm');
   el.fuelConfirmTitle = $('fuelConfirmTitle'); el.fuelConfirmBody = $('fuelConfirmBody');
   el.fuelKeep = $('fuelKeep'); el.fuelDrop = $('fuelDrop');
@@ -3667,6 +3702,104 @@ body {
 
   /* Same three steps as the rest of the icons. One weight across every size is
      what made a 16px chip look faint beside a 24px card. */
+  /* ── The square a till reads ──────────────────────────────────────────
+     There is no network in this prototype and no image file, so the QR has to
+     be drawn out of rectangles like everything else here.
+
+     It is a convincing likeness rather than a working encoder. The three
+     corner finders, the alignment square and the timing rows sit where a real
+     one puts them, and the payload modules come from a hash of the fill's
+     reference. That is the part that matters for a prototype: it looks like
+     what it is, and the same fill always draws the same square.
+
+     Seeded, never random. Math.random would redraw it on every paint, which
+     makes the screen impossible to screenshot and impossible to test, and this
+     file already bans randomness for exactly that reason. */
+  var QR_N = 25;
+
+  function qrHash(str) {
+    var h = 2166136261;                     /* FNV-1a offset basis */
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h * 16777619) >>> 0;             /* kept unsigned, so it stays stable */
+    }
+    return h;
+  }
+
+  function qrModules(ref) {
+    var n = QR_N, on = [], fixed = [], r, c;
+    for (r = 0; r < n; r++) {
+      on.push([]); fixed.push([]);
+      for (c = 0; c < n; c++) { on[r].push(false); fixed[r].push(false); }
+    }
+
+    /* Three corners, which is how a scanner works out which way up it is. */
+    function finder(top, left) {
+      for (var y = -1; y <= 7; y++) {
+        for (var x = -1; x <= 7; x++) {
+          var gy = top + y, gx = left + x;
+          if (gy < 0 || gx < 0 || gy >= n || gx >= n) { continue; }
+          fixed[gy][gx] = true;
+          var inside = y >= 0 && y <= 6 && x >= 0 && x <= 6;
+          var ring = (y === 0 || y === 6 || x === 0 || x === 6);
+          var core = y >= 2 && y <= 4 && x >= 2 && x <= 4;
+          on[gy][gx] = inside && (ring || core);
+        }
+      }
+    }
+    finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
+
+    /* The small square that keeps a big code readable off a tilted phone. */
+    for (var ay = 0; ay < 5; ay++) {
+      for (var ax = 0; ax < 5; ax++) {
+        var ty = n - 9 + ay, tx = n - 9 + ax;
+        fixed[ty][tx] = true;
+        on[ty][tx] = (ay === 0 || ay === 4 || ax === 0 || ax === 4) || (ay === 2 && ax === 2);
+      }
+    }
+
+    /* The dotted lines that run between the corners. */
+    for (var t = 8; t < n - 8; t++) {
+      fixed[6][t] = true; on[6][t] = t % 2 === 0;
+      fixed[t][6] = true; on[t][6] = t % 2 === 0;
+    }
+
+    /* Everything left over is payload, taken from the reference. xorshift, so
+       neighbouring modules do not fall into a visible stripe the way a plain
+       counter hash does. */
+    var h = qrHash(ref) || 1;
+    for (r = 0; r < n; r++) {
+      for (c = 0; c < n; c++) {
+        if (fixed[r][c]) { continue; }
+        h ^= (h << 13); h >>>= 0;
+        h ^= (h >>> 17);
+        h ^= (h << 5);  h >>>= 0;
+        on[r][c] = (h & 1) === 1;
+      }
+    }
+    return on;
+  }
+
+  function qrArt(ref) {
+    var n = QR_N, quiet = 2, span = n + quiet * 2;
+    var grid = qrModules(ref), cells = [], r, c;
+    for (r = 0; r < n; r++) {
+      /* Runs of adjacent modules become one rectangle rather than five. */
+      c = 0;
+      while (c < n) {
+        if (!grid[r][c]) { c++; continue; }
+        var start = c;
+        while (c < n && grid[r][c]) { c++; }
+        cells.push('<rect x="' + (start + quiet) + '" y="' + (r + quiet) +
+                   '" width="' + (c - start) + '" height="1"/>');
+      }
+    }
+    return '<svg class="a-qr__svg" viewBox="0 0 ' + span + ' ' + span + '" ' +
+           'shape-rendering="crispEdges" aria-hidden="true" focusable="false">' +
+           '<rect width="' + span + '" height="' + span + '" fill="#FFFFFF"/>' +
+           '<g fill="#000000">' + cells.join('') + '</g></svg>';
+  }
+
   function vehicleArt(type, size, stroke) {
     var w = size <= 16 ? '2.25' : size <= 21 ? '2' : '1.75';
     return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
@@ -3888,20 +4021,29 @@ body {
   /* ── The fill ─────────────────────────────────────────────────────────
      Three moments, and only one of them is a screen. Asking is the button
      changing under the thumb that pressed it. Waiting is the same button.
-     Only the approved code goes somewhere new, because it is the only part
-     of this a second person has to read.
+     Only the approved fill goes somewhere new, because the square a till
+     scans is the only part of this a second person has to see.
 
      Nothing here reaches a pump, authorises anything or expires. */
 
   /* Fixed, because a state you cannot screenshot twice is not a state. The
      clock on this phone reads 9:41 and a forecourt authorisation is good for
      half an hour, so the window is drawn from the same place. */
-  var FUEL_CODE   = '482107';
   var FUEL_LITRES = '60 L';
-  /* Grouped in twos to be read out, ungrouped to be spoken. "48 21" said by a
-     screen reader is "forty-eight twenty-one", which is not the code. */
-  function fuelCodeShown()  { return FUEL_CODE.replace(/(\d{2})(?=\d)/g, '$1 '); }
-  function fuelCodeSpoken() { return FUEL_CODE.split('').join(' '); }
+  /* What the square encodes.
+
+     It used to be six digits printed on the screen for a person to read out and
+     another person to key into a till, which is two chances to get it wrong
+     while somebody waits behind you. Nothing is typed now: the till scans it.
+
+     Built from the fill rather than fixed, so two different fills do not draw
+     the same square, and built only from things already decided, so it is the
+     same square every time this fill is drawn. */
+  function fuelRef() {
+    var v = activeVehicle();
+    return 'EXT.' + (S.station || S.checking || 'station') + '.' +
+           (v ? v.plate.replace(/\s+/g, '') : 'novehicle');
+  }
 
   var SPINNER =
     '<svg class="a-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
@@ -3924,7 +4066,7 @@ body {
       /* Said once as a sentence rather than left to be assembled out of a dot,
          a title and a call to action by anyone listening to it. */
       el.homeLive.setAttribute('aria-label',
-        'Fuel approved for ' + plate + ', up to ' + FUEL_LITRES + '. Show the code.');
+        'Fuel approved for ' + plate + ', up to ' + FUEL_LITRES + '. Show the QR.');
     }
     if (S.fuel === 'pending') {
       el.homeFuel.innerHTML = SPINNER + '<span>Authorising</span>';
@@ -4125,17 +4267,36 @@ body {
         S.scanMode = b2.dataset.mode; S.scanFace = 'ready'; paintScan();
       });
     });
-    el.scanOther.textContent = S.scanMode === 'disc'
-      ? 'Try number plate instead' : 'Try licence disc instead';
-    /* After two goes the way out stops being the quiet option. Somebody on
-       their third attempt is not going to succeed on the fourth by trying
-       harder, and the only thing left that can help is a person.
+    /* After two goes the driver gets the shutter. Somebody on their third
+       attempt is not going to succeed on the fourth by holding stiller, and
+       they can see the disc perfectly well: it is the auto capture that cannot
+       decide, not them.
 
-       It used to offer typing the registration here, which was a way to set
-       today's vehicle without reading anything on the vehicle. */
+       There is no camera in a prototype, so nothing here can fail once they
+       press it. That is the honest version anyway. A driver who chooses the
+       moment is a driver who has judged it readable. */
     var struggling = S.scanTries >= 2;
-    el.scanType.className = struggling ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
-    el.scanType.textContent = struggling ? 'Ask your manager' : 'Ask your manager';
+    /* Not while the camera is unreachable. A shutter on a screen that says the
+       camera is off is a button that cannot do the thing it offers. */
+    /* Two different reasons the shutter is not on screen, and they must not be
+       confused. "The camera cannot be reached" means the driver is out of
+       options and a person is the way on. "A read is already running" means
+       wait a second. Treating the second as the first promoted "Ask your
+       manager" to primary for the 900ms of the read, so the button changed
+       weight under the driver's eyes at the exact moment they were watching it. */
+    var noCamera = S.scanFace === 'nocam' || S.scanFace === 'denied'
+                   || S.scanFace === 'offline';
+    var busy = S.scanFace === 'reading';
+    var canShoot = struggling && !noCamera;
+    el.scanShutter.hidden = !canShoot || busy;
+    el.scanShutterLabel.textContent = S.scanMode === 'disc'
+      ? 'Line the disc up and press when it looks clear'
+      : 'Line the plate up and press when it looks clear';
+    /* A person is the last resort, so it only leads when there is genuinely
+       nothing left the driver can do for themselves. */
+    el.scanType.className = (struggling && noCamera)
+      ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
+    el.scanType.textContent = 'Ask your manager';
   }
 
   /* The read landing. Auto capture, so the driver is not holding a phone at a
@@ -4513,7 +4674,7 @@ body {
        tappable plates here, which was a second way to set today's vehicle
        without a scan. */
     el.checkGo.setAttribute('aria-disabled', 'false');
-    el.checkGo.textContent = v ? 'Get code for ' + v.plate : 'Scan your vehicle';
+    el.checkGo.textContent = v ? 'Get a QR for ' + v.plate : 'Scan your vehicle';
     el.checkOther.textContent = clear ? 'Choose another station' : 'Choose a station on the list';
 
     el.check.hidden = false;
@@ -4580,18 +4741,21 @@ body {
     'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     '<path d="M18 6 6 18M6 6l12 12"/></svg>';
 
+  /* The rows are the answers now.
+
+     There used to be a 132px ring above them with one segment per check, and it
+     was the tallest thing on a screen that did not fit: 164px with its margin
+     and its gap, on the phone where 292px was hidden below the fold. It was
+     also aria-hidden, so it was the only block here carrying nothing at all for
+     anyone not looking at it, while every answer it encoded was already written
+     in text underneath.
+
+     The staged reveal it was built for survives. It was never the ring's: the
+     rows land one at a time on the same timer, which is what made the screen
+     feel like it was being checked rather than pre-answered. */
   function paintGate(st, v) {
     var checks = fuelChecks(st, v);
-    var R = 53, C = 2 * Math.PI * R, n = checks.length;
-    var gap = 7, seg = C / n - gap;
-
-    /* One arc per question, drawn as a dashed circle offset round the ring, so
-       the five are visibly five rather than one bar cut up. */
-    el.checkSegs.innerHTML = checks.map(function (c, i) {
-      return '<circle class="a-gate__seg" cx="60" cy="60" r="' + R + '"' +
-             ' stroke-dasharray="' + seg.toFixed(2) + ' ' + (C - seg).toFixed(2) + '"' +
-             ' stroke-dashoffset="' + (-i * (C / n)).toFixed(2) + '"></circle>';
-    }).join('');
+    var n = checks.length;
 
     el.checkList.innerHTML = checks.map(function (c) {
       return '<div class="m-check" data-ok="' + c.ok + '" role="listitem">' +
@@ -4601,7 +4765,6 @@ body {
              '<span class="m-check__sub">' + c.sub + '</span></span></div>';
     }).join('');
 
-    var segs = el.checkSegs.querySelectorAll('.a-gate__seg');
     var rows = el.checkList.querySelectorAll('.m-check');
     var step = prefersReduced() ? 0 : 190;
 
@@ -4613,7 +4776,6 @@ body {
     checks.forEach(function (c, i) {
       if (i > stopAt) { return; }
       after(step * i, function () {
-        if (segs[i]) { segs[i].setAttribute('data-state', c.ok ? 'pass' : 'fail'); }
         if (rows[i]) { rows[i].setAttribute('data-state', 'in'); }
       });
     });
@@ -4674,11 +4836,11 @@ body {
     S.fuel = 'pending';
     paintFuelAction();
     /* The check screen has already been through. This is the authorisation
-       itself, and it ends on the code.
+       itself, and it ends on the QR.
 
-       It briefly pointed back at the check screen, which meant Get code did
-       nothing at all: showCheck now takes a station and returned immediately
-       without one. */
+       It briefly pointed back at the check screen, which meant the button that
+       asks for one did nothing at all: showCheck now takes a station and
+       returned immediately without one. */
     after(prefersReduced() ? 0 : 900, function () {
       S.fuel = 'live';
       paintFuelAction();
@@ -4758,8 +4920,11 @@ body {
     S.step = 'fuel';
     holdScreenAwake();
     var v = activeVehicle();
-    el.fuelCode.textContent = fuelCodeShown();
-    el.fuelCodeSpoken.textContent = 'Code ' + fuelCodeSpoken();
+    /* Redrawn per fill, and identical every time for the same fill. */
+    el.fuelQr.innerHTML = qrArt(fuelRef());
+    el.fuelQr.setAttribute('aria-label',
+      'Fuel authorisation for ' + (v ? v.plate : 'this vehicle') + ' at ' +
+      stationName() + '. Hold the screen up for the attendant to scan.');
     /* The plate and nothing else. The make and model are how a driver picks a
        van out of a yard, and this screen is read standing beside one, where the
        plate is the only part of it written on the vehicle itself. */
@@ -4777,10 +4942,13 @@ body {
       el.fuel.setAttribute('data-state', 'visible');
     }
     after(60, function () { el.fuelTitle.focus({ preventScroll: true }); });
-    /* Behind the focus move rather than racing it, and the digits are spoken
-       one at a time, because this is the number somebody is about to key in. */
+    /* Behind the focus move rather than racing it, so the announcement is not
+       flushed by the focus change before it is heard. */
     after(500, function () {
-      announce('Approved. Code ' + fuelCodeSpoken() + '. Show this at the pump.');
+      /* A screen reader used to spell out six digits here. There are no digits
+         to spell, so it says what is approved and what to do with the screen. */
+      announce('Approved for ' + (v ? v.plate : 'this vehicle') + ' at ' +
+               stationName() + '. Show this to the attendant. Their till scans it.');
     });
   }
 
@@ -4818,7 +4986,7 @@ body {
     el.fuelConfirmTitle.textContent =
       'Cancel the code for ' + (v ? v.plate : 'this fill') + '?';
     el.fuelConfirmBody.textContent =
-      'Code ' + fuelCodeShown() + ' will stop working. You would have to choose a station again.';
+      'This QR will stop working. You would have to choose a station again.';
     el.fuelConfirm.hidden = false;
     after(60, function () { el.fuelConfirmTitle.focus({ preventScroll: true }); });
     announce(el.fuelConfirmTitle.textContent + ' ' + el.fuelConfirmBody.textContent);
@@ -4948,12 +5116,20 @@ body {
      the phone is what will not read it. */
   var ASK_MANAGER_SCAN = 'Hi, my phone cannot scan the disc on the vehicle I am in. Please help me get fuelling today.';
   el.scanClose.addEventListener('click', function () { showStep('vehicle'); });
-  el.scanOther.addEventListener('click', function () {
-    S.scanMode = S.scanMode === 'disc' ? 'plate' : 'disc';
-    S.scanFace = 'ready';
+  /* The driver takes the read themselves. Same camera, same disc, same rule:
+     the only difference is who decided the moment. */
+  el.scanShutter.addEventListener('click', function () {
+    if (S.step !== 'scan') { return; }
+    clearTimers();
+    S.scanFace = 'reading';
     paintScan();
-    announce('Scanning the ' + (S.scanMode === 'disc' ? 'licence disc' : 'number plate') + '.');
+    announce('Reading the ' + (S.scanMode === 'disc' ? 'disc' : 'plate') + '.');
+    after(prefersReduced() ? 0 : 900, function () {
+      if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
+      scanSucceeded();
+    });
   });
+
   /* The one thing left when a camera cannot be made to work. It does not set a
      vehicle, because nothing but a scan does. */
   el.scanType.addEventListener('click', function () {
@@ -5138,6 +5314,10 @@ body {
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
     'flow1-scan-notyours': { group: 'flow1', label: '2 \u00b7 Scan, not on your list',
       run: function () { reset('returning-driver', true, 3); showScan('notyours'); } },
+    'flow1-scan-manual': { group: 'flow1', label: '2 \u00b7 Scan, take it yourself',
+      /* Two failed reads behind them, so the driver has the shutter. */
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 2;
+                         showScan('blur'); } },
     'flow1-linked': { group: 'flow1', label: '2 \u00b7 Linked, back on home',
       run: function () { reset('returning-driver', true, 3);
                          confirmByScan(readDisc()); showHome(false, true); } },
@@ -5173,17 +5353,26 @@ body {
       run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc()); showCheck('randburg'); } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
       run: function () {
-        reset('returning-driver', true, 1); showHome(); clearTimers();
+        /* A live fill cannot exist without a vehicle, and a vehicle cannot
+           exist without a scan, so the state that shows one scans first. */
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
         S.fuel = 'pending'; paintFuelAction();
       } },
-    'fuel-approved':   { group: 'fuelling', label: 'Approved, the code',
+    'fuel-approved':   { group: 'fuelling', label: 'Approved, the QR',
       run: function () {
-        reset('returning-driver', true, 1); showHome(); clearTimers();
+        /* A live fill cannot exist without a vehicle, and a vehicle cannot
+           exist without a scan, so the state that shows one scans first. */
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
         S.fuel = 'live'; paintFuelAction(); showFuel();
       } },
     'fuel-live':       { group: 'fuelling', label: 'Home, fill still open',
       run: function () {
-        reset('returning-driver', true, 1); showHome(); clearTimers();
+        /* A live fill cannot exist without a vehicle, and a vehicle cannot
+           exist without a scan, so the state that shows one scans first. */
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
         S.fuel = 'live'; paintFuelAction();
       } },
     'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing scanned',
@@ -5352,7 +5541,7 @@ body {
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
-    'fuelling':     'Choosing where, the code that comes back, and home while the fill is open.'
+    'fuelling':     'Choosing where, the QR that comes back, and home while the fill is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -5424,6 +5613,7 @@ body {
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
+        ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
         ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
@@ -5440,7 +5630,7 @@ body {
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
         ['fuel-requesting', 'Authorising'],
-        ['fuel-approved', 'Approved, the code'],
+        ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ]

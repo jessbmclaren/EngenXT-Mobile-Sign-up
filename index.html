@@ -3486,7 +3486,7 @@ button { background: none; border: none; color: inherit; }
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
-    'fuelling':     'Choosing where, the code that comes back, and home while the fill is open.'
+    'fuelling':     'Choosing where, the QR that comes back, and home while the fill is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3556,6 +3556,7 @@ button { background: none; border: none; color: inherit; }
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
+        ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
         ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
@@ -3572,7 +3573,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
         ['fuel-requesting', 'Authorising'],
-        ['fuel-approved', 'Approved, the code'],
+        ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ],
