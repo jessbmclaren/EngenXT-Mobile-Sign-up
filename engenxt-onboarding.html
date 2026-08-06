@@ -1476,6 +1476,16 @@ body {
 
    A card rather than a row: the registration is what a driver matches against
    the metal in front of them, so it is the largest thing on it. */
+/* Reference, not a control. It shows what the driver is allowed to fuel; the
+   scan is what says which one they are standing at. Drawn without the
+   affordances of a button, so nobody taps it expecting to have answered. */
+.m-vehicle-opt[data-static="true"] { cursor: default; border-style: solid; }
+.m-vehicle-opt[data-static="true"] .m-vehicle-opt__tick { display: none; }
+.o-step__label {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+.o-step__note { font-size: var(--text-caption); color: var(--color-text-secondary); }
 .m-vehicle-opt {
   display: flex; align-items: center; gap: var(--sp-3);
   width: 100%; min-height: 72px; padding: var(--sp-3);
@@ -4096,55 +4106,36 @@ body {
     vehicle: {
       mark: ICON_VAN,
       title: 'Which vehicle are you using?',
-      body: 'Select or scan the vehicle you\u2019re driving today.',
-      go: 'Confirm vehicle',
-      alt: 'Scan licence disc or number plate',
-      third: 'Enter registration instead',
-      /* Scanning is offered, never required. A cracked lens, a dark yard or a
-         phone with a poor camera must not be the thing that stops somebody
-         fuelling, and the assigned list is already the faster route for a
-         driver who recognises their own plate. */
+      /* Scanning is the confirmation, not one route to it.
+
+         Choosing from a list proves nothing: a driver can pick any vehicle on
+         it from anywhere. Reading the disc on the vehicle is the only part of
+         this that shows they are standing at it, which is the whole reason the
+         step exists. The list stays, because a driver still needs to see what
+         they are allowed, but it is reference and not the answer. */
+      body: 'Scan the licence disc on the vehicle you\u2019re driving today.',
+      go: 'Scan licence disc',
+      alt: 'Enter registration instead',
       build: function (host) {
         var list = S.vehicles.length ? S.vehicles : makeFleet(3);
-        /* One vehicle is still confirmed rather than assumed, because the app
-           cannot know they did not walk up to a different van this morning. */
-        if (stepPick === null) { stepPick = 0; }
-        host.innerHTML = list.slice(0, 4).map(function (v, i) {
-          var on = i === stepPick;
-          return '<button class="m-vehicle-opt" type="button" role="radio" data-opt="' + i + '"' +
-                 ' aria-checked="' + on + '" tabindex="' + (on ? '0' : '-1') + '">' +
-                 '<span class="m-vehicle-opt__art">' + vehicleArt(v.type, 22, 'currentColor') + '</span>' +
-                 '<span class="m-vehicle-opt__body">' +
-                 '<span class="m-vehicle-opt__plate">' + v.plate + '</span>' +
-                 '<span class="m-vehicle-opt__model">' + v.make + ' ' + v.model + '</span>' +
-                 '<span class="m-vehicle-opt__state">Assigned to you</span></span>' +
-                 '<span class="m-vehicle-opt__tick">' +
-                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                 'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-                 '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></button>';
-        }).join('');
-        host.setAttribute('role', 'radiogroup');
-        host.setAttribute('aria-label', 'Your assigned vehicles');
-        Array.prototype.forEach.call(host.querySelectorAll('[data-opt]'), function (b) {
-          b.addEventListener('click', function () {
-            stepPick = Number(b.dataset.opt);
-            STEPS.vehicle.build(host);
-            var v = (S.vehicles.length ? S.vehicles : makeFleet(3))[stepPick];
-            announce(v.plate + ' selected.');
-            host.querySelector('[data-opt="' + stepPick + '"]').focus({ preventScroll: true });
-          });
-        });
+        host.innerHTML =
+          '<p class="o-step__label">Assigned to you</p>' +
+          list.slice(0, 4).map(function (v) {
+            return '<div class="m-vehicle-opt" data-static="true">' +
+                   '<span class="m-vehicle-opt__art">' + vehicleArt(v.type, 22, 'currentColor') + '</span>' +
+                   '<span class="m-vehicle-opt__body">' +
+                   '<span class="m-vehicle-opt__plate">' + v.plate + '</span>' +
+                   '<span class="m-vehicle-opt__model">' + v.make + ' ' + v.model + '</span>' +
+                   '</span></div>';
+          }).join('') +
+          '<p class="o-step__note">Scan any one of these to start fuelling.</p>';
       },
-      onGo: function () {
-        var list = S.vehicles.length ? S.vehicles : makeFleet(3);
-        S.vehicles = list; S.vehicleLinked = true; S.activeVehicle = stepPick || 0;
-        S.linkedToday = true;
-        /* Location is asked once, on the first run. A driver who has already
-           granted it goes straight to home. */
-        if (S.located) { hideStep(); showHome(true); } else { showStep('location'); }
-      },
-      onAlt: function () { S.scanTries = 0; showScan('ready'); },
-      onThird: function () { announce('Manual registration entry is not built yet.'); }
+      onGo: function () { S.scanTries = 0; showScan('ready'); },
+      /* Kept, and kept honest about what it costs. A cracked lens or a camera
+         another app has hold of must not be the thing that stops somebody
+         working, but typing a registration proves nothing on its own, so it
+         carries a second check rather than being a way round the rule. */
+      onAlt: function () { announce('Typing the registration needs a second check. Not built yet.'); }
     },
 
     /* Asked after the vehicle, never before. A permission prompt that arrives
