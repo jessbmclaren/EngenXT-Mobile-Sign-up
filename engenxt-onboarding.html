@@ -1466,7 +1466,8 @@ body {
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
 }
-@media (max-height: 760px) { .o-stations__pins { inset-block-start: 112px; } }
+/* Same reason: the frame, not the window. */
+.t-device-frame[data-width="320"] .o-stations__pins { inset-block-start: 112px; }
 /* The bar floats on the map rather than sitting in a band above it, so the
    map keeps its full height on a short phone. */
 .o-stations__bar {
@@ -1502,7 +1503,25 @@ body {
    The rows are separate lines rather than one wrapped sentence. Squeezed onto
    one line, "8 pumps" fell to a second row at its own alignment and the card
    grew a third taller for no information. */
-.o-stations__detail { display: flex; flex-direction: column; gap: var(--sp-3); }
+/* The detail scrolls inside the sheet rather than growing it.
+
+   Without this, a station with two deals pushed the sheet past its cap and ate
+   the strip of map the camera needed, so exactly the stations with the most to
+   say were the ones whose pin could not be brought into view. The actions stay
+   pinned below, so choosing never scrolls out of reach. */
+.o-stations__detail {
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  min-height: 0; overflow: hidden;
+}
+/* Only the reading scrolls. The actions are outside it, so choosing a station
+   never scrolls out of reach on a small phone: the first version put them
+   inside the scroller and the button left the screen. */
+.o-stations__read {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: none;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.o-stations__read::-webkit-scrollbar { display: none; }
+.o-stations__act { flex-shrink: 0; }
 .m-station-head { display: flex; align-items: flex-start; gap: var(--sp-3); }
 .m-station-head__art {
   flex-shrink: 0; width: 44px; height: 44px;
@@ -1649,6 +1668,16 @@ body {
 /* Open a station and the sheet takes the room, because the station is now the
    thing being read and the map only has to keep showing where it is. */
 .o-stations[data-peek="on"] .o-stations__sheet { max-height: 72%; }
+/* On a small phone 72 per cent leaves a strip of map too thin to move a pin
+   into, so the sheet gives some back. The station still gets the room it needs,
+   and the map keeps enough to answer "where is that".
+
+   Keyed off the frame, not a media query. The phone here is a div inside a
+   desktop page, so @media (max-height) reads the browser window and never
+   matched: the rule was written, shipped and did nothing. */
+.t-device-frame[data-width="320"] .o-stations[data-peek="on"] .o-stations__sheet {
+  max-height: 52%;
+}
 /* The sheet grows out of the pin rather than sliding up over it. Scaling from
    the top edge means the first thing to appear is the edge nearest the map, so
    the eye is carried from the pin down into the detail instead of being handed
@@ -2830,6 +2859,7 @@ body {
                and the station and its alternatives are the same object at two
                levels of detail. -->
           <div class="o-stations__detail" id="stationDetail" hidden>
+            <div class="o-stations__read">
             <div class="m-station-head">
               <span class="m-station-head__art" id="stationArt"></span>
               <span class="m-station-head__body">
@@ -2844,6 +2874,7 @@ body {
               </button>
             </div>
             <div class="m-deals" id="stationDeals" hidden></div>
+            </div><!-- /o-stations__read -->
             <div class="o-stations__act">
               <button class="a-btn a-btn--primary" type="button" id="stationGo">Choose this station</button>
               <button class="a-btn a-btn--outline" type="button" id="stationNav">Get directions</button>
@@ -4226,11 +4257,16 @@ body {
       if (bottom - top < 56) { return; }
       var r = pin.getBoundingClientRect();
       var shift = ((top + bottom) / 2) - (r.top + r.height / 2);
-      /* The map is a map, not a scroll view. It moves enough to answer the
-         question and stops, so the driver keeps the bit of geography they
-         already had in their head. */
-      var limit = band.height * 0.4;
-      shift = Math.max(-limit, Math.min(limit, shift));
+      /* Asymmetric on purpose. Moving the map down brings a northern pin into
+         view and costs nothing, so it is allowed to travel as far as it needs.
+         Moving up is capped, because that is the direction that carries pins
+         off the top, and a driver who loses every landmark at once has lost the
+         thing a map is for.
+
+         A symmetric cap was the bug: the two northernmost stations needed more
+         downward travel than it allowed and stopped short, under the filters. */
+      var up = band.height * 0.4;
+      shift = Math.max(-up, shift);
       pins.style.transform = 'translateY(' + Math.round(shift) + 'px)';
     });
   }
