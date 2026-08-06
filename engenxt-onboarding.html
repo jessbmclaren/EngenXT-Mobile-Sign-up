@@ -2103,7 +2103,44 @@ body {
 }
 /* Quiet, and outside the scroll, so calling the fill off is always available
    and never the thing a thumb finds first. */
-.o-fuel__action { flex-shrink: 0; padding: var(--sp-3) var(--sp-5) var(--sp-6); }
+.o-fuel__action {
+  flex-shrink: 0; padding: var(--sp-3) var(--sp-5) var(--sp-6);
+  display: flex; flex-direction: column; gap: var(--sp-2h); align-items: stretch;
+}
+/* A way out that is not a decision. Quiet, centred, and never the width of the
+   thing it sits under. */
+.a-quiet-link {
+  align-self: center; padding: var(--sp-2) var(--sp-3);
+  border: none; background: none; cursor: pointer;
+  font-size: var(--text-caption); font-weight: 600;
+  color: var(--color-on-dark-soft); text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.a-quiet-link:hover { color: var(--color-text-on-dark); }
+
+/* m-confirm. Asked before something cannot be undone. */
+.m-confirm {
+  position: absolute; inset: 0; z-index: var(--z-toast);
+  display: grid; place-items: center; padding: var(--sp-5);
+  background: var(--color-scrim);
+}
+.m-confirm__panel {
+  width: 100%; max-width: 320px;
+  display: flex; flex-direction: column; gap: var(--sp-2h);
+  padding: var(--sp-5);
+  border-radius: var(--radius-sheet);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-overlay);
+  text-align: center;
+}
+.m-confirm__title { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
+.m-confirm__title:focus, .m-confirm__title:focus-visible { outline: none; box-shadow: none; }
+.m-confirm__body {
+  font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-2);
+}
+.m-confirm .a-quiet-link { color: var(--color-text-secondary); }
+.m-confirm .a-quiet-link:hover { color: var(--color-error-text); }
 
 @media (max-width: 900px) {
   /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
@@ -2798,8 +2835,25 @@ body {
 
         </div>
 
+        <!-- Done is the affirmative, and it goes where every other screen on
+             this flow puts the affirmative. Cancelling is not an action of the
+             same rank, so it stops being drawn as one and stops sitting under
+             the thumb that has just finished reading a code. -->
         <div class="o-fuel__action">
-          <button class="a-btn a-btn--outline" type="button" id="fuelCancel">Cancel this request</button>
+          <button class="a-btn a-btn--primary" type="button" id="fuelDone">Done</button>
+          <button class="a-quiet-link" type="button" id="fuelCancel">Cancel this request</button>
+        </div>
+
+        <!-- Asked before a live code is destroyed, and it quotes the code, so
+             nobody voids the one they are holding while looking at another. -->
+        <div class="m-confirm" id="fuelConfirm" role="dialog" aria-modal="true"
+             aria-labelledby="fuelConfirmTitle" hidden>
+          <div class="m-confirm__panel">
+            <h2 class="m-confirm__title" id="fuelConfirmTitle" tabindex="-1"></h2>
+            <p class="m-confirm__body" id="fuelConfirmBody"></p>
+            <button class="a-btn a-btn--primary" type="button" id="fuelKeep">Keep the code</button>
+            <button class="a-quiet-link" type="button" id="fuelDrop">Cancel it</button>
+          </div>
         </div>
       </section>
 
@@ -2864,6 +2918,9 @@ body {
   el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelCode = $('fuelCode');
   el.fuelVehicle = $('fuelVehicle'); el.fuelClose = $('fuelClose'); el.fuelCancel = $('fuelCancel');
   el.fuelCodeSpoken = $('fuelCodeSpoken');
+  el.fuelDone = $('fuelDone'); el.fuelConfirm = $('fuelConfirm');
+  el.fuelConfirmTitle = $('fuelConfirmTitle'); el.fuelConfirmBody = $('fuelConfirmBody');
+  el.fuelKeep = $('fuelKeep'); el.fuelDrop = $('fuelDrop');
   el.stations = $('stationsScreen'); el.stationList = $('stationList');
   el.stationPins = $('stationPins'); el.stationFilters = $('stationFilters');
   el.stationSearch = $('stationSearch'); el.stationEmpty = $('stationEmpty');
@@ -2897,6 +2954,9 @@ body {
     fuel: 'idle',
     step: 'signup-reward',
     station: null, stationSort: 'near',
+    /* What the company's side says. Front of house only: nothing here reads
+       a real account or a real clock. */
+    account: 'ok', hours: 'open',
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
 
@@ -3873,7 +3933,13 @@ body {
     hideAll();
     S.step = 'check';
     S.checking = id;
-    var clear = !!st.allowed;
+    /* Cleared means every question passed, not just the station one. The
+       screen used to read the station alone, so a driver blocked by the hours
+       or the account was told "Your company pays here" above a red row. */
+    var rows = fuelChecks(st, activeVehicle());
+    var failed = null;
+    for (var q = 0; q < rows.length; q++) { if (!rows[q].ok) { failed = q; break; } }
+    var clear = failed === null;
     var face = clear ? CHECK.clear : CHECK.block;
 
     el.check.setAttribute('data-verdict', clear ? 'clear' : 'block');
@@ -3884,9 +3950,15 @@ body {
 
     /* A refusal that does not say what to do next is a dead end, and a driver
        at a dead end goes looking for a way round it. */
+    var WHY = [
+      'Your company chooses which stations it pays for. Only your manager can add this one.',
+      'Your manager can get this going again. Nothing is wrong with your account.',
+      'Your company sets when its drivers can fuel. Your manager can change it.',
+      'Choose which vehicle you are driving and the rest of the check will run.',
+      ''
+    ];
     el.checkWhy.hidden = clear;
-    el.checkWhy.textContent = clear ? ''
-      : 'Your company chooses which stations it pays for. Only your manager can add this one.';
+    el.checkWhy.textContent = clear ? '' : WHY[failed];
 
     /* The vehicle rides inside the button as well as above it, so the plate is
        part of the thing being tapped rather than a line that can be skipped. */
@@ -3928,14 +4000,28 @@ body {
      screen somebody has to design, and the ring stops where the driver's
      problem actually is. */
   function fuelChecks(st, v) {
+    var account = S.account !== 'blocked';
+    var hours = S.hours !== 'closed';
     return [
-      { ok: !!st.allowed, title: "You're in the right area",
+      { ok: !!st.allowed, title: 'On your company list',
         sub: st.allowed ? st.name + ' is approved for you'
-                        : st.name + ' is not on your company list' },
-      { ok: true,  title: 'Your account has enough funds',
-        sub: 'Budget available for this fill' },
-      { ok: true,  title: 'Right day, right time',
-        sub: 'Your company allows fuelling right now' },
+                        : st.name + ' is not one your company pays for' },
+      /* Never a number, and never the word funds.
+
+         A driver has no business seeing what their employer holds in an
+         account, cannot act on it, and telling them turns a company matter
+         into an argument at a forecourt. Both faces of this row say only
+         whether the fill can go ahead, and the failure hands them the one
+         person who can fix it. */
+      { ok: account,
+        title: account ? 'Your company account is active'
+                       : 'Your company cannot approve this fill',
+        sub: account ? 'Nothing is stopping this fill'
+                     : 'Ask your manager to sort it out.' },
+      { ok: hours,
+        title: hours ? 'Right day, right time' : 'Outside your fuelling hours',
+        sub: hours ? 'Your company allows fuelling right now'
+                   : 'Your company allows Monday to Saturday, 05:00 to 19:00.' },
       { ok: !!v,   title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
         sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
                : 'Pick the one you are driving' },
@@ -4218,10 +4304,32 @@ body {
   });
   el.homeLive.addEventListener('click', function () { showFuel(true); });
   el.fuelClose.addEventListener('click', hideFuel);
+  el.fuelDone.addEventListener('click', function () { hideFuel(); });
+
+  /* Cancelling voids a code the driver may be holding out to an attendant, and
+     it cannot be undone, so it is asked rather than done. The code is quoted in
+     the question: somebody looking at one code and cancelling another is the
+     mistake this prevents. */
   el.fuelCancel.addEventListener('click', function () {
+    var v = activeVehicle();
+    el.fuelConfirmTitle.textContent =
+      'Cancel the code for ' + (v ? v.plate : 'this fill') + '?';
+    el.fuelConfirmBody.textContent =
+      'Code ' + fuelCodeShown() + ' will stop working. You would have to choose a station again.';
+    el.fuelConfirm.hidden = false;
+    after(60, function () { el.fuelConfirmTitle.focus({ preventScroll: true }); });
+    announce(el.fuelConfirmTitle.textContent + ' ' + el.fuelConfirmBody.textContent);
+  });
+  el.fuelKeep.addEventListener('click', function () {
+    el.fuelConfirm.hidden = true;
+    el.fuelCancel.focus({ preventScroll: true });
+  });
+  el.fuelDrop.addEventListener('click', function () {
+    el.fuelConfirm.hidden = true;
     S.fuel = 'idle';
     hideFuel();
-    announce('Request cancelled. Nothing has been authorised.');
+    paintFuelAction();
+    announce('Code cancelled. Nothing has been authorised.');
   });
   /* Escape closes it the way the close button does, because a screen laid over
      another one has to be dismissible from the keyboard. It never cancels: a
@@ -4392,6 +4500,9 @@ body {
   }
 
   function reset(userType, linked, fleet) {
+    /* Cleared here too, so a demo state that blocks the account does not leak
+       into the next one somebody opens. */
+    S.account = 'ok'; S.hours = 'open';
     S.userType = userType;
     S.vehicleLinked = !!linked;
     S.confettiPlayed = false;
@@ -4482,6 +4593,12 @@ body {
                          el.stationSearch.value = 'zzz'; paintStations(); } },
     'fuel-check':      { group: 'fuelling', label: 'Check before the code',
       run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('bryanston'); } },
+    'fuel-check-no-account': { group: 'fuelling', label: 'Check, account on hold',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         S.account = 'blocked'; showCheck('bryanston'); } },
+    'fuel-check-hours': { group: 'fuelling', label: 'Check, outside hours',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         S.hours = 'closed'; showCheck('bryanston'); } },
     'fuel-check-blocked': { group: 'fuelling', label: 'Check, station refused',
       run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('randburg'); } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
@@ -4728,6 +4845,8 @@ body {
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
         ['fuel-check-blocked', 'Check, station refused'],
+        ['fuel-check-no-account', 'Check, account on hold'],
+        ['fuel-check-hours', 'Check, outside hours'],
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
