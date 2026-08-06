@@ -1481,6 +1481,9 @@ body {
    affordances of a button, so nobody taps it expecting to have answered. */
 .m-vehicle-opt[data-static="true"] { cursor: default; border-style: solid; }
 .m-vehicle-opt[data-static="true"] .m-vehicle-opt__tick { display: none; }
+.m-vehicle-opt[data-done="true"] { border-color: var(--color-primary); background: var(--color-primary-light); }
+.m-vehicle-opt[data-done="true"] .m-vehicle-opt__art { background: var(--color-primary); color: var(--color-text-on-dark); }
+.m-vehicle-opt[data-done="true"] .m-vehicle-opt__tick { display: grid; }
 .o-step__label {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
@@ -2775,7 +2778,7 @@ body {
             <div class="m-vehicle-picker__head">
               <span class="m-vehicle-picker__title" id="homePickerTitle">Driving today</span>
               <span class="m-vehicle-picker__count" id="homePickerCount"></span>
-              <button class="a-link a-link--flush" type="button" id="homePickerMore">Scan or type</button>
+              <button class="a-link a-link--flush" type="button" id="homePickerMore">Change vehicle</button>
             </div>
             <!-- Only once the row is too long to scan. -->
             <label class="a-search" id="homeSearchWrap" hidden>
@@ -2784,7 +2787,7 @@ body {
               <input class="a-search__input" id="homeSearch" type="search"
                      placeholder="Search by registration or model" autocomplete="off">
             </label>
-            <div class="m-vehicle-picker__row" id="homePickerRow" role="radiogroup"
+            <div class="m-vehicle-picker__row" id="homePickerRow"
                  aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></div>
             <!-- How much of the fleet the row is not showing. Only when the
                  row has actually been cut short. -->
@@ -2815,8 +2818,8 @@ body {
           <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg></span>
             <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__plate">Choose your vehicle</span>
-              <span class="m-vehicle-card__note">Your next fill goes on the one you pick.</span>
+              <span class="m-vehicle-card__plate">Scan your vehicle</span>
+              <span class="m-vehicle-card__note">Read the licence disc to start fuelling today.</span>
             </span>
           </button>
 
@@ -3734,7 +3737,11 @@ body {
        driver's picker is different from a new one's. */
     var when = v.lastDriven
       ? '<span class="a-vehicle-chip__when">' + v.lastDriven + '</span>' : '';
-    return '<button class="a-vehicle-chip" type="button" role="radio" data-vehicle="' + i + '"' +
+    /* Not a radio. Tapping a plate cannot confirm a vehicle, because picking a
+       name off a list proves nothing about where the driver is standing. It
+       opens the screen where the disc gets scanned. */
+    return '<button class="a-vehicle-chip" type="button" data-vehicle="' + i + '"' +
+           (on ? ' aria-current="true"' : '') +
            ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
            ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model +
            (v.lastDriven ? ', last driven ' + v.lastDriven.toLowerCase() : '') + '">' +
@@ -3799,6 +3806,7 @@ body {
        above an answer nobody has given was labelling an empty box. */
     var asking = S.activeVehicle === NONE;
     el.homePickerTitle.textContent = asking ? 'Which vehicle today?' : 'Driving today';
+    el.homePickerMore.textContent = asking ? 'Scan to start' : 'Change vehicle';
     if (asking) { el.homePickerTitle.setAttribute('data-ask', 'true'); }
     else { el.homePickerTitle.removeAttribute('data-ask'); }
     el.homePickerRow.setAttribute('aria-required', asking ? 'true' : 'false');
@@ -3832,7 +3840,13 @@ body {
     }).join('');
 
     Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'), function (b) {
-      b.addEventListener('click', function () { chooseVehicle(Number(b.dataset.vehicle)); });
+      b.addEventListener('click', function () {
+        /* Every route to today's vehicle goes through the scan. This row used to
+           set it directly, which put a way round the rule on the screen the
+           driver sees most. */
+        stepPick = Number(b.dataset.vehicle);
+        showStep('vehicle');
+      });
       /* A radio group is one tab stop, and the arrows move within it. */
       b.addEventListener('keydown', function (ev) {
         var step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
@@ -4138,6 +4152,30 @@ body {
       onAlt: function () { announce('Typing the registration needs a second check. Not built yet.'); }
     },
 
+    /* What the scan proved, and the way onward. A silent return to home would
+       leave the driver wondering whether it took. */
+    confirmed: {
+      mark: ICON_VAN,
+      title: 'Vehicle confirmed',
+      body: '',
+      go: 'Find a station',
+      build: function (host) {
+        var v = activeVehicle();
+        host.innerHTML =
+          '<div class="m-vehicle-opt" data-static="true" data-done="true">' +
+          '<span class="m-vehicle-opt__art">' + (v ? vehicleArt(v.type, 22, 'currentColor') : '') + '</span>' +
+          '<span class="m-vehicle-opt__body">' +
+          '<span class="m-vehicle-opt__plate">' + (v ? v.plate : '') + '</span>' +
+          '<span class="m-vehicle-opt__model">' + (v ? v.make + ' ' + v.model : '') + '</span>' +
+          '<span class="m-vehicle-opt__state">Confirmed for today</span></span>' +
+          '<span class="m-vehicle-opt__tick">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+          'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></div>';
+      },
+      onGo: function () { hideStep(); if (S.located) { showHome(true); } else { showStep('location'); } }
+    },
+
     /* Asked after the vehicle, never before. A permission prompt that arrives
        before the driver has done anything to need it is the one they refuse. */
     location: {
@@ -4203,6 +4241,25 @@ body {
       ? 'Enter the registration' : 'Enter registration';
   }
 
+  /* The read landing. Auto capture, so the driver is not holding a phone at a
+     van hunting for a shutter button, and the result is a screen rather than a
+     silent return: something was proved and the driver should see what. */
+  function scanSucceeded() {
+    var list = S.vehicles.length ? S.vehicles : makeFleet(3);
+    var i = (stepPick === null || stepPick === undefined) ? 0 : stepPick;
+    S.vehicles = list;
+    S.vehicleLinked = true;
+    S.activeVehicle = i;
+    S.linkedToday = true;
+    hideScan();
+    showStep('confirmed');
+  }
+
+  function hideScan() {
+    el.scan.hidden = true;
+    el.scan.removeAttribute('data-state');
+  }
+
   function showScan(face) {
     clearTimers(); hideAll();
     S.step = 'scan';
@@ -4216,6 +4273,19 @@ body {
       var f = SCAN_FACES[S.scanFace];
       announce(f.t + '. ' + f.b);
     });
+    /* Aiming becomes reading becomes confirmed, on its own. A prototype that
+       waits forever for a capture that cannot happen is a scanner nobody can
+       get past, which is exactly what this was. */
+    if (S.scanFace === 'ready') {
+      after(prefersReduced() ? 0 : 1700, function () {
+        if (S.step !== 'scan' || S.scanFace !== 'ready') { return; }
+        S.scanFace = 'reading'; paintScan();
+        after(prefersReduced() ? 0 : 1100, function () {
+          if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
+          scanSucceeded();
+        });
+      });
+    }
   }
 
   function showStep(key, arriving) {
@@ -4226,6 +4296,10 @@ body {
     el.stepMark.innerHTML = def.mark;
     el.stepTitle.textContent = def.title;
     el.stepBody.textContent = def.body;
+    if (key === 'confirmed') {
+      var cv = activeVehicle();
+      el.stepBody.textContent = (cv ? cv.plate : 'That vehicle') + ' is ready to use.';
+    }
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
     if (def.build) { def.build(el.stepGroup); }
@@ -5211,6 +5285,9 @@ body {
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('unread'); } },
     'flow1-scan-offline': { group: 'flow1', label: '2 \u00b7 Scan, no connection',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
+    'flow1-confirmed': { group: 'flow1', label: '2 \u00b7 Vehicle confirmed',
+      run: function () { reset('returning-driver', true, 3); stepPick = 0;
+                         chooseVehicle(0); showStep('confirmed'); } },
     'flow1-location': { group: 'flow1', label: '3 · Find stations near you',
       run: function () { reset('returning-driver', true, 3); chooseVehicle(0); showStep('location'); } },
     'flow1-open-linked': { group: 'flow1', label: 'Opening, already linked today',
@@ -5492,6 +5569,7 @@ body {
         ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
+        ['flow1-confirmed', '2 \u00b7 Vehicle confirmed'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
         ['flow1-open-linked', 'Opening, already linked today'],
