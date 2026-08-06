@@ -4295,18 +4295,25 @@ body {
   });
   /* Back to the map with the choice intact, because the driver is changing
      their mind about a station, not starting the search again. */
-  el.checkOther.addEventListener('click', function () {
+  /* Back to the map with home restored underneath it, so the next Back has
+     somewhere to land. */
+  function backToMap() {
     hideCheck();
+    showHome();
     showStations(false, true);
-  });
-  el.checkBack.addEventListener('click', function () {
-    hideCheck();
-    showStations(false, true);
-  });
+  }
+  el.checkOther.addEventListener('click', backToMap);
+  el.checkBack.addEventListener('click', backToMap);
 
+  /* Back goes home, and puts home back.
+     It only hid the map, which worked while home was still underneath. Coming
+     to the map the long way, through the check screen and "Choose another
+     station", home has been hidden by hideAll, so hiding the map on top of it
+     left every screen off and the phone blank. Restoring it is the fix, rather
+     than trusting whatever happened to be behind. */
   el.stationsBack.addEventListener('click', function () {
     hideStations();
-    S.step = 'home';
+    showHome();
     announce('Back on home. No fill was requested.');
     el.homeFuel.focus({ preventScroll: true });
   });
