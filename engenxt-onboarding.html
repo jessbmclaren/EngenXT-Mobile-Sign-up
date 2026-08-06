@@ -1448,6 +1448,23 @@ body {
 .o-stations__pins {
   position: absolute; inset: 128px var(--sp-4) var(--sp-5);
   pointer-events: none;
+  /* The camera. Choosing a station moves the map so the chosen pin sits clear
+     of the sheet, rather than leaving it wherever it happened to be, possibly
+     underneath the thing describing it. */
+  transition: transform var(--dur-sheet) var(--ease-emphasis);
+}
+/* Pins leaving the top dissolve rather than sliding under the filter chips.
+   Panning the map moved a pin behind "Nearest", where it was still a target and
+   still drawn, half a pin poking out from under a control. A mask is the honest
+   edge: the map continues past it, and nothing is left half drawn. */
+.o-stations__pins {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+  /* Without no-repeat the gradient tiles, so the band above the mask got a
+     fresh opaque copy of it and the pin the mask existed to hide was drawn
+     anyway, poking out from under the filter chips. */
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
 }
 @media (max-height: 760px) { .o-stations__pins { inset-block-start: 112px; } }
 /* The bar floats on the map rather than sitting in a band above it, so the
@@ -1632,6 +1649,20 @@ body {
 /* Open a station and the sheet takes the room, because the station is now the
    thing being read and the map only has to keep showing where it is. */
 .o-stations[data-peek="on"] .o-stations__sheet { max-height: 72%; }
+/* The sheet grows out of the pin rather than sliding up over it. Scaling from
+   the top edge means the first thing to appear is the edge nearest the map, so
+   the eye is carried from the pin down into the detail instead of being handed
+   a panel that arrived from somewhere else. */
+.o-stations__detail {
+  transform-origin: top center;
+  animation: detailRise 320ms var(--ease-emphasis) both;
+}
+@keyframes detailRise {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+[data-motion="reduced"] .o-stations__detail { animation: none; }
+@media (prefers-reduced-motion: reduce) { .o-stations__detail { animation: none; } }
 .o-stations__sheet {
   flex-shrink: 0; max-height: 54%;
   transition: max-height var(--dur-sheet) var(--ease-emphasis);
@@ -4167,12 +4198,45 @@ body {
     el.stationDetail.hidden = false;
     el.stationBrowse.hidden = true;
     el.stations.setAttribute('data-peek', 'on');
+    panTo(st);
     after(60, function () { el.stationName.focus({ preventScroll: true }); });
     announce(st.name + '. ' + el.stationStatusLine.textContent + '. ' +
              st.km.toFixed(1) + ' kilometres away.');
   }
 
+  /* Bring the chosen pin into the strip of map the sheet has left.
+
+     Measured, not guessed. It used to work off fractions of the band height,
+     which assumed a fixed sheet, and the sheet resizes to its content. Two
+     stations in three landed under the chips or under the sheet. This reads the
+     real gap between the filter chips and the sheet, after the layout has
+     settled, and centres the pin in it. */
+  function panTo(st) {
+    requestAnimationFrame(function () {
+      var pins = el.stationPins;
+      pins.style.transform = '';
+      var band = pins.getBoundingClientRect();
+      var chips = el.stationFilters.getBoundingClientRect();
+      var sheet = el.stations.querySelector('.o-stations__sheet').getBoundingClientRect();
+      var pin = pins.querySelector('[data-pin="' + st.id + '"]');
+      if (!pin || !band.height) { return; }
+      var top = chips.bottom + 12;
+      var bottom = sheet.top - 12;
+      /* Nothing worth moving into. */
+      if (bottom - top < 56) { return; }
+      var r = pin.getBoundingClientRect();
+      var shift = ((top + bottom) / 2) - (r.top + r.height / 2);
+      /* The map is a map, not a scroll view. It moves enough to answer the
+         question and stops, so the driver keeps the bit of geography they
+         already had in their head. */
+      var limit = band.height * 0.4;
+      shift = Math.max(-limit, Math.min(limit, shift));
+      pins.style.transform = 'translateY(' + Math.round(shift) + 'px)';
+    });
+  }
+
   function shutPeek() {
+    el.stationPins.style.transform = '';
     el.stationDetail.hidden = true;
     el.stationBrowse.hidden = false;
     el.stations.removeAttribute('data-peek');
