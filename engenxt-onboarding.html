@@ -1174,23 +1174,37 @@ body {
    asking is not an invitation, and the rest of the screen still has to be
    readable. It also stops the instant a driver goes anywhere near it, because
    once it has been seen it has done its job. */
-.o-home__fuel[data-pulse="on"]::before,
+/* One ring, once, leaving the button's own edge.
+
+   It was two rings beating three times over seven seconds, and it fires at the
+   moment the driver has just tapped a chip, so their eye is already on that
+   half of the screen. An invitation repeated six times to somebody who is
+   already looking is not an invitation, it is a nag, and a ring pulsing out of
+   a control is the visual language of an alert, which this is the opposite of.
+
+   It also animated `inset`, which is layout: four sides recalculated every
+   frame, on two pseudo-elements, for seven seconds, on the screen where a
+   mid-range Android decides how fast this app feels. Scale and opacity are
+   composited and cost the main thread nothing.
+
+   `border-radius: inherit` so the ring is the button's exact shape rather than
+   a pill of its own, and scaling keeps the corners in proportion, which
+   insetting by 16px did not. */
 .o-home__fuel[data-pulse="on"]::after {
   content: ''; position: absolute; inset: 0;
-  border-radius: var(--radius-pill);
+  border-radius: inherit;
   border: 1.5px solid var(--color-primary);
-  box-shadow: 0 0 16px var(--color-primary-12);
   pointer-events: none; opacity: 0;
-  animation: fuelInvite 2.2s var(--ease-out) 3 both;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: fuelInvite 1100ms var(--ease-out) 1 both;
 }
-.o-home__fuel[data-pulse="on"]::after { animation-delay: 0.55s; }
 @keyframes fuelInvite {
-  0%        { inset: 0;     opacity: 0.55; }
-  60%, 100% { inset: -16px; opacity: 0; }
+  0%   { transform: scale(1);    opacity: 0.5; }
+  100% { transform: scale(1.09); opacity: 0; }
 }
 /* Nothing to collapse to a still frame: an invitation is the movement. Held
    at its first frame it would be a permanent blue band round the button. */
-[data-motion="reduced"] .o-home__fuel[data-pulse="on"]::before,
 [data-motion="reduced"] .o-home__fuel[data-pulse="on"]::after { display: none; }
 
 /* ── Asking for a fill ────────────────────────────────────────────────
@@ -1596,16 +1610,65 @@ body {
    Five questions, answered where the driver can watch them being answered.
    It replaces a spinner, so it is not decoration: the same 900ms is now
    spent saying what is being checked instead of saying nothing. */
-.o-onboard--check { background: var(--gradient-hero); align-items: stretch; }
-.o-check__list { display: flex; flex-direction: column; gap: var(--sp-2h); }
+
+/* a-gate. The brand mark inside a ring that closes as the checks are answered.
+
+   Five questions, so five segments, each lighting as its answer lands. The ring
+   is not a spinner dressed up: a spinner says "wait", and this says "four of
+   five, and here is the fifth". When one fails the ring stops there and turns
+   to the brand red, so the answer is legible from arm's length before a word
+   of it has been read.
+
+   The mark is EngenXT's own. What is being granted is permission from this
+   company, and a driver holding a phone up on a forecourt should be holding up
+   something obviously theirs. */
+.a-gate {
+  position: relative; align-self: center;
+  /* Held open. As a flex item in a column its height was shrinkable, so it
+     collapsed to the mark inside it and the ring came out the same size as the
+     thing it is supposed to be drawn around. */
+  flex-shrink: 0;
+  width: 132px; height: 132px; margin-bottom: var(--sp-4);
+  display: grid; place-items: center;
+}
+.a-gate__ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.a-gate__track { fill: none; stroke: var(--color-border); stroke-width: 3; }
+/* Unanswered, answered, refused. This screen is a light surface, so the ring
+   takes the light palette: the on-dark pair it was first drawn in was very
+   nearly white on white. */
+.a-gate__seg {
+  fill: none; stroke: var(--color-border-strong); stroke-width: 4; stroke-linecap: round;
+  transition: stroke var(--dur-base) var(--ease-out);
+}
+.a-gate__seg[data-state="pass"] { stroke: var(--color-success); }
+.a-gate__seg[data-state="fail"] { stroke: var(--color-secondary); }
+.a-gate__mark {
+  width: 68px; height: 68px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-circle);
+  background: var(--gradient-primary);
+  color: var(--color-text-on-dark);
+  box-shadow: var(--shadow-btn);
+  transition: background var(--dur-slow) var(--ease-out),
+              box-shadow var(--dur-slow) var(--ease-out);
+}
+/* Refused, so the mark carries the brand red rather than the brand blue. The
+   colour of the thing in the middle is the fastest read on the screen. */
+.o-check[data-verdict="block"] .a-gate__mark {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #A5140E 100%);
+  box-shadow: 0 6px 16px var(--color-secondary-30);
+}
+
+/* The receipt of what the ring counted. */
+.o-check__checks { display: flex; flex-direction: column; gap: var(--sp-1h); margin-top: var(--sp-4); }
 
 /* m-check. One question and its answer. */
 .m-check {
   display: flex; align-items: flex-start; gap: var(--sp-3);
   padding: var(--sp-3);
   border-radius: var(--radius-card);
-  background: var(--color-on-dark-fill);
-  border: 1px solid var(--color-on-dark-faint);
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-border);
   text-align: left;
   /* Waiting to be answered. Each one arrives as its answer does, so the list
      is a sequence of results rather than a block that appears finished. */
@@ -1614,6 +1677,33 @@ body {
               transform var(--dur-base) var(--ease-out);
 }
 .m-check[data-state="in"] { opacity: 1; transform: none; }
+/* A passed check is a receipt, not news. It keeps its place so the list can be
+   read back, and gives up its weight so the verdict and the action above it are
+   what the eye lands on. */
+.m-check[data-ok="true"] {
+  background: none; border-color: transparent; padding-block: var(--sp-1h);
+}
+.m-check[data-ok="true"] .m-check__mark {
+  width: 22px; height: 22px; border-width: 1.5px;
+}
+.m-check[data-ok="true"] .m-check__title {
+  font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary);
+}
+.m-check[data-ok="true"] .m-check__sub { display: none; }
+/* Never asked, because the app stopped before it got here. It keeps its place
+   so the list still reads as five questions, and says nothing about an answer
+   it does not have. */
+.m-check[data-ok="skipped"] {
+  background: none; border-color: transparent; padding-block: var(--sp-1h);
+}
+.m-check[data-ok="skipped"] .m-check__mark {
+  width: 22px; height: 22px; border-width: 1.5px;
+  border-color: var(--color-border-strong); color: var(--color-text-tertiary);
+}
+.m-check[data-ok="skipped"] .m-check__title {
+  font-size: var(--text-caption); font-weight: 600; color: var(--color-text-tertiary);
+}
+.m-check[data-ok="skipped"] .m-check__sub { display: none; }
 .m-check__mark {
   flex-shrink: 0; width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
@@ -1629,11 +1719,11 @@ body {
 .m-check__body { flex: 1 1 auto; min-width: 0; }
 .m-check__title {
   display: block; font-size: var(--text-callout); font-weight: 700;
-  color: var(--color-text-on-dark);
+  color: var(--color-text-primary);
 }
 .m-check__sub {
   display: block; margin-top: 1px;
-  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+  font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary);
 }
 .o-onboard--reward .o-onboard__eyebrow,
 .o-onboard--reward .o-onboard__title { text-align: center; }
@@ -2423,22 +2513,6 @@ body {
         </div>
       </section>
 
-      <!-- SCREEN FOUR · the check.
-           The authorisation used to be 900ms of spinner. It is really five
-           separate questions being answered, and a driver who is about to hand
-           a code to an attendant is entitled to see which ones passed. It also
-           gives every possible refusal somewhere to live: a check that fails is
-           a row that fails, not a screen somebody has to design later. -->
-      <section class="o-onboard o-onboard--check" id="checkScreen" aria-labelledby="checkTitle" hidden>
-        <p class="o-onboard__eyebrow">Fuel check</p>
-        <h1 class="o-onboard__title" id="checkTitle" tabindex="-1">Checking your fill</h1>
-        <div class="o-check__list" id="checkList"></div>
-        <div class="o-onboard__spacer"></div>
-        <div class="o-onboard__actions">
-          <button class="a-btn a-btn--primary" id="checkCta" type="button" disabled>Show attendant card</button>
-        </div>
-      </section>
-
       <!-- SCREEN FIVE · the fill.
            Home is still underneath and is still the way back, so this is laid
            over it rather than instead of it. -->
@@ -2449,6 +2523,26 @@ body {
 
           <div class="o-check__bar">
             <button class="a-icon-btn" type="button" id="checkBack" aria-label="Back to the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+          </div>
+
+          <!-- The gate. Five questions are being asked, so the ring is drawn in
+               five segments and each one lights as its answer lands. The motion
+               is the clearance rather than a decoration on top of it: when a
+               check fails the ring stops at that segment and goes to the brand
+               red, so a driver knows they have been stopped before they have
+               read a word.
+
+               The mark in the middle is the brand's, because the thing granting
+               permission is EngenXT, and a driver holding this up at a forecourt
+               should be holding up something obviously ours. -->
+          <div class="a-gate" id="checkGate" aria-hidden="true">
+            <svg class="a-gate__ring" viewBox="0 0 120 120">
+              <circle class="a-gate__track" cx="60" cy="60" r="53"/>
+              <g class="a-gate__segs" id="checkSegs"></g>
+            </svg>
+            <span class="a-gate__mark">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>
+            </span>
           </div>
 
           <p class="m-verdict" id="checkVerdict">
@@ -2481,6 +2575,12 @@ body {
             <span class="m-fact__name">Fuel</span>
             <span class="m-fact__value">Up to 60 L</span>
           </div>
+
+          <!-- What the ring was counting. Quiet once passed, because five
+               answered questions are a receipt and not the point of the screen.
+               A failed one keeps its weight, since that is the only one the
+               driver now has to do anything about. -->
+          <div class="o-check__checks" id="checkList" role="list"></div>
         </div>
 
         <!-- The plate rides inside the button, so the vehicle is part of the
@@ -2587,6 +2687,7 @@ body {
     checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkPlate: $('checkPlate'),
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
+    checkSegs: $('checkSegs'), checkList: $('checkList'),
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
@@ -2608,8 +2709,6 @@ body {
   el.stationSearch = $('stationSearch'); el.stationEmpty = $('stationEmpty');
   el.stationStatus = $('stationStatus'); el.stationsBack = $('stationsBack');
   el.fuelStation = $('fuelStation');
-  el.check = $('checkScreen'); el.checkTitle = $('checkTitle');
-  el.checkList = $('checkList'); el.checkCta = $('checkCta');
 
   /* ════════════════════════════════════════════════════════════════════
      MOCK STATE
@@ -3380,10 +3479,9 @@ body {
       if (S.fuel !== 'idle' || !S.vehicleLinked || !activeVehicle()) { return; }
       if (el.home.hidden) { return; }
       el.homeFuel.setAttribute('data-pulse', 'on');
-      /* Cleared once the last ring has gone, so the attribute never outlives
-         the thing it describes. Three beats of 2.2s, the second ring set off
-         0.55s late, and a frame either side. */
-      after(2200 * 3 + 550 + 100, stopPulse);
+      /* Cleared once the ring has gone, so the attribute never outlives the
+         thing it describes. One pass of 1.1s and a frame either side. */
+      after(1100 + 100, stopPulse);
     });
   }
   function stopPulse() { el.homeFuel.removeAttribute('data-pulse'); }
@@ -3572,12 +3670,96 @@ body {
     } else {
       el.check.setAttribute('data-state', 'visible');
     }
+    paintGate(st, v);
     after(60, function () { el.checkStation.focus({ preventScroll: true }); });
     after(500, function () {
       announce(st.name + '. ' + face.verdict + '.' +
                (clear && v ? ' Up to 60 litres on ' + v.plate + '.' : '') +
                (clear ? '' : ' ' + el.checkWhy.textContent));
     });
+  }
+
+  /* The five questions behind the verdict, and the ring that counts them.
+
+     Written as data because every one of them can fail. A refusal is then this
+     same list with one row answered the other way, rather than a separate
+     screen somebody has to design, and the ring stops where the driver's
+     problem actually is. */
+  function fuelChecks(st, v) {
+    return [
+      { ok: !!st.allowed, title: "You're in the right area",
+        sub: st.allowed ? st.name + ' is approved for you'
+                        : st.name + ' is not on your company list' },
+      { ok: true,  title: 'Your account has enough funds',
+        sub: 'Budget available for this fill' },
+      { ok: true,  title: 'Right day, right time',
+        sub: 'Your company allows fuelling right now' },
+      { ok: !!v,   title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
+        sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
+               : 'Pick the one you are driving' },
+      { ok: true,  title: '60 L approved for this fill',
+        sub: 'Your company limit for this vehicle' }
+    ];
+  }
+
+  var TICK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+  var DASH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>';
+  var CROSS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+  function paintGate(st, v) {
+    var checks = fuelChecks(st, v);
+    var R = 53, C = 2 * Math.PI * R, n = checks.length;
+    var gap = 7, seg = C / n - gap;
+
+    /* One arc per question, drawn as a dashed circle offset round the ring, so
+       the five are visibly five rather than one bar cut up. */
+    el.checkSegs.innerHTML = checks.map(function (c, i) {
+      return '<circle class="a-gate__seg" cx="60" cy="60" r="' + R + '"' +
+             ' stroke-dasharray="' + seg.toFixed(2) + ' ' + (C - seg).toFixed(2) + '"' +
+             ' stroke-dashoffset="' + (-i * (C / n)).toFixed(2) + '"></circle>';
+    }).join('');
+
+    el.checkList.innerHTML = checks.map(function (c) {
+      return '<div class="m-check" data-ok="' + c.ok + '" role="listitem">' +
+             '<span class="m-check__mark">' + (c.ok ? TICK : CROSS) + '</span>' +
+             '<span class="m-check__body">' +
+             '<span class="m-check__title">' + c.title + '</span>' +
+             '<span class="m-check__sub">' + c.sub + '</span></span></div>';
+    }).join('');
+
+    var segs = el.checkSegs.querySelectorAll('.a-gate__seg');
+    var rows = el.checkList.querySelectorAll('.m-check');
+    var step = prefersReduced() ? 0 : 190;
+
+    /* Answers land one at a time, and the ring stops at the first refusal
+       rather than completing round a problem. */
+    var stopAt = n;
+    for (var k = 0; k < n; k++) { if (!checks[k].ok) { stopAt = k; break; } }
+
+    checks.forEach(function (c, i) {
+      if (i > stopAt) { return; }
+      after(step * i, function () {
+        if (segs[i]) { segs[i].setAttribute('data-state', c.ok ? 'pass' : 'fail'); }
+        if (rows[i]) { rows[i].setAttribute('data-state', 'in'); }
+      });
+    });
+    /* Anything after a refusal was never asked, so it does not get an answer.
+       Leaving the tick on made the screen say a question had passed when the
+       app had stopped before reaching it. */
+    for (var j = stopAt + 1; j < n; j++) {
+      (function (r) { after(step * (stopAt + 1), function () {
+        if (!r) { return; }
+        r.setAttribute('data-state', 'in');
+        r.setAttribute('data-ok', 'skipped');
+        var mark = r.querySelector('.m-check__mark');
+        if (mark) { mark.innerHTML = DASH; }
+      }); })(rows[j]);
+    }
   }
 
   /* The row this screen grows when the question was never answered on home.
@@ -3667,83 +3849,22 @@ body {
     el.stations.removeAttribute('data-state');
   }
 
-  /* ── The check ────────────────────────────────────────────────────────
-     What the authorisation is actually made of. Five questions, and a driver
-     about to hand a code to an attendant is entitled to see which ones were
-     asked. Written as data because every one of them can fail, and a failed
-     check should be this row with the other answer rather than a screen
-     somebody has to invent later. */
-  function fuelChecks() {
-    var v = activeVehicle();
-    return [
-      { ok: true, title: "You're in the right area",
-        sub: stationName() + ' is approved for you' },
-      { ok: true, title: 'Your account has enough funds',
-        sub: 'Budget available for this fill' },
-      { ok: true, title: 'Right day, right time',
-        sub: 'Your company allows fuelling right now' },
-      { ok: true, title: 'Your vehicle is confirmed',
-        sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate : 'No vehicle chosen' },
-      { ok: true, title: '60 L approved for this fill',
-        sub: 'Your company limit for this vehicle' }
-    ];
-  }
-
-  var TICK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<path d="m5 12.5 4.5 4.5L19 7"/></svg>';
-  var CROSS = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<path d="M18 6 6 18M6 6l12 12"/></svg>';
-
-  function showCheck() {
-    S.step = 'check';
-    var checks = fuelChecks();
-    var allOk = checks.every(function (c) { return c.ok; });
-
-    el.checkTitle.textContent = 'Checking your fill';
-    el.checkCta.disabled = true;
-    el.checkList.innerHTML = checks.map(function (c) {
-      return '<div class="m-check" data-ok="' + c.ok + '" role="listitem">' +
-             '<span class="m-check__mark">' + (c.ok ? TICK : CROSS) + '</span>' +
-             '<span class="m-check__body">' +
-             '<span class="m-check__title">' + c.title + '</span>' +
-             '<span class="m-check__sub">' + c.sub + '</span></span></div>';
-    }).join('');
-    el.checkList.setAttribute('role', 'list');
-    el.check.hidden = false;
-    el.check.setAttribute('data-state', 'visible');
-    after(60, function () { el.checkTitle.focus({ preventScroll: true }); });
-
-    /* Each answer arrives as it is answered. Under reduced motion the list is
-       simply already answered, which is the same information without the
-       staging: a still sequence is a delay, not a sequence. */
-    var rows = el.checkList.querySelectorAll('.m-check');
-    var step = prefersReduced() ? 0 : 220;
-    Array.prototype.forEach.call(rows, function (r, i) {
-      after(step * i, function () { r.setAttribute('data-state', 'in'); });
-    });
-    var done = step * rows.length;
-    after(done, function () {
-      el.checkTitle.textContent = allOk ? "You're cleared to fuel." : 'You cannot fuel here';
-      el.checkCta.disabled = !allOk;
-      announce(allOk
-        ? "You're cleared to fuel at " + stationName() + '. Show the attendant card.'
-        : 'You cannot fuel here. Read the checks for the reason.');
-    });
-  }
-
-  function hideCheck() {
-    el.check.hidden = true;
-    el.check.removeAttribute('data-state');
-  }
-
   /* The authorisation itself, once the station is known. */
   function authoriseFill() {
     hideStations();
     S.fuel = 'pending';
     paintFuelAction();
-    showCheck();
+    /* The check screen has already been through. This is the authorisation
+       itself, and it ends on the code.
+
+       It briefly pointed back at the check screen, which meant Get code did
+       nothing at all: showCheck now takes a station and returned immediately
+       without one. */
+    after(prefersReduced() ? 0 : 900, function () {
+      S.fuel = 'live';
+      paintFuelAction();
+      showFuel(true);
+    });
   }
 
   function requestFuel() {
@@ -3948,14 +4069,6 @@ body {
     el.homeFuel.focus({ preventScroll: true });
   });
   el.stationSearch.addEventListener('input', paintStations);
-  /* The card is what the attendant reads, so it is a deliberate second tap
-     rather than something that appears while the driver is still reading. */
-  el.checkCta.addEventListener('click', function () {
-    hideCheck();
-    S.fuel = 'live';
-    paintFuelAction();
-    showFuel(true);
-  });
 
   el.homeVehicleEmpty.addEventListener('click', function () {
     var first = el.homePickerRow.querySelector('[data-vehicle]');
@@ -4339,6 +4452,7 @@ body {
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
         ['fuel-stations-searched', 'Station search, no match'],
+        ['fuel-check', 'The five checks'],
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
