@@ -1365,81 +1365,69 @@ body {
 }
 .a-icon-btn--onMap:hover { background: var(--color-surface); }
 
-/* m-station-card. The station a pin opens, over the map.
+/* m-station-head. The selected station, at the top of the sheet.
 
-   Filled in the brand blue because it is the one station being considered, and
-   everything under it on this screen is a list of alternatives. The action
-   inverts to white on that blue, which is the strongest a control can be
-   without introducing a third colour. */
-.o-stations__peek {
-  /* Above the pins. A pressed pin lifts itself to sit over its neighbours, and
-     without this it lifted itself over the card it had just opened. */
-  z-index: 3;
-  position: absolute; left: var(--sp-3); right: var(--sp-3);
-  top: calc(var(--size-status-bar) + var(--sp-8) + var(--sp-3));
-  display: flex; flex-direction: column; gap: var(--sp-2h);
-  max-height: calc(100% - var(--size-status-bar) - var(--sp-12));
-  overflow-y: auto; scrollbar-width: none;
-}
-.o-stations__peek::-webkit-scrollbar { display: none; }
-.m-station-card {
-  flex-shrink: 0;
-  padding: var(--sp-4);
-  border-radius: var(--radius-sheet);
-  background: var(--gradient-primary);
-  color: var(--color-text-on-dark);
-  box-shadow: var(--shadow-btn);
-}
-.m-station-card__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
-.m-station-card__art {
+   It was a blue card floating over the map. That card was a strong object and
+   the wrong one: it put the filters, the map, a hero card, a search field and a
+   list on screen at once, its shadow collided with the chips above it, and the
+   map stopped reading as something you navigate.
+
+   Here the station and the list of alternatives are one surface at two levels
+   of detail, and the map above stays a map.
+
+   The rows are separate lines rather than one wrapped sentence. Squeezed onto
+   one line, "8 pumps" fell to a second row at its own alignment and the card
+   grew a third taller for no information. */
+.o-stations__detail { display: flex; flex-direction: column; gap: var(--sp-3); }
+.m-station-head { display: flex; align-items: flex-start; gap: var(--sp-3); }
+.m-station-head__art {
   flex-shrink: 0; width: 44px; height: 44px;
   display: grid; place-items: center;
   border-radius: var(--radius-card-sm);
-  background: var(--color-on-dark-fill);
+  background: var(--color-primary-light); color: var(--color-primary);
 }
-.m-station-card__body { flex: 1 1 auto; min-width: 0; }
-.m-station-card__name {
-  display: block; font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+.m-station-head__body { flex: 1 1 auto; min-width: 0; }
+.m-station-head__name {
+  display: block; font-size: var(--text-large); font-weight: 800;
+  letter-spacing: -0.4px; color: var(--color-text-primary);
 }
-.m-station-card__meta {
-  display: block; margin-top: var(--sp-1h);
-  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+/* Focused by script so the sheet is announced, which is not the same as a
+   driver having navigated to it. The global ring sets a halo as well as an
+   outline, and clearing only the outline left the halo drawing a box round the
+   station name. */
+.m-station-head__name:focus,
+.m-station-head__name:focus-visible { outline: none; box-shadow: none; }
+/* Whether the company pays is worth more than whether there is a shop, so it
+   sits with the name rather than among the facilities. */
+.m-station-head__status {
+  display: block; margin-top: 2px;
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-success);
 }
-.m-station-card__km {
+.m-station-head__status[data-allowed="false"] { color: var(--color-error-text); }
+.m-station-head__where,
+.m-station-head__has {
+  display: block; margin-top: 2px;
+  font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary);
+}
+.m-station-head__km {
   flex-shrink: 0; text-align: right;
   font-size: var(--text-title); font-weight: 800; font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
 }
-.m-station-card__km small {
-  display: block; font-size: var(--text-nano); font-weight: 600; color: var(--color-on-dark-soft);
+.m-station-head__km small {
+  display: block; font-size: var(--text-nano); font-weight: 600; color: var(--color-text-tertiary);
 }
-/* Open or shut is the first thing a driver needs and the only one that changes
-   hour to hour, so it sits inside the name rather than among the facilities. */
-.a-open-badge {
-  display: inline-flex; align-items: center; margin-right: var(--sp-2);
-  padding: 1px var(--sp-2); border-radius: var(--radius-pill);
-  background: var(--color-surface); color: var(--color-primary-dark);
-  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.04em;
-  vertical-align: 2px;
-}
-.a-open-badge[data-open="false"] { background: var(--color-on-dark-fill); color: var(--color-on-dark-soft); }
-/* What is actually there. Facts, not features: a driver at 2am wants to know
-   about the toilet. */
-.m-station-card__has { display: flex; flex-wrap: wrap; gap: var(--sp-1h); margin-top: var(--sp-3); }
-.a-has-chip {
-  padding: var(--sp-1) var(--sp-2h);
-  border-radius: var(--radius-pill);
-  background: var(--color-on-dark-fill);
-  font-size: var(--text-caption2); font-weight: 600;
-}
-.m-station-card__actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-4); }
-.m-station-card__actions .a-btn { flex: 1 1 auto; }
-.a-close-round {
-  flex-shrink: 0; width: var(--size-control); height: var(--size-control);
+/* Closing is not an action of the same rank as choosing, so it is not drawn as
+   one. It was a 56dp circle sitting beside the primary button, which read as a
+   second major choice and could plausibly have meant cancel the whole request. */
+.a-shut {
+  flex-shrink: 0; width: 32px; height: 32px; margin: -2px -4px 0 0;
   display: grid; place-items: center;
   border: none; border-radius: var(--radius-circle);
-  background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
-  cursor: pointer;
+  background: none; color: var(--color-text-tertiary); cursor: pointer;
 }
+.a-shut:hover { background: var(--color-surface-sunken); color: var(--color-text-primary); }
+.o-stations__act { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 /* m-deals. What the station sells that is not fuel.
 
@@ -1518,7 +1506,14 @@ body {
   color: var(--color-primary);
   transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-.a-pin[aria-pressed="true"] { color: var(--color-primary-dark); transform: scale(1.18); z-index: 2; }
+/* Blue is allowed, grey is not, and the one being looked at takes the brand
+   red. Three meanings, three treatments, and the red appears nowhere else on
+   this screen so it can only mean "this one". */
+.a-pin[aria-pressed="true"] {
+  color: var(--color-secondary);
+  transform: scale(1.3); z-index: 2;
+  filter: drop-shadow(0 3px 6px var(--color-secondary-30));
+}
 /* A station the manager has not approved is on the map, because it is still a
    petrol station and pretending otherwise would send a driver looking for it.
    It just is not one of theirs. */
@@ -1527,7 +1522,9 @@ body {
 /* With a station open, the list steps back so the card and what is at that
    station are not sliced off by it. The list is the alternatives, and the
    alternatives matter less than the one being looked at. */
-.o-stations[data-peek="on"] .o-stations__sheet { max-height: 30%; }
+/* Open a station and the sheet takes the room, because the station is now the
+   thing being read and the map only has to keep showing where it is. */
+.o-stations[data-peek="on"] .o-stations__sheet { max-height: 72%; }
 .o-stations__sheet {
   flex-shrink: 0; max-height: 54%;
   transition: max-height var(--dur-sheet) var(--ease-emphasis);
@@ -1554,7 +1551,9 @@ body {
 .o-stations__group {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
-  padding-top: var(--sp-2);
+  /* 12, not 10: the heading was off the four point grid and sat closer to the
+     card under it than to nothing. */
+  padding-top: var(--sp-3);
 }
 
 /* m-station. One station: what it is called, why it is worth knowing, how far.
@@ -2605,15 +2604,7 @@ body {
           <span class="a-here" style="left:47%;top:56%" aria-hidden="true"></span>
           <div class="o-stations__pins" id="stationPins"></div>
 
-          <!-- What a pin opens. The map used to commit on the first tap, which
-               made it a list of buttons with a picture behind them. A driver
-               picking a forecourt wants to know whether it is open, whether
-               there is a toilet, and how far, before they decide, so the pin
-               opens the station and the decision stays theirs. -->
-          <div class="o-stations__peek" id="stationPeek" hidden>
-            <div class="m-station-card" id="stationCard"></div>
-            <div class="m-deals" id="stationDeals" hidden></div>
-          </div>
+
 
           <div class="o-stations__bar">
             <button class="a-icon-btn a-icon-btn--onMap" type="button" id="stationsBack" aria-label="Back to home">
@@ -2631,7 +2622,38 @@ body {
              and on a phone held in one hand the list is the half you can reach. -->
         <div class="o-stations__sheet">
           <span class="a-grabber" aria-hidden="true"></span>
+
+          <!-- The selected station lives here rather than on a card over the
+               map. Floating it above meant the screen ran five interaction
+               surfaces at once, the filters collided with it, and the map
+               stopped being a thing you navigate and became a backdrop.
+
+               In the sheet there is one place to look, the map stays a map,
+               and the station and its alternatives are the same object at two
+               levels of detail. -->
+          <div class="o-stations__detail" id="stationDetail" hidden>
+            <div class="m-station-head">
+              <span class="m-station-head__art" id="stationArt"></span>
+              <span class="m-station-head__body">
+                <span class="m-station-head__name" id="stationName" tabindex="-1"></span>
+                <span class="m-station-head__status" id="stationStatusLine"></span>
+                <span class="m-station-head__where" id="stationWhere"></span>
+                <span class="m-station-head__has" id="stationHas"></span>
+              </span>
+              <span class="m-station-head__km" id="stationKm"></span>
+              <button class="a-shut" type="button" id="stationShut" aria-label="Close, back to the list">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+            </div>
+            <div class="m-deals" id="stationDeals" hidden></div>
+            <div class="o-stations__act">
+              <button class="a-btn a-btn--primary" type="button" id="stationGo">Choose this station</button>
+              <button class="a-btn a-btn--outline" type="button" id="stationNav">Get directions</button>
+            </div>
+          </div>
+
           <h1 class="u-visually-hidden" id="stationsTitle">Choose a station</h1>
+          <div class="o-stations__browse" id="stationBrowse">
           <label class="a-search">
             <span class="u-visually-hidden">Search stations</span>
             <span class="a-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
@@ -2641,6 +2663,7 @@ body {
           <div class="o-stations__list" id="stationList" role="radiogroup" aria-labelledby="stationsTitle"></div>
           <p class="m-vehicle-picker__empty" id="stationEmpty" hidden>No station matches that.</p>
           <span class="u-visually-hidden" id="stationStatus" role="status"></span>
+          </div><!-- /o-stations__browse -->
         </div>
       </section>
 
@@ -2819,7 +2842,12 @@ body {
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
     checkSegs: $('checkSegs'), checkList: $('checkList'),
-    stationPeek: $('stationPeek'), stationCard: $('stationCard'), stationDeals: $('stationDeals'),
+    stationDetail: $('stationDetail'), stationBrowse: $('stationBrowse'),
+    stationArt: $('stationArt'), stationName: $('stationName'),
+    stationStatusLine: $('stationStatusLine'), stationWhere: $('stationWhere'),
+    stationHas: $('stationHas'), stationKm: $('stationKm'),
+    stationShut: $('stationShut'), stationGo: $('stationGo'), stationNav: $('stationNav'),
+    stationDeals: $('stationDeals'),
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
@@ -3672,7 +3700,7 @@ body {
     { key: 'open',  label: 'Open 24 hours', by: function (a, b) {
         var oa = /24 hours/.test(a.note) ? 0 : 1, ob = /24 hours/.test(b.note) ? 0 : 1;
         return oa - ob || a.km - b.km; } },
-    { key: 'known', label: 'Been here', by: function (a, b) {
+    { key: 'known', label: 'Visited', by: function (a, b) {
         var ka = /fuelled here/.test(a.note) ? 0 : 1, kb = /fuelled here/.test(b.note) ? 0 : 1;
         return ka - kb || a.km - b.km; } }
   ];
@@ -3757,34 +3785,28 @@ body {
     '<path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>';
 
   function paintPeek(st) {
-    el.stationCard.innerHTML =
-      '<div class="m-station-card__top">' +
-        '<span class="m-station-card__art">' + PUMP_ART + '</span>' +
-        '<span class="m-station-card__body">' +
-          '<span class="m-station-card__name">' + st.name + '</span>' +
-          '<span class="m-station-card__meta">' +
-            '<span class="a-open-badge" data-open="' + st.open + '">' +
-            (st.open ? 'Open' : 'Closed') + '</span>' + st.street +
-            ' \u00b7 ' + st.pumps + ' pumps</span>' +
-        '</span>' +
-        '<span class="m-station-card__km">' + st.km.toFixed(1) + '<small>km</small></span>' +
-      '</div>' +
-      (st.has && st.has.length
-        ? '<div class="m-station-card__has">' + st.has.map(function (h) {
-            return '<span class="a-has-chip">' + h + '</span>'; }).join('') + '</div>'
-        : '') +
-      '<div class="m-station-card__actions">' +
-        (st.allowed
-          ? '<button class="a-btn a-btn--onDark" type="button" data-peek="go">Fuel here</button>'
-          : '<button class="a-btn a-btn--onDark" type="button" data-peek="go">Why not here?</button>') +
-        '<button class="a-close-round" type="button" data-peek="shut" aria-label="Close, back to the map">' +
-        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
-        'stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
-      '</div>';
+    el.stationArt.innerHTML = PUMP_ART;
+    el.stationName.textContent = st.name;
 
-    /* The deals are not the company's business. A driver buying a coffee is
-       spending their own money, so the card says so once rather than leaving
-       somebody to discover it at the till. */
+    /* Whether the company pays comes first, because it is the only line here
+       that decides anything. A driver who reads "Shop" and drives over to find
+       the fill refused has been told the wrong thing first. */
+    el.stationStatusLine.textContent =
+      (st.allowed ? 'Allowed' : 'Not on your company list') +
+      ' \u00b7 ' + (st.open ? 'Open now' : 'Closed');
+    el.stationStatusLine.setAttribute('data-allowed', st.allowed);
+
+    el.stationWhere.textContent = st.street;
+    el.stationHas.textContent = st.pumps + ' pumps' +
+      (st.has && st.has.length ? ' \u00b7 ' + st.has.join(' \u00b7 ') : '');
+    el.stationKm.innerHTML = st.km.toFixed(1) + '<small>km</small>';
+
+    /* "Fuel here" claimed a driver could start fuelling from fourteen
+       kilometres away. This screen chooses a station, it does not begin a fill,
+       and the label now says which. */
+    el.stationGo.textContent = st.allowed ? 'Choose this station' : 'Why not here?';
+    el.stationNav.hidden = !st.allowed;
+
     var deals = st.deals || [];
     el.stationDeals.hidden = deals.length === 0;
     if (deals.length) {
@@ -3801,23 +3823,19 @@ body {
         }).join('') + '</div>';
     }
 
-    el.stationPeek.hidden = false;
+    /* One thing on screen at a time. The list is the alternatives, and while a
+       station is open the alternatives are not what is being looked at. */
+    el.stationDetail.hidden = false;
+    el.stationBrowse.hidden = true;
     el.stations.setAttribute('data-peek', 'on');
-    Array.prototype.forEach.call(el.stationCard.querySelectorAll('[data-peek]'), function (b) {
-      b.addEventListener('click', function () {
-        if (b.dataset.peek === 'shut') { shutPeek(); return; }
-        shutPeek();
-        after(prefersReduced() ? 0 : 160, function () { showCheck(st.id, true); });
-      });
-    });
-    announce(st.name + '. ' + (st.open ? 'Open' : 'Closed') + '. ' +
-             st.km.toFixed(1) + ' kilometres. ' +
-             (st.allowed ? 'Fuel here, or close to keep looking.'
-                         : 'Not on your company list.'));
+    after(60, function () { el.stationName.focus({ preventScroll: true }); });
+    announce(st.name + '. ' + el.stationStatusLine.textContent + '. ' +
+             st.km.toFixed(1) + ' kilometres away.');
   }
 
   function shutPeek() {
-    el.stationPeek.hidden = true;
+    el.stationDetail.hidden = true;
+    el.stationBrowse.hidden = false;
     el.stations.removeAttribute('data-peek');
     S.station = null;
     paintStations();
@@ -4293,6 +4311,19 @@ body {
     el.homeFuel.focus({ preventScroll: true });
   });
   el.stationSearch.addEventListener('input', paintStations);
+  el.stationShut.addEventListener('click', shutPeek);
+  el.stationGo.addEventListener('click', function () {
+    var id = S.station;
+    if (!id) { return; }
+    shutPeek();
+    after(prefersReduced() ? 0 : 160, function () { showCheck(id, true); });
+  });
+  /* Directions are the other thing a driver wants from a station they have not
+     reached yet, and it is not this app's job. Saying so beats a control that
+     looks live and is not. */
+  el.stationNav.addEventListener('click', function () {
+    announce('Directions are not built yet.');
+  });
 
   el.homeVehicleEmpty.addEventListener('click', function () {
     var first = el.homePickerRow.querySelector('[data-vehicle]');
