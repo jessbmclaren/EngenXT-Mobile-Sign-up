@@ -3079,7 +3079,9 @@ body {
       { row: 0, label: 'Signing up', pts: 50 }
     ],
     ptsPerGb: 1000,
-    gbCap: 5,
+    /* Three, not five. The reward is data and three gigabytes is the ceiling
+       the scheme actually pays out to. */
+    gbCap: 3,
     vehicleLinked: false,
     vehicles: [], activeVehicle: 0,
     /* idle | pending | live. What the fuel action is currently showing, and
@@ -3089,7 +3091,12 @@ body {
     station: null, stationSort: 'near',
     /* What the company's side says. Front of house only: nothing here reads
        a real account or a real clock. */
-    account: 'ok', hours: 'open',
+    account: 'ok', hours: 'open', located: true,
+    /* Confirmed for today. A driver swaps vans between days far more often than
+       within one, so the question is asked once each day and not again. Asking
+       every time they press the button would train them to tap past it, which
+       is exactly how the wrong van ends up on a fill. */
+    linkedToday: false,
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
 
@@ -3845,6 +3852,14 @@ body {
   el.homeFuel.addEventListener('pointerdown', stopPulse);
   el.homeFuel.addEventListener('focus', stopPulse);
 
+  /* Opening the app. The only question is whether today's vehicle is already
+     confirmed. If it is, the driver lands on home and can press the fuel button
+     straight away. If it is not, the gate runs first. */
+  function openApp() {
+    if (S.linkedToday) { showHome(); return; }
+    showStep('vehicle');
+  }
+
   /* ══ FLOW 1 ══════════════════════════════════════════════════════════
      Open the app, confirm the account only when something has changed,
      confirm the vehicle, ask for location, land on the map.
@@ -3922,7 +3937,10 @@ body {
       onGo: function () {
         var list = S.vehicles.length ? S.vehicles : makeFleet(3);
         S.vehicles = list; S.vehicleLinked = true; S.activeVehicle = stepPick || 0;
-        showStep('location');
+        S.linkedToday = true;
+        /* Location is asked once, on the first run. A driver who has already
+           granted it goes straight to home. */
+        if (S.located) { hideStep(); showHome(true); } else { showStep('location'); }
       },
       onAlt: function () { announce('The camera permission screen is not built yet.'); },
       onThird: function () { announce('Manual registration entry is not built yet.'); }
@@ -3936,8 +3954,11 @@ body {
       body: 'EngenXT uses your location to show stations available for this vehicle.',
       go: 'Use my location',
       alt: 'Search instead',
-      onGo: function () { hideStep(); showHome(); showStations(true); },
-      onAlt: function () { hideStep(); showHome(); showStations(true); }
+      /* Ends on home, not on the map. Linking is the gate for the day and
+         home is still where the day is run from: the driver presses the fuel
+         button when they are ready, which may be hours later. */
+      onGo: function () { hideStep(); showHome(true); },
+      onAlt: function () { hideStep(); showHome(true); }
     }
   };
 
@@ -4760,7 +4781,7 @@ body {
   function reset(userType, linked, fleet) {
     /* Cleared here too, so a demo state that blocks the account does not leak
        into the next one somebody opens. */
-    S.account = 'ok'; S.hours = 'open';
+    S.account = 'ok'; S.hours = 'open'; S.linkedToday = false; S.located = true;
     S.userType = userType;
     S.vehicleLinked = !!linked;
     S.confettiPlayed = false;
@@ -4851,6 +4872,12 @@ body {
       run: function () { reset('returning-driver', true, 1); stepPick = null; showStep('vehicle'); } },
     'flow1-location': { group: 'flow1', label: '3 · Find stations near you',
       run: function () { reset('returning-driver', true, 3); chooseVehicle(0); showStep('location'); } },
+    'flow1-open-linked': { group: 'flow1', label: 'Opening, already linked today',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         S.linkedToday = true; openApp(); } },
+    'flow1-open-fresh':  { group: 'flow1', label: 'Opening, not linked yet',
+      run: function () { reset('returning-driver', true, 3); stepPick = null;
+                         S.linkedToday = false; openApp(); } },
     'flow1-map':      { group: 'flow1', label: '4 · The allowed stations',
       run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
                          showHome(); showStations(false); } },
@@ -5116,7 +5143,9 @@ body {
         ['flow1-vehicle', '2 \u00b7 Which vehicle today'],
         ['flow1-vehicle-one', '2 \u00b7 One vehicle, still confirmed'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
-        ['flow1-map', '4 \u00b7 The allowed stations']
+        ['flow1-map', '4 \u00b7 The allowed stations'],
+        ['flow1-open-linked', 'Opening, already linked today'],
+        ['flow1-open-fresh', 'Opening, not linked yet']
       ],
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
