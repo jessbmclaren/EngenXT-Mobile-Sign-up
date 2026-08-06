@@ -42,14 +42,17 @@
   --color-primary:       #1650B8;
   --color-primary-dark:  #0D3A8A;
   --color-primary-light: #EEF3FF;
+  --color-primary-06: rgba(22,80,184,0.06);
   --color-primary-08: rgba(22,80,184,0.08);
   --color-primary-12: rgba(22,80,184,0.12);
+  --color-primary-18: rgba(22,80,184,0.18);   /* the halo on the you-are-here dot */
   --color-primary-30: rgba(22,80,184,0.30);   /* gradient stop and button shadow */
 
   --color-secondary:     #E2231A;
   --color-secondary-bg:  #FDEEEE;
   --color-secondary-12: rgba(226,35,26,0.12);
   --color-secondary-25: rgba(226,35,26,0.25);
+  --color-secondary-30: rgba(226,35,26,0.30);
   --color-secondary-40: rgba(226,35,26,0.40);
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
@@ -890,11 +893,57 @@ body {
    it takes its weight from type rather than from an alert colour. */
 .m-stat-pill__figure { font-size: var(--text-callout); font-weight: 800; }
 
-/* m-vehicle-picker. Which of your vehicles you are driving today. One job,
-   so a molecule, and it changes shape with how many there are: one vehicle
-   needs no picker at all, a few are faster to recognise as pictures than to
-   read as a list, and past a certain number no row is scannable and the
-   honest answer is a search field. */
+/* m-linked. The scan worked, said where the driver landed.
+
+   Success green rather than the brand blue, because the brand blue on this
+   screen is the fuel button and a second blue block above it competes with the
+   thing it is meant to be handing over to. */
+.m-linked {
+  display: flex; align-items: flex-start; gap: var(--sp-2h);
+  margin-bottom: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-20);
+}
+.m-linked__tick {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-circle);
+  background: var(--color-success); color: #FFFFFF;
+}
+.m-linked__body { display: flex; flex-direction: column; gap: 2px; }
+.m-linked__title {
+  font-size: var(--text-body); font-weight: 700; line-height: 1.3;
+  color: var(--color-success);
+}
+.m-linked__sub {
+  font-size: var(--text-caption); line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+/* Reduced motion still gets the message, it just arrives rather than slides. */
+.m-linked[data-state="in"] { animation: linkedIn var(--dur-slow) var(--ease-out) both; }
+@keyframes linkedIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-linked[data-state="in"] { animation: none; }
+}
+
+/* m-vehicle-picker. What the driver is allowed to fuel, and the one door to
+   today's vehicle. One job, so a molecule.
+
+   It is no longer a picker in the sense the name suggests, and the name is kept
+   because the block is still the same block. Nothing in it selects: it lists
+   what the manager has assigned, and it holds the single control that opens the
+   scanner, which is the only thing that can decide which vehicle a fill goes on.
+
+   It changes shape with how many vehicles there are and with whether one has
+   been scanned. One vehicle needs no list at all. A fleet that fits shows its
+   plates. A fleet that does not shows its size. And once a disc has been read,
+   the list steps aside for the card that names what was read. */
 /* m-empty-note. Why the thing you expected to see is not there. A screen
    with a hole in it and no explanation is worse than a screen that says
    plainly that nothing has been assigned yet. */
@@ -932,22 +981,18 @@ body {
   font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
   font-variant-numeric: tabular-nums;
 }
-/* Scrolls sideways on its own so the page never does. The gutters are negative
-   margins, so the first and last chip can sit against the screen edge and the
-   row reads as continuing rather than ending. */
+/* Wraps rather than scrolls.
+
+   It used to be a sideways scroller, which was right when it held a fleet you
+   had to travel through to find your own van in. It holds a complete list now,
+   and a scroller is not complete: five vehicles showed as three, and the two
+   past the edge were exactly as hidden as the search box used to make them.
+   Wrapping puts the whole list on the screen at once, which is the only thing
+   that makes it worth showing at all. */
 .m-vehicle-picker__row {
-  display: flex; gap: var(--sp-3);
-  overflow-x: auto; scrollbar-width: none;
-  scroll-snap-type: x proximity;
-  /* The bleed stays, so the row reads as continuing past the edge, but it is
-     measured against whatever contains it. It was cut to the screen gutter,
-     and once the picker moved inside a panel with a smaller inset the row
-     overshot its own container and the last chip was clipped by the glass. */
-  margin-inline: calc(var(--sp-4) * -1);
-  padding-inline: var(--sp-4);
-  padding-block: var(--sp-1);
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: var(--sp-1h);
 }
-.m-vehicle-picker__row::-webkit-scrollbar { display: none; }
 .m-vehicle-picker__empty {
   font-size: var(--text-caption); color: var(--color-text-secondary);
   padding-block: var(--sp-2);
@@ -958,63 +1003,35 @@ body {
   font-size: var(--text-caption2); color: var(--color-text-tertiary);
 }
 
-/* a-vehicle-chip. A vehicle, named by the thing that tells it apart.
+/* a-vehicle-chip. A registration, listed.
 
-   It used to be a 64px circle holding a silhouette, with the registration at
-   10px underneath it. That had the weighting backwards. A driver is not
-   choosing a class of vehicle, they are choosing THEIR vehicle, and five vans
-   draw five identical silhouettes, so the picture is the caption and the
-   registration is the content. The plate now sets the size of the tile and the
-   drawing rides above it at 16px, saying only which kind of thing it is. */
+   It has been a 64px silhouette with the plate underneath, then a card with the
+   plate and the day it was last driven. Both were sized for a thing you choose
+   between. Nothing is chosen here any more, so it is sized for a thing you
+   read: one line, the drawing at the size of the text beside it, and no card.
+
+   The day it was last driven went with the choosing. "Yesterday" earned its
+   place when it was the fastest way to find your own van in a row you had to
+   pick from. There is no picking, and a list annotated with facts nobody acts
+   on is just a taller list.
+
+   Flat, borderless and unpressable on purpose. Everything else on this screen
+   that is raised and white can be tapped, and a row of things that look tappable
+   and do nothing is worse than the selection it replaced. */
 .a-vehicle-chip {
-  position: relative;
-  flex-shrink: 0; scroll-snap-align: center;
-  /* Grows with its own text rather than clipping it, so a long registration at
-     200% browser zoom takes its own width instead of crossing into the chip
-     beside it. */
-  min-width: 100px; max-width: 168px; min-height: 56px;
-  padding: var(--sp-2) var(--sp-2h);
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  border-radius: var(--radius-card-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card-sm);
-  cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-in-out),
-              border-color var(--dur-fast) var(--ease-out),
-              background var(--dur-fast) var(--ease-out);
+  flex: 0 1 auto;
+  min-height: 32px;
+  padding: var(--sp-1) var(--sp-2h) var(--sp-1) var(--sp-2);
+  display: inline-flex; align-items: center; gap: var(--sp-1h);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
 }
-.a-vehicle-chip:active { transform: scale(0.97); }
-.a-vehicle-chip[aria-checked="true"] {
-  border-color: var(--color-primary);
-  background: var(--color-primary);
-}
-.a-vehicle-chip__art { display: flex; opacity: 0.9; }
+.a-vehicle-chip__art { display: flex; opacity: 0.75; }
 .a-vehicle-chip__plate {
-  font-size: var(--text-body); font-weight: 700; line-height: 1.25;
-  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
-  text-align: center;
+  font-size: var(--text-caption); font-weight: 700; line-height: 1.3;
+  font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
+  white-space: nowrap;
 }
-.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__plate { color: var(--color-text-on-dark); }
-/* Quieter than the registration, because it helps you find the chip and is not
-   the thing you are choosing. */
-.a-vehicle-chip__when {
-  font-size: var(--text-nano); font-weight: 600; line-height: 1.3;
-  color: var(--color-text-tertiary); white-space: nowrap;
-}
-.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__when { color: var(--color-on-dark-soft); }
-/* The fill is a colour, so the tick is the second cue and the choice is never
-   carried by hue alone. */
-.a-vehicle-chip__tick {
-  position: absolute; top: -6px; right: -6px;
-  width: 22px; height: 22px;
-  display: none; align-items: center; justify-content: center;
-  border-radius: var(--radius-circle);
-  background: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-surface-page);
-}
-.a-vehicle-chip[aria-checked="true"] .a-vehicle-chip__tick { display: flex; }
-
 /* a-search. A field that filters what is under it. */
 .a-search { position: relative; display: flex; align-items: center; }
 .a-search__icon {
@@ -2254,24 +2271,6 @@ body {
   width: 100%;
   font-size: var(--text-caption2); color: var(--color-text-secondary);
 }
-/* The fact grows a control when it has no value yet. It scrolls sideways like
-   the picker on home and bleeds to the screen gutter for the same reason: a row
-   cut flush at the edge looks like the whole fleet. */
-.m-fact__pick {
-  width: 100%;
-  display: flex; gap: var(--sp-2h);
-  overflow-x: auto; scrollbar-width: none;
-  scroll-snap-type: x proximity;
-  margin-inline: calc(var(--sp-5) * -1);
-  padding-inline: var(--sp-5);
-  padding-block: var(--sp-1);
-}
-.m-fact__pick::-webkit-scrollbar { display: none; }
-.m-fact__pick > * { scroll-snap-align: start; }
-.m-fact__note {
-  width: 100%;
-  font-size: var(--text-caption2); color: var(--color-text-secondary);
-}
 
 .o-fuel {
   position: absolute; inset: 0; z-index: var(--z-overlay);
@@ -2758,6 +2757,24 @@ body {
             </span>
           </div>
 
+          <!-- What the scan proved, said on the screen the driver came back to.
+
+               It used to be a full screen of its own reading "Vehicle confirmed"
+               with a button on to the map, which took a driver who had linked
+               their van at seven in the morning and pushed them towards a fill
+               they were not ready to start. Linking and fuelling are two
+               different decisions, hours apart. This states the first and leaves
+               the second where it belongs, on the button below. -->
+          <div class="m-linked" id="homeLinked" role="status" hidden>
+            <span class="m-linked__tick">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+            </span>
+            <span class="m-linked__body">
+              <span class="m-linked__title">Vehicle linked</span>
+              <span class="m-linked__sub" id="homeLinkedSub"></span>
+            </span>
+          </div>
+
           <!-- Everything a driver reaches for, gathered at the bottom of the
                screen. Above it the bloom shows through, which is the point:
                a work tool that puts its controls under the thumb and its
@@ -2776,29 +2793,14 @@ body {
                the empty message, and none of those are radios. -->
           <div class="m-vehicle-picker" id="homePicker" hidden>
             <div class="m-vehicle-picker__head">
-              <span class="m-vehicle-picker__title" id="homePickerTitle">Driving today</span>
+              <span class="m-vehicle-picker__title" id="homePickerTitle">Your vehicles</span>
               <span class="m-vehicle-picker__count" id="homePickerCount"></span>
-              <button class="a-link a-link--flush" type="button" id="homePickerMore">Change vehicle</button>
             </div>
-            <!-- Only once the row is too long to scan. -->
-            <label class="a-search" id="homeSearchWrap" hidden>
-              <span class="u-visually-hidden">Search your vehicles</span>
-              <span class="a-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
-              <input class="a-search__input" id="homeSearch" type="search"
-                     placeholder="Search by registration or model" autocomplete="off">
-            </label>
-            <div class="m-vehicle-picker__row" id="homePickerRow"
-                 aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></div>
-            <!-- How much of the fleet the row is not showing. Only when the
-                 row has actually been cut short. -->
-            <p class="m-vehicle-picker__note" id="homePickerNote" hidden></p>
-            <p class="m-vehicle-picker__empty" id="homePickerEmpty" hidden>
-              No vehicle matches that.
-            </p>
-            <!-- What the search did, for anyone who cannot see the row change.
-                 Written only from the search path, on a debounce, so it never
-                 speaks on arrival and never collides with the greeting. -->
-            <span class="u-visually-hidden" id="homePickerStatus" role="status"></span>
+            <!-- A list, not a group of controls. There is no aria-checked and
+                 no tab stop in here, because there is nothing to choose: the
+                 only thing that can decide today's vehicle is the scan. -->
+            <ul class="m-vehicle-picker__row" id="homePickerRow" role="list"
+                aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></ul>
           </div>
 
           <button class="m-vehicle-card" type="button" id="homeVehicle" data-unbuilt="Vehicle details">
@@ -2936,7 +2938,7 @@ body {
         <div class="o-scan__modes" id="scanModes" role="group" aria-label="What to scan"></div>
         <div class="o-scan__actions">
           <button class="a-btn a-btn--outline" type="button" id="scanOther">Try number plate instead</button>
-          <button class="a-btn a-btn--outline" type="button" id="scanType">Enter registration</button>
+          <button class="a-btn a-btn--outline" type="button" id="scanType">Ask your manager</button>
         </div>
       </section>
 
@@ -3090,12 +3092,6 @@ body {
             <span class="m-fact__name">Vehicle</span>
             <span class="m-fact__value" id="checkPlate">CA 123-456</span>
             <span class="m-fact__sub" id="checkModel">Ford Transit Custom</span>
-            <!-- Asked here when it was not answered on home, because this is
-                 the last screen before a code exists and a code without a
-                 vehicle is not a thing the app can issue. -->
-            <div class="m-fact__pick" id="checkPick" role="radiogroup"
-                 aria-label="Which vehicle are you driving" hidden></div>
-            <p class="m-fact__note" id="checkPickNote" hidden></p>
           </div>
           <div class="m-fact">
             <span class="m-fact__name">Fuel</span>
@@ -3229,7 +3225,7 @@ body {
     checkVerdict: $('checkVerdict'), checkVerdictText: $('checkVerdictText'),
     checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkPlate: $('checkPlate'),
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
-    checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
+    checkBack: $('checkBack'),
     checkSegs: $('checkSegs'), checkList: $('checkList'),
     scan: $('scanScreen'), scanNoteTitle: $('scanNoteTitle'), scanNoteBody: $('scanNoteBody'),
     scanModes: $('scanModes'), scanLine: $('scanLine'), scanOther: $('scanOther'),
@@ -3245,13 +3241,12 @@ body {
     stationDeals: $('stationDeals'),
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
-    homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
-    homePickerNote: $('homePickerNote'), homePickerTitle: $('homePickerTitle'),
-    homePickerMore: $('homePickerMore'),
-    homePickerStatus: $('homePickerStatus'), homePanel: $('homePanel'),
+    homePickerCount: $('homePickerCount'),
+    homePickerTitle: $('homePickerTitle'),
+    homeLinked: $('homeLinked'), homeLinkedSub: $('homeLinkedSub'),
+    homePanel: $('homePanel'),
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
     homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
-    homeSearch: $('homeSearch'), homeSearchWrap: $('homeSearchWrap'),
     announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar'),
     seam: $('seam')
   };
@@ -3565,31 +3560,24 @@ body {
     playReward();
   }
 
-  /* ── The driver's vehicles ─────────────────────────────────────────────
-     A fleet driver is not always in the same vehicle, so home has to answer
-     "which one today" before anything else on it means much.
-
-     The picker changes shape with how many there are, because the right
-     control genuinely differs: one vehicle is not a choice and gets no picker,
-     a handful are recognised faster as pictures than read as text, and beyond
-     a row you can scan, pictures stop helping and a search field starts. */
-  var SEARCH_FROM = 6;
 
   /* No vehicle chosen. A driver with a choice in front of them starts here,
      not on whichever vehicle happened to be first in the list. */
   var NONE = -1;
 
-  /* Past this many, the row stops trying to hold the fleet. A driver dragging
-     through hundreds of chips is not picking, they are looking for something,
-     and looking for something is what the search field is for. The row shows
-     the start of the fleet, says how much it is not showing, and the search
-     reaches the rest.
+  /* Past this many, the row stops trying to hold the fleet at all.
 
-     The vehicles table in the organise-vehicles prototype makes the same trade
-     at desk scale: it lists the first hundred of however many there are and
-     prints "first 100 listed" beside the true count, rather than rendering a
-     thousand rows nobody will read. */
-  var ROW_CAP = 12;
+     It is the line between a list and a tease. Under it the driver sees every
+     vehicle they are allowed, which is a real answer to "what may I fuel". Over
+     it the row would be showing an arbitrary slice, and there is no longer a
+     search field to reach the rest, because nothing in the row can be chosen.
+     So over the line the count speaks for the fleet instead.
+
+     Six, because the row wraps and the whole list has to fit above the fuel
+     button without pushing it off the screen. Twelve was the old cap, set when
+     the row scrolled sideways and could hold any number by hiding most of
+     them. */
+  var ROW_CAP = 6;
 
   /* A yard's worth of vehicles to draw a demo fleet from. Registrations follow
      the South African province letters a driver would actually read off a
@@ -3713,201 +3701,79 @@ body {
     /* Said once, deliberately, rather than left to be read off three separate
        lines by a screen reader. */
     el.homeVehicle.setAttribute('aria-label',
-      'Driving today, ' + v.plate + ', ' + v.make + ' ' + v.model);
+      'Driving today, ' + v.plate + ', ' + v.make + ' ' + v.model +
+      '. Scan a different vehicle.');
     el.homeVehicle.querySelector('.m-vehicle-card__art').innerHTML =
       vehicleArt(v.type, 24, 'currentColor');
   }
 
-  /* One chip, drawn in one place. Home asks this question and so does the
-     check screen, and two copies of a control this specific is how they end up
-     disagreeing about what a chosen vehicle looks like.
+  /* One vehicle, drawn as a fact rather than a control.
 
-     `at` is the chip's position in whichever row it is being drawn into, and it
-     only decides the tab stop. */
-  function vehicleChip(v, i, at) {
-    var on = i === S.activeVehicle;
-    /* A radio group is one tab stop, and that stop is the chosen radio. With
-       nothing chosen there is no such radio, so the first one takes the tab
-       stop. Keying it off `on` alone left every chip at tabindex -1 and put
-       the whole picker out of reach of the keyboard. */
-    var tabStop = on || (S.activeVehicle === NONE && at === 0);
-    /* When they were last in it, said on the chip. It is the fastest way to
-       recognise your own vehicle out of a fleet, faster than the make and
-       much faster than the picture, and it is the whole reason a returning
-       driver's picker is different from a new one's. */
-    var when = v.lastDriven
-      ? '<span class="a-vehicle-chip__when">' + v.lastDriven + '</span>' : '';
-    /* Not a radio. Tapping a plate cannot confirm a vehicle, because picking a
-       name off a list proves nothing about where the driver is standing. It
-       opens the screen where the disc gets scanned. */
-    return '<button class="a-vehicle-chip" type="button" data-vehicle="' + i + '"' +
-           (on ? ' aria-current="true"' : '') +
-           ' aria-checked="' + on + '" tabindex="' + (tabStop ? '0' : '-1') + '"' +
-           ' aria-label="' + v.plate + ', ' + v.make + ' ' + v.model +
-           (v.lastDriven ? ', last driven ' + v.lastDriven.toLowerCase() : '') + '">' +
+     Nothing in this row can be pressed. Picking a name off a list proves
+     nothing about where the driver is standing, so the only thing that can
+     decide today's vehicle is a licence disc read by the camera. The list is
+     evidence of what the driver is allowed to fuel, and evidence is read
+     rather than operated. */
+  function vehicleChip(v) {
+    return '<li class="a-vehicle-chip">' +
            '<span class="a-vehicle-chip__art">' +
-           vehicleArt(v.type, 16, on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)') +
-           '</span>' +
-           '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' + when +
-           '<span class="a-vehicle-chip__tick">' +
-           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" ' +
-           'stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-           '<path d="M20 6 9 17l-5-5"/></svg></span></button>';
+           vehicleArt(v.type, 14, 'currentColor') + '</span>' +
+           '<span class="a-vehicle-chip__plate">' + v.plate + '</span></li>';
   }
 
+  /* The list answers one question: what am I allowed to fuel. That question is
+     live until something is scanned and dead the moment one is, because the
+     card below then answers the better one, which is what am I fuelling today.
+     Kept up, the row put "CA 118-402 TODAY" directly above a card reading
+     "Driving today, CA 118-402": the same fact twice, touching.
+
+     It is also only worth drawing when it is whole. It used to show twelve of a
+     thousand with a search box above it, which was an apparatus for finding a
+     vehicle to tap. Nothing is tapped now, so the search had no job left, and
+     twelve arbitrary plates out of a thousand are not a reference: they are a
+     tease, and a driver who cannot find their own among them concludes they
+     have not been given one. A fleet that fits shows its plates. A fleet that
+     does not shows how big it is, which is the only true thing a partial list
+     was ever saying. */
   function paintPicker() {
     var many = S.vehicles.length > 1;
     el.homePicker.hidden = !many;
     if (!many) { el.homeVehicle.hidden = !activeVehicle(); paintVehicleCard(); return; }
 
-    var searchable = S.vehicles.length >= SEARCH_FROM;
-    el.homeSearchWrap.hidden = !searchable;
-    if (!searchable) { el.homeSearch.value = ''; }
+    var confirmed = S.activeVehicle !== NONE;
+    el.homePickerTitle.textContent = 'Your vehicles';
+    el.homePickerCount.textContent = groupNum(S.vehicles.length) + ' vehicles';
+    /* One door, and it is never a link up here.
 
-    var q = (el.homeSearch.value || '').trim().toLowerCase();
-    /* The position travels with the vehicle rather than being looked up again
-       per chip. Searching a thousand vehicles and then scanning the thousand
-       once per match is the same work done a thousand times over. */
-    var matches = [];
-    for (var n = 0; n < S.vehicles.length; n++) {
-      var vh = S.vehicles[n];
-      if (!q || (vh.plate + ' ' + vh.make + ' ' + vh.model).toLowerCase().indexOf(q) !== -1) {
-        matches.push({ v: vh, i: n });
-      }
-    }
+       With nothing confirmed the dashed slot below is the way in. Once a vehicle
+       is confirmed the card has taken that slot's place, and the card already
+       carries a chevron, so it is the way to a different one. A "Change vehicle"
+       link beside the heading was a second control for the same job, and at
+       320dp it broke the heading row into three ragged lines. */
 
-    /* What the driver has actually been in, most recent first. A returning
-       driver at a company with a thousand trucks does not browse a thousand
-       trucks: they are in the one they were in yesterday, or they search. */
-    var recent = matches.filter(function (m) { return m.v.lastDriven; });
-    var rest = matches.filter(function (m) { return !m.v.lastDriven; });
+    /* What the driver has actually been in leads, because a plate you recognise
+       is a faster read than one you do not. */
+    var recent = [], rest = [];
+    S.vehicles.forEach(function (vh) { (vh.lastDriven ? recent : rest).push(vh); });
+    var ordered = recent.concat(rest);
+    var show = !confirmed && ordered.length <= ROW_CAP;
 
-    /* Recents lead when there are any. Past the row's capacity they are the
-       only thing worth showing, because the twelve arbitrary registrations
-       after them are no more likely to be the right one than the other
-       nine hundred and eighty five. Inside the capacity the whole fleet still
-       fits, so hiding any of it would be withholding for no reason. */
-    var recentsOnly = !q && recent.length > 0 && matches.length > ROW_CAP;
-    var ordered = recentsOnly ? recent : recent.concat(rest);
-    var shown = ordered.slice(0, ROW_CAP);
-
-    /* Whatever the cap, the search or the recency rule would have done, the
-       vehicle being driven stays in the row. A picker that drops your own
-       answer off the end reads as having forgotten it. */
-    if (matches.length && !shown.some(function (m) { return m.i === S.activeVehicle; })) {
-      var active = null;
-      for (var a = 0; a < matches.length; a++) {
-        if (matches[a].i === S.activeVehicle) { active = matches[a]; break; }
-      }
-      if (active) { shown = [active].concat(shown.slice(0, ROW_CAP - 1)); }
-    }
-
-    /* While it is still a question, ask it. A heading reading "Driving today"
-       above an answer nobody has given was labelling an empty box. */
-    var asking = S.activeVehicle === NONE;
-    el.homePickerTitle.textContent = asking ? 'Which vehicle today?' : 'Driving today';
-    el.homePickerMore.textContent = asking ? 'Scan to start' : 'Change vehicle';
-    if (asking) { el.homePickerTitle.setAttribute('data-ask', 'true'); }
-    else { el.homePickerTitle.removeAttribute('data-ask'); }
-    el.homePickerRow.setAttribute('aria-required', asking ? 'true' : 'false');
-
-    /* A bare fraction with no noun. The count says what it is counting. */
-    el.homePickerCount.textContent = q
-      ? groupNum(matches.length) + ' of ' + groupNum(S.vehicles.length) + ' vehicles'
-      : groupNum(S.vehicles.length) + ' vehicles';
-    /* A way to scan or type, for the driver whose van is not in the row at all.
-       Hidden while searching, because the count is doing that job then. */
-    el.homePickerMore.hidden = !!q;
-    el.homePickerEmpty.hidden = matches.length > 0;
-
-    /* Say what is not on screen, and say why these are the ones that are. A row
-       that quietly stops at twelve of a thousand looks like the whole fleet,
-       and a driver who cannot find their van in it concludes they have not been
-       given one. */
-    var over = matches.length - shown.length;
-    el.homePickerNote.hidden = over <= 0;
-    el.homePickerNote.textContent = q
-      /* It used to say "narrow the search to see the rest", which is the
-         opposite of what narrowing does. */
-      ? 'Showing ' + shown.length + ' of ' + groupNum(matches.length) +
-        ' matches. Type more of the registration to narrow it.'
-      : recentsOnly
-        ? 'The ones you have driven. Search to reach the other ' + groupNum(over) + '.'
-        : 'Showing ' + shown.length + '. Search to reach the other ' + groupNum(over) + '.';
-
-    el.homePickerRow.innerHTML = shown.map(function (m, at) {
-      return vehicleChip(m.v, m.i, at);
-    }).join('');
-
-    Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'), function (b) {
-      b.addEventListener('click', function () {
-        /* Every route to today's vehicle goes through the scan. This row used to
-           set it directly, which put a way round the rule on the screen the
-           driver sees most. */
-        stepPick = Number(b.dataset.vehicle);
-        showStep('vehicle');
-      });
-      /* A radio group is one tab stop, and the arrows move within it. */
-      b.addEventListener('keydown', function (ev) {
-        var step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
-        if (!step) { return; }
-        ev.preventDefault();
-        var all = Array.prototype.slice.call(el.homePickerRow.querySelectorAll('[data-vehicle]'));
-        var at = all.indexOf(b);
-        var next = all[(at + step + all.length) % all.length];
-        if (next) { chooseVehicle(Number(next.dataset.vehicle), true); }
-      });
-    });
+    el.homePickerRow.hidden = !show;
+    el.homePickerRow.innerHTML = show ? ordered.map(vehicleChip).join('') : '';
     paintVehicleCard();
   }
 
-  /* Choosing repaints the chips in place rather than rebuilding the row.
+  /* The single writer of today's vehicle, and it is only ever reached from a
+     completed scan. Every other route was a way round the rule.
 
-     It used to call paintPicker, which rewrites the row's innerHTML, which
-     destroys the very node the driver is standing on. Focus landed on the body
-     on every pointer tap and on every screen-reader activation, because the
-     restore only ran when the caller passed viaKeyboard and the click listener
-     never did. Choosing also cannot change which chips are shown: the chip
-     being tapped is by definition already in the row, so there is nothing to
-     re-filter and nothing to reorder. */
-  function repaintChips() {
-    Array.prototype.forEach.call(el.homePickerRow.querySelectorAll('[data-vehicle]'),
-      function (b, at) {
-        var i = Number(b.dataset.vehicle);
-        var on = i === S.activeVehicle;
-        var v = S.vehicles[i];
-        b.setAttribute('aria-checked', on ? 'true' : 'false');
-        b.tabIndex = (on || (S.activeVehicle === NONE && at === 0)) ? 0 : -1;
-        var art = b.querySelector('.a-vehicle-chip__art');
-        if (art && v) {
-          art.innerHTML = vehicleArt(v.type, 16,
-            on ? 'var(--color-text-on-dark)' : 'var(--color-text-tertiary)');
-        }
-      });
-  }
-
-  function chooseVehicle(i, viaKeyboard) {
+     It says nothing out loud. The screen that follows names the vehicle in its
+     own body copy and takes focus, and announcing here as well made the phone
+     say the plate twice over itself. */
+  function confirmByScan(i) {
     if (!S.vehicles[i]) { return; }
-    var first = S.activeVehicle === NONE;
+    S.vehicleLinked = true;
     S.activeVehicle = i;
-    repaintChips();
-    paintVehicleCard();
-    /* The heading stops asking once it has an answer. */
-    el.homePickerTitle.textContent = 'Driving today';
-    el.homePickerTitle.removeAttribute('data-ask');
-    el.homePickerRow.setAttribute('aria-required', 'false');
-    var chip = el.homePickerRow.querySelector('[data-vehicle="' + i + '"]');
-    if (chip) {
-      chip.scrollIntoView({ block: 'nearest', inline: 'center' });
-      if (viaKeyboard) { chip.focus({ preventScroll: true }); }
-    }
-    var v = S.vehicles[i];
-    announce('Driving ' + v.plate + ', ' + v.make + ' ' + v.model + '.' +
-             (first ? ' Your next fill goes on this vehicle.' : ''));
-    /* The first pick is the moment fuelling becomes possible. Swapping vans
-       after that changes which vehicle it goes on, not whether it can happen,
-       so the button has nothing new to say. */
-    if (first) { pulseFuel(); }
+    S.linkedToday = true;
   }
 
   /* The app the flow lands in. A driver who has just signed up has the fifty
@@ -3917,7 +3783,7 @@ body {
   /* `arriving` when the driver crossed the seam from the reward, so home fades
      up rather than appearing. Landing here directly from a link or the menu is
      not a journey, so it is instant. */
-  function showHome(arriving) {
+  function showHome(arriving, linked) {
     clearTimers(); hideAll();
     S.step = 'home';
     el.statusBar.removeAttribute('data-tone');
@@ -3926,14 +3792,29 @@ body {
     /* The card names the vehicle being driven, so it waits until one has been
        chosen. Assigned and chosen are not the same thing. */
     if (!S.vehicleLinked) { S.vehicles = []; }
-    el.homeSearch.value = '';
-    el.homePickerStatus.textContent = '';
     paintPicker();
     /* Tied to whether the manager has assigned anything, not to whether the
        card is up. Hanging it off the card put "your manager assigns the
        vehicles you are allowed to fuel" in front of a driver who had four of
        them and simply had not picked one yet. */
     el.homeNoVehicle.hidden = S.vehicleLinked;
+    /* Shown only on the arrival that earned it. Home is landed on all day, and
+       a permanent "Vehicle linked" is not news, it is furniture. The card below
+       carries the standing fact. */
+    var v0 = activeVehicle();
+    el.homeLinked.hidden = !(linked && v0);
+    el.homeLinked.removeAttribute('data-state');
+    if (linked && v0) {
+      /* The plate, because the one thing a driver needs to check after a scan is
+         that it read the right disc, and the card carrying it standing is
+         further down the screen. Then the rule rather than the instruction:
+         "press I want to fuel" was the label of the button directly below it,
+         and a message that reads out a nearby button is filler. What is worth
+         saying is that the link lasts the day, so there is no hurry. */
+      el.homeLinkedSub.textContent =
+        v0.plate + '. Linked for the rest of today, so fuel when you are ready.';
+      requestAnimationFrame(function () { el.homeLinked.setAttribute('data-state', 'in'); });
+    }
     /* The glass is the container for the vehicle block, so with no vehicles
        there is nothing for it to contain and an empty pane of glass is just
        a smudge on the screen. */
@@ -3956,16 +3837,23 @@ body {
     /* Behind the focus move rather than racing it. A focus change flushes a
        pending polite message on the platform this is built for, so announcing
        at 60ms and moving focus on the same tick lost the announcement. */
-    var greeting = 'Home. ' + el.homeGreeting.textContent + ', David.';
+    /* The greeting element already ends in a comma, so appending another read
+       out as "Good morning,, David". */
+    var greeting = 'Home. ' + el.homeGreeting.textContent.replace(/,\s*$/, '') + ', David.';
     if (S.vehicleLinked && S.activeVehicle === NONE && S.vehicles.length > 1) {
-      greeting += ' Choose which of your ' + groupNum(S.vehicles.length) +
-                  ' vehicles you are driving today.';
+      greeting += ' Scan the licence disc on the vehicle you are driving to' +
+                  ' start fuelling today.';
+    }
+    /* A driver arriving from a scan is arriving with news, and the news beats
+       the greeting. Saying "Good morning, David" to somebody who has just held
+       a phone up to a windscreen buries the one thing they are waiting to hear. */
+    if (linked && activeVehicle()) {
+      greeting = 'Vehicle linked. ' + el.homeLinkedSub.textContent;
     }
     after(60, function () { el.homeName.focus({ preventScroll: true }); });
     after(500, function () { announce(greeting); });
-    /* A driver with one vehicle never picks it, so their invitation comes on
-       arrival. Behind the greeting, so the button is not moving while the
-       screen is still being read. */
+    /* Behind the greeting, so the button is not moving while the screen is
+       still being read. */
     if (activeVehicle()) { after(700, pulseFuel); }
     /* Only a driver arriving from sign-up waits: they are the one whose vehicle
        list, entitlement and balance have never been fetched. Someone opening the
@@ -4096,8 +3984,24 @@ body {
   var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg>';
   var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
 
-  /* Which vehicle the driver has said they are in, for this session only. */
-  var stepPick = null;
+  /* What the camera read.
+
+     There is no camera in a prototype, so the read has to come from somewhere,
+     and the one place it must never come from is anything the driver tapped.
+     That was the old behaviour and it was the deepest version of the bug: tap
+     a plate, open the scanner, and the app confirmed the plate that was tapped.
+     The camera read nothing and the scan was theatre over a selection.
+
+     It walks the fleet by scan count, so scanning twice returns two different
+     vehicles. Anyone driving the demo can see the camera deciding rather than
+     echoing. */
+  var scanReads = 0;
+  function readDisc() {
+    if (!S.vehicles.length) { S.vehicles = makeFleet(3); }
+    var i = scanReads % S.vehicles.length;
+    scanReads += 1;
+    return i;
+  }
 
   var STEPS = {
     /* Only when something has changed: a new phone, an expired session, a
@@ -4119,61 +4023,46 @@ body {
 
     vehicle: {
       mark: ICON_VAN,
-      title: 'Which vehicle are you using?',
+      title: 'Scan the licence disc',
       /* Scanning is the confirmation, not one route to it.
 
          Choosing from a list proves nothing: a driver can pick any vehicle on
          it from anywhere. Reading the disc on the vehicle is the only part of
          this that shows they are standing at it, which is the whole reason the
          step exists. The list stays, because a driver still needs to see what
-         they are allowed, but it is reference and not the answer. */
-      body: 'Scan the licence disc on the vehicle you\u2019re driving today.',
-      go: 'Scan licence disc',
-      alt: 'Enter registration instead',
+         they are allowed, but it is reference and not the answer.
+
+         The heading, the body and the button all used to say "scan the licence
+         disc". Three of the same sentence is not emphasis, it is one sentence
+         and two wasted lines, so the body now says where to look instead.
+
+         Typing a registration has gone with the choosing. It was a way to set
+         today's vehicle without reading anything on the vehicle, which is the
+         same hole as the list, just slower. What is left when a camera really
+         cannot be made to work is the manager, and the scanner says so. */
+      body: 'It is in the corner of the windscreen. Reading it links the vehicle to you for today.',
+      go: 'Open the camera',
+      /* The same pills as home, for the same reason and out of the same
+         function. These used to be full width raised cards carrying the make
+         and the model, which made the list the heaviest thing on a screen whose
+         only job is to get the camera open, and made three unpressable objects
+         look like the three choices on offer.
+
+         The make and model went with the weight. A driver reads a plate off a
+         windscreen, not a trim level. */
       build: function (host) {
         var list = S.vehicles.length ? S.vehicles : makeFleet(3);
+        var whole = list.length <= ROW_CAP;
         host.innerHTML =
-          '<p class="o-step__label">Assigned to you</p>' +
-          list.slice(0, 4).map(function (v) {
-            return '<div class="m-vehicle-opt" data-static="true">' +
-                   '<span class="m-vehicle-opt__art">' + vehicleArt(v.type, 22, 'currentColor') + '</span>' +
-                   '<span class="m-vehicle-opt__body">' +
-                   '<span class="m-vehicle-opt__plate">' + v.plate + '</span>' +
-                   '<span class="m-vehicle-opt__model">' + v.make + ' ' + v.model + '</span>' +
-                   '</span></div>';
-          }).join('') +
-          '<p class="o-step__note">Scan any one of these to start fuelling.</p>';
+          '<p class="o-step__label">You can use these</p>' +
+          (whole
+            ? '<ul class="m-vehicle-picker__row" role="list">' +
+              list.map(vehicleChip).join('') + '</ul>'
+            : '<p class="o-step__note">' + groupNum(list.length) +
+              ' vehicles are assigned to you.</p>') +
+          '<p class="o-step__note">Scan whichever one you are standing at.</p>';
       },
-      onGo: function () { S.scanTries = 0; showScan('ready'); },
-      /* Kept, and kept honest about what it costs. A cracked lens or a camera
-         another app has hold of must not be the thing that stops somebody
-         working, but typing a registration proves nothing on its own, so it
-         carries a second check rather than being a way round the rule. */
-      onAlt: function () { announce('Typing the registration needs a second check. Not built yet.'); }
-    },
-
-    /* What the scan proved, and the way onward. A silent return to home would
-       leave the driver wondering whether it took. */
-    confirmed: {
-      mark: ICON_VAN,
-      title: 'Vehicle confirmed',
-      body: '',
-      go: 'Find a station',
-      build: function (host) {
-        var v = activeVehicle();
-        host.innerHTML =
-          '<div class="m-vehicle-opt" data-static="true" data-done="true">' +
-          '<span class="m-vehicle-opt__art">' + (v ? vehicleArt(v.type, 22, 'currentColor') : '') + '</span>' +
-          '<span class="m-vehicle-opt__body">' +
-          '<span class="m-vehicle-opt__plate">' + (v ? v.plate : '') + '</span>' +
-          '<span class="m-vehicle-opt__model">' + (v ? v.make + ' ' + v.model : '') + '</span>' +
-          '<span class="m-vehicle-opt__state">Confirmed for today</span></span>' +
-          '<span class="m-vehicle-opt__tick">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-          'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-          '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></div>';
-      },
-      onGo: function () { hideStep(); if (S.located) { showHome(true); } else { showStep('location'); } }
+      onGo: function () { S.scanTries = 0; showScan('ready'); }
     },
 
     /* Asked after the vehicle, never before. A permission prompt that arrives
@@ -4184,11 +4073,13 @@ body {
       body: 'EngenXT uses your location to show stations available for this vehicle.',
       go: 'Use my location',
       alt: 'Search instead',
-      /* Ends on home, not on the map. Linking is the gate for the day and
-         home is still where the day is run from: the driver presses the fuel
-         button when they are ready, which may be hours later. */
-      onGo: function () { hideStep(); showHome(true); },
-      onAlt: function () { hideStep(); showHome(true); }
+      /* Both ways carry on to the map, because the driver is only ever on this
+         screen because they pressed the button that leads there. Sending them
+         back to home would drop the thing they asked for on the floor. Refusing
+         the phone's location does not refuse the map: the stations are still
+         listed, they are just not sorted by how near they are. */
+      onGo: function () { S.located = true; hideStep(); showStations(true); },
+      onAlt: function () { hideStep(); showStations(true); }
     }
   };
 
@@ -4205,10 +4096,14 @@ body {
     glare:   { t: 'Too much glare', b: 'Tilt the phone slightly, or move out of the sun.' },
     dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.' },
     blur:    { t: 'Too blurry', b: 'Hold the phone still and wait for it to sharpen.' },
-    nocam:   { t: 'The camera is not available', b: 'Another app may be using it. You can type the registration instead.' },
-    denied:  { t: 'Camera access is off', b: 'Turn it on in your phone settings, or type the registration instead.' },
-    unread:  { t: 'That could not be read', b: 'Try the number plate, or type the registration.' },
-    offline: { t: 'No connection', b: 'We cannot check the vehicle right now. Try again in a moment.' }
+    nocam:   { t: 'The camera is not available', b: 'Another app may be holding it. Close that app and try again.' },
+    denied:  { t: 'Camera access is off', b: 'Turn it on for EngenXT in your phone settings, then come back.' },
+    unread:  { t: 'That could not be read', b: 'Try the number plate instead, or move somewhere lighter.' },
+    offline: { t: 'No connection', b: 'We cannot check the vehicle right now. Try again in a moment.' },
+    /* The state the rule creates. Once the disc decides, a disc that belongs to
+       nothing on the driver's list has to be told about, and the only person
+       who can fix it is the one who assigns the vehicles. */
+    notyours: { t: 'That vehicle is not on your list', b: 'Ask your manager to add it, or scan one that is.' }
   };
   var SCAN_MODES = [{ k: 'disc', l: 'Licence disc' }, { k: 'plate', l: 'Number plate' }];
 
@@ -4232,27 +4127,25 @@ body {
     });
     el.scanOther.textContent = S.scanMode === 'disc'
       ? 'Try number plate instead' : 'Try licence disc instead';
-    /* After two goes the fallbacks stop being the quiet option. Somebody on
+    /* After two goes the way out stops being the quiet option. Somebody on
        their third attempt is not going to succeed on the fourth by trying
-       harder, and the assigned list was always faster. */
+       harder, and the only thing left that can help is a person.
+
+       It used to offer typing the registration here, which was a way to set
+       today's vehicle without reading anything on the vehicle. */
     var struggling = S.scanTries >= 2;
     el.scanType.className = struggling ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
-    el.scanType.textContent = struggling
-      ? 'Enter the registration' : 'Enter registration';
+    el.scanType.textContent = struggling ? 'Ask your manager' : 'Ask your manager';
   }
 
   /* The read landing. Auto capture, so the driver is not holding a phone at a
      van hunting for a shutter button, and the result is a screen rather than a
      silent return: something was proved and the driver should see what. */
   function scanSucceeded() {
-    var list = S.vehicles.length ? S.vehicles : makeFleet(3);
-    var i = (stepPick === null || stepPick === undefined) ? 0 : stepPick;
-    S.vehicles = list;
-    S.vehicleLinked = true;
-    S.activeVehicle = i;
-    S.linkedToday = true;
+    confirmByScan(readDisc());
     hideScan();
-    showStep('confirmed');
+    hideStep();
+    showHome(true, true);
   }
 
   function hideScan() {
@@ -4296,10 +4189,6 @@ body {
     el.stepMark.innerHTML = def.mark;
     el.stepTitle.textContent = def.title;
     el.stepBody.textContent = def.body;
-    if (key === 'confirmed') {
-      var cv = activeVehicle();
-      el.stepBody.textContent = (cv ? cv.plate : 'That vehicle') + ' is ready to use.';
-    }
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
     if (def.build) { def.build(el.stepGroup); }
@@ -4601,7 +4490,7 @@ body {
       'Your company chooses which stations it pays for. Only your manager can add this one.',
       'Your manager can get this going again. Nothing is wrong with your account.',
       'Your company sets when its drivers can fuel. Your manager can change it.',
-      'Choose which vehicle you are driving and the rest of the check will run.',
+      'Scan the vehicle you are driving and the rest of the check will run.',
       ''
     ];
     el.checkWhy.hidden = clear;
@@ -4612,14 +4501,19 @@ body {
     el.checkPlate.textContent = v ? v.plate : 'Not chosen yet';
     el.checkModel.textContent = v ? v.make + ' ' + v.model : '';
     el.checkModel.hidden = !v;
-    paintCheckPick(clear);
     el.checkGo.hidden = !clear;
     /* Nothing to get a code for yet, so the button says what is missing rather
        than offering something it cannot do. It stays in the focus order and
        still answers, because a control that vanishes takes the explanation with
        it. */
-    el.checkGo.setAttribute('aria-disabled', v ? 'false' : 'true');
-    el.checkGo.textContent = v ? 'Get code for ' + v.plate : 'Pick a vehicle first';
+    /* Not disabled and not a dead end. With no vehicle confirmed there is
+       exactly one thing to do about it, so the button becomes that thing
+       rather than a greyed control scolding the driver for a question this
+       screen never gave them a way to answer. It used to grow its own row of
+       tappable plates here, which was a second way to set today's vehicle
+       without a scan. */
+    el.checkGo.setAttribute('aria-disabled', 'false');
+    el.checkGo.textContent = v ? 'Get code for ' + v.plate : 'Scan your vehicle';
     el.checkOther.textContent = clear ? 'Choose another station' : 'Choose a station on the list';
 
     el.check.hidden = false;
@@ -4737,56 +4631,6 @@ body {
     }
   }
 
-  /* The row this screen grows when the question was never answered on home.
-     It is the picker's chips and nothing else: no search, no recency note, no
-     cap message. A driver standing at a forecourt with the station already
-     chosen is picking between the two or three they actually drive, and the
-     apparatus that makes a thousand vehicles findable belongs on the screen
-     that has room for it. Past the cap, the row says so and home is still one
-     press of Back away. */
-  function paintCheckPick(clear) {
-    var v = activeVehicle();
-    var show = clear && !v && S.vehicles.length > 0;
-    el.checkPick.hidden = !show;
-    el.checkPickNote.hidden = true;
-    if (!show) { return; }
-
-    /* The ones they have actually been in lead, for the same reason they lead
-       on home: it is the fastest way to recognise your own vehicle. */
-    var recent = [], rest = [];
-    S.vehicles.forEach(function (vh, i) { (vh.lastDriven ? recent : rest).push({ v: vh, i: i }); });
-    var ordered = recent.concat(rest);
-    var shown = ordered.slice(0, ROW_CAP);
-    el.checkPick.innerHTML = shown.map(function (m, at) {
-      return vehicleChip(m.v, m.i, at);
-    }).join('');
-
-    var over = ordered.length - shown.length;
-    el.checkPickNote.hidden = over <= 0;
-    el.checkPickNote.textContent =
-      'Showing ' + shown.length + '. Go back to home to search the other ' + groupNum(over) + '.';
-
-    Array.prototype.forEach.call(el.checkPick.querySelectorAll('[data-vehicle]'), function (b) {
-      b.addEventListener('click', function () {
-        chooseVehicle(Number(b.dataset.vehicle));
-        /* Repainted in place rather than pushed anywhere. The driver answered a
-           question on this screen, so this screen is where the answer appears,
-           and the button they were reaching for is now the one that works. */
-        showCheck(S.checking);
-        after(60, function () { el.checkGo.focus({ preventScroll: true }); });
-      });
-      b.addEventListener('keydown', function (ev) {
-        var step = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0;
-        if (!step) { return; }
-        ev.preventDefault();
-        var all = Array.prototype.slice.call(el.checkPick.querySelectorAll('[data-vehicle]'));
-        var at = all.indexOf(b) + step;
-        if (at < 0) { at = all.length - 1; }
-        if (at >= all.length) { at = 0; }
-        all[at].focus();
-      });
-    });
-  }
 
   function hideCheck() {
     el.check.hidden = true;
@@ -4849,16 +4693,28 @@ body {
       announce('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
-    /* Straight to the map, whether or not a van has been picked.
-       This used to refuse and send the driver back up the screen to the picker.
-       It was the right rule enforced in the wrong place: pressing the one
-       button the app exists for and having nothing open is indistinguishable
-       from a broken button, and the driver who has not chosen a van is exactly
-       the driver least sure the app is working.
+    /* Scanning is the gate for the day, so the button that starts a fill runs
+       into it rather than round it.
 
-       The rule has not gone anywhere. A code is issued against a vehicle, so it
-       still cannot be issued without one, and the check screen is where that is
-       held, because it is the last point at which the answer still matters. */
+       This used to open the map regardless and hold the rule at the check
+       screen, back when that screen could still ask which vehicle it was. It
+       cannot any more: the only thing that answers that question is a disc
+       under a camera. Sending the driver on to a map, a station and a check
+       before telling them what is missing is three screens of the app pretending
+       the fill is going ahead.
+
+       It still never refuses. It goes to the one thing that fixes it, and the
+       scan puts the driver back on this screen with the vehicle linked, so the
+       button they pressed is the button they press again when they are ready. */
+    if (!activeVehicle()) { showStep('vehicle'); return; }
+    /* And this is where the phone's location is worth asking for.
+
+       It used to be asked straight after the vehicle, on the way to a map the
+       driver had not asked to see. They scan when they climb in and they may
+       not fuel for hours, so a permission prompt at the moment of scanning
+       arrives with nothing to justify it, and a prompt with no reason attached
+       is the one people refuse. Pressing this button is the reason. */
+    if (!S.located) { showStep('location'); return; }
     showStations(true);
   }
 
@@ -4986,28 +4842,6 @@ body {
     if (e.key === 'Escape' && S.step === 'check') { hideCheck(); showStations(false, true); }
   });
 
-
-
-
-
-  /* The row keeps up with the keys, and what the search did is said separately
-     on a delay. Announcing on every keystroke interrupts the typing it is
-     describing, and announcing from paintPicker would speak on arrival and
-     collide with the greeting. */
-  var searchSaid = null;
-  el.homeSearch.addEventListener('input', function () {
-    paintPicker();
-    clearTimeout(searchSaid);
-    searchSaid = setTimeout(function () {
-      var q = (el.homeSearch.value || '').trim();
-      if (!q) { el.homePickerStatus.textContent = ''; return; }
-      var shown = el.homePickerRow.querySelectorAll('[data-vehicle]').length;
-      el.homePickerStatus.textContent = shown
-        ? el.homePickerCount.textContent + ' match. Showing ' + shown + '.'
-        : 'No vehicle matches that.';
-    }, 400);
-  });
-
   /* Continue is the one place this seam is crossed in the flow, so it is the
      one place it is animated. Jumping straight to #home from the menu still
      lands instantly, because a reviewer picking a state is not travelling. */
@@ -5037,12 +4871,13 @@ body {
   /* Backing out is not cancelling a fill, because no fill has started yet. It
      simply puts the driver back where they pressed. */
   el.checkGo.addEventListener('click', function () {
-    /* Says what is missing rather than doing nothing, because a control that
-       looks live and is not is the fault this whole change exists to remove. */
-    if (el.checkGo.getAttribute('aria-disabled') === 'true') {
-      announce('Pick which vehicle you are driving to get a code.');
-      var first = el.checkPick.querySelector('[data-vehicle]');
-      if (first) { first.focus(); }
+    /* No vehicle confirmed means no code can exist, so the button opens the
+       one thing that can fix that. The driver came here to fuel and leaves
+       this screen still going forwards. */
+    if (!activeVehicle()) {
+      hideCheck();
+      S.scanTries = 0;
+      showScan('ready');
       return;
     }
     hideCheck();
@@ -5097,13 +4932,21 @@ body {
      The chips stay, because recognising your own plate is faster than any of
      it. They are the shortcut. This is the full answer. */
   el.homeVehicleEmpty.addEventListener('click', function () {
-    stepPick = S.activeVehicle === NONE ? null : S.activeVehicle;
+    showStep('vehicle');
+  });
+  /* The card is the way to a different vehicle. It has always had a chevron and
+     the chevron always led nowhere: tapping it announced "that is not built
+     yet". A vehicle is changed the only way any vehicle is set, by scanning. */
+  el.homeVehicle.addEventListener('click', function () {
     showStep('vehicle');
   });
   /* A driver with nothing assigned cannot fix that from here, but they can ask
      the person who can. The same shape the sign-up flow already uses for a
      driver it has to turn away. */
   var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
+  /* A different problem and so a different message: the vehicle is assigned,
+     the phone is what will not read it. */
+  var ASK_MANAGER_SCAN = 'Hi, my phone cannot scan the disc on the vehicle I am in. Please help me get fuelling today.';
   el.scanClose.addEventListener('click', function () { showStep('vehicle'); });
   el.scanOther.addEventListener('click', function () {
     S.scanMode = S.scanMode === 'disc' ? 'plate' : 'disc';
@@ -5111,7 +4954,11 @@ body {
     paintScan();
     announce('Scanning the ' + (S.scanMode === 'disc' ? 'licence disc' : 'number plate') + '.');
   });
-  el.scanType.addEventListener('click', function () { showStep('vehicle'); });
+  /* The one thing left when a camera cannot be made to work. It does not set a
+     vehicle, because nothing but a scan does. */
+  el.scanType.addEventListener('click', function () {
+    announce('Message ready: ' + ASK_MANAGER_SCAN);
+  });
   /* The torch is the answer to the dark state, so it says so when it fixes it. */
   el.scanTorch.addEventListener('click', function () {
     var on = el.scanTorch.getAttribute('aria-pressed') === 'true';
@@ -5120,10 +4967,6 @@ body {
     announce(on ? 'Torch off.' : 'Torch on.');
   });
 
-  el.homePickerMore.addEventListener('click', function () {
-    stepPick = S.activeVehicle === NONE ? null : S.activeVehicle;
-    showStep('vehicle');
-  });
   el.homeAskManager.addEventListener('click', function () {
     announce('Message ready: ' + ASK_MANAGER);
   });
@@ -5136,7 +4979,7 @@ body {
      no text to scrape. Tiles and tabs already read correctly, so they keep the
      fallback. */
   Array.prototype.forEach.call(
-    el.home.querySelectorAll('[data-tile], [data-tab], #homeBell, #homeAvatar, #homeVehicle'),
+    el.home.querySelectorAll('[data-tile], [data-tab], #homeBell, #homeAvatar'),
     function (b) {
       b.addEventListener('click', function () {
         if (b.getAttribute('aria-current') === 'page') { return; }
@@ -5185,15 +5028,23 @@ body {
     /* A fill belongs to a session, and picking a state starts a new one. The
        three fuelling states set it again after this runs. */
     S.fuel = 'idle';
+    /* So does the camera. Without this a reviewer walking the menu would see the
+       plate change under them from one state to the next, because the reader
+       carries on where the last state left it. */
+    scanReads = 0;
     S.vehicles = !S.vehicleLinked ? []
                : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
                : makeFleet(fleet || 1);
     S.vehicles = markRecent(S.vehicles, userType);
-    /* Nothing is chosen for the driver. Being assigned four vehicles does not
-       mean you are in the first one, and the app cannot know which yard you
-       walked into this morning. One vehicle is the exception, because there is
-       no choice to make and picking it for them is not a guess. */
-    S.activeVehicle = S.vehicles.length === 1 ? 0 : NONE;
+    /* Nothing is set for the driver, ever, not even when they have one van.
+
+       Being assigned a vehicle is not being in it, and the app cannot know
+       which yard somebody walked into this morning. A single vehicle used to
+       be the exception on the grounds that there was no choice to make, but
+       that made the app assign it with the driver doing nothing at all, which
+       is a weaker proof than the selection this whole rule exists to remove.
+       One van is one scan. */
+    S.activeVehicle = NONE;
   }
 
   /* What a driver arrives from sign-up with. Assignment happens on the manager's
@@ -5255,18 +5106,18 @@ body {
        and home while the fill is still open. A menu that lists screens in the
        order they were built makes a reviewer reconstruct the journey. */
     'fuel-station-open': { group: 'fuelling', label: 'A station, opened',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          showStations(false); chooseStation('fourways'); } },
     'fuel-station-refused': { group: 'fuelling', label: 'A station, not on the list',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          showStations(false); chooseStation('randburg'); } },
     /* Flow 1, in the order a driver meets it. */
     'flow1-account':  { group: 'flow1', label: '1 · Confirm your account',
-      run: function () { reset('returning-driver', true, 3); stepPick = null; showStep('account'); } },
-    'flow1-vehicle':  { group: 'flow1', label: '2 · Which vehicle today',
-      run: function () { reset('returning-driver', true, 3); stepPick = null; showStep('vehicle'); } },
-    'flow1-vehicle-one': { group: 'flow1', label: '2 · One vehicle, still confirmed',
-      run: function () { reset('returning-driver', true, 1); stepPick = null; showStep('vehicle'); } },
+      run: function () { reset('returning-driver', true, 3); showStep('account'); } },
+    'flow1-vehicle':  { group: 'flow1', label: '2 · Scan the licence disc',
+      run: function () { reset('returning-driver', true, 3); showStep('vehicle'); } },
+    'flow1-vehicle-one': { group: 'flow1', label: '2 · One vehicle, still scanned',
+      run: function () { reset('returning-driver', true, 1); showStep('vehicle'); } },
     'flow1-scan-ready': { group: 'flow1', label: '2 \u00b7 Scanning',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('ready'); } },
     'flow1-scan-reading': { group: 'flow1', label: '2 \u00b7 Scanning, reading it',
@@ -5285,19 +5136,22 @@ body {
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('unread'); } },
     'flow1-scan-offline': { group: 'flow1', label: '2 \u00b7 Scan, no connection',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
-    'flow1-confirmed': { group: 'flow1', label: '2 \u00b7 Vehicle confirmed',
-      run: function () { reset('returning-driver', true, 3); stepPick = 0;
-                         chooseVehicle(0); showStep('confirmed'); } },
+    'flow1-scan-notyours': { group: 'flow1', label: '2 \u00b7 Scan, not on your list',
+      run: function () { reset('returning-driver', true, 3); showScan('notyours'); } },
+    'flow1-linked': { group: 'flow1', label: '2 \u00b7 Linked, back on home',
+      run: function () { reset('returning-driver', true, 3);
+                         confirmByScan(readDisc()); showHome(false, true); } },
     'flow1-location': { group: 'flow1', label: '3 · Find stations near you',
-      run: function () { reset('returning-driver', true, 3); chooseVehicle(0); showStep('location'); } },
+      run: function () { reset('returning-driver', true, 3); confirmByScan(readDisc());
+                         S.located = false; showStep('location'); } },
     'flow1-open-linked': { group: 'flow1', label: 'Opening, already linked today',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          S.linkedToday = true; openApp(); } },
     'flow1-open-fresh':  { group: 'flow1', label: 'Opening, not linked yet',
-      run: function () { reset('returning-driver', true, 3); stepPick = null;
+      run: function () { reset('returning-driver', true, 3);
                          S.linkedToday = false; openApp(); } },
     'flow1-map':      { group: 'flow1', label: '4 · The allowed stations',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          showHome(); showStations(false); } },
 
     'fuel-stations':   { group: 'fuelling', label: 'Choosing a station',
@@ -5308,15 +5162,15 @@ body {
                          showHome(); showStations(false);
                          el.stationSearch.value = 'zzz'; paintStations(); } },
     'fuel-check':      { group: 'fuelling', label: 'Check before the code',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('bryanston'); } },
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc()); showCheck('bryanston'); } },
     'fuel-check-no-account': { group: 'fuelling', label: 'Check, account on hold',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          S.account = 'blocked'; showCheck('bryanston'); } },
     'fuel-check-hours': { group: 'fuelling', label: 'Check, outside hours',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          S.hours = 'closed'; showCheck('bryanston'); } },
     'fuel-check-blocked': { group: 'fuelling', label: 'Check, station refused',
-      run: function () { reset('returning-driver', true, 4); chooseVehicle(0); showCheck('randburg'); } },
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc()); showCheck('randburg'); } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
       run: function () {
         reset('returning-driver', true, 1); showHome(); clearTimers();
@@ -5332,7 +5186,7 @@ body {
         reset('returning-driver', true, 1); showHome(); clearTimers();
         S.fuel = 'live'; paintFuelAction();
       } },
-    'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing chosen',
+    'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing scanned',
       run: function () {
         reset('returning-driver', true, 4); showHome(); clearTimers();
         requestFuel();
@@ -5558,8 +5412,8 @@ body {
       ],
       'flow1': [
         ['flow1-account', '1 \u00b7 Confirm your account'],
-        ['flow1-vehicle', '2 \u00b7 Which vehicle today'],
-        ['flow1-vehicle-one', '2 \u00b7 One vehicle, still confirmed'],
+        ['flow1-vehicle', '2 \u00b7 Scan the licence disc'],
+        ['flow1-vehicle-one', '2 \u00b7 One vehicle, still scanned'],
         ['flow1-scan-ready', '2 \u00b7 Scanning'],
         ['flow1-scan-reading', '2 \u00b7 Scanning, reading it'],
         ['flow1-scan-glare', '2 \u00b7 Scan, too much glare'],
@@ -5569,7 +5423,8 @@ body {
         ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
-        ['flow1-confirmed', '2 \u00b7 Vehicle confirmed'],
+        ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
+        ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
         ['flow1-open-linked', 'Opening, already linked today'],
@@ -5587,7 +5442,7 @@ body {
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
-        ['fuel-no-vehicle', 'Asked with nothing chosen']
+        ['fuel-no-vehicle', 'Asked with nothing scanned']
       ]
     },
     'engenxt-signup.html': {

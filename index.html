@@ -37,14 +37,17 @@
   --color-primary:       #1650B8;
   --color-primary-dark:  #0D3A8A;
   --color-primary-light: #EEF3FF;
+  --color-primary-06: rgba(22,80,184,0.06);
   --color-primary-08: rgba(22,80,184,0.08);
   --color-primary-12: rgba(22,80,184,0.12);
+  --color-primary-18: rgba(22,80,184,0.18);   /* the halo on the you-are-here dot */
   --color-primary-30: rgba(22,80,184,0.30);   /* gradient stop and button shadow */
 
   --color-secondary:     #E2231A;
   --color-secondary-bg:  #FDEEEE;
   --color-secondary-12: rgba(226,35,26,0.12);
   --color-secondary-25: rgba(226,35,26,0.25);
+  --color-secondary-30: rgba(226,35,26,0.30);
   --color-secondary-40: rgba(226,35,26,0.40);
   --color-secondary-04: rgba(226,35,26,0.04);
   --color-secondary-18: rgba(226,35,26,0.18);
@@ -3541,8 +3544,8 @@ button { background: none; border: none; color: inherit; }
       ],
       'flow1': [
         ['flow1-account', '1 \u00b7 Confirm your account'],
-        ['flow1-vehicle', '2 \u00b7 Which vehicle today'],
-        ['flow1-vehicle-one', '2 \u00b7 One vehicle, still confirmed'],
+        ['flow1-vehicle', '2 \u00b7 Scan the licence disc'],
+        ['flow1-vehicle-one', '2 \u00b7 One vehicle, still scanned'],
         ['flow1-scan-ready', '2 \u00b7 Scanning'],
         ['flow1-scan-reading', '2 \u00b7 Scanning, reading it'],
         ['flow1-scan-glare', '2 \u00b7 Scan, too much glare'],
@@ -3552,7 +3555,8 @@ button { background: none; border: none; color: inherit; }
         ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
-        ['flow1-confirmed', '2 \u00b7 Vehicle confirmed'],
+        ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
+        ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
         ['flow1-open-linked', 'Opening, already linked today'],
@@ -3570,7 +3574,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
-        ['fuel-no-vehicle', 'Asked with nothing chosen']
+        ['fuel-no-vehicle', 'Asked with nothing scanned']
       ],
       'returning': [
         ['returning-without-vehicle', 'No vehicle assigned'],
