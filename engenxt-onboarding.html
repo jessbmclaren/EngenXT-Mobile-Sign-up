@@ -2668,6 +2668,7 @@ body {
             <div class="m-vehicle-picker__head">
               <span class="m-vehicle-picker__title" id="homePickerTitle">Driving today</span>
               <span class="m-vehicle-picker__count" id="homePickerCount"></span>
+              <button class="a-link a-link--flush" type="button" id="homePickerMore">Scan or type</button>
             </div>
             <!-- Only once the row is too long to scan. -->
             <label class="a-search" id="homeSearchWrap" hidden>
@@ -3101,6 +3102,7 @@ body {
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
     homePickerNote: $('homePickerNote'), homePickerTitle: $('homePickerTitle'),
+    homePickerMore: $('homePickerMore'),
     homePickerStatus: $('homePickerStatus'), homePanel: $('homePanel'),
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
     homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
@@ -3661,6 +3663,9 @@ body {
     el.homePickerCount.textContent = q
       ? groupNum(matches.length) + ' of ' + groupNum(S.vehicles.length) + ' vehicles'
       : groupNum(S.vehicles.length) + ' vehicles';
+    /* A way to scan or type, for the driver whose van is not in the row at all.
+       Hidden while searching, because the count is doing that job then. */
+    el.homePickerMore.hidden = !!q;
     el.homePickerEmpty.hidden = matches.length > 0;
 
     /* Say what is not on screen, and say why these are the ones that are. A row
@@ -4819,14 +4824,27 @@ body {
     announce('Directions are not built yet.');
   });
 
+  /* The slot opens the confirmation screen rather than nudging focus at a chip.
+
+     There were two places to answer one question: these chips, and the screen
+     that also offers scanning and typing a registration. A driver whose plate
+     is not in the row had no way through from here, and the chips are the only
+     part of the app that cannot read a licence disc.
+
+     The chips stay, because recognising your own plate is faster than any of
+     it. They are the shortcut. This is the full answer. */
   el.homeVehicleEmpty.addEventListener('click', function () {
-    var first = el.homePickerRow.querySelector('[data-vehicle]');
-    if (first) { first.focus(); }
+    stepPick = S.activeVehicle === NONE ? null : S.activeVehicle;
+    showStep('vehicle');
   });
   /* A driver with nothing assigned cannot fix that from here, but they can ask
      the person who can. The same shape the sign-up flow already uses for a
      driver it has to turn away. */
   var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
+  el.homePickerMore.addEventListener('click', function () {
+    stepPick = S.activeVehicle === NONE ? null : S.activeVehicle;
+    showStep('vehicle');
+  });
   el.homeAskManager.addEventListener('click', function () {
     announce('Message ready: ' + ASK_MANAGER);
   });
