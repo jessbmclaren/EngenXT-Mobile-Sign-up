@@ -1375,6 +1375,103 @@ body {
   font-size: var(--text-callout); font-weight: 600; color: var(--color-primary);
 }
 
+/* o-scan. Reading a licence disc or a number plate.
+
+   Dark, because a camera view is dark and the controls have to sit on whatever
+   the lens is pointed at. The frame is the only bright thing: it says where to
+   aim without a sentence, which matters when the driver is holding a phone at
+   arm's length beside a van. */
+.o-scan {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  background: #0B1220; color: var(--color-text-on-dark);
+}
+.o-scan[data-state="visible"] { display: flex; }
+/* What the lens sees. Drawn, not filmed. */
+.o-scan__view { position: absolute; inset: 0; overflow: hidden; }
+.o-scan__view::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 40% at 50% 38%, rgba(255,255,255,0.10) 0%, transparent 70%),
+    linear-gradient(180deg, #16203A 0%, #0B1220 70%);
+}
+.o-scan > * { position: relative; z-index: var(--z-content); }
+.o-scan__bar {
+  flex-shrink: 0; display: flex; align-items: center; gap: var(--sp-2);
+  padding: calc(var(--size-status-bar) + var(--sp-2)) var(--sp-4) var(--sp-2);
+}
+.o-scan__bar .a-icon-btn { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
+.o-scan__bar .a-icon-btn:hover { background: rgba(255,255,255,0.18); }
+.o-scan__spacer { flex: 1 1 auto; }
+
+.o-scan__stage { flex: 1 1 auto; display: grid; place-items: center; padding: var(--sp-4); }
+/* The frame. Corners rather than a full rectangle, so it reads as an aiming
+   guide and not as a border round the picture. */
+.a-scan-frame {
+  position: relative; width: 100%; max-width: 300px; aspect-ratio: 3 / 2;
+  border-radius: var(--radius-card);
+}
+.a-scan-frame::before, .a-scan-frame::after,
+.a-scan-frame > i::before, .a-scan-frame > i::after {
+  content: ''; position: absolute; width: 34px; height: 34px;
+  border: 3px solid var(--color-text-on-dark); border-radius: 6px;
+}
+.a-scan-frame::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.a-scan-frame::after { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.a-scan-frame > i::before { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.a-scan-frame > i::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+/* A single pass, not a loop. A line sweeping forever says the app is busy when
+   it is waiting for the driver to hold still. */
+.a-scan-frame__line {
+  position: absolute; left: 8px; right: 8px; height: 2px;
+  background: var(--color-accent-on-dark);
+  box-shadow: 0 0 12px var(--color-accent-on-dark);
+  animation: scanSweep 2.4s var(--ease-in-out) infinite;
+}
+@keyframes scanSweep { 0%,100% { top: 10%; } 50% { top: 88%; } }
+[data-motion="reduced"] .a-scan-frame__line { animation: none; top: 50%; }
+@media (prefers-reduced-motion: reduce) { .a-scan-frame__line { animation: none; top: 50%; } }
+/* Trouble the driver can act on. Sits under the frame, never over it, because
+   covering the thing they are aiming is the opposite of helping. */
+.m-scan-note {
+  margin-top: var(--sp-4); max-width: 300px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-card);
+  background: var(--color-on-dark-fill);
+  border: 1px solid var(--color-on-dark-faint);
+  text-align: center;
+}
+.m-scan-note__title { display: block; font-size: var(--text-callout); font-weight: 700; }
+/* Focused by script so the state is announced, which is not the driver having
+   navigated to it. Third time this has bitten: the global ring sets a halo as
+   well as an outline, so both have to go. */
+.m-scan-note__title:focus,
+.m-scan-note__title:focus-visible { outline: none; box-shadow: none; }
+.m-scan-note__body {
+  display: block; margin-top: 2px;
+  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+}
+.o-scan__modes { display: flex; justify-content: center; gap: var(--sp-2); padding: 0 var(--sp-4) var(--sp-3); }
+.o-scan__modes .a-filter-chip {
+  /* 48, not the 36 a filter chip carries elsewhere. This one is pressed at
+     arm's length, one-handed, beside a van, and often in the dark. */
+  min-height: 48px; padding-inline: var(--sp-4);
+  background: var(--color-on-dark-fill); border-color: var(--color-on-dark-faint);
+  color: var(--color-text-on-dark); backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.o-scan__modes .a-filter-chip[aria-pressed="true"] {
+  background: var(--color-text-on-dark); color: var(--color-primary-dark);
+  border-color: var(--color-text-on-dark);
+}
+.o-scan__actions {
+  flex-shrink: 0; display: flex; flex-direction: column; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4) var(--sp-5);
+}
+.o-scan__actions .a-btn { min-height: 52px; }
+.o-scan__actions .a-btn--outline {
+  border-color: var(--color-on-dark-line); color: var(--color-text-on-dark);
+}
+
 /* m-vehicle-opt. One assigned vehicle, chosen or not.
 
    A card rather than a row: the registration is what a driver matches against
@@ -2798,6 +2895,38 @@ body {
         </div>
       </section>
 
+      <!-- Reading the disc or the plate. -->
+      <section class="o-scan" id="scanScreen" aria-labelledby="scanNoteTitle" hidden>
+        <div class="o-scan__view" aria-hidden="true"></div>
+        <div class="o-scan__bar">
+          <button class="a-icon-btn" type="button" id="scanClose" aria-label="Close the scanner">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+          <span class="o-scan__spacer"></span>
+          <button class="a-icon-btn" type="button" id="scanTorch" aria-label="Torch" aria-pressed="false">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6l-1 6 3 2-6 12 1-9H8l1-5z"/></svg>
+          </button>
+        </div>
+
+        <div class="o-scan__stage">
+          <div>
+            <div class="a-scan-frame"><i aria-hidden="true"></i>
+              <span class="a-scan-frame__line" id="scanLine" aria-hidden="true"></span>
+            </div>
+            <p class="m-scan-note" id="scanNote" role="status">
+              <span class="m-scan-note__title" id="scanNoteTitle" tabindex="-1">Hold still</span>
+              <span class="m-scan-note__body" id="scanNoteBody">Point the camera at the licence disc.</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="o-scan__modes" id="scanModes" role="group" aria-label="What to scan"></div>
+        <div class="o-scan__actions">
+          <button class="a-btn a-btn--outline" type="button" id="scanOther">Try number plate instead</button>
+          <button class="a-btn a-btn--outline" type="button" id="scanType">Enter registration</button>
+        </div>
+      </section>
+
       <!-- SCREEN THREE · where.
            A code is issued against a station, so the station is chosen before
            the code exists rather than after it. Home stays underneath.
@@ -3089,6 +3218,9 @@ body {
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
     checkSegs: $('checkSegs'), checkList: $('checkList'),
+    scan: $('scanScreen'), scanNoteTitle: $('scanNoteTitle'), scanNoteBody: $('scanNoteBody'),
+    scanModes: $('scanModes'), scanLine: $('scanLine'), scanOther: $('scanOther'),
+    scanType: $('scanType'), scanClose: $('scanClose'), scanTorch: $('scanTorch'),
     step: $('stepScreen'), stepMark: $('stepMark'), stepTitle: $('stepTitle'),
     stepBody: $('stepBody'), stepGroup: $('stepGroup'), stepGo: $('stepGo'),
     stepAlt: $('stepAlt'), stepThird: $('stepThird'), stepBack: $('stepBack'),
@@ -3156,6 +3288,7 @@ body {
     /* What the company's side says. Front of house only: nothing here reads
        a real account or a real clock. */
     account: 'ok', hours: 'open', located: true,
+    scanMode: 'disc', scanFace: 'ready', scanTries: 0,
     /* Confirmed for today. A driver swaps vans between days far more often than
        within one, so the question is asked once each day and not again. Asking
        every time they press the button would train them to tap past it, which
@@ -3293,6 +3426,7 @@ body {
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
     el.stations.hidden = true; el.stations.removeAttribute('data-state');
     el.step.hidden = true;     el.step.removeAttribute('data-state');
+    el.scan.hidden = true;     el.scan.removeAttribute('data-state');
     el.check.hidden = true;    el.check.removeAttribute('data-state');
   }
 
@@ -4009,7 +4143,7 @@ body {
            granted it goes straight to home. */
         if (S.located) { hideStep(); showHome(true); } else { showStep('location'); }
       },
-      onAlt: function () { announce('The camera permission screen is not built yet.'); },
+      onAlt: function () { S.scanTries = 0; showScan('ready'); },
       onThird: function () { announce('Manual registration entry is not built yet.'); }
     },
 
@@ -4028,6 +4162,70 @@ body {
       onAlt: function () { hideStep(); showHome(true); }
     }
   };
+
+  /* ── The scanner ──────────────────────────────────────────────────────
+     Everything that can go wrong with a camera in a yard, written as data.
+
+     A cracked lens, a dark bay, a plate behind glare or a phone whose camera
+     the driver has denied are all ordinary, not exceptional, and none of them
+     may be the thing that stops somebody fuelling. Every one of these states
+     keeps a way through: try the other thing, or type it. */
+  var SCAN_FACES = {
+    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc.' },
+    reading: { t: 'Reading the disc\u2026', b: 'Keep the phone steady.' },
+    glare:   { t: 'Too much glare', b: 'Tilt the phone slightly, or move out of the sun.' },
+    dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.' },
+    blur:    { t: 'Too blurry', b: 'Hold the phone still and wait for it to sharpen.' },
+    nocam:   { t: 'The camera is not available', b: 'Another app may be using it. You can type the registration instead.' },
+    denied:  { t: 'Camera access is off', b: 'Turn it on in your phone settings, or type the registration instead.' },
+    unread:  { t: 'That could not be read', b: 'Try the number plate, or type the registration.' },
+    offline: { t: 'No connection', b: 'We cannot check the vehicle right now. Try again in a moment.' }
+  };
+  var SCAN_MODES = [{ k: 'disc', l: 'Licence disc' }, { k: 'plate', l: 'Number plate' }];
+
+  function paintScan() {
+    var face = SCAN_FACES[S.scanFace] || SCAN_FACES.ready;
+    el.scanNoteTitle.textContent = face.t;
+    el.scanNoteBody.textContent = face.b;
+    /* The sweep stops once there is something to read rather than something to
+       aim at. A line still travelling under an error says the app has not
+       noticed the thing it is telling you about. */
+    var live = S.scanFace === 'ready' || S.scanFace === 'reading';
+    el.scanLine.hidden = !live;
+    el.scanModes.innerHTML = SCAN_MODES.map(function (m) {
+      return '<button class="a-filter-chip" type="button" data-mode="' + m.k + '"' +
+             ' aria-pressed="' + (m.k === S.scanMode) + '">' + m.l + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(el.scanModes.querySelectorAll('[data-mode]'), function (b2) {
+      b2.addEventListener('click', function () {
+        S.scanMode = b2.dataset.mode; S.scanFace = 'ready'; paintScan();
+      });
+    });
+    el.scanOther.textContent = S.scanMode === 'disc'
+      ? 'Try number plate instead' : 'Try licence disc instead';
+    /* After two goes the fallbacks stop being the quiet option. Somebody on
+       their third attempt is not going to succeed on the fourth by trying
+       harder, and the assigned list was always faster. */
+    var struggling = S.scanTries >= 2;
+    el.scanType.className = struggling ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
+    el.scanType.textContent = struggling
+      ? 'Enter the registration' : 'Enter registration';
+  }
+
+  function showScan(face) {
+    clearTimers(); hideAll();
+    S.step = 'scan';
+    S.scanFace = face || 'ready';
+    if (face && face !== 'ready' && face !== 'reading') { S.scanTries = (S.scanTries || 0) + 1; }
+    paintScan();
+    el.scan.hidden = false;
+    el.scan.setAttribute('data-state', 'visible');
+    after(60, function () { el.scanNoteTitle.focus({ preventScroll: true }); });
+    after(500, function () {
+      var f = SCAN_FACES[S.scanFace];
+      announce(f.t + '. ' + f.b);
+    });
+  }
 
   function showStep(key, arriving) {
     var def = STEPS[key];
@@ -4841,6 +5039,22 @@ body {
      the person who can. The same shape the sign-up flow already uses for a
      driver it has to turn away. */
   var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
+  el.scanClose.addEventListener('click', function () { showStep('vehicle'); });
+  el.scanOther.addEventListener('click', function () {
+    S.scanMode = S.scanMode === 'disc' ? 'plate' : 'disc';
+    S.scanFace = 'ready';
+    paintScan();
+    announce('Scanning the ' + (S.scanMode === 'disc' ? 'licence disc' : 'number plate') + '.');
+  });
+  el.scanType.addEventListener('click', function () { showStep('vehicle'); });
+  /* The torch is the answer to the dark state, so it says so when it fixes it. */
+  el.scanTorch.addEventListener('click', function () {
+    var on = el.scanTorch.getAttribute('aria-pressed') === 'true';
+    el.scanTorch.setAttribute('aria-pressed', on ? 'false' : 'true');
+    if (!on && S.scanFace === 'dark') { S.scanFace = 'ready'; paintScan(); }
+    announce(on ? 'Torch off.' : 'Torch on.');
+  });
+
   el.homePickerMore.addEventListener('click', function () {
     stepPick = S.activeVehicle === NONE ? null : S.activeVehicle;
     showStep('vehicle');
@@ -4988,6 +5202,24 @@ body {
       run: function () { reset('returning-driver', true, 3); stepPick = null; showStep('vehicle'); } },
     'flow1-vehicle-one': { group: 'flow1', label: '2 · One vehicle, still confirmed',
       run: function () { reset('returning-driver', true, 1); stepPick = null; showStep('vehicle'); } },
+    'flow1-scan-ready': { group: 'flow1', label: '2 \u00b7 Scanning',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('ready'); } },
+    'flow1-scan-reading': { group: 'flow1', label: '2 \u00b7 Scanning, reading it',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('reading'); } },
+    'flow1-scan-glare': { group: 'flow1', label: '2 \u00b7 Scan, too much glare',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('glare'); } },
+    'flow1-scan-dark': { group: 'flow1', label: '2 \u00b7 Scan, too dark',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('dark'); } },
+    'flow1-scan-blur': { group: 'flow1', label: '2 \u00b7 Scan, too blurry',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('blur'); } },
+    'flow1-scan-nocam': { group: 'flow1', label: '2 \u00b7 Scan, camera unavailable',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('nocam'); } },
+    'flow1-scan-denied': { group: 'flow1', label: '2 \u00b7 Scan, access refused',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('denied'); } },
+    'flow1-scan-unread': { group: 'flow1', label: '2 \u00b7 Scan, could not be read',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('unread'); } },
+    'flow1-scan-offline': { group: 'flow1', label: '2 \u00b7 Scan, no connection',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
     'flow1-location': { group: 'flow1', label: '3 · Find stations near you',
       run: function () { reset('returning-driver', true, 3); chooseVehicle(0); showStep('location'); } },
     'flow1-open-linked': { group: 'flow1', label: 'Opening, already linked today',
@@ -5260,6 +5492,15 @@ body {
         ['flow1-account', '1 \u00b7 Confirm your account'],
         ['flow1-vehicle', '2 \u00b7 Which vehicle today'],
         ['flow1-vehicle-one', '2 \u00b7 One vehicle, still confirmed'],
+        ['flow1-scan-ready', '2 \u00b7 Scanning'],
+        ['flow1-scan-reading', '2 \u00b7 Scanning, reading it'],
+        ['flow1-scan-glare', '2 \u00b7 Scan, too much glare'],
+        ['flow1-scan-dark', '2 \u00b7 Scan, too dark'],
+        ['flow1-scan-blur', '2 \u00b7 Scan, too blurry'],
+        ['flow1-scan-nocam', '2 \u00b7 Scan, camera unavailable'],
+        ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
+        ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
+        ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
         ['flow1-map', '4 \u00b7 The allowed stations'],
         ['flow1-open-linked', 'Opening, already linked today'],
