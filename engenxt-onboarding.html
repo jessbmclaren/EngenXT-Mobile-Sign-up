@@ -1314,6 +1314,113 @@ body {
   .o-onboard[data-state="leaving"], .o-home[data-state="arriving"] { transform: none; }
 }
 
+/* ══ FLOW 1 · getting to the map ══════════════════════════════════════
+   Open the app, confirm who you are if anything has changed, confirm which
+   vehicle you are in, ask for location, land on the stations you are allowed.
+
+   One organism carries all of them, because they are the same shape: a title,
+   a sentence, some content, and one dominant action. Building three screens
+   would have produced three sets of margins that drifted apart.
+
+   Sized for a 320dp Android Go phone. 16dp screen margins, 16sp body copy,
+   48dp minimum targets, one column of actions because two buttons side by side
+   at 320dp gives each of them 140dp and a two-line label. Gradients and vector
+   icons only: no blur behind moving content, no image assets, nothing that
+   asks a 2GB phone to composite a layer it does not need. */
+.o-step {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  background: var(--color-surface-page);
+}
+.o-step[data-state="visible"] { display: flex; }
+/* A tonal wash rather than a picture. Two stops, no blur, no repaint. */
+.o-step::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, var(--color-primary-06) 0%, transparent 42%);
+}
+.o-step > * { position: relative; z-index: var(--z-content); }
+.o-step__scroll {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(var(--size-status-bar) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.o-step__bar { display: flex; align-items: center; gap: var(--sp-2); min-height: 48px; }
+.o-step__mark {
+  width: 56px; height: 56px; flex-shrink: 0;
+  display: grid; place-items: center;
+  border-radius: var(--radius-card);
+  background: var(--color-primary-light); color: var(--color-primary);
+}
+.o-step__title {
+  font-size: var(--text-display); font-weight: 300; line-height: 1.18;
+  letter-spacing: -0.6px; color: var(--color-text-primary);
+}
+.o-step__title:focus, .o-step__title:focus-visible { outline: none; box-shadow: none; }
+/* 16sp, because this is the sentence the whole screen rests on and 13 is a
+   caption. It wraps rather than truncating at large Android font settings. */
+.o-step__body {
+  font-size: var(--text-callout); line-height: 1.5; color: var(--color-text-secondary);
+}
+.o-step__group { display: flex; flex-direction: column; gap: var(--sp-3); }
+/* One column, always. Side by side at 320dp is two cramped buttons and a
+   wrapped label on each. */
+.o-step__actions {
+  flex-shrink: 0; padding: var(--sp-3) var(--sp-4) var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-2);
+}
+.o-step__actions .a-btn { min-height: 52px; }
+.o-step__tertiary {
+  align-self: center; min-height: 48px; padding: 0 var(--sp-3);
+  border: none; background: none; cursor: pointer;
+  font-size: var(--text-callout); font-weight: 600; color: var(--color-primary);
+}
+
+/* m-vehicle-opt. One assigned vehicle, chosen or not.
+
+   A card rather than a row: the registration is what a driver matches against
+   the metal in front of them, so it is the largest thing on it. */
+.m-vehicle-opt {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%; min-height: 72px; padding: var(--sp-3);
+  border: 2px solid var(--color-border); border-radius: var(--radius-card);
+  background: var(--color-surface); text-align: left; cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
+}
+.m-vehicle-opt[aria-checked="true"] {
+  border-color: var(--color-primary); background: var(--color-primary-light);
+}
+.m-vehicle-opt__art {
+  flex-shrink: 0; width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-card-sm);
+  background: var(--color-surface-sunken); color: var(--color-text-secondary);
+}
+.m-vehicle-opt[aria-checked="true"] .m-vehicle-opt__art {
+  background: var(--color-primary); color: var(--color-text-on-dark);
+}
+.m-vehicle-opt__body { flex: 1 1 auto; min-width: 0; }
+.m-vehicle-opt__plate {
+  display: block; font-size: var(--text-large); font-weight: 800;
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+}
+.m-vehicle-opt__model {
+  display: block; margin-top: 1px;
+  font-size: var(--text-caption); color: var(--color-text-secondary);
+}
+.m-vehicle-opt__state {
+  display: block; margin-top: var(--sp-1);
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-success);
+}
+/* The tick is a second cue, so the choice never rests on the border colour. */
+.m-vehicle-opt__tick {
+  flex-shrink: 0; width: 26px; height: 26px;
+  display: none; place-items: center;
+  border-radius: var(--radius-circle);
+  background: var(--color-primary); color: var(--color-text-on-dark);
+}
+.m-vehicle-opt[aria-checked="true"] .m-vehicle-opt__tick { display: grid; }
+
 /* ══ STATIONS ═════════════════════════════════════════════════════════
    Where the fill will happen. Map above, list below, and the list is the
    control: the map answers "where", the list answers "which", and on a phone
@@ -2607,6 +2714,29 @@ body {
         </nav>
       </section>
 
+      <!-- FLOW 1 · one screen, three jobs.
+           Account confirmation, vehicle confirmation and the location ask are
+           the same shape, so they are the same organism with different content
+           rather than three screens whose margins drift apart. -->
+      <section class="o-step" id="stepScreen" aria-labelledby="stepTitle" hidden>
+        <div class="o-step__scroll">
+          <div class="o-step__bar">
+            <button class="a-icon-btn" type="button" id="stepBack" aria-label="Back" hidden>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+            </button>
+          </div>
+          <span class="o-step__mark" id="stepMark" aria-hidden="true"></span>
+          <h1 class="o-step__title" id="stepTitle" tabindex="-1"></h1>
+          <p class="o-step__body" id="stepBody"></p>
+          <div class="o-step__group" id="stepGroup"></div>
+        </div>
+        <div class="o-step__actions">
+          <button class="a-btn a-btn--primary" type="button" id="stepGo"></button>
+          <button class="a-btn a-btn--outline" type="button" id="stepAlt" hidden></button>
+          <button class="o-step__tertiary" type="button" id="stepThird" hidden></button>
+        </div>
+      </section>
+
       <!-- SCREEN THREE · where.
            A code is issued against a station, so the station is chosen before
            the code exists rather than after it. Home stays underneath.
@@ -2896,6 +3026,9 @@ body {
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
     checkSegs: $('checkSegs'), checkList: $('checkList'),
+    step: $('stepScreen'), stepMark: $('stepMark'), stepTitle: $('stepTitle'),
+    stepBody: $('stepBody'), stepGroup: $('stepGroup'), stepGo: $('stepGo'),
+    stepAlt: $('stepAlt'), stepThird: $('stepThird'), stepBack: $('stepBack'),
     stationDetail: $('stationDetail'), stationBrowse: $('stationBrowse'),
     stationArt: $('stationArt'), stationName: $('stationName'),
     stationStatusLine: $('stationStatusLine'), stationWhere: $('stationWhere'),
@@ -3088,6 +3221,7 @@ body {
     el.check.hidden = true;    el.check.removeAttribute('data-state');
     el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
     el.stations.hidden = true; el.stations.removeAttribute('data-state');
+    el.step.hidden = true;     el.step.removeAttribute('data-state');
     el.check.hidden = true;    el.check.removeAttribute('data-state');
   }
 
@@ -3710,6 +3844,130 @@ body {
   el.homeFuel.addEventListener('pointerenter', stopPulse);
   el.homeFuel.addEventListener('pointerdown', stopPulse);
   el.homeFuel.addEventListener('focus', stopPulse);
+
+  /* ══ FLOW 1 ══════════════════════════════════════════════════════════
+     Open the app, confirm the account only when something has changed,
+     confirm the vehicle, ask for location, land on the map.
+
+     Each step is content rather than a screen of its own. They ask the same
+     shape of question, so one organism carries all three and the margins
+     cannot drift apart between them. */
+  var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg>';
+  var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
+
+  /* Which vehicle the driver has said they are in, for this session only. */
+  var stepPick = null;
+
+  var STEPS = {
+    /* Only when something has changed: a new phone, an expired session, a
+       different number, a manually typed registration, or a code about to be
+       issued. A driver whose session is good is never asked again, because
+       asking somebody to prove who they are for no reason is how an app
+       teaches them to tap through without reading. */
+    account: {
+      mark: ICON_LOCK,
+      title: 'Confirm your account',
+      /* Plain words. "Biometric authentication" is the bank's language, and a
+         driver does not have to learn it to unlock their own phone. */
+      body: 'Use your phone\u2019s screen lock or a verification code to continue.',
+      go: 'Continue',
+      alt: 'Use verification code',
+      onGo: function () { showStep('vehicle'); },
+      onAlt: function () { announce('A six digit code would be sent. Not built yet.'); }
+    },
+
+    vehicle: {
+      mark: ICON_VAN,
+      title: 'Which vehicle are you using?',
+      body: 'Select or scan the vehicle you\u2019re driving today.',
+      go: 'Confirm vehicle',
+      alt: 'Scan licence disc or number plate',
+      third: 'Enter registration instead',
+      /* Scanning is offered, never required. A cracked lens, a dark yard or a
+         phone with a poor camera must not be the thing that stops somebody
+         fuelling, and the assigned list is already the faster route for a
+         driver who recognises their own plate. */
+      build: function (host) {
+        var list = S.vehicles.length ? S.vehicles : makeFleet(3);
+        /* One vehicle is still confirmed rather than assumed, because the app
+           cannot know they did not walk up to a different van this morning. */
+        if (stepPick === null) { stepPick = 0; }
+        host.innerHTML = list.slice(0, 4).map(function (v, i) {
+          var on = i === stepPick;
+          return '<button class="m-vehicle-opt" type="button" role="radio" data-opt="' + i + '"' +
+                 ' aria-checked="' + on + '" tabindex="' + (on ? '0' : '-1') + '">' +
+                 '<span class="m-vehicle-opt__art">' + vehicleArt(v.type, 22, 'currentColor') + '</span>' +
+                 '<span class="m-vehicle-opt__body">' +
+                 '<span class="m-vehicle-opt__plate">' + v.plate + '</span>' +
+                 '<span class="m-vehicle-opt__model">' + v.make + ' ' + v.model + '</span>' +
+                 '<span class="m-vehicle-opt__state">Assigned to you</span></span>' +
+                 '<span class="m-vehicle-opt__tick">' +
+                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                 'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                 '<path d="m5 12.5 4.5 4.5L19 7"/></svg></span></button>';
+        }).join('');
+        host.setAttribute('role', 'radiogroup');
+        host.setAttribute('aria-label', 'Your assigned vehicles');
+        Array.prototype.forEach.call(host.querySelectorAll('[data-opt]'), function (b) {
+          b.addEventListener('click', function () {
+            stepPick = Number(b.dataset.opt);
+            STEPS.vehicle.build(host);
+            var v = (S.vehicles.length ? S.vehicles : makeFleet(3))[stepPick];
+            announce(v.plate + ' selected.');
+            host.querySelector('[data-opt="' + stepPick + '"]').focus({ preventScroll: true });
+          });
+        });
+      },
+      onGo: function () {
+        var list = S.vehicles.length ? S.vehicles : makeFleet(3);
+        S.vehicles = list; S.vehicleLinked = true; S.activeVehicle = stepPick || 0;
+        showStep('location');
+      },
+      onAlt: function () { announce('The camera permission screen is not built yet.'); },
+      onThird: function () { announce('Manual registration entry is not built yet.'); }
+    },
+
+    /* Asked after the vehicle, never before. A permission prompt that arrives
+       before the driver has done anything to need it is the one they refuse. */
+    location: {
+      mark: ICON_PIN,
+      title: 'Find allowed stations near you',
+      body: 'EngenXT uses your location to show stations available for this vehicle.',
+      go: 'Use my location',
+      alt: 'Search instead',
+      onGo: function () { hideStep(); showHome(); showStations(true); },
+      onAlt: function () { hideStep(); showHome(); showStations(true); }
+    }
+  };
+
+  function showStep(key, arriving) {
+    var def = STEPS[key];
+    if (!def) { return; }
+    clearTimers(); hideAll();
+    S.step = 'step:' + key;
+    el.stepMark.innerHTML = def.mark;
+    el.stepTitle.textContent = def.title;
+    el.stepBody.textContent = def.body;
+    el.stepGroup.innerHTML = '';
+    el.stepGroup.removeAttribute('role');
+    if (def.build) { def.build(el.stepGroup); }
+    el.stepGo.textContent = def.go;
+    el.stepGo.onclick = def.onGo;
+    el.stepAlt.hidden = !def.alt;
+    if (def.alt) { el.stepAlt.textContent = def.alt; el.stepAlt.onclick = def.onAlt; }
+    el.stepThird.hidden = !def.third;
+    if (def.third) { el.stepThird.textContent = def.third; el.stepThird.onclick = def.onThird; }
+    el.step.hidden = false;
+    el.step.setAttribute('data-state', 'visible');
+    after(60, function () { el.stepTitle.focus({ preventScroll: true }); });
+    after(500, function () { announce(def.title + '. ' + def.body); });
+  }
+
+  function hideStep() {
+    el.step.hidden = true;
+    el.step.removeAttribute('data-state');
+  }
 
   /* ── The stations ─────────────────────────────────────────────────────
      A fleet driver does not choose from every forecourt in the city, they
@@ -4584,6 +4842,19 @@ body {
     'fuel-station-refused': { group: 'fuelling', label: 'A station, not on the list',
       run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
                          showStations(false); chooseStation('randburg'); } },
+    /* Flow 1, in the order a driver meets it. */
+    'flow1-account':  { group: 'flow1', label: '1 · Confirm your account',
+      run: function () { reset('returning-driver', true, 3); stepPick = null; showStep('account'); } },
+    'flow1-vehicle':  { group: 'flow1', label: '2 · Which vehicle today',
+      run: function () { reset('returning-driver', true, 3); stepPick = null; showStep('vehicle'); } },
+    'flow1-vehicle-one': { group: 'flow1', label: '2 · One vehicle, still confirmed',
+      run: function () { reset('returning-driver', true, 1); stepPick = null; showStep('vehicle'); } },
+    'flow1-location': { group: 'flow1', label: '3 · Find stations near you',
+      run: function () { reset('returning-driver', true, 3); chooseVehicle(0); showStep('location'); } },
+    'flow1-map':      { group: 'flow1', label: '4 · The allowed stations',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         showHome(); showStations(false); } },
+
     'fuel-stations':   { group: 'fuelling', label: 'Choosing a station',
       run: function () { reset('returning-driver', true, 4); S.activeVehicle = 0;
                          showHome(); showStations(false); } },
@@ -4781,6 +5052,7 @@ body {
     navDone:    'The end of sign-up, which hands over to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
+    'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
     'fuelling':     'Choosing where, the code that comes back, and home while the fill is open.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
@@ -4803,6 +5075,7 @@ body {
       sections: [
         ['after-signup', 'After sign-up'],
         ['returning',    'Returning driver'],
+        ['flow1',        'Flow 1, getting to the map'],
         ['fuelling',     'Fuelling']
       ]
     }
@@ -4837,6 +5110,13 @@ body {
         ['home-five-vans', 'Five vans'],
         ['home-many-vehicles', 'Nine vehicles'],
         ['home-thousand-vehicles', 'A thousand vehicles']
+      ],
+      'flow1': [
+        ['flow1-account', '1 \u00b7 Confirm your account'],
+        ['flow1-vehicle', '2 \u00b7 Which vehicle today'],
+        ['flow1-vehicle-one', '2 \u00b7 One vehicle, still confirmed'],
+        ['flow1-location', '3 \u00b7 Find stations near you'],
+        ['flow1-map', '4 \u00b7 The allowed stations']
       ],
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
