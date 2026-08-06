@@ -1365,6 +1365,122 @@ body {
 }
 .a-icon-btn--onMap:hover { background: var(--color-surface); }
 
+/* m-station-card. The station a pin opens, over the map.
+
+   Filled in the brand blue because it is the one station being considered, and
+   everything under it on this screen is a list of alternatives. The action
+   inverts to white on that blue, which is the strongest a control can be
+   without introducing a third colour. */
+.o-stations__peek {
+  /* Above the pins. A pressed pin lifts itself to sit over its neighbours, and
+     without this it lifted itself over the card it had just opened. */
+  z-index: 3;
+  position: absolute; left: var(--sp-3); right: var(--sp-3);
+  top: calc(var(--size-status-bar) + var(--sp-8) + var(--sp-3));
+  display: flex; flex-direction: column; gap: var(--sp-2h);
+  max-height: calc(100% - var(--size-status-bar) - var(--sp-12));
+  overflow-y: auto; scrollbar-width: none;
+}
+.o-stations__peek::-webkit-scrollbar { display: none; }
+.m-station-card {
+  flex-shrink: 0;
+  padding: var(--sp-4);
+  border-radius: var(--radius-sheet);
+  background: var(--gradient-primary);
+  color: var(--color-text-on-dark);
+  box-shadow: var(--shadow-btn);
+}
+.m-station-card__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
+.m-station-card__art {
+  flex-shrink: 0; width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-card-sm);
+  background: var(--color-on-dark-fill);
+}
+.m-station-card__body { flex: 1 1 auto; min-width: 0; }
+.m-station-card__name {
+  display: block; font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+}
+.m-station-card__meta {
+  display: block; margin-top: var(--sp-1h);
+  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+}
+.m-station-card__km {
+  flex-shrink: 0; text-align: right;
+  font-size: var(--text-title); font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.m-station-card__km small {
+  display: block; font-size: var(--text-nano); font-weight: 600; color: var(--color-on-dark-soft);
+}
+/* Open or shut is the first thing a driver needs and the only one that changes
+   hour to hour, so it sits inside the name rather than among the facilities. */
+.a-open-badge {
+  display: inline-flex; align-items: center; margin-right: var(--sp-2);
+  padding: 1px var(--sp-2); border-radius: var(--radius-pill);
+  background: var(--color-surface); color: var(--color-primary-dark);
+  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.04em;
+  vertical-align: 2px;
+}
+.a-open-badge[data-open="false"] { background: var(--color-on-dark-fill); color: var(--color-on-dark-soft); }
+/* What is actually there. Facts, not features: a driver at 2am wants to know
+   about the toilet. */
+.m-station-card__has { display: flex; flex-wrap: wrap; gap: var(--sp-1h); margin-top: var(--sp-3); }
+.a-has-chip {
+  padding: var(--sp-1) var(--sp-2h);
+  border-radius: var(--radius-pill);
+  background: var(--color-on-dark-fill);
+  font-size: var(--text-caption2); font-weight: 600;
+}
+.m-station-card__actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-4); }
+.m-station-card__actions .a-btn { flex: 1 1 auto; }
+.a-close-round {
+  flex-shrink: 0; width: var(--size-control); height: var(--size-control);
+  display: grid; place-items: center;
+  border: none; border-radius: var(--radius-circle);
+  background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
+  cursor: pointer;
+}
+
+/* m-deals. What the station sells that is not fuel.
+
+   Kept visibly separate from the blue card, because the blue card is the
+   company's business and this is not. A driver buying a coffee is spending
+   their own money, and the copy says so once rather than leaving somebody to
+   find out at the till. */
+.m-deals {
+  flex-shrink: 0;
+  padding: var(--sp-4);
+  border-radius: var(--radius-sheet);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.m-deals__head { display: flex; align-items: baseline; gap: var(--sp-2); }
+.m-deals__title { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
+.m-deals__count { font-size: var(--text-caption); font-weight: 700; color: var(--color-secondary); }
+.m-deals__note {
+  margin-top: 2px; font-size: var(--text-caption2); color: var(--color-text-tertiary);
+}
+.m-deals__row { display: flex; gap: var(--sp-2h); margin-top: var(--sp-3); overflow-x: auto; scrollbar-width: none; }
+.m-deals__row::-webkit-scrollbar { display: none; }
+.m-deal {
+  flex: 0 0 auto; width: 62%; max-width: 220px;
+  padding: var(--sp-3);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+}
+.m-deal__icon { font-size: 22px; line-height: 1; }
+.m-deal__title {
+  display: block; margin-top: var(--sp-2);
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+}
+.m-deal__sub { display: block; margin-top: 1px; font-size: var(--text-caption2); color: var(--color-text-secondary); }
+.m-deal__tag {
+  display: inline-block; margin-top: var(--sp-2h);
+  padding: 1px var(--sp-2); border-radius: var(--radius-pill);
+  background: var(--color-secondary-bg); color: var(--color-error-text);
+  font-size: var(--text-nano); font-weight: 800;
+}
+
 /* a-filter-chip. Sorting, not choosing. It takes the same selected treatment as
    the vehicle chip, because a driver has already learned that here: filled
    primary means this one is on. */
@@ -1408,8 +1524,13 @@ body {
    It just is not one of theirs. */
 .a-pin[data-allowed="false"] { color: var(--color-text-tertiary); }
 
+/* With a station open, the list steps back so the card and what is at that
+   station are not sliced off by it. The list is the alternatives, and the
+   alternatives matter less than the one being looked at. */
+.o-stations[data-peek="on"] .o-stations__sheet { max-height: 30%; }
 .o-stations__sheet {
   flex-shrink: 0; max-height: 54%;
+  transition: max-height var(--dur-sheet) var(--ease-emphasis);
   display: flex; flex-direction: column; gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-5) var(--sp-4);
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
@@ -2484,6 +2605,16 @@ body {
           <span class="a-here" style="left:47%;top:56%" aria-hidden="true"></span>
           <div class="o-stations__pins" id="stationPins"></div>
 
+          <!-- What a pin opens. The map used to commit on the first tap, which
+               made it a list of buttons with a picture behind them. A driver
+               picking a forecourt wants to know whether it is open, whether
+               there is a toilet, and how far, before they decide, so the pin
+               opens the station and the decision stays theirs. -->
+          <div class="o-stations__peek" id="stationPeek" hidden>
+            <div class="m-station-card" id="stationCard"></div>
+            <div class="m-deals" id="stationDeals" hidden></div>
+          </div>
+
           <div class="o-stations__bar">
             <button class="a-icon-btn a-icon-btn--onMap" type="button" id="stationsBack" aria-label="Back to home">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
@@ -2688,6 +2819,7 @@ body {
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'), checkPick: $('checkPick'), checkPickNote: $('checkPickNote'),
     checkSegs: $('checkSegs'), checkList: $('checkList'),
+    stationPeek: $('stationPeek'), stationCard: $('stationCard'), stationDeals: $('stationDeals'),
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'), homePickerEmpty: $('homePickerEmpty'),
@@ -3502,19 +3634,37 @@ body {
      and the screen can be screenshotted twice. */
   var STATIONS = [
     { id: 'fourways',  name: 'Engen Fourways',    km: 6.2,  x: 32, y: 12,
-      note: 'You have fuelled here once. Approved.', allowed: true },
+      note: 'You have fuelled here once. Approved.', allowed: true, open: true,
+      street: 'William Nicol Dr and Witkoppen Rd', pumps: 8,
+      has: ['Open 24 hours', 'Shop', 'Toilets', 'Car wash'],
+      deals: [
+        { icon: '\u{1F964}', title: 'Slurpee for R5 with any fill', sub: 'Any size', tag: 'Today' },
+        { icon: '\u{1F355}', title: 'Free slice with a full tank', sub: 'While stocks last', tag: '40 L and up' }
+      ] },
     { id: 'roodekop',  name: 'Engen Roodekop',    km: 14.6, x: 78, y: 34,
-      note: 'Cheapest allowed. More points per fill.', allowed: true },
+      note: 'Cheapest allowed. More points per fill.', allowed: true, open: true,
+      street: 'Main Reef Rd, Roodekop', pumps: 6,
+      has: ['Shop', 'Toilets'], deals: [] },
     { id: 'bryanston', name: 'Engen Bryanston',   km: 2.1,  x: 36, y: 47,
-      note: 'Nearest to you. Open 24 hours.', allowed: true },
+      note: 'Nearest to you. Open 24 hours.', allowed: true, open: true,
+      street: 'Main Rd, Bryanston', pumps: 4,
+      has: ['Open 24 hours', 'Shop', 'Car wash'],
+      deals: [
+        { icon: '\u{1F950}', title: 'Coffee and a croissant for R29', sub: 'Any hot drink', tag: 'Before 11am' }
+      ] },
     { id: 'rivonia',   name: 'Engen Rivonia',     km: 3.8,  x: 62, y: 41,
-      note: 'Open 24 hours.', allowed: true },
+      note: 'Open 24 hours.', allowed: true, open: true,
+      street: 'Rivonia Blvd', pumps: 6, has: ['Open 24 hours', 'Toilets'], deals: [] },
     { id: 'woodmead',  name: 'Engen Woodmead',    km: 8.9,  x: 71, y: 22,
-      note: 'Open 24 hours. Diesel and petrol.', allowed: true },
+      note: 'Open 24 hours. Diesel and petrol.', allowed: true, open: true,
+      street: 'Woodmead Dr, Woodmead', pumps: 4,
+      has: ['Open 24 hours', 'Shop', 'Car wash'], deals: [] },
     { id: 'randburg',  name: 'Engen Randburg',    km: 5.4,  x: 18, y: 58,
-      note: 'Not on your company list.', allowed: false },
+      note: 'Not on your company list.', allowed: false, open: true,
+      street: 'Republic Rd, Randburg', pumps: 5, has: ['Shop'], deals: [] },
     { id: 'sandton',   name: 'Engen Sandton City', km: 4.5, x: 52, y: 66,
-      note: 'Not on your company list.', allowed: false }
+      note: 'Not on your company list.', allowed: false, open: false,
+      street: 'Rivonia Rd, Sandton', pumps: 3, has: ['Toilets'], deals: [] }
   ];
 
   var STATION_SORTS = [
@@ -3587,16 +3737,90 @@ body {
     });
   }
 
+  /* A pin opens the station. It used to commit on the first tap, which made the
+     map a list of buttons with a picture behind it: no way to look at a
+     forecourt before choosing it, and no way to change your mind without going
+     back. Now the tap opens what is there, and the decision is a second,
+     deliberate press. */
   function chooseStation(id) {
-    var st = STATIONS.filter(function (s) { return s.id === id; })[0];
+    var st = stationById(id);
     if (!st) { return; }
     S.station = id;
     paintStations();
-    /* Both answers go to the same screen. A station that is not on the list
-       used to be refused here by an announcement nobody sees, which meant the
-       rule could only be learned by never hitting it. Being stopped, in words,
-       on a screen you have to read past, is the lesson. */
-    after(prefersReduced() ? 0 : 200, function () { showCheck(id, true); });
+    paintPeek(st);
+  }
+
+  var PUMP_ART = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/>' +
+    '<path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>' +
+    '<path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>';
+
+  function paintPeek(st) {
+    el.stationCard.innerHTML =
+      '<div class="m-station-card__top">' +
+        '<span class="m-station-card__art">' + PUMP_ART + '</span>' +
+        '<span class="m-station-card__body">' +
+          '<span class="m-station-card__name">' + st.name + '</span>' +
+          '<span class="m-station-card__meta">' +
+            '<span class="a-open-badge" data-open="' + st.open + '">' +
+            (st.open ? 'Open' : 'Closed') + '</span>' + st.street +
+            ' \u00b7 ' + st.pumps + ' pumps</span>' +
+        '</span>' +
+        '<span class="m-station-card__km">' + st.km.toFixed(1) + '<small>km</small></span>' +
+      '</div>' +
+      (st.has && st.has.length
+        ? '<div class="m-station-card__has">' + st.has.map(function (h) {
+            return '<span class="a-has-chip">' + h + '</span>'; }).join('') + '</div>'
+        : '') +
+      '<div class="m-station-card__actions">' +
+        (st.allowed
+          ? '<button class="a-btn a-btn--onDark" type="button" data-peek="go">Fuel here</button>'
+          : '<button class="a-btn a-btn--onDark" type="button" data-peek="go">Why not here?</button>') +
+        '<button class="a-close-round" type="button" data-peek="shut" aria-label="Close, back to the map">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+        'stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
+      '</div>';
+
+    /* The deals are not the company's business. A driver buying a coffee is
+       spending their own money, so the card says so once rather than leaving
+       somebody to discover it at the till. */
+    var deals = st.deals || [];
+    el.stationDeals.hidden = deals.length === 0;
+    if (deals.length) {
+      el.stationDeals.innerHTML =
+        '<div class="m-deals__head"><span class="m-deals__title">At this station</span>' +
+        '<span class="m-deals__count">' + deals.length +
+        (deals.length === 1 ? ' deal' : ' deals') + '</span></div>' +
+        '<p class="m-deals__note">You pay for these yourself, not your company.</p>' +
+        '<div class="m-deals__row">' + deals.map(function (d) {
+          return '<div class="m-deal"><span class="m-deal__icon">' + d.icon + '</span>' +
+                 '<span class="m-deal__title">' + d.title + '</span>' +
+                 '<span class="m-deal__sub">' + d.sub + '</span>' +
+                 '<span class="m-deal__tag">' + d.tag + '</span></div>';
+        }).join('') + '</div>';
+    }
+
+    el.stationPeek.hidden = false;
+    el.stations.setAttribute('data-peek', 'on');
+    Array.prototype.forEach.call(el.stationCard.querySelectorAll('[data-peek]'), function (b) {
+      b.addEventListener('click', function () {
+        if (b.dataset.peek === 'shut') { shutPeek(); return; }
+        shutPeek();
+        after(prefersReduced() ? 0 : 160, function () { showCheck(st.id, true); });
+      });
+    });
+    announce(st.name + '. ' + (st.open ? 'Open' : 'Closed') + '. ' +
+             st.km.toFixed(1) + ' kilometres. ' +
+             (st.allowed ? 'Fuel here, or close to keep looking.'
+                         : 'Not on your company list.'));
+  }
+
+  function shutPeek() {
+    el.stationPeek.hidden = true;
+    el.stations.removeAttribute('data-peek');
+    S.station = null;
+    paintStations();
   }
 
   /* ── The check ─────────────────────────────────────────────────────────
