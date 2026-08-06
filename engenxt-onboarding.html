@@ -4425,6 +4425,16 @@ body {
        clearTimers after showHome, because home queues its own greeting and its
        own focus move, and neither belongs to a state whose point is the screen
        laid over it. */
+    /* The fuelling section reads in the order a driver meets it: the map, a
+       station opened on it, the one they are not allowed, the check, the code,
+       and home while the fill is still open. A menu that lists screens in the
+       order they were built makes a reviewer reconstruct the journey. */
+    'fuel-station-open': { group: 'fuelling', label: 'A station, opened',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         showStations(false); chooseStation('fourways'); } },
+    'fuel-station-refused': { group: 'fuelling', label: 'A station, not on the list',
+      run: function () { reset('returning-driver', true, 4); chooseVehicle(0);
+                         showStations(false); chooseStation('randburg'); } },
     'fuel-stations':   { group: 'fuelling', label: 'Choosing a station',
       run: function () { reset('returning-driver', true, 4); S.activeVehicle = 0;
                          showHome(); showStations(false); } },
@@ -4675,8 +4685,11 @@ body {
       ],
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
+        ['fuel-station-open', 'A station, opened'],
+        ['fuel-station-refused', 'A station, not on the list'],
         ['fuel-stations-searched', 'Station search, no match'],
-        ['fuel-check', 'The five checks'],
+        ['fuel-check', 'Check before the code'],
+        ['fuel-check-blocked', 'Check, station refused'],
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the code'],
         ['fuel-live', 'Home, fill still open'],
