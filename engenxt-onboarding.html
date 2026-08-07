@@ -2355,6 +2355,26 @@ body {
   max-width: 28ch;
 }
 
+/* m-fallback. The number for a till that cannot read the square.
+
+   Quiet, because reaching for it means the fast path has already failed, and a
+   number given equal weight to the square invites an attendant to type when
+   they could scan. Mono and grouped in threes so it can be read out across a
+   counter without losing a digit. */
+.m-fallback {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  margin-top: calc(var(--sp-2) * -1);
+}
+.m-fallback__label {
+  font-size: var(--text-nano); font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+.m-fallback__value {
+  font-family: var(--font-mono); font-size: var(--text-body); font-weight: 700;
+  letter-spacing: 2px; font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
 /* a-qr. The square a till reads.
 
    Pure black on pure white with its own quiet zone, and never tinted with the
@@ -2366,7 +2386,16 @@ body {
    Squared by aspect-ratio rather than a fixed height, so the width cap is the
    only number that has to change on a narrow phone. */
 .a-qr {
-  width: 100%; max-width: 260px; aspect-ratio: 1;
+  /* Sized by the height it is given, not by a cap per phone width.
+
+     It used to be a fixed max-width with a narrow override, and every time
+     something above or below it changed size, a different width overflowed and
+     earned another override. Height is the scarce thing on this screen, so
+     height is what it is measured in: it asks for 260, shrinks when the screen
+     cannot spare it, and aspect-ratio keeps it square on the way down. */
+  flex: 0 1 auto; min-height: 0;
+  height: 260px;
+  width: auto; max-width: 100%; aspect-ratio: 1;
   padding: var(--sp-2);
   border-radius: var(--radius-card);
   background: #FFFFFF;
@@ -2376,7 +2405,10 @@ body {
 /* A media query cannot see the device frame, because the frame is a div inside
    a desktop page. The attribute is how every other narrow-phone rule in this
    file is written. */
-.t-device-frame[data-width="320"] .a-qr { max-width: 208px; }
+/* The number under the square costs height, and the narrowest phone has least
+   of it. The rhythm gives some back; the square gives the rest by shrinking
+   itself, so there is no per width size to keep in step. */
+.t-device-frame[data-width="320"] .o-fuel__scroll { gap: var(--sp-3); }
 
 /* The code sits high where a held-out phone is read, and what it is good for
    sits low where it is looked up. The gap between them is flexible, so a tall
@@ -2910,7 +2942,7 @@ body {
             <span class="a-icon-wrap" data-tone="warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg></span>
             <span class="m-list-row__body">
               <span class="m-list-row__title">Rewards</span>
-              <span class="m-list-row__sub">Points and data</span>
+              <span class="m-list-row__sub" id="homeRewardSub">Points and data</span>
             </span>
             <span class="m-list-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
@@ -3198,6 +3230,19 @@ body {
                depends on the fill it belongs to. -->
           <div class="a-qr" id="fuelQr" role="img" aria-label=""></div>
 
+          <!-- The way through when the till cannot read the screen. A cracked
+               phone, a dirty lens or hard sun on a forecourt should not end a
+               fill with a queue building behind the driver.
+
+               It is the backup and it is drawn like one. The square is still the
+               way this is meant to work: this is smaller, quieter, and only
+               explains itself to somebody who has already tried and failed. -->
+          <p class="m-fallback">
+            <span class="m-fallback__label">Cannot scan it? Enter this number</span>
+            <span class="m-fallback__value" id="fuelRefNum" aria-hidden="true"></span>
+            <span class="u-visually-hidden" id="fuelRefSpoken"></span>
+          </p>
+
           <!-- Where the QR works, directly under it, because it is what the
                authorisation is scoped to rather than one fact among four. -->
           <p class="m-place">
@@ -3304,7 +3349,7 @@ body {
     homeNoVehicle: $('homeNoVehicle'),
     homePicker: $('homePicker'), homePickerRow: $('homePickerRow'),
     homePickerCount: $('homePickerCount'),
-    homePickerTitle: $('homePickerTitle'),
+    homePickerTitle: $('homePickerTitle'), homeRewardSub: $('homeRewardSub'),
     homeLinked: $('homeLinked'), homeLinkedSub: $('homeLinkedSub'),
     homePanel: $('homePanel'),
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
@@ -3315,6 +3360,7 @@ body {
   el.homeFuel = $('homeFuel');
   el.homeLive = $('homeLive'); el.homeLiveSub = $('homeLiveSub');
   el.fuel = $('fuelScreen'); el.fuelTitle = $('fuelTitle'); el.fuelQr = $('fuelQr');
+  el.fuelRefNum = $('fuelRefNum'); el.fuelRefSpoken = $('fuelRefSpoken');
   el.fuelVehicle = $('fuelVehicle'); el.fuelClose = $('fuelClose'); el.fuelCancel = $('fuelCancel');
   el.fuelDone = $('fuelDone'); el.fuelConfirm = $('fuelConfirm');
   el.fuelConfirmTitle = $('fuelConfirmTitle'); el.fuelConfirmBody = $('fuelConfirmBody');
@@ -3806,6 +3852,18 @@ body {
     return on;
   }
 
+  /* The same fill, said as digits. Six of them, from the same hash the square is
+     drawn from, so the number on screen and the square above it can never
+     describe two different fills. Grouped in threes to be read out, ungrouped to
+     be spoken: a screen reader saying "four hundred and eighty two" is not the
+     number an attendant needs to hear. */
+  function fuelDigits(ref) {
+    var n = qrHash(ref) % 1000000;
+    return String(n + 1000000).slice(1);
+  }
+  function fuelDigitsShown(ref)  { return fuelDigits(ref).replace(/(\d{3})(?=\d)/g, '$1 '); }
+  function fuelDigitsSpoken(ref) { return fuelDigits(ref).split('').join(' '); }
+
   function qrArt(ref) {
     var n = QR_N, quiet = 2, span = n + quiet * 2;
     var grid = qrModules(ref), cells = [], r, c;
@@ -3946,8 +4004,21 @@ body {
     clearTimers(); hideAll();
     S.step = 'home';
     el.statusBar.removeAttribute('data-tone');
-    el.homePoints.textContent =
-      groupNum(S.userType === 'new-driver' ? rewardTotal() : 2450) + ' pts';
+    var points = S.userType === 'new-driver' ? rewardTotal() : 2450;
+    el.homePoints.textContent = groupNum(points) + ' pts';
+    /* What the number is worth, not just how big it is.
+
+       The row said "Points and data", which names two things and tells you
+       neither. A driver reading "2 450 pts" cannot price it: the rate lives on
+       the rewards screen, which is the one place they do not need it. The rate
+       is already in the model, so this only has to say it out loud.
+
+       It does not repeat the figure. The pill two rows up already carries the
+       count, and one number said twice on one screen is how a screen starts
+       looking like it does not know what it is for. */
+    el.homeRewardSub.textContent = points
+      ? 'About ' + dataLabel(points / S.ptsPerGb) + ' of data earned'
+      : 'Earn data on every fill';
     /* The card names the vehicle being driven, so it waits until one has been
        chosen. Assigned and chosen are not the same thing. */
     if (!S.vehicleLinked) { S.vehicles = []; }
@@ -4163,6 +4234,10 @@ body {
      It walks the fleet by scan count, so scanning twice returns two different
      vehicles. Anyone driving the demo can see the camera deciding rather than
      echoing. */
+  /* Set when the account screen is standing in front of something, rather than
+     starting a session. */
+  var afterAccount = null;
+
   var scanReads = 0;
   function readDisc() {
     if (!S.vehicles.length) { S.vehicles = makeFleet(3); }
@@ -4177,6 +4252,8 @@ body {
        issued. A driver whose session is good is never asked again, because
        asking somebody to prove who they are for no reason is how an app
        teaches them to tap through without reading. */
+    /* What it continues to, when it is gating something rather than starting a
+       session. Cleared as soon as it is used, so a stale one cannot fire later. */
     account: {
       mark: ICON_LOCK,
       title: 'Confirm your account',
@@ -4185,7 +4262,11 @@ body {
       body: 'Use your phone\u2019s screen lock or a verification code to continue.',
       go: 'Continue',
       alt: 'Use verification code',
-      onGo: function () { showStep('vehicle'); },
+      onGo: function () {
+        var next = afterAccount; afterAccount = null;
+        if (next) { next(); return; }
+        showStep('vehicle');
+      },
       onAlt: function () { announce('A six digit code would be sent. Not built yet.'); }
     },
 
@@ -4376,6 +4457,13 @@ body {
     el.stepMark.innerHTML = def.mark;
     el.stepTitle.textContent = def.title;
     el.stepBody.textContent = def.body;
+    /* Standing in front of a fill rather than starting a session, so it says so.
+       A lock screen with no reason attached is the one people tap through. */
+    if (key === 'account' && afterAccount) {
+      el.stepTitle.textContent = 'Confirm it is you';
+      el.stepBody.textContent =
+        'The fuel goes on your company\u2019s account, so we check who is asking.';
+    }
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
     if (def.build) { def.build(el.stepGroup); }
@@ -4967,7 +5055,11 @@ body {
     holdScreenAwake();
     var v = activeVehicle();
     /* Redrawn per fill, and identical every time for the same fill. */
-    el.fuelQr.innerHTML = qrArt(fuelRef());
+    var ref = fuelRef();
+    el.fuelQr.innerHTML = qrArt(ref);
+    el.fuelRefNum.textContent = fuelDigitsShown(ref);
+    el.fuelRefSpoken.textContent =
+      'If it cannot be scanned, the number is ' + fuelDigitsSpoken(ref) + '.';
     el.fuelQr.setAttribute('aria-label',
       'Fuel authorisation for ' + (v ? v.plate : 'this vehicle') + ' at ' +
       stationName() + '. Hold the screen up for the attendant to scan.');
@@ -5094,8 +5186,21 @@ body {
       showScan('ready');
       return;
     }
+    /* Who is holding the phone.
+
+       The scan proves where the driver is standing. It does not prove who they
+       are, and nothing else did either: an unlocked phone was four taps from a
+       live authorisation on somebody else's fuel. This screen was written for
+       exactly this, and its own note says it belongs "when a code is about to be
+       issued". It was wired to nothing.
+
+       A touch, not a typed number. The driver is in a yard, possibly in the
+       rain, possibly in gloves, and the phone already knows how to recognise
+       them. Asked once per fill, which is a second, and never during the
+       morning scan, where nothing is being authorised yet. */
     hideCheck();
-    authoriseFill();
+    afterAccount = function () { hideStep(); authoriseFill(); };
+    showStep('account');
   });
   /* Back to the map with the choice intact, because the driver is changing
      their mind about a station, not starting the search again. */
@@ -5398,6 +5503,15 @@ body {
                          S.hours = 'closed'; showCheck('bryanston'); } },
     'fuel-check-blocked': { group: 'fuelling', label: 'Check, station refused',
       run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc()); showCheck('randburg'); } },
+    'fuel-confirm-you': { group: 'fuelling', label: 'Confirm it is you',
+      /* The same screen as step 1, standing in front of a fill rather than
+         starting a session, so it says why it is here. */
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
+        afterAccount = function () { hideStep(); authoriseFill(); };
+        showStep('account');
+      } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
       run: function () {
         /* A live fill cannot exist without a vehicle, and a vehicle cannot
@@ -5676,6 +5790,7 @@ body {
         ['fuel-check-blocked', 'Check, station refused'],
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
+        ['fuel-confirm-you', 'Confirm it is you'],
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
