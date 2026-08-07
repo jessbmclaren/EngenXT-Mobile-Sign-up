@@ -1611,7 +1611,12 @@ body {
    top and the sheet's shadow at the bottom, so a station is never drawn
    somewhere a driver cannot see or tap it. */
 .o-stations__pins {
-  position: absolute; inset: 128px var(--sp-4) var(--sp-5);
+  /* Starts where the filter chips end, measured rather than guessed. The chips
+     grew from 36px to the 48dp floor, and this was still tuned to the old
+     height, so the band began 14px above them and a pin could sit under
+     "Nearest" with only the mask to hide it. The chips end at the same place at
+     every width, so one number covers all four. */
+  position: absolute; inset: 144px var(--sp-4) var(--sp-5);
   pointer-events: none;
   /* The camera. Choosing a station moves the map so the chosen pin sits clear
      of the sheet, rather than leaving it wherever it happened to be, possibly
@@ -1632,7 +1637,8 @@ body {
   -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
 }
 /* Same reason: the frame, not the window. */
-.t-device-frame[data-width="320"] .o-stations__pins { inset-block-start: 112px; }
+/* No narrow override any more: the chips are the same height at every width, so
+   the band starts in the same place at every width. */
 /* The bar floats on the map rather than sitting in a band above it, so the
    map keeps its full height on a short phone. */
 .o-stations__bar {
@@ -1728,8 +1734,12 @@ body {
 /* Closing is not an action of the same rank as choosing, so it is not drawn as
    one. It was a 56dp circle sitting beside the primary button, which read as a
    second major choice and could plausibly have meant cancel the whole request. */
+/* 32px on a close button, which is the control a driver hits when they have
+   opened the wrong station. The circle stays 32px so the sheet header does not
+   change shape, and the target grows around it. */
 .a-shut {
-  flex-shrink: 0; width: 32px; height: 32px; margin: -2px -4px 0 0;
+  flex-shrink: 0; width: var(--size-target); height: var(--size-target);
+  margin: -10px -12px 0 0;
   display: grid; place-items: center;
   border: none; border-radius: var(--radius-circle);
   background: none; color: var(--color-text-tertiary); cursor: pointer;
@@ -1781,7 +1791,8 @@ body {
    the vehicle chip, because a driver has already learned that here: filled
    primary means this one is on. */
 .a-filter-chip {
-  flex-shrink: 0; min-height: 36px; padding: 0 var(--sp-3);
+  /* 36px was below the floor this file sets for every other control. */
+  flex-shrink: 0; min-height: var(--size-target); padding: 0 var(--sp-3);
   display: inline-flex; align-items: center; gap: var(--sp-1h);
   border: 1px solid var(--glass-panel-line); border-radius: var(--radius-pill);
   background: var(--glass-bar-bg);
@@ -1807,12 +1818,21 @@ body {
 
 /* a-pin. A station on the map. It is a button, because everything a driver can
    choose from should be reachable from either half of this screen. */
+/* The pin is drawn at 28x34 because that is what reads as a pin on a map, but a
+   28px target on a moving forecourt is not one. The drawing keeps its size and
+   an invisible box grows around it to the 48dp floor, so the anchor point where
+   the pin meets the map does not move. */
 .a-pin {
   position: absolute; margin: -34px 0 0 -14px;
   width: 28px; height: 34px; padding: 0;
   border: none; background: none; cursor: pointer; pointer-events: auto;
   color: var(--color-primary);
   transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+/* The invisible half of the target. 28x34 drawn, 48x48 pressable, and the
+   anchor where the pin meets the map does not move. */
+.a-pin::after {
+  content: ''; position: absolute; inset: -7px -10px;
 }
 /* Blue is allowed, grey is not, and the one being looked at takes the brand
    red. Three meanings, three treatments, and the red appears nowhere else on
@@ -2431,7 +2451,13 @@ body {
    fuel screen behind it. White on white, on the one control a driver reaches for
    when they need to stop a fill. */
 .a-quiet-link {
-  align-self: center; padding: var(--sp-2) var(--sp-3);
+  align-self: center;
+  /* It was 31px tall. This is the control that destroys a live fuel
+     authorisation, on a forecourt, and it sat below the 48dp floor every other
+     control in this file holds to. */
+  min-height: var(--size-target);
+  padding: var(--sp-2) var(--sp-4);
+  display: inline-flex; align-items: center; justify-content: center;
   border: none; background: none; cursor: pointer;
   font-size: var(--text-caption); font-weight: 600;
   color: var(--color-text-secondary); text-decoration: underline;
@@ -4353,6 +4379,13 @@ body {
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
     if (def.build) { def.build(el.stepGroup); }
+    /* The way out. This button has been in the markup since the step screen was
+       written, hidden and wired to nothing, so every step was a closed loop: the
+       scanner's close returns here, and here had no exit. A driver who opened
+       the wrong screen, or walked to the wrong van, had to kill the app.
+
+       Every step is entered from home, so back always means home. */
+    el.stepBack.hidden = false;
     el.stepGo.textContent = def.go;
     el.stepGo.onclick = def.onGo;
     el.stepAlt.hidden = !def.alt;
@@ -4799,8 +4832,21 @@ body {
     el.check.removeAttribute('data-state');
   }
 
+  /* The station the fill is scoped to, which is not the same thing as the pin
+     currently selected on the map.
+
+     This read S.station, the map selection, and S.station is deliberately
+     cleared when the sheet closes and when the driver leaves the map. By the
+     time the QR is drawn it is always null, so this fell through to
+     STATIONS[0].name and the authorisation named "Engen Fourways" no matter
+     where the driver actually was. It looked correct only for the one driver in
+     six who happened to choose Fourways.
+
+     S.checking is what the check screen ran against and what the fill was
+     authorised for, so it is what the QR is scoped to. It is the answer. */
   function stationName() {
-    var st = STATIONS.filter(function (s) { return s.id === S.station; })[0];
+    var id = S.checking || S.station;
+    var st = STATIONS.filter(function (s) { return s.id === id; })[0];
     return st ? st.name : STATIONS[0].name;
   }
 
@@ -5102,6 +5148,7 @@ body {
   el.homeVehicleEmpty.addEventListener('click', function () {
     showStep('vehicle');
   });
+  el.stepBack.addEventListener('click', function () { hideStep(); showHome(); });
   /* The card is the way to a different vehicle. It has always had a chevron and
      the chevron always led nowhere: tapping it announced "that is not built
      yet". A vehicle is changed the only way any vehicle is set, by scanning. */
