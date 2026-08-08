@@ -1419,6 +1419,11 @@ body {
 }
 .o-scan__bar .a-icon-btn { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
 .o-scan__bar .a-icon-btn:hover { background: rgba(255,255,255,0.18); }
+/* A torch you cannot tell is on is a torch you press twice. Only aria-pressed
+   changed before, which is a state for a screen reader and nobody else. */
+.o-scan__bar .a-icon-btn[aria-pressed="true"] {
+  background: var(--color-text-on-dark); color: #0B1220;
+}
 .o-scan__spacer { flex: 1 1 auto; }
 
 .o-scan__stage { flex: 1 1 auto; display: grid; place-items: center; padding: var(--sp-4); }
@@ -2369,10 +2374,18 @@ body {
   font-size: var(--text-nano); font-weight: 600;
   color: var(--color-text-tertiary);
 }
+/* Read out loud, across a counter, in sun, off a scratched screen, by somebody
+   who is not holding the phone. It was 15px in the secondary grey, the smallest
+   painted type on the screen, which made the app's answer to "the scan failed"
+   quieter than the three figures sitting under it.
+
+   The label above still says this is the backup, and it is still under the
+   square rather than beside it, so the hierarchy survives. What changes is that
+   when a driver finally needs it, it can be read. */
 .m-fallback__value {
-  font-family: var(--font-mono); font-size: var(--text-body); font-weight: 700;
+  font-family: var(--font-mono); font-size: var(--text-title); font-weight: 800;
   letter-spacing: 2px; font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
 }
 
 /* a-qr. The square a till reads.
@@ -4049,10 +4062,20 @@ body {
        there is nothing for it to contain and an empty pane of glass is just
        a smudge on the screen. */
     el.homePanel.hidden = !S.vehicleLinked;
-    /* With nothing assigned the screen was making three claims at once and two
-       of them were false: an entitlement of sixty litres, and an invitation to
-       go and fuel, above a note saying the driver has no vehicle. */
-    el.homeLitres.hidden = !S.vehicleLinked;
+    /* Tied to the vehicle actually scanned, not to the ones a manager assigned.
+
+       "60 L per fill", ticked and in the approved green, is a claim about a
+       specific vehicle. Hung off assignment it appeared the moment a driver
+       signed up and never changed, so home looked exactly the same before a scan
+       as after one, and the only thing that did change was the card in the
+       middle, which is the part nobody reads. A driver learned the app's real
+       precondition by pressing the blue button and being sent to the scanner,
+       and on a bad day that lesson lands at the pump.
+
+       With nothing assigned at all it also made three claims at once and two
+       were false: an entitlement, and an invitation to go and fuel, above a note
+       saying there was no vehicle. */
+    el.homeLitres.hidden = !activeVehicle();
     paintFuelAction();
     el.home.hidden = false;
     if (arriving && !prefersReduced()) {
@@ -4340,8 +4363,12 @@ body {
      may be the thing that stops somebody fuelling. Every one of these states
      keeps a way through: try the other thing, or type it. */
   var SCAN_FACES = {
-    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc.' },
-    reading: { t: 'Reading the disc\u2026', b: 'Keep the phone steady.' },
+    /* The body follows the mode. Switching to the number plate and still being
+       told to point at the licence disc is the app arguing with its own chip. */
+    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc.',
+               plate: 'Point the camera at the number plate.' },
+    reading: { t: 'Reading the disc\u2026', b: 'Keep the phone steady.',
+               plateTitle: 'Reading the plate\u2026' },
     glare:   { t: 'Too much glare', b: 'Tilt the phone slightly, or move out of the sun.' },
     dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.' },
     blur:    { t: 'Too blurry', b: 'Hold the phone still and wait for it to sharpen.' },
@@ -4358,8 +4385,9 @@ body {
 
   function paintScan() {
     var face = SCAN_FACES[S.scanFace] || SCAN_FACES.ready;
-    el.scanNoteTitle.textContent = face.t;
-    el.scanNoteBody.textContent = face.b;
+    var plate = S.scanMode === 'plate';
+    el.scanNoteTitle.textContent = (plate && face.plateTitle) ? face.plateTitle : face.t;
+    el.scanNoteBody.textContent = (plate && face.plate) ? face.plate : face.b;
     /* The sweep stops once there is something to read rather than something to
        aim at. A line still travelling under an error says the app has not
        noticed the thing it is telling you about. */
@@ -4371,7 +4399,8 @@ body {
     }).join('');
     Array.prototype.forEach.call(el.scanModes.querySelectorAll('[data-mode]'), function (b2) {
       b2.addEventListener('click', function () {
-        S.scanMode = b2.dataset.mode; S.scanFace = 'ready'; paintScan();
+        if (b2.dataset.mode === S.scanMode) { return; }
+        S.scanMode = b2.dataset.mode; S.scanFace = 'ready'; paintScan(); beginRead();
       });
     });
     /* After two goes the driver gets the shutter. Somebody on their third
@@ -4434,19 +4463,27 @@ body {
       var f = SCAN_FACES[S.scanFace];
       announce(f.t + '. ' + f.b);
     });
-    /* Aiming becomes reading becomes confirmed, on its own. A prototype that
-       waits forever for a capture that cannot happen is a scanner nobody can
-       get past, which is exactly what this was. */
-    if (S.scanFace === 'ready') {
-      after(prefersReduced() ? 0 : 1700, function () {
-        if (S.step !== 'scan' || S.scanFace !== 'ready') { return; }
-        S.scanFace = 'reading'; paintScan();
-        after(prefersReduced() ? 0 : 1100, function () {
-          if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
-          scanSucceeded();
-        });
+    if (S.scanFace === 'ready') { beginRead(); }
+  }
+
+  /* Aiming becomes reading becomes confirmed, on its own.
+
+     This used to live inside showScan, which meant only showScan could start a
+     read. Everything else that puts the viewfinder back to "ready" called
+     paintScan instead, which repaints the words and restarts the sweep line and
+     starts nothing. Turn the torch on at the "too dark" screen, exactly as that
+     screen tells you to, and you got "Hold still" and a moving line that would
+     still be moving a minute later. The one instruction the app gives, at the
+     one step the whole day hangs on, led into a dead screen. */
+  function beginRead() {
+    after(prefersReduced() ? 0 : 1700, function () {
+      if (S.step !== 'scan' || S.scanFace !== 'ready') { return; }
+      S.scanFace = 'reading'; paintScan();
+      after(prefersReduced() ? 0 : 1100, function () {
+        if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
+        scanSucceeded();
       });
-    }
+    });
   }
 
   function showStep(key, arriving) {
@@ -5291,7 +5328,9 @@ body {
   el.scanTorch.addEventListener('click', function () {
     var on = el.scanTorch.getAttribute('aria-pressed') === 'true';
     el.scanTorch.setAttribute('aria-pressed', on ? 'false' : 'true');
-    if (!on && S.scanFace === 'dark') { S.scanFace = 'ready'; paintScan(); }
+    /* Lighting the bay is a fix, so the read starts again rather than the
+       screen merely agreeing that it is lighter now. */
+    if (!on && S.scanFace === 'dark') { S.scanFace = 'ready'; paintScan(); beginRead(); }
     announce(on ? 'Torch off.' : 'Torch on.');
   });
 
