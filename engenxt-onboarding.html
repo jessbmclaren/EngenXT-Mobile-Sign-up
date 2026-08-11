@@ -388,6 +388,26 @@ body {
 .a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
 .a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
 .a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
+/* a-toast. Verbatim from index.html, and it should have come across with the
+   rest of the shared atoms the first time. Only the tokens did: --shadow-toast
+   and --z-toast were sitting at the top of this file with nothing to paint,
+   which is exactly the shape of a copy that was made by eye.
+
+   What the gap cost is on the other side of the file. Five controls here
+   answer a tap by calling announce(), and announce() writes to a span that is
+   u-visually-hidden. Every one of them was silent to anybody looking at the
+   screen — including "Ask your manager", which this app promotes to the
+   primary button on the two screens where the driver has genuinely run out of
+   other options. */
+.a-toast {
+  position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
+  background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
+  font-size: var(--text-caption); font-weight: 600; line-height: 1.45;
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
+  box-shadow: var(--shadow-toast);
+  opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
+}
+.a-toast[data-state="visible"] { opacity: 1; }
 .m-status-bar {
   position: relative; z-index: var(--z-content); flex-shrink: 0;
   display: flex; align-items: center; justify-content: space-between;
@@ -1015,9 +1035,22 @@ body {
    pick from. There is no picking, and a list annotated with facts nobody acts
    on is just a taller list.
 
-   Flat, borderless and unpressable on purpose. Everything else on this screen
-   that is raised and white can be tapped, and a row of things that look tappable
-   and do nothing is worse than the selection it replaced. */
+   Flat and sunken on purpose, and that part has not changed. Everything else on
+   this screen that is raised and white can be tapped, so the flatness is what
+   says this row is not the selection it replaced.
+
+   What changed is that it is a button underneath. Flat was doing its job on the
+   eye and losing anyway, because the thing being drawn is a registration: a
+   driver reads their own plate in a row of three and puts a thumb on it, and no
+   amount of not looking like a control stops them. The tap then did nothing at
+   all — no movement, no sentence, on the one screen where the driver is trying
+   to get going.
+
+   It cannot set a vehicle and it does not. It opens the way to the scan, which
+   is the only thing tapping a plate could honestly mean, and the camera still
+   decides. So the rule is intact and the dead tap is gone. The styling stays
+   deliberately quiet: the raised white card below is still the loud way in, and
+   this is a plate that answers when pressed. */
 .a-vehicle-chip {
   flex: 0 1 auto;
   min-height: 32px;
@@ -1025,7 +1058,14 @@ body {
   display: inline-flex; align-items: center; gap: var(--sp-1h);
   border-radius: var(--radius-pill);
   background: var(--color-surface-sunken);
+  border: none; font: inherit; color: inherit; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  transition: background var(--dur-fast) ease;
 }
+/* The whole of the feedback, and it is deliberately small. A press that darkens
+   by one step is enough to say the tap landed; anything louder would be the chip
+   claiming to have chosen something. */
+.a-vehicle-chip:active { background: var(--color-border); }
 .a-vehicle-chip__art { display: flex; opacity: 0.75; }
 .a-vehicle-chip__plate {
   font-size: var(--text-caption); font-weight: 700; line-height: 1.3;
@@ -2928,9 +2968,15 @@ body {
               <span class="m-vehicle-picker__title" id="homePickerTitle">Your vehicles</span>
               <span class="m-vehicle-picker__count" id="homePickerCount"></span>
             </div>
-            <!-- A list, not a group of controls. There is no aria-checked and
-                 no tab stop in here, because there is nothing to choose: the
-                 only thing that can decide today's vehicle is the scan. -->
+            <!-- A list, and still not a group of controls. There is no
+                 aria-checked and no aria-selected in here, because there is
+                 nothing to choose: the only thing that can decide today's
+                 vehicle is the scan.
+
+                 The chips are tab stops now, which is not the same claim. Each
+                 one is a button to the scanner, not an option, and its label
+                 says so rather than reading out a bare plate that a listener
+                 would take for a choice. -->
             <ul class="m-vehicle-picker__row" id="homePickerRow" role="list"
                 aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></ul>
           </div>
@@ -3370,6 +3416,13 @@ body {
         </div>
       </section>
 
+      <!-- aria-hidden, which is the one way this differs from the copy in
+           index.html, and it differs because the announcer below already exists
+           here and carries the same sentence. Left as a role="status" it would
+           be the second live region to say it, so the phone would read every
+           one of these twice over. Two channels, one message: the toast is the
+           seeing half, the announcer is the hearing half. -->
+      <div class="a-toast" id="toast" aria-hidden="true"></div>
       <span class="u-visually-hidden" id="announcer" role="status" aria-live="polite"></span>
       <div class="d-gridOverlay" aria-hidden="true"></div>
     </div>
@@ -3431,7 +3484,8 @@ body {
     homePanel: $('homePanel'),
     homeVehicleEmpty: $('homeVehicleEmpty'), homeVehicleNote: $('homeVehicleNote'),
     homeAskManager: $('homeAskManager'), homeLitres: $('homeLitres'),
-    announcer: $('announcer'), caption: $('caption'), statusBar: $('statusBar'),
+    announcer: $('announcer'), toast: $('toast'),
+    caption: $('caption'), statusBar: $('statusBar'),
     seam: $('seam')
   };
   el.homeFuel = $('homeFuel');
@@ -3506,6 +3560,27 @@ body {
     el.announcer.textContent = '';
     setTimeout(function () { el.announcer.textContent = msg; }, 60);
   }
+  /* Verbatim from index.html. Its own timer rather than the `timers` array on
+     purpose: clearTimers() runs on every screen change, and a toast is allowed
+     to finish being read after the screen it was raised on has gone. */
+  var toastTimer = null;
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.setAttribute('data-state', 'visible');
+    clearTimeout(toastTimer);
+    /* 2.6s is index.html's dwell and it is right for the one line it raises
+       there. Two of the messages here are the message: the manager text runs to
+       about 120 characters, and a driver who has just been told the camera is
+       beaten is not a fast reader of it. Scaled rather than chosen per call, so
+       nobody has to guess a number when they add the next one. */
+    toastTimer = setTimeout(function () {
+      el.toast.removeAttribute('data-state');
+    }, Math.max(2600, msg.length * 45));
+  }
+  /* The pair, for every control whose whole answer is a sentence. Saying it in
+     one place stops the next one of these being written with only half of it,
+     which is how all five of the existing ones came to be announce-only. */
+  function reply(msg) { toast(msg); announce(msg); }
   function prefersReduced() {
     var m = root.getAttribute('data-motion');
     if (m === 'reduced') { return true; }
@@ -4011,19 +4086,44 @@ body {
       vehicleArt(v.type, 24, 'currentColor');
   }
 
-  /* One vehicle, drawn as a fact rather than a control.
+  /* One vehicle a driver is allowed to fuel, and a way to get on with it.
 
-     Nothing in this row can be pressed. Picking a name off a list proves
-     nothing about where the driver is standing, so the only thing that can
-     decide today's vehicle is a licence disc read by the camera. The list is
-     evidence of what the driver is allowed to fuel, and evidence is read
-     rather than operated. */
+     Picking a name off a list still proves nothing about where the driver is
+     standing, so this cannot and does not set today's vehicle: confirmByScan is
+     the only writer and it only runs off a completed read. What the tap does is
+     open the road to the camera, which is the one thing pressing a plate could
+     honestly mean.
+
+     It was inert, and inert was the wrong answer to the right worry. See the
+     note above .a-vehicle-chip.
+
+     The label says the whole of it out loud, because "CA 118-402, button" would
+     promise a selection this cannot make. */
   function vehicleChip(v) {
-    return '<li class="a-vehicle-chip">' +
+    return '<li>' +
+           '<button type="button" class="a-vehicle-chip" data-chip ' +
+           'aria-label="' + v.plate + '. Scan the vehicle you are standing at.">' +
            '<span class="a-vehicle-chip__art">' +
            vehicleArt(v.type, 14, 'currentColor') + '</span>' +
-           '<span class="a-vehicle-chip__plate">' + v.plate + '</span></li>';
+           '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' +
+           '</button></li>';
   }
+
+  /* Delegated off the document, because both rows that hold chips are rewritten
+     from innerHTML — home's on every paintPicker, the step's on every build —
+     and a listener bound to a chip dies with the string that made it.
+
+     Where it goes depends on where it was pressed, and both go where that
+     screen's own primary control already goes. On home that is the vehicle step,
+     the same as the dashed slot sitting directly under the row. On the step it
+     is the camera, the same as Open the camera an inch below. A chip is a
+     shortcut to the screen's own answer, never a different answer. */
+  document.addEventListener('click', function (e) {
+    var chip = e.target.closest && e.target.closest('[data-chip]');
+    if (!chip) { return; }
+    if (S.step === 'home') { showStep('vehicle'); return; }
+    S.scanTries = 0; S.unreadTries = 0; showScan('ready');
+  });
 
   /* The list answers one question: what am I allowed to fuel. That question is
      live until something is scanned and dead the moment one is, because the
@@ -4344,6 +4444,23 @@ body {
   /* The same idea for the scanner: where to go once a read lands, when the scan
      was asked for from somewhere that is not home. */
   var afterScan = null;
+  /* And the third one, which is the way back rather than the way on.
+
+     Back on a step screen means home, and that is right for every step reached
+     from home. It is wrong for the one that is not: a driver standing at a pump
+     who backs out of "Confirm it is you" had already chosen a station and run
+     the check, and home threw all of it away. Getting back meant the location
+     step, the map, the station and the check again, with somebody waiting
+     behind them, for pressing the one control on the screen that means "not
+     this, take me back".
+
+     It also closes a hole that was one route away from firing. Back never
+     cleared afterAccount, so the continuation set by the check screen outlived
+     the screen that set it. Nothing reaches the account step today without
+     setting its own, so it was never reachable — but it was a live authorisation
+     waiting on the next route that forgot. Both are cleared together now,
+     because they are two halves of one arrangement. */
+  var stepBackTo = null;
 
   var scanReads = 0;
   function readDisc() {
@@ -4374,7 +4491,7 @@ body {
         if (next) { next(); return; }
         showStep('vehicle');
       },
-      onAlt: function () { announce('A six digit code would be sent. Not built yet.'); }
+      onAlt: function () { reply('A six digit code would be sent. Not built yet.'); }
     },
 
     vehicle: {
@@ -5196,9 +5313,13 @@ body {
         title: hours ? 'Right day, right time' : 'Outside your fuelling hours',
         sub: hours ? 'Your company allows fuelling right now'
                    : 'Your company allows Monday to Saturday, 05:00 to 19:00.' },
+      /* "Pick the one you are driving" was the last line on this screen still
+         speaking the language of a list. There is nothing here to pick from and
+         has not been for some time: the button below it says Scan your vehicle
+         and the why-line above says the same. */
       { ok: !!v,   title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
         sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
-               : 'Pick the one you are driving' },
+               : 'Scan the one you are driving' },
       { ok: true,  title: '60 L approved for this fill',
         sub: 'Your company limit for this vehicle' }
     ];
@@ -5493,10 +5614,37 @@ body {
   });
   /* Escape closes it the way the close button does, because a screen laid over
      another one has to be dismissible from the keyboard. It never cancels: a
-     stray key press must not call off a fill somebody is standing at. */
+     stray key press must not call off a fill somebody is standing at.
+
+     It covered two of the five. The QR and the check answered, and the scanner,
+     the map and the three step screens did not — so a reviewer who pressed
+     Escape at a full-screen camera got nothing, on a prototype that is driven
+     from a laptop far more often than from a phone. The precedent was set by
+     the two that worked; the other three were just missing.
+
+     Each one presses its own control rather than repeating what that control
+     does. There is exactly one way out of each screen and this is not a second
+     one, which also means none of these can drift out of step with the buttons
+     the way a copied line would.
+
+     Order matters: the layer nearest the driver goes first. A confirmation over
+     the QR takes the key before the QR does, and an open station sheet takes it
+     before the map, because dismissing the thing underneath the thing you are
+     looking at is the version of this that feels broken. */
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && S.step === 'fuel') { hideFuel(); }
-    if (e.key === 'Escape' && S.step === 'check') { hideCheck(); showStations(false, true); }
+    if (e.key !== 'Escape') { return; }
+    if (S.step === 'fuel') {
+      /* Keep it, never Cancel it. Escape must not be able to void a code. */
+      if (!el.fuelConfirm.hidden) { el.fuelKeep.click(); return; }
+      hideFuel(); return;
+    }
+    if (S.step === 'check') { hideCheck(); showStations(false, true); return; }
+    if (S.step === 'scan') { el.scanClose.click(); return; }
+    if (S.step === 'stations') {
+      if (!el.stationDetail.hidden) { shutPeek(); return; }
+      el.stationsBack.click(); return;
+    }
+    if (S.step.indexOf('step:') === 0) { el.stepBack.click(); }
   });
 
   /* Continue is the one place this seam is crossed in the flow, so it is the
@@ -5561,6 +5709,9 @@ body {
        morning scan, where nothing is being authorised yet. */
     hideCheck();
     afterAccount = function () { hideStep(); authoriseFill(); };
+    /* Back to the check, not to home. The station and the five answers are
+       still true; the driver has only declined to prove who they are yet. */
+    stepBackTo = function () { showCheck(S.checking, true); };
     showStep('account');
   });
   /* Back to the map with the choice intact, because the driver is changing
@@ -5599,7 +5750,7 @@ body {
      reached yet, and it is not this app's job. Saying so beats a control that
      looks live and is not. */
   el.stationNav.addEventListener('click', function () {
-    announce('Directions are not built yet.');
+    reply('Directions are not built yet.');
   });
 
   /* The slot opens the confirmation screen rather than nudging focus at a chip.
@@ -5614,7 +5765,13 @@ body {
   el.homeVehicleEmpty.addEventListener('click', function () {
     showStep('vehicle');
   });
-  el.stepBack.addEventListener('click', function () { hideStep(); showHome(); });
+  el.stepBack.addEventListener('click', function () {
+    var back = stepBackTo;
+    stepBackTo = null; afterAccount = null;
+    hideStep();
+    if (back) { back(); return; }
+    showHome();
+  });
   /* The card is the way to a different vehicle. It has always had a chevron and
      the chevron always led nowhere: tapping it announced "that is not built
      yet". A vehicle is changed the only way any vehicle is set, by scanning. */
@@ -5680,7 +5837,7 @@ body {
   /* The one thing left when a camera cannot be made to work. It does not set a
      vehicle, because nothing but a scan does. */
   el.scanType.addEventListener('click', function () {
-    announce('Message ready: ' + ASK_MANAGER_SCAN);
+    reply('Message ready: ' + ASK_MANAGER_SCAN);
   });
   /* The torch is the answer to the dark state, so it says so when it fixes it. */
   el.scanTorch.addEventListener('click', function () {
@@ -5719,7 +5876,7 @@ body {
   });
 
   el.homeAskManager.addEventListener('click', function () {
-    announce('Message ready: ' + ASK_MANAGER);
+    reply('Message ready: ' + ASK_MANAGER);
   });
   /* Nothing beyond this screen is built yet. Saying so out loud beats a
      control that looks live and does nothing when it is tapped.
@@ -5736,7 +5893,7 @@ body {
         if (b.getAttribute('aria-current') === 'page') { return; }
         var name = b.getAttribute('data-unbuilt') ||
                    b.textContent.trim().split('\n')[0] || 'That';
-        announce(name + ' is not built yet.');
+        reply(name + ' is not built yet.');
       });
     });
 
@@ -5785,7 +5942,7 @@ body {
     scanReads = 0;
     /* And both ways back out of it, so a state picked from the menu cannot
        inherit an errand left over from the one before. */
-    afterScan = null; afterAccount = null;
+    afterScan = null; afterAccount = null; stepBackTo = null;
     S.unreadTries = 0;
     /* The lamp too, and for exactly the reason the reader above is reset. It
        lives in the button rather than in S, so nothing here was clearing it,
@@ -5969,6 +6126,7 @@ body {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
         S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
         afterAccount = function () { hideStep(); authoriseFill(); };
+        stepBackTo = function () { showCheck(S.checking, true); };
         showStep('account');
       } },
     'fuel-requesting': { group: 'fuelling', label: 'Authorising',
