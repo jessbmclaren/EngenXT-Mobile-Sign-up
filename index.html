@@ -1081,6 +1081,15 @@ button { background: none; border: none; color: inherit; }
    focus too, so the keyboard sees the same thing the mouse does. */
 .d-stateNav {
   display: grid; grid-template-columns: 216px 264px;
+  /* The row that makes both panes scrollable, and without it neither ever did.
+     Both are written to scroll — min-height: 0 and overflow-y: auto on each —
+     but with no row track the implicit row is max-content, so each pane was
+     exactly as tall as its own list, never overflowed itself, and had nothing
+     for its overflow-y to act on. max-height and overflow: hidden up here then
+     cut the difference off, putting the tail of a long section below the fold
+     with no scrollbar to reach it. minmax(0, 1fr) bounds the row to this box
+     and gives the panes the definite height their own rules were waiting on. */
+  grid-template-rows: minmax(0, 1fr);
   align-self: flex-start; flex-shrink: 0;
   position: sticky; top: var(--sp-8);
   max-height: calc(100vh - var(--sp-8) * 2);
@@ -3492,7 +3501,14 @@ button { background: none; border: none; color: inherit; }
 
   var FLOWS = [
     {
-      file: 'engenxt-signup.html',
+      /* index.html, because that is the file's name. It said
+         engenxt-signup.html, which exists neither in the repo nor on the
+         deployed site, and the menu writes this straight into the href of every
+         away link — so every sign-up state reached from the other file landed on
+         ERR_FILE_NOT_FOUND. isThisFlow below used to carry a special case
+         pretending the two names were the same, which fixed reading the name and
+         never writing it. Both are gone. */
+      file: 'index.html',
       label: 'Home and sign-up',
       sections: [
         ['navHome',    'Home',    4],
@@ -3516,12 +3532,12 @@ button { background: none; border: none; color: inherit; }
 
   /* Which file this is, so the menu knows which sections it can open itself
      and which ones it has to travel to. */
+  /* A directory URL, which is how the deployed site is reached, has nothing
+     after the last slash and the server hands back index.html. So does opening
+     the folder locally. That is what the fallback is for, and with the flow now
+     carrying its real name a plain comparison is the whole test. */
   var THIS_FILE = location.pathname.split('/').pop() || 'index.html';
-  function isThisFlow(flow) {
-    return flow.file === THIS_FILE ||
-           (THIS_FILE === 'index.html' && flow.file === 'engenxt-signup.html') ||
-           (THIS_FILE === '' && flow.file === 'engenxt-signup.html');
-  }
+  function isThisFlow(flow) { return flow.file === THIS_FILE; }
 
   var SECTION_LABELS = {
     navHome: 'Home', navNumber: 'Number', navCode: 'Code',
@@ -3544,16 +3560,21 @@ button { background: none; border: none; color: inherit; }
       ],
       'flow1': [
         ['flow1-account', '1 \u00b7 Confirm your account'],
-        ['flow1-vehicle', '2 \u00b7 Scan the licence disc'],
+        ['flow1-vehicle', '2 \u00b7 Scan the disc or the plate'],
         ['flow1-vehicle-one', '2 \u00b7 One vehicle, still scanned'],
         ['flow1-scan-ready', '2 \u00b7 Scanning'],
-        ['flow1-scan-reading', '2 \u00b7 Scanning, reading it'],
+        ['flow1-scan-reading', '2 \u00b7 Scan, reading the disc'],
+        ['flow1-scan-plate', '2 \u00b7 Scan, reading the plate'],
         ['flow1-scan-glare', '2 \u00b7 Scan, too much glare'],
         ['flow1-scan-dark', '2 \u00b7 Scan, too dark'],
         ['flow1-scan-blur', '2 \u00b7 Scan, too blurry'],
+        ['flow1-scan-smear', '2 \u00b7 Scan, something on the lens'],
+        ['flow1-scan-dark-lit', '2 \u00b7 Scan, dark with the torch on'],
+        ['flow1-scan-glare-torch', '2 \u00b7 Scan, glare off the torch'],
         ['flow1-scan-nocam', '2 \u00b7 Scan, camera unavailable'],
         ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
+        ['flow1-scan-spent', '2 \u00b7 Scan, this vehicle will not read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
         ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
@@ -3587,7 +3608,7 @@ button { background: none; border: none; color: inherit; }
         ['home-thousand-vehicles', 'A thousand vehicles']
       ]
     },
-    'engenxt-signup.html': {
+    'index.html': {
       navHome:    [['home/default','Ready'],['home/offline','No internet'],
                    ['home/maintenance','Unavailable'],['home/update','Update required']],
       navNumber:  [['number/empty','Empty'],['number/partial','Part typed'],['number/valid','Valid'],

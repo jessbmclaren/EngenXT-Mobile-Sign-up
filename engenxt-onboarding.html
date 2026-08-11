@@ -26,7 +26,7 @@
                                          Tooling. Never ships.
 
    THE TOKENS AND THE SHARED ATOMS BELOW ARE A COPY of the ones in
-   engenxt-signup.html, taken verbatim so the two flows cannot disagree about
+   index.html, taken verbatim so the two flows cannot disagree about
    a colour or a step of the spacing scale. That copy is the known debt in
    this pair of files: the moment a third flow appears, they belong in one
    stylesheet both files link, which works over file:// as long as it is a
@@ -1392,12 +1392,22 @@ body {
   font-size: var(--text-callout); font-weight: 600; color: var(--color-primary);
 }
 
-/* o-scan. Reading a licence disc or a number plate.
+/* o-scan. Reading a licence disc or a number plate, whichever it is shown.
 
    Dark, because a camera view is dark and the controls have to sit on whatever
    the lens is pointed at. The frame is the only bright thing: it says where to
    aim without a sentence, which matters when the driver is holding a phone at
-   arm's length beside a van. */
+   arm's length beside a van.
+
+   One frame for both, and it is a compromise rather than a solution. A disc is
+   a circle behind glass at about 1:1 and a plate is roughly 4.6:1, so 3:2 is
+   snug on neither. Drawn tight to either one it would be wrong half the time
+   and would tell the driver they had brought the wrong thing to a scanner that
+   accepts both, which is the worse failure. Corners rather than a closed box
+   for the same reason: they mark the middle of the picture, where both belong,
+   without claiming to be a crop either one has to fill. If it earns a second
+   look, the honest fix is a frame that changes shape the moment the reader
+   commits, not a tighter guess before it has seen anything. */
 .o-scan {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
@@ -1473,18 +1483,10 @@ body {
   display: block; margin-top: 2px;
   font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
 }
-.o-scan__modes { display: flex; justify-content: center; gap: var(--sp-2); padding: 0 var(--sp-4) var(--sp-3); }
-.o-scan__modes .a-filter-chip {
-  /* 48, not the 36 a filter chip carries elsewhere. This one is pressed at
-     arm's length, one-handed, beside a van, and often in the dark. */
-  min-height: 48px; padding-inline: var(--sp-4);
-  background: var(--color-on-dark-fill); border-color: var(--color-on-dark-faint);
-  color: var(--color-text-on-dark); backdrop-filter: none; -webkit-backdrop-filter: none;
-}
-.o-scan__modes .a-filter-chip[aria-pressed="true"] {
-  background: var(--color-text-on-dark); color: var(--color-primary-dark);
-  border-color: var(--color-text-on-dark);
-}
+/* There was a pair of chips here, Licence disc and Number plate, sized up to 48
+   for a gloved hand at arm's length. They are gone, and the styles with them.
+   The reader decides what it is looking at, so there is nothing left to press.
+   See the note above o-scan in the markup. */
 .o-scan__actions {
   flex-shrink: 0; display: flex; flex-direction: column; gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4) var(--sp-5);
@@ -2556,6 +2558,20 @@ body {
    focus too, so the keyboard sees the same thing the mouse does. */
 .d-stateNav {
   display: grid; grid-template-columns: 216px 264px;
+  /* The row that makes both panes scrollable, and without it neither ever did.
+     Both panes are written to scroll — min-height: 0 and overflow-y: auto, on
+     purpose, on each. Neither could. With no row track declared the implicit
+     row is auto, which is max-content, so the panes were always exactly as tall
+     as their own lists: taller than the menu, never overflowing themselves, so
+     their overflow-y had nothing to act on. max-height and overflow: hidden up
+     here then cut the difference off. On a 900px window that clipped the last
+     state by five pixels and looked like a rounding error. On a 600px laptop it
+     buried five of them below the fold with no scrollbar to reach them, on the
+     one control whose entire job is reaching states.
+     minmax(0, 1fr) bounds the row to this box, which finally gives the panes a
+     definite height to overflow, which is the condition their own rules were
+     waiting on. The list can now grow as long as it needs to. */
+  grid-template-rows: minmax(0, 1fr);
   align-self: flex-start; flex-shrink: 0;
   position: sticky; top: var(--sp-8);
   max-height: calc(100vh - var(--sp-8) * 2);
@@ -2919,13 +2935,38 @@ body {
                 aria-labelledby="homePickerTitle" aria-describedby="homePickerCount"></ul>
           </div>
 
-          <button class="m-vehicle-card" type="button" id="homeVehicle" data-unbuilt="Vehicle details">
+          <!-- data-unbuilt is gone from here. It matched nothing in the sweep at
+               the foot of the file, which only claims tiles, tabs, the bell and
+               the avatar, so it never announced anything - but it was the
+               chevron's old meaning, "this opens vehicle details", lying in the
+               markup of the one control the wrong-read escape now depends on.
+               This card opens the scanner. -->
+          <button class="m-vehicle-card" type="button" id="homeVehicle">
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg></span>
             <span class="m-vehicle-card__body">
               <span class="m-vehicle-card__label" id="homeVehicleLabel">Driving today</span>
               <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
               <span class="m-vehicle-card__model" id="homeVehicleModel">Ford Transit Custom 2.0TDCi</span>
-              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
+              <!-- The way out of a wrong read, and the whole of it.
+
+                   Handing the disc-or-plate decision to the camera created one
+                   failure the driver cannot be shown as a state, because the app
+                   cannot know it happened: a confident read of the van parked in
+                   front of theirs, which is on their list, and which every check
+                   in the flow then passes. Nothing is wrong from where the app is
+                   standing. Only the driver can see it, and only off this plate.
+
+                   So the fix is a sentence rather than a screen. Not a "is this
+                   right?" gate, which would tax every correct scan every day to
+                   catch a rare wrong one, at the one step between a driver and
+                   fuel, and would teach them to tap past the one string that must
+                   not be skimmed. The card is already the button, already opens
+                   the scanner, and already tells a screen reader so - its label
+                   ends "Scan a different vehicle." A blind driver was told the way
+                   out and a sighted one was not. That is the inversion this
+                   closes, and the stake and the exit belong in one sentence
+                   because they are one thought. -->
+              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle. Scan again if it is the wrong one.</span>
             </span>
             <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
@@ -2937,7 +2978,7 @@ body {
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg></span>
             <span class="m-vehicle-card__body">
               <span class="m-vehicle-card__plate">Scan your vehicle</span>
-              <span class="m-vehicle-card__note">Read the licence disc to start fuelling today.</span>
+              <span class="m-vehicle-card__note">Read the disc or the plate to start fuelling today.</span>
             </span>
           </button>
 
@@ -3026,7 +3067,19 @@ body {
         </div>
       </section>
 
-      <!-- Reading the disc or the plate. -->
+      <!-- Reading the disc or the plate, and working out which by itself.
+
+           The driver used to say which first, on a pair of chips. It was a
+           question the app could answer and the driver could not: they are
+           standing at a vehicle holding both, and which one reads faster
+           depends on the glare, the angle and how faded the disc is, none of
+           which anyone can judge before pointing the camera. Getting it wrong
+           cost a failed read, a chip press and another read, at the one step
+           the rest of the day hangs on.
+
+           So the camera takes whatever is put in front of it and names what it
+           found. Aiming at the other one is now just moving the phone, which is
+           what the driver was going to do anyway. -->
       <section class="o-scan" id="scanScreen" aria-labelledby="scanNoteTitle" hidden>
         <div class="o-scan__view" aria-hidden="true"></div>
         <div class="o-scan__bar">
@@ -3046,25 +3099,35 @@ body {
             </div>
             <p class="m-scan-note" id="scanNote" role="status">
               <span class="m-scan-note__title" id="scanNoteTitle" tabindex="-1">Hold still</span>
-              <span class="m-scan-note__body" id="scanNoteBody">Point the camera at the licence disc.</span>
+              <span class="m-scan-note__body" id="scanNoteBody">Point the camera at the licence disc or the number plate.</span>
             </p>
           </div>
         </div>
-
-        <div class="o-scan__modes" id="scanModes" role="group" aria-label="What to scan"></div>
 
         <!-- The driver's own shutter, revealed only once the camera has failed
              to take the read on its own. Filled by paintScan. -->
         <button class="a-shutter" type="button" id="scanShutter" hidden>
           <span class="a-shutter__ring" aria-hidden="true"></span>
-          <span class="a-shutter__label" id="scanShutterLabel">Line the disc up and press when it looks clear</span>
+          <span class="a-shutter__label" id="scanShutterLabel">Line up the disc or the plate and press when it looks clear</span>
         </button>
 
-        <!-- One button. "Try number plate instead" used to sit here doing
-             exactly what the two chips above it do, which is switch what is
-             being read, and at 320dp the pair of them pushed the last resort
-             clean off the bottom of the screen. -->
+        <!-- "Try number plate instead" used to sit here, and the two chips that
+             replaced it are gone as well: both were the driver telling the app
+             something the camera can see for itself.
+
+             Try again is what is left in their place, and it is not a tidying-up
+             of the chips but a hole they were covering. Switching chip called
+             beginRead, so the way out of "too much glare" was to press Number
+             plate and press Licence disc back. That is not a retry, it is a
+             retry disguised as a mode switch, and it only worked because the
+             driver happened to have two buttons that restarted the camera as a
+             side effect. Take the chips away and glare, blur and a failed read
+             are dead screens: the sweep has stopped, the shutter needs two
+             failures before it appears, and the torch only restarts the dark
+             one. Every one of those screens tells the driver to do something
+             with the camera, so the camera has to be willing to look again. -->
         <div class="o-scan__actions">
+          <button class="a-btn a-btn--primary" type="button" id="scanRetry" hidden>Try again</button>
           <button class="a-btn a-btn--outline" type="button" id="scanType">Ask your manager</button>
         </div>
       </section>
@@ -3183,7 +3246,7 @@ body {
 
           <p class="m-verdict" id="checkVerdict">
             <span class="m-verdict__mark" id="checkMark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
-            <span id="checkVerdictText">Your company pays here</span>
+            <span id="checkVerdictText">You can fuel here</span>
           </p>
 
           <h1 class="o-check__station" id="checkStation" tabindex="-1">Engen Bryanston</h1>
@@ -3347,9 +3410,10 @@ body {
     checkBack: $('checkBack'),
     checkList: $('checkList'),
     scan: $('scanScreen'), scanNoteTitle: $('scanNoteTitle'), scanNoteBody: $('scanNoteBody'),
-    scanModes: $('scanModes'), scanLine: $('scanLine'),
+    scanLine: $('scanLine'),
     scanShutter: $('scanShutter'), scanShutterLabel: $('scanShutterLabel'),
-    scanType: $('scanType'), scanClose: $('scanClose'), scanTorch: $('scanTorch'),
+    scanType: $('scanType'), scanRetry: $('scanRetry'),
+    scanClose: $('scanClose'), scanTorch: $('scanTorch'),
     step: $('stepScreen'), stepMark: $('stepMark'), stepTitle: $('stepTitle'),
     stepBody: $('stepBody'), stepGroup: $('stepGroup'), stepGo: $('stepGo'),
     stepAlt: $('stepAlt'), stepThird: $('stepThird'), stepBack: $('stepBack'),
@@ -3416,7 +3480,17 @@ body {
     /* What the company's side says. Front of house only: nothing here reads
        a real account or a real clock. */
     account: 'ok', hours: 'open', located: true,
-    scanMode: 'disc', scanFace: 'ready', scanTries: 0,
+    /* scanRead is what the camera decided it is looking at, not what the driver
+       asked for. Null until it has decided, which is why the ready state names
+       both and every state after it names one. */
+    /* Two tallies. scanTries counts every failed face and decides when the
+       driver gets the shutter. unreadTries counts only reads that came back
+       unreadable, and decides when the app stops telling them to try the other
+       one. Weather must not be able to declare a vehicle unscannable. */
+    /* The registration the camera came back with, held only so a refusal can
+       show its working. Never used to set a vehicle: confirmByScan is still the
+       one writer and still only runs off a completed read. */
+    scanRead: null, scanPlate: null, scanFace: 'ready', scanTries: 0, unreadTries: 0,
     /* Confirmed for today. A driver swaps vans between days far more often than
        within one, so the question is asked once each day and not again. Asking
        every time they press the button would train them to tap past it, which
@@ -4094,7 +4168,7 @@ body {
        out as "Good morning,, David". */
     var greeting = 'Home. ' + el.homeGreeting.textContent.replace(/,\s*$/, '') + ', David.';
     if (S.vehicleLinked && S.activeVehicle === NONE && S.vehicles.length > 1) {
-      greeting += ' Scan the licence disc on the vehicle you are driving to' +
+      greeting += ' Scan the disc or the plate on the vehicle you are driving to' +
                   ' start fuelling today.';
     }
     /* A driver arriving from a scan is arriving with news, and the news beats
@@ -4112,7 +4186,14 @@ body {
        list, entitlement and balance have never been fetched. Someone opening the
        app again has all of it already, so faking a wait for them would be a lie
        about how fast the app is. */
-    if (S.userType === 'new-driver' && S.step === 'home') { loadHomeData(); }
+    /* Never on the arrival from a scan. The fetch is a sign-up thing, and this
+       gate let it run again on the way back from the camera: it announces "Your
+       vehicles are ready." at 620ms, 120ms after the greeting reaches the live
+       region, so "Vehicle linked. CA 118-402." was cleared off the driver's
+       phone by stale news about a fetch that had already happened. The vehicle
+       card is in the skeleton set too, so the one card carrying the plate they
+       are waiting to check was a shimmer for the whole announcement. */
+    if (S.userType === 'new-driver' && S.step === 'home' && !linked) { loadHomeData(); }
   }
 
   /* The blocks that depend on a fetch, and nothing else. The greeting, the fuel
@@ -4260,6 +4341,9 @@ body {
   /* Set when the account screen is standing in front of something, rather than
      starting a session. */
   var afterAccount = null;
+  /* The same idea for the scanner: where to go once a read lands, when the scan
+     was asked for from somewhere that is not home. */
+  var afterScan = null;
 
   var scanReads = 0;
   function readDisc() {
@@ -4295,11 +4379,11 @@ body {
 
     vehicle: {
       mark: ICON_VAN,
-      title: 'Scan the licence disc',
+      title: 'Scan the disc or the plate',
       /* Scanning is the confirmation, not one route to it.
 
          Choosing from a list proves nothing: a driver can pick any vehicle on
-         it from anywhere. Reading the disc on the vehicle is the only part of
+         it from anywhere. Reading something off the vehicle is the only part of
          this that shows they are standing at it, which is the whole reason the
          step exists. The list stays, because a driver still needs to see what
          they are allowed, but it is reference and not the answer.
@@ -4308,11 +4392,17 @@ body {
          disc". Three of the same sentence is not emphasis, it is one sentence
          and two wasted lines, so the body now says where to look instead.
 
+         The heading names both because the driver decides which by walking, and
+         a heading that names only the disc sends them to the windscreen of a van
+         whose disc is bleached white. Naming both here is also the only warning
+         they get before the camera opens, and the viewfinder is a bad place to
+         learn what your options were.
+
          Typing a registration has gone with the choosing. It was a way to set
          today's vehicle without reading anything on the vehicle, which is the
          same hole as the list, just slower. What is left when a camera really
          cannot be made to work is the manager, and the scanner says so. */
-      body: 'It is in the corner of the windscreen. Reading it links the vehicle to you for today.',
+      body: 'The disc is in the corner of the windscreen. Either one links the vehicle to you for today.',
       go: 'Open the camera',
       /* The same pills as home, for the same reason and out of the same
          function. These used to be full width raised cards carrying the make
@@ -4363,46 +4453,142 @@ body {
      may be the thing that stops somebody fuelling. Every one of these states
      keeps a way through: try the other thing, or type it. */
   var SCAN_FACES = {
-    /* The body follows the mode. Switching to the number plate and still being
-       told to point at the licence disc is the app arguing with its own chip. */
-    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc.',
-               plate: 'Point the camera at the number plate.' },
-    reading: { t: 'Reading the disc\u2026', b: 'Keep the phone steady.',
-               plateTitle: 'Reading the plate\u2026' },
-    glare:   { t: 'Too much glare', b: 'Tilt the phone slightly, or move out of the sun.' },
-    dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.' },
+    /* Ready is the one state that names both, because it is the only one where
+       nothing has been decided yet. Naming one of them here would be the app
+       asking for the disc, which is the instruction it just stopped giving. */
+    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc or the number plate.' },
+    /* And this is the state that reports the decision back. A read that says
+       only "Reading\u2026" leaves the driver holding a phone at a windscreen with
+       no idea whether it has caught anything, which is exactly when they move
+       it. Naming what it found is the difference between waiting and guessing,
+       and it is also the driver's chance to catch it reading the van next to
+       theirs. Filled by paintScan from S.scanRead. */
+    reading: { t: 'Reading\u2026', b: 'Keep the phone steady.',
+               disc: 'Reading the licence disc\u2026', plate: 'Reading the number plate\u2026' },
+    /* Two bodies, because the torch changes what is true here rather than only
+       what is convenient. A number plate is retroreflective by law, and a phone
+       torch sits about a centimetre from the lens, which is the worst geometry
+       there is: the light goes out and comes straight back. So the app can
+       manufacture this state itself by promoting the torch on the dark screen,
+       and then advise a driver to move out of a sun that set an hour ago.
+       "Straight on" rather than "the sun" for the same reason — sodium canopy
+       light and another vehicle's headlights do this at 19:00. */
+    glare:   { t: 'Too much glare', b: 'Tilt the phone slightly, or move so the light is not straight on.',
+               lit: 'The torch is bouncing back off the glass. Turn it off, or tilt the phone.' },
+    /* And here the second body is the app not repeating an instruction it has
+       already been given. lightIt goes false once the lamp is on, so the button
+       quietly stopped saying "Turn on the torch" while this sentence carried on
+       telling the driver to. The button and the words disagreed, and the words
+       were the ones that were wrong. */
+    dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.',
+               lit: 'The torch is on and it is still too dark. Move closer, or bring the vehicle into light.' },
     blur:    { t: 'Too blurry', b: 'Hold the phone still and wait for it to sharpen.' },
+    /* The ninth face, and the only one whose fix is on the phone rather than on
+       the vehicle or in the sky.
+
+       It is a sibling of blur and not a wider blur, because this set is
+       organised by remedy and not by symptom — which is why glare and dark are
+       two states and not one "cannot read the light". Widening blur's body to
+       mention wiping would tell every shaking hand to clean a spotless lens
+       while telling the smeared driver to hold still: two instructions, one
+       useless to each. And blur is the only face in the table that names
+       something the driver is already doing, so a filmed lens sent them to hold
+       stiller, fail, hold stiller, fail, and then handed them a shutter reading
+       "press when it looks clear" about a clarity that cannot arrive.
+
+       A fleet phone lives face-down in a diesel-and-dust pocket and is handled
+       with working hands. This is nearer the default than the edge case. */
+    smear:   { t: 'Something is on the lens', b: 'Wipe the lens on your shirt or your sleeve.' },
     nocam:   { t: 'The camera is not available', b: 'Another app may be holding it. Close that app and try again.' },
     denied:  { t: 'Camera access is off', b: 'Turn it on for EngenXT in your phone settings, then come back.' },
-    unread:  { t: 'That could not be read', b: 'Try the number plate instead, or move somewhere lighter.' },
-    offline: { t: 'No connection', b: 'We cannot check the vehicle right now. Try again in a moment.' },
-    /* The state the rule creates. Once the disc decides, a disc that belongs to
-       nothing on the driver's list has to be told about, and the only person
-       who can fix it is the one who assigns the vehicles. */
-    notyours: { t: 'That vehicle is not on your list', b: 'Ask your manager to add it, or scan one that is.' }
+    /* Still "try the other one", because that advice was always sound. What
+       changed is that it is now a sentence about where to point the phone
+       rather than a chip to go and press first. A disc bleached by ten summers
+       behind a windscreen is a real thing, and the plate on the same vehicle is
+       three paces away. */
+    /* "Try the number plate instead" is what this said, under the chips, in
+       both modes, including the one the driver had already switched to the
+       number plate. The app cannot say which to try instead here, because the
+       state it is in is not knowing what it was looking at. So it says the true
+       thing, which is that the other one is also a way in. */
+    /* And a second cut, because "try the other one" speaks as though one of
+       them is still untried. There was one threshold in the whole scanner, so
+       attempt seven was pixel-identical to attempt three: a bleached disc above
+       a muddy plate ground out the same two sentences forever, each time
+       recommending the thing the driver had already done twice. `spent` gives
+       the state somewhere to go. The retry survives the escalation and only the
+       lead changes — declaring the phone dead to somebody two paces from shade
+       is the mistake the offline state already made once. */
+    unread:  { t: 'That could not be read', b: 'Try the other one. The disc and the plate both work.',
+               spentTitle: 'This vehicle will not scan',
+               spentBody: 'Wipe the plate and go once more. If it still will not read, your manager can sort it out.' },
+    /* "In a moment" is a promise about time that a flat mast will not keep, and
+       its specific harm is the retry loop it invites: a driver who believes
+       "a moment" presses Try again eight times before concluding the app is
+       broken rather than the tower. */
+    offline: { t: 'No connection', b: 'We cannot check the vehicle without one. Try again when you have signal.' },
+    /* The state the rule creates. Once the camera decides, something that
+       belongs to nothing on the driver's list has to be told about.
+
+       It names the registration now, and that is not a detail. The body used to
+       send the driver to their manager on an accusation with no evidence
+       attached, and the manager then checks and finds the van is assigned after
+       all — because the two ways in are not equally trustworthy. A disc is a
+       barcode: it decodes exactly or not at all, so a second read returns the
+       same answer and there is genuinely nothing to argue with. A plate is OCR,
+       it always returns something, and a South African registration carries no
+       check digit, so one transposed character is a perfectly valid
+       registration belonging to a different vehicle. Same screen, same confident
+       server no, two completely different problems.
+
+       Printing what it read lets the driver tell them apart in about a second,
+       which is faster than any round trip through a person. */
+    notyours: { t: 'That vehicle is not on your list', b: 'Ask your manager to add it, or scan one that is.',
+                readAs: 'We read %s. Ask your manager to add it, or scan again if that is not your plate.' }
   };
-  var SCAN_MODES = [{ k: 'disc', l: 'Licence disc' }, { k: 'plate', l: 'Number plate' }];
+
+  /* What the camera decided it is looking at.
+
+     There is no camera in a prototype, so this stands in for the classifier: a
+     real one looks at the picture, and this one alternates, so anybody driving
+     the demo sees both halves of the rule without having to hunt for a state
+     that shows the plate. It reads scanReads before readDisc increments it, so
+     the disc read and the plate read land on different vehicles and the
+     alternation is visible rather than a caption that never changes. */
+  function senseRead() {
+    return (scanReads % 2 === 0) ? 'disc' : 'plate';
+  }
+
+  /* The lamp is held in the button rather than in S, because the button is the
+     thing that has to show it and there is exactly one of them. */
+  function torchOn() { return el.scanTorch.getAttribute('aria-pressed') === 'true'; }
 
   function paintScan() {
     var face = SCAN_FACES[S.scanFace] || SCAN_FACES.ready;
-    var plate = S.scanMode === 'plate';
-    el.scanNoteTitle.textContent = (plate && face.plateTitle) ? face.plateTitle : face.t;
-    el.scanNoteBody.textContent = (plate && face.plate) ? face.plate : face.b;
+    /* Two counts, not one, because "the camera cannot decide" and "this vehicle
+       is not going to scan" are different findings and only the second one ends
+       the attempt. unread carries its own tally: scanTries counts every failed
+       face, so one sun flare followed by two failed reads would otherwise tell a
+       driver their vehicle is unreadable on the strength of the weather. */
+    var struggling = S.scanTries >= 2;
+    var spent = S.scanFace === 'unread' && S.unreadTries >= 4;
+    /* The words follow what the camera found, never what the driver asked for,
+       because the driver is no longer asked. Three things can override the
+       title and body, and they are checked in the order they become true:
+       what was read, whether the lamp is on, and whether the driver has run
+       out of road. */
+    var title = (S.scanRead && face[S.scanRead]) ? face[S.scanRead] : face.t;
+    var body = (face.lit && torchOn()) ? face.lit : face.b;
+    if (spent) { title = face.spentTitle || title; body = face.spentBody || body; }
+    /* What it read, when it read something and the answer was no. */
+    if (face.readAs && S.scanPlate) { body = face.readAs.replace('%s', S.scanPlate); }
+    el.scanNoteTitle.textContent = title;
+    el.scanNoteBody.textContent = body;
     /* The sweep stops once there is something to read rather than something to
        aim at. A line still travelling under an error says the app has not
        noticed the thing it is telling you about. */
     var live = S.scanFace === 'ready' || S.scanFace === 'reading';
     el.scanLine.hidden = !live;
-    el.scanModes.innerHTML = SCAN_MODES.map(function (m) {
-      return '<button class="a-filter-chip" type="button" data-mode="' + m.k + '"' +
-             ' aria-pressed="' + (m.k === S.scanMode) + '">' + m.l + '</button>';
-    }).join('');
-    Array.prototype.forEach.call(el.scanModes.querySelectorAll('[data-mode]'), function (b2) {
-      b2.addEventListener('click', function () {
-        if (b2.dataset.mode === S.scanMode) { return; }
-        S.scanMode = b2.dataset.mode; S.scanFace = 'ready'; paintScan(); beginRead();
-      });
-    });
     /* After two goes the driver gets the shutter. Somebody on their third
        attempt is not going to succeed on the fourth by holding stiller, and
        they can see the disc perfectly well: it is the auto capture that cannot
@@ -4411,7 +4597,6 @@ body {
        There is no camera in a prototype, so nothing here can fail once they
        press it. That is the honest version anyway. A driver who chooses the
        moment is a driver who has judged it readable. */
-    var struggling = S.scanTries >= 2;
     /* Not while the camera is unreachable. A shutter on a screen that says the
        camera is off is a button that cannot do the thing it offers. */
     /* Two different reasons the shutter is not on screen, and they must not be
@@ -4420,17 +4605,89 @@ body {
        wait a second. Treating the second as the first promoted "Ask your
        manager" to primary for the 900ms of the read, so the button changed
        weight under the driver's eyes at the exact moment they were watching it. */
-    var noCamera = S.scanFace === 'nocam' || S.scanFace === 'denied'
-                   || S.scanFace === 'offline';
+    /* Three kinds of stuck, and they are not the same kind.
+
+       hardFail is the camera itself being out of reach, which is the only one
+       the driver cannot argue with from this screen. offline used to be filed
+       here, and it does not belong: a connection coming back is the most
+       ordinary thing on the list, and the state's own words are "try again in a
+       moment". Filing it with a refused permission promoted "Ask your manager"
+       to primary for a driver whose problem was a bar of signal in a steel
+       forecourt. */
+    /* denied is the only true dead end left. A refused permission cannot be
+       granted from inside this screen, so nothing here can offer to try again
+       and mean it.
+
+       nocam left this list. Its own body says "close that app and try again"
+       and it was hardFail, so retryable excluded it and the screen carried no
+       button to press: an instruction to try again above nothing that tries.
+       That was survivable while nocam only ever appeared before the camera
+       opened. It is not survivable now that a stalled read lands here, because
+       then it describes a camera that worked five seconds ago and will almost
+       certainly work again. The shutter still stays off it — a shutter cannot
+       capture from a camera that is not there — and the escalation is untouched,
+       so a driver who keeps landing here still gets their manager. */
+    var hardFail = S.scanFace === 'denied';
+    /* notyours is on this list and off the shutter's, because it is the one
+       state here that is not a camera problem at all. The read worked. It read a
+       vehicle, correctly, that the driver is not assigned. Offering "line it up
+       and press when it looks clear" tells somebody whose camera just did its
+       job perfectly to do it again more carefully, and the second read returns
+       the same vehicle and the same answer. What moves them on is different
+       glass, so the button says so. */
+    var notyours = S.scanFace === 'notyours';
+    var retryable = S.scanFace === 'glare' || S.scanFace === 'dark'
+                    || S.scanFace === 'blur' || S.scanFace === 'unread'
+                    || S.scanFace === 'smear' || S.scanFace === 'offline'
+                    || S.scanFace === 'nocam' || notyours;
     var busy = S.scanFace === 'reading';
-    var canShoot = struggling && !noCamera;
+    /* The shutter is off nocam and offline for the same reason in two forms:
+       neither a pressed button nor a steadier hand can produce a camera that is
+       not there or a network that is not answering. */
+    var canShoot = struggling && !hardFail && !notyours
+                   && S.scanFace !== 'offline' && S.scanFace !== 'nocam';
     el.scanShutter.hidden = !canShoot || busy;
-    el.scanShutterLabel.textContent = S.scanMode === 'disc'
-      ? 'Line the disc up and press when it looks clear'
-      : 'Line the plate up and press when it looks clear';
+    /* Both, because the shutter only appears after the camera has failed to
+       decide. Naming one of them here would be the app guessing on the driver's
+       behalf at the exact moment it has admitted it cannot tell. */
+    el.scanShutterLabel.textContent = 'Line up the disc or the plate and press when it looks clear';
+    /* One way to start another read on screen at a time, never two. Before the
+       second failure that is Try again, and after it the shutter, which is the
+       same offer with the driver picking the moment. Stacking them puts two
+       buttons on a 320dp screen that do very nearly the same thing, above a
+       third that is the last resort, and the driver has to read all three to
+       find out that the first two are the same idea. */
+    el.scanRetry.hidden = !(retryable && !canShoot) || busy;
+    /* Same button, because it does the same thing: change one condition and let
+       the camera look again. The word changes because the condition does, and a
+       button that names the wrong one is a button that sends the driver back
+       into the thing that just failed.
+
+       The dark state is the sharpest case. It says, correctly, that the fix is
+       the torch, and then the torch is a 19px icon in the top right corner:
+       the far end of the screen from the thumb of somebody holding a phone
+       one-handed beside a van, in the dark, which is the only circumstance in
+       which they will ever read this. "Try again" as the primary underneath
+       that sentence offers another go at the dark. So the primary becomes the
+       fix the screen already named, in the corner the hand is already in, and
+       the icon stays where camera torches live for anyone reaching for it. */
+    var lightIt = S.scanFace === 'dark' && !torchOn();
+    /* And the mirror of it. Glare with the lamp on is very often the lamp: a
+       plate is retroreflective and the torch is coaxial with the lens, so the
+       app can cause this state by fixing the one before it. The button that
+       created the problem is the button that undoes it. */
+    var douseIt = S.scanFace === 'glare' && torchOn();
+    el.scanRetry.dataset.act = notyours ? 'again'
+                             : lightIt ? 'torch'
+                             : douseIt ? 'torchoff' : 'again';
+    el.scanRetry.textContent = notyours ? 'Scan another vehicle'
+                             : lightIt ? 'Turn on the torch'
+                             : douseIt ? 'Turn the torch off' : 'Try again';
     /* A person is the last resort, so it only leads when there is genuinely
-       nothing left the driver can do for themselves. */
-    el.scanType.className = (struggling && noCamera)
+       nothing left the driver can do for themselves: a permission this screen
+       cannot grant, or a vehicle that has now failed to read four times over.
+       Not the network, and not a camera that will very likely come back. */
+    el.scanType.className = ((struggling && hardFail) || spent)
       ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
     el.scanType.textContent = 'Ask your manager';
   }
@@ -4442,6 +4699,12 @@ body {
     confirmByScan(readDisc());
     hideScan();
     hideStep();
+    /* Back where the scan was asked for. Set only by the check screen, and
+       cleared before it runs so it cannot fire a second time. showCheck calls
+       hideAll itself, and its own announcement already names the vehicle, so
+       the linked news is not lost by skipping home. */
+    var back = afterScan; afterScan = null;
+    if (back) { back(); return; }
     showHome(true, true);
   }
 
@@ -4450,18 +4713,40 @@ body {
     el.scan.removeAttribute('data-state');
   }
 
-  function showScan(face) {
+  /* `kind` is for the demo rail only, which needs to open on a disc read and a
+     plate read on purpose rather than on whatever the counter happens to be
+     sitting at. The app itself never passes it: in the flow the camera decides. */
+  function showScan(face, kind) {
     clearTimers(); hideAll();
     S.step = 'scan';
     S.scanFace = face || 'ready';
-    if (face && face !== 'ready' && face !== 'reading') { S.scanTries = (S.scanTries || 0) + 1; }
+    /* Whatever it caught last time is not what it is looking at now. A stale
+       "Reading the number plate" over a fresh viewfinder is the app reporting a
+       read it has not taken. Only the reading state carries one, and the rail
+       can open straight onto it, so that one senses its own. */
+    S.scanRead = S.scanFace === 'reading' ? (kind || senseRead()) : null;
+    /* A registration only exists where something was actually read. There is no
+       camera here, so this is the stand-in: a plausible plate off the same
+       generator the yard uses, on a province the demo fleet does not carry, so
+       it is visibly not one of the driver's own. */
+    S.scanPlate = S.scanFace === 'notyours' ? 'NP 402-118' : null;
+    /* notyours is not a failed try. It is a successful read of the wrong
+       vehicle, and counting it as a camera failure walked the driver towards
+       the shutter and towards "Ask your manager" leading, on the strength of a
+       camera that had just worked twice. */
+    if (face && face !== 'ready' && face !== 'reading' && face !== 'notyours') {
+      S.scanTries = (S.scanTries || 0) + 1;
+      if (face === 'unread') { S.unreadTries = (S.unreadTries || 0) + 1; }
+    }
     paintScan();
     el.scan.hidden = false;
     el.scan.setAttribute('data-state', 'visible');
     after(60, function () { el.scanNoteTitle.focus({ preventScroll: true }); });
+    /* Read off the painted screen rather than the table, so what is announced is
+       what is on it. Built from the table, the reading state said "Reading…" out
+       loud while the screen named the disc. */
     after(500, function () {
-      var f = SCAN_FACES[S.scanFace];
-      announce(f.t + '. ' + f.b);
+      announce(el.scanNoteTitle.textContent + '. ' + el.scanNoteBody.textContent);
     });
     if (S.scanFace === 'ready') { beginRead(); }
   }
@@ -4478,7 +4763,18 @@ body {
   function beginRead() {
     after(prefersReduced() ? 0 : 1700, function () {
       if (S.step !== 'scan' || S.scanFace !== 'ready') { return; }
+      /* The moment the camera decides, and the only place it does. Catching
+         something is what ends the aiming, so what it caught is settled here
+         and the screen says so on the same repaint. */
+      S.scanRead = senseRead();
       S.scanFace = 'reading'; paintScan();
+      /* Nothing is announced here on purpose. The note is a role="status", so
+         the repaint above already reads "Reading the licence disc" out loud.
+         Announcing it as well says it twice, and this is the one screen where a
+         driver is listening for exactly one sentence. showScan still announces,
+         because it un-hides the region rather than changing text inside a
+         region already on screen, and that is the case a live region does not
+         reliably catch. */
       after(prefersReduced() ? 0 : 1100, function () {
         if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
         scanSucceeded();
@@ -4771,9 +5067,25 @@ body {
     'stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" ' +
     'stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>';
 
+  /* The verdict answers the driver's question, which is "am I good to go", and
+     it has to be true of all five rows underneath it rather than the first one.
+
+     It said "Your company pays here". The logic behind it was corrected once
+     already — see the note in showCheck — so that the tick waits for every row
+     to pass, but the words were left behind naming the station check alone. A
+     driver stopped by the hours was told the company would not pay at a station
+     the company pays for perfectly well; it was Sunday. A driver who had not
+     scanned yet was told the same thing, about a station that was never the
+     problem. One of five reasons, printed as though it were the verdict.
+
+     It is also the company's sentence rather than the driver's. Nobody standing
+     at a pump is asking who settles the account. They are asking whether they
+     can fill up. The row below already says which of the five stopped them, and
+     the reason line under that says what to do, so the headline only has to be
+     unambiguous and true. */
   var CHECK = {
-    clear: { verdict: 'Your company pays here', mark: 'tick' },
-    block: { verdict: 'Your company will not pay here', mark: 'cross' }
+    clear: { verdict: 'You can fuel here', mark: 'tick' },
+    block: { verdict: 'You cannot fuel here', mark: 'cross' }
   };
 
   function stationById(id) {
@@ -4790,7 +5102,9 @@ body {
     S.checking = id;
     /* Cleared means every question passed, not just the station one. The
        screen used to read the station alone, so a driver blocked by the hours
-       or the account was told "Your company pays here" above a red row. */
+       or the account was told "Your company pays here" above a red row. The
+       words caught up with the logic later, and the verdict now speaks about
+       the fill rather than about who settles the account. See CHECK. */
     var rows = fuelChecks(st, activeVehicle());
     var failed = null;
     for (var q = 0; q < rows.length; q++) { if (!rows[q].ok) { failed = q; break; } }
@@ -5219,7 +5533,17 @@ body {
        this screen still going forwards. */
     if (!activeVehicle()) {
       hideCheck();
-      S.scanTries = 0;
+      S.scanTries = 0; S.unreadTries = 0;
+      /* Come back here afterwards, because this is the one door into the
+         scanner that opens at a pump rather than in a yard.
+
+         It sent the driver to the scanner and the scanner landed them on home,
+         which is right for the morning scan and wrong for this one: the station
+         they had already chosen survived in S.checking, but they did not, and
+         getting back meant home, the map, the station and the check again with
+         a car waiting behind them. Same shape as afterAccount, cleared as soon
+         as it is used so a stale one cannot fire later. */
+      afterScan = function () { showCheck(S.checking, true); };
       showScan('ready');
       return;
     }
@@ -5303,20 +5627,54 @@ body {
   var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
   /* A different problem and so a different message: the vehicle is assigned,
      the phone is what will not read it. */
-  var ASK_MANAGER_SCAN = 'Hi, my phone cannot scan the disc on the vehicle I am in. Please help me get fuelling today.';
-  el.scanClose.addEventListener('click', function () { showStep('vehicle'); });
+  var ASK_MANAGER_SCAN = 'Hi, my phone cannot scan the disc or the plate on the vehicle I am in. Please help me get fuelling today.';
+  /* Backing out goes back where it was opened from, not to a fixed screen.
+     Closing a scan that the check screen asked for used to land on the vehicle
+     step, which is a screen the driver at a pump never chose and has to escape
+     again. Cleared on the way through either door, so a scan abandoned here
+     cannot redirect the next one opened from home. */
+  el.scanClose.addEventListener('click', function () {
+    var back = afterScan; afterScan = null;
+    if (back) { back(); return; }
+    showStep('vehicle');
+  });
   /* The driver takes the read themselves. Same camera, same disc, same rule:
      the only difference is who decided the moment. */
   el.scanShutter.addEventListener('click', function () {
     if (S.step !== 'scan') { return; }
     clearTimers();
+    /* Same decision, same place in the sequence: the driver picked the moment,
+       the camera still says what was in the frame when they did. */
+    S.scanRead = senseRead();
     S.scanFace = 'reading';
+    /* The repaint speaks for itself, same as the auto read. See beginRead. */
     paintScan();
-    announce('Reading the ' + (S.scanMode === 'disc' ? 'disc' : 'plate') + '.');
     after(prefersReduced() ? 0 : 900, function () {
       if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
       scanSucceeded();
     });
+  });
+
+  /* The way back into a read, and the same three lines the torch already runs
+     for the dark state: put the viewfinder back to aiming, repaint, and start
+     the camera. The torch is this button with a lamp attached. */
+  el.scanRetry.addEventListener('click', function () {
+    if (S.step !== 'scan') { return; }
+    clearTimers();
+    /* When it is the torch, it is really the torch: the lamp changes and the
+       icon in the bar shows it, so the driver is never left with a lit bay and
+       a control that still reads off. One state, two ways to reach it, and it
+       runs both ways — the glare screen turns the lamp off with the same
+       button that the dark screen turns it on. */
+    var act = el.scanRetry.dataset.act;
+    if (act === 'torch' || act === 'torchoff') {
+      var want = act === 'torch';
+      el.scanTorch.setAttribute('aria-pressed', want ? 'true' : 'false');
+      announce(want ? 'Torch on.' : 'Torch off.');
+    }
+    S.scanFace = 'ready'; S.scanRead = null;
+    /* And the repaint speaks here too. See beginRead. */
+    paintScan(); beginRead();
   });
 
   /* The one thing left when a camera cannot be made to work. It does not set a
@@ -5326,11 +5684,37 @@ body {
   });
   /* The torch is the answer to the dark state, so it says so when it fixes it. */
   el.scanTorch.addEventListener('click', function () {
-    var on = el.scanTorch.getAttribute('aria-pressed') === 'true';
+    var on = torchOn();
     el.scanTorch.setAttribute('aria-pressed', on ? 'false' : 'true');
-    /* Lighting the bay is a fix, so the read starts again rather than the
-       screen merely agreeing that it is lighter now. */
-    if (!on && S.scanFace === 'dark') { S.scanFace = 'ready'; paintScan(); beginRead(); }
+    /* Changing the light is a fix, so the read starts again rather than the
+       screen merely agreeing that it is different now.
+
+       It ran one way only, and the missing half was a dead screen: a driver who
+       found the 19px icon and switched the lamp OFF on the glare screen — which
+       is exactly what that screen asks for once the torch is the thing causing
+       the glare — got "Torch off." announced and nothing else. No repaint, no
+       read, and the sweep had already stopped. The right action, correctly
+       taken, on the correct control, led nowhere. */
+    var fixed = (!on && S.scanFace === 'dark') || (on && S.scanFace === 'glare');
+    if (fixed) { S.scanFace = 'ready'; S.scanRead = null; }
+    /* The repaint is unconditional and the read is not, because those are two
+       different questions. Restarting the camera is only right when the lamp
+       was the fix. But two faces read the lamp to choose their own words, and
+       the primary button reads it to choose its own, so every press changes
+       what this screen ought to say — including the two presses that fix
+       nothing.
+
+       Those two were the leftovers. Turning the lamp off on the dark screen
+       left "The torch is on and it is still too dark" sitting over a torch that
+       is off, under a button still reading Try again where the screen's own
+       advice had just become Turn on the torch. Turning it on at the glare
+       screen was the same in reverse: the app never said the lamp it had just
+       lit was the thing bouncing back, and offered no way to douse it. In both
+       the driver did something real to the camera and was shown the state
+       before they did it, which reads as a frozen app — and the state they were
+       shown was the one telling them to do the thing they had already done. */
+    paintScan();
+    if (fixed) { beginRead(); }
     announce(on ? 'Torch off.' : 'Torch on.');
   });
 
@@ -5399,6 +5783,17 @@ body {
        plate change under them from one state to the next, because the reader
        carries on where the last state left it. */
     scanReads = 0;
+    /* And both ways back out of it, so a state picked from the menu cannot
+       inherit an errand left over from the one before. */
+    afterScan = null; afterAccount = null;
+    S.unreadTries = 0;
+    /* The lamp too, and for exactly the reason the reader above is reset. It
+       lives in the button rather than in S, so nothing here was clearing it,
+       and now that two states read the torch to decide their own words, a
+       reviewer who opened the glare-with-torch state and then opened the plain
+       dark one was shown the torch-is-already-on wording of a torch they had
+       never turned on. The states that want it lit set it after this runs. */
+    el.scanTorch.setAttribute('aria-pressed', 'false');
     S.vehicles = !S.vehicleLinked ? []
                : Object.prototype.toString.call(fleet) === '[object Array]' ? fleet.slice()
                : makeFleet(fleet || 1);
@@ -5481,26 +5876,51 @@ body {
     /* Flow 1, in the order a driver meets it. */
     'flow1-account':  { group: 'flow1', label: '1 · Confirm your account',
       run: function () { reset('returning-driver', true, 3); showStep('account'); } },
-    'flow1-vehicle':  { group: 'flow1', label: '2 · Scan the licence disc',
+    'flow1-vehicle':  { group: 'flow1', label: '2 · Scan the disc or the plate',
       run: function () { reset('returning-driver', true, 3); showStep('vehicle'); } },
     'flow1-vehicle-one': { group: 'flow1', label: '2 · One vehicle, still scanned',
       run: function () { reset('returning-driver', true, 1); showStep('vehicle'); } },
     'flow1-scan-ready': { group: 'flow1', label: '2 \u00b7 Scanning',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('ready'); } },
-    'flow1-scan-reading': { group: 'flow1', label: '2 \u00b7 Scanning, reading it',
-      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('reading'); } },
+    /* Both halves of the rule, as two states, because the whole point of the
+       change is that the driver does not choose and the camera reports. That is
+       only reviewable if the reviewer can stand in front of each outcome. */
+    'flow1-scan-reading': { group: 'flow1', label: '2 \u00b7 Scan, reading the disc',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('reading', 'disc'); } },
+    'flow1-scan-plate': { group: 'flow1', label: '2 \u00b7 Scan, reading the plate',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('reading', 'plate'); } },
     'flow1-scan-glare': { group: 'flow1', label: '2 \u00b7 Scan, too much glare',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('glare'); } },
     'flow1-scan-dark': { group: 'flow1', label: '2 \u00b7 Scan, too dark',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('dark'); } },
     'flow1-scan-blur': { group: 'flow1', label: '2 \u00b7 Scan, too blurry',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('blur'); } },
+    'flow1-scan-smear': { group: 'flow1', label: '2 \u00b7 Scan, something on the lens',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('smear'); } },
+    /* The torch on, and still not enough light. Both the words and the button
+       have to change here, so it needs standing in front of to be reviewed. */
+    'flow1-scan-dark-lit': { group: 'flow1', label: '2 \u00b7 Scan, dark with the torch on',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0;
+                         el.scanTorch.setAttribute('aria-pressed', 'true');
+                         showScan('dark'); } },
+    /* And the state the torch creates. A plate is retroreflective and the lamp
+       sits beside the lens, so the fix for the screen above is the cause of
+       this one. */
+    'flow1-scan-glare-torch': { group: 'flow1', label: '2 \u00b7 Scan, glare off the torch',
+      run: function () { reset('returning-driver', true, 3); S.scanTries = 0;
+                         el.scanTorch.setAttribute('aria-pressed', 'true');
+                         showScan('glare'); } },
     'flow1-scan-nocam': { group: 'flow1', label: '2 \u00b7 Scan, camera unavailable',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('nocam'); } },
     'flow1-scan-denied': { group: 'flow1', label: '2 \u00b7 Scan, access refused',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 0; showScan('denied'); } },
     'flow1-scan-unread': { group: 'flow1', label: '2 \u00b7 Scan, could not be read',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('unread'); } },
+    /* Four unreadable reads deep: the state stops recommending the thing the
+       driver has already done twice, and the manager takes the lead. */
+    'flow1-scan-spent': { group: 'flow1', label: '2 \u00b7 Scan, this vehicle will not read',
+      run: function () { reset('returning-driver', true, 3);
+                         S.scanTries = 4; S.unreadTries = 3; showScan('unread'); } },
     'flow1-scan-offline': { group: 'flow1', label: '2 \u00b7 Scan, no connection',
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
     'flow1-scan-notyours': { group: 'flow1', label: '2 \u00b7 Scan, not on your list',
@@ -5747,7 +6167,20 @@ body {
 
   var FLOWS = [
     {
-      file: 'engenxt-signup.html',
+      /* index.html, because that is the file's name.
+
+         This said engenxt-signup.html, which has never existed in the repo or on
+         the deployed site. The menu writes this straight into the href of every
+         away link, so every sign-up state in the rail led to ERR_FILE_NOT_FOUND
+         and the two halves of the prototype were unreachable from each other.
+
+         It was survivable for a while because isThisFlow below carried a special
+         case pretending index.html and engenxt-signup.html were the same thing,
+         so the sections still opened in place when you were already in the
+         sign-up file. That patched the reading of the name and never the writing
+         of it, which is why the breakage only showed on the one action the name
+         exists for. The special case is gone with the wrong name. */
+      file: 'index.html',
       label: 'Home and sign-up',
       sections: [
         ['navHome',    'Home',    4],
@@ -5771,12 +6204,12 @@ body {
 
   /* Which file this is, so the menu knows which sections it can open itself
      and which ones it has to travel to. */
+  /* A directory URL, which is how the deployed site is reached, has nothing
+     after the last slash, and the server hands back index.html. So does opening
+     the folder locally. That is what the fallback is for, and with the flow now
+     carrying its real name a plain comparison is the whole test. */
   var THIS_FILE = location.pathname.split('/').pop() || 'index.html';
-  function isThisFlow(flow) {
-    return flow.file === THIS_FILE ||
-           (THIS_FILE === 'index.html' && flow.file === 'engenxt-signup.html') ||
-           (THIS_FILE === '' && flow.file === 'engenxt-signup.html');
-  }
+  function isThisFlow(flow) { return flow.file === THIS_FILE; }
 
   /* The states of a section that lives in the other file. They are links,
      because reaching them means loading that file at that state, and a link is
@@ -5801,16 +6234,21 @@ body {
       ],
       'flow1': [
         ['flow1-account', '1 \u00b7 Confirm your account'],
-        ['flow1-vehicle', '2 \u00b7 Scan the licence disc'],
+        ['flow1-vehicle', '2 \u00b7 Scan the disc or the plate'],
         ['flow1-vehicle-one', '2 \u00b7 One vehicle, still scanned'],
         ['flow1-scan-ready', '2 \u00b7 Scanning'],
-        ['flow1-scan-reading', '2 \u00b7 Scanning, reading it'],
+        ['flow1-scan-reading', '2 \u00b7 Scan, reading the disc'],
+        ['flow1-scan-plate', '2 \u00b7 Scan, reading the plate'],
         ['flow1-scan-glare', '2 \u00b7 Scan, too much glare'],
         ['flow1-scan-dark', '2 \u00b7 Scan, too dark'],
         ['flow1-scan-blur', '2 \u00b7 Scan, too blurry'],
+        ['flow1-scan-smear', '2 \u00b7 Scan, something on the lens'],
+        ['flow1-scan-dark-lit', '2 \u00b7 Scan, dark with the torch on'],
+        ['flow1-scan-glare-torch', '2 \u00b7 Scan, glare off the torch'],
         ['flow1-scan-nocam', '2 \u00b7 Scan, camera unavailable'],
         ['flow1-scan-denied', '2 \u00b7 Scan, access refused'],
         ['flow1-scan-unread', '2 \u00b7 Scan, could not be read'],
+        ['flow1-scan-spent', '2 \u00b7 Scan, this vehicle will not read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
         ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
@@ -5836,7 +6274,7 @@ body {
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ]
     },
-    'engenxt-signup.html': {
+    'index.html': {
       navHome:    [['home/default','Ready'],['home/offline','No internet'],
                    ['home/maintenance','Unavailable'],['home/update','Update required']],
       navNumber:  [['number/empty','Empty'],['number/partial','Part typed'],['number/valid','Valid'],
@@ -5936,7 +6374,7 @@ body {
        row of closed doors. */
     revealCurrentSection();
     document.getElementById('navKey').innerHTML =
-      ['Sign-up finishes in engenxt-signup.html',
+      ['Sign-up finishes in index.html',
        'A new driver arrives here on its last step',
        'A returning driver skips the reward',
        'Nothing here awards a real point'].map(function (t) {
@@ -6046,7 +6484,7 @@ body {
     var panel = document.getElementById('specPanel');
     var cs = getComputedStyle(root);
     var rows = [
-      ['Where this sits', 'The last step of engenxt-signup.html hands over to this file. Sign-up is a separate flow with its own states and its own specification panel.'],
+      ['Where this sits', 'The last step of index.html hands over to this file. Sign-up is a separate flow with its own states and its own specification panel.'],
       ['Shared tokens', 'The token block and the shared atoms in this file are a verbatim copy of the ones in the sign-up prototype, so the two cannot disagree about a colour or a spacing step. When a third flow appears they belong in one stylesheet both files link.'],
       ['Reward, then task', 'Two screens, never one. A celebration that also asks for something is neither a celebration nor a clear instruction. The driver acknowledges the reward and the task comes after it.'],
       ['The burst', '26 pieces, 1.2 seconds, out of the graphic, on a canvas that takes no pointer events so Continue is tappable throughout. It runs once per arrival and never on a re-render. Under reduced motion it does not run at all and the graphic takes a still glow instead.'],
