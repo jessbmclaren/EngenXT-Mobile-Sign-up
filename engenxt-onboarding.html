@@ -6340,12 +6340,19 @@ body {
          exists for. The special case is gone with the wrong name. */
       file: 'index.html',
       label: 'Home and sign-up',
+      /* No third element. Each of these rows used to end in a hand-typed count
+         and buildNav has never read one: it counts the ids it is about to draw,
+         which is the only number that cannot be wrong. The typed ones drifted
+         exactly as the comment down there predicts they would - Number said 13
+         above a list of 14 from the day err-server-2 was added - and a wrong
+         number sitting in the manifest is read by the next person as the
+         authority even though the menu ignores it. */
       sections: [
-        ['navHome',    'Home',    4],
-        ['navNumber',  'Number', 13],
-        ['navCode',    'Code',   13],
-        ['navBlocked', 'Blocked', 4],
-        ['navDone',    'Done',    2]
+        ['navHome',    'Home'],
+        ['navNumber',  'Number'],
+        ['navCode',    'Code'],
+        ['navBlocked', 'Blocked'],
+        ['navDone',    'Done']
       ]
     },
     {
