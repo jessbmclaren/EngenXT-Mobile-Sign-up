@@ -52,14 +52,24 @@ screen, so the states can be checked under the conditions drivers actually use.
 ## Checks
 
 ```
-node tools/check-menu.js
+node tools/check.js
 ```
 
-Each file's rail lists the other file's states from a hand-written copy, and
-nothing in the browser can tell when that copy falls behind — a state added on
-one side is simply not there on the other, reachable only by typing its hash.
-This compares both rails against both registries, ids and labels, and says
-what drifted. No dependencies; it is the only script in the repo.
+Runs on every push and pull request, and it is the only script in the repo. No
+dependencies and no build — there is nothing to install.
+
+It covers the three ways these files have actually broken:
+
+- **The script does not parse.** Each page is one inline `<script>`, so a stray
+  brace is not a degraded feature, it is a blank phone.
+- **An id is looked up that the markup no longer has.** The element registry
+  dereferences everything at load, so a rename that misses one lookup is a
+  TypeError on line one — blank phone again.
+- **The state rail falls behind.** Each file lists the other file's states from
+  a hand-written copy. When it drifts nothing looks wrong; the state is just
+  unreachable unless you know to type its hash. It also catches a rail pointing
+  at a file that is not in the repo, which shipped once and made every away
+  link a 404.
 
 ## Status
 

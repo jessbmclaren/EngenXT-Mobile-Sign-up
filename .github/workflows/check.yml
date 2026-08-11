@@ -1,0 +1,27 @@
+# Runs tools/check.js on every push and pull request.
+#
+# In CI rather than a git hook on purpose. A hook lives in .git, so it is not
+# versioned, not shared with anyone who clones this, and skipped by --no-verify
+# and by every commit made from a web UI or an editor that does not run them.
+# This repo deploys straight from main to GitHub Pages, so main being green is
+# the only gate that means anything.
+#
+# No install step. The check has no dependencies and this repo has no
+# package.json; adding one so a workflow looks conventional would be the
+# toolchain the prototype has done without for its whole life.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tools/check.js
