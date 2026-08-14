@@ -74,12 +74,14 @@
   --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
   /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
      the logo, so it must not be darkened to satisfy a text contrast rule. */
-  --color-error-text:    #B81510;    /* 4.94:1 on the sheet glass */
+  --color-error-text:    #B81510;    /* 4.74:1 on the composited sheet */
 
   /* Text */
   --color-text-primary:   #0d1e2a;
-  --color-text-secondary: #4C5973;   /* 5.03:1 on the sheet glass */
-  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.79:1 on sunken */
+  --color-text-secondary: #4C5973;   /* 5.01:1 on the composited sheet */
+  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.69:1 on sunken.
+                                        3.72:1 on the sheet, so it is for inert
+                                        controls only, never for a line being read. */
   --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
   --color-text-on-dark:   #ffffff;
 
@@ -389,6 +391,11 @@ button { background: none; border: none; color: inherit; }
 .a-link:disabled, .a-link[disabled] {
   color: var(--color-text-tertiary); font-weight: 500; cursor: default;
 }
+/* Except this one. Disabled, it is not a control being ignored: it is the
+   sentence telling a driver when they can try again, read one-handed on a
+   forecourt. Tertiary is 3.72:1 on the sheet and is meant for inert controls;
+   the countdown is content, so it takes the colour content takes. */
+.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }
 
 /* a-field. Two orthogonal axes: data-state for idle, pending and error,
    :focus-within for focus. Squeezing focus and
@@ -680,7 +687,12 @@ button { background: none; border: none; color: inherit; }
 /* m-otp-group. 6px between cells is optical, tuned so six squares and five
    gaps fill the content width at 320. Error carries extra border weight as
    well as colour, so the two outcomes differ by more than hue. */
-.m-otp-group { display: flex; gap: var(--sp-1h); justify-content: space-between; }
+/* Centred rather than space-between. With the cells capped at --size-otp-cell,
+   space-between handed every spare pixel to the gaps: the declared 6px rendered
+   7.6px at 390 and about 15.6px at 430, so the row's rhythm changed with the
+   handset and the six boxes stopped reading as one group. The gap is the token
+   now, on every width, and the cells still divide what is left. */
+.m-otp-group { display: flex; gap: var(--sp-2); justify-content: center; }
 /* The group's outcome belongs to every cell in it, so the group propagates a
    tone to its members and each cell decides what that tone looks like. Two
    axes on the cell, because a cell can be filled and wrong at the same time:
@@ -745,14 +757,17 @@ button { background: none; border: none; color: inherit; }
   bottom: 200px; right: -30px; width: 200px; height: 200px;
   background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
 }
-.o-auth-hero__brand { position: relative; z-index: var(--z-content); flex-shrink: 0; padding: var(--sp-7) var(--sp-6) 0; }
+/* --sp-5, the gutter the sheet uses. The sheet rises over the hero and the two
+   are read in sequence, so a 24px hero against a 20px sheet stepped the left
+   edge of the type inward exactly as the sheet arrived. */
+.o-auth-hero__brand { position: relative; z-index: var(--z-content); flex-shrink: 0; padding: var(--sp-7) var(--sp-5) 0; }
 /* margin-top:auto on the first child rather than justify-content:flex-end,
    because flex-end plus overflow pushes the overflow past the top edge into
    a region the scroll container does not reach. */
 .o-auth-hero__body {
   position: relative; z-index: var(--z-content); flex: 1;
   display: flex; flex-direction: column;
-  padding: 0 var(--sp-6) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--sp-5) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
 }
 /* 12px binds the 42px hero to its lede. The bind scales with the type it
@@ -1004,7 +1019,17 @@ button { background: none; border: none; color: inherit; }
 .o-signup-sheet__cta { margin-top: var(--sp-4); }
 /* Resend belongs to the cells above it: it is what a driver does when the
    code did not come, so it stays in that cluster at the base gap and sits on
-   their left edge rather than floating in the centre of the stage. */
+   their left edge rather than floating in the centre of the stage.
+
+   Worth knowing, and deliberately not corrected here: these gaps are authored
+   between boxes, and a 48px target holds about 18px of line, so it carries
+   ~15px of nothing above and below it. The eye is therefore shown roughly 23,
+   39 and 31 where the scale says 8, 24 and 16, and the countdown reads as
+   floating between the cells and the button. Pulling the dead space back out
+   with a negative margin was tried and overshot: it tightened the button gap
+   to 17 and closed the row to 1. Getting it right is a judgement about which
+   edges the eye actually pairs, not a number a script can settle, so it wants
+   a designer looking at it rather than a blind correction. */
 .o-signup-sheet__resend { align-self: flex-start; }
 /* Below here the driver has left the task and is taking another route, which
    is a decision, so it earns the same separation the primary action gets. */
@@ -2509,6 +2534,13 @@ button { background: none; border: none; color: inherit; }
        actually says what happened, and pushed it down the screen. */
     var outcome = (name === 'blocked' || name === 'success');
     el.sheetHeading.hidden = outcome;
+    /* The dialog is named by whatever aria-labelledby points at, and an
+       explicit reference is followed into hidden elements: hiding the heading
+       does not retire its text. So an outcome announced itself as "Enter your
+       mobile number", the last thing the header had been set to, while the
+       screen said the account was paused. It points at the heading the panel
+       is actually showing. */
+    el.sheet.setAttribute('aria-labelledby', outcome ? 'blockedTitle' : 'sheetTitle');
     el.sheetClose.hidden = (name === 'success');
     if (outcome) { el.sheetHeader.setAttribute('data-heading', 'none'); }
     else { el.sheetHeader.removeAttribute('data-heading'); }
