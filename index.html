@@ -656,12 +656,17 @@ button { background: none; border: none; color: inherit; }
 }
 .m-sheet-header__close:hover { background: var(--color-border-light); }
 
-/* m-progress */
+/* m-progress. The display lives here rather than in a script-written inline
+   style, because an inline display beats every rule in this file: the
+   keyboard's own rule below asked for display:none and never once won. State
+   is an attribute, and the attribute is the one the platform already has. */
 .m-progress {
+  display: flex;
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
   margin-bottom: var(--sp-4);
 }
+.m-progress[hidden] { display: none; }
 
 /* m-phone-field */
 .m-phone-field__prefix {
@@ -888,6 +893,18 @@ button { background: none; border: none; color: inherit; }
 /* 4. Only then the loose steps. */
 .t-device-frame[data-keyboard="open"] .o-signup-sheet__cta,
 .t-device-frame[data-keyboard="open"] .o-signup-sheet__secondary { margin-top: var(--sp-2); }
+/* 5. And what is still left over goes to the bottom of the stage, not the end
+      of the column. Giving the sheet the full remaining height (below) without
+      giving the stage a way to spend it left the number stage holding 97px of
+      empty sheet under its own button: the one control on the screen, parked
+      at the furthest point from the thumb that is still on the sheet. The
+      stage takes the height and the action sits at the bottom of it. */
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__scroll {
+  display: flex; flex-direction: column;
+}
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__body { flex: 1; }
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__stage[data-state="active"] { flex: 1; }
+.t-device-frame[data-keyboard="open"] .o-signup-sheet__cta { margin-top: auto; }
 .t-device-frame[data-keyboard="open"] .o-signup-sheet__body {
   padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom, 0px));
 }
@@ -1010,6 +1027,18 @@ button { background: none; border: none; color: inherit; }
 .o-outcome-panel__meta { margin-top: var(--sp-4); }
 /* 8 + 24 = 32. The panel is one centred group and the action closes it. */
 .o-outcome-panel__actions { margin-top: var(--sp-6); }
+/* Centred across the panel, not just within its own width. A driver who cannot
+   get in is given the whole sheet on purpose, but nothing was spending the
+   height: the group stacked from the top and stopped, leaving 135px of panel
+   under the one action the screen has. The height was the right call. This is
+   the half of it that was missing. */
+.o-signup-sheet[data-stage="blocked"] .o-signup-sheet__scroll {
+  display: flex; flex-direction: column;
+}
+.o-signup-sheet[data-stage="blocked"] .o-signup-sheet__body { flex: 1; }
+.o-signup-sheet[data-stage="blocked"] .o-outcome-panel[data-state="active"] {
+  flex: 1; justify-content: center;
+}
 /* On success the header empties completely, so the group would otherwise start
    8px under the handle. It gets the same run-in the header used to give it. */
 /* 8 + 0 = 8. When the aside is present the button belongs to it, not to the
@@ -2455,7 +2484,7 @@ button { background: none; border: none; color: inherit; }
     var step = name === 'number' ? 0 : name === 'code' ? 1 : 2;
     /* An outcome is not a step. Counting to 2 of 2 on a finished journey adds
        nothing and costs the group the room it wants. */
-    el.progress.style.display = (name === 'blocked' || name === 'success') ? 'none' : 'flex';
+    el.progress.hidden = (name === 'blocked' || name === 'success');
     var label = document.getElementById('progressLabel');
     if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
     /* Prototype scaffolding, kept out of the product copy so the sentence a
@@ -2671,6 +2700,12 @@ button { background: none; border: none; color: inherit; }
   function setCodeView(name) {
     var v = CODE_VIEWS[name] || CODE_VIEWS.waiting;
     S.codeView = name;
+    /* The stage above hides the counter on an outcome, and never saw this one:
+       a confirmed code is the end of the journey, but the stage it ends on is
+       still the code stage. So the finished screen counted "2 of 2" over six
+       digits the driver had already got right. Same rule, applied where the
+       outcome actually lives. */
+    el.progress.hidden = (name === 'confirmed');
     el.resendBtn.hidden = !v.resend;
     el.openWhatsapp.hidden = !v.whatsapp || S.channel !== 'whatsapp';
     el.channelSwitchBtn.hidden = !v.channel;
