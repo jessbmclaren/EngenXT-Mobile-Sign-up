@@ -233,6 +233,9 @@
 
   /* Glass. Near opaque, because the sheet sits over a near-black hero and
      0.72 alpha put every piece of secondary text below 2.5:1. */
+  --glass-push-bg: rgba(250,250,252,0.92); /* the OS's notification card, not
+                                              an app surface: near-opaque so
+                                              the news reads over anything */
   --glass-sheet-bg: rgba(228,235,250,0.35);
   --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
@@ -1799,7 +1802,7 @@ button { background: none; border: none; color: inherit; }
           <div class="o-signup-sheet__stage o-outcome-panel" id="stageBiometrics">
             <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark" id="bioIcon" data-tone="info" aria-hidden="true"></span>
             <h3 class="o-outcome-panel__title" id="bioTitle" tabindex="-1">Skip the code next time</h3>
-            <p class="o-outcome-panel__body" id="bioBody">Sign in with your face or fingerprint instead of waiting for a code. If you skip this, you can turn it on later in Account.</p>
+            <p class="o-outcome-panel__body" id="bioBody">Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.</p>
             <div class="o-outcome-panel__actions">
               <button class="a-btn a-btn--primary" type="button" id="bioEnable">Turn it on</button>
               <button class="a-btn a-btn--outline" type="button" id="bioSkip">Not now</button>
@@ -2096,8 +2099,8 @@ button { background: none; border: none; color: inherit; }
     },
     server: {
       tone: 'error', icon: 'server',
-      title: "We couldn't verify your code right now",
-      body: 'Your code is still valid. Wait a moment, then try again.',
+      title: "We couldn't check your code right now",
+      body: 'Your code still works. Wait a moment, then try again.',
       actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }],
       escalateAfter: 2,
       escalation: { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
@@ -2215,7 +2218,7 @@ button { background: none; border: none; color: inherit; }
     channel: 'whatsapp',   // whatsapp | sms
     /* Written only by chooseBiometrics. The answer is given once: asked at
        the end of sign-up, never re-asked, and skipping is not a failure. */
-    biometrics: 'unasked', // unasked | enabled | skipped
+    biometrics: 'unasked', // unasked | enabled | skipped | deferred
     otp: ['', '', '', '', '', ''],
     attemptsLeft: MAX_ATTEMPTS,
     resendsLeft: MAX_RESENDS,
@@ -2493,7 +2496,10 @@ button { background: none; border: none; color: inherit; }
        marketing hero is not a state this flow has. Mid-wait the skip button
        is disabled and click() does nothing, which is also right: the phone's
        own sheet cannot be cancelled from underneath. */
-    if (S.stage === 'biometrics') { el.bioSkip.click(); return; }
+    if (S.stage === 'biometrics') {
+      if (!isOff(el.bioSkip)) { chooseBiometrics(false, true); }
+      return;
+    }
     if (!force && !S.dismissArmed) {
       var partialNumber = S.stage === 'number' && phoneDigits().length > 0 && !phoneComplete();
       var midCode = S.stage === 'code';
@@ -3152,7 +3158,7 @@ button { background: none; border: none; color: inherit; }
     el.bioIcon.setAttribute('data-tone', 'info');
     el.bioIcon.innerHTML = icon('scanFace', toneColour('info'), 28);
     el.bioTitle.textContent = 'Skip the code next time';
-    el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. If you skip this, you can turn it on later in Account.';
+    el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.';
     setBtn(el.bioEnable, true, 'Turn it on');
     setBtn(el.bioSkip, true, 'Not now');
   }
@@ -3170,18 +3176,23 @@ button { background: none; border: none; color: inherit; }
   function paintBioDone() {
     el.bioIcon.setAttribute('data-tone', 'success');
     el.bioIcon.innerHTML = icon('check', toneColour('success'), 28);
-    el.bioTitle.textContent = 'Biometrics on';
+    /* Not "Biometrics on": the offer never says the word, and a category is
+       not a thing a driver can picture. The title names what they gave. */
+    el.bioTitle.textContent = 'Your face or fingerprint is set';
     el.bioBody.textContent = 'Next time, your face or fingerprint signs you in. No code to wait for.';
     setBtn(el.bioEnable, false);
     setBtn(el.bioSkip, false);
   }
 
-  /* The one writer of S.biometrics. Skipping proceeds at once and is never
-     asked about again; enabling waits out the phone's own sheet, shows the
-     answer long enough to read, and then the app arrives either way. */
-  function chooseBiometrics(enable) {
+  /* The one writer of S.biometrics. A tapped "Not now" is an answer and is
+     never asked about again. A dismissal - the grab bar, the scrim, Escape -
+     is not an answer, so it defers instead: the driver leaves now, and the
+     question may be asked at the next sign-in. Enabling waits out the phone's
+     own sheet, shows the answer long enough to read, and then the app arrives
+     either way. */
+  function chooseBiometrics(enable, implicit) {
     if (!enable) {
-      S.biometrics = 'skipped';
+      S.biometrics = implicit ? 'deferred' : 'skipped';
       handOver();
       return;
     }
@@ -3547,7 +3558,7 @@ button { background: none; border: none; color: inherit; }
                           offerBiometrics(); clearTimers();
                           paintBioWaiting();
                         } },
-    'biometrics/enabled': { label: 'Biometrics on', run: function () {
+    'biometrics/enabled': { label: 'Face or fingerprint set', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('valid'); setCodeView('confirmed');
@@ -3853,7 +3864,7 @@ button { background: none; border: none; color: inherit; }
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
                    ['biometrics/waiting','Waiting for the phone'],
-                   ['biometrics/enabled','Biometrics on']]
+                   ['biometrics/enabled','Face or fingerprint set']]
     }
   };
 

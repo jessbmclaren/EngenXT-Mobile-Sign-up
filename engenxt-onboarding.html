@@ -238,6 +238,9 @@
 
   /* Glass. Near opaque, because the sheet sits over a near-black hero and
      0.72 alpha put every piece of secondary text below 2.5:1. */
+  --glass-push-bg: rgba(250,250,252,0.92); /* the OS's notification card, not
+                                              an app surface: near-opaque so
+                                              the news reads over anything */
   --glass-sheet-bg: rgba(228,235,250,0.35);
   --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
   --glass-sheet-fallback: #E4EBFA;
@@ -463,7 +466,7 @@ body {
   display: none; align-items: center; gap: var(--sp-3); text-align: left;
   min-height: 64px; padding: var(--sp-3) var(--sp-4);
   border: none; border-radius: var(--radius-card);
-  background: rgba(250,250,252,0.92);
+  background: var(--glass-push-bg);
   -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%);
   box-shadow: var(--shadow-overlay);
   cursor: pointer;
@@ -2639,7 +2642,13 @@ body {
 /* The card reads like the till slip it stands in for: one fact per row, the
    figures on the right in tabular numerals so they stack into a column a
    driver can run a thumb down. The points row is the one this app added to
-   the paper version, so it is the one row allowed a colour. */
+   the paper version, so it is the one row allowed a colour.
+
+   Kin to m-fact, and deliberately not m-fact: the check screen's rows are
+   metadata above a task and speak in micro-caps; a receipt is the document
+   itself, so its labels read as words and its dividers close each fact off.
+   If a third fact-row voice ever appears, fold all three into m-fact with
+   modifiers - two is the most this file will carry. */
 .o-receipt__card {
   margin-top: var(--sp-4);
   background: var(--color-surface); border: 1px solid var(--color-border);
@@ -2656,7 +2665,7 @@ body {
   font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
   text-align: right; font-variant-numeric: tabular-nums;
 }
-.o-receipt__value small { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
+.o-receipt__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
 .o-receipt__row[data-tone="points"] .o-receipt__value { color: var(--color-success); }
 .o-receipt__spacer { flex: 1 1 auto; min-height: var(--sp-4); }
 .o-receipt__action { display: flex; flex-direction: column; gap: var(--sp-2); }
@@ -2981,7 +2990,7 @@ body {
         <span class="m-push__body">
           <span class="m-push__app">EngenXT · now</span>
           <span class="m-push__title" id="pushTitle">Fill complete</span>
-          <span class="m-push__sub" id="pushSub">CA 123-456 took 52.4 L. Tap to see your points.</span>
+          <span class="m-push__sub" id="pushSub">CA 123-456 took 52.4 L and earned 524 points.</span>
         </span>
       </button>
 
@@ -3104,11 +3113,11 @@ body {
           </div>
           <div class="o-receipt__row">
             <span class="o-receipt__label">Vehicle</span>
-            <span class="o-receipt__value" id="receiptVehicle">CA 123-456<small id="receiptModel">Ford Transit Custom 2.0TDCi</small></span>
+            <span class="o-receipt__value" id="receiptVehicle">CA 123-456<small class="o-receipt__sub" id="receiptModel">Ford Transit Custom 2.0TDCi</small></span>
           </div>
           <div class="o-receipt__row">
             <span class="o-receipt__label">Fuel</span>
-            <span class="o-receipt__value" id="receiptLitres">52.4 L<small>of 60 L approved</small></span>
+            <span class="o-receipt__value" id="receiptLitres">52.4 L<small class="o-receipt__sub">of 60 L approved</small></span>
           </div>
           <div class="o-receipt__row" data-tone="points">
             <span class="o-receipt__label">Points earned</span>
@@ -3770,6 +3779,11 @@ body {
      ════════════════════════════════════════════════════════════════════ */
   var S = {
     userType: 'new-driver',      // new-driver | returning-driver
+    /* Points paid out by finished fills this session. Written only by
+       bankFill, zeroed by reset: money has one writer. */
+    bankedPts: 0,
+    fillBanked: false,
+    fillVehicle: null,
     /* Signing up is worth 50, the same as it is in the full app. Change this
        and the total, the meter, the goal line and the announcement all follow.
 
@@ -4477,8 +4491,7 @@ body {
     clearTimers(); hideAll();
     S.step = 'home';
     statusTone(false);
-    var points = (S.userType === 'new-driver' ? rewardTotal() : 2450) +
-                 (S.fillEarned ? FILL_PTS : 0);
+    var points = (S.userType === 'new-driver' ? rewardTotal() : 2450) + S.bankedPts;
     el.homePoints.textContent = groupNum(points) + ' pts';
     /* The figure and its worth are one thought and sit as one block: a count
        you cannot price is not information. The worth line used to live on the
@@ -4652,7 +4665,7 @@ body {
       '<path d="M21 12a9 9 0 1 1-6.219-8.56" stroke="var(--color-text-on-dark)" stroke-width="2.4" stroke-linecap="round"/>' +
     '</svg>';
 
-  /* One slot, three faces, and exactly one of them up at a time. The button is
+  /* One slot, five faces, and exactly one of them up at a time. The button is
      never hidden behind the live bar or the other way round, because two
      controls for the same job in the same place is how a driver ends up
      pressing the one that is not there. */
@@ -4662,7 +4675,9 @@ body {
        time, and the bar stays the same bar throughout so the thing a driver
        is in the middle of never moves. */
     var onBar = S.fuel === 'live' || S.fuel === 'filling' || S.fuel === 'done';
-    var v = activeVehicle();
+    /* The bar speaks for the running fill, so it names the fill's vehicle,
+       not whichever one a mid-fill rescan just chose for tomorrow. */
+    var v = onBar ? (S.fillVehicle || activeVehicle()) : activeVehicle();
     el.homeFuel.hidden = onBar;
     el.homeLive.hidden = !onBar;
     if (onBar) {
@@ -4697,7 +4712,7 @@ body {
       }
     }
     if (S.fuel === 'pending') {
-      el.homeFuel.innerHTML = SPINNER + '<span>Authorising</span>';
+      el.homeFuel.innerHTML = SPINNER + '<span>Getting approval…</span>';
       el.homeFuel.setAttribute('data-state', 'pending');
       el.homeFuel.setAttribute('aria-busy', 'true');
       el.homeFuel.setAttribute('aria-disabled', 'true');
@@ -4810,15 +4825,15 @@ body {
       title: 'Confirm your account',
       /* Plain words. "Biometric authentication" is the bank's language, and a
          driver does not have to learn it to unlock their own phone. */
-      body: 'Use your phone\u2019s screen lock or a verification code to continue.',
+      body: 'Use your phone\u2019s screen lock, or a code we send you.',
       go: 'Continue',
-      alt: 'Use verification code',
+      alt: 'Use a code instead',
       onGo: function () {
         var next = afterAccount; afterAccount = null;
         if (next) { next(); return; }
         showStep('vehicle');
       },
-      onAlt: function () { reply('A six digit code would be sent. Not built yet.'); }
+      onAlt: function () { reply('A 6-digit code would be sent. Not built yet.'); }
     },
 
     vehicle: {
@@ -4965,7 +4980,7 @@ body {
        is the mistake the offline state already made once. */
     unread:  { t: 'That could not be read', b: 'Try the other one. The disc and the plate both work.',
                spentTitle: 'This vehicle will not scan',
-               spentBody: 'Wipe the plate and go once more. If it still will not read, your manager can sort it out.' },
+               spentBody: 'Wipe the plate and scan once more. If it still fails, ask your manager.' },
     /* "In a moment" is a promise about time that a flat mast will not keep, and
        its specific harm is the retry loop it invites: a driver who believes
        "a moment" presses Try again eight times before concluding the app is
@@ -5624,7 +5639,7 @@ body {
     var account = S.account !== 'blocked';
     var hours = S.hours !== 'closed';
     return [
-      { ok: !!st.allowed, title: 'On your company list',
+      { ok: !!st.allowed, shortName: 'Company list', title: 'On your company list',
         sub: st.allowed ? st.name + ' is approved for you'
                         : st.name + ' is not one your company pays for' },
       /* Never a number, and never the word funds.
@@ -5634,12 +5649,12 @@ body {
          into an argument at a forecourt. Both faces of this row say only
          whether the fill can go ahead, and the failure hands them the one
          person who can fix it. */
-      { ok: account,
+      { ok: account, shortName: 'Company account',
         title: account ? 'Your company account is active'
                        : 'Your company cannot approve this fill',
         sub: account ? 'Nothing is stopping this fill'
-                     : 'Ask your manager to sort it out.' },
-      { ok: hours,
+                     : 'Ask your manager to fix it.' },
+      { ok: hours, shortName: 'Fuelling hours',
         title: hours ? 'Right day, right time' : 'Outside your fuelling hours',
         sub: hours ? 'Your company allows fuelling right now'
                    : 'Your company allows Monday to Saturday, 05:00 to 19:00.' },
@@ -5647,10 +5662,12 @@ body {
          speaking the language of a list. There is nothing here to pick from and
          has not been for some time: the button below it says Scan your vehicle
          and the why-line above says the same. */
-      { ok: !!v,   title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
+      { ok: !!v,   shortName: 'Your vehicle',
+        title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
         sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
                : 'Scan the one you are driving' },
-      { ok: true,  title: '60 L approved for this fill',
+      { ok: true,  shortName: 'Litres for this fill',
+        title: '60 L approved for this fill',
         sub: 'Your company limit for this vehicle' }
     ];
   }
@@ -5688,6 +5705,16 @@ body {
              '<span class="m-check__sub">' + c.sub + '</span></span></div>';
     }).join('');
 
+    /* A row the ring never reached must not keep a sentence that claims an
+       answer. The dash already says "not checked" to the eye; these give the
+       same answer to the words - the visible title goes neutral and a hidden
+       prefix keeps the accessible name honest, because a screen reader hears
+       only the words and a second-language reader trusts them over grey. */
+    function neutraliseSkipped(row, c) {
+      var title = row.querySelector('.m-check__title');
+      title.innerHTML = '<span class="u-visually-hidden">Not checked: </span>' + c.shortName;
+    }
+
     var rows = el.checkList.querySelectorAll('.m-check');
     var step = prefersReduced() ? 0 : 190;
 
@@ -5706,13 +5733,17 @@ body {
        Leaving the tick on made the screen say a question had passed when the
        app had stopped before reaching it. */
     for (var j = stopAt + 1; j < n; j++) {
-      (function (r) { after(step * (stopAt + 1), function () {
+      (function (r, c) { after(step * (stopAt + 1), function () {
         if (!r) { return; }
         r.setAttribute('data-state', 'in');
         r.setAttribute('data-ok', 'skipped');
         var mark = r.querySelector('.m-check__mark');
         if (mark) { mark.innerHTML = DASH; }
-      }); })(rows[j]);
+        /* The dash said "not checked" to the eye while the title still said
+           "Your company account is active" to the words - and a screen reader
+           hears only the words. The sentence goes with the tick. */
+        neutraliseSkipped(r, c);
+      }); })(rows[j], checks[j]);
     }
   }
 
@@ -5778,6 +5809,12 @@ body {
        It briefly pointed back at the check screen, which meant the button that
        asks for one did nothing at all: showCheck now takes a station and
        returned immediately without one. */
+    /* The fill belongs to the vehicle that was at the pump when it was
+       approved. Everything downstream - the bar, the notification, the
+       receipt - reads this snapshot, never activeVehicle(), because a driver
+       who rescans mid-fill is choosing tomorrow's vehicle, not rewriting
+       which van the fuel went into. A fleet audit reads the receipt. */
+    S.fillVehicle = activeVehicle() || null;
     after(prefersReduced() ? 0 : 900, function () {
       S.fuel = 'live';
       paintFuelAction();
@@ -5803,6 +5840,10 @@ body {
   function stopFillClock() {
     if (fillClockId) { clearInterval(fillClockId); fillClockId = null; }
   }
+  /* The vehicle a fill sentence names: the snapshot first, the live choice
+     only as the fallback the rail states rely on. */
+  function fillVehicle() { return S.fillVehicle || activeVehicle() || null; }
+
   function fillClockTick() {
     var t = Date.now() - S.fillStartAt;
     if (t < SCAN_AFTER_MS) { return; }
@@ -5814,7 +5855,7 @@ body {
       S.fillLitresNow = 0;
       if (S.step === 'fuel') { hideFuel(); }
       paintFuelAction();
-      announce('The till has your code. Filling ' + (activeVehicle() ? activeVehicle().plate : 'your vehicle') + '.');
+      announce('The till has your code. Filling ' + (fillVehicle() ? fillVehicle().plate : 'your vehicle') + '.');
       return;
     }
     if (S.fuel === 'filling') {
@@ -5831,7 +5872,7 @@ body {
     paintFuelAction();
     showPush();
     announce('Fill complete. ' + FILL_LITRES + ' litres on ' +
-             (activeVehicle() ? activeVehicle().plate : 'your vehicle') +
+             (fillVehicle() ? fillVehicle().plate : 'your vehicle') +
              '. Open the notification to see your points.');
   }
 
@@ -5839,13 +5880,13 @@ body {
      The sign-up reward's screen, replayed for a fill: same medal, same wave,
      same burst, one earn row. Seeing the same shape twice is the point - the
      second time, the driver already knows how to read it. */
-  function showEarned(arriving) {
+  function showEarned() {
     clearTimers(); hideAll(); hidePush();
     stopFillClock();
     S.step = 'earned';
     statusTone(true);
-    S.fillEarned = true;
-    var v = activeVehicle();
+    bankFill();
+    var v = fillVehicle();
     el.earnedRowLabel.textContent = 'Fuelling ' + FILL_LITRES + ' L';
     el.earnedRowPill.textContent = '+' + FILL_PTS + ' pts';
     el.earnedWorth.textContent = 'About ' + dataLabel(FILL_PTS / S.ptsPerGb) + ' of data';
@@ -5882,8 +5923,8 @@ body {
     stopFillClock();
     S.step = 'receipt';
     statusTone(false);
-    S.fillEarned = true;
-    var v = activeVehicle();
+    bankFill();
+    var v = fillVehicle();
     el.receiptStation.textContent = stationName();
     if (v) {
       el.receiptVehicle.firstChild.textContent = v.plate;
@@ -5892,7 +5933,7 @@ body {
     el.receiptLitres.firstChild.textContent = FILL_LITRES + ' L';
     el.receiptPoints.textContent = '+' + FILL_PTS + ' pts';
     var base = S.userType === 'new-driver' ? rewardTotal() : 2450;
-    el.receiptBalance.textContent = groupNum(base + FILL_PTS) + ' pts';
+    el.receiptBalance.textContent = groupNum(base + S.bankedPts) + ' pts';
     el.receiptRef.textContent = fuelDigitsShown(fuelRef());
     el.receipt.hidden = false;
     el.receipt.setAttribute('data-state', 'visible');
@@ -5901,32 +5942,79 @@ body {
     after(60, function () { el.receiptTitle.focus({ preventScroll: true }); });
   }
 
+  /* Every fill pays once. The counter is money, so it has one writer and an
+     idempotent guard: the earned screen and the receipt can both run for the
+     same fill - the notification opens one, the live bar the other - and the
+     second one must not pay the driver twice. A boolean was here before and
+     it froze the balance after the first fill, which taught the exact
+     opposite of "earn on every fill". */
+  function bankFill() {
+    if (S.fillBanked) { return; }
+    S.fillBanked = true;
+    S.bankedPts += FILL_PTS;
+  }
+
   /* Done on the receipt is the end of the fill: the code is spent, the slot
      on home goes back to asking, and the balance the driver lands on is the
      one the receipt just promised. */
   function finishFill() {
     S.fuel = 'idle';
     S.fillLitresNow = 0;
+    S.fillVehicle = null;
+    S.fillBanked = false;
     paintFuelAction();
     showHome(true);
   }
 
   function showPush() {
-    var v = activeVehicle();
-    el.pushSub.textContent = (v ? v.plate : 'Your vehicle') + ' took ' + FILL_LITRES + ' L. Tap to see your points.';
+    var v = fillVehicle();
+    /* Fact-complete, the way a good notification is: the news works at a
+       glance, and the tap deepens it rather than ransoming it. */
+    el.pushSub.textContent = (v ? v.plate : 'Your vehicle') + ' took ' + FILL_LITRES +
+      ' L and earned ' + FILL_PTS + ' points.';
     el.push.hidden = false;
     el.push.setAttribute('data-state', 'visible');
   }
   function hidePush() {
     el.push.hidden = true;
     el.push.removeAttribute('data-state');
+    el.push.style.transform = '';
+    el.push.style.opacity = '';
   }
+
+  /* The dismissal gesture the real notification has. The component imitates
+     the OS's chrome, so it owes the OS's manners: a driver who is not ready
+     to collect swipes the banner up and away, and loses nothing, because the
+     banner is fact-complete and the live bar holds the same door. A drag
+     that ends short of meaning it springs back. */
+  (function () {
+    var startY = null, dy = 0;
+    el.push.addEventListener('pointerdown', function (e) {
+      startY = e.clientY; dy = 0;
+      el.push.setPointerCapture(e.pointerId);
+    });
+    el.push.addEventListener('pointermove', function (e) {
+      if (startY === null) { return; }
+      dy = Math.min(0, e.clientY - startY);
+      el.push.style.transform = 'translateY(' + dy + 'px)';
+    });
+    el.push.addEventListener('pointerup', function () {
+      if (startY === null) { return; }
+      var flung = dy < -28;
+      startY = null;
+      if (flung) { hidePush(); return; }
+      el.push.style.transform = '';
+    });
+    el.push.addEventListener('pointercancel', function () {
+      startY = null; el.push.style.transform = '';
+    });
+  })();
 
   function requestFuel() {
     if (S.fuel !== 'idle') { return; }
     stopPulse();
     if (!S.vehicleLinked) {
-      announce('You cannot fuel until your manager assigns a vehicle.');
+      reply('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
     /* Scanning is the gate for the day, so the button that starts a fill runs
@@ -6002,7 +6090,7 @@ body {
     el.fuelRefSpoken.textContent =
       'If it cannot be scanned, the number is ' + fuelDigitsSpoken(ref) + '.';
     el.fuelQr.setAttribute('aria-label',
-      'Fuel authorisation for ' + (v ? v.plate : 'this vehicle') + ' at ' +
+      'Fuel approval for ' + (v ? v.plate : 'this vehicle') + ' at ' +
       stationName() + '. Hold the screen up for the attendant to scan.');
     /* The plate and nothing else. The make and model are how a driver picks a
        van out of a yard, and this screen is read standing beside one, where the
@@ -6048,21 +6136,28 @@ body {
 
   el.homeFuel.addEventListener('click', function () {
     if (el.homeFuel.getAttribute('aria-disabled') === 'true') {
-      announce('You cannot fuel until your manager assigns a vehicle.');
+      reply('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
     requestFuel();
   });
   el.homeLive.addEventListener('click', function () {
     /* Three phases, three honest answers: the code, the fact, the pay-off. */
-    if (S.fuel === 'done') { showEarned(true); return; }
+    if (S.fuel === 'done') { showEarned(); return; }
     if (S.fuel === 'filling') {
-      announce('Filling. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
+      /* Through reply, not announce alone: the file's own history says every
+         announce-only control reads as a dead tap to a sighted driver. */
+      reply('Filling. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
       return;
     }
     showFuel(true);
   });
-  el.push.addEventListener('click', function () { showEarned(true); });
+  el.push.addEventListener('click', function (e) {
+    /* A completed swipe also fires click; a hidden banner means it was the
+       swipe, and a swipe is not a tap. */
+    if (el.push.hidden) { return; }
+    showEarned();
+  });
   el.earnedCta.addEventListener('click', function () { showReceipt(); });
   el.receiptDone.addEventListener('click', function () { finishFill(); });
   el.fuelClose.addEventListener('click', hideFuel);
@@ -6091,7 +6186,7 @@ body {
     S.fuel = 'idle';
     hideFuel();
     paintFuelAction();
-    announce('Code cancelled. Nothing has been authorised.');
+    announce('Code cancelled. Nothing was approved.');
   });
   /* Escape closes it the way the close button does, because a screen laid over
      another one has to be dismissible from the keyboard. It never cancels: a
@@ -6433,7 +6528,9 @@ body {
     stopFillClock();
     hidePush();
     S.fillLitresNow = 0;
-    S.fillEarned = false;
+    S.fillVehicle = null;
+    S.fillBanked = false;
+    S.bankedPts = 0;
     S.earnedConfettiPlayed = false;
     /* So does the camera. Without this a reviewer walking the menu would see the
        plate change under them from one state to the next, because the reader
@@ -6996,7 +7093,7 @@ body {
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
                    ['biometrics/waiting','Waiting for the phone'],
-                   ['biometrics/enabled','Biometrics on']]
+                   ['biometrics/enabled','Face or fingerprint set']]
     }
   };
 
