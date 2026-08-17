@@ -1529,6 +1529,36 @@ body {
    steps keep their layout and only the short ones stop looking abandoned. */
 .o-step__mark { margin-top: auto; }
 .o-step__group { margin-bottom: auto; }
+
+/* THE CEREMONY FACE. Identity is not a task, and this app already knows it:
+   the sign-up flow's face-or-fingerprint ask is centred under a ringed mark.
+   When the step screen carries the identity question it files itself the
+   same way - centre stage, rings, and a lock that actually opens when the
+   driver is through, because motion is the sentence "you're in" said
+   without words. Every other step keeps the task voice, left-aligned. */
+.o-step[data-step="account"] .o-step__scroll { align-items: center; text-align: center; }
+.o-step[data-step="account"] .o-step__bar { align-self: stretch; }
+.o-step[data-step="account"] .o-step__mark {
+  width: 88px; height: 88px; position: relative;
+  border-radius: var(--radius-circle);
+  color: var(--color-primary);
+}
+.o-step[data-step="account"] .o-step__mark::before,
+.o-step[data-step="account"] .o-step__mark::after {
+  content: ''; position: absolute; border-radius: var(--radius-circle);
+  border: 1px solid currentColor; pointer-events: none;
+}
+.o-step[data-step="account"] .o-step__mark::before { inset: -10px; opacity: 0.30; }
+.o-step[data-step="account"] .o-step__mark::after  { inset: -22px; opacity: 0.14; }
+.o-step[data-step="account"] .o-step__mark svg { width: 34px; height: 34px; }
+/* The shackle turns open. Origin at its hinge, a spring out, and the rings
+   warm to the success tone in the same beat. Still under reduced motion:
+   the open state is a frame, not a journey. */
+.o-step__shackle { transform-origin: 16px 11px; transition: transform .3s var(--ease-spring); }
+.o-step[data-step="account"] .o-step__mark[data-open="true"] { color: var(--color-success); }
+.o-step__mark[data-open="true"] .o-step__shackle { transform: translate(1.5px, -2.5px) rotate(26deg); }
+[data-motion="reduced"] .o-step__shackle { transition: none; }
+@media (prefers-reduced-motion: reduce) { .o-step__shackle { transition: none; } }
 .o-step__bar { display: flex; align-items: center; gap: var(--sp-2); min-height: 48px; }
 .o-step__mark {
   width: 56px; height: 56px; flex-shrink: 0;
@@ -5010,7 +5040,7 @@ body {
      Each step is content rather than a screen of its own. They ask the same
      shape of question, so one organism carries all three and the margins
      cannot drift apart between them. */
-  var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path class="o-step__shackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   var ICON_GAUGE = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>';
   var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg>';
   var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
@@ -5101,9 +5131,16 @@ body {
       go: 'Continue',
       alt: 'Use a code instead',
       onGo: function () {
-        var next = afterAccount; afterAccount = null;
-        if (next) { next(); return; }
-        showStep('vehicle');
+        /* The lock opens first. 350ms of shackle is the confirmation felt
+           before the next screen says it; under reduced motion the open
+           frame shows and the flow moves at once. */
+        var go = function () {
+          var next = afterAccount; afterAccount = null;
+          if (next) { next(); return; }
+          showStep('vehicle');
+        };
+        el.stepMark.setAttribute('data-open', 'true');
+        after(prefersReduced() ? 0 : 350, go);
       },
       onAlt: function () { reply('A 6-digit code would be sent. Not built yet.'); }
     },
@@ -5520,6 +5557,10 @@ body {
     clearTimers(); hideAll();
     statusTone(false);
     S.step = 'step:' + key;
+    /* Published so the layout can respond: the identity step wears the
+       ceremony face, the tasks keep the task voice. */
+    el.step.setAttribute('data-step', key);
+    el.stepMark.removeAttribute('data-open');
     el.stepMark.innerHTML = def.mark;
     el.stepTitle.textContent = def.title;
     el.stepBody.textContent = def.body;
