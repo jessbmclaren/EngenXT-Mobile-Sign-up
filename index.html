@@ -2270,6 +2270,19 @@ button { background: none; border: none; color: inherit; }
   /* ════════════════════════════════════════════════════════════════════
      ELEMENTS
      ════════════════════════════════════════════════════════════════════ */
+  /* THE TAP GUARD. Eight test personas found one bug in seven costumes: a
+     button pressed twice fast, where the second press lands on whatever now
+     occupies the first button's coordinates - Done pressing the control
+     revealed beneath it, "Not now" pressing the next page's Continue. The
+     cure is one rule, not seven patches: a screen that just arrived does not
+     accept the tail of the tap that summoned it. Every swap arms it; clicks
+     inside the window are swallowed in capture, before any handler. */
+  var tapsArmedAt = Date.now() + 450;   /* the page itself just arrived */
+  function disarmTaps() { tapsArmedAt = Date.now() + 320; }
+  document.addEventListener('click', function (e) {
+    if (Date.now() < tapsArmedAt) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+
   function $(id) { return document.getElementById(id); }
   var el = {
     root: document.documentElement,
@@ -2607,6 +2620,12 @@ button { background: none; border: none; color: inherit; }
     returnFocusTo = null;
     el.scrim.setAttribute('data-state', 'closing');
     el.sheet.setAttribute('data-state', 'closing');
+    /* The hero watches the sheet's data-stage to hide its own actions while
+       a journey is up. Closing left the attribute behind, so the hero came
+       back with every control faded out - a driver stranded on a poster.
+       The stage goes with the sheet. */
+    el.sheet.removeAttribute('data-stage');
+    disarmTaps();
     setTimeout(function () {
       if (S.stage === 'closed') { el.scrim.style.display = 'none'; el.sheet.style.display = 'none'; }
     }, 300);
@@ -2618,11 +2637,17 @@ button { background: none; border: none; color: inherit; }
     S.stage = 'closed'; S.dismissArmed = false;
     el.scrim.removeAttribute('data-state');
     el.sheet.removeAttribute('data-state');
+    el.sheet.removeAttribute('data-stage');
     el.scrim.style.display = 'none'; el.sheet.style.display = 'none';
   }
 
   function showStage(name) {
     S.stage = name;
+    disarmTaps();
+    /* A toast raised on the way in ("Tap again to close...") must not outlive
+       the screen it spoke about: it sat over the next stage's primary. */
+    clearTimeout(toastTimer);
+    el.toast.removeAttribute('data-state');
     /* The stage is published on the sheet so the layout can respond to it,
        for instance when the keyboard needs space and only some stages can
        give up their subtitle. */
@@ -3356,8 +3381,13 @@ button { background: none; border: none; color: inherit; }
     releaseKeyboard();
     var signup = S.mode === 'signup';
     announce(signup ? 'Signed up. Opening EngenXT.' : 'Signed in. Opening EngenXT.');
+    /* The hash is the one channel these two files share, and it now carries
+       the one answer the far side kept guessing at: whether the driver set
+       their face or fingerprint. Account stopped claiming On for a driver
+       who had just said Not now. */
+    var bio = S.biometrics === 'enabled' ? '' : '-nobio';
     window.location.href = 'engenxt-onboarding.html#' +
-      (signup ? 'route/new-driver' : 'route/returning-no-vehicle');
+      (signup ? 'route/new-driver' : 'route/returning') + bio;
   }
 
   /* ════════════════════════════════════════════════════════════════════
@@ -3928,6 +3958,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
         ['fuel-filling', 'Filling'],
+        ['fuel-filling-open', 'Filling, watched'],
         ['fuel-done', 'Done, the notification'],
         ['fuel-stopped', 'Stopped early, the notification'],
         ['fuel-earned', 'Points earned'],
@@ -3936,6 +3967,8 @@ button { background: none; border: none; color: inherit; }
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ],
       'returning': [
+        ['returning-signin', 'Signed in again'],
+        ['rewards', 'Rewards, the bundles'],
         ['account', 'Account'],
         ['returning-without-vehicle', 'No vehicle assigned'],
         ['returning-with-vehicle', 'One vehicle'],

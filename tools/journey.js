@@ -136,7 +136,7 @@ async function signup() {
   await raw(`document.getElementById('bioSkip').click()`);
   await sleep(700);
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`).catch(() => null);
-  check('skip lands in the welcome flow', s && s.href === 'engenxt-onboarding.html#route/new-driver', s && s.href);
+  check('skip lands in the welcome flow', s && s.href.indexOf('engenxt-onboarding.html#route/new-driver') === 0, s && s.href);
 
   console.log('\n── walk 2: Turn it on ──');
   await fresh('code/idle');
@@ -153,21 +153,21 @@ async function signup() {
   check('S.biometrics = enabled', s.bio === 'enabled', s.bio);
   await sleep(900);              /* 700ms beat to handover */
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
-  check('enable lands in the welcome flow', s.href === 'engenxt-onboarding.html#route/new-driver', s.href);
+  check('enable lands in the welcome flow', s.href.indexOf('engenxt-onboarding.html#route/new-driver') === 0, s.href);
 
   console.log('\n── walk 3: Escape at the offer skips ──');
   await fresh('success/signup');
   await raw(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
   await sleep(700);
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
-  check('Escape at offer = skip = handover', s.href === 'engenxt-onboarding.html#route/new-driver', s.href);
+  check('Escape at offer = skip = handover', s.href.indexOf('engenxt-onboarding.html#route/new-driver') === 0, s.href);
 
   console.log('\n── walk 4: grab bar at the offer skips, never strands ──');
   await fresh('success/signup');
   await raw(`document.getElementById('sheetGrab').click()`);
   await sleep(700);
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
-  check('grab bar at offer = skip = handover', s.href === 'engenxt-onboarding.html#route/new-driver', s.href);
+  check('grab bar at offer = skip = handover', s.href.indexOf('engenxt-onboarding.html#route/new-driver') === 0, s.href);
 
   console.log('\n── walk 5: Escape mid-wait does nothing ──');
   await fresh('biometrics/waiting');
@@ -182,7 +182,7 @@ async function signup() {
   await raw(`document.getElementById('bioSkip').click()`);
   await sleep(700);
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
-  check('signin skip lands on returning route', s.href === 'engenxt-onboarding.html#route/returning-no-vehicle', s.href);
+  check('signin skip lands on the returning route', s.href.indexOf('engenxt-onboarding.html#route/returning') === 0, s.href);
 
   console.log('\n── walk 7: a colleague types her best guess ──');
   await fresh('code/idle');
@@ -229,7 +229,10 @@ async function fuelling() {
   let s = await st();
   check('identity step stands before the code', s.step === 'step:account', s.step);
   await ev(`document.getElementById('stepGo').click()`);
-  await sleep(600);
+  /* The unlock beat (350ms) plus the tap guard's arrival window (320ms):
+     a human does not press a screen 250ms after it appears, and since the
+     guard exists, neither may the walk. */
+  await sleep(950);
   s = await st();
   check('odometer stands between identity and the code', s.step === 'step:odometer', s.step);
   await ev(`document.getElementById('stepGo').click()`);
@@ -306,6 +309,55 @@ async function fuelling() {
   s = await st();
   check('Done mid-live lands on a visible home', s.homeVisible && s.step === 'home', JSON.stringify(s));
   check('the way back to the code survives', s.barTitle === 'Fuel approved', s.barTitle);
+
+  console.log('\n── the guard, the beat, and the new rooms ──');
+  /* The double-tap family: the second tap must die at the guard. */
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=8#fuel-approved` });
+  await sleep(1400);
+  await ev(`document.getElementById('fuelDone').click()`);
+  await sleep(140);
+  await ev(`(document.querySelector('#homeLive') || document.getElementById('fuelDone')).click()`);
+  await sleep(500);
+  s = await st();
+  check('double-tapped Done stays closed', s.homeVisible && !s.fuelUp, JSON.stringify(s));
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=9#fuel-earned` });
+  await sleep(1700);
+  await ev(`document.getElementById('earnedCta').click()`);
+  await sleep(140);
+  await ev(`document.getElementById('receiptDone').click()`);
+  await sleep(600);
+  s = await st();
+  check('double-tapped receipt stays seen', s.receiptUp, s.step);
+  /* The approval survives an impatient Escape, on a visible home. */
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=10#fuel-check` });
+  await sleep(2200);
+  await ev(`document.getElementById('checkGo').click()`); await sleep(950);
+  await ev(`document.getElementById('stepGo').click()`); await sleep(950);
+  await ev(`document.getElementById('stepGo').click()`); await sleep(120);
+  await ev(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+  await sleep(300);
+  s = await st();
+  check('the approval beat plays on a visible home', s.homeVisible && s.fuel === 'pending', s.fuel + ' visible=' + s.homeVisible);
+  await sleep(1100);
+  s = await st();
+  check('Escape could not kill the approval', s.fuelUp && s.fuel === 'live', s.fuel);
+  /* The new rooms. */
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=11#rewards` });
+  await sleep(1000);
+  await ev(`document.querySelector('[data-bundle="1"]').click()`);
+  await sleep(400);
+  let rw = JSON.parse(await ev(`JSON.stringify({
+    pts: document.getElementById('rewardsPoints').textContent,
+    sent: (document.querySelector('[data-bundle="1"]')||{}).getAttribute && document.querySelector('[data-bundle="1"]').getAttribute('data-state')
+  })`));
+  check('a bundle spends the points', rw.pts === '1 450 pts' && rw.sent === 'sent', JSON.stringify(rw));
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=12#fuel-filling-open` });
+  await sleep(1000);
+  let fl = JSON.parse(await ev(`JSON.stringify({
+    up: !document.getElementById('fillingScreen').hidden,
+    litres: document.getElementById('fillingLitres').textContent
+  })`));
+  check('the watched fill shows its litres', fl.up && fl.litres === '31.4', JSON.stringify(fl));
 
   console.log('\n── the drawer and the pump that stopped ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=5#fuel-receipt` });
