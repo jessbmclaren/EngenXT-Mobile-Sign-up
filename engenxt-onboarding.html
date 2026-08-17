@@ -79,12 +79,14 @@
   --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
   /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
      the logo, so it must not be darkened to satisfy a text contrast rule. */
-  --color-error-text:    #B81510;    /* 4.94:1 on the sheet glass */
+  --color-error-text:    #B81510;    /* 4.74:1 on the composited sheet */
 
   /* Text */
   --color-text-primary:   #0d1e2a;
-  --color-text-secondary: #4C5973;   /* 5.03:1 on the sheet glass */
-  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.79:1 on sunken */
+  --color-text-secondary: #4C5973;   /* 5.01:1 on the composited sheet */
+  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.69:1 on sunken.
+                                        3.72:1 on the sheet, so it is for inert
+                                        controls only, never for a line being read. */
   --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
   --color-text-on-dark:   #ffffff;
 
@@ -1065,6 +1067,16 @@ body {
 /* The whole of the feedback, and it is deliberately small. A press that darkens
    by one step is enough to say the tap landed; anything louder would be the chip
    claiming to have chosen something. */
+/* Drawn at the size of the text, which the note above argues for and which
+   stays. The target is another matter: a plate a driver puts a thumb on was
+   32px of pressable, against the 48 this file holds everywhere else. The pin
+   on the map already solves exactly this, so the chip borrows its answer —
+   the drawing does not move, the hit area reaches 48. */
+.a-vehicle-chip { position: relative; }
+.a-vehicle-chip::after {
+  content: ''; position: absolute; left: 0; right: 0;
+  top: 50%; height: var(--size-target); transform: translateY(-50%);
+}
 .a-vehicle-chip:active { background: var(--color-border); }
 .a-vehicle-chip__art { display: flex; opacity: 0.75; }
 .a-vehicle-chip__plate {
@@ -1586,9 +1598,12 @@ body {
 .m-vehicle-opt[data-done="true"] { border-color: var(--color-primary); background: var(--color-primary-light); }
 .m-vehicle-opt[data-done="true"] .m-vehicle-opt__art { background: var(--color-primary); color: var(--color-text-on-dark); }
 .m-vehicle-opt[data-done="true"] .m-vehicle-opt__tick { display: grid; }
+/* Secondary, not tertiary. Tertiary is 4.19:1 on the page grey this label sits
+   on, and at 11px it gets no large-text allowance: it is a line being read, and
+   tertiary is for controls that are switched off. */
 .o-step__label {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--color-text-tertiary);
+  text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-step__note { font-size: var(--text-caption); color: var(--color-text-secondary); }
 .m-vehicle-opt {
@@ -3815,10 +3830,23 @@ body {
     });
   }
 
+  /* THE CLOCK BELONGS TO THE SCREEN.
+
+     It used to be set by whoever happened to run before: the markup shipped
+     onDark for the reward, and only showHome ever cleared it. Reach a light
+     screen any other way — a link, the menu, a reload on the hash — and the
+     white clock stayed, at 1:1 on the white check screens. Eleven of the
+     forty-nine states rendered a status bar you could not see. Every screen
+     now says which it is, so no screen depends on the one before it. */
+  function statusTone(dark) {
+    if (dark) { el.statusBar.setAttribute('data-tone', 'onDark'); }
+    else { el.statusBar.removeAttribute('data-tone'); }
+  }
+
   function showReward() {
     clearTimers(); hideAll();
     S.step = 'signup-reward';
-    el.statusBar.setAttribute('data-tone', 'onDark');
+    statusTone(true);
     el.reward.hidden = false;
     el.reward.setAttribute('data-state', 'visible');
     announce('You are signed up. You earned ' + rewardTotal() + ' points.');
@@ -4190,7 +4218,7 @@ body {
   function showHome(arriving, linked) {
     clearTimers(); hideAll();
     S.step = 'home';
-    el.statusBar.removeAttribute('data-tone');
+    statusTone(false);
     var points = S.userType === 'new-driver' ? rewardTotal() : 2450;
     el.homePoints.textContent = groupNum(points) + ' pts';
     /* What the number is worth, not just how big it is.
@@ -4835,6 +4863,7 @@ body {
      sitting at. The app itself never passes it: in the flow the camera decides. */
   function showScan(face, kind) {
     clearTimers(); hideAll();
+    statusTone(true);            /* the camera fills the screen */
     S.step = 'scan';
     S.scanFace = face || 'ready';
     /* Whatever it caught last time is not what it is looking at now. A stale
@@ -4903,6 +4932,7 @@ body {
     var def = STEPS[key];
     if (!def) { return; }
     clearTimers(); hideAll();
+    statusTone(false);
     S.step = 'step:' + key;
     el.stepMark.innerHTML = def.mark;
     el.stepTitle.textContent = def.title;
@@ -5214,6 +5244,7 @@ body {
     var v = activeVehicle();
     if (!st) { return; }
     clearTimers();
+    statusTone(false);
     hideAll();
     S.step = 'check';
     S.checking = id;
@@ -5412,6 +5443,7 @@ body {
 
   function showStations(arriving, keepChoice) {
     S.step = 'stations';
+    statusTone(false);
     if (!keepChoice) { el.stationSearch.value = ''; }
     el.stationStatus.textContent = '';
     if (!keepChoice) { S.station = null; }
@@ -5524,6 +5556,7 @@ body {
      is not a journey, so it is instant. */
   function showFuel(arriving) {
     S.step = 'fuel';
+    statusTone(false);
     holdScreenAwake();
     var v = activeVehicle();
     /* Redrawn per fill, and identical every time for the same fill. */
