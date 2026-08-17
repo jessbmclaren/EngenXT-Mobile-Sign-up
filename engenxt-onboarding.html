@@ -279,6 +279,29 @@
   --dur-slow:  0.42s;
 }
 
+/* Large text mode re-points the ramp. Components read tokens, so they follow.
+
+   Copied from index.html with the rest of the scale, and for a while it was the
+   one part that was not. The sidebar carried the Large text switch here just as
+   it does there, so the attribute went on and every one of these forty-nine
+   screens ignored it: the toggle looked like it worked and tested nothing. A
+   driver reading a pump screen in the sun is exactly who turns this on. */
+[data-text="large"] {
+  --text-hero:     46px;
+  --text-title:    24px;
+  --text-large:    22px;
+  --text-heading:  20px;
+  --text-subhead:  19px;
+  --text-callout:  18px;
+  --text-body:     17px;
+  --text-footnote: 16px;
+  --text-caption:  15px;
+  --text-caption2: 14px;
+  --text-micro:    13px;
+  --text-nano:     12px;
+  --size-otp-cell: 60px;   /* the square has to keep containing its glyph */
+}
+
 :root {
   /* Developer layer tokens. Separate from the product scale on purpose:
      the boundary runs one way: tooling reads product tokens because it

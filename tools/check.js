@@ -213,6 +213,54 @@ const counts = {
   }
 }
 
+/* ── 4. The two files agree about the tokens ─────────────────────────── */
+
+/* The scale in engenxt-onboarding.html is a copy of the one in index.html,
+   taken verbatim so the two flows cannot disagree about a colour or a step of
+   the spacing scale. Nothing enforced that, and it drifted twice:
+
+     - Three contrast annotations were corrected on one side only. Harmless in
+       itself, comments, but the block exists precisely so that reading it in
+       one file tells you the truth about the other.
+
+     - The whole large-text ramp was in index.html and missing here. Both files
+       carry the Large text switch in the sidebar, so the attribute went on and
+       forty-nine screens ignored it: a control that looked like it worked and
+       tested nothing, on the accessibility mode a driver reading a pump screen
+       in the sun is most likely to reach for.
+
+   Comments are stripped before comparing, so a note about one file's own
+   surfaces is allowed to differ; names and values are not. Only the product
+   scale: each file's --d- layer is its own tooling and is expected to differ. */
+function productTokens(s) {
+  const out = new Map();
+  for (const m of s.matchAll(/(?:^|[^-\w])(:root|\[data-text="large"\])\s*\{/g)) {
+    const open = s.indexOf('{', m.index);
+    /* No nested braces inside a token block, so the first close is the end. */
+    const body = s.slice(open + 1, s.indexOf('}', open)).replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const d of body.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+)/g)) {
+      if (d[1].startsWith('--d-')) { continue; }
+      out.set(`${m[1]} ${d[1]}`, d[2].trim().replace(/\s+/g, ' '));
+    }
+  }
+  return out;
+}
+
+{
+  const a = productTokens(src[SIGNUP]);
+  const b = productTokens(src[ONBOARD]);
+  for (const [k, v] of a) {
+    if (!b.has(k)) { fail(`${ONBOARD} is missing \`${k}\`, which ${SIGNUP} declares — the scale is meant to be a verbatim copy`); }
+    else if (b.get(k) !== v) {
+      fail(`token drift for \`${k}\`\n        ${SIGNUP} : ${v}\n        ${ONBOARD}: ${b.get(k)}`);
+    }
+  }
+  for (const k of b.keys()) {
+    if (!a.has(k)) { fail(`${ONBOARD} declares \`${k}\`, which ${SIGNUP} does not — the scale is meant to be a verbatim copy`); }
+  }
+  counts.tokens = a.size;
+}
+
 /* Away links are written straight into an href, so a flow naming a file that
    is not in the repo is a rail full of 404s. This has happened once already. */
 for (const name of FILES) {
@@ -235,4 +283,5 @@ if (problems.length) {
 console.log('\n  All checks pass.');
 console.log(`    ${SIGNUP}: ${counts[SIGNUP].real} states, all listed by ${ONBOARD}`);
 console.log(`    ${ONBOARD}: ${counts[ONBOARD].real} states, all listed by ${SIGNUP}`);
-console.log('    scripts parse, every looked-up id exists, no duplicate ids\n');
+console.log('    scripts parse, every looked-up id exists, no duplicate ids');
+console.log(`    ${counts.tokens} product tokens, identical in both files\n`);
