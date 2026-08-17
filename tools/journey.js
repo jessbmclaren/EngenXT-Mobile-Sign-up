@@ -303,7 +303,9 @@ async function fuelling() {
     cards: document.querySelectorAll('.o-history__card').length,
     pts: (document.querySelector('.o-history__card .o-receipt__row[data-tone="points"] .o-receipt__value')||{}).textContent
   })`));
-  check('Done filed the receipt into History', h.up && h.cards === 1, JSON.stringify(h));
+  /* Four cards: today's newly filed slip on top of the three past ones a
+     returning driver carries. */
+  check('Done filed the receipt into History', h.up && h.cards === 4, JSON.stringify(h));
   check('the filed slip keeps its points', h.pts === '+524 pts', h.pts);
 
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=6#fuel-stopped` });

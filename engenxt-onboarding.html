@@ -877,6 +877,10 @@ body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5) var(--sp-5);
   display: flex; flex-direction: column; gap: var(--sp-4);
+  /* Content leaving under the pinned action fades rather than clips: the cut
+     edge read as an accident; the fade reads as "more below". */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-4)), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-4)), transparent 100%);
 }
 /* Everything a driver reaches for sits at the bottom, within a thumb. The gap
    above it is not empty space for its own sake: it is where the bloom shows,
@@ -2700,6 +2704,54 @@ body {
 .o-receipt__spacer { flex: 1 1 auto; min-height: var(--sp-4); }
 .o-receipt__action { display: flex; flex-direction: column; gap: var(--sp-2); }
 
+/* a-switch. On or off, sized for a thumb, drawn from two tokens that waited
+   years for a switch to exist: the track grey that clears 3:1, and the knob
+   shadow. aria-checked is the state; the class never changes. */
+.a-switch {
+  flex-shrink: 0; width: 52px; height: 32px; padding: 2px;
+  border: none; border-radius: var(--radius-pill);
+  background: var(--color-switch-track); cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-in-out);
+  /* Drawn at the platform's switch size, pressable at the rule's. */
+  position: relative;
+}
+.a-switch::before { content: ''; position: absolute; inset: -8px -4px; }
+.a-switch[aria-checked="true"] { background: var(--color-primary); }
+.a-switch__knob {
+  display: block; width: 28px; height: 28px;
+  border-radius: var(--radius-circle); background: #fff;
+  box-shadow: var(--shadow-knob);
+  transition: transform var(--dur-fast) var(--ease-in-out);
+}
+.a-switch[aria-checked="true"] .a-switch__knob { transform: translateX(20px); }
+
+.o-account {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
+           calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  background: var(--color-surface-page);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.o-account[data-state="visible"] { display: flex; }
+.o-account__row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) 0; border-bottom: 1px solid var(--color-border-light);
+  min-height: var(--size-target);
+}
+.o-account__row:last-of-type { border-bottom: none; }
+.o-account__rowBody { flex: 1 1 auto; min-width: 0; }
+.o-account__rowTitle { display: block; font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary); }
+.o-account__rowSub { display: block; margin-top: 1px; font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary); }
+.o-account__value {
+  font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  /* One token. A masked number split over two lines is two fragments to a
+     driver checking it against their SIM. */
+  white-space: nowrap;
+}
+.o-account__out { margin-top: auto; padding-top: var(--sp-5); }
+
 .o-history {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
@@ -3220,6 +3272,48 @@ body {
         </div>
       </section>
 
+      <!-- The door the app promises twice. "You can turn it on later in
+           Account" pointed at a locked tab; a promise a curious colleague can
+           disprove in two taps is worse than no promise. Everything here is
+           the driver's own facts and the one setting that is theirs. -->
+      <section class="o-account" id="accountScreen" aria-labelledby="accountTitle" hidden>
+        <div class="o-history__bar">
+          <button class="a-icon-btn" type="button" id="accountBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+        </div>
+        <h1 class="o-receipt__title" id="accountTitle" tabindex="-1">Account</h1>
+
+        <div class="o-account__row">
+          <span class="o-account__rowBody">
+            <span class="o-account__rowTitle">Sign in with your face or fingerprint</span>
+            <span class="o-account__rowSub" id="accountBioSub">On. No code to wait for.</span>
+          </span>
+          <button class="a-switch" type="button" role="switch" id="accountBio" aria-checked="true"
+                  aria-label="Sign in with your face or fingerprint">
+            <span class="a-switch__knob" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="o-account__row">
+          <span class="o-account__rowBody">
+            <span class="o-account__rowTitle">Mobile number</span>
+            <span class="o-account__rowSub">Your company registered it. Ask your manager to change it.</span>
+          </span>
+          <span class="o-account__value">+27 82 ··· 567</span>
+        </div>
+
+        <div class="o-account__row">
+          <span class="o-account__rowBody">
+            <span class="o-account__rowTitle">Vehicles</span>
+            <span class="o-account__rowSub">Assigned by your company. Scan one to drive it today.</span>
+          </span>
+          <span class="o-account__value" id="accountVehicles">3</span>
+        </div>
+
+        <div class="o-account__out">
+          <button class="a-btn a-btn--outline" type="button" id="accountOut">Sign out</button>
+        </div>
+      </section>
+
       <!-- SCREEN TWO · the app the flow lands in -->
       <section class="o-home" id="homeScreen" aria-labelledby="homeName" hidden>
         <div class="o-home__scroll">
@@ -3230,9 +3324,12 @@ body {
               <span class="m-brand-lockup__name">Engen<em>XT</em></span>
             </span>
             <span class="m-app-bar__actions">
-              <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications, 1 unread" data-unbuilt="Notifications">
+              <!-- The dot only when there is news: an uncollected fill. It
+                   promised "1 unread" from the day it was drawn, and the tap
+                   said "not built yet" - a decoration wearing a claim. -->
+              <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications">
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-                <span class="a-badge" aria-hidden="true"></span>
+                <span class="a-badge" id="homeBellDot" aria-hidden="true" hidden></span>
               </button>
               <button class="a-avatar" type="button" id="homeAvatar" aria-label="Your account, David" data-unbuilt="Your account">D</button>
             </span>
@@ -3799,6 +3896,11 @@ body {
     receiptModel: $('receiptModel'), receiptLitres: $('receiptLitres'),
     receiptPoints: $('receiptPoints'), receiptBalance: $('receiptBalance'),
     receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptDone: $('receiptDone'),
+    account: $('accountScreen'), accountTitle: $('accountTitle'),
+    accountBio: $('accountBio'), accountBioSub: $('accountBioSub'),
+    accountVehicles: $('accountVehicles'), accountOut: $('accountOut'),
+    accountBack: $('accountBack'),
+    homeBell: $('homeBell'), homeBellDot: $('homeBellDot'),
     history: $('historyScreen'), historyTitle: $('historyTitle'),
     historyList: $('historyList'), historyEmpty: $('historyEmpty'),
     historyBack: $('historyBack'),
@@ -3873,6 +3975,9 @@ body {
     /* Filed by finishFill, newest first. Session-scoped like the balance:
        reset starts a reviewer from a clean drawer. */
     receipts: [],
+    /* The Account toggle's own axis. On, because that is what the sign-up
+       flow's happy path hands over. */
+    bioOn: true,
     /* Signing up is worth 50, the same as it is in the full app. Change this
        and the total, the meter, the goal line and the announcement all follow.
 
@@ -4078,6 +4183,7 @@ body {
     el.earned.hidden = true;   el.earned.removeAttribute('data-state');
     el.receipt.hidden = true;  el.receipt.removeAttribute('data-state');
     el.history.hidden = true;  el.history.removeAttribute('data-state');
+    el.account.hidden = true;  el.account.removeAttribute('data-state');
     /* Not the push. It is the phone's chrome, not an app screen: real
        notifications survive the app changing screens underneath them, and so
        does this one. reset() takes it down, because a state picked from the
@@ -4743,6 +4849,18 @@ body {
   /* The pump's clock, not the app's: how long the QR sits before the till
      reads it, and how long the fuel takes. Fixed beats, one timeline. */
   var SCAN_AFTER_MS = 6000;
+  /* A returning driver's recent slips, fixed like everything else here. The
+     drawer looked like a first day - one slip, or none - when the person
+     holding it is meant to have been driving for months. Newest first, the
+     way finishFill files. */
+  var PAST_RECEIPTS = [
+    { when: 'Tuesday · 15:42', station: 'Engen Sandton City', plate: 'CA 214-887',
+      model: 'Toyota Hilux 2.4GD-6', litres: 48.7, pts: 487, odo: '83 981 km', ref: '412 095' },
+    { when: 'Monday · 07:18', station: 'Engen Bryanston', plate: 'CA 123-456',
+      model: 'Ford Transit Custom 2.0TDCi', litres: 52.4, pts: 524, odo: '61 220 km', ref: '388 410' },
+    { when: 'Friday · 16:55', station: 'Engen Woodmead', plate: 'CA 214-887',
+      model: 'Toyota Hilux 2.4GD-6', litres: 31.0, pts: 310, odo: '83 402 km', ref: '355 118' }
+  ];
   var FILL_TAKES_MS = 8000;
   /* What the square encodes.
 
@@ -4770,6 +4888,8 @@ body {
      controls for the same job in the same place is how a driver ends up
      pressing the one that is not there. */
   function paintFuelAction() {
+    /* The bell's dot is the uncollected fill, nothing else. */
+    if (el.homeBellDot) { el.homeBellDot.hidden = S.fuel !== 'done'; }
     /* One slot, and now five faces of it: the ask, the spinner, and the three
        phases of a fill - approved, filling, done. Still exactly one up at a
        time, and the bar stays the same bar throughout so the thing a driver
@@ -4811,6 +4931,7 @@ body {
           'Filling ' + plate + '. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
       } else {
         el.homeLive.setAttribute('data-phase', 'done');
+
         barCta.textContent = 'See points';
         barTitle.textContent = partialFill() ? 'Fill stopped early' : 'Fill complete';
         el.homeLiveSub.textContent = plate + ' · ' + fillLitresFinal() + ' L';
@@ -5801,9 +5922,13 @@ body {
         title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
         sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
                : 'Scan the one you are driving' },
+      /* The cap is the tank, which is how Absa actually sets it: a litre
+         ceiling derived from the vehicle so the card cannot overfill. Naming
+         the vehicle makes the number the driver's own instead of a rule. */
       { ok: true,  shortName: 'Litres for this fill',
         title: '60 L approved for this fill',
-        sub: 'Your company limit for this vehicle' }
+        sub: v ? 'The tank size of your ' + v.make + ' ' + v.model
+               : 'Set from your vehicle\u2019s tank size' }
     ];
   }
 
@@ -6102,6 +6227,7 @@ body {
     /* Done files the slip. Everything on it is already settled, so the filed
        copy is plain facts, not live state. */
     S.receipts.unshift({
+      when: 'Today · 9:41',
       station: stationName(),
       plate: v ? v.plate : '',
       model: v ? v.make + ' ' + v.model : '',
@@ -6119,6 +6245,28 @@ body {
     showHome(true);
   }
 
+  /* The one setting that is the driver's own. Its axis lives in this file:
+     the sign-up flow's enrolment answer cannot be seen from here - two files,
+     no build step - so the demo driver arrives with it on, which is the state
+     the sign-up flow's happy path produces. */
+  function showAccount() {
+    clearTimers(); hideAll();
+    S.step = 'account';
+    statusTone(false);
+    el.accountVehicles.textContent = String(S.vehicles.length || 0);
+    paintBioSetting();
+    el.account.hidden = false;
+    el.account.setAttribute('data-state', 'visible');
+    announce('Account.');
+    after(60, function () { el.accountTitle.focus({ preventScroll: true }); });
+  }
+  function paintBioSetting() {
+    el.accountBio.setAttribute('aria-checked', S.bioOn ? 'true' : 'false');
+    el.accountBioSub.textContent = S.bioOn
+      ? 'On. No code to wait for.'
+      : 'Off. We send a code to sign you in.';
+  }
+
   /* The drawer the slips live in. Each is the receipt's own card, redrawn
      from its filed facts - the driver already learned to read this shape on
      the screen that filed it. */
@@ -6128,7 +6276,7 @@ body {
     statusTone(false);
     el.historyEmpty.hidden = S.receipts.length > 0;
     el.historyList.innerHTML = S.receipts.map(function (r) {
-      return '<p class="o-history__when">Today · 9:41</p>' +
+      return '<p class="o-history__when">' + (r.when || 'Today · 9:41') + '</p>' +
         '<div class="o-history__card">' +
         row('Station', r.station) +
         row('Vehicle', r.plate + '<small class="o-receipt__sub">' + r.model + '</small>') +
@@ -6352,6 +6500,23 @@ body {
   el.earnedCta.addEventListener('click', function () { showReceipt(); });
   el.receiptDone.addEventListener('click', function () { finishFill(); });
   el.historyBack.addEventListener('click', function () { showHome(false); });
+  el.accountBack.addEventListener('click', function () { showHome(false); });
+  el.accountBio.addEventListener('click', function () {
+    S.bioOn = !S.bioOn;
+    paintBioSetting();
+    reply(S.bioOn ? 'Face or fingerprint is on.' : 'Face or fingerprint is off. We will send a code.');
+  });
+  /* Signing out is real: it lands on the sign-in flow's front door, which is
+     what signing out of the finished app would do. */
+  el.accountOut.addEventListener('click', function () {
+    window.location.href = 'index.html#home/default';
+  });
+  /* The bell tells the truth: news is an uncollected fill, and the tap goes
+     to the news or says there is none. */
+  el.homeBell.addEventListener('click', function () {
+    if (S.fuel === 'done') { showEarned(); return; }
+    reply('No new messages.');
+  });
   el.fuelClose.addEventListener('click', hideFuel);
   el.fuelDone.addEventListener('click', function () { hideFuel(); });
 
@@ -6411,6 +6576,7 @@ body {
     if (S.step === 'earned') { el.earnedCta.click(); return; }
     if (S.step === 'receipt') { el.receiptDone.click(); return; }
     if (S.step === 'history') { el.historyBack.click(); return; }
+    if (S.step === 'account') { el.accountBack.click(); return; }
     if (S.step === 'fuel') {
       /* Keep it, never Cancel it. Escape must not be able to void a code. */
       if (!el.fuelConfirm.hidden) { el.fuelKeep.click(); return; }
@@ -6665,13 +6831,15 @@ body {
      no text to scrape. Tiles and tabs already read correctly, so they keep the
      fallback. */
   Array.prototype.forEach.call(
-    el.home.querySelectorAll('[data-tile], [data-tab], #homeBell, #homeAvatar'),
+    el.home.querySelectorAll('[data-tile], [data-tab], #homeAvatar'),
     function (b) {
       b.addEventListener('click', function () {
         if (b.getAttribute('aria-current') === 'page') { return; }
+        if (b.id === 'homeAvatar') { showAccount(); return; }
         /* History stopped being a promise the day receipts needed somewhere
            to live. The other tabs keep the honest fallback. */
         if (b.getAttribute('data-tab') === 'history') { showHistory(); return; }
+        if (b.getAttribute('data-tab') === 'account') { showAccount(); return; }
         var name = b.getAttribute('data-unbuilt') ||
                    b.textContent.trim().split('\n')[0] || 'That';
         reply(name + ' is not built yet.');
@@ -6730,7 +6898,7 @@ body {
     S.odoReading = '';
     S.fillBanked = false;
     S.bankedPts = 0;
-    S.receipts = [];
+    S.receipts = userType === 'returning-driver' ? PAST_RECEIPTS.slice() : [];
     S.earnedConfettiPlayed = false;
     /* So does the camera. Without this a reviewer walking the menu would see the
        plate change under them from one state to the next, because the reader
@@ -6796,6 +6964,11 @@ body {
     'new-thousand-vehicles': { group: 'after-signup', label: 'A thousand vehicles',
       run: function () { reset('new-driver', true, 1000); showHome(); } },
 
+    'account':            { group: 'returning', label: 'Account',
+      run: function () {
+        reset('returning-driver', true, 3);
+        showAccount(); clearTimers();
+      } },
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle assigned',
       run: function () { reset('returning-driver', false); route(); } },
     'returning-with-vehicle':    { group: 'returning', label: 'One vehicle',
@@ -7016,10 +7189,11 @@ body {
         /* One finished fill already in the drawer, filed the way finishFill
            files it, so the state shows the drawer doing its job. */
         S.bankedPts = FILL_PTS;
-        S.receipts = [{ station: 'Engen Bryanston', plate: 'CA 123-456',
-                        model: 'Ford Transit Custom 2.0TDCi',
-                        litres: FILL_LITRES, pts: FILL_PTS,
-                        ref: fuelDigitsShown('EXT.bryanston.CA123-456') }];
+        S.receipts = [{ when: 'Today · 9:41', station: 'Engen Bryanston',
+                        plate: 'CA 123-456', model: 'Ford Transit Custom 2.0TDCi',
+                        litres: FILL_LITRES, pts: FILL_PTS, odo: '84 230 km',
+                        ref: fuelDigitsShown('EXT.bryanston.CA123-456') }]
+                     .concat(PAST_RECEIPTS);
         showHistory(); clearTimers();
       } },
     'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing scanned',
@@ -7259,7 +7433,8 @@ body {
         ['new-thousand-vehicles', 'A thousand vehicles']
       ],
       'returning': [
-        ['returning-without-vehicle', 'No vehicle assigned'],
+        ['account', 'Account'],
+                   ['returning-without-vehicle', 'No vehicle assigned'],
         ['returning-with-vehicle', 'One vehicle'],
         ['home-few-vehicles', 'Four vehicles'],
         ['home-five-vans', 'Five vans'],
