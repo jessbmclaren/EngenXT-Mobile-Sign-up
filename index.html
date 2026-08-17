@@ -1798,6 +1798,13 @@ button { background: none; border: none; color: inherit; }
 
             <div id="codeAlert" tabindex="-1" hidden></div>
 
+            <!-- Only the confirmed face shows this. The offer follows on its
+                 own in 700ms, but two reviewers now read that beat as a hang,
+                 and a screen with no control is a hang to whoever is holding
+                 it. The button and the timer race; whichever wins, the same
+                 door opens once. -->
+            <button class="a-btn a-btn--primary o-signup-sheet__cta" id="codeContinue" type="button" hidden>Continue</button>
+
             <button class="a-link a-link--flush o-signup-sheet__resend" id="resendBtn" type="button" disabled>Resend code in 0:45</button>
 
             <button class="a-btn a-btn--outline a-btn--sm o-signup-sheet__secondary" id="openWhatsappBtn" type="button">
@@ -2270,7 +2277,7 @@ button { background: none; border: none; color: inherit; }
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
     privacyMore: $('privacyMore'), privacyCard: $('privacyCard'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
-    otpGroup: $('otpGroup'), otpHelper: $('otpHelper'),
+    otpGroup: $('otpGroup'), otpHelper: $('otpHelper'), codeContinue: $('codeContinue'),
     codeAlert: $('codeAlert'), resendBtn: $('resendBtn'), channelSwitchBtn: $('channelSwitchBtn'),
     openWhatsapp: $('openWhatsappBtn'), backToNumber: $('backToNumberBtn'),
     blockedIcon: $('blockedIcon'), blockedTitle: $('blockedTitle'), blockedBody: $('blockedBody'),
@@ -2841,7 +2848,7 @@ button { background: none; border: none; color: inherit; }
     offline:     { resend: false, whatsapp: false, channel: false, back: true },
     server:      { resend: false, whatsapp: false, channel: false, back: true },
     /* Confirmed. The screen is leaving, so it stops offering ways to stay. */
-    confirmed:   { resend: false, whatsapp: false, channel: false, back: false }
+    confirmed:   { resend: false, whatsapp: false, channel: false, back: false, go: true }
   };
 
   function setCodeView(name) {
@@ -2853,6 +2860,7 @@ button { background: none; border: none; color: inherit; }
        digits the driver had already got right. Same rule, applied where the
        outcome actually lives. */
     el.progress.hidden = (name === 'confirmed');
+    el.codeContinue.hidden = !v.go;
     el.resendBtn.hidden = !v.resend;
     el.openWhatsapp.hidden = !v.whatsapp || S.channel !== 'whatsapp';
     el.channelSwitchBtn.hidden = !v.channel;
@@ -4214,6 +4222,9 @@ button { background: none; border: none; color: inherit; }
       announce('About your information. ' + card.querySelector('.m-alert__body').textContent);
     }
   });
+  /* Idempotent by construction: offerBiometrics clears the pending timer, so
+     a tap and the 700ms beat can both fire without a double journey. */
+  el.codeContinue.addEventListener('click', function () { offerBiometrics(); });
   el.bioEnable.addEventListener('click', function () { chooseBiometrics(true); });
   el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
