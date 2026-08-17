@@ -2800,7 +2800,10 @@ body {
    already know this exact mechanic - VodaBucks, Discovery, UCount all sell
    prepaid bundles for points - so the screen looks like the thing they know:
    a short list of bundles, priced in points, and an honest face on the one
-   the balance cannot cover yet. */
+   the balance cannot cover yet. This is also the room the app's promise is
+   kept in, so it is not allowed to look like Settings: the balance wears
+   the hero's light, the bundles wear the data mark, and the verb wears a
+   button's body. */
 .o-rewards {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
@@ -2813,14 +2816,33 @@ body {
 }
 .o-rewards[data-state="visible"] { display: flex; }
 /* Kin to the home hero, one screen along: same figure, same worth line, so
-   the number a driver followed here is the number that greets them. */
-.o-rewards__balance { display: flex; flex-direction: column; gap: var(--sp-1); margin-top: var(--sp-4); }
+   the number a driver followed here is the number that greets them. But
+   here the number is the destination, so it sits on the hero surface under
+   two soft blooms - the accent's and the points amber's - with the medal's
+   bolt in the corner. The blooms live in the background stack rather than
+   a pseudo-element, so nothing fights the text for paint order. */
+.o-rewards__balanceCard {
+  position: relative;
+  display: flex; flex-direction: column; gap: var(--sp-1);
+  margin-top: var(--sp-4); padding: var(--sp-5);
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(95% 110% at 88% -10%, var(--color-accent-on-dark-fill) 0%, transparent 62%),
+    radial-gradient(55% 70% at 8% 108%, var(--color-points-on-dark-35) 0%, transparent 58%),
+    var(--gradient-hero);
+  box-shadow: var(--shadow-card-sm);
+}
+.o-rewards__bolt { position: absolute; top: var(--sp-4); right: var(--sp-4); font-size: 20px; line-height: 1; }
+.o-rewards__balanceLabel {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-on-dark-soft);
+}
 .o-rewards__points {
   font-size: var(--text-display); font-weight: 800; line-height: 1.1;
-  letter-spacing: -0.6px; color: var(--color-text-primary);
+  letter-spacing: -0.6px; color: var(--color-text-on-dark);
   font-variant-numeric: tabular-nums;
 }
-.o-rewards__worth { font-size: var(--text-caption); font-weight: 500; color: var(--color-text-secondary); }
+.o-rewards__worth { font-size: var(--text-caption); font-weight: 500; color: var(--color-on-dark-mid); }
 .o-rewards__lead {
   margin-top: var(--sp-6);
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
@@ -2837,16 +2859,55 @@ body {
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
 .m-bundle:active { transform: scale(0.985); }
+.m-bundle__main { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+/* The bundle is a prize, not a settings row: it carries the same data mark
+   the earned screen wears, and the mark's colour follows the row's state. */
+.m-bundle .a-icon-wrap { color: var(--color-primary); }
 .m-bundle__size { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
 .m-bundle__price { display: block; margin-top: 1px; font-size: var(--text-caption); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
 .m-bundle__state { font-size: var(--text-footnote); font-weight: 700; color: var(--color-primary-dark); white-space: nowrap; }
+/* The verb wears a button's body. A text link asks to be read; a filled
+   pill asks to be pressed, and pressing is the point. The row stays the
+   tap target - the pill is drawn, not nested, so no button sits inside
+   a button. */
+.m-bundle__go {
+  display: inline-flex; align-items: center;
+  min-height: 36px; padding: 0 var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary); color: var(--color-text-on-dark);
+  font-size: var(--text-footnote); font-weight: 700; white-space: nowrap;
+}
 /* Sent keeps its place and goes quiet-green; short stays visible and says
    what is missing, because a hidden option teaches nothing. */
 .m-bundle[data-state="sent"] { border-color: var(--color-success-20); background: var(--color-success-bg); cursor: default; }
 .m-bundle[data-state="sent"] .m-bundle__state { color: var(--color-success); }
+.m-bundle[data-state="sent"] .a-icon-wrap { color: var(--color-success); }
 .m-bundle[data-state="short"] { background: var(--color-surface-sunken); box-shadow: none; cursor: default; }
 .m-bundle[data-state="short"] .m-bundle__size { color: var(--color-text-secondary); }
 .m-bundle[data-state="short"] .m-bundle__state { color: var(--color-text-secondary); font-weight: 600; }
+.m-bundle[data-state="short"] .a-icon-wrap { color: var(--color-text-secondary); background: var(--color-surface); }
+/* Distance, not bookkeeping: the short row draws how close the balance is,
+   so the missing points read as a journey with a length, not a wall. */
+.m-bundle__track {
+  display: block; width: 120px; height: 4px; margin-top: var(--sp-2);
+  border-radius: var(--radius-pill); background: var(--color-border);
+  overflow: hidden;
+}
+.m-bundle__trackFill { display: block; height: 100%; border-radius: inherit; background: var(--gradient-primary); }
+/* Arrival. The card lands first, then the bundles take their places - the
+   same small rise the station detail makes, staggered by row. The balance
+   does not count up: the medal counts because points were just earned, and
+   nothing was just earned here. Light, not fiction. */
+@keyframes rewardsIn { from { opacity: 0; transform: translateY(14px); } }
+.o-rewards[data-motion="in"] .o-rewards__balanceCard { animation: rewardsIn .5s var(--ease-out) both; }
+.o-rewards[data-motion="in"] .m-bundle {
+  animation: rewardsIn .45s var(--ease-out) both;
+  animation-delay: calc(90ms + var(--bundle-i, 0) * 60ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .o-rewards[data-motion="in"] .o-rewards__balanceCard,
+  .o-rewards[data-motion="in"] .m-bundle { animation: none; }
+}
 .o-rewards__earnNote {
   margin-top: var(--sp-5);
   font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
@@ -3475,14 +3536,17 @@ body {
 
       <!-- Where points become something. The bundles are the mechanic SA
            drivers already know from VodaBucks and the banks: a short list,
-           priced in points, the unaffordable one honest about what it needs. -->
+           priced in points, the unaffordable one honest about what it needs.
+           The balance wears the hero's light: this is the room the app's
+           promise is kept in, so the number is lit like the prize it is. -->
       <section class="o-rewards" id="rewardsScreen" aria-labelledby="rewardsTitle" hidden>
         <div class="o-history__bar">
           <button class="a-icon-btn" type="button" id="rewardsBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
         </div>
         <h1 class="o-receipt__title" id="rewardsTitle" tabindex="-1">Rewards</h1>
-        <div class="o-rewards__balance">
-          <span class="u-visually-hidden">Your balance.</span>
+        <div class="o-rewards__balanceCard">
+          <span class="o-rewards__bolt" aria-hidden="true">⚡</span>
+          <span class="o-rewards__balanceLabel">Your balance</span>
           <span class="o-rewards__points" id="rewardsPoints">2 450 pts</span>
           <span class="o-rewards__worth" id="rewardsWorth">About 2.45 GB of data</span>
         </div>
@@ -6486,12 +6550,20 @@ body {
     S.step = 'rewards';
     statusTone(false);
     paintRewards();
+    /* The arrival wave plays once, on arrival. The attribute comes off
+       before any spend repaints the list, so tapping Get it changes one
+       row's face instead of replaying the whole entrance. */
+    el.rewards.setAttribute('data-motion', 'in');
     el.rewards.hidden = false;
     el.rewards.setAttribute('data-state', 'visible');
     announce('Rewards. ' + groupNum(balancePts()) + ' points. About ' +
              dataLabel(balancePts() / S.ptsPerGb) + ' of data.');
     after(60, function () { el.rewardsTitle.focus({ preventScroll: true }); });
+    after(900, function () { el.rewards.removeAttribute('data-motion'); });
   }
+  /* The data mark the earned screen already wears. Stroke is currentColor,
+     so the row's state colours the mark without a second drawing. */
+  var DATA_MARK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>';
   function paintRewards() {
     var bal = balancePts();
     el.rewardsPoints.textContent = groupNum(bal) + ' pts';
@@ -6501,14 +6573,25 @@ body {
       var sent = S.sentBundles.indexOf(b.mb) > -1;
       var short = !sent && bal < b.pts;
       var state = sent ? 'sent' : short ? 'short' : 'can';
-      var right = sent ? 'Sent \u2713'
-                : short ? 'Needs ' + groupNum(b.pts) + ' points'
-                : 'Get it';
+      /* Short says the distance, not the price - the price is already on
+         the row, the track draws the rest, and "1 050 more" is a reason
+         to fill up again. "More points" collided with the price column at
+         large text, and the word the line can spare is the one the row
+         already says twice. */
+      var right = sent ? '<span class="m-bundle__state">Sent \u2713</span>'
+                : short ? '<span class="m-bundle__state">Needs ' + groupNum(b.pts - bal) + ' more</span>'
+                : '<span class="m-bundle__go">Get it</span>';
+      var track = short ? '<span class="m-bundle__track"><span class="m-bundle__trackFill" style="width:' +
+                          Math.round(bal / b.pts * 100) + '%"></span></span>' : '';
       return '<button class="m-bundle" type="button" role="listitem" data-bundle="' + i + '"' +
-             ' data-state="' + state + '"' + (sent || short ? ' aria-disabled="true"' : '') + '>' +
+             ' data-state="' + state + '" style="--bundle-i:' + i + '"' +
+             (sent || short ? ' aria-disabled="true"' : '') + '>' +
+             '<span class="m-bundle__main">' +
+             '<span class="a-icon-wrap"' + (sent ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
              '<span><span class="m-bundle__size">' + b.label + ' of data</span>' +
-             '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span></span>' +
-             '<span class="m-bundle__state">' + right + '</span></button>';
+             '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span>' + track + '</span>' +
+             '</span>' +
+             right + '</button>';
     }).join('');
   }
   /* The one writer of spend. A sent bundle stays sent for the session, its
@@ -7366,6 +7449,18 @@ body {
         reset('returning-driver', true, 3);
         showRewards(); clearTimers();
       } },
+    'rewards-spent':      { group: 'returning', label: 'Rewards, after spending',
+      run: function () {
+        reset('returning-driver', true, 3);
+        showRewards();
+        /* Spend through the one writer so the frame is the honest result
+           of two sends: two rows quiet-green, the 2 GB short with its
+           distance drawn. The toast about the sends is stale news in a
+           frozen frame, so it comes down. */
+        sendBundle(0); sendBundle(1);
+        el.toast.removeAttribute('data-state');
+        clearTimers();
+      } },
     'account':            { group: 'returning', label: 'Account',
       run: function () {
         reset('returning-driver', true, 3);
@@ -7867,6 +7962,7 @@ body {
       'returning': [
         ['returning-signin', 'Signed in again'],
                    ['rewards', 'Rewards, the bundles'],
+                   ['rewards-spent', 'Rewards, after spending'],
                    ['account', 'Account'],
                    ['returning-without-vehicle', 'No vehicle assigned'],
         ['returning-with-vehicle', 'One vehicle'],
