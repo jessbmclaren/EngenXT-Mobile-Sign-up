@@ -844,7 +844,14 @@ button { background: none; border: none; color: inherit; }
    Two of them side by side, so a driver can compare the versions without
    reading the sentence above them, and read either one out to their manager
    without hunting through prose for it. */
-.m-figure-row { display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4); }
+.m-figure-row {
+  display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4);
+  /* Centred as a pair. The row sat on the left edge of cards whose every
+     other line is centred - the one left-handed thing on the screen. Each
+     figure keeps its own left-aligned key-over-value stack, which is how a
+     label and its number read; only the pair takes the centre. */
+  justify-content: center;
+}
 .m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .m-figure__key {
   font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.12em;
@@ -874,6 +881,12 @@ button { background: none; border: none; color: inherit; }
 .o-status-page__panel {
   width: 100%; background: var(--color-surface); border-radius: var(--radius-sheet);
   padding: var(--sp-7) var(--sp-6); text-align: center;
+}
+/* The mark's rings reach 22px beyond it, and the panel's padding alone left
+   them grazing the card's top corner and dipping into the title. The mark
+   carries its own clearance so the rings float in air on both sides. */
+.o-status-page__panel .a-icon-wrap--mark {
+  margin-top: var(--sp-3); margin-bottom: var(--sp-3);
   box-shadow: var(--shadow-overlay);
 }
 .o-status-page__icon { margin-inline: auto; }
