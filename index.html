@@ -528,6 +528,10 @@ button { background: none; border: none; color: inherit; }
 .a-icon-wrap--mark[data-tone="error"]   { color: var(--color-secondary); }
 .a-icon-wrap--mark[data-tone="warning"] { color: var(--color-warning); }
 .a-icon-wrap--mark[data-tone="success"] { color: var(--color-success); }
+/* An offer is not an outcome. The biometrics ask rings in the brand's own
+   blue, because nothing has gone right or wrong yet - a question is being
+   asked. */
+.a-icon-wrap--mark[data-tone="info"]    { color: var(--color-primary); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
 .a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
 .a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
@@ -1778,11 +1782,29 @@ button { background: none; border: none; color: inherit; }
             <div class="o-outcome-panel__actions" id="blockedActions"></div>
           </div>
 
-          <!-- There is no success stage. Sign-up used to end on a sheet saying
-               the account was ready, with a Continue button, immediately before
-               a second screen saying the same thing with a medal. The
+          <!-- STAGE · BIOMETRICS
+
+               There is still no success stage. Sign-up used to end on a sheet
+               saying the account was ready, with a Continue button, immediately
+               before a second screen saying the same thing with a medal. The
                confirmation lives on the code field, which the driver is already
-               looking at, and the app arrives on its own. -->
+               looking at, and that has not changed.
+
+               What stands between it and the app now is one real question, not
+               a restatement: whether the next sign-in should need a code at
+               all. Asked here because this is the one moment the driver has
+               just felt the cost being removed - they are holding the code
+               they had to wait for. Skip is a full-rank button and the
+               question is never asked again. -->
+          <div class="o-signup-sheet__stage o-outcome-panel" id="stageBiometrics">
+            <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark" id="bioIcon" data-tone="info" aria-hidden="true"></span>
+            <h3 class="o-outcome-panel__title" id="bioTitle" tabindex="-1">Skip the code next time</h3>
+            <p class="o-outcome-panel__body" id="bioBody">Sign in with your face or fingerprint instead of waiting for a code. If you skip this, you can turn it on later in Account.</p>
+            <div class="o-outcome-panel__actions">
+              <button class="a-btn a-btn--primary" type="button" id="bioEnable">Turn it on</button>
+              <button class="a-btn a-btn--outline" type="button" id="bioSkip">Not now</button>
+            </div>
+          </div>
 
         </div>
         </div>
@@ -1942,7 +1964,8 @@ button { background: none; border: none; color: inherit; }
       alert:    '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
       message:  '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
       check:    '<path d="M20 6 9 17l-5-5"/>',
-      upload:   '<path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>'
+      upload:   '<path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>',
+      scanFace: '<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'
     };
     /* A missing icon must be visible, not silently absent. The fallback used
        to be paths.info, which was removed as unused, so an unknown name
@@ -2170,7 +2193,9 @@ button { background: none; border: none; color: inherit; }
     sheetClose: $('sheetClose'),
     progress: $('progress'),
     stageNumber: $('stageNumber'), stageCode: $('stageCode'),
-    stageBlocked: $('stageBlocked'),
+    stageBlocked: $('stageBlocked'), stageBiometrics: $('stageBiometrics'),
+    bioIcon: $('bioIcon'), bioTitle: $('bioTitle'), bioBody: $('bioBody'),
+    bioEnable: $('bioEnable'), bioSkip: $('bioSkip'),
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
     otpGroup: $('otpGroup'), otpHelper: $('otpHelper'),
@@ -2186,8 +2211,11 @@ button { background: none; border: none; color: inherit; }
      ════════════════════════════════════════════════════════════════════ */
   var S = {
     mode: 'signup',        // signup | signin
-    stage: 'closed',       // closed | number | code | blocked | success
+    stage: 'closed',       // closed | number | code | blocked | biometrics | success
     channel: 'whatsapp',   // whatsapp | sms
+    /* Written only by chooseBiometrics. The answer is given once: asked at
+       the end of sign-up, never re-asked, and skipping is not a failure. */
+    biometrics: 'unasked', // unasked | enabled | skipped
     otp: ['', '', '', '', '', ''],
     attemptsLeft: MAX_ATTEMPTS,
     resendsLeft: MAX_RESENDS,
@@ -2459,6 +2487,13 @@ button { background: none; border: none; color: inherit; }
 
   function closeSheet(force) {
     if (S.stage === 'closed') { return; }
+    /* A driver at the biometrics offer is already signed in. Every dismissal
+       - the grab bar, the scrim, Escape - answers the question rather than
+       un-asking it, because dropping a signed-in driver back onto the
+       marketing hero is not a state this flow has. Mid-wait the skip button
+       is disabled and click() does nothing, which is also right: the phone's
+       own sheet cannot be cancelled from underneath. */
+    if (S.stage === 'biometrics') { el.bioSkip.click(); return; }
     if (!force && !S.dismissArmed) {
       var partialNumber = S.stage === 'number' && phoneDigits().length > 0 && !phoneComplete();
       var midCode = S.stage === 'code';
@@ -2499,7 +2534,8 @@ button { background: none; border: none; color: inherit; }
        for instance when the keyboard needs space and only some stages can
        give up their subtitle. */
     el.sheet.setAttribute('data-stage', name);
-    [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked]]
+    [['number', el.stageNumber], ['code', el.stageCode], ['blocked', el.stageBlocked],
+     ['biometrics', el.stageBiometrics]]
       .forEach(function (pair) {
         if (pair[0] === name) { pair[1].setAttribute('data-state', 'active'); }
         else { pair[1].removeAttribute('data-state'); }
@@ -2509,7 +2545,7 @@ button { background: none; border: none; color: inherit; }
     var step = name === 'number' ? 0 : name === 'code' ? 1 : 2;
     /* An outcome is not a step. Counting to 2 of 2 on a finished journey adds
        nothing and costs the group the room it wants. */
-    el.progress.hidden = (name === 'blocked' || name === 'success');
+    el.progress.hidden = (name === 'blocked' || name === 'biometrics' || name === 'success');
     var label = document.getElementById('progressLabel');
     if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
     /* Prototype scaffolding, kept out of the product copy so the sentence a
@@ -2532,7 +2568,7 @@ button { background: none; border: none; color: inherit; }
     /* An outcome fills the sheet and carries its own heading. A second, vaguer
        one above it ("We can't finish this yet") competed with the sentence that
        actually says what happened, and pushed it down the screen. */
-    var outcome = (name === 'blocked' || name === 'success');
+    var outcome = (name === 'blocked' || name === 'biometrics' || name === 'success');
     el.sheetHeading.hidden = outcome;
     /* The dialog is named by whatever aria-labelledby points at, and an
        explicit reference is followed into hidden elements: hiding the heading
@@ -2540,8 +2576,12 @@ button { background: none; border: none; color: inherit; }
        mobile number", the last thing the header had been set to, while the
        screen said the account was paused. It points at the heading the panel
        is actually showing. */
-    el.sheet.setAttribute('aria-labelledby', outcome ? 'blockedTitle' : 'sheetTitle');
-    el.sheetClose.hidden = (name === 'success');
+    el.sheet.setAttribute('aria-labelledby',
+      name === 'biometrics' ? 'bioTitle' : outcome ? 'blockedTitle' : 'sheetTitle');
+    /* No X on the offer. Enable and Not now are the two honest exits, and a
+       third control that means "not now" is a second opinion about one of
+       them. Every dismissal path resolves to the skip instead. */
+    el.sheetClose.hidden = (name === 'biometrics' || name === 'success');
     if (outcome) { el.sheetHeader.setAttribute('data-heading', 'none'); }
     else { el.sheetHeader.removeAttribute('data-heading'); }
   }
@@ -2918,18 +2958,20 @@ button { background: none; border: none; color: inherit; }
          than lingering behind the transition. */
       setCodeView('confirmed');
       stopCountdown('resend'); stopCountdown('slow');
-      /* Straight into the app, rather than through a screen that says the
-         account is ready and waits to be told to continue.
+      /* On to the one question sign-up has left, rather than through a screen
+         that says the account is ready and waits to be told to continue.
 
          There used to be a full sheet here: a green tick, "Your account is
          ready", and a Continue button, immediately followed by a second screen
          congratulating the driver again with a medal. Two celebrations and two
          taps for one act. The confirmation belongs on the field the driver just
-         typed into, which already has it, and the app should simply arrive.
+         typed into, which already has it. What follows is not a restatement:
+         it is the offer to skip this code next time, and the app arrives on
+         the far side of the answer.
 
          The beat is long enough to read the field turning green and no longer.
          It is not a loading screen: nothing is being waited for. */
-      after(700, handOver);
+      after(700, offerBiometrics);
     });
   }
 
@@ -3076,6 +3118,83 @@ button { background: none; border: none; color: inherit; }
     renderAlert(el.codeAlert, resolveDef(to === 'sms' ? CODE_ALERTS.smsSent : CODE_ALERTS.waSent));
     startResendCooldown();
     var first = cells()[0]; if (first) { first.focus({ preventScroll: true }); }
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     STAGE · BIOMETRICS
+     ════════════════════════════════════════════════════════════════════ */
+  /* The offer, not the outcome, is the screen. There is no biometrics/ask
+     state in the rail because success/signup and success/signin ARE the ask:
+     the last thing sign-up shows. Adding a third state that rendered the same
+     screen is the duplicate-render mistake the rail already removed once.
+
+     There is also no biometrics/unavailable. On a phone with no biometrics
+     the offer never appears and the app simply arrives, and a rail state
+     that renders an absence gives a reviewer nothing to look at.
+
+     The welcome flow's per-fill "Confirm it is you" step is deliberately not
+     told the answer. These are two files and one cannot see inside the other
+     without a build step; its copy speaks device truth ("your phone's screen
+     lock") and is correct whichever way this question went. */
+
+  function offerBiometrics() {
+    clearTimers();
+    releaseKeyboard();
+    paintBioAsk();
+    showStage('biometrics');
+    announce(el.bioTitle.textContent + '. ' + el.bioBody.textContent);
+    after(60, function () { el.bioTitle.focus({ preventScroll: true }); });
+  }
+
+  /* Paints are pure and timer-free, so the rail can land on any face directly
+     and an organic journey passes through the same three. */
+  function paintBioAsk() {
+    el.bioIcon.setAttribute('data-tone', 'info');
+    el.bioIcon.innerHTML = icon('scanFace', toneColour('info'), 28);
+    el.bioTitle.textContent = 'Skip the code next time';
+    el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. If you skip this, you can turn it on later in Account.';
+    setBtn(el.bioEnable, true, 'Turn it on');
+    setBtn(el.bioSkip, true, 'Not now');
+  }
+
+  /* The operating system owns this beat: its own sheet is up and the page
+     can only wait. Both buttons go quiet, which also makes Escape a no-op,
+     because a driver cannot cancel the phone's check from underneath it. */
+  function paintBioWaiting() {
+    el.bioEnable.innerHTML = spinnerMarkup() + '<span>Waiting for your phone…</span>';
+    el.bioEnable.setAttribute('aria-disabled', 'true');
+    el.bioEnable.disabled = true;
+    setBtn(el.bioSkip, false);
+  }
+
+  function paintBioDone() {
+    el.bioIcon.setAttribute('data-tone', 'success');
+    el.bioIcon.innerHTML = icon('check', toneColour('success'), 28);
+    el.bioTitle.textContent = 'Biometrics on';
+    el.bioBody.textContent = 'Next time, your face or fingerprint signs you in. No code to wait for.';
+    setBtn(el.bioEnable, false);
+    setBtn(el.bioSkip, false);
+  }
+
+  /* The one writer of S.biometrics. Skipping proceeds at once and is never
+     asked about again; enabling waits out the phone's own sheet, shows the
+     answer long enough to read, and then the app arrives either way. */
+  function chooseBiometrics(enable) {
+    if (!enable) {
+      S.biometrics = 'skipped';
+      handOver();
+      return;
+    }
+    paintBioWaiting();
+    /* Not gated on reduced motion: nothing moves. The wait is the phone's
+       own sheet taking the time it takes, and the beats here are reading
+       time, like the 700ms on the confirmed code. */
+    after(900, function () {
+      S.biometrics = 'enabled';
+      paintBioDone();
+      announce(el.bioTitle.textContent + '. ' + el.bioBody.textContent);
+      after(700, handOver);
+    });
   }
 
   /* ════════════════════════════════════════════════════════════════════
@@ -3383,7 +3502,11 @@ button { background: none; border: none; color: inherit; }
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
                             setOtpTone('valid');
-                            setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
+                            /* Not "Opening EngenXT" any more: what opens next
+                               is the biometrics offer, and a helper promising
+                               the app while a question stands between them
+                               would be the screen lying about its own flow. */
+                            setHelper(el.otpHelper, 'Code confirmed', 'success');
                             setCodeView('confirmed');
                           } },
 
@@ -3394,20 +3517,43 @@ button { background: none; border: none; color: inherit; }
     'blocked/locked':       { label: 'Locked 15 min',   run: function () { base('signup', '821234567'); showBlocked('locked'); } },
 
     /* Done */
-    /* The last thing sign-up shows, which is the code field confirming itself.
-       These do not navigate: a menu state that walks the reviewer out of the
-       file is not a state you can look at. The helper says where it goes. */
+    /* The last thing sign-up shows, which is now the biometrics offer. These
+       states render the ask, not a biometrics/ask twin of themselves: the
+       rail already removed one section that listed the same screens twice,
+       and the ids stay put so every link into them keeps working. They do
+       not navigate: a menu state that walks the reviewer out of the file is
+       not a state you can look at. */
     'success/signup': { label: 'Signed up, opens the welcome reward', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('valid'); setCodeView('confirmed');
-                          setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
+                          setHelper(el.otpHelper, 'Code confirmed', 'success');
+                          offerBiometrics(); clearTimers();
                         } },
     'success/signin': { label: 'Signed in, opens home', run: function () {
                           base('signin', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('valid'); setCodeView('confirmed');
-                          setHelper(el.otpHelper, 'Code confirmed. Opening EngenXT.', 'success');
+                          setHelper(el.otpHelper, 'Code confirmed', 'success');
+                          offerBiometrics(); clearTimers();
+                        } },
+    /* The two moments only the enable path has. clearTimers so the navigator
+       holds the frame: a reviewer looking at "waiting" is looking at the
+       wait, not riding it into the handover. */
+    'biometrics/waiting': { label: 'Waiting for the phone', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('valid'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          paintBioWaiting();
+                        } },
+    'biometrics/enabled': { label: 'Biometrics on', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('valid'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          S.biometrics = 'enabled';
+                          paintBioDone();
                         } }
   };
 
@@ -3425,7 +3571,7 @@ button { background: none; border: none; color: inherit; }
                  'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
                  'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
     navBlocked: ['blocked/unregistered', 'blocked/suspended', 'blocked/fleet', 'blocked/locked'],
-    navDone:    ['success/signup', 'success/signin']
+    navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/enabled']
   };
 
   /* ════════════════════════════════════════════════════════════════════
@@ -3558,7 +3704,7 @@ button { background: none; border: none; color: inherit; }
     navNumber:  'Entering the number their company registered, and everything that can come back.',
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
-    navDone:    'The end of sign-up, which hands over to the welcome flow.',
+    navDone:    'The end of sign-up: the offer to skip the code next time, then the handover to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
@@ -3701,7 +3847,9 @@ button { background: none; border: none; color: inherit; }
       navBlocked: [['blocked/unregistered','Not registered'],['blocked/suspended','Driver paused'],
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
-                   ['success/signin','Signed in, opens home']]
+                   ['success/signin','Signed in, opens home'],
+                   ['biometrics/waiting','Waiting for the phone'],
+                   ['biometrics/enabled','Biometrics on']]
     }
   };
 
@@ -3956,6 +4104,8 @@ button { background: none; border: none; color: inherit; }
   el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
   el.backToNumber.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
   el.sheetClose.addEventListener('click', function () { closeSheet(); });
+  el.bioEnable.addEventListener('click', function () { chooseBiometrics(true); });
+  el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
   el.scrim.addEventListener('click', function () { closeSheet(); });
 
@@ -4261,7 +4411,7 @@ button { background: none; border: none; color: inherit; }
         ['colour', 'var(--color-text-secondary)'],
         ['margin-bottom', 'var(--sp-4)']
       ], states: [
-        ['hidden on', 'the blocked and success stages. An outcome is not a step.'],
+        ['hidden on', 'the blocked, biometrics and success stages. An outcome is not a step, and neither is a question.'],
         ['hidden when', 'the keyboard is open. A driver mid-type knows which step they are on, and it is the least useful height on the screen.']
       ] },
     { name: '.m-resend-row', level: 'molecule', lines: [
@@ -4437,7 +4587,7 @@ button { background: none; border: none; color: inherit; }
         ['box-shadow', 'var(--shadow-sheet)'], ['body padding', '0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom))'],
         ['enter', 'sheetUp var(--dur-sheet) cubic-bezier(0.32,0.72,0,1)']
       ], states: [
-        ['stages', 'number | code | blocked | success, one visible at a time, published on the sheet as data-stage so the layout can respond to it'],
+        ['stages', 'number | code | blocked | biometrics | success, one visible at a time, published on the sheet as data-stage so the layout can respond to it'],
         ['[data-more="true"]', 'a mask fades the bottom of __scroll when there is readable content below the fold. Trailing padding does not count, so the fade means something.'],
         ['keyboard', 'under [data-keyboard="open"] on the frame the sheet takes height 100% minus --keyboard-inset minus --size-status-bar, so it sits on the keys and stops below the status bar. That is also the full-screen treatment the flow wants, at exactly the moment it wants it.'],
         ['rhythm', '__stage owns the vertical spacing: gap var(--sp-2) as the base, __cta at margin-top var(--sp-4) for 24, __secondary the same, alert hosts at var(--sp-2) for 16.']
