@@ -429,11 +429,11 @@ button { background: none; border: none; color: inherit; }
 /* The ring lives on the field, not the bare input, so it follows the border. */
 .a-field__input:focus { outline: none; }
 .a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: 500; }
-/* The input stretches to the field's full height. Centred, its focusable box
-   was a 21px strip inside a 56px field: a thumb landing on the field's own
-   padding hit the wrapper and focused nothing. The wrapper is not a label,
-   so the input's box is the tap target, and it has to be the whole field. */
-.a-field .a-field__input { align-self: stretch; }
+/* The field is a label (below), so the whole 56px focuses the input. The
+   first cure stretched the input instead, and its own background rode over
+   the field's rounded corners as a square block: geometry was the wrong
+   tool for what is really a click-forwarding problem, and forwarding is the
+   one thing a label does natively. */
 
 /* a-otp-cell */
 .a-otp-cell {
@@ -1765,7 +1765,7 @@ button { background: none; border: none; color: inherit; }
           <!-- STAGE · NUMBER -->
           <div class="o-signup-sheet__stage" id="stageNumber">
             <label class="a-label" for="phoneInput">Mobile number</label>
-            <div class="a-field m-phone-field" id="phoneField">
+            <label class="a-field m-phone-field" id="phoneField">
               <span class="m-phone-field__prefix" aria-hidden="true">
                 <span class="m-phone-field__flag">🇿🇦</span>
                 <span class="m-phone-field__code">+27</span>
@@ -1773,7 +1773,7 @@ button { background: none; border: none; color: inherit; }
               <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric"
                      autocomplete="tel-national" placeholder="82 123 4567"
                      aria-describedby="phoneHelper">
-            </div>
+            </label>
             <span class="a-helper" id="phoneHelper" role="status"></span>
 
             <!-- The law's two sentences, before the number is taken. POPIA

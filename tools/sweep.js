@@ -92,7 +92,11 @@ const AUDIT = `(function () {
     if (el.closest('.d-stateNav, .d-panel')) { return; }
     var c = getComputedStyle(el);
     if (c.display === 'none' || !el.getClientRects().length) { return; }
-    var r = el.getBoundingClientRect(); var w = r.width, h = r.height;
+    /* An input inside a label is tapped through the label: the label's box
+       is the honest target, which is exactly why the field wraps one. */
+    var box = el;
+    if (el.tagName === 'INPUT' && el.closest('label')) { box = el.closest('label'); }
+    var r = box.getBoundingClientRect(); var w = r.width, h = r.height;
     ['::after', '::before'].forEach(function (pe) {
       var p = getComputedStyle(el, pe);
       if (p.content && p.content !== 'none' && p.position === 'absolute') {
