@@ -2866,7 +2866,11 @@ body {
 }
 .o-filling[data-state="visible"] { display: flex; }
 .o-filling__bar { align-self: stretch; display: flex; justify-content: flex-end; }
-.o-filling__stage { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+/* True centre on every face. margin-top alone let the cluster fall to the
+   bottom the moment the note hid: the completion huddled over the button
+   under a screen of nothing. Both margins auto, and the tail - note or
+   action - anchors below on its own. */
+.o-filling__stage { margin-block: auto; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-filling__dot {
   width: 12px; height: 12px; border-radius: var(--radius-circle);
   background: var(--color-success);
@@ -2880,9 +2884,25 @@ body {
 }
 .o-filling__unit { font-size: var(--text-callout); font-weight: 600; color: var(--color-text-secondary); }
 .o-filling__facts { margin-top: var(--sp-4); font-size: var(--text-caption); color: var(--color-text-secondary); }
-.o-filling__note { margin-top: auto; padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
+.o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
 .o-filling__action { align-self: stretch; margin-top: var(--sp-4); }
 .o-filling[data-face="done"] .o-filling__dot { animation: none; }
+/* Waiting has no litres, and a placeholder drawn at the numeral's size read
+   as a black brick. The waiting face speaks instead: the sentence takes the
+   stage at title weight, the pulse carries the life. */
+.o-filling[data-face="waiting"] .o-filling__unit {
+  font-size: var(--text-large); font-weight: 800; color: var(--color-text-primary);
+  letter-spacing: -0.4px;
+}
+/* The verdict is its own line, not a clause spliced into the unit. */
+.o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: 700; color: var(--color-success); }
+.o-filling__verdict[data-tone="partial"] { color: var(--color-warning); }
+/* The number arrives. One spring on completion, a still frame under reduced
+   motion - the medal's grammar, at the pump. */
+@keyframes fillingLand { 0% { transform: scale(0.92); opacity: 0.4; } 100% { transform: none; opacity: 1; } }
+.o-filling[data-face="done"] .o-filling__litres { animation: fillingLand .45s var(--ease-spring) both; }
+[data-motion="reduced"] .o-filling[data-face="done"] .o-filling__litres { animation: none; }
+@media (prefers-reduced-motion: reduce) { .o-filling[data-face="done"] .o-filling__litres { animation: none; } }
 
 .o-history {
   position: absolute; inset: 0; z-index: var(--z-overlay);
@@ -3482,6 +3502,7 @@ body {
           <span class="o-filling__dot" aria-hidden="true"></span>
           <span class="o-filling__litres" id="fillingLitres" role="status">31.4</span>
           <span class="o-filling__unit" id="fillingUnit">litres so far</span>
+          <span class="o-filling__verdict" id="fillingVerdict" hidden></span>
           <p class="o-filling__facts" id="fillingFacts">CA 123-456 · Engen Bryanston · up to 60 L</p>
         </div>
         <p class="o-filling__note" id="fillingNote">The pump is running. You can put the phone away - we will tell you when it is done.</p>
@@ -4078,7 +4099,8 @@ body {
     rewardsPoints: $('rewardsPoints'), rewardsWorth: $('rewardsWorth'),
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
     filling: $('fillingScreen'), fillingLitres: $('fillingLitres'),
-    fillingUnit: $('fillingUnit'), fillingFacts: $('fillingFacts'),
+    fillingUnit: $('fillingUnit'), fillingVerdict: $('fillingVerdict'),
+    fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
     fillingClose: $('fillingClose'),
     account: $('accountScreen'), accountTitle: $('accountTitle'),
@@ -6618,14 +6640,23 @@ body {
     /* Before the till reads the code there are no litres, and a zero would
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
+    el.fillingLitres.hidden = waiting;
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
-                                 : waiting ? '\u2014'
-                                 : (S.fillLitresNow || 0).toFixed(1);
-    el.fillingUnit.textContent = done ? 'litres. ' + (partialFill() ? 'The pump stopped early.' : 'Fill complete.')
-                               : waiting ? 'waiting for the till'
+                                        : (S.fillLitresNow || 0).toFixed(1);
+    el.fillingUnit.textContent = done ? 'litres'
+                               : waiting ? 'Waiting for the till'
                                : 'litres so far';
+    el.fillingVerdict.hidden = !done;
+    el.fillingVerdict.textContent = partialFill() ? 'The pump stopped early.' : 'Fill complete.';
+    if (done && partialFill()) { el.fillingVerdict.setAttribute('data-tone', 'partial'); }
+    else { el.fillingVerdict.removeAttribute('data-tone'); }
     el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
     el.fillingNote.hidden = done;
+    /* The note may not claim a pump that has not started. Before the till
+       reads, only the promise is true; after, the pump line joins it. */
+    el.fillingNote.textContent = waiting
+      ? 'You can put the phone away - we will tell you when it is done.'
+      : 'The pump is running. You can put the phone away - we will tell you when it is done.';
     el.fillingCta.hidden = !done;
   }
 

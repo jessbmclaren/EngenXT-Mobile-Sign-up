@@ -311,7 +311,7 @@ async function fuelling() {
     face: document.getElementById('fillingScreen').getAttribute('data-face'),
     unit: document.getElementById('fillingUnit').textContent })`));
   check('Done walks forward into the watched fill', fw.up, JSON.stringify(fw));
-  check('before the till reads, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'waiting for the till', JSON.stringify(fw));
+  check('before the till reads, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'Waiting for the till', JSON.stringify(fw));
   await ev(`document.getElementById('fillingClose').click()`);
   await sleep(500);
   s = await st();
