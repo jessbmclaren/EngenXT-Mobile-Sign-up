@@ -877,10 +877,12 @@ body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5) var(--sp-5);
   display: flex; flex-direction: column; gap: var(--sp-4);
-  /* Content leaving under the pinned action fades rather than clips: the cut
-     edge read as an accident; the fade reads as "more below". */
-  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-4)), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-4)), transparent 100%);
+  /* Both edges fade. At the bottom, content leaving under the pinned action
+     reads as "more below" instead of a cut. At the top, content scrolled up
+     toward the clock dissolves before it collides with it: the clock is the
+     phone's, and nothing of ours may run into it. */
+  mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)), #000 calc(100% - var(--sp-4)), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)), #000 calc(100% - var(--sp-4)), transparent 100%);
 }
 /* Everything a driver reaches for sits at the bottom, within a thumb. The gap
    above it is not empty space for its own sake: it is where the bloom shows,
@@ -1517,7 +1519,16 @@ body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   padding: calc(var(--size-status-bar) + var(--sp-4)) var(--sp-4) var(--sp-4);
   display: flex; flex-direction: column; gap: var(--sp-4);
+  mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
 }
+/* A two-line thought was top-stacked over a void the height of the screen,
+   with the actions a thumb-stretch away at the bottom - the same disease the
+   blocked panel had. The cluster centres in the room it is given: the auto
+   margins collapse to nothing when a step carries a full list, so the tall
+   steps keep their layout and only the short ones stop looking abandoned. */
+.o-step__mark { margin-top: auto; }
+.o-step__group { margin-bottom: auto; }
 .o-step__bar { display: flex; align-items: center; gap: var(--sp-2); min-height: 48px; }
 .o-step__mark {
   width: 56px; height: 56px; flex-shrink: 0;
@@ -2761,6 +2772,11 @@ body {
   overflow-y: auto; overscroll-behavior: contain;
 }
 .o-history[data-state="visible"] { display: flex; }
+/* Scrolled slips dissolve before the clock, as on home. */
+.o-history, .o-receipt, .o-account {
+  mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
+}
 .o-history__bar { display: flex; margin-bottom: var(--sp-2); }
 /* Each filed slip is the receipt's own card, smaller: the driver already
    learned to read it once, on the screen that filed it. */
