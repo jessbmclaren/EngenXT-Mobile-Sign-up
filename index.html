@@ -1954,7 +1954,14 @@ button { background: none; border: none; color: inherit; }
   /* ════════════════════════════════════════════════════════════════════
      CONFIG
      ════════════════════════════════════════════════════════════════════ */
-  var GOOD_CODE     = '123456';
+  /* Any code lets a reviewer in. The first colleague to try this prototype
+     on a phone was locked out for fifteen minutes: the on-screen keyboard
+     hides the demo hint (tooling is the first thing the compression order
+     gives up), so she never saw which code the file wanted, typed her best
+     guess three times, and met the lock built for attackers. A prototype
+     that gates its own reviewers behind a secret is testing their patience,
+     not the flow. The magic numbers remain for demoing the failures. */
+  var WRONG_CODE    = '999999';
   var EXPIRED_CODE  = '000000';
   var RESEND_SECS   = 45;
   var LOCK_SECS     = 15 * 60;
@@ -2619,7 +2626,7 @@ button { background: none; border: none; color: inherit; }
     /* Prototype scaffolding, kept out of the product copy so the sentence a
        driver reads is the sentence that ships. */
     el.demoHint.hidden = (name !== 'code');
-    el.demoHint.innerHTML = name === 'code' ? 'Prototype: enter <b>123456</b>, or <b>000000</b> to expire it.' : '';
+    el.demoHint.innerHTML = name === 'code' ? 'Prototype: any code works. <b>999999</b> is wrong, <b>000000</b> is expired.' : '';
 
     if (name === 'number') {
       el.sheetTitle.textContent = 'Enter your mobile number';
@@ -3017,7 +3024,7 @@ button { background: none; border: none; color: inherit; }
 
       var entered = S.otp.join('');
       if (entered === EXPIRED_CODE) { showCodeExpired(); return; }
-      if (entered !== GOOD_CODE) { lockOtp(false); showCodeWrong(); return; }
+      if (entered === WRONG_CODE) { lockOtp(false); showCodeWrong(); return; }
 
       lockOtp(false);
       setOtpTone('valid');
