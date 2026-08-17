@@ -6522,6 +6522,12 @@ body {
     releaseScreen();
     el.fuel.hidden = true;
     el.fuel.removeAttribute('data-state');
+    /* Home is not assumed, it is guaranteed. The QR can be reached through
+       the step screens, whose hideAll took home down on the way - so lifting
+       the overlay revealed nothing, and Done landed a driver on a blank
+       phone. If home is not standing, it is stood up properly; the fill
+       clock is untouched either way, because it runs in its own channel. */
+    if (el.home.hidden) { showHome(false); return; }
     S.step = 'home';
     paintFuelAction();
     after(60, function () {

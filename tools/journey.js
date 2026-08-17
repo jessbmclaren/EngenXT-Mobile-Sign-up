@@ -217,7 +217,8 @@ async function fuelling() {
     earnedUp: !document.getElementById('earnedScreen').hidden,
     receiptUp: !document.getElementById('receiptScreen').hidden,
     balance: document.getElementById('homePoints').textContent,
-    barTitle: (document.querySelector('#homeLive .m-live-bar__title')||{}).textContent || ''
+    barTitle: (document.querySelector('#homeLive .m-live-bar__title')||{}).textContent || '',
+    homeVisible: !document.getElementById('homeScreen').hidden
   })`));
 
   console.log('\n── the full journey, one driver, real time ──');
@@ -238,6 +239,10 @@ async function fuelling() {
   await sleep(6400);                                     /* the till reads it at 6s */
   s = await st();
   check('QR came down on its own once read', !s.fuelUp, JSON.stringify(s));
+  /* State was not enough once: an invisible home answers every question
+     about itself, and the driver sees a blank phone. Visibility is asserted
+     wherever a screen claims to be under the driver's thumb. */
+  check('home is standing under it', s.homeVisible);
   check('fuel is flowing', s.fuel === 'filling');
   check('litres are counting', s.litres > 0 && s.litres < 52.4, s.litres);
   check('bar says Filling', s.barTitle === 'Filling', s.barTitle);
@@ -263,7 +268,7 @@ async function fuelling() {
   await ev(`document.getElementById('receiptDone').click()`);
   await sleep(900);
   s = await st();
-  check('home again, fill closed', s.step === 'home' && s.fuel === 'idle', s.step + ' ' + s.fuel);
+  check('home again, fill closed', s.step === 'home' && s.fuel === 'idle' && s.homeVisible, s.step + ' ' + s.fuel + ' visible=' + s.homeVisible);
   check('the balance grew on home', s.balance === '2 974 pts', s.balance);
 
   console.log('\n── Escape dismisses the news without losing it ──');
@@ -290,6 +295,17 @@ async function fuelling() {
   /* #home is the new-driver home: 50 signup points, and none of the fill's.
      An inflated frame would read 574. */
   check('plain home is not inflated by an old fill', s.balance === '50 pts', s.balance);
+
+  console.log('\n── Done at the QR lands somewhere real ──');
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=7#fuel-check` });
+  await sleep(2200);
+  await ev(`document.getElementById('checkGo').click()`); await sleep(500);
+  await ev(`document.getElementById('stepGo').click()`); await sleep(800);   /* the lock opens */
+  await ev(`document.getElementById('stepGo').click()`); await sleep(1400);  /* odometer -> QR */
+  await ev(`document.getElementById('fuelDone').click()`); await sleep(500);
+  s = await st();
+  check('Done mid-live lands on a visible home', s.homeVisible && s.step === 'home', JSON.stringify(s));
+  check('the way back to the code survives', s.barTitle === 'Fuel approved', s.barTitle);
 
   console.log('\n── the drawer and the pump that stopped ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=5#fuel-receipt` });
