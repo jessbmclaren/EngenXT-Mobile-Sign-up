@@ -554,6 +554,15 @@ button { background: none; border: none; color: inherit; }
 
 /* a-notch, a-toast */
 .a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
+/* At the Android width the chrome follows the platform: the notch becomes a
+   hole-punch, the corners square off a step. Same element, other hardware -
+   a 360-wide frame wearing an iPhone notch was reviewing a phone that does
+   not exist. */
+.t-device-frame[data-width="360"] { border-radius: 20px; }
+.t-device-frame[data-width="360"] .a-notch {
+  width: 14px; height: 14px; margin-top: 10px;
+  border-radius: var(--radius-circle);
+}
 .a-toast {
   position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
   background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
@@ -1043,12 +1052,21 @@ button { background: none; border: none; color: inherit; }
 .o-signup-sheet__secondary { margin-top: var(--sp-4); }
 .o-signup-sheet__secondary svg { flex: none; }
 /* A rule the driver keeps, not a helper about the current attempt: quiet,
-   one step under the ways out, present on every face of the code stage. */
+   one step under the ways out, present on every face of the code stage.
+   The number stage's copy of it carries the POPIA notice, with its
+   disclosure riding inline so the sentence and its door read as one. */
 .o-signup-sheet__note {
   margin-top: var(--sp-2);
   font-size: var(--text-caption2); line-height: 1.5;
   color: var(--color-text-secondary);
 }
+.o-signup-sheet__noteMore {
+  min-height: 0; padding-block: 0;
+  font-size: var(--text-caption2); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+/* The opened card is part of the same thought, one base step below it. */
+#privacyCard:not([hidden]) { margin-top: var(--sp-2); }
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
    states and the success state, and the tone lives on data-tone. */
@@ -1747,6 +1765,24 @@ button { background: none; border: none; color: inherit; }
             </div>
             <span class="a-helper" id="phoneHelper" role="status"></span>
 
+            <!-- The law's two sentences, before the number is taken. POPIA
+                 s18 asks that a person is told what is collected and why
+                 BEFORE collection, in words they can follow. Layered: the
+                 fact here, the detail one tap away, nothing bundled. -->
+            <p class="o-signup-sheet__note">Your company gave us this number so you can sign in. We use it only for that.
+              <button class="a-link a-link--quiet a-link--flush o-signup-sheet__noteMore" id="privacyMore" type="button" aria-expanded="false">More about your information</button>
+            </p>
+            <div id="privacyCard" hidden>
+              <div class="m-alert" data-tone="info" tabindex="-1">
+                <div class="m-alert__top">
+                  <div>
+                    <p class="m-alert__title">About your information</p>
+                    <p class="m-alert__body">We collect your mobile number. Your company registered it so you can fuel their vehicles. We use it to send your sign-in code and to run your points. We do not sell it. To change or remove it, ask your manager.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div id="numberAlert" tabindex="-1" hidden></div>
 
             <button class="a-btn a-btn--primary o-signup-sheet__cta" id="phoneCta" type="button">
@@ -2225,6 +2261,7 @@ button { background: none; border: none; color: inherit; }
     bioIcon: $('bioIcon'), bioTitle: $('bioTitle'), bioBody: $('bioBody'),
     bioEnable: $('bioEnable'), bioSkip: $('bioSkip'),
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
+    privacyMore: $('privacyMore'), privacyCard: $('privacyCard'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
     otpGroup: $('otpGroup'), otpHelper: $('otpHelper'),
     codeAlert: $('codeAlert'), resendBtn: $('resendBtn'), channelSwitchBtn: $('channelSwitchBtn'),
@@ -3460,6 +3497,11 @@ button { background: none; border: none; color: inherit; }
 
     /* Number */
     'number/empty':          { label: 'Empty',              run: function () { base('signup'); } },
+    'number/privacy':        { label: 'The privacy note, opened', run: function () {
+                                 base('signup');
+                                 el.privacyCard.hidden = false;
+                                 el.privacyMore.setAttribute('aria-expanded', 'true');
+                               } },
     'number/partial':        { label: 'Part typed',         run: function () { base('signup', '82 12'); paintPhoneValidity(); } },
     'number/valid':          { label: 'Valid',              run: function () { base('signup', '821234567'); paintPhoneValidity(); } },
     'number/sending':        { label: 'Sending',            run: function () {
@@ -3544,6 +3586,12 @@ button { background: none; border: none; color: inherit; }
                                would be the screen lying about its own flow. */
                             setHelper(el.otpHelper, 'Code confirmed', 'success');
                             setCodeView('confirmed');
+                            /* And it goes there. This state froze at the green
+                               field and read as the app hanging - a reviewer
+                               waited at a moment the flow only passes through.
+                               The beat is the organic one; the offer follows
+                               on its own, exactly as it does for a driver. */
+                            after(700, offerBiometrics);
                           } },
 
     /* Blocked */
@@ -3595,7 +3643,7 @@ button { background: none; border: none; color: inherit; }
 
   var NAV_GROUPS = {
     navHome:    ['home/default', 'home/offline', 'home/maintenance', 'home/update'],
-    navNumber:  ['number/empty', 'number/partial', 'number/valid', 'number/sending',
+    navNumber:  ['number/empty', 'number/privacy', 'number/partial', 'number/valid', 'number/sending',
                  'number/err-format', 'number/err-landline', 'number/err-unregistered',
                  'number/err-suspended', 'number/err-fleet',
                  'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server',
@@ -3873,7 +3921,8 @@ button { background: none; border: none; color: inherit; }
     'index.html': {
       navHome:    [['home/default','Ready'],['home/offline','No internet'],
                    ['home/maintenance','Unavailable'],['home/update','Update required']],
-      navNumber:  [['number/empty','Empty'],['number/partial','Part typed'],['number/valid','Valid'],
+      navNumber:  [['number/empty','Empty'],
+                   ['number/privacy','The privacy note, opened'],['number/partial','Part typed'],['number/valid','Valid'],
                    ['number/sending','Sending'],['number/err-format','Too few digits'],
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
                    ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
@@ -4147,6 +4196,17 @@ button { background: none; border: none; color: inherit; }
   el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
   el.backToNumber.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
   el.sheetClose.addEventListener('click', function () { closeSheet(); });
+  /* Progressive disclosure, not a dialog: the detail opens in place, under
+     the sentence that offered it, and reads itself out once. */
+  el.privacyMore.addEventListener('click', function () {
+    var open = el.privacyCard.hidden;
+    el.privacyCard.hidden = !open;
+    el.privacyMore.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      var card = el.privacyCard.querySelector('.m-alert');
+      announce('About your information. ' + card.querySelector('.m-alert__body').textContent);
+    }
+  });
   el.bioEnable.addEventListener('click', function () { chooseBiometrics(true); });
   el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });

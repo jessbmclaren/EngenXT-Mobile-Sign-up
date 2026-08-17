@@ -416,6 +416,15 @@ body {
 .a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
 .a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
 .a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
+/* At the Android width the chrome follows the platform: the notch becomes a
+   hole-punch, the corners square off a step. Same element, other hardware -
+   a 360-wide frame wearing an iPhone notch was reviewing a phone that does
+   not exist. */
+.t-device-frame[data-width="360"] { border-radius: 20px; }
+.t-device-frame[data-width="360"] .a-notch {
+  width: 14px; height: 14px; margin-top: 10px;
+  border-radius: var(--radius-circle);
+}
 /* a-toast. Verbatim from index.html, and it should have come across with the
    rest of the shared atoms the first time. Only the tokens did: --shadow-toast
    and --z-toast were sitting at the top of this file with nothing to paint,
@@ -7309,7 +7318,8 @@ body {
     'index.html': {
       navHome:    [['home/default','Ready'],['home/offline','No internet'],
                    ['home/maintenance','Unavailable'],['home/update','Update required']],
-      navNumber:  [['number/empty','Empty'],['number/partial','Part typed'],['number/valid','Valid'],
+      navNumber:  [['number/empty','Empty'],
+                   ['number/privacy','The privacy note, opened'],['number/partial','Part typed'],['number/valid','Valid'],
                    ['number/sending','Sending'],['number/err-format','Too few digits'],
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
                    ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
