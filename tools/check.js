@@ -261,6 +261,84 @@ function productTokens(s) {
   counts.tokens = a.size;
 }
 
+/* ── 5. The words stay plain ─────────────────────────────────────────── */
+
+/* The copy standard is written for a reader working in their second, third
+   or fourth language, and it has drifted twice already: "sort it out" and
+   the authorise/verify/biometric family all shipped, were caught by a review
+   rather than a tool, and were replaced by the flow's own plainer words.
+   This gate holds the line the review drew.
+
+   It scans what a person can meet - string literals in the scripts and text
+   in the markup, comments stripped - never identifiers, so offerBiometrics
+   the function is fine and "biometric" the word is not. Sentence length is
+   deliberately not gated: it needs judgement, and a gate that cries wolf
+   gets deleted. The rail ids for the biometrics states are allowed by name:
+   they are tooling, and renaming them would break every listed link. */
+
+const BANNED = [
+  { re: /\bauthori[sz]\w*/i, why: 'use "approve", the flow\u2019s own word' },
+  { re: /\bverif\w*/i, why: 'use "check" or "code we send you"' },
+  { re: /\bbiometric\w*/i, why: 'name the thing: "face or fingerprint"' },
+  { re: /sort (it|this|that) out/i, why: 'idiom; use "fix it"' },
+  { re: /\bgo once more\b/i, why: 'idiom; use "scan once more"' },
+  { re: /pays? you back/i, why: 'reads as promise or threat; state the fact' },
+];
+const COPY_ALLOWED = [
+  /^[a-z0-9-]+\/[a-z0-9-]+$/,   // rail ids are tooling: code/verifying, biometrics/waiting
+  /^biometrics$/,                // the stage's machine name, compared and published as data-stage
+  /^close, verify$/,             // the contrast inspector's own vocabulary (d- layer)
+];
+
+function stripJsComments(code) {
+  /* The m flag matters: without it only the first line's // was stripped, an
+     apostrophe in any later comment paired with one in real code, and the
+     scanner read fabricated strings that were never strings. */
+  return code.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/gm, '$1');
+}
+
+for (const name of FILES) {
+  /* Literals out of the scripts. A simple matcher is enough here: it may
+     also catch a regex body or a selector, and that is fine - those should
+     not contain banned words either. */
+  const texts = [];
+  for (const code of scriptsOf(src[name])) {
+    let clean = stripJsComments(code);
+    /* The spec panel documents the machine, and documentation must name the
+       stages and states it documents. Its whole literal comes out of the
+       scan rather than each of its lines onto an allowlist. */
+    try {
+      const spec = literal(clean, 'var RECIPES =');
+      clean = clean.replace(spec, ' ');
+    } catch (e) { /* file without a panel */ }
+    for (const m of clean.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g)) {
+      texts.push(m[1] !== undefined ? m[1] : m[2]);
+    }
+  }
+  /* Text out of the markup: tags and comments dropped, what remains is what
+     is read. */
+  /* Styles out first: their comments are rationale for maintainers, and a
+     driver can no more read a CSS comment than a JS one. */
+  const markupText = markupOf(src[name])
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<[^>]+>/g, '\n');
+  texts.push(...markupText.split('\n'));
+
+  for (const t of texts) {
+    const trimmed = t.trim();
+    if (!trimmed) { continue; }
+    if (COPY_ALLOWED.some((rx) => rx.test(trimmed))) { continue; }
+    for (const b of BANNED) {
+      const hit = trimmed.match(b.re);
+      if (hit) {
+        fail(`${name}: copy uses "${hit[0]}" (${b.why}) \u2014 in: ${JSON.stringify(trimmed.slice(0, 70))}`);
+        break;
+      }
+    }
+  }
+}
+
 /* Away links are written straight into an href, so a flow naming a file that
    is not in the repo is a rail full of 404s. This has happened once already. */
 for (const name of FILES) {
@@ -284,4 +362,5 @@ console.log('\n  All checks pass.');
 console.log(`    ${SIGNUP}: ${counts[SIGNUP].real} states, all listed by ${ONBOARD}`);
 console.log(`    ${ONBOARD}: ${counts[ONBOARD].real} states, all listed by ${SIGNUP}`);
 console.log('    scripts parse, every looked-up id exists, no duplicate ids');
-console.log(`    ${counts.tokens} product tokens, identical in both files\n`);
+console.log(`    ${counts.tokens} product tokens, identical in both files`);
+console.log('    the words stay plain\n');

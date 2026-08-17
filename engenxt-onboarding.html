@@ -6933,7 +6933,7 @@ body {
         stepBackTo = function () { showCheck(S.checking, true); };
         showStep('account');
       } },
-    'fuel-requesting': { group: 'fuelling', label: 'Authorising',
+    'fuel-requesting': { group: 'fuelling', label: 'Getting approval',
       run: function () {
         /* A live fill cannot exist without a vehicle, and a vehicle cannot
            exist without a scan, so the state that shows one scans first. */
@@ -7303,7 +7303,7 @@ body {
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
         ['fuel-confirm-you', 'Confirm it is you'],
-        ['fuel-requesting', 'Authorising'],
+        ['fuel-requesting', 'Getting approval'],
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
                    ['fuel-filling', 'Filling'],

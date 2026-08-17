@@ -75,3 +75,24 @@ It covers the three ways these files have actually broken:
 
 A prototype, not production. It talks to nothing and stores nothing. The
 support and manager links point at a placeholder number.
+
+## Checking it
+
+Three tools, no dependencies beyond Node and Chrome:
+
+- `node tools/check.js` — the fast gates, run by CI on every push: scripts
+  parse, every looked-up id exists, the two files' state rails and product
+  tokens agree, and the driver-facing words stay plain (no idiom, no
+  authorise/verify/biometric — the copy standard for second-language
+  readers, held by a tool instead of a reviewer's memory).
+- `node tools/sweep.js [--large]` — renders every state headless and
+  measures what a driver would meet: status-bar contrast sampled off real
+  pixels, tap targets at 44px counting pseudo-element hit areas, nothing
+  stranded past a scroller, nothing thrown. A few minutes; run before a
+  merge.
+- `node tools/journey.js` — walks the flows with real events and the real
+  clock: the typed code into the face-or-fingerprint offer, the till reading
+  the QR, litres counting, the notification, the receipt keeping its promise
+  on home, History, and the pump that stops early. About two minutes.
+
+Set `CHROME=/path/to/chrome` if Chrome is not at the macOS default.

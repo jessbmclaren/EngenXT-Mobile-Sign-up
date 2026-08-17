@@ -429,6 +429,11 @@ button { background: none; border: none; color: inherit; }
 /* The ring lives on the field, not the bare input, so it follows the border. */
 .a-field__input:focus { outline: none; }
 .a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: 500; }
+/* The input stretches to the field's full height. Centred, its focusable box
+   was a 21px strip inside a 56px field: a thumb landing on the field's own
+   padding hit the wrapper and focused nothing. The wrapper is not a label,
+   so the input's box is the tap target, and it has to be the whole field. */
+.a-field .a-field__input { align-self: stretch; }
 
 /* a-otp-cell */
 .a-otp-cell {
@@ -1064,6 +1069,12 @@ button { background: none; border: none; color: inherit; }
   min-height: 0; padding-block: 0;
   font-size: var(--text-caption2); font-weight: 600;
   text-decoration: underline; text-underline-offset: 2px;
+  /* Drawn at the sentence's size, pressable at the rule's. The invisible
+     half of the target, the same answer the map pins use. */
+  position: relative;
+}
+.o-signup-sheet__noteMore::before {
+  content: ''; position: absolute; inset: -16px -10px;
 }
 /* The opened card is part of the same thought, one base step below it. */
 #privacyCard:not([hidden]) { margin-top: var(--sp-2); }
@@ -3913,7 +3924,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
         ['fuel-confirm-you', 'Confirm it is you'],
-        ['fuel-requesting', 'Authorising'],
+        ['fuel-requesting', 'Getting approval'],
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
         ['fuel-filling', 'Filling'],
