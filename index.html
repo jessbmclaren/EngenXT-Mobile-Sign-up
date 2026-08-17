@@ -3708,7 +3708,7 @@ button { background: none; border: none; color: inherit; }
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
-    'fuelling':     'Choosing where, the QR that comes back, and home while the fill is open.'
+    'fuelling':     'Choosing where, the QR that comes back, the fill itself, and what it pays.'
   };
   function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
 
@@ -3816,6 +3816,10 @@ button { background: none; border: none; color: inherit; }
         ['fuel-requesting', 'Authorising'],
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
+        ['fuel-filling', 'Filling'],
+        ['fuel-done', 'Done, the notification'],
+        ['fuel-earned', 'Points earned'],
+        ['fuel-receipt', 'The receipt'],
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ],
       'returning': [
