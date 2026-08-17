@@ -1534,11 +1534,12 @@ body {
 .o-step__group { margin-bottom: auto; }
 
 /* THE CEREMONY FACE. Identity is not a task, and this app already knows it:
-   the sign-up flow's face-or-fingerprint ask is centred under a ringed mark.
+   the sign-up flow's face-or-fingerprint ask is centred under a haloed mark.
    When the step screen carries the identity question it files itself the
-   same way - centre stage, rings, and a lock that actually opens when the
-   driver is through, because motion is the sentence "you're in" said
-   without words. Every other step keeps the task voice, left-aligned. */
+   same way - centre stage, the tone's own light behind the mark, and a lock
+   that actually opens when the driver is through, because motion is the
+   sentence "you're in" said without words. Every other step keeps the task
+   voice, left-aligned. */
 .o-step[data-step="account"] .o-step__scroll { align-items: center; text-align: center; }
 .o-step[data-step="account"] .o-step__bar { align-self: stretch; }
 .o-step[data-step="account"] .o-step__mark {
@@ -1546,16 +1547,15 @@ body {
   border-radius: var(--radius-circle);
   color: var(--color-primary);
 }
-.o-step[data-step="account"] .o-step__mark::before,
-.o-step[data-step="account"] .o-step__mark::after {
-  content: ''; position: absolute; border-radius: var(--radius-circle);
-  border: 1px solid currentColor; pointer-events: none;
+.o-step[data-step="account"] .o-step__mark::before {
+  content: ''; position: absolute; inset: -34px;
+  border-radius: var(--radius-circle);
+  background: radial-gradient(closest-side, currentColor, transparent 74%);
+  opacity: 0.20; pointer-events: none;
 }
-.o-step[data-step="account"] .o-step__mark::before { inset: -10px; opacity: 0.30; }
-.o-step[data-step="account"] .o-step__mark::after  { inset: -22px; opacity: 0.14; }
 .o-step[data-step="account"] .o-step__mark svg { width: 34px; height: 34px; }
-/* The shackle turns open. Origin at its hinge, a spring out, and the rings
-   warm to the success tone in the same beat. Still under reduced motion:
+/* The shackle turns open. Origin at its hinge, a spring out, and the halo
+   warms to the success tone in the same beat. Still under reduced motion:
    the open state is a frame, not a journey. */
 .o-step__shackle { transform-origin: 16px 11px; transition: transform .3s var(--ease-spring); }
 .o-step[data-step="account"] .o-step__mark[data-open="true"] { color: var(--color-success); }
