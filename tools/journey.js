@@ -306,9 +306,16 @@ async function fuelling() {
   await ev(`document.getElementById('stepGo').click()`); await sleep(800);   /* the lock opens */
   await ev(`document.getElementById('stepGo').click()`); await sleep(1400);  /* odometer -> QR */
   await ev(`document.getElementById('fuelDone').click()`); await sleep(500);
+  const fw = JSON.parse(await ev(`JSON.stringify({
+    up: !document.getElementById('fillingScreen').hidden,
+    face: document.getElementById('fillingScreen').getAttribute('data-face'),
+    unit: document.getElementById('fillingUnit').textContent })`));
+  check('Done walks forward into the watched fill', fw.up, JSON.stringify(fw));
+  check('before the till reads, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'waiting for the till', JSON.stringify(fw));
+  await ev(`document.getElementById('fillingClose').click()`);
+  await sleep(500);
   s = await st();
-  check('Done mid-live lands on a visible home', s.homeVisible && s.step === 'home', JSON.stringify(s));
-  check('the way back to the code survives', s.barTitle === 'Fuel approved', s.barTitle);
+  check('X still pockets the phone onto a visible home', s.homeVisible && s.barTitle === 'Fuel approved', JSON.stringify(s));
 
   console.log('\n── the guard, the beat, and the new rooms ──');
   /* The double-tap family: the second tap must die at the guard. */
@@ -316,10 +323,10 @@ async function fuelling() {
   await sleep(1400);
   await ev(`document.getElementById('fuelDone').click()`);
   await sleep(140);
-  await ev(`(document.querySelector('#homeLive') || document.getElementById('fuelDone')).click()`);
+  await ev(`document.getElementById('fillingClose').click()`);
   await sleep(500);
-  s = await st();
-  check('double-tapped Done stays closed', s.homeVisible && !s.fuelUp, JSON.stringify(s));
+  const dfw = JSON.parse(await ev(`JSON.stringify({ fillingUp: !document.getElementById('fillingScreen').hidden, fuelUp: !document.getElementById('fuelScreen').hidden })`));
+  check('double-tapped Done: the guard holds the fill screen', dfw.fillingUp && !dfw.fuelUp, JSON.stringify(dfw));
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=9#fuel-earned` });
   await sleep(1700);
   await ev(`document.getElementById('earnedCta').click()`);

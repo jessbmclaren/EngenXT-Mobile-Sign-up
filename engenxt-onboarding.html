@@ -6337,6 +6337,7 @@ body {
       S.fuel = 'filling';
       S.fillLitresNow = 0;
       if (S.step === 'fuel') { hideFuel(); }
+      if (S.step === 'filling-screen') { paintFilling(); }
       paintFuelAction();
       announce('The till has your code. Filling ' + (fillVehicle() ? fillVehicle().plate : 'your vehicle') + '.');
       return;
@@ -6612,10 +6613,17 @@ body {
   function paintFilling() {
     var v = fillVehicle();
     var done = S.fuel === 'done';
-    el.filling.setAttribute('data-face', done ? 'done' : 'running');
-    el.fillingLitres.textContent = done ? String(fillLitresFinal()) : (S.fillLitresNow || 0).toFixed(1);
+    var waiting = S.fuel === 'live';
+    el.filling.setAttribute('data-face', done ? 'done' : waiting ? 'waiting' : 'running');
+    /* Before the till reads the code there are no litres, and a zero would
+       be the screen inventing a fill that has not started. The waiting face
+       says what is true; the first real tick replaces it. */
+    el.fillingLitres.textContent = done ? String(fillLitresFinal())
+                                 : waiting ? '\u2014'
+                                 : (S.fillLitresNow || 0).toFixed(1);
     el.fillingUnit.textContent = done ? 'litres. ' + (partialFill() ? 'The pump stopped early.' : 'Fill complete.')
-                                      : 'litres so far';
+                               : waiting ? 'waiting for the till'
+                               : 'litres so far';
     el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
     el.fillingNote.hidden = done;
     el.fillingCta.hidden = !done;
@@ -6853,7 +6861,12 @@ body {
     reply('No new messages.');
   });
   el.fuelClose.addEventListener('click', hideFuel);
-  el.fuelDone.addEventListener('click', function () { hideFuel(); });
+  /* Done goes forward, by the owner's call: the driver has shown the code,
+     and what follows the showing is the fill - so Done opens the watched
+     fill and the journey stays one unbroken line to the receipt. The X
+     remains the way back to home for a driver pocketing the phone; the bar
+     and the notification keep serving that path. */
+  el.fuelDone.addEventListener('click', function () { showFilling(); });
 
   /* Cancelling voids a code the driver may be holding out to an attendant, and
      it cannot be undone, so it is asked rather than done. The code is quoted in
@@ -7517,6 +7530,13 @@ body {
         S.fuel = 'done'; S.fillLitresNow = PARTIAL_LITRES; paintFuelAction();
         showPush();
       } },
+    'fuel-watching':   { group: 'fuelling', label: 'Watching, till not read yet',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
+        S.fuel = 'live'; S.fillVehicle = activeVehicle(); paintFuelAction();
+        showFilling(); clearTimers();
+      } },
     'fuel-filling-open': { group: 'fuelling', label: 'Filling, watched',
       run: function () {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
@@ -7857,6 +7877,7 @@ body {
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
                    ['fuel-filling', 'Filling'],
+                   ['fuel-watching', 'Watching, till not read yet'],
                    ['fuel-filling-open', 'Filling, watched'],
                    ['fuel-done', 'Done, the notification'],
                    ['fuel-stopped', 'Stopped early, the notification'],
