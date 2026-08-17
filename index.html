@@ -1091,6 +1091,16 @@ button { background: none; border: none; color: inherit; }
 }
 /* The opened card is part of the same thought, one base step below it. */
 #privacyCard:not([hidden]) { margin-top: var(--sp-2); }
+/* m-privacy. Facts as rows: an icon naming the subject, a bold headline of
+   a few words, one plain line after it. A paragraph made a reader hold five
+   sentences; a row asks for one glance each. */
+.m-privacy { display: flex; flex-direction: column; gap: var(--sp-2h); margin-top: var(--sp-2); }
+.m-privacy__row {
+  display: flex; align-items: flex-start; gap: var(--sp-2h);
+  font-size: var(--text-caption2); line-height: 1.5; color: var(--color-text-secondary);
+}
+.m-privacy__row b { color: var(--color-text-primary); font-weight: 700; }
+.m-privacy__icon { flex-shrink: 0; color: var(--color-primary); margin-top: 1px; }
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
    states and the success state, and the tone lives on data-tone. */
@@ -1796,12 +1806,29 @@ button { background: none; border: none; color: inherit; }
             <p class="o-signup-sheet__note">Your company gave us this number so you can sign in. We use it only for that.
               <button class="a-link a-link--quiet a-link--flush o-signup-sheet__noteMore" id="privacyMore" type="button" aria-expanded="false">More about your information</button>
             </p>
+            <!-- The primer pattern, not a paragraph: an icon, a short
+                 headline and one line per fact, the way the driver apps this
+                 audience already uses present their permissions. The same
+                 POPIA facts, shaped for a second-language eye that scans. -->
             <div id="privacyCard" hidden>
               <div class="m-alert" data-tone="info" tabindex="-1">
-                <div class="m-alert__top">
-                  <div>
-                    <p class="m-alert__title">About your information</p>
-                    <p class="m-alert__body">We collect your mobile number. Your company registered it so you can fuel their vehicles. We use it to send your sign-in code and to run your points. We do not sell it. To change or remove it, ask your manager.</p>
+                <p class="m-alert__title">About your information</p>
+                <div class="m-privacy">
+                  <div class="m-privacy__row">
+                    <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span>
+                    <span><b>We collect your number.</b> Nothing else.</span>
+                  </div>
+                  <div class="m-privacy__row">
+                    <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                    <span><b>It signs you in.</b> And runs your points.</span>
+                  </div>
+                  <div class="m-privacy__row">
+                    <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/></svg></span>
+                    <span><b>Your company registered it.</b> Ask your manager to change it.</span>
+                  </div>
+                  <div class="m-privacy__row">
+                    <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+                    <span><b>We do not sell it.</b></span>
                   </div>
                 </div>
               </div>
@@ -4277,8 +4304,7 @@ button { background: none; border: none; color: inherit; }
     el.privacyCard.hidden = !open;
     el.privacyMore.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) {
-      var card = el.privacyCard.querySelector('.m-alert');
-      announce('About your information. ' + card.querySelector('.m-alert__body').textContent);
+      announce('About your information. ' + el.privacyCard.textContent.replace(/\s+/g, ' ').trim());
     }
   });
   /* Idempotent by construction: offerBiometrics clears the pending timer, so

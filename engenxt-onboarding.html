@@ -2887,6 +2887,8 @@ body {
 .o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
 .o-filling__action { align-self: stretch; margin-top: var(--sp-4); }
 .o-filling[data-face="done"] .o-filling__dot { animation: none; }
+.o-filling[data-face="waiting"] .o-filling__dot { display: none; }
+.o-filling__spin { margin-bottom: var(--sp-2); }
 /* Waiting has no litres, and a placeholder drawn at the numeral's size read
    as a black brick. The waiting face speaks instead: the sentence takes the
    stage at title weight, the pulse carries the life. */
@@ -3499,6 +3501,10 @@ body {
           <button class="a-icon-btn" type="button" id="fillingClose" aria-label="Close, the fill carries on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
         <div class="o-filling__stage">
+          <!-- Waiting shows work, not a mark: the app's own spinner at stage
+               size. Once litres flow, the counting number is the loader and
+               the pulse takes over. -->
+          <span class="o-filling__spin" id="fillingSpin" aria-hidden="true" hidden><svg class="a-spinner" width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12.5" stroke="var(--color-border)" stroke-width="3"/><path d="M17 4.5a12.5 12.5 0 0 1 12.5 12.5" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round"/></svg></span>
           <span class="o-filling__dot" aria-hidden="true"></span>
           <span class="o-filling__litres" id="fillingLitres" role="status">31.4</span>
           <span class="o-filling__unit" id="fillingUnit">litres so far</span>
@@ -4100,6 +4106,7 @@ body {
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
     filling: $('fillingScreen'), fillingLitres: $('fillingLitres'),
     fillingUnit: $('fillingUnit'), fillingVerdict: $('fillingVerdict'),
+    fillingSpin: $('fillingSpin'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
     fillingClose: $('fillingClose'),
@@ -6640,6 +6647,7 @@ body {
     /* Before the till reads the code there are no litres, and a zero would
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
+    el.fillingSpin.hidden = !waiting;
     el.fillingLitres.hidden = waiting;
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
