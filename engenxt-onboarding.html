@@ -2670,6 +2670,32 @@ body {
 .o-receipt__spacer { flex: 1 1 auto; min-height: var(--sp-4); }
 .o-receipt__action { display: flex; flex-direction: column; gap: var(--sp-2); }
 
+.o-history {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+  padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
+           calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  background: var(--color-surface-page);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.o-history[data-state="visible"] { display: flex; }
+.o-history__bar { display: flex; margin-bottom: var(--sp-2); }
+/* Each filed slip is the receipt's own card, smaller: the driver already
+   learned to read it once, on the screen that filed it. */
+.o-history__when {
+  margin-top: var(--sp-4);
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--color-text-secondary);
+}
+.o-history__card + .o-history__when { margin-top: var(--sp-5); }
+.o-history__card {
+  margin-top: var(--sp-2);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-card); padding: var(--sp-1) var(--sp-4);
+  box-shadow: var(--shadow-card-sm);
+}
+.m-empty-note--history { margin-top: var(--sp-4); }
+
 .o-fuel__action {
   flex-shrink: 0; padding: var(--sp-3) var(--sp-5) var(--sp-6);
   display: flex; flex-direction: column; gap: var(--sp-2h); align-items: stretch;
@@ -3135,6 +3161,21 @@ body {
         <div class="o-receipt__spacer"></div>
         <div class="o-receipt__action">
           <button class="a-btn a-btn--primary" id="receiptDone" type="button">Done</button>
+        </div>
+      </section>
+
+      <!-- Where receipts go to live. Done files the slip here rather than
+           destroying it, because a receipt that cannot be found again is not
+           a receipt, and the person who asks for it is usually not the
+           driver - it is the manager, a week later. -->
+      <section class="o-history" id="historyScreen" aria-labelledby="historyTitle" hidden>
+        <div class="o-history__bar">
+          <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+        </div>
+        <h1 class="o-receipt__title" id="historyTitle" tabindex="-1">History</h1>
+        <div id="historyList"></div>
+        <div class="m-empty-note m-empty-note--history" id="historyEmpty">
+          <p class="m-empty-note__text">No fills yet. Receipts from your fills are kept here.</p>
         </div>
       </section>
 
@@ -3716,6 +3757,9 @@ body {
     receiptModel: $('receiptModel'), receiptLitres: $('receiptLitres'),
     receiptPoints: $('receiptPoints'), receiptBalance: $('receiptBalance'),
     receiptRef: $('receiptRef'), receiptDone: $('receiptDone'),
+    history: $('historyScreen'), historyTitle: $('historyTitle'),
+    historyList: $('historyList'), historyEmpty: $('historyEmpty'),
+    historyBack: $('historyBack'),
     rewardGoalValue: $('rewardGoalValue'), rewardMeter: $('rewardMeter'),
     rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'),
     /* One row now. The array stays because the sequence indexes it by e.row,
@@ -3784,6 +3828,9 @@ body {
     bankedPts: 0,
     fillBanked: false,
     fillVehicle: null,
+    /* Filed by finishFill, newest first. Session-scoped like the balance:
+       reset starts a reviewer from a clean drawer. */
+    receipts: [],
     /* Signing up is worth 50, the same as it is in the full app. Change this
        and the total, the meter, the goal line and the announcement all follow.
 
@@ -3988,6 +4035,7 @@ body {
     el.check.hidden = true;    el.check.removeAttribute('data-state');
     el.earned.hidden = true;   el.earned.removeAttribute('data-state');
     el.receipt.hidden = true;  el.receipt.removeAttribute('data-state');
+    el.history.hidden = true;  el.history.removeAttribute('data-state');
     /* Not the push. It is the phone's chrome, not an app screen: real
        notifications survive the app changing screens underneath them, and so
        does this one. reset() takes it down, because a state picked from the
@@ -4638,8 +4686,18 @@ body {
      the difference between what was allowed and what went in. Ten points a
      litre keeps the sum checkable in a driver's head at the pump. */
   var FILL_LITRES = 52.4;
+  /* The pump can stop early - a tank full at 23 litres, a nozzle hung up, a
+     queue - and the app's promise is to pay for what actually flowed. One
+     fixed partial figure, for the same screenshot-twice reason as the full
+     one. */
+  var PARTIAL_LITRES = 23.1;
   var PTS_PER_LITRE = 10;
   var FILL_PTS = Math.round(FILL_LITRES * PTS_PER_LITRE);
+  /* What this fill actually took and pays: the full figure unless the fill
+     stopped early. Everything that names litres or points reads these two,
+     so a partial fill tells one consistent story everywhere. */
+  function fillLitresFinal() { return S.fillLitresFinal || FILL_LITRES; }
+  function fillPts() { return Math.round(fillLitresFinal() * PTS_PER_LITRE); }
   /* The pump's clock, not the app's: how long the QR sits before the till
      reads it, and how long the fuel takes. Fixed beats, one timeline. */
   var SCAN_AFTER_MS = 6000;
@@ -4697,6 +4755,13 @@ body {
         el.homeLive.setAttribute('data-phase', 'filling');
         barTitle.textContent = 'Filling';
         barCta.textContent = '';
+        /* KNOWN DEBT, kept with eyes open. The phone cannot know litres
+           mid-fill - only the pump can - so this count is the demo selling
+           the feeling, reviewed and kept by the owner's call. A production
+           build must either receive pump telemetry or fall back to the
+           honest stage line ("Pump open · filling") that Uber and DoorDash
+           use when they have no number. The final litres ARE real: they
+           arrive with the pump's own report at fill end. */
         el.homeLiveSub.textContent = plate + ' · ' + (S.fillLitresNow || 0).toFixed(1) + ' L so far';
         /* Not re-announced per tick: a screen reader hearing forty updates of
            one number is being shouted at. The label is read when focused. */
@@ -4704,11 +4769,12 @@ body {
           'Filling ' + plate + '. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
       } else {
         el.homeLive.setAttribute('data-phase', 'done');
-        barTitle.textContent = 'Fill complete';
         barCta.textContent = 'See points';
-        el.homeLiveSub.textContent = plate + ' · ' + FILL_LITRES + ' L';
+        barTitle.textContent = partialFill() ? 'Fill stopped early' : 'Fill complete';
+        el.homeLiveSub.textContent = plate + ' · ' + fillLitresFinal() + ' L';
         el.homeLive.setAttribute('aria-label',
-          'Fill complete. ' + FILL_LITRES + ' litres on ' + plate + '. See your points.');
+          (partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+          fillLitresFinal() + ' litres on ' + plate + '. See your points.');
       }
     }
     if (S.fuel === 'pending') {
@@ -5868,13 +5934,15 @@ body {
   function fillFinished() {
     stopFillClock();
     S.fuel = 'done';
-    S.fillLitresNow = FILL_LITRES;
+    S.fillLitresNow = fillLitresFinal();
     paintFuelAction();
     showPush();
-    announce('Fill complete. ' + FILL_LITRES + ' litres on ' +
+    announce((partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+             fillLitresFinal() + ' litres on ' +
              (fillVehicle() ? fillVehicle().plate : 'your vehicle') +
              '. Open the notification to see your points.');
   }
+  function partialFill() { return fillLitresFinal() < FILL_LITRES; }
 
   /* ── THE PAY-OFF ────────────────────────────────────────────────────
      The sign-up reward's screen, replayed for a fill: same medal, same wave,
@@ -5887,13 +5955,14 @@ body {
     statusTone(true);
     bankFill();
     var v = fillVehicle();
-    el.earnedRowLabel.textContent = 'Fuelling ' + FILL_LITRES + ' L';
-    el.earnedRowPill.textContent = '+' + FILL_PTS + ' pts';
-    el.earnedWorth.textContent = 'About ' + dataLabel(FILL_PTS / S.ptsPerGb) + ' of data';
-    el.earnedMedal.setAttribute('aria-label', FILL_PTS + ' points earned for this fill');
+    el.earnedRowLabel.textContent = 'Fuelling ' + fillLitresFinal() + ' L';
+    el.earnedRowPill.textContent = '+' + fillPts() + ' pts';
+    el.earnedWorth.textContent = 'About ' + dataLabel(fillPts() / S.ptsPerGb) + ' of data';
+    el.earnedMedal.setAttribute('aria-label', fillPts() + ' points earned for this fill');
     el.earned.hidden = false;
     el.earned.setAttribute('data-state', 'visible');
-    announce('Fill complete. You earned ' + FILL_PTS + ' points.');
+    announce((partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+             'You earned ' + fillPts() + ' points.');
     after(60, function () { el.earnedTitle.focus({ preventScroll: true }); });
     after(240, function () { playConfetti(el.earnedMedal, el.earnedConfetti, 'earnedConfettiPlayed'); });
     playEarned();
@@ -5905,13 +5974,13 @@ body {
     el.earnedValue.textContent = '0';
     el.earnedRow.removeAttribute('data-state');
     if (prefersReduced()) {
-      el.earnedValue.textContent = FILL_PTS;
+      el.earnedValue.textContent = fillPts();
       el.earnedRow.setAttribute('data-state', 'landed');
       return;
     }
     after(360, function () {
       el.earnedRow.setAttribute('data-state', 'landed');
-      el.earnedValue.textContent = FILL_PTS;
+      el.earnedValue.textContent = fillPts();
       el.earnedWave.removeAttribute('data-state');
       void el.earnedWave.offsetWidth;
       el.earnedWave.setAttribute('data-state', 'out');
@@ -5930,8 +5999,8 @@ body {
       el.receiptVehicle.firstChild.textContent = v.plate;
       el.receiptModel.textContent = v.make + ' ' + v.model;
     }
-    el.receiptLitres.firstChild.textContent = FILL_LITRES + ' L';
-    el.receiptPoints.textContent = '+' + FILL_PTS + ' pts';
+    el.receiptLitres.firstChild.textContent = fillLitresFinal() + ' L';
+    el.receiptPoints.textContent = '+' + fillPts() + ' pts';
     var base = S.userType === 'new-driver' ? rewardTotal() : 2450;
     el.receiptBalance.textContent = groupNum(base + S.bankedPts) + ' pts';
     el.receiptRef.textContent = fuelDigitsShown(fuelRef());
@@ -5951,27 +6020,76 @@ body {
   function bankFill() {
     if (S.fillBanked) { return; }
     S.fillBanked = true;
-    S.bankedPts += FILL_PTS;
+    S.bankedPts += fillPts();
   }
 
   /* Done on the receipt is the end of the fill: the code is spent, the slot
      on home goes back to asking, and the balance the driver lands on is the
      one the receipt just promised. */
   function finishFill() {
+    var v = fillVehicle();
+    /* Done files the slip. Everything on it is already settled, so the filed
+       copy is plain facts, not live state. */
+    S.receipts.unshift({
+      station: stationName(),
+      plate: v ? v.plate : '',
+      model: v ? v.make + ' ' + v.model : '',
+      litres: fillLitresFinal(),
+      pts: fillPts(),
+      ref: fuelDigitsShown(fuelRef())
+    });
     S.fuel = 'idle';
     S.fillLitresNow = 0;
+    S.fillLitresFinal = 0;
     S.fillVehicle = null;
     S.fillBanked = false;
     paintFuelAction();
     showHome(true);
   }
 
+  /* The drawer the slips live in. Each is the receipt's own card, redrawn
+     from its filed facts - the driver already learned to read this shape on
+     the screen that filed it. */
+  function showHistory() {
+    clearTimers(); hideAll();
+    S.step = 'history';
+    statusTone(false);
+    el.historyEmpty.hidden = S.receipts.length > 0;
+    el.historyList.innerHTML = S.receipts.map(function (r) {
+      return '<p class="o-history__when">Today · 9:41</p>' +
+        '<div class="o-history__card">' +
+        row('Station', r.station) +
+        row('Vehicle', r.plate + '<small class="o-receipt__sub">' + r.model + '</small>') +
+        row('Fuel', r.litres + ' L') +
+        '<div class="o-receipt__row" data-tone="points">' +
+          '<span class="o-receipt__label">Points earned</span>' +
+          '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
+        row('Reference', r.ref) +
+        '</div>';
+      function row(label, value) {
+        return '<div class="o-receipt__row">' +
+          '<span class="o-receipt__label">' + label + '</span>' +
+          '<span class="o-receipt__value">' + value + '</span></div>';
+      }
+    }).join('');
+    el.history.hidden = false;
+    el.history.setAttribute('data-state', 'visible');
+    announce(S.receipts.length
+      ? 'History. ' + S.receipts.length + (S.receipts.length === 1 ? ' receipt.' : ' receipts.')
+      : 'History. No fills yet.');
+    after(60, function () { el.historyTitle.focus({ preventScroll: true }); });
+  }
+
   function showPush() {
     var v = fillVehicle();
+    /* The stopped-early fill says so in the headline, because "complete" over
+       23 litres would be the app calling a half tank a whole one. */
+    el.push.querySelector('#pushTitle').textContent =
+      partialFill() ? 'Fill stopped early' : 'Fill complete';
     /* Fact-complete, the way a good notification is: the news works at a
        glance, and the tap deepens it rather than ransoming it. */
-    el.pushSub.textContent = (v ? v.plate : 'Your vehicle') + ' took ' + FILL_LITRES +
-      ' L and earned ' + FILL_PTS + ' points.';
+    el.pushSub.textContent = (v ? v.plate : 'Your vehicle') + ' took ' + fillLitresFinal() +
+      ' L and earned ' + fillPts() + ' points.';
     el.push.hidden = false;
     el.push.setAttribute('data-state', 'visible');
   }
@@ -6160,6 +6278,7 @@ body {
   });
   el.earnedCta.addEventListener('click', function () { showReceipt(); });
   el.receiptDone.addEventListener('click', function () { finishFill(); });
+  el.historyBack.addEventListener('click', function () { showHome(false); });
   el.fuelClose.addEventListener('click', hideFuel);
   el.fuelDone.addEventListener('click', function () { hideFuel(); });
 
@@ -6218,6 +6337,7 @@ body {
        back to: the fill has happened. */
     if (S.step === 'earned') { el.earnedCta.click(); return; }
     if (S.step === 'receipt') { el.receiptDone.click(); return; }
+    if (S.step === 'history') { el.historyBack.click(); return; }
     if (S.step === 'fuel') {
       /* Keep it, never Cancel it. Escape must not be able to void a code. */
       if (!el.fuelConfirm.hidden) { el.fuelKeep.click(); return; }
@@ -6476,6 +6596,9 @@ body {
     function (b) {
       b.addEventListener('click', function () {
         if (b.getAttribute('aria-current') === 'page') { return; }
+        /* History stopped being a promise the day receipts needed somewhere
+           to live. The other tabs keep the honest fallback. */
+        if (b.getAttribute('data-tab') === 'history') { showHistory(); return; }
         var name = b.getAttribute('data-unbuilt') ||
                    b.textContent.trim().split('\n')[0] || 'That';
         reply(name + ' is not built yet.');
@@ -6528,9 +6651,11 @@ body {
     stopFillClock();
     hidePush();
     S.fillLitresNow = 0;
+    S.fillLitresFinal = 0;
     S.fillVehicle = null;
     S.fillBanked = false;
     S.bankedPts = 0;
+    S.receipts = [];
     S.earnedConfettiPlayed = false;
     /* So does the camera. Without this a reviewer walking the menu would see the
        plate change under them from one state to the next, because the reader
@@ -6766,6 +6891,17 @@ body {
         S.fuel = 'done'; S.fillLitresNow = FILL_LITRES; paintFuelAction();
         showPush();
       } },
+    'fuel-stopped':    { group: 'fuelling', label: 'Stopped early, the notification',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
+        /* The pump gave 23.1 of the approved 60. The story every surface
+           tells from here - bar, notification, points, receipt - is the
+           partial one, because the figures all read the same two facts. */
+        S.fillLitresFinal = PARTIAL_LITRES;
+        S.fuel = 'done'; S.fillLitresNow = PARTIAL_LITRES; paintFuelAction();
+        showPush();
+      } },
     'fuel-earned':     { group: 'fuelling', label: 'Points earned',
       run: function () {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
@@ -6780,6 +6916,19 @@ body {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
         S.station = 'bryanston'; S.fuel = 'done';
         showReceipt(); clearTimers();
+      } },
+    'fuel-history':    { group: 'fuelling', label: 'History, the filed receipt',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston';
+        /* One finished fill already in the drawer, filed the way finishFill
+           files it, so the state shows the drawer doing its job. */
+        S.bankedPts = FILL_PTS;
+        S.receipts = [{ station: 'Engen Bryanston', plate: 'CA 123-456',
+                        model: 'Ford Transit Custom 2.0TDCi',
+                        litres: FILL_LITRES, pts: FILL_PTS,
+                        ref: fuelDigitsShown('EXT.bryanston.CA123-456') }];
+        showHistory(); clearTimers();
       } },
     'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing scanned',
       run: function () {
@@ -7066,8 +7215,10 @@ body {
         ['fuel-live', 'Home, fill still open'],
                    ['fuel-filling', 'Filling'],
                    ['fuel-done', 'Done, the notification'],
+                   ['fuel-stopped', 'Stopped early, the notification'],
                    ['fuel-earned', 'Points earned'],
                    ['fuel-receipt', 'The receipt'],
+                   ['fuel-history', 'History, the filed receipt'],
         ['fuel-no-vehicle', 'Asked with nothing scanned']
       ]
     },
