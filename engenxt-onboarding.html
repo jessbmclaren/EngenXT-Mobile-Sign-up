@@ -449,6 +449,17 @@ body {
   font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
   color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
 }
+/* d-demoHint. Prototype scaffolding, the developer prefix says it never
+   ships. The one on the QR screen exists because a reviewer kept waiting for
+   a till that is not there. */
+.d-demoHint {
+  margin-top: var(--sp-2);
+  font-size: var(--text-micro); font-weight: 600; letter-spacing: 0.2px;
+  color: var(--color-text-secondary);
+  border-left: 2px dashed var(--color-border-field);
+  padding-left: var(--sp-2);
+}
+
 /* m-push. The operating system's notification, drawn the way the notch and
    the keyboard are drawn: as the phone's own chrome, above the app and under
    nothing. It is how a driver standing at a pump with the phone back in a
@@ -1511,6 +1522,16 @@ body {
 .o-step__body {
   font-size: var(--text-callout); line-height: 1.5; color: var(--color-text-secondary);
 }
+.o-step__field {
+  width: 100%; min-height: var(--size-control);
+  padding: 0 var(--sp-4);
+  font: inherit; font-size: var(--text-large); font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+  background: var(--color-surface); border: 1.5px solid var(--color-border-field);
+  border-radius: var(--radius-card-sm);
+}
+.o-step__field:focus { outline: none; border-color: var(--color-primary); }
 .o-step__group { display: flex; flex-direction: column; gap: var(--sp-3); }
 /* One column, always. Side by side at 320dp is two cramped buttons and a
    wrapped label on each. */
@@ -3117,6 +3138,13 @@ body {
             <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
             <span class="m-earn-row__label" id="earnedWorth">About 0.52 GB of data</span>
           </div>
+          <!-- The claim no other South African programme makes, said where it
+               is truest: the driver just watched it happen. Two short
+               sentences, because the fact needs no dressing. -->
+          <div class="m-earn-row" data-state="landed">
+            <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="m-earn-row__label">These points are yours. Your company pays for the fuel.</span>
+          </div>
         </div>
 
         <div class="o-onboard__spacer"></div>
@@ -3152,6 +3180,10 @@ body {
           <div class="o-receipt__row">
             <span class="o-receipt__label">New balance</span>
             <span class="o-receipt__value" id="receiptBalance">2 974 pts</span>
+          </div>
+          <div class="o-receipt__row">
+            <span class="o-receipt__label">Odometer</span>
+            <span class="o-receipt__value" id="receiptOdo">84 230 km</span>
           </div>
           <div class="o-receipt__row">
             <span class="o-receipt__label">Reference</span>
@@ -3646,6 +3678,7 @@ body {
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             </span>Approved</h1>
           <p class="o-fuel__lead">Show this to the attendant. Their till scans it.</p>
+          <p class="d-demoHint">Prototype: the till reads it in a few seconds, then the rest plays.</p>
 
           <!-- Drawn, not fetched. Filled by showFuel, because what it encodes
                depends on the fill it belongs to. -->
@@ -3756,7 +3789,7 @@ body {
     receiptStation: $('receiptStation'), receiptVehicle: $('receiptVehicle'),
     receiptModel: $('receiptModel'), receiptLitres: $('receiptLitres'),
     receiptPoints: $('receiptPoints'), receiptBalance: $('receiptBalance'),
-    receiptRef: $('receiptRef'), receiptDone: $('receiptDone'),
+    receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptDone: $('receiptDone'),
     history: $('historyScreen'), historyTitle: $('historyTitle'),
     historyList: $('historyList'), historyEmpty: $('historyEmpty'),
     historyBack: $('historyBack'),
@@ -4832,6 +4865,7 @@ body {
      shape of question, so one organism carries all three and the margins
      cannot drift apart between them. */
   var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var ICON_GAUGE = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>';
   var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg>';
   var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
 
@@ -4886,6 +4920,32 @@ body {
        teaches them to tap through without reading. */
     /* What it continues to, when it is gating something rather than starting a
        session. Cleared as soon as it is used, so a stale one cannot fire later. */
+    /* The reading every real SA fleet transaction records: the terminal
+       prompts the attendant for it on every fleet-card fill, and it is how a
+       company reconciles litres against distance. Here the driver keys it,
+       because in this flow the driver is standing where the attendant stands.
+       It rides the receipt and the filed slip, which is what a fleet
+       manager's system reads. */
+    odometer: {
+      mark: ICON_GAUGE,
+      title: 'Enter the odometer',
+      body: 'Type the km number on the dashboard. Your company checks fuel against distance.',
+      go: 'Continue',
+      build: function (host) {
+        host.innerHTML =
+          '<input class="o-step__field" type="text" inputmode="numeric"' +
+          ' value="' + (S.odoReading || '84 230') + '"' +
+          ' aria-label="Odometer reading in kilometres, from the dashboard">';
+      },
+      onGo: function () {
+        var field = el.stepGroup.querySelector('.o-step__field');
+        var raw = (field && field.value ? field.value : '').replace(/[^0-9]/g, '');
+        if (!raw) { reply('Type the km number first.'); if (field) { field.focus(); } return; }
+        S.odoReading = groupNum(parseInt(raw, 10));
+        hideStep();
+        authoriseFill();
+      }
+    },
     account: {
       mark: ICON_LOCK,
       title: 'Confirm your account',
@@ -5881,6 +5941,7 @@ body {
        who rescans mid-fill is choosing tomorrow's vehicle, not rewriting
        which van the fuel went into. A fleet audit reads the receipt. */
     S.fillVehicle = activeVehicle() || null;
+    S.fillOdo = S.odoReading || '84 230';
     after(prefersReduced() ? 0 : 900, function () {
       S.fuel = 'live';
       paintFuelAction();
@@ -6004,6 +6065,7 @@ body {
     var base = S.userType === 'new-driver' ? rewardTotal() : 2450;
     el.receiptBalance.textContent = groupNum(base + S.bankedPts) + ' pts';
     el.receiptRef.textContent = fuelDigitsShown(fuelRef());
+    el.receiptOdo.textContent = (S.fillOdo || S.odoReading || '84 230') + ' km';
     el.receipt.hidden = false;
     el.receipt.setAttribute('data-state', 'visible');
     announce('Receipt. ' + FILL_LITRES + ' litres at ' + stationName() + '. ' +
@@ -6036,6 +6098,7 @@ body {
       model: v ? v.make + ' ' + v.model : '',
       litres: fillLitresFinal(),
       pts: fillPts(),
+      odo: (S.fillOdo || S.odoReading || '84 230') + ' km',
       ref: fuelDigitsShown(fuelRef())
     });
     S.fuel = 'idle';
@@ -6064,6 +6127,7 @@ body {
         '<div class="o-receipt__row" data-tone="points">' +
           '<span class="o-receipt__label">Points earned</span>' +
           '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
+        row('Odometer', r.odo || '') +
         row('Reference', r.ref) +
         '</div>';
       function row(label, value) {
@@ -6413,7 +6477,7 @@ body {
        them. Asked once per fill, which is a second, and never during the
        morning scan, where nothing is being authorised yet. */
     hideCheck();
-    afterAccount = function () { hideStep(); authoriseFill(); };
+    afterAccount = function () { showStep('odometer'); };
     /* Back to the check, not to home. The station and the five answers are
        still true; the driver has only declined to prove who they are yet. */
     stepBackTo = function () { showCheck(S.checking, true); };
@@ -6653,6 +6717,8 @@ body {
     S.fillLitresNow = 0;
     S.fillLitresFinal = 0;
     S.fillVehicle = null;
+    S.fillOdo = '';
+    S.odoReading = '';
     S.fillBanked = false;
     S.bankedPts = 0;
     S.receipts = [];
@@ -6840,13 +6906,21 @@ body {
                          S.hours = 'closed'; showCheck('bryanston'); } },
     'fuel-check-blocked': { group: 'fuelling', label: 'Check, station refused',
       run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc()); showCheck('randburg'); } },
+    'fuel-odometer':   { group: 'fuelling', label: 'The odometer',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
+        afterAccount = function () { showStep('odometer'); };
+        stepBackTo = function () { showCheck(S.checking, true); };
+        showStep('odometer'); clearTimers();
+      } },
     'fuel-confirm-you': { group: 'fuelling', label: 'Confirm it is you',
       /* The same screen as step 1, standing in front of a fill rather than
          starting a session, so it says why it is here. */
       run: function () {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
         S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
-        afterAccount = function () { hideStep(); authoriseFill(); };
+        afterAccount = function () { showStep('odometer'); };
         stepBackTo = function () { showCheck(S.checking, true); };
         showStep('account');
       } },
@@ -6865,6 +6939,15 @@ body {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
         S.station = 'bryanston'; showHome(); clearTimers();
         S.fuel = 'live'; paintFuelAction(); showFuel();
+        /* The one rail state that runs rather than freezes, by the owner's
+           ask: land here and the till reads the code, the litres count, the
+           notification drops and the pay-off plays - the whole back half of
+           the journey from one click. The frozen moments either side
+           (fuel-live, fuel-filling, fuel-done) still hold their frames for
+           reviewing one screen at a time. */
+        S.fillVehicle = activeVehicle() || null;
+        S.fillOdo = '84 230';
+        startFillClock();
       } },
     'fuel-live':       { group: 'fuelling', label: 'Home, fill still open',
       run: function () {
@@ -7206,6 +7289,7 @@ body {
         ['fuel-station-refused', 'A station, not on the list'],
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
+                   ['fuel-odometer', 'The odometer'],
         ['fuel-check-blocked', 'Check, station refused'],
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],

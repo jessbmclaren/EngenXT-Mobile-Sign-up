@@ -1042,6 +1042,13 @@ button { background: none; border: none; color: inherit; }
    is a decision, so it earns the same separation the primary action gets. */
 .o-signup-sheet__secondary { margin-top: var(--sp-4); }
 .o-signup-sheet__secondary svg { flex: none; }
+/* A rule the driver keeps, not a helper about the current attempt: quiet,
+   one step under the ways out, present on every face of the code stage. */
+.o-signup-sheet__note {
+  margin-top: var(--sp-2);
+  font-size: var(--text-caption2); line-height: 1.5;
+  color: var(--color-text-secondary);
+}
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
    states and the success state, and the tone lives on data-tone. */
@@ -1771,6 +1778,12 @@ button { background: none; border: none; color: inherit; }
               <button class="a-link a-link--quiet a-link--flush" id="channelSwitchBtn" type="button">Send by SMS</button>
               <button class="a-link a-link--quiet a-link--flush" id="backToNumberBtn" type="button">Use a different number</button>
             </div>
+
+            <!-- OTP-sharing scams circulate on WhatsApp in South Africa, so
+                 the warning stands where the code is typed. Two short
+                 sentences, no idiom, and it never names a scam - it states
+                 the rule a driver can hold onto. -->
+            <p class="o-signup-sheet__note">Never share this code. Engen will never ask for it.</p>
           </div>
 
           <!-- STAGE · BLOCKED -->
@@ -1911,7 +1924,12 @@ button { background: none; border: none; color: inherit; }
   var LOCK_SECS     = 15 * 60;
   var MAX_ATTEMPTS  = 3;
   var MAX_RESENDS   = 3;
-  var SLOW_HINT_MS  = 20000;
+  /* Eight seconds, not twenty. Research on the SA market says the SMS
+     fallback is a mainline path, not an edge case: a driver whose data is
+     depleted can receive SMS but not WhatsApp, and the delivery webhook a
+     real build would use knows within seconds. The prototype's stand-in for
+     that webhook is this timer. */
+  var SLOW_HINT_MS  = 8000;
   var WA_MANAGER    = 'https://wa.me/27800000000?text=';
   /* The driver should not have to describe a state the app already knows, so
      each route to a human opens with the message that fits the screen. */
@@ -1926,6 +1944,13 @@ button { background: none; border: none; color: inherit; }
   var WA_SUPPORT       = WA_SUPPORT_N + encodeURIComponent('Hi, I need help signing in to EngenXT.');
   var WA_SUPPORT_LOCK  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT has paused my sign in for 15 minutes and I need to fuel now.');
   var WA_SUPPORT_DOWN  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT says it is unavailable and I need to fuel now.');
+  /* Production note, from sourced research (Aug 2026): send the OTP as a
+     Meta AUTHENTICATION template (cheapest category, one-tap code copy,
+     shown only on the primary device), and register the WhatsApp Business
+     Account as a South African business - SA sits on Meta's
+     authentication-international list, so an offshore-registered sender
+     pays roughly 2.5x more per code. Real cost is read off Meta's SA row,
+     not "Rest of Africa". */
   var WA_APP        = 'https://wa.me/';
   /* The helper names the channel the driver is actually on. It used to be a
      constant that said WhatsApp, so after switching to SMS the number screen
@@ -3820,6 +3845,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-station-refused', 'A station, not on the list'],
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
+        ['fuel-odometer', 'The odometer'],
         ['fuel-check-blocked', 'Check, station refused'],
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],
