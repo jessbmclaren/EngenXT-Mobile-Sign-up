@@ -3679,7 +3679,7 @@ body {
                and the live bar both say so. -->
           <div class="o-filling__hideWrap">
             <button class="a-btn a-btn--outline a-btn--sm o-filling__hide" type="button" id="fillingClose">Close live view</button>
-            <span class="o-filling__hideNote" id="fillingHideNote">Fuelling will continue.</span>
+            <span class="o-filling__hideNote" id="fillingHideNote">Fuelling will continue if you close this screen.</span>
           </div>
         </div>
         <div class="o-filling__stage">
@@ -5370,8 +5370,8 @@ body {
           'Fuel approved for ' + plate + ', up to ' + FUEL_LITRES + '. Show the QR.');
       } else if (S.fuel === 'filling') {
         el.homeLive.setAttribute('data-phase', 'filling');
-        barTitle.textContent = 'Filling';
-        barCta.textContent = '';
+        barTitle.textContent = 'Fuelling';
+        barCta.textContent = 'View live fill';
         /* KNOWN DEBT, kept with eyes open. The phone cannot know litres
            mid-fill - only the pump can - so this count is the demo selling
            the feeling, reviewed and kept by the owner's call. A production
@@ -5383,7 +5383,8 @@ body {
         /* Not re-announced per tick: a screen reader hearing forty updates of
            one number is being shouted at. The label is read when focused. */
         el.homeLive.setAttribute('aria-label',
-          'Filling ' + plate + '. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
+          'Fuelling ' + plate + '. ' + (S.fillLitresNow || 0).toFixed(1) +
+          ' litres so far. View the live fill.');
       } else {
         el.homeLive.setAttribute('data-phase', 'done');
 

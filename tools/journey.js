@@ -260,7 +260,7 @@ async function fuelling() {
     face: document.getElementById('fillingScreen').getAttribute('data-face') })`));
   check('the scan walks the watcher to the pump beat', pw.up && pw.face === 'pump', JSON.stringify(pw));
   check('fuel is flowing', s.fuel === 'filling');
-  check('bar says Filling', s.barTitle === 'Filling', s.barTitle);
+  check('bar says Fuelling with a door back', s.barTitle === 'Fuelling', s.barTitle);
   await sleep(1800);                                     /* the nozzle goes in */
   s = await st();
   check('litres are counting', s.litres > 0 && s.litres < 52.4, s.litres);
