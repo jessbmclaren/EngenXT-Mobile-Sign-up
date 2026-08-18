@@ -835,13 +835,22 @@ button { background: none; border: none; color: inherit; }
    holds: 4 under the sheet's 22px title, 8 under an 18px outcome heading,
    12 under the hero. Space proportional to type, one rule, three sizes. */
 .o-auth-hero__title {
-  margin-top: auto;
+  /* The owner's call: the way in must not live below a screen of air. The
+     promise sits high, the door right under it, and the empty space moves
+     beneath the actions where the orbs carry it. */
+  margin-top: var(--sp-8);
   font-size: var(--text-hero); font-weight: 800; color: var(--color-text-on-dark);
   line-height: 1.08; letter-spacing: -1.6px; margin-bottom: var(--sp-3);
 }
 .o-auth-hero__lede {
   font-size: var(--text-body); font-weight: 400; line-height: 1.6;
-  color: var(--color-on-dark-soft); margin-bottom: var(--sp-8);
+  color: var(--color-on-dark-soft); margin-bottom: var(--sp-5);
+}
+/* How the door works, in one breath, so the button is an answer rather
+   than a question. */
+.o-auth-hero__how {
+  font-size: var(--text-caption); color: var(--color-on-dark-soft);
+  text-align: center;
 }
 /* The hero copy is pinned to the bottom of the frame, which is exactly where
    the sheet rises to. On the shorter sheets the top edge landed part way down
@@ -1773,7 +1782,8 @@ button { background: none; border: none; color: inherit; }
 
           <div class="o-auth-hero__actions">
             <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Continue with mobile number</button>
-            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">Need help signing in?</a>
+            <p class="o-auth-hero__how">No password. We'll send you a 6-digit code.</p>
+            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">My mobile number does not work</a>
           </div>
         </div>
       </section>
@@ -2890,6 +2900,9 @@ button { background: none; border: none; color: inherit; }
     if (def.hideCta === true || def.cta === 'countdown') { releaseKeyboard(); }
     el.phoneInput.readOnly = false;
     shake(el.phoneField);
+    if (kind === 'offline') {
+      startNetWatch(function () { hideAlert(el.numberAlert); submitPhone(); });
+    }
   }
 
   function submitPhone() {
@@ -3211,6 +3224,9 @@ button { background: none; border: none; color: inherit; }
     setOtpTone(null);
     setCodeView(view || kind);
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS[kind], 'code:' + kind));
+    if (kind === 'offline') {
+      startNetWatch(function () { hideAlert(el.codeAlert); submitOtp(); });
+    }
   }
 
   var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Another incorrect code will pause sign-in for 15 minutes.</span>';
@@ -3604,6 +3620,9 @@ button { background: none; border: none; color: inherit; }
       if (isOffline()) {
         help.textContent = 'Call support';
         help.href = SUPPORT_TEL;
+        /* Earned, not offered: the person appears after the second failed
+           check, because nobody on a phone line can fix mobile data. */
+        help.hidden = true;
       } else {
         help.textContent = 'Contact support';
         help.href = WA_SUPPORT_DOWN;
@@ -3614,7 +3633,7 @@ button { background: none; border: none; color: inherit; }
       primary.setAttribute('aria-disabled', 'false');
       primary.dataset.action = 'enter';
       help.hidden = false;
-      help.textContent = 'Need help signing in?';
+      help.textContent = 'My mobile number does not work';
       help.href = WA_SUPPORT;
     }
   }
@@ -3642,10 +3661,39 @@ button { background: none; border: none; color: inherit; }
     setSheetShown('opening');
     S.stage = 'number';
   }
+  /* ── THE NET WATCH ──────────────────────────────────────────────────
+     Offline recovers itself: the app checks the connection on its own,
+     because nobody should press a button to find out whether the lights
+     are back on. In this demo the connection returns on the third check.
+     Try again stays for the impatient, everything typed stays typed -
+     recovery runs the same act the button would - and on the hero,
+     support only appears once the second check has failed, because a
+     manager or a helpline cannot fix a phone's data. */
+  var NET_CHECK_MS = 2500;
+  function startNetWatch(recover, onStillOffline) {
+    var checks = 0;
+    var tick = function () {
+      checks += 1;
+      if (checks >= 3) {
+        userNet = 'online';
+        applyNet('online');
+        recover();
+        return;
+      }
+      if (onStillOffline) { onStillOffline(checks); }
+      after(NET_CHECK_MS, tick);
+    };
+    after(NET_CHECK_MS, tick);
+  }
+
   function home(notice, action, status) {
     clearTimers(); closeSheetNow();
     applyNet(notice === 'offline' ? 'offline' : null);
     setHomeNotice(notice); setHomeAction(action || 'enter');
+    if (notice === 'offline') {
+      startNetWatch(function () { go('home/default'); },
+        function (checks) { if (checks === 2) { $('homeHelp').hidden = false; } });
+    }
     if (status && STATUS[status]) { showStatusPage(status); }
     else { hideStatusPage(); }
   }
@@ -3713,7 +3761,12 @@ button { background: none; border: none; color: inherit; }
     'number/err-fleet':      { label: 'Company inactive',   run: function () { base('signup', '823333333'); showNumberError('fleet'); } },
     'number/err-rate':       { label: 'Rate limited',       run: function () { base('signup', '824444444'); showNumberError('rate'); } },
     'number/err-nowhatsapp': { label: 'Not on WhatsApp',    run: function () { base('signup', '825555555'); showNumberError('nowhatsapp'); } },
-    'number/err-offline':    { label: 'No connection',      run: function () { base('signup', '821234567'); showNumberError('offline'); } },
+    'number/err-offline':    { label: 'No connection',      run: function () {
+                                 base('signup', '821234567');
+                                 /* The state stages the fact, not just the words: the net
+                                    really is off, and the watch really heals it. */
+                                 userNet = 'offline'; applyNet('offline');
+                                 showNumberError('offline'); } },
     'number/err-server':     { label: 'Server error',       run: function () { base('signup', '829999999'); showNumberError('server'); } },
     /* The escalated twin. Support appears only once retrying has visibly
        failed, so the state has to be reachable on its own: clicking the first
@@ -3758,6 +3811,7 @@ button { background: none; border: none; color: inherit; }
     'code/err-offline': { label: 'No connection',    run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
+                            userNet = 'offline'; applyNet('offline');
                             showCodeAlert('offline');
                           } },
     'code/err-server':  { label: 'Server error',     run: function () {

@@ -428,6 +428,16 @@ async function fuelling() {
   check('partial receipt balance 2 681',
     await ev(`document.getElementById('receiptBalance').textContent`) === '2 681 pts');
 
+  console.log('\n── offline heals itself, and keeps the number ──');
+  await send('Page.navigate', { url: `file://${STAGE}/index.html?w=16#number/err-offline` });
+  await sleep(1200);
+  let net = await ev(`document.documentElement.getAttribute('data-net')`);
+  check('the error starts offline', net === 'offline', String(net));
+  const healed = await until(`document.documentElement.getAttribute('data-net') === 'online'`, 10000);
+  const flowed = await until(`Demo.S().stage === 'code'`, 14000);
+  check('the connection returns on its own and the flow continues with the number kept',
+    healed && flowed, 'healed=' + healed + ' flowed=' + flowed);
+
   console.log('\n── the account keeps its word, and the way out is real ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=12#account` });
   await until(`!document.getElementById('accountScreen').hidden`);
