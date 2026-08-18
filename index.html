@@ -840,10 +840,11 @@ button { background: none; border: none; color: inherit; }
    holds: 4 under the sheet's 22px title, 8 under an 18px outcome heading,
    12 under the hero. Space proportional to type, one rule, three sizes. */
 .o-auth-hero__title {
-  /* The owner's call: the way in must not live below a screen of air. The
-     promise sits high, the door right under it, and the empty space moves
-     beneath the actions where the orbs carry it. */
-  margin-top: var(--sp-8);
+  /* The owner's call, reversed on review: the promise reads from anywhere,
+     but the door must sit where the thumb rests. Everything real - headline,
+     lede, button, help - anchors to the bottom of the frame and the orbs
+     carry the air above it. */
+  margin-top: auto;
   font-size: var(--text-hero); font-weight: 800; color: var(--color-text-on-dark);
   line-height: 1.08; letter-spacing: -1.6px; margin-bottom: var(--sp-3);
 }
@@ -1781,13 +1782,13 @@ button { background: none; border: none; color: inherit; }
 
         <div class="o-auth-hero__body">
           <h1 class="o-auth-hero__title">Fill up at Engen.<br>Earn airtime and data.</h1>
-          <p class="o-auth-hero__lede">Your manager has added you to EngenXT. Continue with the mobile number they registered for you.</p>
+          <p class="o-auth-hero__lede">Your manager added you to EngenXT. Sign in with the mobile number they registered for you.</p>
 
           <div class="o-auth-hero__notice" id="homeNotice" role="status" hidden></div>
 
           <div class="o-auth-hero__actions">
-            <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Continue with mobile number</button>
-            <p class="o-auth-hero__how">No password. We'll send you a 6-digit code.</p>
+            <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Sign in with mobile number</button>
+            <p class="o-auth-hero__how">No password needed. We'll send you a 6-digit code.</p>
             <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">My mobile number does not work</a>
           </div>
         </div>
@@ -1852,7 +1853,7 @@ button { background: none; border: none; color: inherit; }
                  s18 asks that a person is told what is collected and why
                  BEFORE collection, in words they can follow. Layered: the
                  fact here, the detail one tap away, nothing bundled. -->
-            <p class="o-signup-sheet__note">Your company gave us this number so you can sign in. We use it only for that.
+            <p class="o-signup-sheet__note">Your company gave us this number so you can sign in. We only use it for EngenXT.
               <button class="a-link a-link--quiet a-link--flush o-signup-sheet__noteMore" id="privacyMore" type="button" aria-expanded="false">More about your information</button>
             </p>
             <!-- The primer pattern, not a paragraph: an icon, a short
@@ -1886,7 +1887,7 @@ button { background: none; border: none; color: inherit; }
             <div id="numberAlert" tabindex="-1" hidden></div>
 
             <button class="a-btn a-btn--primary o-signup-sheet__cta" id="phoneCta" type="button">
-              Continue
+              Send my code
             </button>
           </div>
 
@@ -1905,28 +1906,28 @@ button { background: none; border: none; color: inherit; }
                  door opens once. -->
             <button class="a-btn a-btn--primary o-signup-sheet__cta" id="codeContinue" type="button" hidden>Continue</button>
 
-            <button class="a-link a-link--flush o-signup-sheet__resend" id="resendBtn" type="button" disabled>Resend code in 0:45</button>
+            <button class="a-link a-link--flush o-signup-sheet__resend" id="resendBtn" type="button" disabled>Request another code in 0:45</button>
 
             <button class="a-btn a-btn--outline a-btn--sm o-signup-sheet__secondary" id="openWhatsappBtn" type="button">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-whatsapp-dark)" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
               </svg>
-              Open WhatsApp
+              Check WhatsApp
             </button>
 
             <!-- The two ways out of this stage, both quiet, because neither is
                  the task. The task is the six digits above. -->
             <div class="m-resend-row">
-              <button class="a-link a-link--quiet a-link--flush" id="channelSwitchBtn" type="button">Send by SMS</button>
-              <button class="a-link a-link--quiet a-link--flush" id="backToNumberBtn" type="button">Use a different number</button>
+              <button class="a-link a-link--quiet a-link--flush" id="channelSwitchBtn" type="button">Send code by SMS</button>
+              <button class="a-link a-link--quiet a-link--flush" id="backToNumberBtn" type="button">Use a different registered number</button>
             </div>
 
             <!-- OTP-sharing scams circulate on WhatsApp in South Africa, so
                  the warning stands where the code is typed. Two short
                  sentences, no idiom, and it never names a scam - it states
                  the rule a driver can hold onto. -->
-            <p class="o-signup-sheet__note">Never share this code. Engen will never ask for it.</p>
+            <p class="o-signup-sheet__note">Never share this code. Engen will never ask you for it.</p>
           </div>
 
           <!-- STAGE · BLOCKED -->
@@ -2112,7 +2113,7 @@ button { background: none; border: none; color: inherit; }
   function sendHelper() {
     return S.channel === 'sms'
       ? "We'll send a code to this number by SMS."
-      : "We'll send a code to this number on WhatsApp. A small amount of data is needed.";
+      : "We'll send a 6-digit code on WhatsApp. A small amount of mobile data is needed.";
   }
 
   /* Numbers that force an outcome, so the flow can be driven by hand. */
@@ -2166,7 +2167,7 @@ button { background: none; border: none; color: inherit; }
          the field stays neutral and the send keeps running - SMS is an
          offer, not an abort. */
       tone: 'warning', icon: 'clock', field: 'neutral',
-      title: 'Your WhatsApp code is taking longer than expected',
+      title: 'The WhatsApp code is taking longer than usual',
       body: 'You can keep waiting, or get the code by SMS.',
       actions: [
         { label: 'Send by SMS instead', kind: 'primary', act: 'sendSmsNow' }
@@ -2221,7 +2222,7 @@ button { background: none; border: none; color: inherit; }
          driver, not by whose fault it was. */
       tone: 'warning', icon: 'server', field: 'neutral', hideCta: true,
       title: "We couldn't send your code",
-      body: 'Your mobile number is correct. Please wait a moment and try again.',
+      body: 'Your mobile number is correct. Wait a moment, then try again.',
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retrySend' }
       ],
@@ -2849,7 +2850,7 @@ button { background: none; border: none; color: inherit; }
 
     if (name === 'number') {
       el.sheetTitle.textContent = 'Enter your mobile number';
-      el.sheetSub.textContent = 'Use the number your company registered for you.';
+      el.sheetSub.textContent = 'Use the mobile number your company registered for you.';
     } else if (name === 'code') {
       paintChannel();
       /* One sentence carries the task, the channel and the number, which is
@@ -2884,7 +2885,7 @@ button { background: none; border: none; color: inherit; }
      waiting to be read. */
   function paintChannel() {
     var wa = S.channel === 'whatsapp';
-    el.channelSwitchBtn.textContent = wa ? 'Send by SMS' : 'Send on WhatsApp';
+    el.channelSwitchBtn.textContent = wa ? 'Send code by SMS' : 'Send on WhatsApp';
     el.openWhatsappBtn.hidden = !wa;
   }
 
@@ -2910,7 +2911,7 @@ button { background: none; border: none; color: inherit; }
     el.privacyMore.setAttribute('aria-expanded', 'false');
     setHelper(el.phoneHelper, sendHelper());
     paintPhoneValidity();
-    setBtn(el.phoneCta, phoneComplete(), 'Continue');
+    setBtn(el.phoneCta, phoneComplete(), 'Send my code');
     showStage('number');
   }
 
@@ -2960,13 +2961,13 @@ button { background: none; border: none; color: inherit; }
         hideAlert(el.numberAlert);
         el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
         setHelper(el.phoneHelper, sendHelper());
-        setBtn(el.phoneCta, phoneComplete(), 'Send code');
+        setBtn(el.phoneCta, phoneComplete(), 'Send my code');
         announce('You can request another code now.');
       });
     } else {
       /* The card owns the actions, so a dead Continue underneath is noise. */
       el.phoneCta.hidden = def.hideCta === true;
-      setBtn(el.phoneCta, false, 'Continue');
+      setBtn(el.phoneCta, false, 'Send my code');
     }
     if (def.hideCta === true || def.cta === 'countdown') { releaseKeyboard(); }
     el.phoneInput.readOnly = false;
@@ -2988,7 +2989,7 @@ button { background: none; border: none; color: inherit; }
 
     if (d.length !== 9) {
       el.phoneField.setAttribute('data-state', 'error');
-      setBtn(el.phoneCta, false, 'Continue');
+      setBtn(el.phoneCta, false, 'Send my code');
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter your mobile number.'
         : 'Enter the full mobile number. Example: 82 123 4567.', 'error');
@@ -2998,8 +2999,8 @@ button { background: none; border: none; color: inherit; }
     }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
-      setBtn(el.phoneCta, false, 'Continue');
-      setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
+      setBtn(el.phoneCta, false, 'Send my code');
+      setHelper(el.phoneHelper, 'Enter a mobile number. Use the number your company registered for you.', 'error');
       shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
       return;
@@ -3362,7 +3363,7 @@ button { background: none; border: none; color: inherit; }
   function startResendCooldown() {
     el.resendBtn.disabled = true;
     startCountdown('resend', RESEND_SECS, function (left, label) {
-      el.resendBtn.textContent = 'Resend code in ' + label;
+      el.resendBtn.textContent = 'Request another code in ' + label;
     }, function () {
       /* Nothing left to spend means the button must not offer to spend it.
          Re-enabling here baited the one tap that starts the fifteen minutes. */
@@ -3404,7 +3405,7 @@ button { background: none; border: none; color: inherit; }
       /* One clock, in the control being waited for - and in the sentence
          that explains it, because the timer means "no new codes", never
          "no signing in". */
-      el.resendBtn.textContent = 'Resend code in ' + label;
+      el.resendBtn.textContent = 'Request another code in ' + label;
       var alertBody = el.codeAlert.querySelector('.m-alert__body');
       if (alertBody) {
         alertBody.textContent = 'Your newest code still works. Enter it now, or request another in ' + label + '.';
@@ -3793,7 +3794,7 @@ button { background: none; border: none; color: inherit; }
         help.href = WA_SUPPORT_DOWN;
       }
     } else {
-      primary.textContent = 'Continue with mobile number';
+      primary.textContent = 'Sign in with mobile number';
       primary.disabled = false;
       primary.setAttribute('aria-disabled', 'false');
       primary.dataset.action = 'enter';
@@ -4362,6 +4363,7 @@ button { background: none; border: none; color: inherit; }
         ['returning-signin', 'Signed in again'],
         ['rewards', 'Rewards, the bundles'],
         ['rewards-spent', 'Rewards, after spending'],
+        ['rewards-delivery-failed', 'Data delivery failed'],
         ['account', 'Account'],
         ['returning-without-vehicle', 'No vehicle assigned'],
         ['returning-with-vehicle', 'One vehicle'],

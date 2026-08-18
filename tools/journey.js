@@ -380,7 +380,13 @@ async function fuelling() {
     pts: document.getElementById('rewardsPoints').textContent,
     sent: (document.querySelector('[data-bundle="1"]')||{}).getAttribute && document.querySelector('[data-bundle="1"]').getAttribute('data-state')
   })`));
-  check('a bundle spends the points', rw.pts === '1 450 pts' && rw.sent === 'sent', JSON.stringify(rw));
+  check('a bundle spends the points and starts processing', rw.pts === '1 450 pts' && rw.sent === 'processing', JSON.stringify(rw));
+  /* The delivery narrates itself: processing, then sent, then delivered. */
+  await sleep(3600);
+  rw = JSON.parse(await ev(`JSON.stringify({
+    state: document.querySelector('[data-bundle="1"]').getAttribute('data-state')
+  })`));
+  check('the delivery arrives as delivered', rw.state === 'delivered', JSON.stringify(rw));
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=12#fuel-filling-open` });
   await sleep(1000);
   let fl = JSON.parse(await ev(`JSON.stringify({

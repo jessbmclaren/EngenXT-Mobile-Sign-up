@@ -2637,6 +2637,11 @@ body {
   border-radius: var(--radius-circle);
   background: var(--color-success); color: var(--color-text-on-dark);
 }
+/* A dead code must not wear an approval: the tick goes, and the square the
+   attendant can no longer scan steps back while the words lead. */
+.o-fuel[data-expired="true"] .o-fuel__tick { display: none; }
+.o-fuel[data-expired="true"] .a-qr,
+.o-fuel[data-expired="true"] .m-fallback { opacity: 0.4; }
 .o-fuel__title {
   font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
   color: var(--color-text-primary);
@@ -2946,9 +2951,15 @@ body {
 }
 /* Sent keeps its place and goes quiet-green; short stays visible and says
    what is missing, because a hidden option teaches nothing. */
-.m-bundle[data-state="sent"] { border-color: var(--color-success-20); background: var(--color-success-bg); cursor: default; }
-.m-bundle[data-state="sent"] .m-bundle__state { color: var(--color-success); }
-.m-bundle[data-state="sent"] .a-icon-wrap { color: var(--color-success); }
+.m-bundle[data-state="delivered"] { border-color: var(--color-success-20); background: var(--color-success-bg); cursor: default; }
+.m-bundle[data-state="delivered"] .m-bundle__state { color: var(--color-success); }
+.m-bundle[data-state="delivered"] .a-icon-wrap { color: var(--color-success); }
+/* In flight: quiet, not green - the promise is not kept yet. */
+.m-bundle[data-state="processing"], .m-bundle[data-state="sent"] { cursor: default; }
+.m-bundle[data-state="processing"] .m-bundle__state,
+.m-bundle[data-state="sent"] .m-bundle__state { color: var(--color-text-secondary); }
+/* Failed keeps a pressable door and wears the warning, not an accusation. */
+.m-bundle[data-state="failed"] { border-color: var(--color-warning-25); background: var(--color-warning-bg); }
 .m-bundle[data-state="short"] { background: var(--color-surface-sunken); box-shadow: none; cursor: default; }
 .m-bundle[data-state="short"] .m-bundle__size { color: var(--color-text-secondary); }
 .m-bundle[data-state="short"] .m-bundle__state { color: var(--color-text-secondary); font-weight: 600; }
@@ -3526,27 +3537,27 @@ body {
         <div class="o-onboard__earned">
           <div class="m-earn-row" id="earnedRow">
             <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
-            <span class="m-earn-row__label" id="earnedRowLabel">Fuelling 52.4 L</span>
+            <span class="m-earn-row__label" id="earnedRowLabel">Fuel: 52.4 L</span>
             <span class="m-earn-row__pill" id="earnedRowPill">+524 pts</span>
           </div>
           <!-- The worth line home taught the driver to read, on the screen
                where the number just grew. -->
           <div class="m-earn-row" data-state="landed">
             <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg></span>
-            <span class="m-earn-row__label" id="earnedWorth">About 0.52 GB of data</span>
+            <span class="m-earn-row__label" id="earnedWorth">Worth about 0.52 GB of mobile data</span>
           </div>
           <!-- The claim no other South African programme makes, said where it
                is truest: the driver just watched it happen. Two short
                sentences, because the fact needs no dressing. -->
           <div class="m-earn-row" data-state="landed">
             <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span class="m-earn-row__label">These points are yours. Your company pays for the fuel.</span>
+            <span class="m-earn-row__label">Your company pays for the fuel. The points belong to you.</span>
           </div>
         </div>
 
         <div class="o-onboard__spacer"></div>
         <div class="o-onboard__actions">
-          <button class="a-btn a-btn--primary" id="earnedCta" type="button">See the receipt</button>
+          <button class="a-btn a-btn--primary" id="earnedCta" type="button">See receipt</button>
         </div>
       </section>
 
@@ -3575,11 +3586,11 @@ body {
             <span class="o-receipt__value" id="receiptPoints">+524 pts</span>
           </div>
           <div class="o-receipt__row">
-            <span class="o-receipt__label">New balance</span>
+            <span class="o-receipt__label">New points balance</span>
             <span class="o-receipt__value" id="receiptBalance">2 974 pts</span>
           </div>
           <div class="o-receipt__row">
-            <span class="o-receipt__label">Odometer</span>
+            <span class="o-receipt__label">Kilometre reading</span>
             <span class="o-receipt__value" id="receiptOdo">84 230 km</span>
           </div>
           <div class="o-receipt__row">
@@ -3601,7 +3612,7 @@ body {
         <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
-        <h1 class="a-screen-title" id="historyTitle" tabindex="-1">History</h1>
+        <h1 class="a-screen-title" id="historyTitle" tabindex="-1">Fuel history</h1>
         <div id="historyList"></div>
         <div class="m-empty-note m-empty-note--history" id="historyEmpty">
           <p class="m-empty-note__text">No fills yet. Receipts from your fills are kept here.</p>
@@ -3632,15 +3643,15 @@ body {
         <div class="o-account__row">
           <span class="o-account__rowBody">
             <span class="o-account__rowTitle">Mobile number</span>
-            <span class="o-account__rowSub">Your company registered it. Ask your manager to change it.</span>
+            <span class="o-account__rowSub">Your company registered this number. Ask your manager to change it.</span>
           </span>
           <span class="o-account__value">+27 82 ··· 567</span>
         </div>
 
         <div class="o-account__row">
           <span class="o-account__rowBody">
-            <span class="o-account__rowTitle">Vehicles</span>
-            <span class="o-account__rowSub">Assigned by your company. Scan one to drive it today.</span>
+            <span class="o-account__rowTitle">Vehicles assigned by your company</span>
+            <span class="o-account__rowSub">Scan one to link it for today.</span>
           </span>
           <span class="o-account__value" id="accountVehicles">3</span>
         </div>
@@ -3662,13 +3673,13 @@ body {
         <h1 class="a-screen-title" id="rewardsTitle" tabindex="-1">Rewards</h1>
         <div class="o-rewards__balanceCard">
           <span class="o-rewards__bolt" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg></span>
-          <span class="o-rewards__balanceLabel">Your balance</span>
+          <span class="o-rewards__balanceLabel">Your points</span>
           <span class="o-rewards__points" id="rewardsPoints">2 450 pts</span>
-          <span class="o-rewards__worth" id="rewardsWorth">About 2.45 GB of data</span>
+          <span class="o-rewards__worth" id="rewardsWorth">Enough for up to 2.45 GB of mobile data</span>
         </div>
         <p class="o-rewards__lead">Use your points</p>
         <div class="o-rewards__list" id="rewardsList" role="list"></div>
-        <p class="o-rewards__earnNote">You earn 10 points for every litre you fuel. Data goes to +27 82 ··· 567.</p>
+        <p class="o-rewards__earnNote">You earn 10 points for every litre you fuel. Mobile data will be sent to +27 82 ··· 567.</p>
       </section>
 
       <!-- The fill, watched. Tapping the Filling bar opens the one screen in
@@ -3872,7 +3883,7 @@ body {
           <p class="o-home__balance">
             <span class="u-visually-hidden">Your balance.</span>
             <span class="o-home__points" id="homePoints">2 450 pts</span>
-            <span class="o-home__worth" id="homeWorth">About 2.45 GB of data earned</span>
+            <span class="o-home__worth" id="homeWorth">About 2.45 GB of mobile data earned</span>
           </p>
         </div>
 
@@ -3892,7 +3903,7 @@ body {
               <span class="m-live-bar__title">Fuel approved</span>
               <span class="m-live-bar__sub" id="homeLiveSub">CA 123-456 &middot; up to 60 L</span>
             </span>
-            <span class="m-live-bar__cta" aria-hidden="true">Show QR</span>
+            <span class="m-live-bar__cta" aria-hidden="true">Show fuel code</span>
           </button>
         </div>
 
@@ -3972,8 +3983,8 @@ body {
               <span class="a-scan-frame__line" id="scanLine" aria-hidden="true"></span>
             </div>
             <p class="m-scan-note" id="scanNote" role="status">
-              <span class="m-scan-note__title" id="scanNoteTitle" tabindex="-1">Hold still</span>
-              <span class="m-scan-note__body" id="scanNoteBody">Point the camera at the licence disc or the number plate.</span>
+              <span class="m-scan-note__title" id="scanNoteTitle" tabindex="-1">Line up the licence disc or number plate</span>
+              <span class="m-scan-note__body" id="scanNoteBody">Hold still when it is inside the frame.</span>
             </p>
           </div>
         </div>
@@ -4003,7 +4014,7 @@ body {
         <div class="o-scan__typePanel" id="scanTypePanel" hidden>
           <label class="o-scan__typeLabel" for="scanPlateInput">Number plate</label>
           <input class="o-scan__typeInput" id="scanPlateInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="CA 123-456">
-          <p class="o-scan__typeErr" id="scanTypeErr" hidden>That plate is not on your list. Check it and try again.</p>
+          <p class="o-scan__typeErr" id="scanTypeErr" hidden>That plate is not assigned to you. Check it and try again.</p>
         </div>
         <div class="o-scan__actions">
           <button class="a-btn a-btn--primary" type="button" id="scanRetry" hidden>Try again</button>
@@ -4178,7 +4189,7 @@ body {
         <!-- The plate rides inside the button, so the vehicle is part of the
              thing being tapped rather than a line above it that can be skipped. -->
         <div class="o-check__action">
-          <button class="a-btn a-btn--primary" type="button" id="checkGo">Get a QR</button>
+          <button class="a-btn a-btn--primary" type="button" id="checkGo">Show fuel code</button>
           <button class="a-btn a-btn--outline" type="button" id="checkOther">Choose another station</button>
         </div>
       </section>
@@ -4423,7 +4434,9 @@ body {
     bioOn: true,
     /* Points spent on data this session. One writer: sendBundle. */
     spentPts: 0,
-    sentBundles: [],
+    /* mb -> 'processing' | 'sent' | 'delivered' | 'failed'. Points spend at
+       request time and come back on failure; the row narrates the rest. */
+    redemptions: {},
     /* Signing up is worth 50, the same as it is in the full app. Change this
        and the total, the meter, the goal line and the announcement all follow.
 
@@ -5171,12 +5184,12 @@ body {
        Rewards row, arguing that the pill above already carried the count; the
        pill is gone and the hero carries both halves now. */
     el.homeWorth.textContent = points
-      ? 'About ' + dataLabel(points / S.ptsPerGb) + ' of data earned'
+      ? 'About ' + dataLabel(points / S.ptsPerGb) + ' of mobile data earned'
       : 'Earn data on every fill';
     /* So the Rewards row says the one thing the hero does not: how the number
        grows. Not the balance again - one number, said once - and not
        "Points and data", which names two things and tells you neither. */
-    el.homeRewardSub.textContent = 'Every ' + groupNum(S.ptsPerGb) + ' points is 1 GB of data';
+    el.homeRewardSub.textContent = 'Every ' + groupNum(S.ptsPerGb) + ' points is 1 GB of mobile data';
     /* The card names the vehicle being driven, so it waits until one has been
        chosen. Assigned and chosen are not the same thing. */
     if (!S.vehicleLinked) { S.vehicles = []; }
@@ -5242,7 +5255,7 @@ body {
        out as "Good morning,, David". */
     var greeting = 'Home. ' + el.homeGreeting.textContent.replace(/,\s*$/, '') + ', David.';
     if (S.vehicleLinked && S.activeVehicle === NONE && S.vehicles.length > 1) {
-      greeting += ' Scan the disc or the plate on the vehicle you are driving to' +
+      greeting += ' Scan the licence disc or number plate on the vehicle you are driving to' +
                   ' start fuelling today.';
     }
     /* A driver arriving from a scan is arriving with news, and the news beats
@@ -5387,7 +5400,7 @@ body {
       if (S.fuel === 'live') {
         el.homeLive.removeAttribute('data-phase');
         barTitle.textContent = 'Fuel approved';
-        barCta.textContent = 'Show QR';
+        barCta.textContent = 'Show fuel code';
         el.homeLiveSub.textContent = plate + ' · up to ' + FUEL_LITRES;
         /* Said once as a sentence rather than left to be assembled out of a
            dot, a title and a call to action by anyone listening to it. */
@@ -5435,7 +5448,7 @@ body {
        a vehicle linked the button fuels; with vehicles assigned but none
        linked, it IS the linking step; with nothing assigned it stays a
        disabled fact only a manager can change. */
-    if (S.vehicleLinked) {
+    if (activeVehicle()) {
       el.homeFuel.textContent = 'I want to fuel';
       el.homeFuel.setAttribute('aria-disabled', 'false');
     } else if (S.vehicles.length) {
@@ -5552,14 +5565,14 @@ body {
        manager's system reads. */
     odometer: {
       mark: ICON_GAUGE,
-      title: 'Enter the odometer',
-      body: 'Type the km number on the dashboard. Your company checks fuel against distance.',
+      title: 'Enter the kilometre reading',
+      body: 'Find this number on the dashboard. Your company checks fuel against distance.',
       go: 'Continue',
       build: function (host) {
         host.innerHTML =
           '<input class="o-step__field" type="text" inputmode="numeric"' +
           ' value="' + (S.odoReading || '84 230') + '"' +
-          ' aria-label="Odometer reading in kilometres, from the dashboard">';
+          ' aria-label="Kilometre reading, from the dashboard">';
       },
       onGo: function () {
         var field = el.stepGroup.querySelector('.o-step__field');
@@ -5649,8 +5662,8 @@ body {
        before the driver has done anything to need it is the one they refuse. */
     location: {
       mark: ICON_PIN,
-      title: 'Find allowed stations near you',
-      body: 'EngenXT uses your location to show stations available for this vehicle.',
+      title: 'Find approved stations near you',
+      body: 'EngenXT uses your location to show stations approved for this vehicle.',
       go: 'Use my location',
       alt: 'Search instead',
       /* Both ways carry on to the map, because the driver is only ever on this
@@ -5674,7 +5687,7 @@ body {
     /* Ready is the one state that names both, because it is the only one where
        nothing has been decided yet. Naming one of them here would be the app
        asking for the disc, which is the instruction it just stopped giving. */
-    ready:   { t: 'Hold still', b: 'Point the camera at the licence disc or the number plate.' },
+    ready:   { t: 'Line up the licence disc or number plate', b: 'Hold still when it is inside the frame.' },
     /* And this is the state that reports the decision back. A read that says
        only "Reading\u2026" leaves the driver holding a phone at a windscreen with
        no idea whether it has caught anything, which is exactly when they move
@@ -5700,7 +5713,7 @@ body {
        were the ones that were wrong. */
     dark:    { t: 'Too dark to read', b: 'Turn the torch on, or move somewhere lighter.',
                lit: 'The torch is on and it is still too dark. Move closer, or bring the vehicle into light.' },
-    blur:    { t: 'Too blurry', b: 'Hold the phone still and wait for it to sharpen.' },
+    blur:    { t: 'Image is blurry', b: 'Hold still for a moment.' },
     /* The ninth face, and the only one whose fix is on the phone rather than on
        the vehicle or in the sky.
 
@@ -5716,8 +5729,8 @@ body {
 
        A fleet phone lives face-down in a diesel-and-dust pocket and is handled
        with working hands. This is nearer the default than the edge case. */
-    smear:   { t: 'Something is on the lens', b: 'Wipe the lens on your shirt or your sleeve.' },
-    nocam:   { t: 'The camera is not available', b: 'Another app may be holding it. Close that app and try again.' },
+    smear:   { t: 'The camera lens may be dirty', b: 'Wipe it with a clean, soft cloth.' },
+    nocam:   { t: 'Camera is unavailable', b: 'Close other camera apps, then try again.' },
     denied:  { t: 'Camera access is off', b: 'Turn it on for EngenXT in your phone settings, then come back.' },
     type:    { t: 'Type the number plate', b: 'As it is on the plate, like CA 123-456.' },
     /* Still "try the other one", because that advice was always sound. What
@@ -5738,14 +5751,14 @@ body {
        the state somewhere to go. The retry survives the escalation and only the
        lead changes — declaring the phone dead to somebody two paces from shade
        is the mistake the offline state already made once. */
-    unread:  { t: 'That could not be read', b: 'Try the other one. The disc and the plate both work.',
-               spentTitle: 'This vehicle will not scan',
-               spentBody: 'Wipe the plate and scan once more. If it still fails, ask your manager.' },
+    unread:  { t: 'We could not read it', b: 'Try the other one. The disc and the plate both work.',
+               spentTitle: 'We still cannot read it',
+               spentBody: 'Enter the number plate instead, or message your manager.' },
     /* "In a moment" is a promise about time that a flat mast will not keep, and
        its specific harm is the retry loop it invites: a driver who believes
        "a moment" presses Try again eight times before concluding the app is
        broken rather than the tower. */
-    offline: { t: 'No connection', b: 'We cannot check the vehicle without one. Try again when you have signal.' },
+    offline: { t: 'Internet connection needed', b: 'We need Wi-Fi or mobile data to check this vehicle. Try again when you have signal.' },
     /* The state the rule creates. Once the camera decides, something that
        belongs to nothing on the driver's list has to be told about.
 
@@ -5762,8 +5775,8 @@ body {
 
        Printing what it read lets the driver tell them apart in about a second,
        which is faster than any round trip through a person. */
-    notyours: { t: 'That vehicle is not on your list', b: 'Ask your manager to add it, or scan one that is.',
-                readAs: 'We read %s. Ask your manager to add it, or scan again if that is not your plate.' }
+    notyours: { t: 'This vehicle is not assigned to you', b: 'Scan again, or ask your manager to assign it.',
+                readAs: 'We read %s. Scan again, or ask your manager to assign it if that is your plate.' }
   };
 
   /* What the camera decided it is looking at.
@@ -6038,7 +6051,7 @@ body {
     /* Standing in front of a fill rather than starting a session, so it says so.
        A lock screen with no reason attached is the one people tap through. */
     if (key === 'account' && afterAccount) {
-      el.stepTitle.textContent = 'Confirm it is you';
+      el.stepTitle.textContent = 'Confirm it\u2019s you';
       el.stepBody.textContent =
         'The fuel goes on your company\u2019s account, so we check who is asking.';
     }
@@ -6118,7 +6131,7 @@ body {
     { key: 'open',  label: 'Open 24 hours', by: function (a, b) {
         var oa = /24 hours/.test(a.note) ? 0 : 1, ob = /24 hours/.test(b.note) ? 0 : 1;
         return oa - ob || a.km - b.km; } },
-    { key: 'known', label: 'Visited', by: function (a, b) {
+    { key: 'known', label: 'Fuelled here before', by: function (a, b) {
         var ka = /fuelled here/.test(a.note) ? 0 : 1, kb = /fuelled here/.test(b.note) ? 0 : 1;
         return ka - kb || a.km - b.km; } }
   ];
@@ -6205,7 +6218,7 @@ body {
        that decides anything. A driver who reads "Shop" and drives over to find
        the fill refused has been told the wrong thing first. */
     el.stationStatusLine.textContent =
-      (st.allowed ? 'Allowed' : 'Not on your company list') +
+      (st.allowed ? 'Approved' : 'Not on your company list') +
       ' \u00b7 ' + (st.open ? 'Open now' : 'Closed');
     el.stationStatusLine.setAttribute('data-allowed', st.allowed);
 
@@ -6408,8 +6421,8 @@ body {
        tappable plates here, which was a second way to set today's vehicle
        without a scan. */
     el.checkGo.setAttribute('aria-disabled', 'false');
-    el.checkGo.textContent = v ? 'Get a QR for ' + v.plate : 'Scan your vehicle';
-    el.checkOther.textContent = clear ? 'Choose another station' : 'Show approved stations';
+    el.checkGo.textContent = v ? 'Show fuel code for ' + v.plate : 'Scan your vehicle';
+    el.checkOther.textContent = clear ? 'Choose another approved station' : 'Show approved stations';
 
     el.check.hidden = false;
     if (arriving && !prefersReduced()) {
@@ -6440,7 +6453,7 @@ body {
     var hours = S.hours !== 'closed';
     return [
       { ok: !!st.allowed, shortName: 'Company list',
-        title: st.allowed ? 'On your company list' : 'Station no longer approved',
+        title: st.allowed ? 'Approved by your company' : 'Station no longer approved',
         sub: st.allowed ? st.name + ' is approved for you'
                         : st.name + ' came off your company list' },
       /* Never a number, and never the word funds.
@@ -6456,7 +6469,7 @@ body {
         sub: account ? 'Nothing is stopping this fill'
                      : 'Ask your manager to fix it.' },
       { ok: hours, shortName: 'Fuelling hours',
-        title: hours ? 'Right day, right time' : 'Outside your fuelling hours',
+        title: hours ? 'Within your fuelling hours' : 'Outside your fuelling hours',
         sub: hours ? 'Your company allows fuelling right now'
                    : 'Your company allows Monday to Saturday, 05:00 to 19:00.' },
       /* "Pick the one you are driving" was the last line on this screen still
@@ -6464,7 +6477,7 @@ body {
          has not been for some time: the button below it says Scan your vehicle
          and the why-line above says the same. */
       { ok: !!v,   shortName: 'Your vehicle',
-        title: v ? 'Your vehicle is confirmed' : 'No vehicle chosen yet',
+        title: v ? 'Vehicle confirmed' : 'No vehicle chosen yet',
         sub: v ? v.make + ' ' + v.model + ' \u00b7 ' + v.plate
                : 'Scan the one you are driving' },
       /* The cap is the tank, which is how Absa actually sets it: a litre
@@ -6595,7 +6608,7 @@ body {
     }
     after(500, function () {
       announce('Choose a station. ' + STATIONS.filter(function (s) { return s.allowed; }).length +
-               ' are allowed for your company.');
+               ' are approved by your company.');
     });
     after(60, function () { el.stationsBack.focus({ preventScroll: true }); });
   }
@@ -6793,6 +6806,9 @@ body {
   function showRewards() {
     clearTimers(); hideAll();
     S.step = 'rewards';
+    Object.keys(S.redemptions).forEach(function (mb) {
+      if (S.redemptions[mb] === 'processing' || S.redemptions[mb] === 'sent') { armRedemption(mb); }
+    });
     setStatusTone(false);
     paintRewards();
     /* The arrival wave plays once, on arrival. The attribute comes off
@@ -6812,27 +6828,31 @@ body {
   function paintRewards() {
     var bal = balancePts();
     el.rewardsPoints.textContent = groupNum(bal) + ' pts';
-    el.rewardsWorth.textContent = bal ? 'About ' + dataLabel(bal / S.ptsPerGb) + ' of data'
-                                      : 'Earn data on every fill';
+    el.rewardsWorth.textContent = bal ? 'Enough for up to ' + dataLabel(bal / S.ptsPerGb) + ' of mobile data'
+                                      : 'Earn mobile data on every fill';
     el.rewardsList.innerHTML = BUNDLES.map(function (b, i) {
-      var sent = S.sentBundles.indexOf(b.mb) > -1;
-      var short = !sent && bal < b.pts;
-      var state = sent ? 'sent' : short ? 'short' : 'can';
+      var status = S.redemptions[b.mb] || null;
+      var short = !status && bal < b.pts;
+      var state = status || (short ? 'short' : 'can');
       /* Short says the distance, not the price - the price is already on
          the row, the track draws the rest, and "1 050 more" is a reason
          to fill up again. "More points" collided with the price column at
          large text, and the word the line can spare is the one the row
          already says twice. */
-      var right = sent ? '<span class="m-bundle__state">Sent \u2713</span>'
+      var right = status === 'processing' ? '<span class="m-bundle__state">Processing\u2026</span>'
+                : status === 'sent' ? '<span class="m-bundle__state">Sent</span>'
+                : status === 'delivered' ? '<span class="m-bundle__state">Delivered \u2713</span>'
+                : status === 'failed' ? '<span class="m-bundle__go">Try again</span>'
                 : short ? '<span class="m-bundle__state">Needs ' + groupNum(b.pts - bal) + ' more</span>'
-                : '<span class="m-bundle__go">Get it</span>';
+                : '<span class="m-bundle__go">Get ' + b.label + '</span>';
       var track = short ? '<span class="m-bundle__track"><span class="m-bundle__trackFill" style="width:' +
                           Math.round(bal / b.pts * 100) + '%"></span></span>' : '';
       return '<button class="m-bundle" type="button" role="listitem" data-bundle="' + i + '"' +
              ' data-state="' + state + '" style="--bundle-i:' + i + '"' +
-             (sent || short ? ' aria-disabled="true"' : '') + '>' +
+             (short || status === 'processing' || status === 'sent' || status === 'delivered'
+               ? ' aria-disabled="true"' : '') + '>' +
              '<span class="m-bundle__main">' +
-             '<span class="a-icon-wrap"' + (sent ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
+             '<span class="a-icon-wrap"' + (status === 'delivered' ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
              '<span><span class="m-bundle__size">' + b.label + ' of data</span>' +
              '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span>' + track + '</span>' +
              '</span>' +
@@ -6841,18 +6861,53 @@ body {
   }
   /* The one writer of spend. A sent bundle stays sent for the session, its
      row keeps its place, and every balance on every screen drops together. */
+  function setRedemption(mb, status) {
+    S.redemptions[mb] = status;
+    if (S.step === 'rewards') { paintRewards(); }
+  }
+  /* Sending is two real beats - the network takes the order, the carrier
+     delivers it - and the row says which one it is in. The beats live in
+     the tracked timers so a frozen rail frame stays frozen; showRewards
+     re-arms anything a screen change paused mid-journey. */
+  function armRedemption(mb) {
+    after(1400, function () {
+      if (S.redemptions[mb] !== 'processing') { return; }
+      setRedemption(mb, 'sent');
+      after(2000, function () {
+        if (S.redemptions[mb] !== 'sent') { return; }
+        setRedemption(mb, 'delivered');
+        var b = BUNDLES.filter(function (x) { return x.mb === mb; })[0];
+        reply((b ? b.label : 'The data') + ' was delivered to +27 82 \u00b7\u00b7\u00b7 567 at 9:41.');
+      });
+    });
+  }
   function sendBundle(i) {
     var b = BUNDLES[i];
     if (!b) { return; }
-    if (S.sentBundles.indexOf(b.mb) > -1) { return; }
+    var status = S.redemptions[b.mb];
+    if (status === 'processing' || status === 'sent' || status === 'delivered') { return; }
+    if (status === 'failed') {
+      /* Try again: the points were returned with the failure, so the retry
+         is an ordinary send. */
+      delete S.redemptions[b.mb];
+    }
     if (balancePts() < b.pts) {
       reply('You need ' + groupNum(b.pts - balancePts()) + ' more points for ' + b.label + '.');
       return;
     }
     S.spentPts += b.pts;
-    S.sentBundles.push(b.mb);
-    paintRewards();
-    reply(b.label + ' of data is on its way to +27 82 \u00b7\u00b7\u00b7 567.');
+    setRedemption(b.mb, 'processing');
+    armRedemption(b.mb);
+    reply('Sending ' + b.label + ' of data to +27 82 \u00b7\u00b7\u00b7 567.');
+  }
+  /* The one road to the failed face, and it gives the points straight back:
+     a delivery the carrier refused must not cost the driver anything. */
+  function failRedemption(i) {
+    var b = BUNDLES[i];
+    if (!b) { return; }
+    S.spentPts -= b.pts;
+    setRedemption(b.mb, 'failed');
+    reply('We could not send the mobile data. Your points are safe.');
   }
 
   function bankFill() {
@@ -6941,7 +6996,7 @@ body {
         '<div class="o-receipt__row" data-tone="success">' +
           '<span class="o-receipt__label">Points earned</span>' +
           '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
-        row('Odometer', r.odo || '') +
+        row('Kilometre reading', r.odo || '') +
         row('Reference', r.ref) +
         '</div>';
       function row(label, value) {
@@ -7248,7 +7303,7 @@ body {
       reply('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
-    if (!S.vehicleLinked) { showStep('vehicle'); return; }
+    if (!activeVehicle()) { showStep('vehicle'); return; }
     requestFuel();
   });
   el.homeLive.addEventListener('click', function () {
@@ -7848,11 +7903,23 @@ body {
       run: function () {
         reset('returning-driver', true, 3);
         showRewards();
-        /* Spend through the one writer so the frame is the honest result
-           of two sends: two rows quiet-green, the 2 GB short with its
-           distance drawn. The toast about the sends is stale news in a
-           frozen frame, so it comes down. */
+        /* Through the one writer, then fast-forwarded one step each, so the
+           frozen frame shows the ladder itself: one delivered, one still
+           only sent. The toast about the sends is stale news in a frozen
+           frame, so it comes down. */
         sendBundle(0); sendBundle(1);
+        S.redemptions[BUNDLES[0].mb] = 'delivered';
+        S.redemptions[BUNDLES[1].mb] = 'sent';
+        paintRewards();
+        el.toast.removeAttribute('data-state');
+        clearTimers();
+      } },
+    'rewards-delivery-failed': { group: 'returning', label: 'Data delivery failed',
+      run: function () {
+        reset('returning-driver', true, 3);
+        showRewards();
+        sendBundle(0);
+        failRedemption(0);
         el.toast.removeAttribute('data-state');
         clearTimers();
       } },
