@@ -197,6 +197,8 @@
   --radius-circle: 50%;
 
   /* Elevation. One light source, from above. */
+  /* Elevation lives in this family. Focus rings and glows are optics,
+     drawn in place from colour tokens - they are not elevations. */
   --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
   --shadow-sheet:     inset 0 var(--size-hairline) 0 rgba(255,255,255,0.65),
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
@@ -212,6 +214,7 @@
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
   --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
   --shadow-toast:     0 4px 20px rgba(0,0,0,0.30);
+  --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
 
@@ -234,6 +237,9 @@
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
      can draw. */
+  /* Page layers. A sibling raise inside one component (a pressed pin
+     above its neighbours) states a bare small integer instead - these
+     tokens name rooms, not shelves. */
   --z-base:     0;
   --z-content:  2;
   --z-scrim:    9;
@@ -285,6 +291,8 @@
   --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
   --ease-emphasis: cubic-bezier(0.32,0.72,0,1);
   --ease-spring:   cubic-bezier(.34,1.4,.64,1);
+  /* The interaction scale. Choreographed motion (a lens crossfade, a
+     pour) may state its own time in place, beside a comment saying so. */
   --dur-fast:  0.12s;
   --dur-base:  0.30s;
   /* A named motion role, kept deliberately: sheet travel is a distance,
@@ -546,7 +554,7 @@ body {
   width: 390px; height: 844px;
   border-radius: var(--radius-phone); overflow: hidden;
   box-shadow: var(--shadow-phone);
-  transition: width .25s var(--ease-out), height .25s var(--ease-out);
+  transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out);
 }
 /* Real devices, in points, which is what a phone lays out in and what CSS
    pixels already are. 390 x 844 is the modern standard iPhone. 375 x 812 is the
@@ -1061,8 +1069,8 @@ body {
   color: var(--color-text-secondary);
 }
 /* Reduced motion still gets the message, it just arrives rather than slides. */
-.m-linked[data-state="in"] { animation: linkedIn var(--dur-slow) var(--ease-out) both; }
-@keyframes linkedIn {
+.m-linked[data-state="in"] { animation: linkedLand var(--dur-slow) var(--ease-out) both; }
+@keyframes linkedLand {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: none; }
 }
@@ -1468,12 +1476,14 @@ body {
    has to animate a gradient. The reward fades out over it and home fades in,
    overlapping rather than queueing. */
 .a-seam {
-  position: absolute; inset: 0; z-index: 0;
+  position: absolute; inset: 0; z-index: var(--z-base);
   background: var(--color-surface-page);
   opacity: 0; pointer-events: none;
 }
 .a-seam[data-state="crossing"] {
   opacity: 1;
+  /* Lens choreography states its own time: three layered crossfades need
+     steps finer than the --dur scale. */
   transition: opacity 260ms var(--ease-emphasis);
 }
 /* Both screens are display:none until their state says otherwise, so a state
@@ -1568,7 +1578,7 @@ body {
 /* The shackle turns open. Origin at its hinge, a spring out, and the halo
    warms to the success tone in the same beat. Still under reduced motion:
    the open state is a frame, not a journey. */
-.o-step__shackle { transform-origin: 16px 11px; transition: transform .3s var(--ease-spring); }
+.o-step__shackle { transform-origin: 16px 11px; transition: transform var(--dur-base) var(--ease-spring); }
 .o-step[data-step="account"] .o-step__mark[data-open="true"] { color: var(--color-success); }
 .o-step__mark[data-open="true"] .o-step__shackle { transform: translate(1.5px, -2.5px) rotate(26deg); }
 [data-motion="reduced"] .o-step__shackle { transition: none; }
@@ -2118,7 +2128,7 @@ body {
   background: var(--glass-panel-bg);
   -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
   border-top: 1px solid var(--glass-panel-line);
-  box-shadow: 0 -8px 32px rgba(0,0,0,0.10);
+  box-shadow: var(--shadow-sheet-up);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .o-stations__sheet { background: var(--color-surface); }
@@ -2966,7 +2976,7 @@ body {
    17 units of travel, eased so each tick pours rather than steps. */
 .o-filling__liquid {
   transform: translateY(calc(22px - var(--fill-level, 0) * 17px));
-  transition: transform .7s var(--ease-out);
+  transition: transform .7s var(--ease-out);  /* its own time: a pour, not a tap */
 }
 .o-filling__wave { animation: waveDrift 2.4s linear infinite; }
 .o-filling__wave--back { animation-duration: 3.4s; }

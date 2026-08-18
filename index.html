@@ -194,6 +194,8 @@
   --radius-circle: 50%;
 
   /* Elevation. One light source, from above. */
+  /* Elevation lives in this family. Focus rings and glows are optics,
+     drawn in place from colour tokens - they are not elevations. */
   --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
   --shadow-sheet:     inset 0 var(--size-hairline) 0 rgba(255,255,255,0.65),
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
@@ -209,6 +211,7 @@
   --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
   --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
   --shadow-toast:     0 4px 20px rgba(0,0,0,0.30);
+  --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
 
@@ -231,6 +234,9 @@
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
      can draw. */
+  /* Page layers. A sibling raise inside one component (a pressed pin
+     above its neighbours) states a bare small integer instead - these
+     tokens name rooms, not shelves. */
   --z-base:     0;
   --z-content:  2;
   --z-scrim:    9;
@@ -282,6 +288,8 @@
   --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
   --ease-emphasis: cubic-bezier(0.32,0.72,0,1);
   --ease-spring:   cubic-bezier(.34,1.4,.64,1);
+  /* The interaction scale. Choreographed motion (a lens crossfade, a
+     pour) may state its own time in place, beside a comment saying so. */
   --dur-fast:  0.12s;
   --dur-base:  0.30s;
   /* A named motion role, kept deliberately: sheet travel is a distance,
@@ -458,7 +466,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-card-sm);
   padding: 0; appearance: none;
   caret-color: var(--color-primary);
-  transition: border-color .15s, background .15s, color .15s;
+  transition: border-color var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
 }
 .a-otp-cell[data-state="filled"] {
   border-color: var(--color-primary); background: var(--color-primary-bg); color: var(--color-primary);
@@ -1182,7 +1190,7 @@ button { background: none; border: none; color: inherit; }
   width: 390px; height: 844px;
   border-radius: var(--radius-phone); overflow: hidden;
   box-shadow: var(--shadow-phone);
-  transition: width .25s var(--ease-out), height .25s var(--ease-out);
+  transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out);
 }
 /* Real devices, in points, which is what a phone lays out in and what CSS
    pixels already are. 390 x 844 is the modern standard iPhone. 375 x 812 is the
