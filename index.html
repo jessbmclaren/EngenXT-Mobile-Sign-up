@@ -2258,29 +2258,32 @@ button { background: none; border: none; color: inherit; }
   var CODE_ALERTS = {
     expired: {
       tone: 'warning', icon: 'clock',
-      title: 'Your code has expired',
-      body: 'Codes are valid for 5 minutes. Request a new code to continue.',
+      title: 'This code has expired',
+      body: 'It was valid for five minutes. Send a new code to continue.',
       /* Built from the live channel, because "Send a new code" does not say
          where the driver should then go looking for it. */
       actions: function () {
         return S.channel === 'whatsapp'
-          ? [{ label: 'Send a new WhatsApp code', kind: 'primary', act: 'resendNow' },
+          ? [{ label: 'Send a new code', kind: 'primary', act: 'resendNow' },
              { label: 'Send by SMS instead', kind: 'outline', act: 'sendBySms' }]
-          : [{ label: 'Send a new SMS code', kind: 'primary', act: 'resendNow' },
+          : [{ label: 'Send a new code', kind: 'primary', act: 'resendNow' },
              { label: 'Send on WhatsApp instead', kind: 'outline', act: 'sendByWhatsapp' }];
       }
     },
     slow: {
       tone: 'info', icon: 'clock',
-      title: 'Your code has not arrived yet',
-      body: 'Codes can be slow to arrive on a weak signal. You can keep waiting, or get this one by SMS.',
-      /* The primary carries EngenXT blue, not WhatsApp green. Verifying is the
-         task; the channel is only how the code travels. */
-      actions: [{ label: 'Send code by SMS', kind: 'primary', act: 'sendBySms' }]
+      title: 'The WhatsApp code is taking longer than usual',
+      /* The switch names its price out loud: a new code kills the old one,
+         so nobody enters a WhatsApp code that SMS already replaced. */
+      body: 'Keep waiting, or send a new code by SMS. Sending a new code will replace the WhatsApp code.',
+      actions: [
+        { label: 'Send a new code by SMS', kind: 'primary', act: 'sendBySms' },
+        { label: 'Keep waiting', kind: 'outline', act: 'keepWaiting' }
+      ]
     },
     resendLimit: {
       tone: 'warning', icon: 'clock',
-      title: 'Too many code requests',
+      title: 'You cannot request another code yet',
       /* No action. Support cannot lift a security limit, and offering it here
          would send a driver to a dead end while the clock still runs. The
          body is rewritten every tick by showResendLimit, so the one thing
@@ -2291,10 +2294,11 @@ button { background: none; border: none; color: inherit; }
     },
     offline: {
       tone: 'warning', icon: 'wifiOff',
-      /* Signal and data are not the same thing, and a driver can have one
-         without the other, so the fix names both. */
+      /* The offline gate runs before the attempt is spent, and the watch
+         re-checks by itself when the connection returns - so this sentence
+         is a report of how the code already works, not a reassurance. */
       title: 'No internet connection',
-      body: "We couldn't check your code. Your code is still here. Connect to mobile data or Wi-Fi, then try again.",
+      body: "Your code and attempts are safe. We'll check it when you reconnect.",
       actions: [{ label: 'Try again', kind: 'primary', act: 'retryVerify' }]
     },
     server: {
@@ -2314,7 +2318,7 @@ button { background: none; border: none; color: inherit; }
     waSent: {
       tone: 'success', icon: 'check',
       title: 'New code sent on WhatsApp',
-      body: 'Enter the newest code. The one before it no longer works.',
+      body: 'We sent a new code. Only the newest code will work.',
       actions: []
     }
   };
@@ -2360,15 +2364,18 @@ button { background: none; border: none; color: inherit; }
       tone: 'warning', icon: 'lock',
       /* Sign in is what paused, not the number. A driver told their number is
          paused will reasonably think their phone line has been cut off. */
-      title: 'Sign-in is temporarily paused',
-      /* The clock appears once, in the meta slot below. Repeating it in the
-         sentence made three different renderings of one number. */
-      body: 'Too many incorrect codes were entered. Try again in:',
-      /* Support cannot shorten the lock, but it can help a driver who is at a
-         pump right now, which is a different question and a real one. */
-      meta: 'Need to fuel now? Contact support.',
+      /* Until-when in the title, from the same fixed clock everything
+         here reads: 9:41 plus the fifteen-minute pause. The live count
+         appears once, in the clock slot below. */
+      title: 'Sign-in paused until 9:56',
+      body: 'Too many incorrect codes were entered. You can try again in:',
+      /* Nobody can shorten a security timer - not support, not a manager -
+         so the one person offered is offered for the one thing they can
+         do: get the driver fuelling another way in the meantime. */
+      meta: 'Need to fuel now?',
       actions: [
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT_LOCK }
+        { label: 'Message my manager', kind: 'outline',
+          href: WA_MANAGER + encodeURIComponent('Hi, my EngenXT sign-in is paused for 15 minutes and I need to fuel now. Can you help me fuel another way?') }
       ],
       /* When the clock runs out the screen stops explaining and starts
          offering the only thing the driver wanted. */
@@ -2618,6 +2625,7 @@ button { background: none; border: none; color: inherit; }
     },
     sendByWhatsapp: function () { switchChannel('whatsapp'); },
     resendNow: function () { resendCode(); },
+    keepWaiting: function () { hideAlert(el.codeAlert); setCodeView('waiting'); },
     restart: function () { closeSheet(true); },
     retryHome: function () { go('home/default'); }
   };
@@ -3398,7 +3406,7 @@ button { background: none; border: none; color: inherit; }
       el.resendBtn.textContent = 'Resend code in ' + label;
       var alertBody = el.codeAlert.querySelector('.m-alert__body');
       if (alertBody) {
-        alertBody.textContent = 'Your newest code still works. Enter it now, or request another code in ' + label + '.';
+        alertBody.textContent = 'Your newest code still works. Enter it now, or request another in ' + label + '.';
       }
     }, function () {
       el.resendBtn.disabled = false;
@@ -3594,10 +3602,11 @@ button { background: none; border: none; color: inherit; }
       }, function () {
         S.lockedUntil = 0;
         el.blockedClock.hidden = true;
+        el.blockedTitle.textContent = 'You can sign in again';
         el.blockedBody.textContent = def.whenDone.body;
         el.blockedMeta.hidden = true;
         paintBlockedActions(def.whenDone.actions);
-        announce(def.whenDone.body);
+        reply(def.whenDone.body);
       });
     } else {
       el.blockedClock.hidden = true;
