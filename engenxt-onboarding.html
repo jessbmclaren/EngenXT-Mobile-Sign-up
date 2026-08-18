@@ -2554,7 +2554,8 @@ body {
   max-width: 28ch;
 }
 
-/* m-fallback. The number for a till that cannot read the square.
+/* m-fallback. The number an attendant can key in when their machine
+   cannot read the square.
 
    Quiet, because reaching for it means the fast path has already failed, and a
    number given equal weight to the square invites an attendant to type when
@@ -2582,7 +2583,7 @@ body {
   color: var(--color-text-primary);
 }
 
-/* a-qr. The square a till reads.
+/* a-qr. The square the attendant's machine reads.
 
    Pure black on pure white with its own quiet zone, and never tinted with the
    brand. Everything else on this screen is styled to belong to EngenXT; this
@@ -4047,8 +4048,8 @@ body {
             <span class="o-fuel__tick" aria-hidden="true">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             </span>Approved</h1>
-          <p class="o-fuel__lead">Show this to the attendant. Their till scans it.</p>
-          <p class="d-demoHint">Prototype: the till reads it in a few seconds, then the rest plays.</p>
+          <p class="o-fuel__lead">Show this to the attendant. Their machine scans it.</p>
+          <p class="d-demoHint">Prototype: the attendant scans it in a few seconds, then the rest plays.</p>
 
           <!-- Drawn, not fetched. Filled by showFuel, because what it encodes
                depends on the fill it belongs to. -->
@@ -6723,7 +6724,7 @@ body {
     var done = S.fuel === 'done';
     var waiting = S.fuel === 'live';
     el.filling.setAttribute('data-face', done ? 'done' : waiting ? 'waiting' : 'running');
-    /* Before the till reads the code there are no litres, and a zero would
+    /* Before the attendant scans the code there are no litres, and a zero would
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
     el.fillingSpin.hidden = !waiting;
@@ -6736,7 +6737,7 @@ body {
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
     el.fillingUnit.textContent = done ? 'litres'
-                               : waiting ? 'Waiting for the till'
+                               : waiting ? 'Waiting for the attendant'
                                : 'litres so far';
     el.fillingVerdict.hidden = !done;
     el.fillingVerdict.textContent = fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
@@ -6905,7 +6906,7 @@ body {
       /* A screen reader used to spell out six digits here. There are no digits
          to spell, so it says what is approved and what to do with the screen. */
       announce('Approved for ' + (v ? v.plate : 'this vehicle') + ' at ' +
-               stationName() + '. Show this to the attendant. Their till scans it.');
+               stationName() + '. Show this to the attendant. Their machine scans it.');
     });
   }
 
@@ -7620,7 +7621,7 @@ body {
         S.station = 'bryanston'; showHome(); clearTimers();
         S.fuel = 'live'; paintFuelAction(); showFuel();
         /* The one rail state that runs rather than freezes, by the owner's
-           ask: land here and the till reads the code, the litres count, the
+           ask: land here and the attendant scans the code, the litres count, the
            notification drops and the pay-off plays - the whole back half of
            the journey from one click. The frozen moments either side
            (fuel-live, fuel-filling, fuel-done) still hold their frames for
@@ -7665,7 +7666,7 @@ body {
         S.fuel = 'done'; S.fillLitresNow = PARTIAL_LITRES; paintFuelAction();
         showPush();
       } },
-    'fuel-watching':   { group: 'fuelling', label: 'Watching, till not read yet',
+    'fuel-watching':   { group: 'fuelling', label: 'Watching, not scanned yet',
       run: function () {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
         S.station = 'bryanston'; showHome(); clearTimers();
@@ -8013,7 +8014,7 @@ body {
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
                    ['fuel-filling', 'Filling'],
-                   ['fuel-watching', 'Watching, till not read yet'],
+                   ['fuel-watching', 'Watching, not scanned yet'],
                    ['fuel-filling-open', 'Filling, watched'],
                    ['fuel-done', 'Done, the notification'],
                    ['fuel-stopped', 'Stopped early, the notification'],

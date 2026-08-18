@@ -239,7 +239,7 @@ async function fuelling() {
   await sleep(1400);                                     /* 900ms authorise + arrive */
   s = await st();
   check('QR up, fill live', s.fuelUp && s.fuel === 'live', s.fuel);
-  await sleep(6400);                                     /* the till reads it at 6s */
+  await sleep(6400);                                     /* the attendant scans at 6s */
   s = await st();
   check('QR came down on its own once read', !s.fuelUp, JSON.stringify(s));
   /* State was not enough once: an invisible home answers every question
@@ -311,7 +311,7 @@ async function fuelling() {
     face: document.getElementById('fillingScreen').getAttribute('data-face'),
     unit: document.getElementById('fillingUnit').textContent })`));
   check('Done walks forward into the watched fill', fw.up, JSON.stringify(fw));
-  check('before the till reads, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'Waiting for the till', JSON.stringify(fw));
+  check('before the scan lands, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'Waiting for the attendant', JSON.stringify(fw));
   await ev(`document.getElementById('fillingClose').click()`);
   await sleep(500);
   s = await st();
