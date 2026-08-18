@@ -198,7 +198,7 @@ async function signup() {
     '999999'.split('').forEach(function(d,i){c[i].value=d;c[i].dispatchEvent(new Event('input',{bubbles:true}));});})()`);
   await sleep(2200);
   s = await ev(`JSON.stringify({ helper: document.getElementById('otpHelper').textContent.trim().slice(0,40), stage: Demo.S().stage })`);
-  check('wrong-code face preserved', s.helper.indexOf("doesn't match") > -1 && s.stage === 'code', s.helper);
+  check('wrong-code face preserved', s.helper.indexOf('code is incorrect') > -1 && s.stage === 'code', s.helper);
 
   ws.close(); chrome.kill();
 }

@@ -431,6 +431,9 @@ button { background: none; border: none; color: inherit; }
    sentence telling a driver when they can try again, read one-handed on a
    forecourt. Tertiary is 3.72:1 on the sheet and is meant for inert controls;
    the countdown is content, so it takes the colour content takes. */
+/* On the final attempt the safest recovery leads: the resend link takes
+   the lead coat and outranks the channel button beside it. */
+.o-signup-sheet__resend[data-lead="true"] { font-weight: 800; color: var(--color-primary-dark); }
 .o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }
 
 /* a-field. Two orthogonal axes: data-state for idle, pending and error,
@@ -2082,8 +2085,6 @@ button { background: none; border: none; color: inherit; }
   /* The driver should not have to describe a state the app already knows, so
      each route to a human opens with the message that fits the screen. */
   var WA_ASK_NUMBER  = WA_MANAGER + encodeURIComponent('Hi, which mobile number did you register for me on EngenXT?');
-  var WA_ASK_UNPAUSE = WA_MANAGER + encodeURIComponent('Hi, EngenXT says my driver access is paused. Please turn it back on when you can.');
-  var WA_ASK_FLEET   = WA_MANAGER + encodeURIComponent("Hi, EngenXT says our company's access is inactive. Please contact Engen.");
   var SUPPORT_TEL   = 'tel:+27800000000';
   var WA_SUPPORT_N  = 'https://wa.me/27800000000?text=';
   /* Support opens knowing which screen the driver came from. A generic "I need
@@ -2190,27 +2191,8 @@ button { background: none; border: none; color: inherit; }
         ];
       }
     },
-    suspended: {
-      /* The number is right and the driver is known, so the field stays
-         neutral. Only the access is restricted. */
-      tone: 'warning', icon: 'pause', field: 'neutral', hideCta: true,
-      title: 'Your EngenXT access is paused',
-      body: 'Your company paused your access. Ask your manager to turn it back on.',
-      /* Only the company can lift this, so no support link is offered. */
-      actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_ASK_UNPAUSE }
-      ]
-    },
-    fleet: {
-      tone: 'warning', icon: 'building', field: 'neutral', hideCta: true,
-      title: "Your company's EngenXT access is inactive",
-      body: "Drivers from your company can't sign in right now. Ask your manager to contact Engen.",
-      /* The body asks the manager to call Engen, so a second button sending
-         the driver to Engen would contradict it. */
-      actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_ASK_FLEET }
-      ]
-    },
+    /* suspended and fleet have no inline faces: a company-level stop is a
+       hard stop, routed straight to the one blocked screen. */
     rate: {
       /* A security limit, not an input error and not an account restriction.
          There is nothing to ask a human for and nothing to correct, so the
@@ -2344,34 +2326,32 @@ button { background: none; border: none; color: inherit; }
      Support is offered only where support can actually act, because a button
      that reaches the wrong desk costs a driver the trip. */
   var BLOCKED = {
-    unregistered: {
-      tone: 'error', icon: 'search',
-      title: "We can't find that number",
-      /* This is the one screen where the number requirement itself is the
-         subject, so it is worth naming the country the number belongs to. */
-      body: 'Check that you entered the South African mobile number your company registered for you.',
-      actions: [
-        { label: 'Try another number', kind: 'primary', act: 'clearNumber' },
-        { label: 'Message my manager', kind: 'outline', href: WA_ASK_NUMBER }
-      ]
-    },
     suspended: {
       tone: 'warning', icon: 'pause',
-      title: 'Your EngenXT access is paused',
-      body: 'Your company paused your access. Ask your manager to turn it back on. Then sign in again with the same number.',
-      /* Only the company can lift this, so support is not offered. */
-      actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_ASK_UNPAUSE }
-      ]
+      /* The company did this, to this driver, on purpose - not the app,
+         not the number, not the weather. Waiting and retrying cannot help,
+         so neither is offered. */
+      title: 'Your company paused your access',
+      body: 'You cannot sign in or fuel with EngenXT. Ask your manager to turn your access back on.',
+      actions: function () {
+        return [{ label: 'Message my manager', kind: 'primary',
+          href: WA_MANAGER + encodeURIComponent(
+            'Hi, my EngenXT access is paused. Please turn it back on so I can sign in and fuel. Number: ' + maskedPhone() + '.') }];
+      }
     },
     fleet: {
       tone: 'warning', icon: 'building',
-      title: "Your company's EngenXT access is inactive",
-      body: "Drivers from your company can't sign in right now. Ask your manager to contact Engen.",
-      /* The body asks the manager to call Engen. Offering the driver a support
-         line as well would contradict the instruction directly above it. */
+      title: "Your company's EngenXT account is inactive",
+      body: 'You cannot sign in or fuel with EngenXT until your manager fixes the company account.',
+      /* The reference rides both the screen and the message, so the manager
+         quotes it to Engen instead of describing symptoms. The body sends
+         the manager to Engen; offering the driver a support line as well
+         would contradict the instruction directly above it. */
+      meta: 'Reference EX-1042',
       actions: [
-        { label: 'Message my manager', kind: 'primary', href: WA_ASK_FLEET }
+        { label: 'Message my manager', kind: 'primary',
+          href: WA_MANAGER + encodeURIComponent(
+            'Hi, our company\'s EngenXT account is inactive. I cannot sign in or fuel. Please contact Engen. Reference: EX-1042.') }
       ]
     },
     locked: {
@@ -2853,8 +2833,10 @@ button { background: none; border: none; color: inherit; }
     if (label) { label.textContent = 'Step ' + Math.min(step + 1, 2) + ' of 2'; }
     /* Prototype scaffolding, kept out of the product copy so the sentence a
        driver reads is the sentence that ships. */
-    el.demoHint.hidden = (name !== 'code');
-    el.demoHint.innerHTML = name === 'code' ? 'Prototype: any code works. <b>999999</b> is wrong, <b>000000</b> is expired.' : '';
+    /* No prototype words on product screens - the owner's launch rule.
+       The rail notes carry the test codes; any code still works, so
+       nobody testing can be stranded. */
+    el.demoHint.hidden = true;
 
     if (name === 'number') {
       el.sheetTitle.textContent = 'Enter your mobile number';
@@ -3051,6 +3033,11 @@ button { background: none; border: none; color: inherit; }
       var outcome = OUTCOMES[d] || 'ok';
       if (outcome === 'returning') { S.mode = 'signin'; outcome = 'ok'; }
       else if (outcome === 'ok') { S.mode = 'signup'; }
+      /* A company-level stop is a hard stop, said once: no inline copy of
+         the same bad news with the number form still under it, because
+         changing the number cannot open a locked company gate. Everything
+         a typo can fix stays on the form. */
+      if (outcome === 'suspended' || outcome === 'fleet') { showBlocked(outcome); return; }
       if (outcome !== 'ok') { showNumberError(outcome); return; }
       goToCode({ fresh: true });
     });
@@ -3186,6 +3173,7 @@ button { background: none; border: none; color: inherit; }
     if (opts.fresh) {
       S.otp = ['', '', '', '', '', ''];
       S.attemptsLeft = MAX_ATTEMPTS;
+      el.resendBtn.removeAttribute('data-lead');
       S.resendsLeft = MAX_RESENDS;
       S.fails = {};
     }
@@ -3264,7 +3252,7 @@ button { background: none; border: none; color: inherit; }
     S.verifying = true;
     hideAlert(el.codeAlert);
     setHelper(el.otpHelper, spinnerMarkup(14, 'var(--color-border)', 'var(--color-text-secondary)') +
-      '<span>Checking code…</span>');
+      '<span>Checking your code…<span class="a-helper__note">This normally takes a few seconds.</span></span>');
     lockOtp(true);
     setCodeBusy(true);
     stopCountdown('slow');
@@ -3317,7 +3305,7 @@ button { background: none; border: none; color: inherit; }
     }
   }
 
-  var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Another incorrect code will pause sign-in for 15 minutes.</span>';
+  var LAST_TRY_NOTE = 'One attempt left.<span class="a-helper__note">Use the newest code we sent. Another incorrect code will pause sign-in for 15 minutes.</span>';
 
   function showCodeWrong() {
     S.attemptsLeft -= 1;
@@ -3327,12 +3315,15 @@ button { background: none; border: none; color: inherit; }
 
     /* The error belongs to the code, so the code goes and the driver starts
        the six digits again with the field they need already focused. */
-    var msg = "That code doesn't match. You have " +
-      (S.attemptsLeft === 1 ? '1 attempt' : S.attemptsLeft + ' attempts') + ' left.';
+    /* The error names the fix: the newest code. On the final attempt the
+       consequence and the safest recovery both speak, and the resend link
+       takes the lead coat - a fresh code is safer than a third guess. */
+    var msg = 'That code is incorrect. You have ' +
+      (S.attemptsLeft === 1 ? '1 attempt' : S.attemptsLeft + ' attempts') +
+      ' left. Enter the newest code we sent.';
     if (S.attemptsLeft === 1) {
-      /* The consequence is a separate sentence, because folding it into the
-         error made it read as though the phone number itself would stop. */
-      msg += '<span class="a-helper__note">Another incorrect code will pause sign-in for 15 minutes.</span>';
+      msg = 'One attempt left.<span class="a-helper__note">Use the newest code we sent. Another incorrect code will pause sign-in for 15 minutes.</span>';
+      el.resendBtn.setAttribute('data-lead', 'true');
     }
     setHelper(el.otpHelper, msg, S.attemptsLeft === 1 ? 'warning' : 'error');
     shake(el.otpGroup);
@@ -3378,6 +3369,7 @@ button { background: none; border: none; color: inherit; }
   function resendCode() {
     if (S.resendsLeft <= 0) { showResendLimit(); return; }
     S.resendsLeft -= 1;
+    el.resendBtn.removeAttribute('data-lead');
     S.otp = ['', '', '', '', '', ''];
     setOtpTone(null);
     lockOtp(false);
@@ -3584,7 +3576,7 @@ button { background: none; border: none; color: inherit; }
     el.blockedBody.innerHTML = def.body;
     el.blockedMeta.hidden = !def.meta;
     el.blockedMeta.textContent = def.meta || '';
-    paintBlockedActions(def.actions);
+    paintBlockedActions(typeof def.actions === 'function' ? def.actions() : def.actions);
     showStage('blocked');
     announce(def.title + '. ' + el.blockedBody.textContent);
     after(60, function () { el.blockedTitle.focus({ preventScroll: true }); });
@@ -3878,8 +3870,6 @@ button { background: none; border: none; color: inherit; }
                                } },
     'number/err-landline':   { label: 'Landline entered',   run: function () { base('signup', '111234567'); submitPhone(); } },
     'number/err-unregistered': { label: 'Not registered',   run: function () { base('signup', '820000000'); showNumberError('unregistered'); } },
-    'number/err-suspended':  { label: 'Driver paused',      run: function () { base('signup', '822222222'); showNumberError('suspended'); } },
-    'number/err-fleet':      { label: 'Company inactive',   run: function () { base('signup', '823333333'); showNumberError('fleet'); } },
     'number/err-rate':       { label: 'Rate limited',       run: function () { base('signup', '824444444'); showNumberError('rate'); } },
     'number/err-nowhatsapp': { label: 'Not on WhatsApp',    run: function () { base('signup', '825555555'); showNumberError('nowhatsapp'); } },
     'number/err-offline':    { label: 'No connection',      run: function () {
@@ -3907,7 +3897,7 @@ button { background: none; border: none; color: inherit; }
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
                             clearTimers(); S.verifying = true; lockOtp(true); setCodeBusy(true);
                             setHelper(el.otpHelper, spinnerMarkup(14, 'var(--color-border)', 'var(--color-text-secondary)') +
-                              '<span>Checking code…</span>');
+                              '<span>Checking your code…<span class="a-helper__note">This normally takes a few seconds.</span></span>');
                           } },
     'code/err-wrong':   { label: 'Wrong code',       run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true });
@@ -3959,7 +3949,6 @@ button { background: none; border: none; color: inherit; }
                           } },
 
     /* Blocked */
-    'blocked/unregistered': { label: 'Not registered',  run: function () { base('signup', '820000000'); showBlocked('unregistered'); } },
     'blocked/suspended':    { label: 'Driver paused',   run: function () { base('signup', '822222222'); showBlocked('suspended'); } },
     'blocked/fleet':        { label: 'Company inactive',run: function () { base('signup', '823333333'); showBlocked('fleet'); } },
     'blocked/locked':       { label: 'Locked 15 min',   run: function () { base('signup', '821234567'); showBlocked('locked'); } },
@@ -4017,7 +4006,6 @@ button { background: none; border: none; color: inherit; }
     navNumber:  ['number/empty', 'number/privacy', 'number/partial', 'number/valid', 'number/sending',
                  'number/sending-slow',
                  'number/err-format', 'number/err-landline', 'number/err-unregistered',
-                 'number/err-suspended', 'number/err-fleet',
                  'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server',
                  /* Defined in STATES and listed by nothing, so the one screen
                     where "Contact support" first appears was reachable only by
@@ -4026,7 +4014,7 @@ button { background: none; border: none; color: inherit; }
     navCode:    ['code/idle', 'code/partial', 'code/verifying', 'code/err-wrong', 'code/err-last',
                  'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
                  'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
-    navBlocked: ['blocked/unregistered', 'blocked/suspended', 'blocked/fleet', 'blocked/locked'],
+    navBlocked: ['blocked/suspended', 'blocked/fleet', 'blocked/locked'],
     navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/failed', 'biometrics/enabled']
   };
 
@@ -4303,7 +4291,6 @@ button { background: none; border: none; color: inherit; }
                    ['number/privacy','The privacy note, opened'],['number/partial','Part typed'],['number/valid','Valid'],
                    ['number/sending','Sending'],['number/sending-slow','Sending, slower than expected'],['number/err-format','Too few digits'],
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
-                   ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
                    ['number/err-rate','Rate limited'],['number/err-nowhatsapp','Not on WhatsApp'],
                    ['number/err-offline','No connection'],['number/err-server','Server error'],
                    ['number/err-server-2','Server error, again']],
@@ -4314,7 +4301,7 @@ button { background: none; border: none; color: inherit; }
                    ['code/resend-limit','Resend limit'],['code/sms-sent','Fell back to SMS'],
                    ['code/err-offline','No connection'],['code/err-server','Server error'],
                    ['code/success','Code confirmed']],
-      navBlocked: [['blocked/unregistered','Not registered'],['blocked/suspended','Driver paused'],
+      navBlocked: [['blocked/suspended','Driver paused'],
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
