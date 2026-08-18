@@ -3382,6 +3382,7 @@ button { background: none; border: none; color: inherit; }
     el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.';
     setBtn(el.bioEnable, true, 'Turn it on');
     setBtn(el.bioSkip, true, 'Not now');
+    el.bioContinue.hidden = true;
   }
 
   /* The operating system owns this beat: its own sheet is up and the page
@@ -3398,14 +3399,30 @@ button { background: none; border: none; color: inherit; }
     el.bioIcon.setAttribute('data-tone', 'success');
     el.bioIcon.innerHTML = iconMarkup('check', toneColour('success'), 28);
     /* Not "Biometrics on": the offer never says the word, and a category is
-       not a thing a driver can picture. The title names what they gave. */
-    el.bioTitle.textContent = 'Your face or fingerprint is set';
+       not a thing a driver can picture. "Ready" is the owner's word: it
+       says the thing will work next time, which is the whole promise. */
+    el.bioTitle.textContent = 'Face or fingerprint sign-in is ready';
     el.bioBody.textContent = 'Next time, your face or fingerprint signs you in. No code to wait for.';
     /* Hidden, not greyed: a disabled "Turn it on" under "is set" reads as
        an offer that failed. The answer was given; the ask is over. */
     el.bioEnable.hidden = true;
     el.bioSkip.hidden = true;
     el.bioContinue.hidden = false;
+  }
+
+  /* The failure face. Nothing is broken and nothing was saved: the
+     phone's own sheet did not finish, and both roads stay open - the same
+     two the ask offered, with the first one renamed to what it now is. */
+  function paintBioFailed() {
+    el.bioIcon.setAttribute('data-tone', 'warning');
+    el.bioIcon.innerHTML = iconMarkup('alert', toneColour('warning'), 28);
+    el.bioTitle.textContent = 'Face or fingerprint sign-in was not turned on';
+    el.bioBody.textContent = 'Your phone could not finish setting it up. Try again, or skip it and sign in with a code.';
+    el.bioContinue.hidden = true;
+    el.bioEnable.hidden = false;
+    el.bioSkip.hidden = false;
+    setBtn(el.bioEnable, true, 'Try again');
+    setBtn(el.bioSkip, true, 'Not now');
   }
 
   /* The one writer of S.biometrics. A tapped "Not now" is an answer and is
@@ -3800,6 +3817,13 @@ button { background: none; border: none; color: inherit; }
                           offerBiometrics(); clearTimers();
                           paintBioWaiting();
                         } },
+    'biometrics/failed': { label: 'Face or fingerprint not turned on', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('success'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          paintBioFailed();
+                        } },
     'biometrics/enabled': { label: 'Face or fingerprint set', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
@@ -3824,7 +3848,7 @@ button { background: none; border: none; color: inherit; }
                  'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
                  'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
     navBlocked: ['blocked/unregistered', 'blocked/suspended', 'blocked/fleet', 'blocked/locked'],
-    navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/enabled']
+    navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/failed', 'biometrics/enabled']
   };
 
   /* ════════════════════════════════════════════════════════════════════
@@ -4116,6 +4140,7 @@ button { background: none; border: none; color: inherit; }
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
                    ['biometrics/waiting','Waiting for the phone'],
+                   ['biometrics/failed','Face or fingerprint not turned on'],
                    ['biometrics/enabled','Face or fingerprint set']]
     }
   };

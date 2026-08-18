@@ -149,7 +149,7 @@ async function signup() {
   check('waiting face: skip is quiet', s.skipDisabled);
   await sleep(800);              /* 900ms wait completes */
   s = await ev(STATE);
-  check('done face renamed plainly', s.title === 'Your face or fingerprint is set', s.title);
+  check('done face speaks the ready promise', s.title === 'Face or fingerprint sign-in is ready', s.title);
   check('S.biometrics = enabled', s.bio === 'enabled', s.bio);
   await sleep(900);              /* 700ms beat to handover */
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
