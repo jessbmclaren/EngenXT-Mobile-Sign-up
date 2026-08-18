@@ -2780,6 +2780,13 @@ button { background: none; border: none; color: inherit; }
     el.phoneField.removeAttribute('data-state');
     el.phoneCta.hidden = false;
     hideAlert(el.numberAlert);
+    /* The card folds with the stage. Detail lives one tap behind the
+       one-line promise - the disclosure pattern - and it may not shove
+       Continue down the sheet before anyone asked for it. A driver who
+       opens it keeps it open while they type, because typing never
+       resets the stage; arriving at the stage does. */
+    el.privacyCard.hidden = true;
+    el.privacyMore.setAttribute('aria-expanded', 'false');
     setHelper(el.phoneHelper, sendHelper());
     paintPhoneValidity();
     setBtn(el.phoneCta, phoneComplete(), 'Continue');
