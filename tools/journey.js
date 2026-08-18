@@ -467,6 +467,17 @@ async function fuelling() {
   check('a typed plate links the vehicle and lands home',
     tv.homeUp && tv.linked && tv.plate === 'CA 123-456', JSON.stringify(tv));
 
+  console.log('\n── settings hands the camera back ──');
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=15#flow1-scan-denied` });
+  await until(`!document.getElementById('scanSettings').hidden`);
+  check('the manager is not offered a phone they cannot fix',
+    await ev(`document.getElementById('scanType').hidden`) === true);
+  await sleep(400);
+  await ev(`document.getElementById('scanSettings').click()`);
+  await sleep(1900);
+  const backFace = await ev(`Demo.S().scanFace`);
+  check('allowing the camera returns to scanning', backFace === 'ready', backFace);
+
   console.log('\n── the stations answer the search ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=13#fuel-stations` });
   await until(`document.querySelectorAll('.m-station').length > 0`);

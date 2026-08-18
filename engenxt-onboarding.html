@@ -1198,12 +1198,13 @@ body {
   list-style: none; margin: 0; padding: 0;
   display: flex; flex-wrap: wrap; gap: var(--sp-1h);
 }
-/* o-stations__empty. The stations sheet's own empty note - it borrowed the
-   picker's element name before, with no picker ancestor in sight. */
-.o-stations__empty {
-  font-size: var(--text-caption); color: var(--color-text-secondary);
-  padding-block: var(--sp-2);
-}
+/* o-stations__empty. Not a shrug: the owner's law is that a driver never
+   sees a station the company will not pay for, so an empty list gets the
+   honest sentence and the two doors that actually help - a new search, or
+   the person who owns the list. */
+.o-stations__empty { display: flex; flex-direction: column; gap: var(--sp-3); padding-block: var(--sp-2); }
+.o-stations__emptyTitle { font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary); }
+.o-stations__emptyActions { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 /* a-vehicle-chip. A registration, listed.
 
@@ -4090,7 +4091,13 @@ body {
                    placeholder="Search suburb or station" autocomplete="off">
           </label>
           <div class="o-stations__list" id="stationList" role="radiogroup" aria-labelledby="stationsTitle"></div>
-          <p class="o-stations__empty" id="stationEmpty" hidden>No station matches that.</p>
+          <div class="o-stations__empty" id="stationEmpty" hidden>
+            <p class="o-stations__emptyTitle">No company-approved stations nearby</p>
+            <div class="o-stations__emptyActions">
+              <button class="a-btn a-btn--outline a-btn--sm" type="button" id="stationClear">Search another area</button>
+              <button class="a-btn a-btn--outline a-btn--sm" type="button" id="stationAskManager">Message my manager</button>
+            </div>
+          </div>
           <span class="u-visually-hidden" id="stationStatus" role="status"></span>
           </div><!-- /o-stations__browse -->
         </div>
@@ -4332,6 +4339,7 @@ body {
     stationDetail: $('stationDetail'), stationBrowse: $('stationBrowse'),
     stationArt: $('stationArt'), stationName: $('stationName'),
     stationStatusLine: $('stationStatusLine'), stationWhere: $('stationWhere'),
+    stationClear: $('stationClear'), stationAskManager: $('stationAskManager'),
     stationHas: $('stationHas'), stationKm: $('stationKm'),
     stationShut: $('stationShut'), stationGo: $('stationGo'), stationNav: $('stationNav'),
     stationDeals: $('stationDeals'),
@@ -5834,7 +5842,9 @@ body {
     el.scanPlateType.hidden = !hardFail;
     el.scanTypePanel.hidden = !typing;
     el.scanPlateGo.hidden = !typing;
-    el.scanType.hidden = typing;
+    /* No manager on the denied face: a permission lives on this phone and
+       only this driver can grant it. The repair pair is the whole offer. */
+    el.scanType.hidden = typing || hardFail;
     if (typing) {
       el.scanShutter.hidden = true;
       after(60, function () { el.scanPlateInput.focus({ preventScroll: true }); });
@@ -7139,7 +7149,15 @@ body {
   });
   el.fillingClose.addEventListener('click', function () { showHome(false); });
   el.scanSettings.addEventListener('click', function () {
-    reply('Your phone settings open here. Allow the camera for EngenXT, then come back.');
+    reply('Settings opens here. When you allow the camera, the scanner comes straight back.');
+    /* The round trip, simulated: the driver grants it, and the app checks
+       the camera again on return rather than making them find their way
+       back. The timer rides the swap channel, so navigating away first
+       cancels the trip. */
+    after(1400, function () {
+      showScan('ready');
+      reply('Camera is on.');
+    });
   });
   el.scanPlateType.addEventListener('click', function () { showScan('type'); });
   el.scanPlateInput.addEventListener('input', function () { el.scanTypeErr.hidden = true; });
@@ -7500,6 +7518,14 @@ body {
   });
 
   el.homeAskManager.addEventListener('click', function () {
+    reply('Message ready: ' + ASK_MANAGER);
+  });
+  el.stationClear.addEventListener('click', function () {
+    el.stationSearch.value = '';
+    paintStations();
+    el.stationSearch.focus({ preventScroll: true });
+  });
+  el.stationAskManager.addEventListener('click', function () {
     reply('Message ready: ' + ASK_MANAGER);
   });
   /* Nothing beyond this screen is built yet. Saying so out loud beats a

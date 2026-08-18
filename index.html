@@ -2833,10 +2833,13 @@ button { background: none; border: none; color: inherit; }
     showStage('number');
   }
 
-  /* Completeness enables the button and nothing else. A tick on nine digits
-     would claim the number is recognised, which only the server knows. */
+  /* Completeness plus the one shape the client can honestly judge: nine
+     digits that start like a mobile. Whether the number is recognised is
+     still only the server's to say - but a landline is not a maybe, and a
+     button that offers to send it a WhatsApp code is a locked door wearing
+     an Open sign. The owner's law: active only for a valid mobile number. */
   function paintPhoneValidity() {
-    setBtn(el.phoneCta, phoneComplete());
+    setBtn(el.phoneCta, phoneComplete() && isMobilePrefix(phoneDigits()));
   }
 
   /* Two different situations wear two different faces. If the value the driver
