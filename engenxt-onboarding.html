@@ -731,7 +731,9 @@ body {
 }
 /* The bolt sits above the number rather than beside it, so the column reads
    top to bottom as symbol, amount, unit. */
-.a-medal__bolt { font-size: var(--text-lead); line-height: 1; margin-bottom: var(--sp-1); }
+/* Lucide zap, filled in the points amber. The emoji it replaces was each
+   platform's own drawing, in a colour nothing here chose. */
+.a-medal__bolt { color: var(--color-points-on-dark); line-height: 0; margin-bottom: var(--sp-1); }
 
 /* a-meter. A track and a fill. It cannot be broken down further without
    ceasing to say "this far along", so it is an atom. */
@@ -2809,7 +2811,7 @@ body {
     var(--gradient-hero);
   box-shadow: var(--shadow-card-sm);
 }
-.o-rewards__bolt { position: absolute; top: var(--sp-4); right: var(--sp-4); font-size: 20px; line-height: 1; }
+.o-rewards__bolt { position: absolute; top: var(--sp-4); right: var(--sp-4); color: var(--color-points-on-dark); line-height: 0; }
 .o-rewards__balanceLabel {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
@@ -3333,7 +3335,7 @@ body {
           <div class="a-medal" id="rewardMedal" role="img"
                aria-label="50 points earned for signing up">
             <span class="a-medal__wave" id="rewardWave" aria-hidden="true"></span>
-            <span class="a-medal__bolt" aria-hidden="true">⚡</span>
+            <span class="a-medal__bolt" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg></span>
             <span class="a-medal__value" id="rewardValue">0</span>
             <span class="a-medal__unit">pts</span>
           </div>
@@ -3395,7 +3397,7 @@ body {
           <div class="a-medal" id="earnedMedal" role="img"
                aria-label="524 points earned for this fill">
             <span class="a-medal__wave" id="earnedWave" aria-hidden="true"></span>
-            <span class="a-medal__bolt" aria-hidden="true">⚡</span>
+            <span class="a-medal__bolt" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg></span>
             <span class="a-medal__value" id="earnedValue">0</span>
             <span class="a-medal__unit">pts</span>
           </div>
@@ -3544,7 +3546,7 @@ body {
         </div>
         <h1 class="a-screen-title" id="rewardsTitle" tabindex="-1">Rewards</h1>
         <div class="o-rewards__balanceCard">
-          <span class="o-rewards__bolt" aria-hidden="true">⚡</span>
+          <span class="o-rewards__bolt" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg></span>
           <span class="o-rewards__balanceLabel">Your balance</span>
           <span class="o-rewards__points" id="rewardsPoints">2 450 pts</span>
           <span class="o-rewards__worth" id="rewardsWorth">About 2.45 GB of data</span>
