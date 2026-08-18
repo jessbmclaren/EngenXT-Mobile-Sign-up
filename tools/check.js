@@ -232,9 +232,18 @@ const counts = {
    Comments are stripped before comparing, so a note about one file's own
    surfaces is allowed to differ; names and values are not. Only the product
    scale: each file's --d- layer is its own tooling and is expected to differ. */
+/* The sanctioned token scopes. A future theme block - [data-theme="dark"],
+   a second brand - must be added HERE to be gated; an all-token block under
+   any other selector fails below rather than silently escaping the gate.
+   Known debt, carried on purpose: byte-identical union means each file
+   carries tokens only the other uses; the trigger to split the scale into
+   shared-plus-local is a third flow joining the pair. */
+const TOKEN_SCOPES = [':root', '[data-text="large"]'];
+
 function productTokens(s) {
   const out = new Map();
-  for (const m of s.matchAll(/(?:^|[^-\w])(:root|\[data-text="large"\])\s*\{/g)) {
+  const scopes = TOKEN_SCOPES.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, (ch) => '\\' + ch)).join('|');
+  for (const m of s.matchAll(new RegExp('(?:^|[^-\\w])(' + scopes + ')\\s*\\{', 'g'))) {
     const open = s.indexOf('{', m.index);
     /* No nested braces inside a token block, so the first close is the end. */
     const body = s.slice(open + 1, s.indexOf('}', open)).replace(/\/\*[\s\S]*?\*\//g, '');
@@ -259,6 +268,74 @@ function productTokens(s) {
     if (!a.has(k)) { fail(`${ONBOARD} declares \`${k}\`, which ${SIGNUP} does not — the scale is meant to be a verbatim copy`); }
   }
   counts.tokens = a.size;
+
+  /* Any OTHER block that is only custom properties is a token block the
+     gate cannot see - a theme landing outside the sanctioned scopes. */
+  for (const name of FILES) {
+    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const sel = m[1].trim().replace(/\s+/g, ' ');
+      if (TOKEN_SCOPES.includes(sel) || sel.startsWith('@')) { continue; }
+      const decls = m[2].split(';').map((d) => d.trim()).filter(Boolean);
+      if (decls.length >= 3 && decls.every((d) => d.startsWith('--'))) {
+        fail(name + ": '" + sel + "' is a token block outside the sanctioned scopes - add it to TOKEN_SCOPES or it escapes the parity gate");
+      }
+    }
+  }
+
+  /* The large-text ramp must cover the whole type scale: a token missing
+     there silently refuses to grow for the driver who asked for large. */
+  for (const [k] of a) {
+    const t = k.match(/^:root (--text-[\w-]+)$/);
+    if (t && !a.has('[data-text="large"] ' + t[1])) {
+      fail(SIGNUP + ': ' + t[1] + ' has no [data-text="large"] value - the ramp misses it');
+    }
+  }
+
+  /* Component CSS may not restate colours the scale already owns. Token
+     scopes are cut out first; what remains must speak var(). The named
+     exceptions are optics, each with its reason. */
+  const COLOUR_ALLOWED = [
+    'mask-image',                    /* alpha masks: #000 is a curve, not a colour */
+    'rgba(255,255,255,0.55)',        /* the skeleton's sheen, an optic on the sunken grey */
+    'background: #FFFFFF',           /* the QR quiet zone must be spec-white, not theme-white */
+  ];
+  for (const name of FILES) {
+    let css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+      .map((m) => m[1]).join('\n');
+    for (const scope of TOKEN_SCOPES) {
+      let i;
+      while ((i = css.indexOf(scope + ' {')) !== -1) {
+        const open = css.indexOf('{', i);
+        const close = css.indexOf('}', open);
+        css = css.slice(0, i) + css.slice(close + 1);
+      }
+    }
+    css = css.replace(/\/\*[\s\S]*?\*\//g, ' ');
+    css.split('\n').forEach((l) => {
+      if (!/#[0-9a-fA-F]{3,8}\b|rgba?\(\s*\d/.test(l)) { return; }
+      if (COLOUR_ALLOWED.some((ok) => l.includes(ok))) { return; }
+      fail(name + ': raw colour outside the scale - ' + l.trim().slice(0, 80));
+    });
+    /* z-index speaks the layer tokens; a bare integer up to 3 is a sibling
+       raise inside one component, which the z comment sanctions. */
+    for (const m of css.matchAll(/z-index:\s*([^;]+);/g)) {
+      const v = m[1].trim();
+      if (v.startsWith('var(--z') || (/^-?[0-3]$/.test(v))) { continue; }
+      fail(name + ': z-index ' + v + ' is neither a layer token nor a sanctioned sibling raise (0-3)');
+    }
+  }
+
+  /* The README's headline numbers are computed here; they may not drift. */
+  {
+    const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+    const want = (counts[SIGNUP].real + counts[ONBOARD].real) + ' states, not just the happy path: ' +
+      counts[SIGNUP].real + ' in sign-up and ' + counts[ONBOARD].real + ' in the app.';
+    if (!readme.includes(want)) {
+      fail('README.md: the state counts line does not read "' + want + '" - it drifted from the rails');
+    }
+  }
 }
 
 /* ── 5. The words stay plain ─────────────────────────────────────────── */

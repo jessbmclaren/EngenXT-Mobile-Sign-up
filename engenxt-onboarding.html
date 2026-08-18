@@ -234,6 +234,7 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
+  --size-action:   52px;   /* the primary CTA's one height, wherever it stands */
   --size-hairline:      0.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
@@ -311,6 +312,7 @@
    screens ignored it: the toggle looked like it worked and tested nothing. A
    driver reading a pump screen in the sun is exactly who turns this on. */
 [data-text="large"] {
+  --text-display:  34px;   /* the ramp's +4, like the hero's */
   --text-hero:     46px;
   --text-title:    24px;
   --text-lead:    22px;
@@ -1659,7 +1661,7 @@ body {
   flex-shrink: 0; padding: var(--sp-3) var(--sp-4) var(--sp-5);
   display: flex; flex-direction: column; gap: var(--sp-2);
 }
-.o-step__actions .a-btn { min-height: 52px; }
+.o-step__actions .a-btn { min-height: var(--size-action); }
 .o-step__tertiary {
   align-self: center; min-height: 48px; padding: 0 var(--sp-3);
   border: none; background: none; cursor: pointer;
@@ -1693,7 +1695,7 @@ body {
 .o-scan__view::before {
   content: ''; position: absolute; inset: 0;
   background:
-    radial-gradient(60% 40% at 50% 38%, rgba(255,255,255,0.10) 0%, transparent 70%),
+    radial-gradient(60% 40% at 50% 38%, var(--color-on-dark-fill) 0%, transparent 70%),
     linear-gradient(180deg, var(--color-scan-2) 0%, var(--color-scan-1) 70%);
 }
 .o-scan > * { position: relative; z-index: var(--z-content); }
@@ -1765,7 +1767,7 @@ body {
   flex-shrink: 0; display: flex; flex-direction: column; gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4) var(--sp-5);
 }
-.o-scan__actions .a-btn { min-height: 52px; }
+.o-scan__actions .a-btn { min-height: var(--size-action); }
 .o-scan__actions .a-btn--outline {
   border-color: var(--color-on-dark-line); color: var(--color-text-on-dark);
 }
@@ -2584,7 +2586,7 @@ body {
   width: 24px; height: 24px; margin-right: var(--sp-2);
   vertical-align: -5px;
   border-radius: var(--radius-circle);
-  background: var(--color-success); color: #FFFFFF;
+  background: var(--color-success); color: var(--color-text-on-dark);
 }
 .o-fuel__title {
   font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;

@@ -231,6 +231,7 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
+  --size-action:   52px;   /* the primary CTA's one height, wherever it stands */
   --size-hairline:      0.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
@@ -302,6 +303,7 @@
 
 /* Large text mode re-points the ramp. Components read tokens, so they follow. */
 [data-text="large"] {
+  --text-display:  34px;   /* the ramp's +4, like the hero's */
   --text-hero:     46px;
   --text-title:    24px;
   --text-lead:    22px;
