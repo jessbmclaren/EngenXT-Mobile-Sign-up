@@ -2173,14 +2173,22 @@ button { background: none; border: none; color: inherit; }
     },
     unregistered: {
       tone: 'error', icon: 'search', field: 'invalid', hideCta: true,
-      title: "We can't find that number",
-      body: 'Check that you entered the mobile number your company registered for you.',
-      /* Correcting a typo is the fastest and least disruptive recovery, so it
-         leads. Reaching a human is the fallback, not the first move. */
-      actions: [
-        { label: 'Try another number', kind: 'primary', act: 'clearNumber' },
-        { label: 'Message my manager', kind: 'outline', href: WA_ASK_NUMBER }
-      ]
+      title: 'This number is not registered',
+      /* Built at fail time, so the sentence shows the very number that was
+         checked - masked the way a bank masks it. "Try another" is gone:
+         only the company can register a number, so guessing is not a road.
+         Checking for a typo is, and it leads. */
+      body: function () {
+        return 'We checked ' + maskedPhone() + '. Check the number, or ask your manager to register it.';
+      },
+      actions: function () {
+        return [
+          { label: 'Check the number', kind: 'primary', act: 'clearNumber' },
+          { label: 'Message my manager', kind: 'outline',
+            href: WA_MANAGER + encodeURIComponent(
+              'Hi, I cannot sign in to EngenXT. Please check that ' + maskedPhone() + ' is registered to me.') }
+        ];
+      }
     },
     suspended: {
       /* The number is right and the driver is known, so the field stays
@@ -2292,8 +2300,11 @@ button { background: none; border: none; color: inherit; }
       tone: 'warning', icon: 'clock',
       title: 'Too many code requests',
       /* No action. Support cannot lift a security limit, and offering it here
-         would send a driver to a dead end while the clock still runs. */
-      body: 'Several codes have already gone to this number.',
+         would send a driver to a dead end while the clock still runs. The
+         body is rewritten every tick by showResendLimit, so the one thing
+         the limit does NOT stop - entering the newest code - is said with
+         the live clock in the sentence. */
+      body: 'Your newest code still works. Enter it now.',
       actions: []
     },
     offline: {
@@ -2571,6 +2582,12 @@ button { background: none; border: none; color: inherit; }
     return d.slice(0, 2) + ' ' + d.slice(2, 5) + ' ' + d.slice(5);
   }
   function phoneDigits() { return nationalDigits(el.phoneInput.value); }
+  /* The number as a bank would show it: enough to recognise, nothing to
+     copy. */
+  function maskedPhone() {
+    var d = phoneDigits();
+    return '+27 ' + d.slice(0, 2) + ' \u2022\u2022\u2022 ' + d.slice(5);
+  }
   function phoneComplete() { return phoneDigits().length === 9; }
   function isMobilePrefix(d) { return /^(6|7|8)/.test(d); }
   /* Bullets, not asterisks. An asterisk reads as a footnote marker and a
@@ -2639,6 +2656,7 @@ button { background: none; border: none; color: inherit; }
   function resolveDef(def, key) {
     var out = clone(def);
     out.actions = typeof def.actions === 'function' ? def.actions() : (def.actions || []);
+    if (typeof def.body === 'function') { out.body = def.body(); }
     if (def.escalateAfter && key) {
       S.fails[key] = (S.fails[key] || 0) + 1;
       if (S.fails[key] >= def.escalateAfter) {
@@ -3382,13 +3400,20 @@ button { background: none; border: none; color: inherit; }
     renderAlert(el.codeAlert, resolveDef(CODE_ALERTS.resendLimit));
     el.resendBtn.disabled = true;
     startCountdown('code', LOCK_SECS, function (left, label) {
-      /* One clock, in the control being waited for. */
+      /* One clock, in the control being waited for - and in the sentence
+         that explains it, because the timer means "no new codes", never
+         "no signing in". */
       el.resendBtn.textContent = 'Resend code in ' + label;
+      var alertBody = el.codeAlert.querySelector('.m-alert__body');
+      if (alertBody) {
+        alertBody.textContent = 'Your newest code still works. Enter it now, or request another code in ' + label + '.';
+      }
     }, function () {
       el.resendBtn.disabled = false;
       el.resendBtn.textContent = S.channel === 'whatsapp' ? 'Resend on WhatsApp' : 'Resend by SMS';
       hideAlert(el.codeAlert);
       setCodeView('waiting');
+      reply('You can request another code now.');
     });
   }
 
