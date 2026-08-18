@@ -512,6 +512,63 @@ function sharedRules(name) {
   }
 }
 
+
+/* ── The axis gate ───────────────────────────────────────────────────
+   The data-* vocabulary is the component API, and it drifted into
+   private dialects twice before this manifest existed (tones nobody
+   else spoke, booleans saying "on"). Closed axes list every value the
+   contract names; a value outside the list fails, and an axis that is
+   neither closed nor declared open fails as undeclared. Values built
+   from expressions are invisible here - the gate guards the written
+   vocabulary, which is where the drift happened. */
+
+const AXES = {
+  tone: ['error', 'info', 'locked', 'onDark', 'success', 'warning'],
+  face: ['done', 'running', 'waiting'],
+  phase: ['done', 'filling'],
+  outcome: ['fail', 'pass', 'skipped'],
+  verdict: ['block', 'clear'],
+  motion: ['in', 'off', 'pop', 'reduced', 'still', 'system'],
+  net: ['offline', 'online'],
+  keyboard: ['open'],
+  text: ['default', 'large'],
+  width: ['320', '360', '375'],
+  stage: ['blocked', 'number'],
+  step: ['account'],
+  state: ['active', 'arriving', 'can', 'closing', 'crossing', 'empty', 'error',
+          'filled', 'in', 'landed', 'leaving', 'on', 'opening', 'out',
+          'pending', 'sent', 'short', 'visible'],
+  tab: ['account', 'fuel', 'history', 'home'],
+  tile: ['rewards'],
+  allowed: ['false'],
+  lead: ['true'], loading: ['true'], open: ['true'], peek: ['true'],
+  pulse: ['true'], shake: ['true'], single: ['true'], still: ['true'],
+  more: ['true'],
+};
+/* Axes whose values are data or tooling, not vocabulary. */
+const AXES_OPEN = ['act', 'bundle', 'chip', 'copy', 'count', 'fuel', 'grid',
+  'heading', 'inspect', 'layers', 'level', 'mode', 'panel', 'pin', 'result',
+  'sort', 'spec', 'state-id', 'station', 'unbuilt'];
+
+for (const name of FILES) {
+  const found = [];
+  for (const m of src[name].matchAll(/data-([a-z][a-z-]*)="([a-z0-9-]+)"/g)) { found.push([m[1], m[2]]); }
+  for (const m of src[name].matchAll(/setAttribute\('data-([a-z][a-z-]*)',\s*'([a-z0-9-]+)'\)/g)) { found.push([m[1], m[2]]); }
+  const seen = new Set();
+  for (const [axis, value] of found) {
+    const key = axis + '=' + value;
+    if (seen.has(key)) { continue; }
+    seen.add(key);
+    if (AXES[axis]) {
+      if (!AXES[axis].includes(value)) {
+        fail(`${name}: data-${axis}="${value}" is not in the axis manifest - a new dialect, or the manifest needs the word`);
+      }
+    } else if (!AXES_OPEN.includes(axis)) {
+      fail(`${name}: data-${axis} is an undeclared axis - add it to AXES (closed) or AXES_OPEN (data/tooling)`);
+    }
+  }
+}
+
 /* ── The naming gate ─────────────────────────────────────────────────
    Brad Frost's layers and BEM as law rather than review. Every class in
    markup, styles and built strings must be shaped like the system: a

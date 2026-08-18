@@ -386,7 +386,7 @@ async function fuelling() {
   let h = JSON.parse(await ev(`JSON.stringify({
     up: !document.getElementById('historyScreen').hidden,
     cards: document.querySelectorAll('.o-history__card').length,
-    pts: (document.querySelector('.o-history__card .o-receipt__row[data-tone="points"] .o-receipt__value')||{}).textContent
+    pts: (document.querySelector('.o-history__card .o-receipt__row[data-tone="success"] .o-receipt__value')||{}).textContent
   })`));
   /* Four cards: today's newly filed slip on top of the three past ones a
      returning driver carries. */

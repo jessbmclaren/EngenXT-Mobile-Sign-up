@@ -503,7 +503,7 @@ button { background: none; border: none; color: inherit; }
   border-color: var(--color-error-text);
   box-shadow: 0 0 0 3px var(--color-secondary-12);
 }
-.a-otp-cell[data-tone="valid"]:focus-visible {
+.a-otp-cell[data-tone="success"]:focus-visible {
   border-color: var(--color-success);
   box-shadow: 0 0 0 3px var(--color-success-20);
 }
@@ -757,7 +757,7 @@ button { background: none; border: none; color: inherit; }
    tone to its members and each cell decides what that tone looks like. Two
    axes on the cell, because a cell can be filled and wrong at the same time:
    data-state is what the driver typed, data-tone is what came back. */
-.a-otp-cell[data-tone="valid"] {
+.a-otp-cell[data-tone="success"] {
   border-color: var(--color-success); background: var(--color-success-bg); color: var(--color-success);
 }
 .a-otp-cell[data-tone="error"] {
@@ -1455,8 +1455,8 @@ button { background: none; border: none; color: inherit; }
 @media (forced-colors: active) {
   .a-otp-cell { border-width: 2px; }
   .a-otp-cell[data-state="filled"] { border-width: 3px; }
-  .m-otp-group[data-state="valid"] .a-otp-cell { outline: 2px solid; outline-offset: 2px; }
-  .m-otp-group[data-state="error"] .a-otp-cell { outline: 2px dashed; outline-offset: 2px; }
+  .m-otp-group[data-tone="success"] .a-otp-cell { outline: 2px solid; outline-offset: 2px; }
+  .m-otp-group[data-tone="error"] .a-otp-cell { outline: 2px dashed; outline-offset: 2px; }
   .a-btn[aria-disabled="true"], .a-btn:disabled { opacity: .5; }
   .a-field[data-state="error"] { outline: 2px dashed; outline-offset: 2px; }
 }
@@ -3028,8 +3028,8 @@ button { background: none; border: none; color: inherit; }
   /* The group keeps its own attribute so a selector can still ask about the
      whole row, and hands the same tone to each cell so the atom paints itself. */
   function setOtpTone(tone) {
-    if (tone) { el.otpGroup.setAttribute('data-state', tone); }
-    else { el.otpGroup.removeAttribute('data-state'); }
+    if (tone) { el.otpGroup.setAttribute('data-tone', tone); }
+    else { el.otpGroup.removeAttribute('data-tone'); }
     cells().forEach(function (c) {
       if (tone) { c.setAttribute('data-tone', tone); } else { c.removeAttribute('data-tone'); }
     });
@@ -3084,7 +3084,7 @@ button { background: none; border: none; color: inherit; }
       if (locked) { c.setAttribute('aria-disabled', 'true'); } else { c.removeAttribute('aria-disabled'); }
     });
     if (locked) { setOtpTone('locked'); }
-    else if (el.otpGroup.getAttribute('data-state') === 'locked') { setOtpTone(null); }
+    else if (el.otpGroup.getAttribute('data-tone') === 'locked') { setOtpTone(null); }
   }
 
   function onOtpInput(i, cell) {
@@ -3155,7 +3155,7 @@ button { background: none; border: none; color: inherit; }
       if (entered === WRONG_CODE) { lockOtp(false); showCodeWrong(); return; }
 
       lockOtp(false);
-      setOtpTone('valid');
+      setOtpTone('success');
       setHelper(el.otpHelper, 'Code confirmed', 'success');
       /* The task is finished, so every way back out of it goes now rather
          than lingering behind the transition. */
@@ -3721,7 +3721,7 @@ button { background: none; border: none; color: inherit; }
     'code/success':     { label: 'Code confirmed',   run: function () {
                             base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                             S.otp = ['1','2','3','4','5','6']; paintOtp();
-                            setOtpTone('valid');
+                            setOtpTone('success');
                             /* Not "Opening EngenXT" any more: what opens next
                                is the biometrics offer, and a helper promising
                                the app while a question stands between them
@@ -3752,14 +3752,14 @@ button { background: none; border: none; color: inherit; }
     'success/signup': { label: 'Signed up, opens the welcome reward', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
-                          setOtpTone('valid'); setCodeView('confirmed');
+                          setOtpTone('success'); setCodeView('confirmed');
                           setHelper(el.otpHelper, 'Code confirmed', 'success');
                           offerBiometrics(); clearTimers();
                         } },
     'success/signin': { label: 'Signed in, opens home', run: function () {
                           base('signin', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
-                          setOtpTone('valid'); setCodeView('confirmed');
+                          setOtpTone('success'); setCodeView('confirmed');
                           setHelper(el.otpHelper, 'Code confirmed', 'success');
                           offerBiometrics(); clearTimers();
                         } },
@@ -3769,14 +3769,14 @@ button { background: none; border: none; color: inherit; }
     'biometrics/waiting': { label: 'Waiting for the phone', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
-                          setOtpTone('valid'); setCodeView('confirmed');
+                          setOtpTone('success'); setCodeView('confirmed');
                           offerBiometrics(); clearTimers();
                           paintBioWaiting();
                         } },
     'biometrics/enabled': { label: 'Face or fingerprint set', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
-                          setOtpTone('valid'); setCodeView('confirmed');
+                          setOtpTone('success'); setCodeView('confirmed');
                           offerBiometrics(); clearTimers();
                           S.biometrics = 'enabled';
                           paintBioDone();
@@ -4777,7 +4777,7 @@ button { background: none; border: none; color: inherit; }
       ], states: [
         ['two axes', 'data-state is what the driver typed, data-tone is what came back. A cell can be filled and wrong at the same time, so they are separate attributes and one attribute holds one value.'],
         ['[data-state="filled"]', 'border + text var(--color-primary), bg var(--color-primary-bg)'],
-        ['[data-tone="valid"]', 'border-color and color var(--color-success), bg var(--color-success-bg)'],
+        ['[data-tone="success"]', 'border-color and color var(--color-success), bg var(--color-success-bg)'],
         ['[data-tone="error"]', 'border-width 2.5px, border-color and color var(--color-error-text), bg var(--color-secondary-bg). Weight as well as hue, so the two outcomes differ by more than colour.'],
         ['[data-tone="locked"]', 'opacity .45. The cell goes readonly with aria-disabled, never disabled, which would evict focus mid-task.'],
         ['[aria-disabled="true"]', 'opacity .55'],
@@ -4858,7 +4858,7 @@ button { background: none; border: none; color: inherit; }
     ['Naming', 'Level prefix, then BEM. a- atoms, m- molecules, o- organisms, t- templates, p- page, u- utilities, d- developer tooling. Element is __, modifier is --. A name states a role, never an appearance: a-btn--primary, not a-btn--blue.'],
     ['Levels', 'An atom cannot be broken down without losing its meaning: a label, an input, a button, an icon. A molecule is a small bond of atoms doing one job, like a label and an input and a helper becoming a field. An organism is a distinct, standalone section made of molecules and atoms, like the sign-up sheet or the hero. A template lays organisms out into a page-level structure with no real content in it, which here is the device frame. A page is a template with real content, which here is the demo itself.'],
     ['Placing something new', 'Four questions, in order, and the first yes decides it. Can I take it apart and still have something that means anything? If no, it is an atom. Is it a handful of atoms bonded to do ONE job? If yes, it is a molecule. Would I point at it and call it a section of the screen? If yes, it is an organism. Is it arranging sections rather than being one? If yes, it is a template. Two habits keep the system honest. First, reach for a variant before a new component: a modifier on an existing atom beats a near-duplicate of it, which is why there is a-btn--primary and not a separate primary button. Second, if you are still unsure, file it at the LOWER level and promote it when a second use appears, because promoting is easy and demoting means finding every caller. A name states a role and never a tone or a moment: this panel had a blocked-panel that also rendered success, and it is o-outcome-panel now.'],
-    ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. The axes are deliberately separate so two of them can be true at once. On a component: data-state is where it is in its own lifecycle (idle, pending, error, valid, filled, locked, active, done); data-tone is the meaning being reported on it (error, warning, success, info); data-valid, data-shake, data-single, data-more and data-heading each carry one boolean fact. On the sheet: data-stage names the step being shown. On the device frame: data-keyboard, data-width. On the document: data-motion, data-text, data-net. Anything beginning data-act, data-panel, data-mode, data-level, data-copy or data-state-id is a hook for script or for tooling, not a styling axis. The rule for adding one: if two conditions can be true at the same time they need two attributes, because one attribute holds one value.'],
+    ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. One attribute holds one value, so two truths need two axes. The lanes: data-stage and data-step say which screen of a sequence; data-phase says where within one screen\'s own life; data-face says which face a single screen wears. data-state is a component\'s own lifecycle (idle, pending, error, filled, active, done). data-tone is the meaning reported on it - error, warning, success, info - plus two documented extras: locked, the quiet fifth tone, and onDark, the surface variant. Boolean facts carry the one word true. Anything beginning data-act, data-panel, data-mode, data-level, data-copy or data-state-id is a hook for script or tooling, not a styling axis, and the tooling toggles speak their own on dialect. The whole vocabulary is gated: check.js holds the axis manifest and fails any value the contract does not name.'],
     ['Tokens', 'A component reads tokens, never raw values. If you need a value that has no token, add the token first.'],
     ['Spacing', 'A 4px base grid: --sp-1 is 4px through --sp-8 at 32px. Two half-steps, --sp-1h at 6px and --sp-2h at 10px, exist for the insides of small components and never for the rhythm between them. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
     ['Rhythm', 'The sheet carries one scale and each step means one thing. 8 is parts of one thing, a label and its field, a field and its helper. 16 is one group to the next. 24 is a decision or a different route. 32 closes a centred group. The organism owns the rhythm through its gap; nothing in the markup sets spacing, and a looser step is declared as a margin on the element that starts it rather than composed from a base plus a nudge.'],

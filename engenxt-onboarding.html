@@ -1078,7 +1078,7 @@ body {
    something in this repo, and they meant it somewhere else.
    (The points tone went with the points pill: the balance is the hero above
    the row now, and one number said twice is a screen forgetting its job.) */
-.m-stat-pill[data-tone="approved"] .m-stat-pill__icon { color: var(--color-success); }
+.m-stat-pill[data-tone="success"] .m-stat-pill__icon { color: var(--color-success); }
 /* The entitlement is the figure that decides whether a driver can fill up, so
    it takes its weight from type rather than from an alert colour. */
 .m-stat-pill__figure { font-size: var(--text-callout); font-weight: 800; }
@@ -1157,14 +1157,6 @@ body {
 .m-vehicle-picker__title {
   font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
-}
-/* While it is still a question it is asked properly, not set in the grey the
-   rest of the file reserves for placeholder and disabled text. Once a vehicle
-   is chosen it drops back to a label, because a question that has been
-   answered is a stale question. */
-.m-vehicle-picker__title[data-ask="true"] {
-  letter-spacing: normal; text-transform: none;
-  font-size: var(--text-caption); color: var(--color-text-primary);
 }
 .m-vehicle-picker__count {
   margin-left: auto;
@@ -1353,10 +1345,6 @@ body {
    A transition rather than a keyframe animation, because an animation freezes
    on its first frame under reduced motion and would leave the ring up for
    good. */
-.m-vehicle-card[data-ask="on"] {
-  border: 1px solid var(--color-primary);
-  background: var(--color-primary-08);
-}
 
 /* The action, at the weight of the reason the app exists. It was a half-width
    tile under a "Quick access" heading, beside a second tile, above roughly
@@ -1424,7 +1412,7 @@ body {
    `border-radius: inherit` so the ring is the button's exact shape rather than
    a pill of its own, and scaling keeps the corners in proportion, which
    insetting by 16px did not. */
-.o-home__fuel[data-pulse="on"]::after {
+.o-home__fuel[data-pulse="true"]::after {
   content: ''; position: absolute; inset: 0;
   border-radius: inherit;
   border: 1.5px solid var(--color-primary);
@@ -1439,7 +1427,7 @@ body {
 }
 /* Nothing to collapse to a still frame: an invitation is the movement. Held
    at its first frame it would be a permanent blue band round the button. */
-[data-motion="reduced"] .o-home__fuel[data-pulse="on"]::after { display: none; }
+[data-motion="reduced"] .o-home__fuel[data-pulse="true"]::after { display: none; }
 
 /* ── Asking for a fill ────────────────────────────────────────────────
    The wait happens inside the control that started it. Pressing the button
@@ -2085,7 +2073,7 @@ body {
    alternatives matter less than the one being looked at. */
 /* Open a station and the sheet takes the room, because the station is now the
    thing being read and the map only has to keep showing where it is. */
-.o-stations[data-peek="on"] .o-stations__sheet { max-height: 72%; }
+.o-stations[data-peek="true"] .o-stations__sheet { max-height: 72%; }
 /* On a small phone 72 per cent leaves a strip of map too thin to move a pin
    into, so the sheet gives some back. The station still gets the room it needs,
    and the map keeps enough to answer "where is that".
@@ -2093,7 +2081,7 @@ body {
    Keyed off the frame, not a media query. The phone here is a div inside a
    desktop page, so @media (max-height) reads the browser window and never
    matched: the rule was written, shipped and did nothing. */
-.t-device-frame[data-width="320"] .o-stations[data-peek="on"] .o-stations__sheet {
+.t-device-frame[data-width="320"] .o-stations[data-peek="true"] .o-stations__sheet {
   max-height: 52%;
 }
 /* The sheet grows out of the pin rather than sliding up over it. Scaling from
@@ -2362,30 +2350,30 @@ body {
 /* A passed check is a receipt, not news. It keeps its place so the list can be
    read back, and gives up its weight so the verdict and the action above it are
    what the eye lands on. */
-.m-check[data-ok="true"] {
+.m-check[data-outcome="pass"] {
   background: none; border-color: transparent; padding-block: var(--sp-1h);
 }
-.m-check[data-ok="true"] .m-check__mark {
+.m-check[data-outcome="pass"] .m-check__mark {
   width: 22px; height: 22px; border-width: 1.5px;
 }
-.m-check[data-ok="true"] .m-check__title {
+.m-check[data-outcome="pass"] .m-check__title {
   font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary);
 }
-.m-check[data-ok="true"] .m-check__sub { display: none; }
+.m-check[data-outcome="pass"] .m-check__sub { display: none; }
 /* Never asked, because the app stopped before it got here. It keeps its place
    so the list still reads as five questions, and says nothing about an answer
    it does not have. */
-.m-check[data-ok="skipped"] {
+.m-check[data-outcome="skipped"] {
   background: none; border-color: transparent; padding-block: var(--sp-1h);
 }
-.m-check[data-ok="skipped"] .m-check__mark {
+.m-check[data-outcome="skipped"] .m-check__mark {
   width: 22px; height: 22px; border-width: 1.5px;
   border-color: var(--color-border-strong); color: var(--color-text-tertiary);
 }
-.m-check[data-ok="skipped"] .m-check__title {
+.m-check[data-outcome="skipped"] .m-check__title {
   font-size: var(--text-caption); font-weight: 600; color: var(--color-text-tertiary);
 }
-.m-check[data-ok="skipped"] .m-check__sub { display: none; }
+.m-check[data-outcome="skipped"] .m-check__sub { display: none; }
 .m-check__mark {
   flex-shrink: 0; width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
@@ -2395,7 +2383,7 @@ body {
 }
 /* A refusal is the same row with the other answer, so the layout never moves
    and the driver reads the list the same way whichever way it goes. */
-.m-check[data-ok="false"] .m-check__mark {
+.m-check[data-outcome="fail"] .m-check__mark {
   border-color: var(--color-secondary); color: var(--color-secondary);
 }
 .m-check__body { flex: 1 1 auto; min-width: 0; }
@@ -2762,7 +2750,7 @@ body {
   text-align: right; font-variant-numeric: tabular-nums;
 }
 .o-receipt__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
-.o-receipt__row[data-tone="points"] .o-receipt__value { color: var(--color-success); }
+.o-receipt__row[data-tone="success"] .o-receipt__value { color: var(--color-success); }
 .o-receipt__spacer { flex: 1 1 auto; min-height: var(--sp-4); }
 .o-receipt__action { display: flex; flex-direction: column; gap: var(--sp-2); }
 
@@ -2995,7 +2983,7 @@ body {
 }
 /* The verdict is its own line, not a clause spliced into the unit. */
 .o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: 700; color: var(--color-success); }
-.o-filling__verdict[data-tone="partial"] { color: var(--color-warning); }
+.o-filling__verdict[data-tone="warning"] { color: var(--color-warning); }
 /* The number arrives. One spring on completion, a still frame under reduced
    motion - the medal's grammar, at the pump. */
 @keyframes fillingLand { 0% { transform: scale(0.92); opacity: 0.4; } 100% { transform: none; opacity: 1; } }
@@ -3514,7 +3502,7 @@ body {
             <span class="o-receipt__label">Fuel</span>
             <span class="o-receipt__value" id="receiptLitres">52.4 L<small class="o-receipt__sub">of 60 L approved</small></span>
           </div>
-          <div class="o-receipt__row" data-tone="points">
+          <div class="o-receipt__row" data-tone="success">
             <span class="o-receipt__label">Points earned</span>
             <span class="o-receipt__value" id="receiptPoints">+524 pts</span>
           </div>
@@ -3684,7 +3672,7 @@ body {
           </p>
 
           <div class="o-home__stats" id="homeStats">
-            <span class="m-stat-pill" data-tone="approved" id="homeLitres">
+            <span class="m-stat-pill" data-tone="success" id="homeLitres">
               <span class="m-stat-pill__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
               <span><span class="m-stat-pill__figure">60 L</span> per fill</span>
             </span>
@@ -5326,7 +5314,7 @@ body {
     requestAnimationFrame(function () {
       if (S.fuel !== 'idle' || !S.vehicleLinked || !activeVehicle()) { return; }
       if (el.home.hidden) { return; }
-      el.homeFuel.setAttribute('data-pulse', 'on');
+      el.homeFuel.setAttribute('data-pulse', 'true');
       /* Cleared once the ring has gone, so the attribute never outlives the
          thing it describes. One pass of 1.1s and a frame either side. */
       after(1100 + 100, stopPulse);
@@ -6084,7 +6072,7 @@ body {
        station is open the alternatives are not what is being looked at. */
     el.stationDetail.hidden = false;
     el.stationBrowse.hidden = true;
-    el.stations.setAttribute('data-peek', 'on');
+    el.stations.setAttribute('data-peek', 'true');
     panTo(st);
     after(60, function () { el.stationName.focus({ preventScroll: true }); });
     announce(st.name + '. ' + el.stationStatusLine.textContent + '. ' +
@@ -6323,7 +6311,7 @@ body {
     var n = checks.length;
 
     el.checkList.innerHTML = checks.map(function (c) {
-      return '<div class="m-check" data-ok="' + c.ok + '" role="listitem">' +
+      return '<div class="m-check" data-outcome="' + (c.ok === true ? 'pass' : c.ok === false ? 'fail' : c.ok) + '" role="listitem">' +
              '<span class="m-check__mark">' + (c.ok ? TICK : CROSS) + '</span>' +
              '<span class="m-check__body">' +
              '<span class="m-check__title">' + c.title + '</span>' +
@@ -6361,7 +6349,7 @@ body {
       (function (r, c) { after(step * (stopAt + 1), function () {
         if (!r) { return; }
         r.setAttribute('data-state', 'in');
-        r.setAttribute('data-ok', 'skipped');
+        r.setAttribute('data-outcome', 'skipped');
         var mark = r.querySelector('.m-check__mark');
         if (mark) { mark.innerHTML = DASH; }
         /* The dash said "not checked" to the eye while the title still said
@@ -6751,7 +6739,7 @@ body {
         row('Station', r.station) +
         row('Vehicle', r.plate + '<small class="o-receipt__sub">' + r.model + '</small>') +
         row('Fuel', r.litres + ' L') +
-        '<div class="o-receipt__row" data-tone="points">' +
+        '<div class="o-receipt__row" data-tone="success">' +
           '<span class="o-receipt__label">Points earned</span>' +
           '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
         row('Odometer', r.odo || '') +
@@ -6803,7 +6791,7 @@ body {
                                : 'litres so far';
     el.fillingVerdict.hidden = !done;
     el.fillingVerdict.textContent = fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
-    if (done && fillPartial()) { el.fillingVerdict.setAttribute('data-tone', 'partial'); }
+    if (done && fillPartial()) { el.fillingVerdict.setAttribute('data-tone', 'warning'); }
     else { el.fillingVerdict.removeAttribute('data-tone'); }
     el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
     /* One line of pump truth on the running face only. The waiting face
@@ -8315,6 +8303,7 @@ body {
       ['Returning drivers', 'skip the reward. It is a one-time welcome, so showing it twice would make it worth nothing. A returning driver with no vehicle lands on the task; one with a vehicle skips both.'],
       ['Nothing is real', 'No point is awarded, nothing is remembered between loads, nothing is sent anywhere. The scan is a button that pretends.'],
       ['Spacing', 'Same scale as the sign-up flow: 8 is parts of one thing, 16 is one group to the next, 24 is a decision, 32 closes a centred group.'],
+      ['State axes', 'The shared law lives in the sign-up spec: state is never a class, one attribute holds one value. This file\'s own axes: data-face (waiting, running, done) on the filling screen; data-phase (filling, done) on the live bar; data-outcome (pass, skipped, fail) on the checks; data-verdict (clear, block) on the read; booleans - data-peek, data-pulse, data-loading, data-open, data-lead - say true. The vocabulary is gated in check.js.'],
       ['Targets', 'Every control clears ' + cs.getPropertyValue('--size-target').trim() + '.']
     ];
     panel.innerHTML =
