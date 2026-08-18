@@ -319,11 +319,16 @@ for (const name of FILES) {
      is read. */
   /* Styles out first: their comments are rationale for maintainers, and a
      driver can no more read a CSS comment than a JS one. */
-  const markupText = markupOf(src[name])
+  const markupNoStyle = markupOf(src[name])
     .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<[^>]+>/g, '\n');
-  texts.push(...markupText.split('\n'));
+    .replace(/<!--[\s\S]*?-->/g, ' ');
+  /* Attribute text is read aloud or shown too: an aria-label is COPY, and
+     for a screen-reader user it is the only copy. It was shipping
+     unscanned. */
+  for (const m of markupNoStyle.matchAll(/(?:aria-label|placeholder|title|alt)="([^"]*)"/g)) {
+    texts.push(m[1]);
+  }
+  texts.push(...markupNoStyle.replace(/<[^>]+>/g, '\n').split('\n'));
 
   for (const t of texts) {
     const trimmed = t.trim();

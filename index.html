@@ -1429,6 +1429,10 @@ button { background: none; border: none; color: inherit; }
 .o-signup-sheet[data-state="closing"] { animation: sheetDown .28s var(--ease-emphasis) forwards; }
 .a-scrim[data-state="opening"] { animation: scrimIn var(--dur-base) ease forwards; }
 .a-scrim[data-state="closing"] { animation: scrimOut .22s ease forwards; }
+/* Visibility is the same state the motion reads: present means shown,
+   absent means gone. No inline display writes - the fact has one home. */
+.o-signup-sheet[data-state] { display: flex; }
+.a-scrim[data-state] { display: block; }
 .a-icon-wrap[data-motion="pop"] { animation: pop .5s var(--ease-spring) both; }
 
 /* Every animation collapses to a still frame when motion is reduced,
@@ -2641,15 +2645,24 @@ button { background: none; border: none; color: inherit; }
     el.hero.setAttribute('aria-hidden', on ? 'true' : 'false');
   }
 
+  /* The one writer of the sheet-and-scrim visibility fact. State rides
+     data-state and CSS derives display from it; 'opening' and 'closing'
+     also play the travel, and absence is gone. */
+  function setSheetShown(state) {
+    if (state) {
+      el.scrim.setAttribute('data-state', state);
+      el.sheet.setAttribute('data-state', state);
+    } else {
+      el.scrim.removeAttribute('data-state');
+      el.sheet.removeAttribute('data-state');
+    }
+  }
   function openSheet(mode) {
     S.mode = mode || 'signup';
     returnFocusTo = document.activeElement;
     if (S.stage === 'closed') {
       setBackgroundInert(true);
-      el.scrim.style.display = 'block';
-      el.scrim.setAttribute('data-state', 'opening');
-      el.sheet.style.display = 'flex';
-      el.sheet.setAttribute('data-state', 'opening');
+      setSheetShown('opening');
     }
   }
 
@@ -2683,8 +2696,7 @@ button { background: none; border: none; color: inherit; }
     setBackgroundInert(false);
     if (returnFocusTo && returnFocusTo.focus) { returnFocusTo.focus({ preventScroll: true }); }
     returnFocusTo = null;
-    el.scrim.setAttribute('data-state', 'closing');
-    el.sheet.setAttribute('data-state', 'closing');
+    setSheetShown('closing');
     /* The hero watches the sheet's data-stage to hide its own actions while
        a journey is up. Closing left the attribute behind, so the hero came
        back with every control faded out - a driver stranded on a poster.
@@ -2692,7 +2704,7 @@ button { background: none; border: none; color: inherit; }
     el.sheet.removeAttribute('data-stage');
     disarmTaps();
     setTimeout(function () {
-      if (S.stage === 'closed') { el.scrim.style.display = 'none'; el.sheet.style.display = 'none'; }
+      if (S.stage === 'closed') { setSheetShown(null); }
     }, 300);
     setNav('home/default');
   }
@@ -2700,10 +2712,8 @@ button { background: none; border: none; color: inherit; }
   function closeSheetNow() {
     clearTimers();
     S.stage = 'closed'; S.dismissArmed = false;
-    el.scrim.removeAttribute('data-state');
-    el.sheet.removeAttribute('data-state');
+    setSheetShown(null);
     el.sheet.removeAttribute('data-stage');
-    el.scrim.style.display = 'none'; el.sheet.style.display = 'none';
   }
 
   function showStage(name) {
@@ -3580,8 +3590,7 @@ button { background: none; border: none; color: inherit; }
     resetNumberStage(phone);
   }
   function openSheetNow() {
-    el.scrim.style.display = 'block'; el.scrim.setAttribute('data-state', 'opening');
-    el.sheet.style.display = 'flex'; el.sheet.setAttribute('data-state', 'opening');
+    setSheetShown('opening');
     S.stage = 'number';
   }
   function home(notice, action, status) {
