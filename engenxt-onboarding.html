@@ -941,7 +941,10 @@ body {
    takes the ink colour and only the XT keeps the brand red. */
 .o-home .m-brand-lockup__name { color: var(--color-text-primary); }
 
-/* a-icon-btn. A round target holding a single icon, and nothing else. */
+/* a-icon-btn. A round target holding a single icon, and nothing else.
+   One glyph size for the atom: 20px at stroke 2, Lucide's own weight, on
+   the ramp the registry writes. Twelve of these existed at four optical
+   weights before this line was law. */
 .a-icon-btn {
   position: relative; flex-shrink: 0;
   width: var(--size-target); height: var(--size-target);
@@ -3310,7 +3313,7 @@ body {
            because that is what it is: the fill finishes while the phone is in
            a pocket, and this is how the phone says so. -->
       <button class="m-push" type="button" id="pushNote" hidden>
-        <span class="m-push__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V12a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v10"/><path d="M13 14h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-6.5a2 2 0 0 0-.6-1.4L18 7.5"/><path d="M3 22h10"/><path d="M6 6h4"/></svg></span>
+        <span class="m-push__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
         <span class="m-push__body">
           <span class="m-push__app">EngenXT · now</span>
           <span class="m-push__title" id="pushTitle">Fill complete</span>
@@ -3350,7 +3353,7 @@ body {
                the score buys and how far off it is. -->
           <div class="m-reward-goal" id="rewardGoal">
             <div class="m-reward-goal__head">
-              <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
+              <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg></span>
               <span class="m-reward-goal__title">Data reward</span>
               <span class="m-reward-goal__value" id="rewardGoalValue">50 MB of 5 GB</span>
             </div>
@@ -3405,14 +3408,14 @@ body {
 
         <div class="o-onboard__earned">
           <div class="m-earn-row" id="earnedRow">
-            <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 22V12a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v10"/><path d="M13 14h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2v-6.5a2 2 0 0 0-.6-1.4L18 7.5"/><path d="M3 22h10"/><path d="M6 6h4"/></svg></span>
+            <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
             <span class="m-earn-row__label" id="earnedRowLabel">Fuelling 52.4 L</span>
             <span class="m-earn-row__pill" id="earnedRowPill">+524 pts</span>
           </div>
           <!-- The worth line home taught the driver to read, on the screen
                where the number just grew. -->
           <div class="m-earn-row" data-state="landed">
-            <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
+            <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg></span>
             <span class="m-earn-row__label" id="earnedWorth">About 0.52 GB of data</span>
           </div>
           <!-- The claim no other South African programme makes, said where it
@@ -3479,7 +3482,7 @@ body {
            driver - it is the manager, a week later. -->
       <section class="o-history" id="historyScreen" aria-labelledby="historyTitle" hidden>
         <div class="m-screen-bar">
-          <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+          <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
         <h1 class="a-screen-title" id="historyTitle" tabindex="-1">History</h1>
         <div id="historyList"></div>
@@ -3494,7 +3497,7 @@ body {
            the driver's own facts and the one setting that is theirs. -->
       <section class="o-account" id="accountScreen" aria-labelledby="accountTitle" hidden>
         <div class="m-screen-bar">
-          <button class="a-icon-btn" type="button" id="accountBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+          <button class="a-icon-btn" type="button" id="accountBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
         <h1 class="a-screen-title" id="accountTitle" tabindex="-1">Account</h1>
 
@@ -3537,7 +3540,7 @@ body {
            promise is kept in, so the number is lit like the prize it is. -->
       <section class="o-rewards" id="rewardsScreen" aria-labelledby="rewardsTitle" hidden>
         <div class="m-screen-bar">
-          <button class="a-icon-btn" type="button" id="rewardsBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+          <button class="a-icon-btn" type="button" id="rewardsBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
         <h1 class="a-screen-title" id="rewardsTitle" tabindex="-1">Rewards</h1>
         <div class="o-rewards__balanceCard">
@@ -3558,7 +3561,7 @@ body {
            here. -->
       <section class="o-filling" id="fillingScreen" aria-labelledby="fillingLitres" hidden>
         <div class="o-filling__bar">
-          <button class="a-icon-btn" type="button" id="fillingClose" aria-label="Close, the fill carries on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+          <button class="a-icon-btn" type="button" id="fillingClose" aria-label="Close, the fill carries on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
         <div class="o-filling__stage">
           <!-- Waiting shows work, not a mark: the app's own spinner at stage
@@ -3584,7 +3587,7 @@ body {
 
           <div class="m-app-bar">
             <span class="m-brand-lockup">
-              <span class="m-brand-lockup__mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg></span>
+              <span class="m-brand-lockup__mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
               <span class="m-brand-lockup__name">Engen<em>XT</em></span>
             </span>
             <span class="m-app-bar__actions">
@@ -3592,7 +3595,7 @@ body {
                    promised "1 unread" from the day it was drawn, and the tap
                    said "not built yet" - a decoration wearing a claim. -->
               <button class="a-icon-btn" type="button" id="homeBell" aria-label="Notifications">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
                 <span class="a-badge" id="homeBellDot" aria-hidden="true" hidden></span>
               </button>
               <button class="a-avatar" type="button" id="homeAvatar" aria-label="Your account, David" data-unbuilt="Your account">D</button>
@@ -3633,7 +3636,7 @@ body {
                the second where it belongs, on the button below. -->
           <div class="m-linked" id="homeLinked" role="status" hidden>
             <span class="m-linked__tick">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
             </span>
             <span class="m-linked__body">
               <span class="m-linked__title">Vehicle linked</span>
@@ -3682,7 +3685,7 @@ body {
                markup of the one control the wrong-read escape now depends on.
                This card opens the scanner. -->
           <button class="m-vehicle-card" type="button" id="homeVehicle">
-            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg></span>
+            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
             <span class="m-vehicle-card__body">
               <span class="m-vehicle-card__label" id="homeVehicleLabel">Driving today</span>
               <span class="m-vehicle-card__plate" id="homeVehiclePlate">CA 123-456</span>
@@ -3715,7 +3718,7 @@ body {
                same place, so the screen does not reflow when a driver picks
                one, and the question is asked where the answer will appear. -->
           <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
-            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg></span>
+            <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
             <span class="m-vehicle-card__body">
               <span class="m-vehicle-card__plate">Scan your vehicle</span>
               <span class="m-vehicle-card__note">Read the disc or the plate to start fuelling today.</span>
@@ -3766,17 +3769,17 @@ body {
 
         <nav class="o-tab-bar" aria-label="Sections">
           <button class="o-tab-bar__tab" type="button" data-tab="home" aria-current="page">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
             <span>Home</span>
           </button>
           <button class="o-tab-bar__tab" type="button" data-tab="fuel">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg></span>
+            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
             <span>Fuel</span>
           </button>
           <!-- The count is real or it is absent. It shipped saying "2 new"
                from the day it was drawn, on an empty drawer. -->
           <button class="o-tab-bar__tab" type="button" data-tab="history" aria-label="History">
-            <span class="o-tab-bar__icon"><span class="a-badge" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg></span>
+            <span class="o-tab-bar__icon"><span class="a-badge" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
             <span>History</span>
           </button>
           <button class="o-tab-bar__tab" type="button" data-tab="account">
@@ -3794,7 +3797,7 @@ body {
         <div class="o-step__scroll">
           <div class="o-step__bar">
             <button class="a-icon-btn" type="button" id="stepBack" aria-label="Back" hidden>
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
             </button>
           </div>
           <span class="o-step__mark" id="stepMark" aria-hidden="true"></span>
@@ -3826,11 +3829,11 @@ body {
         <div class="o-scan__view" aria-hidden="true"></div>
         <div class="o-scan__bar">
           <button class="a-icon-btn" type="button" id="scanClose" aria-label="Close the scanner">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
           <span class="o-scan__spacer"></span>
           <button class="a-icon-btn" type="button" id="scanTorch" aria-label="Torch" aria-pressed="false">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6l-1 6 3 2-6 12 1-9H8l1-5z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg>
           </button>
         </div>
 
@@ -3982,12 +3985,12 @@ body {
         <div class="o-check__scroll">
 
           <div class="o-check__bar">
-            <button class="a-icon-btn" type="button" id="checkBack" aria-label="Back to the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
+            <button class="a-icon-btn" type="button" id="checkBack" aria-label="Back to the map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
           </div>
 
 
           <p class="m-verdict" id="checkVerdict">
-            <span class="m-verdict__mark" id="checkMark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
+            <span class="m-verdict__mark" id="checkMark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
             <span id="checkVerdictText">You can fuel here</span>
           </p>
 
@@ -4711,17 +4714,16 @@ body {
 
      Tabler's own transparent 24 square is dropped from each one. It exists to
      stop a build step trimming the artboard and there is no build step here. */
+  /* Lucide only. The old art was Tabler's, which drew five distinct
+     silhouettes; Lucide's set has three, so van rides with truck and
+     bakkie with car. The plate on every chip and card is what names a
+     vehicle - the art is tone, not identity. */
   var VEHICLE_ART = {
-    /* truck-delivery. A box body over a cab, with the two speed lines that are
-       what tell it apart from the lorry below at 16px. */
-    van:   '<path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/>',
-    /* car-off-road. A cab with an open load bed behind it, which is a bakkie
-       however the rest of the world files it. */
-    bakkie:'<path d="M9 17h6"/><path d="M9 17a2 2 0 1 1 -4 0a2 2 0 0 1 4 0"/><path d="M19 17a2 2 0 1 1 -4 0a2 2 0 0 1 4 0"/><path d="M17 10l-2 -3"/><path d="M19 17h2v-5a2 2 0 0 0 -2 -2h-5v2h-2.586a1 1 0 0 1 -.707 -.293l-1.121 -1.121a2 2 0 0 0 -1.414 -.586h-4.172a1 1 0 0 0 -1 1v6h2"/>',
-    car:   '<path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"/>',
-    /* truck. The taller body and the flat nose are the step up from the van. */
-    truck: '<path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/>',
-    bike:  '<path d="M2 18a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M16 18a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M12 19v-4l-3 -3l5 -4l2 3h3"/><path d="M13.007 5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>'
+    van:   '<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+    bakkie:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+    car:   '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+    truck: '<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+    bike:  '<circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/>'
   };
 
   /* Same three steps as the rest of the icons. One weight across every size is
@@ -5288,10 +5290,10 @@ body {
      Each step is content rather than a screen of its own. They ask the same
      shape of question, so one organism carries all three and the margins
      cannot drift apart between them. */
-  var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path class="o-step__shackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+  var ICON_LOCK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path class="o-step__shackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   var ICON_GAUGE = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>';
-  var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5"/><path d="M3 9l4 0"/></svg>';
-  var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
+  var ICON_VAN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>';
+  var ICON_PIN  = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
 
   /* What the camera read.
 
@@ -5921,9 +5923,7 @@ body {
     el.stationEmpty.hidden = matches.length > 0;
 
     var pump = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M4.5 20V5.5A1.5 1.5 0 0 1 6 4h6a1.5 1.5 0 0 1 1.5 1.5V20"/><path d="M3 20h12"/>' +
-      '<path d="M7 9h4"/><path d="M13.5 8H18a1.5 1.5 0 0 1 1.5 1.5V16a1.2 1.2 0 0 0 2.4 0v-4l-2.2-2.6"/></svg>';
+      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg>';
 
     function row(st) {
       var on = st.id === S.station;
@@ -5975,10 +5975,7 @@ body {
   }
 
   var PUMP_ART = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/>' +
-    '<path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>' +
-    '<path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>';
+    'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg>';
 
   function paintPeek(st) {
     el.stationArt.innerHTML = PUMP_ART;
@@ -6085,10 +6082,10 @@ body {
      the driver has to read past. Being stopped is the lesson. */
   var CHECK_TICK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
     'stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" ' +
-    'stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+    'stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
   var CHECK_CROSS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
     'stroke="var(--color-text-on-dark)" stroke-width="3.4" stroke-linecap="round" ' +
-    'stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>';
+    'stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
 
   /* The verdict answers the driver's question, which is "am I good to go", and
      it has to be true of all five rows underneath it rather than the first one.
@@ -6239,13 +6236,11 @@ body {
   }
 
   var TICK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
   var DASH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>';
+    'stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>';
   var CROSS = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    '<path d="M18 6 6 18M6 6l12 12"/></svg>';
+    'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
 
   /* The rows are the answers now.
 
@@ -6562,7 +6557,7 @@ body {
   }
   /* The data mark the earned screen already wears. Stroke is currentColor,
      so the row's state colours the mark without a second drawing. */
-  var DATA_MARK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>';
+  var DATA_MARK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg>';
   function paintRewards() {
     var bal = balancePts();
     el.rewardsPoints.textContent = groupNum(bal) + ' pts';
