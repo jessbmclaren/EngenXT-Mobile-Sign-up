@@ -2090,6 +2090,11 @@ button { background: none; border: none; color: inherit; }
   var WA_SUPPORT       = WA_SUPPORT_N + encodeURIComponent('Hi, I need help signing in to EngenXT.');
   var WA_SUPPORT_LOCK  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT has paused my sign in for 15 minutes and I need to fuel now.');
   var WA_SUPPORT_DOWN  = WA_SUPPORT_N + encodeURIComponent('Hi, EngenXT says it is unavailable and I need to fuel now.');
+  /* The manager's copy of the outage, pre-written so the driver types
+     nothing at a forecourt: who, the number the account rides on, the
+     fixed demo clock, and a reference the helpdesk can grep. */
+  var WA_OUTAGE = WA_SUPPORT_N + encodeURIComponent(
+    'EngenXT is currently unavailable. Driver: David, +27 82 123 4567. Time: 09:41. Outage ref: ENG-0941.');
   /* Production note, from sourced research (Aug 2026): send the OTP as a
      Meta AUTHENTICATION template (cheapest category, one-tap code copy,
      shown only on the primary device), and register the WhatsApp Business
@@ -3558,13 +3563,25 @@ button { background: none; border: none; color: inherit; }
     maintenance: {
       tone: 'warning', icon: 'alert',
       title: 'EngenXT is temporarily unavailable',
-      /* Do not claim existing approvals still work. Signing in is how a driver
-         reaches an approval, so if sign in is down the approval is out of reach
-         too, and a driver at a pump would act on that promise and be stranded. */
-      body: "You can't sign in right now. If you need to fuel, ask your manager.",
+      /* A closed shop says when it reopens. The recovery time is the one
+         fact that changes what a driver does next - wait here, or go to
+         the manager. Still no claim that existing approvals work: signing
+         in is how a driver reaches one. */
+      body: 'Please try again after 10:30.',
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retryHome' },
-        { label: 'Contact support', kind: 'outline', href: WA_SUPPORT_DOWN }
+        { label: 'Message my manager', kind: 'outline', href: WA_OUTAGE }
+      ]
+    },
+    'maintenance-notime': {
+      tone: 'warning', icon: 'alert',
+      title: 'EngenXT is temporarily unavailable',
+      /* When there is no time to give, saying so is the information: the
+         driver stops waiting on a promise nobody made. */
+      body: 'We do not have a recovery time yet.',
+      actions: [
+        { label: 'Try again', kind: 'primary', act: 'retryHome' },
+        { label: 'Message my manager', kind: 'outline', href: WA_OUTAGE }
       ]
     },
     update: {
@@ -3730,6 +3747,7 @@ button { background: none; border: none; color: inherit; }
     'home/default':     { label: 'Ready',              run: function () { home(null, 'enter'); } },
     'home/offline':     { label: 'No internet',        run: function () { home('offline', 'retry'); } },
     'home/maintenance': { label: 'Unavailable',        run: function () { home(null, 'enter', 'maintenance'); } },
+    'home/maintenance-notime': { label: 'Unavailable, no recovery time', run: function () { home(null, 'enter', 'maintenance-notime'); } },
     'home/update':      { label: 'Update required',    run: function () { home(null, 'enter', 'update'); } },
 
     /* Number */
@@ -3892,7 +3910,7 @@ button { background: none; border: none; color: inherit; }
   };
 
   var NAV_GROUPS = {
-    navHome:    ['home/default', 'home/offline', 'home/maintenance', 'home/update'],
+    navHome:    ['home/default', 'home/offline', 'home/maintenance', 'home/maintenance-notime', 'home/update'],
     navNumber:  ['number/empty', 'number/privacy', 'number/partial', 'number/valid', 'number/sending',
                  'number/err-format', 'number/err-landline', 'number/err-unregistered',
                  'number/err-suspended', 'number/err-fleet',
@@ -4176,7 +4194,7 @@ button { background: none; border: none; color: inherit; }
     },
     'index.html': {
       navHome:    [['home/default','Ready'],['home/offline','No internet'],
-                   ['home/maintenance','Unavailable'],['home/update','Update required']],
+                   ['home/maintenance','Unavailable'],['home/maintenance-notime','Unavailable, no recovery time'],['home/update','Update required']],
       navNumber:  [['number/empty','Empty'],
                    ['number/privacy','The privacy note, opened'],['number/partial','Part typed'],['number/valid','Valid'],
                    ['number/sending','Sending'],['number/err-format','Too few digits'],
