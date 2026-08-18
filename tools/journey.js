@@ -448,6 +448,25 @@ async function fuelling() {
   check('sign out lands on the sign-in front door',
     out && await ev(`location.hash`) === '#home/default', String(out));
 
+  console.log('\n── the keyboard can do what the camera could not ──');
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=14#flow1-scan-type` });
+  await until(`!document.getElementById('scanTypePanel').hidden`);
+  await sleep(400);
+  await ev(`(function(){var f=document.getElementById('scanPlateInput'); f.value='XY 999-000'; f.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await ev(`document.getElementById('scanPlateGo').click()`);
+  await sleep(300);
+  check('a plate off the list is refused with words',
+    await ev(`!document.getElementById('scanTypeErr').hidden`));
+  await ev(`(function(){var f=document.getElementById('scanPlateInput'); f.value='ca 123 456'; f.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await ev(`document.getElementById('scanPlateGo').click()`);
+  await sleep(900);
+  const tv = JSON.parse(await ev(`JSON.stringify({
+    homeUp: !document.getElementById('homeScreen').hidden,
+    plate: document.getElementById('homeVehiclePlate').textContent,
+    linked: Demo.S().vehicleLinked })`));
+  check('a typed plate links the vehicle and lands home',
+    tv.homeUp && tv.linked && tv.plate === 'CA 123-456', JSON.stringify(tv));
+
   console.log('\n── the stations answer the search ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=13#fuel-stations` });
   await until(`document.querySelectorAll('.m-station').length > 0`);

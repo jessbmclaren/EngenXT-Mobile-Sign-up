@@ -1325,11 +1325,6 @@ body {
   font-size: var(--text-caption2); color: var(--color-text-secondary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.m-vehicle-card__change {
-  display: block; margin-top: var(--sp-1);
-  font-size: var(--text-caption); font-weight: 700;
-  color: var(--color-primary-dark);
-}
 .m-vehicle-card__chev {
   flex-shrink: 0; width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
@@ -1721,22 +1716,6 @@ body {
 }
 
 .o-scan__spacer { flex: 1 1 auto; }
-/* Typed entry, on the camera's own dark. The panel replaces the viewfinder
-   card when the camera cannot be repaired from here. */
-.o-scan__typePanel { display: flex; flex-direction: column; gap: var(--sp-2); padding: 0 var(--sp-5) var(--sp-3); }
-.o-scan__typeLabel {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--color-on-dark-soft);
-}
-.o-scan__typeInput {
-  min-height: var(--size-control); padding: 0 var(--sp-4);
-  border: 1px solid var(--color-on-dark-line); border-radius: var(--radius-card-sm);
-  background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
-  font-size: var(--text-callout); font-weight: 700; letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-}
-.o-scan__typeInput::placeholder { color: var(--color-on-dark-faint); }
-.o-scan__typeErr { font-size: var(--text-caption); color: var(--color-points-on-dark); }
 
 .o-scan__stage { flex: 1 1 auto; display: grid; place-items: center; padding: var(--sp-4); }
 /* The frame. Corners rather than a full rectangle, so it reads as an aiming
@@ -2179,6 +2158,13 @@ body {
   display: flex; flex-direction: column; gap: var(--sp-2);
   overflow-y: auto; min-height: 0;
   margin-inline: calc(var(--sp-5) * -1); padding-inline: var(--sp-5);
+}
+.o-stations__group {
+  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+  /* 12, not 10: the heading was off the four point grid and sat closer to the
+     card under it than to nothing. */
+  padding-top: var(--sp-3);
 }
 
 /* m-station. One station: what it is called, why it is worth knowing, how far.
@@ -2981,9 +2967,7 @@ body {
 .o-filling__bar { align-self: stretch; display: flex; justify-content: flex-end; }
 /* A word, not a full-width bar: the way out is quiet and cornered, sized
    to its own label plus the tap floor. */
-.o-filling__hideWrap { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-1); }
-.o-filling__hide { width: auto; min-width: var(--size-target); padding-inline: var(--sp-5); }
-.o-filling__hideNote { font-size: var(--text-caption2); color: var(--color-text-secondary); }
+.o-filling__hide { width: auto; min-width: var(--size-target); padding-inline: var(--sp-6); }
 /* True centre on every face. margin-top alone let the cluster fall to the
    bottom the moment the note hid: the completion huddled over the button
    under a screen of nothing. Both margins auto, and the tail - note or
@@ -3344,6 +3328,12 @@ body {
   .d-stateNav { max-width: none; border-radius: 0; }
 }
 </style>
+<style id="__shot">
+  html, body { margin:0 !important; padding:0 !important; overflow:hidden !important; }
+  .d-stateNav { display:none !important; }
+  .t-device-frame { position:fixed !important; top:0 !important; left:0 !important; margin:0 !important;
+    width:390px !important; height:844px !important; border-radius:0 !important; box-shadow:none !important; }
+</style>
 </head>
 <body>
 <div class="p-onboard-demo">
@@ -3666,10 +3656,7 @@ body {
                fill", and the one thing this button must never seem to do is
                that. It hides the screen; the fill carries on, and the note
                and the live bar both say so. -->
-          <div class="o-filling__hideWrap">
-            <button class="a-btn a-btn--outline a-btn--sm o-filling__hide" type="button" id="fillingClose">Close live view</button>
-            <span class="o-filling__hideNote" id="fillingHideNote">Fuelling will continue.</span>
-          </div>
+          <button class="a-btn a-btn--outline a-btn--sm o-filling__hide" type="button" id="fillingClose">Hide</button>
         </div>
         <div class="o-filling__stage">
           <!-- Waiting shows work, not a mark: the app's own spinner at stage
@@ -3720,6 +3707,15 @@ body {
             <h1 class="o-home__name" id="homeName" tabindex="-1">David</h1>
           </div>
 
+          <!-- The balance, where the greeting already has the driver's eye.
+               The figure and what it buys are one thought, so they sit as one
+               block, and the pill that used to carry the count is gone: one
+               number, said once. -->
+          <p class="o-home__balance">
+            <span class="u-visually-hidden">Your balance.</span>
+            <span class="o-home__points" id="homePoints">2 450 pts</span>
+            <span class="o-home__worth" id="homeWorth">About 2.45 GB of data earned</span>
+          </p>
 
           <div class="o-home__stats" id="homeStats">
             <span class="m-stat-pill" data-tone="success" id="homeLitres">
@@ -3811,8 +3807,7 @@ body {
                    out and a sighted one was not. That is the inversion this
                    closes, and the stake and the exit belong in one sentence
                    because they are one thought. -->
-              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
-              <span class="m-vehicle-card__change">Change vehicle</span>
+              <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle. Scan again if it is the wrong one.</span>
             </span>
             <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
@@ -3848,15 +3843,6 @@ body {
           </button>
 
           </div><!-- /o-home__stack -->
-
-          <!-- The balance, after the work - the owner's launch call: a
-               driver opens home to do a job, and the number waits its turn.
-               The figure and what it buys are still one thought. -->
-          <p class="o-home__balance">
-            <span class="u-visually-hidden">Your balance.</span>
-            <span class="o-home__points" id="homePoints">2 450 pts</span>
-            <span class="o-home__worth" id="homeWorth">About 2.45 GB of data earned</span>
-          </p>
         </div>
 
         <!-- The reason the app exists, and the one control that never scrolls.
@@ -3983,16 +3969,8 @@ body {
              failures before it appears, and the torch only restarts the dark
              one. Every one of those screens tells the driver to do something
              with the camera, so the camera has to be willing to look again. -->
-        <div class="o-scan__typePanel" id="scanTypePanel" hidden>
-          <label class="o-scan__typeLabel" for="scanPlateInput">Number plate</label>
-          <input class="o-scan__typeInput" id="scanPlateInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="CA 123-456">
-          <p class="o-scan__typeErr" id="scanTypeErr" hidden>That plate is not on your list. Check it and try again.</p>
-        </div>
         <div class="o-scan__actions">
           <button class="a-btn a-btn--primary" type="button" id="scanRetry" hidden>Try again</button>
-          <button class="a-btn a-btn--primary" type="button" id="scanSettings" hidden>Open phone settings</button>
-          <button class="a-btn a-btn--primary" type="button" id="scanPlateGo" hidden>Use this vehicle</button>
-          <button class="a-btn a-btn--outline" type="button" id="scanPlateType" hidden>Enter the number plate instead</button>
           <button class="a-btn a-btn--outline" type="button" id="scanType">Ask your manager</button>
         </div>
       </section>
@@ -4225,7 +4203,7 @@ body {
              same rank, so it stops being drawn as one and stops sitting under
              the thumb that has just finished reading a code. -->
         <div class="o-fuel__action">
-          <button class="a-btn a-btn--primary" type="button" id="fuelDone">Hide code</button>
+          <button class="a-btn a-btn--primary" type="button" id="fuelDone">Put the phone away</button>
           <button class="a-quiet-link" type="button" id="fuelCancel">Cancel this request</button>
         </div>
 
@@ -4289,7 +4267,7 @@ body {
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
     filling: $('fillingScreen'), fillingLitres: $('fillingLitres'),
     fillingUnit: $('fillingUnit'), fillingVerdict: $('fillingVerdict'),
-    fillingSpin: $('fillingSpin'), fillingHideNote: $('fillingHideNote'), fillingVessel: $('fillingVessel'),
+    fillingSpin: $('fillingSpin'), fillingVessel: $('fillingVessel'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
     fillingShowCode: $('fillingShowCode'),
@@ -4319,9 +4297,6 @@ body {
     checkBack: $('checkBack'),
     checkList: $('checkList'),
     scan: $('scanScreen'), scanNoteTitle: $('scanNoteTitle'), scanNoteBody: $('scanNoteBody'),
-    scanTypePanel: $('scanTypePanel'), scanPlateInput: $('scanPlateInput'),
-    scanTypeErr: $('scanTypeErr'), scanPlateGo: $('scanPlateGo'),
-    scanSettings: $('scanSettings'), scanPlateType: $('scanPlateType'),
     scanLine: $('scanLine'),
     scanShutter: $('scanShutter'), scanShutterLabel: $('scanShutterLabel'),
     scanType: $('scanType'), scanRetry: $('scanRetry'),
@@ -5381,22 +5356,10 @@ body {
       el.home.setAttribute('data-fuel', 'pending');
       return;
     }
+    el.homeFuel.textContent = 'I want to fuel';
     el.homeFuel.removeAttribute('data-state');
     el.homeFuel.removeAttribute('aria-busy');
-    /* The owner's launch law: linking is the first mandatory action. With
-       a vehicle linked the button fuels; with vehicles assigned but none
-       linked, it IS the linking step; with nothing assigned it stays a
-       disabled fact only a manager can change. */
-    if (S.vehicleLinked) {
-      el.homeFuel.textContent = 'I want to fuel';
-      el.homeFuel.setAttribute('aria-disabled', 'false');
-    } else if (S.vehicles.length) {
-      el.homeFuel.textContent = 'Scan your vehicle first';
-      el.homeFuel.setAttribute('aria-disabled', 'false');
-    } else {
-      el.homeFuel.textContent = 'I want to fuel';
-      el.homeFuel.setAttribute('aria-disabled', 'true');
-    }
+    el.homeFuel.setAttribute('aria-disabled', S.vehicleLinked ? 'false' : 'true');
     el.home.removeAttribute('data-fuel');
   }
 
@@ -5670,7 +5633,6 @@ body {
     smear:   { t: 'Something is on the lens', b: 'Wipe the lens on your shirt or your sleeve.' },
     nocam:   { t: 'The camera is not available', b: 'Another app may be holding it. Close that app and try again.' },
     denied:  { t: 'Camera access is off', b: 'Turn it on for EngenXT in your phone settings, then come back.' },
-    type:    { t: 'Type the number plate', b: 'As it is on the plate, like CA 123-456.' },
     /* Still "try the other one", because that advice was always sound. What
        changed is that it is now a sentence about where to point the phone
        rather than a chip to go and press first. A disc bleached by ten summers
@@ -5798,7 +5760,6 @@ body {
        capture from a camera that is not there — and the escalation is untouched,
        so a driver who keeps landing here still gets their manager. */
     var hardFail = S.scanFace === 'denied';
-    var typing = S.scanFace === 'type';
     /* notyours is on this list and off the shutter's, because it is the one
        state here that is not a camera problem at all. The read worked. It read a
        vehicle, correctly, that the driver is not assigned. Offering "line it up
@@ -5828,17 +5789,7 @@ body {
        buttons on a 320dp screen that do very nearly the same thing, above a
        third that is the last resort, and the driver has to read all three to
        find out that the first two are the same idea. */
-    el.scanRetry.hidden = !(retryable && !canShoot) || busy || typing;
-    /* The repair pair: only when the camera itself is the wall. */
-    el.scanSettings.hidden = !hardFail;
-    el.scanPlateType.hidden = !hardFail;
-    el.scanTypePanel.hidden = !typing;
-    el.scanPlateGo.hidden = !typing;
-    el.scanType.hidden = typing;
-    if (typing) {
-      el.scanShutter.hidden = true;
-      after(60, function () { el.scanPlateInput.focus({ preventScroll: true }); });
-    }
+    el.scanRetry.hidden = !(retryable && !canShoot) || busy;
     /* Same button, because it does the same thing: change one condition and let
        the camera look again. The word changes because the condition does, and a
        button that names the wrong one is a button that sends the driver back
@@ -5875,10 +5826,8 @@ body {
   /* The read landing. Auto capture, so the driver is not holding a phone at a
      van hunting for a shutter button, and the result is a screen rather than a
      silent return: something was proved and the driver should see what. */
-  /* One door in for both the lens and the keyboard: the read or the typed
-     plate resolves to an index, and everything after is identical. */
-  function linkVehicle(i) {
-    confirmByScan(i);
+  function onScanSucceeded() {
+    confirmByScan(readDisc());
     hideScan();
     hideStep();
     /* Back where the scan was asked for. Set only by the check screen, and
@@ -5889,8 +5838,6 @@ body {
     if (back) { back(); return; }
     showHome(true, true);
   }
-  function onScanSucceeded() { linkVehicle(readDisc()); }
-  function plateNorm(p) { return String(p).toUpperCase().replace(/[^A-Z0-9]/g, ''); }
 
   function hideScan() {
     root.setAttribute('data-net', 'online');
@@ -6084,14 +6031,12 @@ body {
       b.addEventListener('click', function () { S.stationSort = b.dataset.sort; paintStations(); });
     });
 
-    /* The owner's launch law: a driver only ever sees stations the
-       company pays for. The unapproved entries stay in the data - the
-       defensive check needs one to tell its story - but no list, pin or
-       search result ever shows them. */
-    var allowed = STATIONS.filter(function (st) {
-      return st.allowed && (!q || st.name.toLowerCase().indexOf(q) !== -1);
+    var matches = STATIONS.filter(function (st) {
+      return !q || st.name.toLowerCase().indexOf(q) !== -1;
     }).slice().sort(sort.by);
-    el.stationEmpty.hidden = allowed.length > 0;
+    var allowed = matches.filter(function (s) { return s.allowed; });
+    var rest    = matches.filter(function (s) { return !s.allowed; });
+    el.stationEmpty.hidden = matches.length > 0;
 
     var pump = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg>';
@@ -6109,13 +6054,15 @@ body {
              '<span class="m-station__km">' + st.km.toFixed(1) + '<small>km</small></span></button>';
     }
 
-    el.stationList.innerHTML = allowed.map(row).join('');
+    el.stationList.innerHTML =
+      (allowed.length ? '<p class="o-stations__group">Allowed stations</p>' + allowed.map(row).join('') : '') +
+      (rest.length ? '<p class="o-stations__group">Not on your company list</p>' + rest.map(row).join('') : '');
 
     Array.prototype.forEach.call(el.stationList.querySelectorAll('[data-station]'), function (b) {
       b.addEventListener('click', function () { chooseStation(b.dataset.station); });
     });
 
-    el.stationPins.innerHTML = STATIONS.filter(function (st) { return st.allowed; }).map(function (st) {
+    el.stationPins.innerHTML = STATIONS.map(function (st) {
       return '<button class="a-pin" type="button" data-pin="' + st.id + '"' +
              ' data-allowed="' + st.allowed + '" aria-pressed="' + (st.id === S.station) + '"' +
              ' style="left:' + st.x + '%;top:' + st.y + '%"' +
@@ -6310,7 +6257,7 @@ body {
     /* A refusal that does not say what to do next is a dead end, and a driver
        at a dead end goes looking for a way round it. */
     var WHY = [
-      'Your company list changed after you chose this station. Pick another one below.',
+      'Your company chooses which stations it pays for. Only your manager can add this one.',
       'Your manager can get this going again. Nothing is wrong with your account.',
       'Your company sets when its drivers can fuel. Your manager can change it.',
       'Scan the vehicle you are driving and the rest of the check will run.',
@@ -6368,9 +6315,9 @@ body {
     var hours = S.hours !== 'closed';
     return [
       { ok: !!st.allowed, shortName: 'Company list',
-        title: st.allowed ? 'On your company list' : 'Station no longer approved',
+        title: st.allowed ? 'On your company list' : 'Not on your company list',
         sub: st.allowed ? st.name + ' is approved for you'
-                        : st.name + ' came off your company list' },
+                        : st.name + ' is not one your company pays for' },
       /* Never a number, and never the word funds.
 
          A driver has no business seeing what their employer holds in an
@@ -6898,8 +6845,6 @@ body {
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
     el.fillingSpin.hidden = !waiting;
-    /* The reassurance may only speak while fuel is actually flowing. */
-    el.fillingHideNote.hidden = !(!done && !waiting);
     el.fillingVessel.hidden = waiting;
     /* The picture reads the cap the facts line reads: one number feeds both
        the words and the water line. */
@@ -7113,7 +7058,6 @@ body {
       reply('You cannot fuel until your manager assigns a vehicle.');
       return;
     }
-    if (!S.vehicleLinked) { showStep('vehicle'); return; }
     requestFuel();
   });
   el.homeLive.addEventListener('click', function () {
@@ -7138,22 +7082,6 @@ body {
     if (b) { sendBundle(parseInt(b.getAttribute('data-bundle'), 10)); }
   });
   el.fillingClose.addEventListener('click', function () { showHome(false); });
-  el.scanSettings.addEventListener('click', function () {
-    reply('Your phone settings open here. Allow the camera for EngenXT, then come back.');
-  });
-  el.scanPlateType.addEventListener('click', function () { showScan('type'); });
-  el.scanPlateInput.addEventListener('input', function () { el.scanTypeErr.hidden = true; });
-  el.scanPlateGo.addEventListener('click', function () {
-    var typed = plateNorm(el.scanPlateInput.value);
-    var hit = -1;
-    S.vehicles.forEach(function (v, i) { if (plateNorm(v.plate) === typed) { hit = i; } });
-    if (hit < 0) {
-      el.scanTypeErr.hidden = false;
-      el.scanPlateInput.focus({ preventScroll: true });
-      return;
-    }
-    linkVehicle(hit);
-  });
   /* The door back to the code. Research put an attendant, not a till, at
      the window, and a person can be slow to reach it. */
   el.fillingShowCode.addEventListener('click', function () {
@@ -7707,6 +7635,9 @@ body {
     'fuel-station-open': { group: 'fuelling', label: 'A station, opened',
       run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
                          showStations(false); chooseStation('fourways'); } },
+    'fuel-station-refused': { group: 'fuelling', label: 'A station, not on the list',
+      run: function () { reset('returning-driver', true, 4); confirmByScan(readDisc());
+                         showStations(false); chooseStation('randburg'); } },
     /* Flow 1, in the order a driver meets it. */
     'flow1-account':  { group: 'flow1', label: '1 · Confirm your account',
       run: function () { reset('returning-driver', true, 3); showStep('account'); } },
@@ -7759,8 +7690,6 @@ body {
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2; showScan('offline'); } },
     'flow1-scan-notyours': { group: 'flow1', label: '2 \u00b7 Scan, not on your list',
       run: function () { reset('returning-driver', true, 3); showScan('notyours'); } },
-    'flow1-scan-type': { group: 'flow1', label: '2 \u00b7 Scan, typed instead',
-      run: function () { reset('returning-driver', true, 3); showScan('type'); } },
     'flow1-scan-manual': { group: 'flow1', label: '2 \u00b7 Scan, take it yourself',
       /* Two failed reads behind them, so the driver has the shutter. */
       run: function () { reset('returning-driver', true, 3); S.scanTries = 2;
@@ -7920,6 +7849,11 @@ body {
                         ref: fuelDigitsShown('EXT.bryanston.CA123-456') }]
                      .concat(PAST_RECEIPTS);
         showHistory(); clearTimers();
+      } },
+    'fuel-no-vehicle': { group: 'fuelling', label: 'Asked with nothing scanned',
+      run: function () {
+        reset('returning-driver', true, 4); showHome(); clearTimers();
+        requestFuel();
       } }
   };
 
@@ -8198,7 +8132,6 @@ body {
         ['flow1-scan-spent', '2 \u00b7 Scan, this vehicle will not read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
-        ['flow1-scan-type', '2 \u00b7 Scan, typed instead'],
         ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
         ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
@@ -8209,6 +8142,7 @@ body {
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
         ['fuel-station-open', 'A station, opened'],
+        ['fuel-station-refused', 'A station, not on the list'],
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
                    ['fuel-odometer', 'The odometer'],
@@ -8226,7 +8160,8 @@ body {
                    ['fuel-stopped', 'Stopped early, the notification'],
                    ['fuel-earned', 'Points earned'],
                    ['fuel-receipt', 'The receipt'],
-                   ['fuel-history', 'History, the filed receipt']
+                   ['fuel-history', 'History, the filed receipt'],
+        ['fuel-no-vehicle', 'Asked with nothing scanned']
       ]
     },
     'index.html': {

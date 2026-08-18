@@ -1947,6 +1947,7 @@ button { background: none; border: none; color: inherit; }
             <div class="o-outcome-panel__actions">
               <button class="a-btn a-btn--primary" type="button" id="bioEnable">Turn it on</button>
               <button class="a-btn a-btn--outline" type="button" id="bioSkip">Not now</button>
+    <button class="a-btn a-btn--primary" type="button" id="bioContinue" hidden>Continue</button>
             </div>
           </div>
 
@@ -2371,7 +2372,7 @@ button { background: none; border: none; color: inherit; }
     stageNumber: $('stageNumber'), stageCode: $('stageCode'),
     stageBlocked: $('stageBlocked'), stageBiometrics: $('stageBiometrics'),
     bioIcon: $('bioIcon'), bioTitle: $('bioTitle'), bioBody: $('bioBody'),
-    bioEnable: $('bioEnable'), bioSkip: $('bioSkip'),
+    bioEnable: $('bioEnable'), bioSkip: $('bioSkip'), bioContinue: $('bioContinue'),
     phoneField: $('phoneField'), phoneInput: $('phoneInput'),
     privacyMore: $('privacyMore'), privacyCard: $('privacyCard'),
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
@@ -2900,6 +2901,7 @@ button { background: none; border: none; color: inherit; }
 
     if (d.length !== 9) {
       el.phoneField.setAttribute('data-state', 'error');
+      setBtn(el.phoneCta, false, 'Continue');
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter your mobile number.'
         : 'Enter 9 digits after +27.', 'error');
@@ -2909,8 +2911,10 @@ button { background: none; border: none; color: inherit; }
     }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
+      setBtn(el.phoneCta, false, 'Continue');
       setHelper(el.phoneHelper, 'That looks like a landline. Enter the mobile number your company registered for you.', 'error');
       shake(el.phoneField);
+      el.phoneInput.focus({ preventScroll: true });
       return;
     }
 
@@ -3371,6 +3375,9 @@ button { background: none; border: none; color: inherit; }
   function paintBioAsk() {
     el.bioIcon.setAttribute('data-tone', 'info');
     el.bioIcon.innerHTML = iconMarkup('scanFace', toneColour('info'), 28);
+    el.bioEnable.hidden = false;
+    el.bioSkip.hidden = false;
+    el.bioContinue.hidden = true;
     el.bioTitle.textContent = 'Skip the code next time';
     el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.';
     setBtn(el.bioEnable, true, 'Turn it on');
@@ -3394,8 +3401,11 @@ button { background: none; border: none; color: inherit; }
        not a thing a driver can picture. The title names what they gave. */
     el.bioTitle.textContent = 'Your face or fingerprint is set';
     el.bioBody.textContent = 'Next time, your face or fingerprint signs you in. No code to wait for.';
-    setBtn(el.bioEnable, false);
-    setBtn(el.bioSkip, false);
+    /* Hidden, not greyed: a disabled "Turn it on" under "is set" reads as
+       an offer that failed. The answer was given; the ask is over. */
+    el.bioEnable.hidden = true;
+    el.bioSkip.hidden = true;
+    el.bioContinue.hidden = false;
   }
 
   /* The one writer of S.biometrics. A tapped "Not now" is an answer and is
@@ -4039,6 +4049,7 @@ button { background: none; border: none; color: inherit; }
         ['flow1-scan-spent', '2 \u00b7 Scan, this vehicle will not read'],
         ['flow1-scan-offline', '2 \u00b7 Scan, no connection'],
         ['flow1-scan-notyours', '2 \u00b7 Scan, not on your list'],
+        ['flow1-scan-type', '2 \u00b7 Scan, typed instead'],
         ['flow1-scan-manual', '2 \u00b7 Scan, take it yourself'],
         ['flow1-linked', '2 \u00b7 Linked, back on home'],
         ['flow1-location', '3 \u00b7 Find stations near you'],
@@ -4049,7 +4060,6 @@ button { background: none; border: none; color: inherit; }
       'fuelling': [
         ['fuel-stations', 'Choosing a station'],
         ['fuel-station-open', 'A station, opened'],
-        ['fuel-station-refused', 'A station, not on the list'],
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
         ['fuel-odometer', 'The odometer'],
@@ -4068,7 +4078,7 @@ button { background: none; border: none; color: inherit; }
         ['fuel-earned', 'Points earned'],
         ['fuel-receipt', 'The receipt'],
         ['fuel-history', 'History, the filed receipt'],
-        ['fuel-no-vehicle', 'Asked with nothing scanned']
+
       ],
       'returning': [
         ['returning-signin', 'Signed in again'],
@@ -4376,6 +4386,7 @@ button { background: none; border: none; color: inherit; }
   el.codeContinue.addEventListener('click', function () { offerBiometrics(); });
   el.bioEnable.addEventListener('click', function () { chooseBiometrics(true); });
   el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
+  el.bioContinue.addEventListener('click', function () { handOver(); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
   el.scrim.addEventListener('click', function () { closeSheet(); });
 

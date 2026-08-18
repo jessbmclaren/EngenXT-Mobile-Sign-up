@@ -538,17 +538,22 @@ function sharedRules(name) {
    shipped without the step once; this is the invariant as a test. */
 for (const name of FILES) {
   for (const code of scriptsOf(src[name])) {
-    const noStrings = code.replace(/'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/g, "''");
-    for (const m of noStrings.matchAll(/function (\w+)\([^)]*\)\s*\{/g)) {
+    /* Length-preserving masks, so brace-walking cannot be derailed by a
+       brace in a string or an apostrophe in a comment, and body offsets
+       still line up with the original for the annotation check. */
+    const masked = code
+      .replace(/\/\*[\s\S]*?\*\//g, (m2) => m2.replace(/[^\n]/g, ' '))
+      .replace(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"/g, (m2) => ' '.repeat(m2.length));
+    for (const m of masked.matchAll(/function (\w+)\([^)]*\)\s*\{/g)) {
       let depth = 1; let i = m.index + m[0].length; const start = i;
-      while (i < noStrings.length && depth) {
-        if (noStrings[i] === '{') { depth++; }
-        if (noStrings[i] === '}') { depth--; }
+      while (i < masked.length && depth) {
+        if (masked[i] === '{') { depth++; }
+        if (masked[i] === '}') { depth--; }
         i++;
       }
-      const body = noStrings.slice(start, i);
+      const body = masked.slice(start, i);
       if (!/S\.step\s*=(?!=)/.test(body)) { continue; }
-      if (/\.focus\(/.test(body) || /no-focus:/.test(body)) { continue; }
+      if (/\.focus\(/.test(body) || /no-focus:/.test(code.slice(start, i))) { continue; }
       fail(`${name}: ${m[1]}() moves S.step but never moves focus - add the focus step or a /* no-focus: reason */`);
     }
   }
