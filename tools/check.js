@@ -349,6 +349,97 @@ for (const name of FILES) {
   }
 }
 
+
+/* ── The naming gate ─────────────────────────────────────────────────
+   Brad Frost's layers and BEM as law rather than review. Every class in
+   markup, styles and built strings must be shaped like the system: a
+   layer prefix, a kebab-case block, at most one element, camelCase for
+   multi-word parts, and no state spelled as a class. Dead names fail in
+   both directions, because a styled class nobody renders and a rendered
+   class nobody styles are the two ways a system stops being one. The d-
+   layer is tooling: shape-checked, excused from the rest. */
+
+const CLASS_SHAPE =
+  /^(a|m|o|t|p|u)-[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__[a-z][a-zA-Z0-9]*)?(?:--[a-z][a-zA-Z0-9]*)?$/;
+/* Tooling keeps its own furniture: camelCase blocks are its convention. */
+const TOOL_SHAPE =
+  /^d-[a-zA-Z][a-zA-Z0-9]*(?:__[a-z][a-zA-Z0-9]*)?(?:--[a-z][a-zA-Z0-9]*)?$/;
+/* Words that make a modifier a state. States ride data-*. */
+const STATE_MODS =
+  /--(active|open|closed|on|off|visible|hidden|selected|current|disabled|loading|waiting|filling|sent|short|done|err|error|ok|success)$/;
+/* Names allowed to exist on one side only, each with its reason. */
+const STYLED_ONLY = new Set([
+  /* The atom library is copied whole between the files, so a variant one
+     file has not reached for yet is library, not death. */
+  'a-btn--onDark', 'a-link', 'a-link--quiet', 'a-link--flush', 'a-link--onDark',
+  'a-icon-wrap--lg', 'a-handle', 'm-brand-lockup__tag',
+]);
+const USED_ONLY = new Set([
+  /* the status bar svg keeps its name in both files so the bars read as
+     one component; only index, which has the offline state, styles it */
+  'm-status-bar__signal',
+  /* the molecule's identity over the a-field shell; the shell carries
+     the declarations */
+  'm-phone-field',
+]);
+const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|radius|shadow|sp|size|z|ease|dur|d)-/;
+
+for (const name of FILES) {
+  const styleBlocks = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1]).join('\n');
+  const styleNoComments = styleBlocks.replace(/\/\*[\s\S]*?\*\//g, ' ');
+
+  /* Classes the stylesheets style. */
+  const styled = new Set();
+  for (const m of styleNoComments.matchAll(/\.([a-zA-Z][\w-]*)/g)) { styled.add(m[1]); }
+
+  /* Classes the page or its scripts actually put on elements, plus the
+     ones scripts look up as selectors. */
+  const used = new Set();
+  const markup = markupOf(src[name]).replace(/<style[\s\S]*?<\/style>/g, ' ');
+  for (const m of markup.matchAll(/class="([^"]+)"/g)) {
+    for (const c of m[1].split(/\s+/)) { if (c) { used.add(c); } }
+  }
+  for (const code of scriptsOf(src[name])) {
+    const clean = stripJsComments(code);
+    for (const m of clean.matchAll(/class=\\?"([^"\\]+)\\?"/g)) {
+      for (const c of m[1].split(/\s+/)) { if (c) { used.add(c); } }
+    }
+    for (const m of clean.matchAll(/['"]\.([a-z]-[\w-]+)/g)) { used.add(m[1]); }
+  }
+
+  const every = new Set([...styled, ...used]);
+  for (const c of every) {
+    if (!/^(a|m|o|t|p|u|d)-/.test(c)) { continue; }   /* layerless names have no contract here */
+    if (c.startsWith('d-')) {
+      if (!TOOL_SHAPE.test(c)) {
+        fail(`${name}: tooling class '${c}' is not shaped like the d- layer`);
+      }
+      continue;                                        /* tooling: shape only */
+    }
+    if (!CLASS_SHAPE.test(c)) {
+      fail(`${name}: class '${c}' is not shaped like the system (layer-kebab-block__camelElement--camelModifier)`);
+      continue;
+    }
+    if (STATE_MODS.test(c)) {
+      fail(`${name}: class '${c}' spells state as a modifier \u2014 state is never a class, it rides data-*`);
+    }
+    if (styled.has(c) && !used.has(c) && !STYLED_ONLY.has(c)) {
+      fail(`${name}: '${c}' is styled but never appears on an element \u2014 a dead name, or a missing use`);
+    }
+    if (used.has(c) && !styled.has(c) && !USED_ONLY.has(c)) {
+      fail(`${name}: '${c}' is on elements but no rule styles it \u2014 a dead name, or a missing rule`);
+    }
+  }
+
+  /* Token definitions stay inside the sanctioned families. */
+  for (const m of styleNoComments.matchAll(/^\s*(--[a-z][\w-]*)\s*:/gm)) {
+    if (!TOKEN_FAMILY.test(m[1])) {
+      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
+    }
+  }
+}
+
 /* ── Report ──────────────────────────────────────────────────────────── */
 
 if (problems.length) {
@@ -363,4 +454,5 @@ console.log(`    ${SIGNUP}: ${counts[SIGNUP].real} states, all listed by ${ONBOA
 console.log(`    ${ONBOARD}: ${counts[ONBOARD].real} states, all listed by ${SIGNUP}`);
 console.log('    scripts parse, every looked-up id exists, no duplicate ids');
 console.log(`    ${counts.tokens} product tokens, identical in both files`);
-console.log('    the words stay plain\n');
+console.log('    the words stay plain');
+console.log('    every class is shaped like the system, no dead names, tokens in their families\n');

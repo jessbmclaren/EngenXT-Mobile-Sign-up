@@ -1766,18 +1766,6 @@ body {
   color: var(--color-on-dark-soft); text-align: center;
 }
 
-/* m-vehicle-opt. One assigned vehicle, chosen or not.
-
-   A card rather than a row: the registration is what a driver matches against
-   the metal in front of them, so it is the largest thing on it. */
-/* Reference, not a control. It shows what the driver is allowed to fuel; the
-   scan is what says which one they are standing at. Drawn without the
-   affordances of a button, so nobody taps it expecting to have answered. */
-.m-vehicle-opt[data-static="true"] { cursor: default; border-style: solid; }
-.m-vehicle-opt[data-static="true"] .m-vehicle-opt__tick { display: none; }
-.m-vehicle-opt[data-done="true"] { border-color: var(--color-primary); background: var(--color-primary-bg); }
-.m-vehicle-opt[data-done="true"] .m-vehicle-opt__art { background: var(--color-primary); color: var(--color-text-on-dark); }
-.m-vehicle-opt[data-done="true"] .m-vehicle-opt__tick { display: grid; }
 /* Secondary, not tertiary. Tertiary is 4.19:1 on the page grey this label sits
    on, and at 11px it gets no large-text allowance: it is a line being read, and
    tertiary is for controls that are switched off. */
@@ -1786,47 +1774,6 @@ body {
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-step__note { font-size: var(--text-caption); color: var(--color-text-secondary); }
-.m-vehicle-opt {
-  display: flex; align-items: center; gap: var(--sp-3);
-  width: 100%; min-height: 72px; padding: var(--sp-3);
-  border: 2px solid var(--color-border); border-radius: var(--radius-card);
-  background: var(--color-surface); text-align: left; cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out),
-              background var(--dur-fast) var(--ease-out);
-}
-.m-vehicle-opt[aria-checked="true"] {
-  border-color: var(--color-primary); background: var(--color-primary-bg);
-}
-.m-vehicle-opt__art {
-  flex-shrink: 0; width: 44px; height: 44px;
-  display: grid; place-items: center;
-  border-radius: var(--radius-card-sm);
-  background: var(--color-surface-sunken); color: var(--color-text-secondary);
-}
-.m-vehicle-opt[aria-checked="true"] .m-vehicle-opt__art {
-  background: var(--color-primary); color: var(--color-text-on-dark);
-}
-.m-vehicle-opt__body { flex: 1 1 auto; min-width: 0; }
-.m-vehicle-opt__plate {
-  display: block; font-size: var(--text-lead); font-weight: 800;
-  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
-}
-.m-vehicle-opt__model {
-  display: block; margin-top: 1px;
-  font-size: var(--text-caption); color: var(--color-text-secondary);
-}
-.m-vehicle-opt__state {
-  display: block; margin-top: var(--sp-1);
-  font-size: var(--text-caption); font-weight: 700; color: var(--color-success);
-}
-/* The tick is a second cue, so the choice never rests on the border colour. */
-.m-vehicle-opt__tick {
-  flex-shrink: 0; width: 26px; height: 26px;
-  display: none; place-items: center;
-  border-radius: var(--radius-circle);
-  background: var(--color-primary); color: var(--color-text-on-dark);
-}
-.m-vehicle-opt[aria-checked="true"] .m-vehicle-opt__tick { display: grid; }
 
 /* ══ STATIONS ═════════════════════════════════════════════════════════
    Where the fill will happen. Map above, list below, and the list is the
