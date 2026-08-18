@@ -2533,6 +2533,15 @@ body {
 }
 .o-check__station:focus, .o-check__station:focus-visible { outline: none; box-shadow: none; }
 .o-check__km { font-size: var(--text-caption); color: var(--color-text-secondary); }
+.o-check__alts { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); }
+.o-check__alt {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  min-height: var(--size-target); padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-card);
+  background: var(--color-surface); cursor: pointer; text-align: left; font: inherit;
+}
+.o-check__altName { font-size: var(--text-footnote); font-weight: 700; color: var(--color-text-primary); }
+.o-check__altKm { font-size: var(--text-caption); color: var(--color-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .o-check__why {
   font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary);
   max-width: 34ch;
@@ -4128,6 +4137,7 @@ body {
                stopped needs the reason and the way out, and a driver who has
                not needs neither. -->
           <p class="o-check__why" id="checkWhy" hidden></p>
+          <div class="o-check__alts" id="checkAlts" hidden></div>
 
           <!-- What is being authorised. Two lines, both of which a driver can
                check against the vehicle in front of them. -->
@@ -4321,7 +4331,7 @@ body {
     homeVehicleModel: $('homeVehicleModel'),
     check: $('checkScreen'), checkStation: $('checkStation'), checkKm: $('checkKm'),
     checkVerdict: $('checkVerdict'), checkVerdictText: $('checkVerdictText'),
-    checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkPlate: $('checkPlate'),
+    checkMark: $('checkMark'), checkWhy: $('checkWhy'), checkAlts: $('checkAlts'), checkPlate: $('checkPlate'),
     checkModel: $('checkModel'), checkGo: $('checkGo'), checkOther: $('checkOther'),
     checkBack: $('checkBack'),
     checkList: $('checkList'),
@@ -6312,7 +6322,11 @@ body {
     var face = clear ? CHECK.clear : CHECK.block;
 
     el.check.setAttribute('data-verdict', clear ? 'clear' : 'block');
-    el.checkVerdictText.textContent = face.verdict;
+    /* The station's failure gets its own headline - the owner's sentence -
+       because the generic refusal reads wrong over a station that WAS
+       approved when the driver chose it. The other refusals keep theirs. */
+    el.checkVerdictText.textContent = (!clear && failed === 0)
+      ? 'This station is no longer approved' : face.verdict;
     el.checkMark.innerHTML = clear ? CHECK_TICK : CHECK_CROSS;
     el.checkStation.textContent = st.name;
     el.checkKm.textContent = st.km.toFixed(1) + ' km away';
@@ -6320,7 +6334,7 @@ body {
     /* A refusal that does not say what to do next is a dead end, and a driver
        at a dead end goes looking for a way round it. */
     var WHY = [
-      'Your company list changed after you chose this station. Pick another one below.',
+      'Choose another company-approved station.',
       'Your manager can get this going again. Nothing is wrong with your account.',
       'Your company sets when its drivers can fuel. Your manager can change it.',
       'Scan the vehicle you are driving and the rest of the check will run.',
@@ -6328,6 +6342,23 @@ body {
     ];
     el.checkWhy.hidden = clear;
     el.checkWhy.textContent = clear ? '' : WHY[failed];
+    /* The nearest approved doors, on the refusal itself: a driver mid-route
+       to a station that fell off the list needs the replacement now, not a
+       map trip. Tapping one runs this same check for that station. */
+    var altFail = !clear && failed === 0;
+    el.checkAlts.hidden = !altFail;
+    if (altFail) {
+      var alts = STATIONS.filter(function (a) { return a.allowed; })
+        .slice().sort(function (x, y) { return x.km - y.km; }).slice(0, 2);
+      el.checkAlts.innerHTML = alts.map(function (a) {
+        return '<button class="o-check__alt" type="button" data-alt="' + a.id + '">' +
+               '<span class="o-check__altName">' + a.name + '</span>' +
+               '<span class="o-check__altKm">' + a.km.toFixed(1) + ' km</span></button>';
+      }).join('');
+      Array.prototype.forEach.call(el.checkAlts.querySelectorAll('[data-alt]'), function (b) {
+        b.addEventListener('click', function () { S.station = b.dataset.alt; showCheck(b.dataset.alt, true); });
+      });
+    }
 
     /* The vehicle rides inside the button as well as above it, so the plate is
        part of the thing being tapped rather than a line that can be skipped. */
@@ -6347,7 +6378,7 @@ body {
        without a scan. */
     el.checkGo.setAttribute('aria-disabled', 'false');
     el.checkGo.textContent = v ? 'Get a QR for ' + v.plate : 'Scan your vehicle';
-    el.checkOther.textContent = clear ? 'Choose another station' : 'Choose a station on the list';
+    el.checkOther.textContent = clear ? 'Choose another station' : 'Show approved stations';
 
     el.check.hidden = false;
     if (arriving && !prefersReduced()) {
