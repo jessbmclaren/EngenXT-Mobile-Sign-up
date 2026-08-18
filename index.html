@@ -2218,31 +2218,49 @@ button { background: none; border: none; color: inherit; }
          vehicle, the tracker or Bluetooth by a driver holding a work phone. */
       tone: 'warning', icon: 'wifiOff', field: 'neutral', hideCta: true,
       title: 'No internet connection',
-      body: 'Connect to Wi-Fi or mobile data, then try again.',
+      /* The watch really does this - one send, when the connection is
+         back - so the sentence is a report, not a hope. */
+      body: "We'll send your code when you are connected again.",
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retrySend' }
       ]
     },
     server: {
-      /* Titled by what failed for the driver, not by whose fault it was. */
-      tone: 'error', icon: 'server', field: 'neutral', hideCta: true,
+      /* Amber, not red: the driver did nothing wrong and must hear that
+         their number is not the problem. Titled by what failed for the
+         driver, not by whose fault it was. */
+      tone: 'warning', icon: 'server', field: 'neutral', hideCta: true,
       title: "We couldn't send your code",
-      body: 'Your number is fine. Wait a moment and try again.',
+      body: 'Your mobile number is correct. Please wait a moment and try again.',
       actions: [
         { label: 'Try again', kind: 'primary', act: 'retrySend' }
       ],
       /* Support appears only once retrying has visibly stopped working, so
-         the first failure keeps a single obvious action. */
+         the first failure keeps a single obvious action - and the repeat
+         face says it is a repeat, in the owner's words. */
       escalateAfter: 2,
-      escalation: { label: 'Contact support', kind: 'outline', href: WA_SUPPORT }
+      escalatedTitle: "We still couldn't send your code",
+      escalatedBody: 'Your mobile number is correct.',
+      escalation: function (key) {
+        /* The driver explains nothing: the message carries the number, the
+           fixed demo clock, the tally and a reference the helpdesk can
+           grep. */
+        return { label: 'Contact support', kind: 'outline',
+          href: WA_SUPPORT_N + encodeURIComponent(
+            'EngenXT cannot send my sign-in code. Number: +27 ' + formatPhone(phoneDigits()) +
+            '. Time: 09:41. Failed attempts: ' + (S.fails[key] || 0) +
+            '. Error ref: ENG-SEND-0941.') };
+      }
     },
     nowhatsapp: {
       tone: 'info', icon: 'message', field: 'neutral', hideCta: true,
-      title: "That number isn't on WhatsApp",
+      title: 'This number is not on WhatsApp',
       body: 'We can send your code by SMS instead.',
+      /* "Use another registered number", never "try another": a driver may
+         have exactly one, and the first wording reads as "yours is wrong". */
       actions: [
-        { label: 'Send by SMS', kind: 'primary', act: 'sendBySms' },
-        { label: 'Try another number', kind: 'outline', act: 'clearNumber' }
+        { label: 'Send code by SMS', kind: 'primary', act: 'sendBySms' },
+        { label: 'Use another registered number', kind: 'outline', act: 'clearNumber' }
       ]
     }
   };
@@ -2623,7 +2641,15 @@ button { background: none; border: none; color: inherit; }
     out.actions = typeof def.actions === 'function' ? def.actions() : (def.actions || []);
     if (def.escalateAfter && key) {
       S.fails[key] = (S.fails[key] || 0) + 1;
-      if (S.fails[key] >= def.escalateAfter) { out.actions = out.actions.concat([def.escalation]); }
+      if (S.fails[key] >= def.escalateAfter) {
+        /* The repeat face may speak its own words, and the escalation may
+           be built at the moment it is needed, when the number and the
+           tally exist to put in it. */
+        if (def.escalatedTitle) { out.title = def.escalatedTitle; }
+        if (def.escalatedBody) { out.body = def.escalatedBody; }
+        var esc = typeof def.escalation === 'function' ? def.escalation(key) : def.escalation;
+        out.actions = out.actions.concat([esc]);
+      }
     }
     return out;
   }
