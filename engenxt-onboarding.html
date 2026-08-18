@@ -297,6 +297,7 @@
   /* The interaction scale. Choreographed motion (a lens crossfade, a
      pour) may state its own time in place, beside a comment saying so. */
   --dur-fast:  0.12s;
+  --dur-quick: 0.24s;
   --dur-base:  0.30s;
   /* A named motion role, kept deliberately: sheet travel is a distance,
      not a speed, and every sheet must move alike. */
@@ -809,6 +810,7 @@ body {
   box-shadow: 0 0 10px var(--color-points-on-dark-glow);
   transition: width var(--dur-slow) var(--ease-out);
 }
+.a-meter__fill[data-snap="true"] { transition: none; }
 
 /* m-earn-row. One line of the receipt: what was earned, and what it was
    worth. An icon, a label and a value bonded into one job, so a molecule. */
@@ -1002,6 +1004,17 @@ body {
   transition: background var(--dur-fast) var(--ease-in-out);
 }
 .a-icon-btn:hover { background: var(--color-surface-hover); }
+/* The screen says which surface the atom stands on; the atom dresses
+   itself. Promoted from a .o-scan__bar descendant override, per the
+   context law: overrides that restate another block's internals move to
+   the atom as a tone. */
+.a-icon-btn[data-tone="onDark"] { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
+.a-icon-btn[data-tone="onDark"]:hover { background: var(--color-on-dark-line); }  /* the line alpha, used as a lift */
+/* A torch you cannot tell is on is a torch you press twice. Only aria-pressed
+   changed before, which is a state for a screen reader and nobody else. */
+.a-icon-btn[data-tone="onDark"][aria-pressed="true"] {
+  background: var(--color-text-on-dark); color: var(--color-scan-1);
+}
 /* a-badge. Something here needs you.
 
    One atom for both jobs. A bare dot says "something", a number says how much,
@@ -1698,13 +1711,7 @@ body {
   flex-shrink: 0; display: flex; align-items: center; gap: var(--sp-2);
   padding: calc(var(--size-status-bar) + var(--sp-2)) var(--sp-4) var(--sp-2);
 }
-.o-scan__bar .a-icon-btn { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
-.o-scan__bar .a-icon-btn:hover { background: var(--color-on-dark-line); }  /* the line alpha, used as a lift */
-/* A torch you cannot tell is on is a torch you press twice. Only aria-pressed
-   changed before, which is a state for a screen reader and nobody else. */
-.o-scan__bar .a-icon-btn[aria-pressed="true"] {
-  background: var(--color-text-on-dark); color: var(--color-scan-1);
-}
+
 .o-scan__spacer { flex: 1 1 auto; }
 
 .o-scan__stage { flex: 1 1 auto; display: grid; place-items: center; padding: var(--sp-4); }
@@ -1726,14 +1733,21 @@ body {
 /* A single pass, not a loop. A line sweeping forever says the app is busy when
    it is waiting for the driver to hold still. */
 .a-scan-frame__line {
-  position: absolute; left: 8px; right: 8px; height: 2px;
-  background: var(--color-accent-on-dark);
-  box-shadow: 0 0 12px var(--color-accent-on-dark);
+  position: absolute; left: 8px; right: 8px; top: 10%; bottom: 12%;
+  overflow: hidden; pointer-events: none;
+}
+/* The line is the runner's top edge, swept by transform so the loop never
+   touches layout on the lowest-end phones this screen is for. The runner
+   is band-height, so translateY's percentage is the band. */
+.a-scan-frame__line::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(var(--color-accent-on-dark), var(--color-accent-on-dark)) top / 100% 2px no-repeat;
+  filter: drop-shadow(0 0 6px var(--color-accent-on-dark));
   animation: scanSweep 2.4s var(--ease-in-out) infinite;
 }
-@keyframes scanSweep { 0%,100% { top: 10%; } 50% { top: 88%; } }
-[data-motion="reduced"] .a-scan-frame__line { animation: none; top: 50%; }
-@media (prefers-reduced-motion: reduce) { .a-scan-frame__line { animation: none; top: 50%; } }
+@keyframes scanSweep { 0%,100% { transform: translateY(0); } 50% { transform: translateY(calc(100% - 2px)); } }
+[data-motion="reduced"] .a-scan-frame__line::before { animation: none; transform: translateY(calc(50% - 1px)); }
+@media (prefers-reduced-motion: reduce) { .a-scan-frame__line::before { animation: none; transform: translateY(calc(50% - 1px)); } }
 /* Trouble the driver can act on. Sits under the frame, never over it, because
    covering the thing they are aiming is the opposite of helping. */
 .m-scan-note {
@@ -3896,11 +3910,11 @@ body {
       <section class="o-scan" id="scanScreen" aria-labelledby="scanNoteTitle" hidden>
         <div class="o-scan__view" aria-hidden="true"></div>
         <div class="o-scan__bar">
-          <button class="a-icon-btn" type="button" id="scanClose" aria-label="Close the scanner">
+          <button class="a-icon-btn" type="button" data-tone="onDark" id="scanClose" aria-label="Close the scanner">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
           <span class="o-scan__spacer"></span>
-          <button class="a-icon-btn" type="button" id="scanTorch" aria-label="Torch" aria-pressed="false">
+          <button class="a-icon-btn" type="button" data-tone="onDark" id="scanTorch" aria-label="Torch" aria-pressed="false">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></svg>
           </button>
         </div>
@@ -4637,16 +4651,22 @@ body {
     new ResizeObserver(sizeMeterSpan).observe(el.rewardMeter);
   }
 
+  /* The meter's no-transition moment is state, not an inline style: one
+     writer, visible in the inspector, impossible to forget to restore. */
+  function snapMeter(on) {
+    if (on) { el.rewardMeterFill.setAttribute('data-snap', 'true'); }
+    else { el.rewardMeterFill.removeAttribute('data-snap'); }
+  }
   function playReward() {
     el.rewardValue.textContent = '0';
     el.earnRows.forEach(function (r) { if (r) { r.removeAttribute('data-state'); } });
-    el.rewardMeterFill.style.transition = 'none';
+    snapMeter(true);
     el.rewardMeterFill.style.width = '0%';
     setMeterFloor(0);
     paintGoal(0);
 
     if (prefersReduced()) {
-      el.rewardMeterFill.style.transition = '';
+      snapMeter(false);
       settleReward();
       return;
     }
@@ -4666,7 +4686,7 @@ body {
       });
     });
     after(360 + S.earned.length * 260 + 180, function () {
-      el.rewardMeterFill.style.transition = '';
+      snapMeter(false);
       el.rewardMeterFill.style.width = paintGoal(rewardTotal()) + '%';
       setMeterFloor(rewardTotal());
     });

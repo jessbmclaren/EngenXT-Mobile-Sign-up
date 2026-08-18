@@ -294,6 +294,7 @@
   /* The interaction scale. Choreographed motion (a lens crossfade, a
      pour) may state its own time in place, beside a comment saying so. */
   --dur-fast:  0.12s;
+  --dur-quick: 0.24s;
   --dur-base:  0.30s;
   /* A named motion role, kept deliberately: sheet travel is a distance,
      not a speed, and every sheet must move alike. */
@@ -1428,9 +1429,9 @@ button { background: none; border: none; color: inherit; }
 /* State drives motion, not classes. One emphasis curve for the sheet and the
    scrim, so the two surfaces move as one object. */
 .o-signup-sheet[data-state="opening"] { animation: sheetUp var(--dur-sheet) var(--ease-emphasis) forwards; }
-.o-signup-sheet[data-state="closing"] { animation: sheetDown .28s var(--ease-emphasis) forwards; }
+.o-signup-sheet[data-state="closing"] { animation: sheetDown var(--dur-quick) var(--ease-emphasis) forwards; }
 .a-scrim[data-state="opening"] { animation: scrimIn var(--dur-base) ease forwards; }
-.a-scrim[data-state="closing"] { animation: scrimOut .22s ease forwards; }
+.a-scrim[data-state="closing"] { animation: scrimOut var(--dur-quick) ease forwards; }  /* one exit time: the two surfaces really do move as one object */
 /* Visibility is the same state the motion reads: present means shown,
    absent means gone. No inline display writes - the fact has one home. */
 .o-signup-sheet[data-state] { display: flex; }
@@ -2716,9 +2717,14 @@ button { background: none; border: none; color: inherit; }
        The stage goes with the sheet. */
     el.sheet.removeAttribute('data-stage');
     disarmTaps();
-    setTimeout(function () {
+    /* The DOM says when the travel ended; the timer is only the fallback
+       for an animationend that never fires. Both paths are idempotent. */
+    var settleClose = function () {
+      el.sheet.removeEventListener('animationend', settleClose);
       if (S.stage === 'closed') { setSheetShown(null); }
-    }, 300);
+    };
+    el.sheet.addEventListener('animationend', settleClose);
+    after(400, settleClose);
     setNav('home/default');
   }
 
@@ -4623,7 +4629,7 @@ button { background: none; border: none; color: inherit; }
         ['background', 'var(--color-scrim)']
       ], states: [
         ['[data-state="opening"]', 'scrimIn var(--dur-base)'],
-        ['[data-state="closing"]', 'scrimOut .22s'],
+        ['[data-state="closing"]', 'scrimOut var(--dur-quick)'],
         ['note', 'a single-declaration overlay with no children, which is why it is an atom and not an organism.']
       ] },
     { name: '.a-toast', level: 'atom', lines: [

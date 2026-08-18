@@ -565,7 +565,7 @@ const AXES = {
   tile: ['rewards'],
   allowed: ['false'],
   lead: ['true'], loading: ['true'], open: ['true'], peek: ['true'],
-  pulse: ['true'], shake: ['true'], single: ['true'], still: ['true'],
+  pulse: ['true'], shake: ['true'], single: ['true'], snap: ['true'], still: ['true'],
   more: ['true'],
 };
 /* Axes whose values are data or tooling, not vocabulary. */
