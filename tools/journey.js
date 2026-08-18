@@ -438,6 +438,17 @@ async function fuelling() {
   check('the connection returns on its own and the flow continues with the number kept',
     healed && flowed, 'healed=' + healed + ' flowed=' + flowed);
 
+  console.log('\n── the number field meets drivers where they are ──');
+  await send('Page.navigate', { url: `file://${STAGE}/index.html?w=17#number/empty` });
+  await sleep(1400);
+  await ev(`(function(){var f=document.getElementById('phoneInput'); f.value='082-123-4567'; f.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await sleep(300);
+  const np = JSON.parse(await ev(`JSON.stringify({
+    shown: document.getElementById('phoneInput').value,
+    ctaOff: document.getElementById('phoneCta').getAttribute('aria-disabled') })`));
+  check('a pasted 082 with dashes becomes the clean national number',
+    np.shown === '82 123 4567' && np.ctaOff !== 'true', JSON.stringify(np));
+
   console.log('\n── the account keeps its word, and the way out is real ──');
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=12#account` });
   await until(`!document.getElementById('accountScreen').hidden`);

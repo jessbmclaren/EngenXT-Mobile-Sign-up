@@ -453,7 +453,9 @@ button { background: none; border: none; color: inherit; }
 .a-field[data-state="error"] {
   border-color: var(--color-error-text); background: var(--color-secondary-bg);
 }
-.a-field[data-state="pending"] { opacity: .6; }
+/* Busy, not gone: the spinner and the disabled button carry the wait,
+   and the number stays readable - a faded form reads as a frozen one. */
+.a-field[data-state="pending"] { opacity: .85; }
 .a-field__input {
   flex: 1; min-width: 0; border: none; background: transparent;
   font-size: var(--text-subhead); font-weight: 600;
@@ -1838,7 +1840,7 @@ button { background: none; border: none; color: inherit; }
                 <span class="m-phone-field__code">+27</span>
               </span>
               <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric"
-                     autocomplete="tel-national" placeholder="82 123 4567"
+                     autocomplete="tel-national" placeholder="Example: 82 123 4567"
                      aria-describedby="phoneHelper">
             </label>
             <span class="a-helper" id="phoneHelper" role="status"></span>
@@ -2158,6 +2160,17 @@ button { background: none; border: none; color: inherit; }
      routine event and gets a designed state rather than a generic error.
      ════════════════════════════════════════════════════════════════════ */
   var NUMBER_ERRORS = {
+    slow: {
+      /* The wait announced itself: nothing is wrong with the number, so
+         the field stays neutral and the send keeps running - SMS is an
+         offer, not an abort. */
+      tone: 'warning', icon: 'clock', field: 'neutral',
+      title: 'Your WhatsApp code is taking longer than expected',
+      body: 'You can keep waiting, or get the code by SMS.',
+      actions: [
+        { label: 'Send by SMS instead', kind: 'primary', act: 'sendSmsNow' }
+      ]
+    },
     unregistered: {
       tone: 'error', icon: 'search', field: 'invalid', hideCta: true,
       title: "We can't find that number",
@@ -2580,6 +2593,14 @@ button { background: none; border: none; color: inherit; }
     retrySend: function () { hideAlert(el.numberAlert); submitPhone(); },
     retryVerify: function () { hideAlert(el.codeAlert); submitOtp(); },
     sendBySms: function () { switchChannel('sms'); },
+    /* The slow send's door: same number, other channel, no resend spent -
+       nothing was delivered yet. */
+    sendSmsNow: function () {
+      S.sending = false;
+      S.channel = 'sms';
+      hideAlert(el.numberAlert);
+      submitPhone();
+    },
     sendByWhatsapp: function () { switchChannel('whatsapp'); },
     resendNow: function () { resendCode(); },
     restart: function () { closeSheet(true); },
@@ -2693,6 +2714,16 @@ button { background: none; border: none; color: inherit; }
     if (S.stage === 'closed') {
       setBackgroundInert(true);
       setSheetShown('opening');
+      /* The keyboard rises with the sheet: the number field takes focus
+         once the travel is done, cursor at the end where the next digit
+         belongs. */
+      after(450, function () {
+        if (S.stage === 'number') {
+          el.phoneInput.focus({ preventScroll: true });
+          var end = el.phoneInput.value.length;
+          try { el.phoneInput.setSelectionRange(end, end); } catch (e) {}
+        }
+      });
     }
   }
 
@@ -2925,7 +2956,7 @@ button { background: none; border: none; color: inherit; }
       setBtn(el.phoneCta, false, 'Continue');
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter your mobile number.'
-        : 'Enter 9 digits after +27.', 'error');
+        : 'Enter the full mobile number. Example: 82 123 4567.', 'error');
       shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
       return;
@@ -2943,8 +2974,16 @@ button { background: none; border: none; color: inherit; }
     S.sending = true;
     hideAlert(el.numberAlert);
     setHelper(el.phoneHelper, S.channel === 'whatsapp'
-      ? 'Sending a code on WhatsApp…'
-      : 'Sending a code by SMS…');
+      ? 'Sending your WhatsApp code…'
+      : 'Sending your SMS code…');
+    /* If the send outlives patience, say so and offer the other channel.
+       The demo delivers before this fires; the guard keeps a late timer
+       from speaking over a stage that moved on. */
+    after(4000, function () {
+      if (S.sending && S.stage === 'number' && S.channel === 'whatsapp') {
+        showNumberError('slow');
+      }
+    });
     el.phoneField.setAttribute('data-state', 'pending');
     /* readonly, not disabled, so the number the driver typed stays readable
        and the field keeps its place in the reading order. */
@@ -3586,16 +3625,20 @@ button { background: none; border: none; color: inherit; }
     },
     update: {
       tone: 'warning', icon: 'upload',
-      title: 'Update EngenXT to continue',
+      title: 'Update required',
       /* "Update to the latest version" is a instruction with nothing in it. A
          driver cannot tell whether they already did this last week, cannot say
          which version they are on when they ring their manager, and cannot tell
          a real prompt from one that has been stuck on screen for a month. Both
          numbers, so the sentence is checkable. */
-      body: 'Signing in needs a newer version than the one on this phone.',
+      /* The weight of the box, before anyone lifts it: a driver on
+         prepaid data decides with the size, not despite it. In production
+         the store link must deep-link back to this same step. */
+      body: 'Signing in needs a newer version than the one on this phone. Use Wi-Fi if you want to save mobile data.',
       meta: [
         { key: 'Installed', val: APP_VERSION.installed },
-        { key: 'Required',  val: APP_VERSION.required }
+        { key: 'Required',  val: APP_VERSION.required },
+        { key: 'Download size', val: '42 MB' }
       ],
       actions: [
         { label: 'Update app', kind: 'primary', act: 'retryHome' }
@@ -3765,7 +3808,16 @@ button { background: none; border: none; color: inherit; }
                                  el.phoneInput.readOnly = true;
                                  el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
                                  setBtn(el.phoneCta, false);
-                                 setHelper(el.phoneHelper, 'Sending a code on WhatsApp…');
+                                 setHelper(el.phoneHelper, 'Sending your WhatsApp code…');
+                               } },
+    'number/sending-slow':   { label: 'Sending, slower than expected', run: function () {
+                                 base('signup', '821234567');
+                                 el.phoneField.setAttribute('data-state', 'pending');
+                                 el.phoneInput.readOnly = true;
+                                 el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
+                                 setBtn(el.phoneCta, false);
+                                 S.sending = true;
+                                 showNumberError('slow');
                                } },
     'number/err-format':     { label: 'Too few digits',     run: function () {
                                  base('signup', '82 12');
@@ -3912,6 +3964,7 @@ button { background: none; border: none; color: inherit; }
   var NAV_GROUPS = {
     navHome:    ['home/default', 'home/offline', 'home/maintenance', 'home/maintenance-notime', 'home/update'],
     navNumber:  ['number/empty', 'number/privacy', 'number/partial', 'number/valid', 'number/sending',
+                 'number/sending-slow',
                  'number/err-format', 'number/err-landline', 'number/err-unregistered',
                  'number/err-suspended', 'number/err-fleet',
                  'number/err-rate', 'number/err-nowhatsapp', 'number/err-offline', 'number/err-server',
@@ -4197,7 +4250,7 @@ button { background: none; border: none; color: inherit; }
                    ['home/maintenance','Unavailable'],['home/maintenance-notime','Unavailable, no recovery time'],['home/update','Update required']],
       navNumber:  [['number/empty','Empty'],
                    ['number/privacy','The privacy note, opened'],['number/partial','Part typed'],['number/valid','Valid'],
-                   ['number/sending','Sending'],['number/err-format','Too few digits'],
+                   ['number/sending','Sending'],['number/sending-slow','Sending, slower than expected'],['number/err-format','Too few digits'],
                    ['number/err-landline','Landline entered'],['number/err-unregistered','Not registered'],
                    ['number/err-suspended','Driver paused'],['number/err-fleet','Company inactive'],
                    ['number/err-rate','Rate limited'],['number/err-nowhatsapp','Not on WhatsApp'],
@@ -4447,7 +4500,7 @@ button { background: none; border: none; color: inherit; }
     if (S.sending || d.length === 0 || phoneComplete()) { return; }
     el.phoneField.setAttribute('data-state', 'error');
     el.phoneInput.setAttribute('aria-invalid', 'true');
-    setHelper(el.phoneHelper, 'Enter 9 digits after +27.', 'error');
+    setHelper(el.phoneHelper, 'Enter the full mobile number. Example: 82 123 4567.', 'error');
   });
   el.phoneCta.addEventListener('click', submitPhone);
 
@@ -4895,7 +4948,7 @@ button { background: none; border: none; color: inherit; }
       ], states: [
         [':focus-within', 'border-color: var(--color-primary) plus a 3px var(--color-primary-12) ring'],
         ['[data-state="error"]', 'border-color: var(--color-error-text); background: var(--color-secondary-bg); aria-invalid on the input'],
-        ['[data-state="pending"]', 'opacity .6, input disabled'],
+        ['[data-state="pending"]', 'opacity .85, input disabled'],
         ['note', 'focus is :focus-within on the field, so the ring follows the border rather than the bare input']
       ] },
     { name: '.a-otp-cell', level: 'atom', lines: [
