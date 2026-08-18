@@ -3593,7 +3593,7 @@ body {
           <span class="o-filling__verdict" id="fillingVerdict" hidden></span>
           <p class="o-filling__facts" id="fillingFacts">CA 123-456 · Engen Bryanston · up to 60 L</p>
         </div>
-        <p class="o-filling__note" id="fillingNote">The pump is running. You can put the phone away - we will tell you when it is done.</p>
+        <p class="o-filling__note" id="fillingNote">The pump is running.</p>
         <div class="o-filling__action">
           <button class="a-btn a-btn--primary" type="button" id="fillingCta" hidden>See your points</button>
         </div>
@@ -6765,12 +6765,12 @@ body {
     if (done && partialFill()) { el.fillingVerdict.setAttribute('data-tone', 'partial'); }
     else { el.fillingVerdict.removeAttribute('data-tone'); }
     el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
-    el.fillingNote.hidden = done;
-    /* The note may not claim a pump that has not started. Before the till
-       reads, only the promise is true; after, the pump line joins it. */
-    el.fillingNote.textContent = waiting
-      ? 'You can put the phone away - we will tell you when it is done.'
-      : 'The pump is running. You can put the phone away - we will tell you when it is done.';
+    /* One line of pump truth on the running face only. The waiting face
+       already says who we are waiting for, and the phone-away promise came
+       off at the owner's call - the note may still not claim a pump that
+       has not started. */
+    el.fillingNote.hidden = done || waiting;
+    el.fillingNote.textContent = 'The pump is running.';
     el.fillingCta.hidden = !done;
   }
 
