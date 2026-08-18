@@ -350,6 +350,86 @@ for (const name of FILES) {
 }
 
 
+
+/* ── The shared library gate ─────────────────────────────────────────
+   The files share the atom library by copy, on the promise the copy is
+   verbatim. Tokens got this gate first and stopped drifting; the atoms
+   had only the promise, and it failed at least once - the forced-colors
+   law and the status bar's offline affordance reached one file only.
+   Every rule that styles a manifest block must now be byte-identical
+   across the pair, allowing the divergences that are deliberate and
+   written down here. */
+
+const SHARED_BLOCKS = [
+  'a-btn', 'a-link', 'a-icon-wrap', 'a-handle', 'a-spinner',
+  'a-notch', 'm-notch', 'm-status-bar', 'm-brand-lockup',
+  't-device-frame', 'u-visually-hidden',
+];
+const SHARED_DIVERGENCE = new Set([
+  /* index has the offline states; the net readout and its driver live
+     only there, and onboarding deleted its dead copy on purpose. */
+  '.m-status-bar__net',
+  '[data-net="offline"] .m-status-bar__net',
+  '[data-net="offline"] .m-status-bar__signal',
+]);
+/* Selectors a file may EXTEND with extra rules of its own - the shared
+   base rule is still compared verbatim. Onboarding raises the device
+   chrome above its full-screen overlays; index has no such overlays. */
+const SHARED_EXTENSION = new Set(['.m-notch', '.m-status-bar']);
+
+function sharedRules(name) {
+  const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1]).join('\n')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ');
+  const rules = new Map();
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const body = m[2].trim().replace(/\s+/g, ' ');
+    /* Grouped selectors compare per selector, so one file grouping what
+       the other writes singly is not read as drift. */
+    for (let sel of m[1].split(',')) {
+      sel = sel.trim().replace(/\s+/g, ' ');
+      if (!sel || sel.startsWith('@')) { continue; }
+      /* Library rules only. A screen styling a shared atom inside itself
+         is the screen's own business (the context-override policy), not
+         the library's: every class in the selector must belong to the
+         manifest for the rule to be the library's. Tooling overlays are
+         not the library either. */
+      if (sel.includes('[data-layers') || sel.includes('[class')) { continue; }
+      const classes = [...sel.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((c) => c[1]);
+      if (!classes.length) { continue; }
+      const root = (c) => c.split('__')[0].split('--')[0];
+      if (!classes.every((c) => SHARED_BLOCKS.includes(root(c)))) { continue; }
+      if (!rules.has(sel)) { rules.set(sel, []); }
+      rules.get(sel).push(body);
+    }
+  }
+  return rules;
+}
+{
+  const a = sharedRules(SIGNUP), b = sharedRules(ONBOARD);
+  for (const [sel, bodies] of a) {
+    if (SHARED_DIVERGENCE.has(sel)) { continue; }
+    if (!b.has(sel)) { fail(`shared library: '${sel}' is styled in ${SIGNUP} but not in ${ONBOARD}`); continue; }
+    if (bodies.join('|') !== b.get(sel).join('|')) {
+      const one = bodies, two = b.get(sel);
+      const subset = (x, y) => x.every((v) => y.includes(v));
+      if (SHARED_EXTENSION.has(sel) && (subset(one, two) || subset(two, one))) { continue; }
+      fail(`shared library: '${sel}' drifted between the files`);
+    }
+  }
+  for (const sel of b.keys()) {
+    if (!a.has(sel) && !SHARED_DIVERGENCE.has(sel)) {
+      fail(`shared library: '${sel}' is styled in ${ONBOARD} but not in ${SIGNUP}`);
+    }
+  }
+  /* The high-contrast law must exist on both sides, not one. */
+  for (const name of FILES) {
+    if (!/@media \(forced-colors: active\)/.test(src[name])) {
+      fail(`${name}: no @media (forced-colors: active) block - colour-only states have no restatement`);
+    }
+  }
+}
+
 /* ── The naming gate ─────────────────────────────────────────────────
    Brad Frost's layers and BEM as law rather than review. Every class in
    markup, styles and built strings must be shaped like the system: a
@@ -372,7 +452,7 @@ const STYLED_ONLY = new Set([
   /* The atom library is copied whole between the files, so a variant one
      file has not reached for yet is library, not death. */
   'a-btn--onDark', 'a-link', 'a-link--quiet', 'a-link--flush', 'a-link--onDark',
-  'a-icon-wrap--lg', 'a-handle', 'm-brand-lockup__tag',
+  'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'a-handle', 'm-brand-lockup__tag',
 ]);
 const USED_ONLY = new Set([
   /* the status bar svg keeps its name in both files so the bars read as
@@ -455,4 +535,5 @@ console.log(`    ${ONBOARD}: ${counts[ONBOARD].real} states, all listed by ${SIG
 console.log('    scripts parse, every looked-up id exists, no duplicate ids');
 console.log(`    ${counts.tokens} product tokens, identical in both files`);
 console.log('    the words stay plain');
-console.log('    every class is shaped like the system, no dead names, tokens in their families\n');
+console.log('    every class is shaped like the system, no dead names, tokens in their families');
+console.log('    the shared library is verbatim in both files, and both restate colour-only states\n');

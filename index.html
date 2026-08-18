@@ -378,6 +378,13 @@ button { background: none; border: none; color: inherit; }
   font-weight: 600;
 }
 .a-btn--outline:hover { background: var(--color-border-light); }
+/* State is never a class: when a person becomes the last resort the scan
+   sheet says so with data-lead, and the fact wears the primary coat. */
+.a-btn--outline[data-lead="true"] {
+  background: var(--gradient-primary); border-color: transparent;
+  color: var(--color-text-on-dark); font-weight: 700;
+  box-shadow: var(--shadow-btn);
+}
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
 /* Disabled is driven by the real attribute as well as the ARIA one, so the
    control is honestly inactive rather than merely greyed. */
@@ -528,6 +535,11 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-primary-bg); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+/* Library carry from the app file: the dark-surface plate. */
+.a-icon-wrap--onDark {
+  background: var(--color-accent-on-dark-fill);
+  border-color: var(--color-accent-on-dark-line);
+}
 /* The mark on a screen that stops someone.
 
    A driver who cannot get in is not reading a field label, they are working out

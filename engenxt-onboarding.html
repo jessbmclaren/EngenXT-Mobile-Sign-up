@@ -436,6 +436,41 @@ body {
   background: var(--color-primary-bg); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+/* The mark on a screen that stops someone.
+
+   A driver who cannot get in is not reading a field label, they are working out
+   whether this is their problem or their manager's, and the answer wants to be
+   legible from arm's length before a word is read. The tinted disc did that job
+   at the size of a list icon, on a panel with half a screen of air above it.
+
+   It is given presence rather than a picture. An illustration per state would
+   mean eight of them to draw, keep on brand and ship to drivers who are signing
+   up precisely because their data is expensive, and it would drift from the
+   system the moment a tone was added. A halo of the tone's own light costs
+   nothing, themes itself and says the same thing. It replaced two hairline
+   rings that did this job first: at phone scale the rings rendered as pencil
+   scratches, and concentric circles around a warning draw a target around
+   bad news. Light carries presence without aiming at it. */
+.a-icon-wrap--mark {
+  width: 88px; height: 88px;
+  position: relative;
+}
+.a-icon-wrap--mark::before {
+  content: ''; position: absolute; inset: -34px;
+  border-radius: var(--radius-circle);
+  background: radial-gradient(closest-side, currentColor, transparent 74%);
+  opacity: 0.20; pointer-events: none;
+}
+.a-icon-wrap--mark svg { width: 38px; height: 38px; }
+/* The halo takes the tone's own colour, so a paused account glows amber and a
+   dead end glows red without a second set of rules. */
+.a-icon-wrap--mark[data-tone="error"]   { color: var(--color-secondary); }
+.a-icon-wrap--mark[data-tone="warning"] { color: var(--color-warning); }
+.a-icon-wrap--mark[data-tone="success"] { color: var(--color-success); }
+/* An offer is not an outcome. The biometrics ask rings in the brand's own
+   blue, because nothing has gone right or wrong yet - a question is being
+   asked. */
+.a-icon-wrap--mark[data-tone="info"]    { color: var(--color-primary); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
 .a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
 .a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
@@ -3049,6 +3084,26 @@ body {
 }
 /* Only the hover differs now that the atom itself is on a light surface. */
 .m-confirm .a-quiet-link:hover { color: var(--color-error-text); }
+
+/* High contrast. Under forced colors the system replaces every colour, so
+   any state signalled by colour alone disappears. Signup wrote this law
+   first; these are this file's colour-only states restated in geometry.
+   If you add a state that is only a background or a border colour, add its
+   forced-colors treatment in the same commit. */
+@media (forced-colors: active) {
+  .a-btn[aria-disabled="true"], .a-btn:disabled { opacity: .5; }
+  /* The active tab was a colour and a weight; the weight survives, the
+     underline restates the colour. */
+  .o-tab-bar__tab[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; }
+  /* The torch's on state was an inversion. */
+  .a-icon-btn[aria-pressed="true"] { outline: 2px solid; outline-offset: 2px; }
+  /* The chosen pin was brand red and a shadow; the scale survives, the
+     outline restates the choice. */
+  .a-pin[aria-pressed="true"] { outline: 2px solid; outline-offset: 2px; }
+  /* Sent and short bundles keep their words; the pressable one was told
+     apart by a filled pill, so the row states it with a border. */
+  .m-bundle[data-state="can"] { border-width: 2px; }
+}
 
 
 
