@@ -14,7 +14,8 @@
    celebration that also asks for something is neither.
 
    Atomic design levels as prefixes, BEM for structure, data-* attributes for
-   runtime state. State is never a class.
+   runtime state. State is never a class. Block names are kebab-case;
+   multi-word element and modifier names are camelCase (__balanceCard).
 
      tokens     CSS custom properties    --color-primary
      atoms      a-                       a-btn, a-medal, a-confetti
@@ -41,7 +42,7 @@
   /* Brand */
   --color-primary:       #1650B8;
   --color-primary-dark:  #0D3A8A;
-  --color-primary-light: #EEF3FF;
+  --color-primary-bg: #EEF3FF;
   --color-primary-06: rgba(22,80,184,0.06);
   --color-primary-08: rgba(22,80,184,0.08);
   --color-primary-12: rgba(22,80,184,0.12);
@@ -75,7 +76,7 @@
   --color-success-20: rgba(22,104,50,0.20);
   --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
-  --color-warning-border: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
+  --color-warning-25: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
   --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
   /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
      the logo, so it must not be darkened to satisfy a text contrast rule. */
@@ -108,7 +109,7 @@
      goes muddy on navy, so this is its on-dark twin. It is the same hue the
      star carries wherever points are shown. */
   --color-points-on-dark:      #FFB454;
-  --color-points-on-dark-35:   rgba(255,180,84,0.35);
+  --color-points-on-dark-glow:   rgba(255,180,84,0.35);
   --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
@@ -135,6 +136,12 @@
   --color-hero-1: #0a1628;
   --color-hero-2: #0d2040;
   --color-hero-3: #0a1830;
+  /* The scan screen's own dark: one step off the hero, so drawn camera
+     footage does not read as the marketing sky. Ordinals mark gradient
+     stops, top to base - the one numeric suffix that is not an alpha
+     percentage; --color-hero-* reads the same way. */
+  --color-scan-1: #0B1220;
+  --color-scan-2: #16203A;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 
@@ -158,6 +165,8 @@
   --kb-on-accent:  #FFFFFF;
 
   /* Type */
+  /* --font-* is a sanctioned family beside --color-/--sp-/--text-*: the
+     faces; --text-* stays the size ramp. */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono: "SF Mono","Menlo",monospace;
   /* Between the title and the hero. A greeting set light at this size reads
@@ -166,7 +175,7 @@
   --text-display:  30px;
   --text-hero:     42px;
   --text-title:    22px;
-  --text-large:    20px;
+  --text-lead:    20px;
   --text-heading:  18px;
   --text-subhead:  17px;
   --text-callout:  16px;
@@ -189,7 +198,7 @@
 
   /* Elevation. One light source, from above. */
   --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
-  --shadow-sheet:     inset 0 var(--hairline) 0 rgba(255,255,255,0.65),
+  --shadow-sheet:     inset 0 var(--size-hairline) 0 rgba(255,255,255,0.65),
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
   --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
   --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
@@ -209,7 +218,7 @@
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
-  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px; --sp-12: 48px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
 
   /* Hardware. The status bar keeps its own height token because layout has to
      stop short of it, and the notch and time are drawn against the same value. */
@@ -220,7 +229,7 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
-  --hairline:      0.5px;
+  --size-hairline:      0.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
@@ -278,6 +287,8 @@
   --ease-spring:   cubic-bezier(.34,1.4,.64,1);
   --dur-fast:  0.12s;
   --dur-base:  0.30s;
+  /* A named motion role, kept deliberately: sheet travel is a distance,
+     not a speed, and every sheet must move alike. */
   --dur-sheet: 0.38s;
   --dur-slow:  0.42s;
 }
@@ -292,7 +303,7 @@
 [data-text="large"] {
   --text-hero:     46px;
   --text-title:    24px;
-  --text-large:    22px;
+  --text-lead:    22px;
   --text-heading:  20px;
   --text-subhead:  19px;
   --text-callout:  18px;
@@ -378,6 +389,13 @@ body {
   font-weight: 600;
 }
 .a-btn--outline:hover { background: var(--color-border-light); }
+/* State is never a class: when a person becomes the last resort the scan
+   sheet says so with data-lead, and the fact wears the primary coat. */
+.a-btn--outline[data-lead="true"] {
+  background: var(--gradient-primary); border-color: transparent;
+  color: var(--color-text-on-dark); font-weight: 700;
+  box-shadow: var(--shadow-btn);
+}
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
 .a-btn[aria-disabled="true"], .a-btn:disabled {
   background: var(--color-surface-sunken); color: var(--color-text-tertiary);
@@ -407,7 +425,7 @@ body {
   /* A fill, not an outline. The tone tints already separate the plate from the
      surface, and the ring on top of them read as a border on the icon rather
      than as a plate behind it. */
-  background: var(--color-primary-light); border: none;
+  background: var(--color-primary-bg); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
@@ -454,10 +472,6 @@ body {
 .m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
-.m-status-bar__net {
-  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
-  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
-}
 /* d-demoHint. Prototype scaffolding, the developer prefix says it never
    ships. The one on the QR screen exists because a reviewer kept waiting for
    a till that is not there. */
@@ -613,12 +627,12 @@ body {
 .d-row__radius {
   width: 44px; height: 34px; flex-shrink: 0;
   border: 2px solid var(--color-primary); border-right: none; border-bottom: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-bg);
 }
 .d-copyBtn {
   padding: 5px 10px; border-radius: var(--radius-chip); cursor: pointer;
   font-size: var(--text-nano); font-weight: 700;
-  background: var(--color-primary-light); color: var(--color-primary-dark);
+  background: var(--color-primary-bg); color: var(--color-primary-dark);
 }
 .d-copyBtn:hover { background: var(--d-copy-hover); }
 .d-check {
@@ -709,7 +723,7 @@ body {
 }
 /* The bolt sits above the number rather than beside it, so the column reads
    top to bottom as symbol, amount, unit. */
-.a-medal__bolt { font-size: var(--text-large); line-height: 1; margin-bottom: var(--sp-1); }
+.a-medal__bolt { font-size: var(--text-lead); line-height: 1; margin-bottom: var(--sp-1); }
 
 /* a-meter. A track and a fill. It cannot be broken down further without
    ceasing to say "this far along", so it is an atom. */
@@ -736,7 +750,7 @@ body {
               var(--color-tertiary) 100%);
   background-size: var(--meter-span, 100%) 100%;
   background-repeat: no-repeat;
-  box-shadow: 0 0 10px var(--color-points-on-dark-35);
+  box-shadow: 0 0 10px var(--color-points-on-dark-glow);
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -892,11 +906,11 @@ body {
   display: flex; flex-direction: column; gap: var(--sp-2h);
 }
 
-/* m-glass-panel. A group of related things on one pane of glass, with the
+/* o-home__panel. A group of related things on one pane of glass, with the
    thing you act on nested inside it rather than beside it. The nesting is the
    point: the picker and the vehicle it produces are one object, and stacking
    them as two cards said they were two. */
-.m-glass-panel {
+.o-home__panel {
   padding: var(--sp-4);
   border-radius: var(--radius-sheet);
   background: var(--glass-panel-bg);
@@ -909,7 +923,7 @@ body {
 /* No backdrop-filter, no glass: fall back to a solid surface rather than to a
    translucent panel over a gradient, which is where text goes unreadable. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .m-glass-panel { background: var(--color-surface); }
+  .o-home__panel { background: var(--color-surface); }
 }
 
 /* m-app-bar. The mark, the name and the two things reachable from anywhere. */
@@ -1035,7 +1049,7 @@ body {
   width: 26px; height: 26px;
   display: grid; place-items: center;
   border-radius: var(--radius-circle);
-  background: var(--color-success); color: #FFFFFF;
+  background: var(--color-success); color: var(--color-text-on-dark);
 }
 .m-linked__body { display: flex; flex-direction: column; gap: 2px; }
 .m-linked__title {
@@ -1117,14 +1131,11 @@ body {
   list-style: none; margin: 0; padding: 0;
   display: flex; flex-wrap: wrap; gap: var(--sp-1h);
 }
-.m-vehicle-picker__empty {
+/* o-stations__empty. The stations sheet's own empty note - it borrowed the
+   picker's element name before, with no picker ancestor in sight. */
+.o-stations__empty {
   font-size: var(--text-caption); color: var(--color-text-secondary);
   padding-block: var(--sp-2);
-}
-/* Quieter than the empty state, because it reports rather than interrupts:
-   the row is working, it just does not end where the fleet does. */
-.m-vehicle-picker__note {
-  font-size: var(--text-caption2); color: var(--color-text-tertiary);
 }
 
 /* a-vehicle-chip. A registration, listed.
@@ -1186,13 +1197,13 @@ body {
   font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
   white-space: nowrap;
 }
-/* a-search. A field that filters what is under it. */
-.a-search { position: relative; display: flex; align-items: center; }
-.a-search__icon {
+/* m-search. A field that filters what is under it. */
+.m-search { position: relative; display: flex; align-items: center; }
+.m-search__icon {
   position: absolute; left: var(--sp-3); display: flex;
   color: var(--color-text-tertiary); pointer-events: none;
 }
-.a-search__input {
+.m-search__input {
   width: 100%; min-height: var(--size-target);
   padding: var(--sp-2) var(--sp-3) var(--sp-2) calc(var(--sp-3) * 2 + 18px);
   border-radius: var(--radius-pill);
@@ -1201,11 +1212,11 @@ body {
   font-size: var(--text-caption); color: var(--color-text-primary);
   font-family: inherit;
 }
-.a-search__input::placeholder { color: var(--color-text-tertiary); }
+.m-search__input::placeholder { color: var(--color-text-tertiary); }
 /* Same rule as every other control that draws its own edge: focus lands on the
    border, with one concentric halo, instead of a detached ring sitting outside
    a border the field already has. */
-.a-search__input:focus-visible {
+.m-search__input:focus-visible {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-12);
@@ -1239,7 +1250,7 @@ body {
 }
 .m-vehicle-card__plate {
   margin-top: 2px;
-  font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px;
   color: var(--color-text-primary);
 }
 .m-vehicle-card__model {
@@ -1256,7 +1267,7 @@ body {
 .m-vehicle-card__art {
   flex-shrink: 0; width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius-card-sm); background: var(--color-primary-light);
+  border-radius: var(--radius-card-sm); background: var(--color-primary-bg);
   color: var(--color-primary);
 }
 /* What choosing this vehicle actually decides. The card named a vehicle and
@@ -1567,7 +1578,7 @@ body {
   width: 56px; height: 56px; flex-shrink: 0;
   display: grid; place-items: center;
   border-radius: var(--radius-card);
-  background: var(--color-primary-light); color: var(--color-primary);
+  background: var(--color-primary-bg); color: var(--color-primary);
 }
 .o-step__title {
   font-size: var(--text-display); font-weight: 300; line-height: 1.18;
@@ -1582,7 +1593,7 @@ body {
 .o-step__field {
   width: 100%; min-height: var(--size-control);
   padding: 0 var(--sp-4);
-  font: inherit; font-size: var(--text-large); font-weight: 700;
+  font: inherit; font-size: var(--text-lead); font-weight: 700;
   font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
   color: var(--color-text-primary);
   background: var(--color-surface); border: 1.5px solid var(--color-border-field);
@@ -1622,7 +1633,7 @@ body {
 .o-scan {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
-  background: #0B1220; color: var(--color-text-on-dark);
+  background: var(--color-scan-1); color: var(--color-text-on-dark);
 }
 .o-scan[data-state="visible"] { display: flex; }
 /* What the lens sees. Drawn, not filmed. */
@@ -1631,7 +1642,7 @@ body {
   content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(60% 40% at 50% 38%, rgba(255,255,255,0.10) 0%, transparent 70%),
-    linear-gradient(180deg, #16203A 0%, #0B1220 70%);
+    linear-gradient(180deg, var(--color-scan-2) 0%, var(--color-scan-1) 70%);
 }
 .o-scan > * { position: relative; z-index: var(--z-content); }
 .o-scan__bar {
@@ -1639,11 +1650,11 @@ body {
   padding: calc(var(--size-status-bar) + var(--sp-2)) var(--sp-4) var(--sp-2);
 }
 .o-scan__bar .a-icon-btn { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
-.o-scan__bar .a-icon-btn:hover { background: rgba(255,255,255,0.18); }
+.o-scan__bar .a-icon-btn:hover { background: var(--color-on-dark-line); }  /* the line alpha, used as a lift */
 /* A torch you cannot tell is on is a torch you press twice. Only aria-pressed
    changed before, which is a state for a screen reader and nobody else. */
 .o-scan__bar .a-icon-btn[aria-pressed="true"] {
-  background: var(--color-text-on-dark); color: #0B1220;
+  background: var(--color-text-on-dark); color: var(--color-scan-1);
 }
 .o-scan__spacer { flex: 1 1 auto; }
 
@@ -1754,7 +1765,7 @@ body {
    affordances of a button, so nobody taps it expecting to have answered. */
 .m-vehicle-opt[data-static="true"] { cursor: default; border-style: solid; }
 .m-vehicle-opt[data-static="true"] .m-vehicle-opt__tick { display: none; }
-.m-vehicle-opt[data-done="true"] { border-color: var(--color-primary); background: var(--color-primary-light); }
+.m-vehicle-opt[data-done="true"] { border-color: var(--color-primary); background: var(--color-primary-bg); }
 .m-vehicle-opt[data-done="true"] .m-vehicle-opt__art { background: var(--color-primary); color: var(--color-text-on-dark); }
 .m-vehicle-opt[data-done="true"] .m-vehicle-opt__tick { display: grid; }
 /* Secondary, not tertiary. Tertiary is 4.19:1 on the page grey this label sits
@@ -1774,7 +1785,7 @@ body {
               background var(--dur-fast) var(--ease-out);
 }
 .m-vehicle-opt[aria-checked="true"] {
-  border-color: var(--color-primary); background: var(--color-primary-light);
+  border-color: var(--color-primary); background: var(--color-primary-bg);
 }
 .m-vehicle-opt__art {
   flex-shrink: 0; width: 44px; height: 44px;
@@ -1787,7 +1798,7 @@ body {
 }
 .m-vehicle-opt__body { flex: 1 1 auto; min-width: 0; }
 .m-vehicle-opt__plate {
-  display: block; font-size: var(--text-large); font-weight: 800;
+  display: block; font-size: var(--text-lead); font-weight: 800;
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 .m-vehicle-opt__model {
@@ -1919,11 +1930,11 @@ body {
   flex-shrink: 0; width: 44px; height: 44px;
   display: grid; place-items: center;
   border-radius: var(--radius-card-sm);
-  background: var(--color-primary-light); color: var(--color-primary);
+  background: var(--color-primary-bg); color: var(--color-primary);
 }
 .m-station-head__body { flex: 1 1 auto; min-width: 0; }
 .m-station-head__name {
-  display: block; font-size: var(--text-large); font-weight: 800;
+  display: block; font-size: var(--text-lead); font-weight: 800;
   letter-spacing: -0.4px; color: var(--color-text-primary);
 }
 /* Focused by script so the sheet is announced, which is not the same as a
@@ -2165,7 +2176,7 @@ body {
   flex-shrink: 0; width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm);
-  background: var(--color-primary-light); color: var(--color-primary);
+  background: var(--color-primary-bg); color: var(--color-primary);
 }
 .m-station[aria-checked="true"] .m-station__art {
   background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
@@ -2208,7 +2219,9 @@ body {
 .m-station[data-allowed="false"] .m-station__name,
 .m-station[data-allowed="false"] .m-station__km { color: var(--color-text-secondary); }
 
-/* a-skeleton. The shape of something that has not arrived.
+/* The loading face. The shape of something that has not arrived - a
+   skeleton - keyed off data-loading, because state is never a class here,
+   and which blocks are loading is state.
 
    Between the code being accepted and home being usable, the app really does
    have to fetch who the driver is, which vehicles their manager assigned, the
@@ -2219,14 +2232,14 @@ body {
 
    Only the blocks that genuinely wait get one. A skeleton over something that
    was never loading is a lie about latency. */
-.a-skeleton {
+[data-loading="true"] {
   position: relative; overflow: hidden;
   background: var(--color-surface-sunken);
   border-radius: var(--radius-pill);
   color: transparent !important;
 }
-.a-skeleton * { visibility: hidden; }
-.a-skeleton::after {
+[data-loading="true"] * { visibility: hidden; }
+[data-loading="true"]::after {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent 0%,
               rgba(255,255,255,0.55) 50%, transparent 100%);
@@ -2236,8 +2249,8 @@ body {
 @keyframes skeletonSweep { to { transform: translateX(100%); } }
 /* Still, not absent. The block keeps its shape so the layout is honest, and
    the sweep stops, because the sweep is the part that moves. */
-[data-motion="reduced"] .a-skeleton::after,
-.a-skeleton[data-still="true"]::after { animation: none; opacity: 0; }
+[data-motion="reduced"] [data-loading="true"]::after,
+[data-loading="true"][data-still="true"]::after { animation: none; opacity: 0; }
 
 /* m-list-row. A destination on one line: icon, what it is, where it goes.
    For the things that deserve a place on home without deserving the action. */
@@ -2296,7 +2309,7 @@ body {
   transition: background var(--dur-base) var(--ease-out);
 }
 .o-tab-bar__tab[aria-current="page"] { color: var(--color-primary); font-weight: 700; }
-.o-tab-bar__tab[aria-current="page"] .o-tab-bar__icon { background: var(--color-primary-light); }
+.o-tab-bar__tab[aria-current="page"] .o-tab-bar__icon { background: var(--color-primary-bg); }
 
 /* o-onboard. A full screen of its own, because the sign-up sheet has finished
    its job and a sheet over a hero would say the flow is still in progress. */
@@ -2696,7 +2709,7 @@ body {
 .m-fuel-figures__cell:nth-child(2) { align-items: center; text-align: center; }
 .m-fuel-figures__cell:last-child   { align-items: flex-end; text-align: right; }
 .m-fuel-figures__value {
-  font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px;
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 .m-fuel-figures__label {
@@ -2714,8 +2727,11 @@ body {
   overflow-y: auto; overscroll-behavior: contain;
 }
 .o-receipt[data-state="visible"] { display: flex; }
-.o-receipt__title { font-size: var(--text-large); font-weight: 800; letter-spacing: -0.4px; }
-.o-receipt__title:focus, .o-receipt__title:focus-visible { outline: none; box-shadow: none; }
+/* a-screen-title. One title for every filed screen: the receipt, History,
+   Account, Rewards. It left o-receipt when three other organisms borrowed
+   the element - an element may not outlive its block's ancestry. */
+.a-screen-title { font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px; }
+.a-screen-title:focus, .a-screen-title:focus-visible { outline: none; box-shadow: none; }
 .o-receipt__when { margin-top: var(--sp-1); font-size: var(--text-caption); color: var(--color-text-secondary); }
 /* The card reads like the till slip it stands in for: one fact per row, the
    figures on the right in tabular numerals so they stack into a column a
@@ -2763,7 +2779,7 @@ body {
 .a-switch[aria-checked="true"] { background: var(--color-primary); }
 .a-switch__knob {
   display: block; width: 28px; height: 28px;
-  border-radius: var(--radius-circle); background: #fff;
+  border-radius: var(--radius-circle); background: var(--color-surface);
   box-shadow: var(--shadow-knob);
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
@@ -2828,7 +2844,7 @@ body {
   border-radius: var(--radius-card);
   background:
     radial-gradient(95% 110% at 88% -10%, var(--color-accent-on-dark-fill) 0%, transparent 62%),
-    radial-gradient(55% 70% at 8% 108%, var(--color-points-on-dark-35) 0%, transparent 58%),
+    radial-gradient(55% 70% at 8% 108%, var(--color-points-on-dark-glow) 0%, transparent 58%),
     var(--gradient-hero);
   box-shadow: var(--shadow-card-sm);
 }
@@ -2972,7 +2988,7 @@ body {
    as a black brick. The waiting face speaks instead: the sentence takes the
    stage at title weight, the pulse carries the life. */
 .o-filling[data-face="waiting"] .o-filling__unit {
-  font-size: var(--text-large); font-weight: 800; color: var(--color-text-primary);
+  font-size: var(--text-lead); font-weight: 800; color: var(--color-text-primary);
   letter-spacing: -0.4px;
 }
 /* The verdict is its own line, not a clause spliced into the unit. */
@@ -2999,7 +3015,9 @@ body {
   mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)));
 }
-.o-history__bar { display: flex; margin-bottom: var(--sp-2); }
+/* m-screen-bar. The back-button shelf the filed screens share; a molecule,
+   because o-history could not honestly chrome Account and Rewards. */
+.m-screen-bar { display: flex; margin-bottom: var(--sp-2); }
 /* Each filed slip is the receipt's own card, smaller: the driver already
    learned to read it once, on the screen that filed it. */
 .o-history__when {
@@ -3069,13 +3087,6 @@ body {
 /* Only the hover differs now that the atom itself is on a light surface. */
 .m-confirm .a-quiet-link:hover { color: var(--color-error-text); }
 
-@media (max-width: 900px) {
-  /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
-  .d-flyout {
-    left: var(--sp-4); right: var(--sp-4); width: auto;
-    bottom: var(--sp-4); top: auto; max-height: 60vh;
-  }
-}
 
 
 /* ── The sidebar, two panes on one surface ────────────────────────────
@@ -3172,9 +3183,8 @@ body {
 
 /* The one thing on screen. It gets the only strong colour in the menu. */
 .d-stateNav__item[aria-current="true"] {
-  background: var(--color-primary-light); color: var(--color-primary-dark); font-weight: 700;
+  background: var(--color-primary-bg); color: var(--color-primary-dark); font-weight: 700;
 }
-.d-stateNav__item--link { color: var(--color-primary-dark); font-weight: 700; }
 
 /* The right pane's own heading and lead, which say what the section is for
    rather than only listing what is in it. */
@@ -3237,6 +3247,14 @@ body {
 /* Left aligned, not centred. The sidebar is the thing you reach for most, so
    it sits where the pointer already is rather than drifting with the width of
    the window. */
+/* p-onboard-demo__rail. Everything that reads out about the device, stacked
+   beside it and sticky, so the eye never leaves the phone to find the
+   answer. Mirrors index.html's rail. */
+.p-onboard-demo__rail {
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  align-self: flex-start; position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - var(--sp-8) * 2);
+}
 .p-onboard-demo {
   min-height: 100vh;
   display: flex; align-items: flex-start; justify-content: flex-start;
@@ -3255,6 +3273,8 @@ body {
 }
 @media (max-width: 900px) {
   .p-onboard-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
+  /* One column, so the rail stops being a rail and stacks under the device. */
+  .p-onboard-demo__rail { position: static; max-height: none; width: 100%; align-items: center; }
   .d-stateNav { position: static; width: 100%; max-width: 390px; max-height: none; }
 }
 @media (max-width: 440px) {
@@ -3457,7 +3477,7 @@ body {
            only then what it paid. It stays until Done because a receipt that
            walks away is not a receipt. -->
       <section class="o-receipt" id="receiptScreen" aria-labelledby="receiptTitle" hidden>
-        <h1 class="o-receipt__title" id="receiptTitle" tabindex="-1">Receipt</h1>
+        <h1 class="a-screen-title" id="receiptTitle" tabindex="-1">Receipt</h1>
         <p class="o-receipt__when" id="receiptWhen">Today · 9:41</p>
         <div class="o-receipt__card">
           <div class="o-receipt__row">
@@ -3500,10 +3520,10 @@ body {
            a receipt, and the person who asks for it is usually not the
            driver - it is the manager, a week later. -->
       <section class="o-history" id="historyScreen" aria-labelledby="historyTitle" hidden>
-        <div class="o-history__bar">
+        <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
         </div>
-        <h1 class="o-receipt__title" id="historyTitle" tabindex="-1">History</h1>
+        <h1 class="a-screen-title" id="historyTitle" tabindex="-1">History</h1>
         <div id="historyList"></div>
         <div class="m-empty-note m-empty-note--history" id="historyEmpty">
           <p class="m-empty-note__text">No fills yet. Receipts from your fills are kept here.</p>
@@ -3515,10 +3535,10 @@ body {
            disprove in two taps is worse than no promise. Everything here is
            the driver's own facts and the one setting that is theirs. -->
       <section class="o-account" id="accountScreen" aria-labelledby="accountTitle" hidden>
-        <div class="o-history__bar">
+        <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="accountBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
         </div>
-        <h1 class="o-receipt__title" id="accountTitle" tabindex="-1">Account</h1>
+        <h1 class="a-screen-title" id="accountTitle" tabindex="-1">Account</h1>
 
         <div class="o-account__row">
           <span class="o-account__rowBody">
@@ -3558,10 +3578,10 @@ body {
            The balance wears the hero's light: this is the room the app's
            promise is kept in, so the number is lit like the prize it is. -->
       <section class="o-rewards" id="rewardsScreen" aria-labelledby="rewardsTitle" hidden>
-        <div class="o-history__bar">
+        <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="rewardsBack" aria-label="Back to home"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button>
         </div>
-        <h1 class="o-receipt__title" id="rewardsTitle" tabindex="-1">Rewards</h1>
+        <h1 class="a-screen-title" id="rewardsTitle" tabindex="-1">Rewards</h1>
         <div class="o-rewards__balanceCard">
           <span class="o-rewards__bolt" aria-hidden="true">⚡</span>
           <span class="o-rewards__balanceLabel">Your balance</span>
@@ -3587,7 +3607,7 @@ body {
                size. Once litres flow, the counting number is the loader and
                the pulse takes over. -->
           <span class="o-filling__spin" id="fillingSpin" aria-hidden="true" hidden><svg class="a-spinner" width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12.5" stroke="var(--color-border)" stroke-width="3"/><path d="M17 4.5a12.5 12.5 0 0 1 12.5 12.5" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round"/></svg></span>
-          <span class="o-filling__vessel" id="fillingVessel" aria-hidden="true" hidden><svg width="84" height="84" viewBox="0 0 24 24" fill="none"><defs><clipPath id="fillingDropClip"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z"/></clipPath></defs><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" fill="var(--color-primary-light)"/><g clip-path="url(#fillingDropClip)"><g class="o-filling__liquid"><path class="o-filling__wave o-filling__wave--back" d="M-24 -1.4q3 1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary-dark)" opacity="0.35"/><path class="o-filling__wave" d="M-24 0q3 -1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary)"/></g></g></svg></span>
+          <span class="o-filling__vessel" id="fillingVessel" aria-hidden="true" hidden><svg width="84" height="84" viewBox="0 0 24 24" fill="none"><defs><clipPath id="fillingDropClip"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z"/></clipPath></defs><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" fill="var(--color-primary-bg)"/><g clip-path="url(#fillingDropClip)"><g class="o-filling__liquid"><path class="o-filling__wave o-filling__wave--back" d="M-24 -1.4q3 1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary-dark)" opacity="0.35"/><path class="o-filling__wave" d="M-24 0q3 -1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary)"/></g></g></svg></span>
           <span class="o-filling__litres" id="fillingLitres" role="status">31.4</span>
           <span class="o-filling__unit" id="fillingUnit">litres so far</span>
           <span class="o-filling__verdict" id="fillingVerdict" hidden></span>
@@ -3670,7 +3690,7 @@ body {
 
           <!-- The picker and the vehicle it produces are one object, so they
                sit on one pane of glass with the card nested inside it. -->
-          <div class="m-glass-panel" id="homePanel">
+          <div class="o-home__panel" id="homePanel">
 
           <!-- Which vehicle is being driven today. Hidden entirely when there
                is only one, because a choice of one is not a choice.
@@ -3743,7 +3763,7 @@ body {
             </span>
           </button>
 
-          </div><!-- /m-glass-panel -->
+          </div><!-- /o-home__panel -->
 
           <!-- Every returning sign-in lands here, so this is an ordinary screen
                and not an edge case. It says what is true and offers the one
@@ -3981,14 +4001,14 @@ body {
 
           <h1 class="u-visually-hidden" id="stationsTitle">Choose a station</h1>
           <div class="o-stations__browse" id="stationBrowse">
-          <label class="a-search">
+          <label class="m-search">
             <span class="u-visually-hidden">Search stations</span>
-            <span class="a-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
-            <input class="a-search__input" id="stationSearch" type="search"
+            <span class="m-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
+            <input class="m-search__input" id="stationSearch" type="search"
                    placeholder="Search suburb or station" autocomplete="off">
           </label>
           <div class="o-stations__list" id="stationList" role="radiogroup" aria-labelledby="stationsTitle"></div>
-          <p class="m-vehicle-picker__empty" id="stationEmpty" hidden>No station matches that.</p>
+          <p class="o-stations__empty" id="stationEmpty" hidden>No station matches that.</p>
           <span class="u-visually-hidden" id="stationStatus" role="status"></span>
           </div><!-- /o-stations__browse -->
         </div>
@@ -4620,7 +4640,7 @@ body {
      white clock stayed, at 1:1 on the white check screens. Eleven of the
      forty-nine states rendered a status bar you could not see. Every screen
      now says which it is, so no screen depends on the one before it. */
-  function statusTone(dark) {
+  function setStatusTone(dark) {
     if (dark) { el.statusBar.setAttribute('data-tone', 'onDark'); }
     else { el.statusBar.removeAttribute('data-tone'); }
   }
@@ -4628,7 +4648,7 @@ body {
   function showReward() {
     clearTimers(); hideAll();
     S.step = 'signup-reward';
-    statusTone(true);
+    setStatusTone(true);
     el.reward.hidden = false;
     el.reward.setAttribute('data-state', 'visible');
     announce('You are signed up. You earned ' + rewardTotal() + ' points.');
@@ -5000,7 +5020,7 @@ body {
   function showHome(arriving, linked) {
     clearTimers(); hideAll();
     S.step = 'home';
-    statusTone(false);
+    setStatusTone(false);
     var points = balancePts();
     el.homePoints.textContent = groupNum(points) + ' pts';
     /* The figure and its worth are one thought and sit as one block: a count
@@ -5116,8 +5136,8 @@ body {
     LOADS.forEach(function (id) {
       var node = document.getElementById(id);
       if (!node || node.hidden) { return; }
-      if (on) { node.classList.add('a-skeleton'); }
-      else { node.classList.remove('a-skeleton'); }
+      if (on) { node.setAttribute('data-loading', 'true'); }
+      else { node.removeAttribute('data-loading'); }
     });
   }
 
@@ -5247,10 +5267,10 @@ body {
         el.homeLive.setAttribute('data-phase', 'done');
 
         barCta.textContent = 'See points';
-        barTitle.textContent = partialFill() ? 'Fill stopped early' : 'Fill complete';
+        barTitle.textContent = fillPartial() ? 'Fill stopped early' : 'Fill complete';
         el.homeLiveSub.textContent = plate + ' · ' + fillLitresFinal() + ' L';
         el.homeLive.setAttribute('aria-label',
-          (partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+          (fillPartial() ? 'Fill stopped early. ' : 'Fill complete. ') +
           fillLitresFinal() + ' litres on ' + plate + '. See your points.');
       }
     }
@@ -5454,8 +5474,10 @@ body {
         host.innerHTML =
           '<p class="o-step__label">You can use these</p>' +
           (whole
-            ? '<ul class="m-vehicle-picker__row" role="list">' +
-              list.map(vehicleChip).join('') + '</ul>'
+            /* The row rides inside its own block, so the element's block
+               is always its ancestor - BEM kept honest in built markup. */
+            ? '<div class="m-vehicle-picker"><ul class="m-vehicle-picker__row" role="list">' +
+              list.map(vehicleChip).join('') + '</ul></div>'
             : '<p class="o-step__note">' + groupNum(list.length) +
               ' vehicles are assigned to you.</p>') +
           '<p class="o-step__note">Scan whichever one you are standing at.</p>';
@@ -5723,15 +5745,14 @@ body {
        nothing left the driver can do for themselves: a permission this screen
        cannot grant, or a vehicle that has now failed to read four times over.
        Not the network, and not a camera that will very likely come back. */
-    el.scanType.className = ((struggling && hardFail) || spent)
-      ? 'a-btn a-btn--primary' : 'a-btn a-btn--outline';
+    el.scanType.setAttribute('data-lead', String((struggling && hardFail) || spent));
     el.scanType.textContent = 'Ask your manager';
   }
 
   /* The read landing. Auto capture, so the driver is not holding a phone at a
      van hunting for a shutter button, and the result is a screen rather than a
      silent return: something was proved and the driver should see what. */
-  function scanSucceeded() {
+  function onScanSucceeded() {
     confirmByScan(readDisc());
     hideScan();
     hideStep();
@@ -5754,7 +5775,7 @@ body {
      sitting at. The app itself never passes it: in the flow the camera decides. */
   function showScan(face, kind) {
     clearTimers(); hideAll();
-    statusTone(true);            /* the camera fills the screen */
+    setStatusTone(true);            /* the camera fills the screen */
     S.step = 'scan';
     S.scanFace = face || 'ready';
     /* Whatever it caught last time is not what it is looking at now. A stale
@@ -5814,7 +5835,7 @@ body {
          reliably catch. */
       after(prefersReduced() ? 0 : 1100, function () {
         if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
-        scanSucceeded();
+        onScanSucceeded();
       });
     });
   }
@@ -5823,7 +5844,7 @@ body {
     var def = STEPS[key];
     if (!def) { return; }
     clearTimers(); hideAll();
-    statusTone(false);
+    setStatusTone(false);
     S.step = 'step:' + key;
     /* Published so the layout can respond: the identity step wears the
        ceremony face, the tasks keep the task voice. */
@@ -6085,7 +6106,7 @@ body {
     });
   }
 
-  function shutPeek() {
+  function hidePeek() {
     el.stationPins.style.transform = '';
     el.stationDetail.hidden = true;
     el.stationBrowse.hidden = false;
@@ -6139,7 +6160,7 @@ body {
     var v = activeVehicle();
     if (!st) { return; }
     clearTimers();
-    statusTone(false);
+    setStatusTone(false);
     hideAll();
     S.step = 'check';
     S.checking = id;
@@ -6358,7 +6379,7 @@ body {
 
   function showStations(arriving, keepChoice) {
     S.step = 'stations';
-    statusTone(false);
+    setStatusTone(false);
     if (!keepChoice) { el.stationSearch.value = ''; }
     el.stationStatus.textContent = '';
     if (!keepChoice) { S.station = null; }
@@ -6458,10 +6479,10 @@ body {
       S.fillLitresNow = Math.round(FILL_LITRES * run * 10) / 10;
       paintFuelAction();
       if (S.step === 'filling-screen') { paintFilling(); }
-      if (run >= 1) { fillFinished(); }
+      if (run >= 1) { onFillFinished(); }
     }
   }
-  function fillFinished() {
+  function onFillFinished() {
     stopFillClock();
     S.fuel = 'done';
     S.fillLitresNow = fillLitresFinal();
@@ -6471,12 +6492,12 @@ body {
        points. The pocket case keeps the push. */
     if (S.step === 'filling-screen') { paintFilling(); }
     else { showPush(); }
-    announce((partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+    announce((fillPartial() ? 'Fill stopped early. ' : 'Fill complete. ') +
              fillLitresFinal() + ' litres on ' +
              (fillVehicle() ? fillVehicle().plate : 'your vehicle') +
              '. Open the notification to see your points.');
   }
-  function partialFill() { return fillLitresFinal() < FILL_LITRES; }
+  function fillPartial() { return fillLitresFinal() < FILL_LITRES; }
 
   /* ── THE PAY-OFF ────────────────────────────────────────────────────
      The sign-up reward's screen, replayed for a fill: same medal, same wave,
@@ -6486,7 +6507,7 @@ body {
     clearTimers(); hideAll(); hidePush();
     stopFillClock();
     S.step = 'earned';
-    statusTone(true);
+    setStatusTone(true);
     bankFill();
     var v = fillVehicle();
     el.earnedRowLabel.textContent = 'Fuelling ' + fillLitresFinal() + ' L';
@@ -6495,7 +6516,7 @@ body {
     el.earnedMedal.setAttribute('aria-label', fillPts() + ' points earned for this fill');
     el.earned.hidden = false;
     el.earned.setAttribute('data-state', 'visible');
-    announce((partialFill() ? 'Fill stopped early. ' : 'Fill complete. ') +
+    announce((fillPartial() ? 'Fill stopped early. ' : 'Fill complete. ') +
              'You earned ' + fillPts() + ' points.');
     after(60, function () { el.earnedTitle.focus({ preventScroll: true }); });
     after(240, function () { playConfetti(el.earnedMedal, el.earnedConfetti, 'earnedConfettiPlayed'); });
@@ -6525,7 +6546,7 @@ body {
     clearTimers(); hideAll(); hidePush();
     stopFillClock();
     S.step = 'receipt';
-    statusTone(false);
+    setStatusTone(false);
     bankFill();
     var v = fillVehicle();
     el.receiptStation.textContent = stationName();
@@ -6566,7 +6587,7 @@ body {
   function showRewards() {
     clearTimers(); hideAll();
     S.step = 'rewards';
-    statusTone(false);
+    setStatusTone(false);
     paintRewards();
     /* The arrival wave plays once, on arrival. The attribute comes off
        before any spend repaints the list, so tapping Get it changes one
@@ -6680,7 +6701,7 @@ body {
   function showAccount() {
     clearTimers(); hideAll();
     S.step = 'account';
-    statusTone(false);
+    setStatusTone(false);
     el.accountVehicles.textContent = String(S.vehicles.length || 0);
     paintBioSetting();
     el.account.hidden = false;
@@ -6701,7 +6722,7 @@ body {
   function showHistory() {
     clearTimers(); hideAll();
     S.step = 'history';
-    statusTone(false);
+    setStatusTone(false);
     S.newSlips = 0;
     paintHistoryBadge();
     el.historyEmpty.hidden = S.receipts.length > 0;
@@ -6734,7 +6755,7 @@ body {
   function showFilling() {
     clearTimers(); hideAll();
     S.step = 'filling-screen';
-    statusTone(false);
+    setStatusTone(false);
     paintFilling();
     el.filling.hidden = false;
     el.filling.setAttribute('data-state', 'visible');
@@ -6761,8 +6782,8 @@ body {
                                : waiting ? 'Waiting for the till'
                                : 'litres so far';
     el.fillingVerdict.hidden = !done;
-    el.fillingVerdict.textContent = partialFill() ? 'The pump stopped early.' : 'Fill complete.';
-    if (done && partialFill()) { el.fillingVerdict.setAttribute('data-tone', 'partial'); }
+    el.fillingVerdict.textContent = fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
+    if (done && fillPartial()) { el.fillingVerdict.setAttribute('data-tone', 'partial'); }
     else { el.fillingVerdict.removeAttribute('data-tone'); }
     el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
     /* One line of pump truth on the running face only. The waiting face
@@ -6779,7 +6800,7 @@ body {
     /* The stopped-early fill says so in the headline, because "complete" over
        23 litres would be the app calling a half tank a whole one. */
     el.push.querySelector('#pushTitle').textContent =
-      partialFill() ? 'Fill stopped early' : 'Fill complete';
+      fillPartial() ? 'Fill stopped early' : 'Fill complete';
     /* Fact-complete, the way a good notification is: the news works at a
        glance, and the tap deepens it rather than ransoming it. */
     el.pushSub.textContent = (v ? v.plate : 'Your vehicle') + ' took ' + fillLitresFinal() +
@@ -6892,7 +6913,7 @@ body {
      is not a journey, so it is instant. */
   function showFuel(arriving) {
     S.step = 'fuel';
-    statusTone(false);
+    setStatusTone(false);
     holdScreenAwake();
     var v = activeVehicle();
     /* Redrawn per fill, and identical every time for the same fill. */
@@ -7080,7 +7101,7 @@ body {
     if (S.step === 'check') { hideCheck(); showStations(false, true); return; }
     if (S.step === 'scan') { el.scanClose.click(); return; }
     if (S.step === 'stations') {
-      if (!el.stationDetail.hidden) { shutPeek(); return; }
+      if (!el.stationDetail.hidden) { hidePeek(); return; }
       el.stationsBack.click(); return;
     }
     if (S.step.indexOf('step:') === 0) { el.stepBack.click(); }
@@ -7178,11 +7199,11 @@ body {
     el.homeFuel.focus({ preventScroll: true });
   });
   el.stationSearch.addEventListener('input', paintStations);
-  el.stationShut.addEventListener('click', shutPeek);
+  el.stationShut.addEventListener('click', hidePeek);
   el.stationGo.addEventListener('click', function () {
     var id = S.station;
     if (!id) { return; }
-    shutPeek();
+    hidePeek();
     after(prefersReduced() ? 0 : 160, function () { showCheck(id, true); });
   });
   /* Directions are the other thing a driver wants from a station they have not
@@ -7247,7 +7268,7 @@ body {
     paintScan();
     after(prefersReduced() ? 0 : 900, function () {
       if (S.step !== 'scan' || S.scanFace !== 'reading') { return; }
-      scanSucceeded();
+      onScanSucceeded();
     });
   });
 
@@ -7828,7 +7849,7 @@ body {
     } else {
       html += ids.map(function (id) {
         return '<button type="button" class="d-stateNav__item" data-state-id="' + id + '">' +
-               STATE_LABEL(id) + '</button>';
+               stateLabel(id) + '</button>';
       }).join('');
     }
     right.innerHTML = html;
@@ -7914,7 +7935,7 @@ body {
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
     'fuelling':     'Choosing where, the QR that comes back, the fill itself, and what it pays.'
   };
-  function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
+  function stateLabel(id) { return STATES[id] ? STATES[id].label : id; }
 
   var FLOWS = [
     {
@@ -8224,7 +8245,7 @@ body {
       var text = typeof m.label === 'function' ? m.label() : m.label;
       return '<button type="button" class="d-stateNav__toggle" data-mode="' + m.key + '"' +
              ' aria-pressed="false"><span class="d-stateNav__toggleLabel">' + text + '</span>' +
-             '<span class="d-stateNav__switch"></span></button>';
+             '</button>';
     }).join('');
     document.querySelectorAll('[data-mode]').forEach(function (b) {
       b.addEventListener('click', function () {

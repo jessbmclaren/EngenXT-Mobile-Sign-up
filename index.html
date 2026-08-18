@@ -12,11 +12,14 @@
    Atomic design levels as prefixes, BEM for structure, data-* attributes for
    runtime state. State is never a class.
 
+     Block names are kebab-case; multi-word element and modifier names are
+     camelCase (__noteMore). State is never a class - it rides data-*.
+
      tokens     CSS custom properties    --color-primary
      atoms      a-                       a-btn, a-field, a-otp-cell
-     molecules  m-                       m-phone-field, m-alert
+     molecules  m-                       m-phone-field, m-keyboard
      organisms  o-                       o-auth-hero, o-signup-sheet
-     templates  t-                       t-device-frame, t-keyboard
+     templates  t-                       t-device-frame
      pages      p-                       p-signup-demo
      utilities  u-                       u-visually-hidden
      developer  d-                       d-panel, d-stateNav, d-inspect
@@ -36,7 +39,7 @@
   /* Brand */
   --color-primary:       #1650B8;
   --color-primary-dark:  #0D3A8A;
-  --color-primary-light: #EEF3FF;
+  --color-primary-bg: #EEF3FF;
   --color-primary-06: rgba(22,80,184,0.06);
   --color-primary-08: rgba(22,80,184,0.08);
   --color-primary-12: rgba(22,80,184,0.12);
@@ -70,7 +73,7 @@
   --color-success-20: rgba(22,104,50,0.20);
   --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
-  --color-warning-border: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
+  --color-warning-25: rgba(156,71,8,0.25);  /* --color-warning at 0.25, same hue */
   --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
   /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
      the logo, so it must not be darkened to satisfy a text contrast rule. */
@@ -103,7 +106,7 @@
      goes muddy on navy, so this is its on-dark twin. It is the same hue the
      star carries wherever points are shown. */
   --color-points-on-dark:      #FFB454;
-  --color-points-on-dark-35:   rgba(255,180,84,0.35);
+  --color-points-on-dark-glow:   rgba(255,180,84,0.35);
   --color-accent-on-dark-fill:   rgba(99,158,255,0.15);
   --color-on-dark-line:   rgba(255,255,255,0.18);
   --color-on-dark-fill:   rgba(255,255,255,0.10);
@@ -130,6 +133,12 @@
   --color-hero-1: #0a1628;
   --color-hero-2: #0d2040;
   --color-hero-3: #0a1830;
+  /* The scan screen's own dark: one step off the hero, so drawn camera
+     footage does not read as the marketing sky. Ordinals mark gradient
+     stops, top to base - the one numeric suffix that is not an alpha
+     percentage; --color-hero-* reads the same way. */
+  --color-scan-1: #0B1220;
+  --color-scan-2: #16203A;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 
@@ -153,6 +162,8 @@
   --kb-on-accent:  #FFFFFF;
 
   /* Type */
+  /* --font-* is a sanctioned family beside --color-/--sp-/--text-*: the
+     faces; --text-* stays the size ramp. */
   --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
   --font-mono: "SF Mono","Menlo",monospace;
   /* Between the title and the hero. A greeting set light at this size reads
@@ -161,7 +172,7 @@
   --text-display:  30px;
   --text-hero:     42px;
   --text-title:    22px;
-  --text-large:    20px;
+  --text-lead:    20px;
   --text-heading:  18px;
   --text-subhead:  17px;
   --text-callout:  16px;
@@ -184,7 +195,7 @@
 
   /* Elevation. One light source, from above. */
   --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
-  --shadow-sheet:     inset 0 var(--hairline) 0 rgba(255,255,255,0.65),
+  --shadow-sheet:     inset 0 var(--size-hairline) 0 rgba(255,255,255,0.65),
                       0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
   --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px rgba(13,58,138,0.20), inset 0 1px 0 rgba(255,255,255,0.16);
   --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
@@ -204,7 +215,7 @@
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
-  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px; --sp-12: 48px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
 
   /* Hardware. The status bar keeps its own height token because layout has to
      stop short of it, and the notch and time are drawn against the same value. */
@@ -215,7 +226,7 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
-  --hairline:      0.5px;
+  --size-hairline:      0.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
@@ -273,6 +284,8 @@
   --ease-spring:   cubic-bezier(.34,1.4,.64,1);
   --dur-fast:  0.12s;
   --dur-base:  0.30s;
+  /* A named motion role, kept deliberately: sheet travel is a distance,
+     not a speed, and every sheet must move alike. */
   --dur-sheet: 0.38s;
   --dur-slow:  0.42s;
 }
@@ -281,7 +294,7 @@
 [data-text="large"] {
   --text-hero:     46px;
   --text-title:    24px;
-  --text-large:    22px;
+  --text-lead:    22px;
   --text-heading:  20px;
   --text-subhead:  19px;
   --text-callout:  18px;
@@ -448,7 +461,7 @@ button { background: none; border: none; color: inherit; }
   transition: border-color .15s, background .15s, color .15s;
 }
 .a-otp-cell[data-state="filled"] {
-  border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary);
+  border-color: var(--color-primary); background: var(--color-primary-bg); color: var(--color-primary);
 }
 .a-otp-cell[aria-disabled="true"] { opacity: .55; }
 /* Focus lands on the cell's own edge, the way .a-field already does it, rather
@@ -504,7 +517,7 @@ button { background: none; border: none; color: inherit; }
   /* A fill, not an outline. The tone tints already separate the plate from the
      surface, and the ring on top of them read as a border on the icon rather
      than as a plate behind it. */
-  background: var(--color-primary-light); border: none;
+  background: var(--color-primary-bg); border: none;
 }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
 /* The mark on a screen that stops someone.
@@ -632,11 +645,11 @@ button { background: none; border: none; color: inherit; }
 .m-alert {
   display: flex; flex-direction: column; gap: var(--sp-3);
   padding: var(--sp-4); border-radius: var(--radius-card);
-  background: var(--color-primary-light); border: 1px solid var(--color-primary-12);
+  background: var(--color-primary-bg); border: 1px solid var(--color-primary-12);
 }
-.m-alert:not(.m-alert--onDark)[data-tone="info"]    { background: var(--color-primary-light); border-color: var(--color-primary-12); }
+.m-alert:not(.m-alert--onDark)[data-tone="info"]    { background: var(--color-primary-bg); border-color: var(--color-primary-12); }
 .m-alert:not(.m-alert--onDark)[data-tone="error"]   { background: var(--color-secondary-bg); border-color: var(--color-secondary-25); }
-.m-alert:not(.m-alert--onDark)[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-border); }
+.m-alert:not(.m-alert--onDark)[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-25); }
 .m-alert:not(.m-alert--onDark)[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
 .m-alert__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
 .m-alert__icon { flex-shrink: 0; margin-top: -1px; }  /* optical, against cap height */
@@ -703,7 +716,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0;
   padding-right: var(--sp-3); border-right: 1px solid var(--color-primary-12);
 }
-.m-phone-field__flag { font-size: var(--text-large); line-height: 1; }
+.m-phone-field__flag { font-size: var(--text-lead); line-height: 1; }
 .m-phone-field__code { font-size: var(--text-body); font-weight: 800; }
 
 
@@ -846,7 +859,7 @@ button { background: none; border: none; color: inherit; }
    Two of them side by side, so a driver can compare the versions without
    reading the sentence above them, and read either one out to their manager
    without hunting through prose for it. */
-.m-figure-row {
+.o-status-page__meta {
   display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4);
   /* Centred as a pair. The row sat on the left edge of cards whose every
      other line is centred - the one left-handed thing on the screen. Each
@@ -860,7 +873,7 @@ button { background: none; border: none; color: inherit; }
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-figure__val {
-  font-size: var(--text-large); font-weight: 800;
+  font-size: var(--text-lead); font-weight: 800;
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 /* On the dark hero the same component takes the on-dark pair. */
@@ -969,27 +982,27 @@ button { background: none; border: none; color: inherit; }
   max-height: calc(100% - var(--keyboard-inset, 0px) - var(--size-status-bar));
   border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
 }
-/* t-keyboard. The Android keypad the number and code stages actually raise,
+/* m-keyboard. The Android keypad the number and code stages actually raise,
    drawn rather than described, so the sheet can be judged against the space it
    really has. Both inputs are inputmode="numeric", so this is the numeric pad
    Android shows them, not a full alphabetic layout. */
-.t-keyboard {
+.m-keyboard {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--z-toast);
   height: var(--keyboard-inset, 0px);
   display: none; overflow: hidden;
   background: var(--kb-surface);
-  border-top: var(--hairline) solid var(--kb-divider);
+  border-top: var(--size-hairline) solid var(--kb-divider);
 }
-.t-device-frame[data-keyboard="open"] .t-keyboard { display: block; }
-.t-keyboard__svg { display: block; width: 100%; height: 100%; }
+.t-device-frame[data-keyboard="open"] .m-keyboard { display: block; }
+.m-keyboard__svg { display: block; width: 100%; height: 100%; }
 /* These sizes deliberately sit outside the type ramp. The ramp exists so app
    text answers the driver's text-size setting, and a drawing of Android's own
    keyboard must not: a real keyboard does not grow when app text does. */
-.t-keyboard__digit {
+.m-keyboard__digit {
   font-family: var(--font-sans); font-size: 21px; font-weight: 400;
   fill: var(--kb-text); text-anchor: middle;
 }
-.t-keyboard__sub {
+.m-keyboard__sub {
   font-family: var(--font-sans); font-size: 9px; font-weight: 600;
   letter-spacing: 0.06em; fill: var(--kb-sub); text-anchor: middle;
 }
@@ -1162,13 +1175,6 @@ button { background: none; border: none; color: inherit; }
 }
 .o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
-@media (max-width: 900px) {
-  /* No room beside the sidebar, so the panel becomes a sheet on the screen. */
-  .d-flyout {
-    left: var(--sp-4); right: var(--sp-4); width: auto;
-    bottom: var(--sp-4); top: auto; max-height: 60vh;
-  }
-}
 
 /* ══ TEMPLATES ═══════════════════════════════════════════════════════════ */
 .t-device-frame {
@@ -1279,9 +1285,8 @@ button { background: none; border: none; color: inherit; }
 
 /* The one thing on screen. It gets the only strong colour in the menu. */
 .d-stateNav__item[aria-current="true"] {
-  background: var(--color-primary-light); color: var(--color-primary-dark); font-weight: 700;
+  background: var(--color-primary-bg); color: var(--color-primary-dark); font-weight: 700;
 }
-.d-stateNav__item--link { color: var(--color-primary-dark); font-weight: 700; }
 
 /* The right pane's own heading and lead, which say what the section is for
    rather than only listing what is in it. */
@@ -1518,7 +1523,7 @@ button { background: none; border: none; color: inherit; }
 .d-row__radius {
   width: 44px; height: 34px; flex-shrink: 0;
   border: 2px solid var(--color-primary); border-right: none; border-bottom: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-bg);
 }
 
 .d-typeSample { color: var(--color-text-primary); line-height: 1.15; }
@@ -1553,7 +1558,7 @@ button { background: none; border: none; color: inherit; }
 .d-copyBtn {
   padding: 5px 10px; border-radius: var(--radius-chip); cursor: pointer;
   font-size: var(--text-nano); font-weight: 700;
-  background: var(--color-primary-light); color: var(--color-primary-dark);
+  background: var(--color-primary-bg); color: var(--color-primary-dark);
 }
 .d-copyBtn:hover { background: var(--d-copy-hover); }
 
@@ -1752,7 +1757,7 @@ button { background: none; border: none; color: inherit; }
           <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark o-status-page__icon" id="statusIcon" data-tone="warning" aria-hidden="true"></span>
           <h2 class="o-status-page__title" id="statusTitle" tabindex="-1"></h2>
           <p class="o-status-page__body" id="statusBody"></p>
-          <div class="m-figure-row" id="statusMeta" hidden></div>
+          <div class="o-status-page__meta" id="statusMeta" hidden></div>
           <div class="o-status-page__actions" id="statusActions"></div>
         </div>
       </div>
@@ -1925,8 +1930,8 @@ button { background: none; border: none; color: inherit; }
       <!-- The operating system's keyboard, not the product's. aria-hidden
            because a real one is never in the accessibility tree of the page
            it covers. -->
-      <div class="t-keyboard" aria-hidden="true">
-        <svg class="t-keyboard__svg" viewBox="0 0 390 312" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+      <div class="m-keyboard" aria-hidden="true">
+        <svg class="m-keyboard__svg" viewBox="0 0 390 312" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
           <rect width="390" height="312" fill="var(--kb-surface)"/>
           <line x1="0" y1="38" x2="390" y2="38" stroke="var(--kb-divider)" stroke-width="1"/>
           <rect x="55.0" y="14" width="46" height="10" rx="5" fill="var(--kb-hint)"/>
@@ -1935,38 +1940,38 @@ button { background: none; border: none; color: inherit; }
           <line x1="136.5" y1="10" x2="136.5" y2="28" stroke="var(--kb-divider)" stroke-width="1"/>
           <line x1="253.5" y1="10" x2="253.5" y2="28" stroke="var(--kb-divider)" stroke-width="1"/>
           <rect x="8.0" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="52.9" y="78.0" class="t-keyboard__digit">1</text>
+          <text x="52.9" y="78.0" class="m-keyboard__digit">1</text>
           <rect x="102.8" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="147.6" y="72.0" class="t-keyboard__digit">2</text>
-          <text x="147.6" y="86.0" class="t-keyboard__sub">ABC</text>
+          <text x="147.6" y="72.0" class="m-keyboard__digit">2</text>
+          <text x="147.6" y="86.0" class="m-keyboard__sub">ABC</text>
           <rect x="197.5" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="242.4" y="72.0" class="t-keyboard__digit">3</text>
-          <text x="242.4" y="86.0" class="t-keyboard__sub">DEF</text>
+          <text x="242.4" y="72.0" class="m-keyboard__digit">3</text>
+          <text x="242.4" y="86.0" class="m-keyboard__sub">DEF</text>
           <rect x="8.0" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="52.9" y="129.0" class="t-keyboard__digit">4</text>
-          <text x="52.9" y="143.0" class="t-keyboard__sub">GHI</text>
+          <text x="52.9" y="129.0" class="m-keyboard__digit">4</text>
+          <text x="52.9" y="143.0" class="m-keyboard__sub">GHI</text>
           <rect x="102.8" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="147.6" y="129.0" class="t-keyboard__digit">5</text>
-          <text x="147.6" y="143.0" class="t-keyboard__sub">JKL</text>
+          <text x="147.6" y="129.0" class="m-keyboard__digit">5</text>
+          <text x="147.6" y="143.0" class="m-keyboard__sub">JKL</text>
           <rect x="197.5" y="101" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="242.4" y="129.0" class="t-keyboard__digit">6</text>
-          <text x="242.4" y="143.0" class="t-keyboard__sub">MNO</text>
+          <text x="242.4" y="129.0" class="m-keyboard__digit">6</text>
+          <text x="242.4" y="143.0" class="m-keyboard__sub">MNO</text>
           <rect x="8.0" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="52.9" y="186.0" class="t-keyboard__digit">7</text>
-          <text x="52.9" y="200.0" class="t-keyboard__sub">PQRS</text>
+          <text x="52.9" y="186.0" class="m-keyboard__digit">7</text>
+          <text x="52.9" y="200.0" class="m-keyboard__sub">PQRS</text>
           <rect x="102.8" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="147.6" y="186.0" class="t-keyboard__digit">8</text>
-          <text x="147.6" y="200.0" class="t-keyboard__sub">TUV</text>
+          <text x="147.6" y="186.0" class="m-keyboard__digit">8</text>
+          <text x="147.6" y="200.0" class="m-keyboard__sub">TUV</text>
           <rect x="197.5" y="158" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="242.4" y="186.0" class="t-keyboard__digit">9</text>
-          <text x="242.4" y="200.0" class="t-keyboard__sub">WXYZ</text>
+          <text x="242.4" y="186.0" class="m-keyboard__digit">9</text>
+          <text x="242.4" y="200.0" class="m-keyboard__sub">WXYZ</text>
           <rect x="8.0" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="52.9" y="249.0" class="t-keyboard__digit">*</text>
+          <text x="52.9" y="249.0" class="m-keyboard__digit">*</text>
           <rect x="102.8" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="147.6" y="243.0" class="t-keyboard__digit">0</text>
-          <text x="147.6" y="257.0" class="t-keyboard__sub">+</text>
+          <text x="147.6" y="243.0" class="m-keyboard__digit">0</text>
+          <text x="147.6" y="257.0" class="m-keyboard__sub">+</text>
           <rect x="197.5" y="215" width="89.8" height="52" rx="8" fill="var(--kb-key)"/>
-          <text x="242.4" y="249.0" class="t-keyboard__digit">#</text>
+          <text x="242.4" y="249.0" class="m-keyboard__digit">#</text>
           <rect x="292.2" y="44" width="89.8" height="52" rx="8" fill="var(--kb-key-alt)"/>
           <g stroke="var(--kb-text)" stroke-width="1.8" fill="none" stroke-linecap="round">
             <path d="M332.1 61.0 h16 a3 3 0 0 1 3 3 v12 a3 3 0 0 1 -3 3 h-16 l-8 -9 z"/>
@@ -2079,7 +2084,7 @@ button { background: none; border: none; color: inherit; }
   /* ════════════════════════════════════════════════════════════════════
      ICONS
      ════════════════════════════════════════════════════════════════════ */
-  function icon(name, colour, size) {
+  function iconMarkup(name, colour, size) {
     var s = size || 20, c = colour || 'currentColor';
     var w = s <= 16 ? '2.25' : s <= 21 ? '2' : '1.75';
     var open = '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + c +
@@ -2345,7 +2350,7 @@ button { background: none; border: none; color: inherit; }
     phoneHelper: $('phoneHelper'), phoneCta: $('phoneCta'), numberAlert: $('numberAlert'),
     otpGroup: $('otpGroup'), otpHelper: $('otpHelper'), codeContinue: $('codeContinue'),
     codeAlert: $('codeAlert'), resendBtn: $('resendBtn'), channelSwitchBtn: $('channelSwitchBtn'),
-    openWhatsapp: $('openWhatsappBtn'), backToNumber: $('backToNumberBtn'),
+    openWhatsappBtn: $('openWhatsappBtn'), backToNumberBtn: $('backToNumberBtn'),
     blockedIcon: $('blockedIcon'), blockedTitle: $('blockedTitle'), blockedBody: $('blockedBody'),
     blockedMeta: $('blockedMeta'), blockedClock: $('blockedClock'), blockedActions: $('blockedActions'),
     toast: $('toast'), announcer: $('announcer'), caption: $('caption')
@@ -2456,9 +2461,9 @@ button { background: none; border: none; color: inherit; }
   }
   function setHelper(node, html, tone) {
     var glyph = '';
-    if (tone === 'error')   { glyph = '<span class="a-helper__icon">' + icon('alert', 'currentColor', 13) + '</span>'; }
-    if (tone === 'warning') { glyph = '<span class="a-helper__icon">' + icon('clock', 'currentColor', 13) + '</span>'; }
-    if (tone === 'success') { glyph = '<span class="a-helper__icon">' + icon('check', 'currentColor', 13) + '</span>'; }
+    if (tone === 'error')   { glyph = '<span class="a-helper__icon">' + iconMarkup('alert', 'currentColor', 13) + '</span>'; }
+    if (tone === 'warning') { glyph = '<span class="a-helper__icon">' + iconMarkup('clock', 'currentColor', 13) + '</span>'; }
+    if (tone === 'success') { glyph = '<span class="a-helper__icon">' + iconMarkup('check', 'currentColor', 13) + '</span>'; }
     node.innerHTML = glyph + html;
     if (tone) { node.setAttribute('data-tone', tone); } else { node.removeAttribute('data-tone'); }
   }
@@ -2555,7 +2560,7 @@ button { background: none; border: none; color: inherit; }
     host.innerHTML =
       '<div class="m-alert" data-tone="' + def.tone + '">' +
         '<div class="m-alert__top">' +
-          '<span class="m-alert__icon">' + icon(def.icon, toneColour(def.tone)) + '</span>' +
+          '<span class="m-alert__icon">' + iconMarkup(def.icon, toneColour(def.tone)) + '</span>' +
           '<span><p class="m-alert__title">' + def.title + '</p>' +
           '<p class="m-alert__body">' + def.body + '</p></span>' +
         '</div>' +
@@ -2751,7 +2756,7 @@ button { background: none; border: none; color: inherit; }
   function paintChannel() {
     var wa = S.channel === 'whatsapp';
     el.channelSwitchBtn.textContent = wa ? 'Send by SMS' : 'Send on WhatsApp';
-    el.openWhatsapp.hidden = !wa;
+    el.openWhatsappBtn.hidden = !wa;
   }
 
   /* ════════════════════════════════════════════════════════════════════
@@ -2940,9 +2945,9 @@ button { background: none; border: none; color: inherit; }
     el.progress.hidden = (name === 'confirmed');
     el.codeContinue.hidden = !v.go;
     el.resendBtn.hidden = !v.resend;
-    el.openWhatsapp.hidden = !v.whatsapp || S.channel !== 'whatsapp';
+    el.openWhatsappBtn.hidden = !v.whatsapp || S.channel !== 'whatsapp';
     el.channelSwitchBtn.hidden = !v.channel;
-    el.backToNumber.hidden = !v.back;
+    el.backToNumberBtn.hidden = !v.back;
     var row = el.channelSwitchBtn.parentNode;
     row.hidden = !v.channel && !v.back;
     /* A row holding one control centres it rather than leaving it stranded
@@ -2954,7 +2959,7 @@ button { background: none; border: none; color: inherit; }
   /* Verifying is a moment, not a destination, so the controls stay in place
      and go quiet rather than disappearing and shifting the layout. */
   function setCodeBusy(busy) {
-    [el.resendBtn, el.openWhatsapp, el.channelSwitchBtn, el.backToNumber].forEach(function (b) {
+    [el.resendBtn, el.openWhatsappBtn, el.channelSwitchBtn, el.backToNumberBtn].forEach(function (b) {
       if (busy) { b.setAttribute('data-was-off', b.disabled ? '1' : '0'); b.disabled = true; }
       else if (b.getAttribute('data-was-off') === '0') { b.disabled = false; }
       if (!busy) { b.removeAttribute('data-was-off'); }
@@ -3311,7 +3316,7 @@ button { background: none; border: none; color: inherit; }
      and an organic journey passes through the same three. */
   function paintBioAsk() {
     el.bioIcon.setAttribute('data-tone', 'info');
-    el.bioIcon.innerHTML = icon('scanFace', toneColour('info'), 28);
+    el.bioIcon.innerHTML = iconMarkup('scanFace', toneColour('info'), 28);
     el.bioTitle.textContent = 'Skip the code next time';
     el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.';
     setBtn(el.bioEnable, true, 'Turn it on');
@@ -3330,7 +3335,7 @@ button { background: none; border: none; color: inherit; }
 
   function paintBioDone() {
     el.bioIcon.setAttribute('data-tone', 'success');
-    el.bioIcon.innerHTML = icon('check', toneColour('success'), 28);
+    el.bioIcon.innerHTML = iconMarkup('check', toneColour('success'), 28);
     /* Not "Biometrics on": the offer never says the word, and a category is
        not a thing a driver can picture. The title names what they gave. */
     el.bioTitle.textContent = 'Your face or fingerprint is set';
@@ -3379,7 +3384,7 @@ button { background: none; border: none; color: inherit; }
     clearTimers();
     releaseKeyboard();
     el.blockedIcon.setAttribute('data-tone', def.tone);
-    el.blockedIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
+    el.blockedIcon.innerHTML = iconMarkup(def.icon, toneColour(def.tone), 28);
     el.blockedTitle.textContent = def.title;
     el.blockedBody.innerHTML = def.body;
     el.blockedMeta.hidden = !def.meta;
@@ -3486,7 +3491,7 @@ button { background: none; border: none; color: inherit; }
     el.homeNotice.innerHTML =
       '<div class="m-alert m-alert--onDark" data-tone="' + def.tone + '">' +
         '<div class="m-alert__top">' +
-          '<span class="m-alert__icon">' + icon(def.icon, 'var(--color-text-on-dark)') + '</span>' +
+          '<span class="m-alert__icon">' + iconMarkup(def.icon, 'var(--color-text-on-dark)') + '</span>' +
           '<span><p class="m-alert__title">' + def.title + '</p>' +
           '<p class="m-alert__body">' + def.body + '</p>' +
           /* Figures a driver can read at a glance or repeat down a phone,
@@ -3535,6 +3540,9 @@ button { background: none; border: none; color: inherit; }
      Nav jumps and organic events go through the same functions, so a
      state you jump to and a state you reach cannot drift apart.
      ════════════════════════════════════════════════════════════════════ */
+  /* base() and home() below are the state DSL the rail states are written
+     in - deliberately noun-named scene-setters, the one sanctioned bend of
+     the verb-first rule, because 'base(...)' reads as stage direction. */
   function base(mode, phone) {
     clearTimers();
     applyNet(); setHomeNotice(null); setHomeAction('enter');
@@ -3562,7 +3570,7 @@ button { background: none; border: none; color: inherit; }
   function showStatusPage(kind) {
     var def = STATUS[kind];
     el.statusIcon.setAttribute('data-tone', def.tone);
-    el.statusIcon.innerHTML = icon(def.icon, toneColour(def.tone), 28);
+    el.statusIcon.innerHTML = iconMarkup(def.icon, toneColour(def.tone), 28);
     el.statusTitle.textContent = def.title;
     el.statusBody.textContent = def.body;
     /* Figures a driver can read at a glance or repeat down a phone to their
@@ -3838,7 +3846,7 @@ button { background: none; border: none; color: inherit; }
     } else {
       html += ids.map(function (id) {
         return '<button type="button" class="d-stateNav__item" data-state-id="' + id + '">' +
-               STATE_LABEL(id) + '</button>';
+               stateLabel(id) + '</button>';
       }).join('');
     }
     right.innerHTML = html;
@@ -3892,7 +3900,7 @@ button { background: none; border: none; color: inherit; }
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
     'fuelling':     'Choosing where, the QR that comes back, the fill itself, and what it pays.'
   };
-  function STATE_LABEL(id) { return STATES[id] ? STATES[id].label : id; }
+  function stateLabel(id) { return STATES[id] ? STATES[id].label : id; }
 
   var FLOWS = [
     {
@@ -4185,7 +4193,7 @@ button { background: none; border: none; color: inherit; }
       b.dataset.mode = m.key;
       var text = typeof m.label === 'function' ? m.label() : m.label;
       b.innerHTML = '<span class="d-stateNav__toggleLabel">' + text + '</span>' +
-                    '<span class="d-stateNav__switch"></span>';
+                    '';
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () { m.toggle(); syncModes(); });
       modesHost.appendChild(b);
@@ -4297,8 +4305,8 @@ button { background: none; border: none; color: inherit; }
   window.addEventListener('online', onReconnect);
   el.resendBtn.addEventListener('click', function () { if (!el.resendBtn.disabled) { resendCode(); } });
   el.channelSwitchBtn.addEventListener('click', function () { switchChannel(S.channel === 'whatsapp' ? 'sms' : 'whatsapp'); });
-  el.openWhatsapp.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
-  el.backToNumber.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
+  el.openWhatsappBtn.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
+  el.backToNumberBtn.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
   el.sheetClose.addEventListener('click', function () { closeSheet(); });
   /* Progressive disclosure, not a dialog: the detail opens in place, under
      the sentence that offered it, and reads itself out once. */
@@ -4449,7 +4457,7 @@ button { background: none; border: none; color: inherit; }
     if (n.indexOf('--color-') === 0 || n.indexOf('--glass-') === 0 ||
         n.indexOf('--gradient-') === 0) { return 'colour'; }
     if (n.indexOf('--size-') === 0 || n.indexOf('--z-') === 0 ||
-        n.indexOf('--kb-') === 0 || n === '--hairline') { return 'layout'; }
+        n.indexOf('--kb-') === 0 || n === '--size-hairline') { return 'layout'; }
     return 'other';
   }
   function subOf(n) {
@@ -4546,11 +4554,11 @@ button { background: none; border: none; color: inherit; }
     { name: '.a-icon-wrap', level: 'atom', lines: [
         ['size', '40px, or 64px with --lg'],
         ['border-radius', 'var(--radius-card-sm), or var(--radius-circle) with --lg'],
-        ['background', 'var(--color-primary-light)'],
+        ['background', 'var(--color-primary-bg)'],
         ['border', '1px solid var(--color-primary-08)']
       ], states: [
         ['[data-tone="error"]', 'var(--color-secondary-bg) on var(--color-secondary-12)'],
-        ['[data-tone="warning"]', 'var(--color-warning-bg) on var(--color-warning-border)'],
+        ['[data-tone="warning"]', 'var(--color-warning-bg) on var(--color-warning-25)'],
         ['[data-tone="success"]', 'var(--color-success-bg) on var(--color-success-20)'],
         ['[data-motion="pop"]', 'animation: pop .5s var(--ease-spring). Collapses to a still frame under reduced motion.'],
         ['a11y', 'aria-hidden. The tone it carries is always also in the words beside it.']
@@ -4668,11 +4676,11 @@ button { background: none; border: none; color: inherit; }
         ['overflow', 'hidden, so nothing decorative escapes the screen'],
         ['shadow', 'var(--shadow-phone)']
       ], states: [
-        ['[data-keyboard="open"]', 'shows .t-keyboard, sizes the sheet to 100% minus --keyboard-inset minus --size-status-bar, and runs the compression order: tooling, then the step counter, then an instruction that has been acted on, then the loose steps. Never the base gap.'],
+        ['[data-keyboard="open"]', 'shows .m-keyboard, sizes the sheet to 100% minus --keyboard-inset minus --size-status-bar, and runs the compression order: tooling, then the step counter, then an instruction that has been acted on, then the loose steps. Never the base gap.'],
         ['[data-width="320"]', 'tightens the sheet’s inline padding to var(--sp-3) and the code cells to var(--sp-1), because six squares and five gaps cannot each clear 48px inside 320.'],
         ['note', 'the template is the page-level structure. Everything that varies by device lives here, not in the components inside it.']
       ] },
-    { name: '.t-keyboard', level: 'template', lines: [
+    { name: '.m-keyboard', level: 'molecule', lines: [
         ['position', 'absolute, bottom 0, height var(--keyboard-inset)'],
         ['background', 'var(--kb-surface)'],
         ['__svg', 'the numeric keypad, drawn, scaled with preserveAspectRatio xMidYMax meet'],
@@ -4732,7 +4740,7 @@ button { background: none; border: none; color: inherit; }
         ['border-radius', 'var(--radius-card-sm)'], ['background', 'var(--color-surface-sunken)']
       ], states: [
         ['two axes', 'data-state is what the driver typed, data-tone is what came back. A cell can be filled and wrong at the same time, so they are separate attributes and one attribute holds one value.'],
-        ['[data-state="filled"]', 'border + text var(--color-primary), bg var(--color-primary-light)'],
+        ['[data-state="filled"]', 'border + text var(--color-primary), bg var(--color-primary-bg)'],
         ['[data-tone="valid"]', 'border-color and color var(--color-success), bg var(--color-success-bg)'],
         ['[data-tone="error"]', 'border-width 2.5px, border-color and color var(--color-error-text), bg var(--color-secondary-bg). Weight as well as hue, so the two outcomes differ by more than colour.'],
         ['[data-tone="locked"]', 'opacity .45. The cell goes readonly with aria-disabled, never disabled, which would evict focus mid-task.'],
@@ -4756,13 +4764,13 @@ button { background: none; border: none; color: inherit; }
       ], states: [
         ['copy the guard', 'every tone rule is written :not(.m-alert--onDark)[data-tone="…"]. An unguarded tone selector is (0,2,0) and beats the --onDark modifier at (0,1,0), which paints white text on a pale tint. That is how both home notices once became blank boxes.'],
         [':not(--onDark)[data-tone="error"]', 'bg var(--color-secondary-bg), border var(--color-secondary-25)'],
-        [':not(--onDark)[data-tone="warning"]', 'bg var(--color-warning-bg), border var(--color-warning-border)'],
+        [':not(--onDark)[data-tone="warning"]', 'bg var(--color-warning-bg), border var(--color-warning-25)'],
         [':not(--onDark)[data-tone="success"]', 'bg var(--color-success-bg), border var(--color-success-20)'],
         ['--onDark', 'translucent white over the hero, white title']
       ] },
     { name: '.m-phone-field', level: 'molecule', lines: [
         ['composition', '.a-field .m-phone-field on one element, then __prefix and .a-field__input inside it'],
-        ['__flag', 'var(--text-large)'],
+        ['__flag', 'var(--text-lead)'],
         ['__code', 'var(--text-body) / 800, with a 1px divider after it'],
         ['__prefix', 'flex, align-items center, gap var(--sp-2), flex-shrink 0'],
         ['input', 'var(--text-subhead) / 600, caret var(--color-primary)']
@@ -4816,7 +4824,7 @@ button { background: none; border: none; color: inherit; }
     ['Placing something new', 'Four questions, in order, and the first yes decides it. Can I take it apart and still have something that means anything? If no, it is an atom. Is it a handful of atoms bonded to do ONE job? If yes, it is a molecule. Would I point at it and call it a section of the screen? If yes, it is an organism. Is it arranging sections rather than being one? If yes, it is a template. Two habits keep the system honest. First, reach for a variant before a new component: a modifier on an existing atom beats a near-duplicate of it, which is why there is a-btn--primary and not a separate primary button. Second, if you are still unsure, file it at the LOWER level and promote it when a second use appears, because promoting is easy and demoting means finding every caller. A name states a role and never a tone or a moment: this panel had a blocked-panel that also rendered success, and it is o-outcome-panel now.'],
     ['State', 'Never a class. Always a data attribute the CSS keys off, and JavaScript sets attributes rather than building class strings. The axes are deliberately separate so two of them can be true at once. On a component: data-state is where it is in its own lifecycle (idle, pending, error, valid, filled, locked, active, done); data-tone is the meaning being reported on it (error, warning, success, info); data-valid, data-shake, data-single, data-more and data-heading each carry one boolean fact. On the sheet: data-stage names the step being shown. On the device frame: data-keyboard, data-width. On the document: data-motion, data-text, data-net. Anything beginning data-act, data-panel, data-mode, data-level, data-copy or data-state-id is a hook for script or for tooling, not a styling axis. The rule for adding one: if two conditions can be true at the same time they need two attributes, because one attribute holds one value.'],
     ['Tokens', 'A component reads tokens, never raw values. If you need a value that has no token, add the token first.'],
-    ['Spacing', 'A 4px base grid: --sp-1 is 4px through --sp-8 at 32px, plus --sp-12 at 48px. Two half-steps, --sp-1h at 6px and --sp-2h at 10px, exist for the insides of small components and never for the rhythm between them. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
+    ['Spacing', 'A 4px base grid: --sp-1 is 4px through --sp-8 at 32px. Two half-steps, --sp-1h at 6px and --sp-2h at 10px, exist for the insides of small components and never for the rhythm between them. Values off the grid are allowed only for optical work: hairlines, hardware insets, a 1px nudge.'],
     ['Rhythm', 'The sheet carries one scale and each step means one thing. 8 is parts of one thing, a label and its field, a field and its helper. 16 is one group to the next. 24 is a decision or a different route. 32 closes a centred group. The organism owns the rhythm through its gap; nothing in the markup sets spacing, and a looser step is declared as a margin on the element that starts it rather than composed from a base plus a nudge.'],
     ['Composition', 'An organism composes molecules, a molecule composes atoms. A parent may PLACE a child, because layout belongs to the container: where it sits, how much room it takes, whether it shows at all. A parent may never RESTYLE a child\'s insides. Colour, type, padding, radius and border stay with the component that owns them, and a child that needs to look different in a context carries a modifier for it. That is why the links on a content edge take a-link--flush rather than the row cancelling their padding.'],
     ['Motion', 'Durations and easings come from tokens, and every animation collapses to a still frame under prefers-reduced-motion.'],
@@ -4866,7 +4874,7 @@ button { background: none; border: none; color: inherit; }
      --gradient-primary, which the component recipes tell you to use. */
   function renderLayout() {
     var subs = [
-      ['Size', function (n) { return n.indexOf('--size-') === 0 || n === '--hairline'; },
+      ['Size', function (n) { return n.indexOf('--size-') === 0 || n === '--size-hairline'; },
         'Fixed dimensions the layout depends on. --size-target is the 48px floor for anything interactive.'],
       ['Stacking order', function (n) { return n.indexOf('--z-') === 0; },
         'Every z-index in the file comes from here, so the layering is a list you can read rather than a set of numbers to guess at.'],
@@ -5035,7 +5043,7 @@ button { background: none; border: none; color: inherit; }
       ['Disabled label',         '--color-text-tertiary',  sunken, 4.5, 'sunken'],
       ['Hero lede',              '--color-on-dark-soft',   hero,   4.5, 'hero'],
       ['WhatsApp glyph',         '--color-whatsapp-dark',  sheet,  4.5, 'sheet'],
-      ['Alert body on info',     '--color-text-secondary', tok('--color-primary-light'), 4.5, 'tint'],
+      ['Alert body on info',     '--color-text-secondary', tok('--color-primary-bg'), 4.5, 'tint'],
       ['Alert body on error',    '--color-text-secondary', tok('--color-secondary-bg'),  4.5, 'tint'],
       ['Alert body on warning',  '--color-text-secondary', tok('--color-warning-bg'),    4.5, 'tint'],
       ['Alert body on success',  '--color-text-secondary', tok('--color-success-bg'),    4.5, 'tint'],
@@ -5222,7 +5230,7 @@ button { background: none; border: none; color: inherit; }
 
     ['Accessibility', 'decorative things are hidden from assistive tech', function () {
       var bad = [];
-      [].forEach.call(frame.querySelectorAll('.a-icon-wrap, .m-notch, .m-status-bar, .t-keyboard, .o-auth-hero__orbs'), function (n) {
+      [].forEach.call(frame.querySelectorAll('.a-icon-wrap, .m-notch, .m-status-bar, .m-keyboard, .o-auth-hero__orbs'), function (n) {
         if (n.getAttribute('aria-hidden') !== 'true') { bad.push((n.className || '').toString().split(' ')[0]); }
       });
       return { pass: !bad.length, detail: bad.length ? bad.join(', ') : 'notch, status bar, keyboard, orbs and tone icons all aria-hidden' };
@@ -5512,7 +5520,7 @@ button { background: none; border: none; color: inherit; }
       b.type = 'button';
       b.className = 'd-stateNav__toggle';
       b.title = t.hint;
-      b.innerHTML = '<span>' + t.label + '</span><span class="d-stateNav__switch"></span>';
+      b.innerHTML = '<span>' + t.label + '</span>';
       b.setAttribute('aria-pressed', 'false');
       b.addEventListener('click', function () {
         var on = root.getAttribute(t.attr) === 'on';
