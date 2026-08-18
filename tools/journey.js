@@ -312,6 +312,16 @@ async function fuelling() {
     unit: document.getElementById('fillingUnit').textContent })`));
   check('Done walks forward into the watched fill', fw.up, JSON.stringify(fw));
   check('before the scan lands, the screen waits honestly', fw.face === 'waiting' && fw.unit === 'Waiting for the attendant', JSON.stringify(fw));
+  await sleep(600);                     /* past the tap guard */
+  await ev(`document.getElementById('fillingShowCode').click()`);
+  await sleep(500);
+  const bk = JSON.parse(await ev(`JSON.stringify({
+    fuelUp: !document.getElementById('fuelScreen').hidden,
+    fillingUp: !document.getElementById('fillingScreen').hidden,
+    fuel: Demo.S().fuel })`));
+  check('the waiting face opens the code again', bk.fuelUp && !bk.fillingUp && bk.fuel === 'live', JSON.stringify(bk));
+  await ev(`document.getElementById('fuelDone').click()`);
+  await sleep(500);
   await ev(`document.getElementById('fillingClose').click()`);
   await sleep(500);
   s = await st();

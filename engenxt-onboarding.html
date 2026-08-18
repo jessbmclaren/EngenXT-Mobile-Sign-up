@@ -3573,6 +3573,7 @@ body {
         </div>
         <p class="o-filling__note" id="fillingNote">The pump is running.</p>
         <div class="o-filling__action">
+          <button class="a-btn a-btn--outline" type="button" id="fillingShowCode" hidden>Show the code again</button>
           <button class="a-btn a-btn--primary" type="button" id="fillingCta" hidden>See your points</button>
         </div>
       </section>
@@ -4169,6 +4170,7 @@ body {
     fillingSpin: $('fillingSpin'), fillingVessel: $('fillingVessel'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
+    fillingShowCode: $('fillingShowCode'),
     fillingClose: $('fillingClose'),
     account: $('accountScreen'), accountTitle: $('accountTitle'),
     accountBio: $('accountBio'), accountBioSub: $('accountBioSub'),
@@ -6751,6 +6753,9 @@ body {
     el.fillingNote.hidden = done || waiting;
     el.fillingNote.textContent = 'The pump is running.';
     el.fillingCta.hidden = !done;
+    /* Until the scan lands the code must stay reachable - the attendant can
+       be slow to arrive. Once fuel flows, the code has done its work. */
+    el.fillingShowCode.hidden = !waiting;
   }
 
   function showPush() {
@@ -6961,6 +6966,12 @@ body {
     if (b) { sendBundle(parseInt(b.getAttribute('data-bundle'), 10)); }
   });
   el.fillingClose.addEventListener('click', function () { showHome(false); });
+  /* The door back to the code. Research put an attendant, not a till, at
+     the window, and a person can be slow to reach it. */
+  el.fillingShowCode.addEventListener('click', function () {
+    clearTimers(); hideAll();
+    showFuel(false);
+  });
   el.fillingCta.addEventListener('click', function () { showEarned(); });
   el.accountBio.addEventListener('click', function () {
     S.bioOn = !S.bioOn;
