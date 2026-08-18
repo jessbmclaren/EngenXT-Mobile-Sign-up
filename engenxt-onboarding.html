@@ -3561,7 +3561,7 @@ body {
            the pump finishes while they are looking, the screen says so and
            offers the points - no notification detour for a driver already
            here. -->
-      <section class="o-filling" id="fillingScreen" aria-labelledby="fillingLitres" hidden>
+      <section class="o-filling" id="fillingScreen" aria-labelledby="fillingFacts" hidden>
         <div class="o-filling__bar">
           <button class="a-icon-btn" type="button" id="fillingClose" aria-label="Close, the fill carries on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
@@ -3571,7 +3571,10 @@ body {
                the pulse takes over. -->
           <span class="o-filling__spin" id="fillingSpin" aria-hidden="true" hidden><svg class="a-spinner" width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12.5" stroke="var(--color-border)" stroke-width="3"/><path d="M17 4.5a12.5 12.5 0 0 1 12.5 12.5" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round"/></svg></span>
           <span class="o-filling__vessel" id="fillingVessel" aria-hidden="true" hidden><svg width="84" height="84" viewBox="0 0 24 24" fill="none"><defs><clipPath id="fillingDropClip"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z"/></clipPath></defs><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" fill="var(--color-primary-bg)"/><g clip-path="url(#fillingDropClip)"><g class="o-filling__liquid"><path class="o-filling__wave o-filling__wave--back" d="M-24 -1.4q3 1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary-dark)" opacity="0.35"/><path class="o-filling__wave" d="M-24 0q3 -1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary)"/></g></g></svg></span>
-          <span class="o-filling__litres" id="fillingLitres" role="status">31.4</span>
+          <!-- Not a live region: a reader hearing five updates a second of one
+           number is being shouted at, the home bar's rule exactly. The
+           arrival, the finish and the verdict all go through announce(). -->
+          <span class="o-filling__litres" id="fillingLitres">31.4</span>
           <span class="o-filling__unit" id="fillingUnit">litres so far</span>
           <span class="o-filling__verdict" id="fillingVerdict" hidden></span>
           <p class="o-filling__facts" id="fillingFacts">CA 123-456 · Engen Bryanston · up to 60 L</p>
@@ -6717,6 +6720,7 @@ body {
     el.filling.hidden = false;
     el.filling.setAttribute('data-state', 'visible');
     announce('Filling. ' + (S.fillLitresNow || 0).toFixed(1) + ' litres so far.');
+    after(60, function () { el.fillingClose.focus({ preventScroll: true }); });
   }
   function paintFilling() {
     var v = fillVehicle();
