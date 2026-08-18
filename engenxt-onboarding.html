@@ -2175,6 +2175,11 @@ body {
   flex: 1 1 auto; min-height: 0;
   display: flex; flex-direction: column; gap: var(--sp-3);
 }
+/* The vehicle the search is for. A fact line, never a control. */
+.o-stations__vehicle {
+  font-size: var(--text-caption); font-weight: 600;
+  color: var(--color-text-secondary);
+}
 .o-stations__list {
   flex: 1 1 auto;
   display: flex; flex-direction: column; gap: var(--sp-2);
@@ -3615,11 +3620,11 @@ body {
 
         <div class="o-account__row">
           <span class="o-account__rowBody">
-            <span class="o-account__rowTitle">Sign in with your face or fingerprint</span>
-            <span class="o-account__rowSub" id="accountBioSub">On. No code to wait for.</span>
+            <span class="o-account__rowTitle">Face ID sign-in</span>
+            <span class="o-account__rowSub" id="accountBioSub">On. Face ID is checked securely by your phone.</span>
           </span>
           <button class="a-switch" type="button" role="switch" id="accountBio" aria-checked="true"
-                  aria-label="Sign in with your face or fingerprint">
+                  aria-label="Face ID sign-in">
             <span class="a-switch__knob" aria-hidden="true"></span>
           </button>
         </div>
@@ -3698,7 +3703,8 @@ body {
         </div>
         <p class="o-filling__note" id="fillingNote">The pump is running.</p>
         <div class="o-filling__action">
-          <button class="a-btn a-btn--outline" type="button" id="fillingShowCode" hidden>Show the code again</button>
+          <button class="a-btn a-btn--outline" type="button" id="fillingShowCode" hidden>Show fuel code again</button>
+          <button class="a-btn a-btn--outline" type="button" id="fillingSupport" hidden>Message support</button>
           <button class="a-btn a-btn--primary" type="button" id="fillingCta" hidden>See your points</button>
         </div>
       </section>
@@ -3834,8 +3840,8 @@ body {
           <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
             <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__plate">Scan your vehicle</span>
-              <span class="m-vehicle-card__note">Read the disc or the plate to start fuelling today.</span>
+              <span class="m-vehicle-card__plate">Link the vehicle you&rsquo;re driving today</span>
+              <span class="m-vehicle-card__note">Scan its licence disc or number plate.</span>
             </span>
           </button>
 
@@ -3845,7 +3851,7 @@ body {
                and not an edge case. It says what is true and offers the one
                thing a driver can actually do about it. -->
           <div class="m-empty-note" id="homeNoVehicle" hidden>
-            <p class="m-empty-note__text">No vehicle assigned yet. You cannot fuel until your manager adds one.</p>
+            <p class="m-empty-note__text">No vehicle assigned. Your manager must assign a vehicle before you can fuel.</p>
             <button class="a-btn a-btn--outline a-btn--sm" type="button" id="homeAskManager">Message my manager</button>
           </div>
 
@@ -4094,6 +4100,9 @@ body {
 
           <h1 class="u-visually-hidden" id="stationsTitle">Choose a station</h1>
           <div class="o-stations__browse" id="stationBrowse">
+          <!-- The plate rides along, so fuel cannot drift to the wrong vehicle
+               between the scan and the pump. -->
+          <p class="o-stations__vehicle" id="stationsVehicle" hidden></p>
           <label class="m-search">
             <span class="u-visually-hidden">Search stations</span>
             <span class="m-search__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
@@ -4189,8 +4198,8 @@ body {
           <h1 class="o-fuel__title" id="fuelTitle" tabindex="-1">
             <span class="o-fuel__tick" aria-hidden="true">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            </span>Approved</h1>
-          <p class="o-fuel__lead">Show this to the attendant. Their machine scans it.</p>
+            </span><span id="fuelTitleWord">Fuel approved</span></h1>
+          <p class="o-fuel__lead" id="fuelLead">Show this code to the attendant.</p>
 
           <!-- Drawn, not fetched. Filled by showFuel, because what it encodes
                depends on the fill it belongs to. -->
@@ -4231,8 +4240,8 @@ body {
               <span class="m-fuel-figures__value">60 L</span>
             </div>
             <div class="m-fuel-figures__cell">
-              <span class="m-fuel-figures__label">Valid until</span>
-              <span class="m-fuel-figures__value">10:11</span>
+              <span class="m-fuel-figures__label">Expires in</span>
+              <span class="m-fuel-figures__value" id="fuelExpiry">29:41</span>
             </div>
           </div>
 
@@ -4310,7 +4319,9 @@ body {
     fillingSpin: $('fillingSpin'), fillingHideNote: $('fillingHideNote'), fillingVessel: $('fillingVessel'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
-    fillingShowCode: $('fillingShowCode'),
+    fillingShowCode: $('fillingShowCode'), fillingSupport: $('fillingSupport'),
+    fuelTitleWord: $('fuelTitleWord'), fuelLead: $('fuelLead'), fuelExpiry: $('fuelExpiry'),
+    stationsVehicle: $('stationsVehicle'),
     fillingClose: $('fillingClose'),
     account: $('accountScreen'), accountTitle: $('accountTitle'),
     accountBio: $('accountBio'), accountBioSub: $('accountBioSub'),
@@ -4433,6 +4444,12 @@ body {
     /* idle | pending | live. What the fuel action is currently showing, and
        the only thing on home that outlives the screen you are looking at. */
     fuel: 'idle',
+    /* null | 'refused' | 'offline'. A fault the fill screen wears over
+       whatever phase the fill is in; only the rail and the net set it. */
+    fillFault: null,
+    /* Seconds left on the fuel code. Set when a code is issued, ticked only
+       while the code is on screen, and zero is the expired face. */
+    fuelExpiryLeft: null,
     step: 'signup-reward',
     station: null, stationSort: 'near',
     /* What the company's side says. Front of house only: nothing here reads
@@ -5088,9 +5105,17 @@ body {
      does not shows how big it is, which is the only true thing a partial list
      was ever saying. */
   function paintPicker() {
-    var many = S.vehicles.length > 1;
-    el.homePicker.hidden = !many;
-    if (!many) { el.homeVehicle.hidden = !activeVehicle(); paintVehicleCard(); return; }
+    /* The owner's call: home never shows the assigned list. The only road to
+       a linked vehicle is scanning the one you are standing at, so a row of
+       plates here was either a tease (a fleet too big to list) or a second
+       door past the scan. The fleet count lives in Account, where it is a
+       fact and not an invitation. */
+    el.homePicker.hidden = true;
+    el.homePickerRow.hidden = true;
+    el.homePickerRow.innerHTML = '';
+    el.homeVehicle.hidden = !activeVehicle();
+    paintVehicleCard();
+    return;
 
     var confirmed = S.activeVehicle !== NONE;
     el.homePickerTitle.textContent = 'Your vehicles';
@@ -5414,10 +5439,11 @@ body {
       el.homeFuel.textContent = 'I want to fuel';
       el.homeFuel.setAttribute('aria-disabled', 'false');
     } else if (S.vehicles.length) {
-      el.homeFuel.textContent = 'Scan your vehicle first';
+      el.homeFuel.textContent = 'Open camera';
       el.homeFuel.setAttribute('aria-disabled', 'false');
     } else {
-      el.homeFuel.textContent = 'I want to fuel';
+      /* Not an invitation that fails on press: the fact, in the button. */
+      el.homeFuel.textContent = 'Fuel unavailable';
       el.homeFuel.setAttribute('aria-disabled', 'true');
     }
     el.home.removeAttribute('data-fuel');
@@ -5569,7 +5595,7 @@ body {
 
     vehicle: {
       mark: ICON_VAN,
-      title: 'Scan the disc or the plate',
+      title: 'Link the vehicle you\u2019re driving today',
       /* Scanning is the confirmation, not one route to it.
 
          Choosing from a list proves nothing: a driver can pick any vehicle on
@@ -5592,8 +5618,8 @@ body {
          today's vehicle without reading anything on the vehicle, which is the
          same hole as the list, just slower. What is left when a camera really
          cannot be made to work is the manager, and the scanner says so. */
-      body: 'The disc is in the corner of the windscreen. Either one links the vehicle to you for today.',
-      go: 'Open the camera',
+      body: 'Scan its licence disc or number plate. The disc is in the corner of the windscreen.',
+      go: 'Open camera',
       /* The same pills as home, for the same reason and out of the same
          function. These used to be full width raised cards carrying the make
          and the model, which made the list the heaviest thing on a screen whose
@@ -5606,7 +5632,7 @@ body {
         var list = S.vehicles.length ? S.vehicles : makeFleet(3);
         var whole = list.length <= ROW_CAP;
         host.innerHTML =
-          '<p class="o-step__label">You can use these</p>' +
+          '<p class="o-step__label">Vehicles you may drive</p>' +
           (whole
             /* The row rides inside its own block, so the element's block
                is always its ancestor - BEM kept honest in built markup. */
@@ -5614,7 +5640,7 @@ body {
               list.map(vehicleChip).join('') + '</ul></div>'
             : '<p class="o-step__note">' + groupNum(list.length) +
               ' vehicles are assigned to you.</p>') +
-          '<p class="o-step__note">Scan whichever one you are standing at.</p>';
+          '<p class="o-step__note">Scan the vehicle you\u2019re standing next to.</p>';
       },
       onGo: function () { S.scanTries = 0; showScan('ready'); }
     },
@@ -6554,6 +6580,9 @@ body {
     if (!keepChoice) { el.stationSearch.value = ''; }
     el.stationStatus.textContent = '';
     if (!keepChoice) { S.station = null; }
+    var sv = activeVehicle();
+    el.stationsVehicle.hidden = !sv;
+    if (sv) { el.stationsVehicle.textContent = 'For ' + sv.plate + ' \u00b7 ' + sv.make + ' ' + sv.model; }
     paintStations();
     el.stations.hidden = false;
     if (arriving && !prefersReduced()) {
@@ -6601,6 +6630,8 @@ body {
        which van the fuel went into. A fleet audit reads the receipt. */
     S.fillVehicle = activeVehicle() || null;
     S.fillOdo = S.odoReading || '84 230';
+    S.fillFault = null;
+    S.fuelExpiryLeft = FUEL_CODE_SECS;
     stopAuthorise();
     authoriseId = setTimeout(function () {
       authoriseId = null;
@@ -6887,7 +6918,7 @@ body {
   function paintBioSetting() {
     el.accountBio.setAttribute('aria-checked', S.bioOn ? 'true' : 'false');
     el.accountBioSub.textContent = S.bioOn
-      ? 'On. No code to wait for.'
+      ? 'On. Face ID is checked securely by your phone.'
       : 'Off. We send a code to sign you in.';
   }
 
@@ -6944,29 +6975,36 @@ body {
     /* Scanned but not yet flowing: the pump beat wears the waiting face's
        clothes with its own sentence. */
     var pumpWait = S.fuel === 'filling' && !(S.fillLitresNow > 0);
+    /* A fault is a coat over the phase, not a phase: the fill underneath is
+       wherever it was, and the coat comes off when the fault does. */
+    var fault = S.fillFault;
     el.filling.setAttribute('data-face',
-      done ? 'done' : waiting ? 'waiting' : pumpWait ? 'pump' : 'running');
+      fault === 'refused' ? 'refused' : fault === 'offline' ? 'offline'
+      : done ? 'done' : waiting ? 'waiting' : pumpWait ? 'pump' : 'running');
     /* Before the attendant scans the code there are no litres, and a zero would
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
-    el.fillingSpin.hidden = !(waiting || pumpWait);
+    el.fillingSpin.hidden = !(waiting || pumpWait) || !!fault;
     /* The reassurance may only speak while fuel is actually flowing. */
-    el.fillingHideNote.hidden = !(!done && !waiting && !pumpWait);
-    el.fillingVessel.hidden = waiting || pumpWait;
+    el.fillingHideNote.hidden = !(!done && !waiting && !pumpWait) || !!fault;
+    el.fillingVessel.hidden = waiting || pumpWait || fault === 'refused';
     /* The picture reads the cap the facts line reads: one number feeds both
        the words and the water line. */
     el.fillingVessel.style.setProperty('--fill-level', String(
       Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES))));
-    el.fillingLitres.hidden = waiting || pumpWait;
+    el.fillingLitres.hidden = waiting || pumpWait || fault === 'refused';
+    el.fillingUnit.hidden = fault === 'refused';
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
     el.fillingUnit.textContent = done ? 'litres'
                                : waiting ? 'Waiting for the attendant'
-                               : pumpWait ? 'Waiting for the pump'
+                               : pumpWait ? 'Waiting for the station'
                                : 'litres so far';
-    el.fillingVerdict.hidden = !done;
-    el.fillingVerdict.textContent = fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
-    if (done && fillPartial()) { el.fillingVerdict.setAttribute('data-tone', 'warning'); }
+    el.fillingVerdict.hidden = !done && fault !== 'refused';
+    el.fillingVerdict.textContent =
+      fault === 'refused' ? 'The station could not start this fill.'
+      : fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
+    if (fault === 'refused' || (done && fillPartial())) { el.fillingVerdict.setAttribute('data-tone', 'warning'); }
     else { el.fillingVerdict.removeAttribute('data-tone'); }
     /* 10:11 is the same fixed clock the QR figures show: 9:41 plus the
        half hour a forecourt approval is good for. */
@@ -6976,12 +7014,20 @@ body {
        already says who we are waiting for, and the phone-away promise came
        off at the owner's call - the note may still not claim a pump that
        has not started. */
-    el.fillingNote.hidden = done || waiting || pumpWait;
-    el.fillingNote.textContent = 'The pump is running.';
+    /* Every live face says what is happening and what is safe. Only the
+       finished fill leaves the line to the verdict above it. */
+    el.fillingNote.hidden = done;
+    el.fillingNote.textContent =
+      fault === 'refused' ? 'Your code and litres are safe. Show the code again, or message support.'
+      : fault === 'offline' ? 'Live updates are paused. Fuelling will continue.'
+      : waiting ? 'The fuel code has not been scanned yet.'
+      : pumpWait ? 'The code was scanned. Waiting for the station to start the pump.'
+      : 'The pump is running.';
     el.fillingCta.hidden = !done;
     /* Until the scan lands the code must stay reachable - the attendant can
        be slow to arrive. Once fuel flows, the code has done its work. */
-    el.fillingShowCode.hidden = !waiting;
+    el.fillingShowCode.hidden = !(waiting || fault === 'refused');
+    el.fillingSupport.hidden = fault !== 'refused';
   }
 
   function showPush() {
@@ -7100,6 +7146,26 @@ body {
 
   /* `arriving` when a driver got here by asking. Landing on it from the menu
      is not a journey, so it is instant. */
+  /* Half an hour is what a forecourt approval is good for; the figure ticks
+     so "expires" is a fact the attendant can check, not a promise. */
+  var FUEL_CODE_SECS = 29 * 60 + 41;
+  function paintFuelExpiry() {
+    var s = Math.max(0, S.fuelExpiryLeft || 0);
+    el.fuelExpiry.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function tickFuelExpiry() {
+    if (S.step !== 'fuel') { return; }
+    if (S.fuelExpiryLeft <= 0) { paintFuelExpired(); return; }
+    after(1000, function () { S.fuelExpiryLeft -= 1; paintFuelExpiry(); tickFuelExpiry(); });
+  }
+  function paintFuelExpired() {
+    el.fuel.setAttribute('data-expired', 'true');
+    el.fuelTitleWord.textContent = 'Code expired';
+    el.fuelLead.textContent = 'This fuel code has expired. Request a new one to fuel.';
+    el.fuelDone.textContent = 'Request a new code';
+    paintFuelExpiry();
+    announce('This fuel code has expired. Request a new one to fuel.');
+  }
   function showFuel(arriving) {
     disarmTaps();
     S.step = 'fuel';
@@ -7122,6 +7188,19 @@ body {
     /* The code is issued against the station that was chosen, so the screen
        says which one rather than leaving the driver to remember. */
     el.fuelStation.textContent = stationName();
+    /* One clock per code. A fresh fill gets the full half hour; coming back
+       to a live code resumes where it left; zero wears the expired face. */
+    if (S.fuelExpiryLeft == null) { S.fuelExpiryLeft = FUEL_CODE_SECS; }
+    if (S.fuelExpiryLeft <= 0) {
+      paintFuelExpired();
+    } else {
+      el.fuel.removeAttribute('data-expired');
+      el.fuelTitleWord.textContent = 'Fuel approved';
+      el.fuelLead.textContent = 'Show this code to the attendant.';
+      el.fuelDone.textContent = 'Hide code';
+      paintFuelExpiry();
+      tickFuelExpiry();
+    }
     el.fuel.hidden = false;
     if (arriving && !prefersReduced()) {
       el.fuel.setAttribute('data-state', 'arriving');
@@ -7220,6 +7299,10 @@ body {
   });
   /* The door back to the code. Research put an attendant, not a till, at
      the window, and a person can be slow to reach it. */
+  el.fillingSupport.addEventListener('click', function () {
+    reply('Message ready: ' + preparedMessage('The station could not start my fill.',
+      fuelDigitsShown(fuelRef())));
+  });
   el.fillingShowCode.addEventListener('click', function () {
     clearTimers(); hideAll();
     showFuel(false);
@@ -7253,7 +7336,16 @@ body {
      fill and the journey stays one unbroken line to the receipt. The X
      remains the way back to home for a driver pocketing the phone; the bar
      and the notification keep serving that path. */
-  el.fuelDone.addEventListener('click', function () { showFilling(); });
+  el.fuelDone.addEventListener('click', function () {
+    if (S.fuelExpiryLeft <= 0) {
+      /* The renewal is the same issue path a fresh approval takes. */
+      S.fuelExpiryLeft = FUEL_CODE_SECS;
+      showFuel();
+      announce('A new fuel code is ready. Show it to the attendant.');
+      return;
+    }
+    showFilling();
+  });
 
   /* Cancelling voids a code the driver may be holding out to an attendant, and
      it cannot be undone, so it is asked rather than done. The code is quoted in
@@ -7469,10 +7561,21 @@ body {
   /* A driver with nothing assigned cannot fix that from here, but they can ask
      the person who can. The same shape the sign-up flow already uses for a
      driver it has to turn away. */
-  var ASK_MANAGER = 'Hi, I have no vehicle assigned. Please add the one I am driving today.';
+  /* Every prepared message carries who, which vehicle, where, what went
+     wrong, when and a reference - the five questions a manager asks back. */
+  function preparedMessage(problem, ref) {
+    var v = activeVehicle();
+    var parts = ['Hi, this is the driver on +27 82 \u00b7\u00b7\u00b7 567.', problem];
+    if (v) { parts.push('Vehicle: ' + v.plate + '.'); }
+    if (S.station) { parts.push('Station: ' + stationName() + '.'); }
+    parts.push('Time: 9:41.');
+    parts.push('Reference: ' + (ref || 'EX-1042') + '.');
+    return parts.join(' ');
+  }
+  var ASK_MANAGER = 'I have no vehicle assigned. Please add the one I am driving today.';
   /* A different problem and so a different message: the vehicle is assigned,
      the phone is what will not read it. */
-  var ASK_MANAGER_SCAN = 'Hi, my phone cannot scan the disc or the plate on the vehicle I am in. Please help me get fuelling today.';
+  var ASK_MANAGER_SCAN = 'My phone cannot scan the disc or the plate on the vehicle I am in. Please help me get fuelling today.';
   /* Backing out goes back where it was opened from, not to a fixed screen.
      Closing a scan that the check screen asked for used to land on the vehicle
      step, which is a screen the driver at a pump never chose and has to escape
@@ -7525,7 +7628,7 @@ body {
   /* The one thing left when a camera cannot be made to work. It does not set a
      vehicle, because nothing but a scan does. */
   el.scanType.addEventListener('click', function () {
-    reply('Message ready: ' + ASK_MANAGER_SCAN);
+    reply('Message ready: ' + preparedMessage(ASK_MANAGER_SCAN));
   });
   /* The torch is the answer to the dark state, so it says so when it fixes it. */
   el.scanTorch.addEventListener('click', function () {
@@ -7564,7 +7667,7 @@ body {
   });
 
   el.homeAskManager.addEventListener('click', function () {
-    reply('Message ready: ' + ASK_MANAGER);
+    reply('Message ready: ' + preparedMessage(ASK_MANAGER));
   });
   el.stationClear.addEventListener('click', function () {
     el.stationSearch.value = '';
@@ -7572,7 +7675,7 @@ body {
     el.stationSearch.focus({ preventScroll: true });
   });
   el.stationAskManager.addEventListener('click', function () {
-    reply('Message ready: ' + ASK_MANAGER);
+    reply('Message ready: ' + preparedMessage(ASK_MANAGER));
   });
   /* Nothing beyond this screen is built yet. Saying so out loud beats a
      control that looks live and does nothing when it is tapped.
@@ -7645,6 +7748,8 @@ body {
     stopFillClock();
     stopAuthorise();
     hidePush();
+    S.fillFault = null;
+    S.fuelExpiryLeft = null;
     S.fillLitresNow = 0;
     S.fillLitresFinal = 0;
     S.fillVehicle = null;
@@ -7706,6 +7811,16 @@ body {
      them yet, so there is nothing to lead with and the row simply starts at the
      beginning of the fleet. */
   var STATES = {
+    /* The owner's order: linking is the first act of the app, so sign-up
+       hands over to the vehicle step and the reward plays once the driver
+       holds a linked vehicle. A celebration before the one mandatory job
+       was a doorway a driver could stop in. */
+    'signup-link':        { group: 'after-signup', label: 'Link a vehicle first',
+      run: function () {
+        reset('new-driver', true, ASSIGNED_ON_ARRIVAL);
+        afterScan = function () { showReward(); };
+        showStep('vehicle');
+      } },
     'signup-reward':      { group: 'after-signup', label: 'Reward, 50 points',
       run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
     'home':               { group: 'after-signup', label: 'One vehicle',
@@ -7949,6 +8064,31 @@ body {
         S.fuel = 'done'; S.fillLitresNow = PARTIAL_LITRES; paintFuelAction();
         showPush();
       } },
+    'fuel-code-expired': { group: 'fuelling', label: 'Fuel code expired',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
+        S.fuel = 'live'; S.fillVehicle = activeVehicle(); paintFuelAction();
+        S.fuelExpiryLeft = 0;
+        showFuel();
+      } },
+    'fill-refused':    { group: 'fuelling', label: 'Station could not start the fill',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
+        S.fuel = 'live'; S.fillVehicle = activeVehicle(); paintFuelAction();
+        S.fillFault = 'refused';
+        showFilling(); clearTimers();
+      } },
+    'fill-signal-lost': { group: 'fuelling', label: 'Live updates paused',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; showHome(); clearTimers();
+        S.fuel = 'filling'; S.fillLitresNow = 31.4; S.fillVehicle = activeVehicle();
+        paintFuelAction();
+        S.fillFault = 'offline';
+        showFilling(); clearTimers();
+      } },
     'fuel-watching':   { group: 'fuelling', label: 'Watching, not scanned yet',
       run: function () {
         reset('returning-driver', true, 1); confirmByScan(readDisc());
@@ -8004,8 +8144,8 @@ body {
 
      route/returning-with-vehicle is gone. Nothing ever handed over to it. */
   var ALIAS = {
-    'route/new-driver': 'signup-reward',
-    'route/new-driver-nobio': 'signup-reward',
+    'route/new-driver': 'signup-link',
+    'route/new-driver-nobio': 'signup-link',
     /* Signing in again lands a driver whose company has already assigned
        vehicles - three of them - with today's scan still to do. It used to
        land the not-assigned state, whose home told a false story about a
@@ -8165,7 +8305,7 @@ body {
     navNumber:  'Entering the number their company registered, and everything that can come back.',
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
-    navDone:    'The end of sign-up: the offer to skip the code next time, then the handover to the welcome flow.',
+    navDone:    'The end of sign-up: the Face ID offer and its every outcome, then the handover to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
@@ -8322,9 +8462,12 @@ body {
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
-                   ['biometrics/waiting','Waiting for the phone'],
-                   ['biometrics/failed','Face or fingerprint not turned on'],
-                   ['biometrics/enabled','Face or fingerprint set']]
+                   ['biometrics/waiting','Waiting for Face ID'],
+                   ['biometrics/failed','Face ID did not work'],
+                   ['biometrics/cancelled','Face ID cancelled'],
+                   ['biometrics/notsetup','Face ID not set up'],
+                   ['biometrics/locked','Face ID locked'],
+                   ['biometrics/enabled','Face ID ready']]
     }
   };
 

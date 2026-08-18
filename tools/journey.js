@@ -146,10 +146,10 @@ async function signup() {
   await sleep(300);
   s = await ev(STATE);
   check('waiting face: enable is busy', s.enableDisabled && s.enableText.indexOf('Waiting') > -1, s.enableText);
-  check('waiting face: skip is quiet', s.skipDisabled);
+  check('waiting face: skip stays live - nobody is trapped', !s.skipDisabled);
   await sleep(800);              /* 900ms wait completes */
   s = await ev(STATE);
-  check('done face speaks the ready promise', s.title === 'Face or fingerprint sign-in is ready', s.title);
+  check('done face speaks the ready promise', s.title === 'Face ID is ready', s.title);
   check('S.biometrics = enabled', s.bio === 'enabled', s.bio);
   await sleep(900);              /* 700ms beat to handover */
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
@@ -169,13 +169,12 @@ async function signup() {
   s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
   check('grab bar at offer = skip = handover', s.href.indexOf('engenxt-onboarding.html#route/new-driver') === 0, s.href);
 
-  console.log('\n── walk 5: Escape mid-wait does nothing ──');
+  console.log('\n── walk 5: Escape mid-wait = Not now, nobody is trapped ──');
   await fresh('biometrics/waiting');
   await raw(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
-  await sleep(400);
-  s = await ev(STATE);
-  check('still at the wait, not navigated', s.stage === 'biometrics' && s.href.indexOf('index.html') === 0, s.stage + ' ' + s.href);
-  check('wait face intact', s.enableDisabled && s.skipDisabled);
+  await sleep(700);
+  s = await ev(`JSON.stringify({ href: location.pathname.split('/').pop() + location.hash })`);
+  check('Escape mid-wait skips to the welcome flow', s.href.indexOf('engenxt-onboarding.html#route/') === 0, s.href);
 
   console.log('\n── walk 6: signin mode routes home ──');
   await fresh('success/signin');

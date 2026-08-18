@@ -1957,10 +1957,10 @@ button { background: none; border: none; color: inherit; }
                question is never asked again. -->
           <div class="o-signup-sheet__stage o-outcome-panel" id="stageBiometrics">
             <span class="a-icon-wrap a-icon-wrap--lg a-icon-wrap--mark" id="bioIcon" data-tone="info" aria-hidden="true"></span>
-            <h3 class="o-outcome-panel__title" id="bioTitle" tabindex="-1">Skip the code next time</h3>
-            <p class="o-outcome-panel__body" id="bioBody">Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.</p>
+            <h3 class="o-outcome-panel__title" id="bioTitle" tabindex="-1">Use Face ID next time</h3>
+            <p class="o-outcome-panel__body" id="bioBody">Sign in faster without waiting for a code. You can change this later in Account.</p>
             <div class="o-outcome-panel__actions">
-              <button class="a-btn a-btn--primary" type="button" id="bioEnable">Turn it on</button>
+              <button class="a-btn a-btn--primary" type="button" id="bioEnable">Turn on Face ID</button>
               <button class="a-btn a-btn--outline" type="button" id="bioSkip">Not now</button>
     <button class="a-btn a-btn--primary" type="button" id="bioContinue" hidden>Continue</button>
             </div>
@@ -2438,6 +2438,7 @@ button { background: none; border: none; color: inherit; }
     /* Written only by chooseBiometrics. The answer is given once: asked at
        the end of sign-up, never re-asked, and skipping is not a failure. */
     biometrics: 'unasked', // unasked | enabled | skipped | deferred
+    bioFace: 'ask',        // which biometric face is up; steers the enable button
     otp: ['', '', '', '', '', ''],
     attemptsLeft: MAX_ATTEMPTS,
     resendsLeft: MAX_RESENDS,
@@ -3277,7 +3278,7 @@ button { background: none; border: none; color: inherit; }
 
       lockOtp(false);
       setOtpTone('success');
-      setHelper(el.otpHelper, 'Code confirmed', 'success');
+      setHelper(el.otpHelper, "Code confirmed. You're signed in.", 'success');
       /* The task is finished, so every way back out of it goes now rather
          than lingering behind the transition. */
       setCodeView('confirmed');
@@ -3487,14 +3488,15 @@ button { background: none; border: none; color: inherit; }
   /* Paints are pure and timer-free, so the rail can land on any face directly
      and an organic journey passes through the same three. */
   function paintBioAsk() {
+    S.bioFace = 'ask';
     el.bioIcon.setAttribute('data-tone', 'info');
     el.bioIcon.innerHTML = iconMarkup('scanFace', toneColour('info'), 28);
     el.bioEnable.hidden = false;
     el.bioSkip.hidden = false;
     el.bioContinue.hidden = true;
-    el.bioTitle.textContent = 'Skip the code next time';
-    el.bioBody.textContent = 'Sign in with your face or fingerprint instead of waiting for a code. You can also turn it on later in Account.';
-    setBtn(el.bioEnable, true, 'Turn it on');
+    el.bioTitle.textContent = 'Use Face ID next time';
+    el.bioBody.textContent = 'Sign in faster without waiting for a code. You can change this later in Account.';
+    setBtn(el.bioEnable, true, 'Turn on Face ID');
     setBtn(el.bioSkip, true, 'Not now');
     el.bioContinue.hidden = true;
   }
@@ -3503,10 +3505,15 @@ button { background: none; border: none; color: inherit; }
      can only wait. Both buttons go quiet, which also makes Escape a no-op,
      because a driver cannot cancel the phone's check from underneath it. */
   function paintBioWaiting() {
-    el.bioEnable.innerHTML = spinnerMarkup() + '<span>Waiting for your phone…</span>';
+    S.bioFace = 'waiting';
+    el.bioTitle.textContent = 'Complete Face ID on your phone';
+    el.bioBody.textContent = 'Waiting for Face ID…';
+    el.bioEnable.innerHTML = spinnerMarkup() + '<span>Waiting for Face ID…</span>';
     el.bioEnable.setAttribute('aria-disabled', 'true');
     el.bioEnable.disabled = true;
-    setBtn(el.bioSkip, false);
+    /* Live, not greyed: the phone's own sheet can close without an answer,
+       and a driver watching a spinner must always hold a way past it. */
+    setBtn(el.bioSkip, true, 'Not now');
   }
 
   function paintBioDone() {
@@ -3515,8 +3522,9 @@ button { background: none; border: none; color: inherit; }
     /* Not "Biometrics on": the offer never says the word, and a category is
        not a thing a driver can picture. "Ready" is the owner's word: it
        says the thing will work next time, which is the whole promise. */
-    el.bioTitle.textContent = 'Face or fingerprint sign-in is ready';
-    el.bioBody.textContent = 'Next time, your face or fingerprint signs you in. No code to wait for.';
+    S.bioFace = 'done';
+    el.bioTitle.textContent = 'Face ID is ready';
+    el.bioBody.textContent = 'You can use it the next time you sign in.';
     /* Hidden, not greyed: a disabled "Turn it on" under "is set" reads as
        an offer that failed. The answer was given; the ask is over. */
     el.bioEnable.hidden = true;
@@ -3530,13 +3538,58 @@ button { background: none; border: none; color: inherit; }
   function paintBioFailed() {
     el.bioIcon.setAttribute('data-tone', 'warning');
     el.bioIcon.innerHTML = iconMarkup('alert', toneColour('warning'), 28);
-    el.bioTitle.textContent = 'Face or fingerprint sign-in was not turned on';
-    el.bioBody.textContent = 'Your phone could not finish setting it up. Try again, or skip it and sign in with a code.';
+    S.bioFace = 'failed';
+    el.bioTitle.textContent = 'Face ID didn’t work';
+    el.bioBody.textContent = 'Try again, or sign in with a code.';
+    el.bioContinue.hidden = true;
+    el.bioEnable.hidden = false;
+    el.bioSkip.hidden = false;
+    setBtn(el.bioEnable, true, 'Try Face ID again');
+    setBtn(el.bioSkip, true, 'Use a code instead');
+  }
+
+  /* The phone's sheet closed without an answer. Nothing failed and nothing
+     was saved; both roads stay open. */
+  function paintBioCancelled() {
+    S.bioFace = 'cancelled';
+    el.bioIcon.setAttribute('data-tone', 'warning');
+    el.bioIcon.innerHTML = iconMarkup('alert', toneColour('warning'), 28);
+    el.bioTitle.textContent = 'Face ID was cancelled';
+    el.bioBody.textContent = 'Nothing was saved. Try again, or sign in with a code.';
     el.bioContinue.hidden = true;
     el.bioEnable.hidden = false;
     el.bioSkip.hidden = false;
     setBtn(el.bioEnable, true, 'Try again');
-    setBtn(el.bioSkip, true, 'Not now');
+    setBtn(el.bioSkip, true, 'Use a code instead');
+  }
+
+  /* The phone has no Face ID enrolled. The fix lives in phone settings, not
+     in this app, and the code road never closes. */
+  function paintBioNotSetup() {
+    S.bioFace = 'notsetup';
+    el.bioIcon.setAttribute('data-tone', 'warning');
+    el.bioIcon.innerHTML = iconMarkup('alert', toneColour('warning'), 28);
+    el.bioTitle.textContent = 'Face ID is not set up on this phone';
+    el.bioBody.textContent = 'Set it up in your phone settings, or use a code.';
+    el.bioContinue.hidden = true;
+    el.bioEnable.hidden = false;
+    el.bioSkip.hidden = false;
+    setBtn(el.bioEnable, true, 'Open phone settings');
+    setBtn(el.bioSkip, true, 'Use a code instead');
+  }
+
+  /* Too many failed tries on the phone side. Only the phone can unlock it,
+     so the app offers the one thing that works now. */
+  function paintBioLocked() {
+    S.bioFace = 'locked';
+    el.bioIcon.setAttribute('data-tone', 'warning');
+    el.bioIcon.innerHTML = iconMarkup('lock', toneColour('warning'), 28);
+    el.bioTitle.textContent = 'Face ID is temporarily locked';
+    el.bioBody.textContent = 'Unlock your phone, then try again.';
+    el.bioContinue.hidden = true;
+    el.bioEnable.hidden = true;
+    el.bioSkip.hidden = false;
+    setBtn(el.bioSkip, true, 'Use a code instead');
   }
 
   /* The one writer of S.biometrics. A tapped "Not now" is an answer and is
@@ -3947,7 +4000,7 @@ button { background: none; border: none; color: inherit; }
                                is the biometrics offer, and a helper promising
                                the app while a question stands between them
                                would be the screen lying about its own flow. */
-                            setHelper(el.otpHelper, 'Code confirmed', 'success');
+                            setHelper(el.otpHelper, "Code confirmed. You're signed in.", 'success');
                             setCodeView('confirmed');
                             /* And it goes there. This state froze at the green
                                field and read as the app hanging - a reviewer
@@ -3973,40 +4026,61 @@ button { background: none; border: none; color: inherit; }
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('success'); setCodeView('confirmed');
-                          setHelper(el.otpHelper, 'Code confirmed', 'success');
+                          setHelper(el.otpHelper, "Code confirmed. You're signed in.", 'success');
                           offerBiometrics(); clearTimers();
                         } },
     'success/signin': { label: 'Signed in, opens home', run: function () {
                           base('signin', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('success'); setCodeView('confirmed');
-                          setHelper(el.otpHelper, 'Code confirmed', 'success');
+                          setHelper(el.otpHelper, "Code confirmed. You're signed in.", 'success');
                           offerBiometrics(); clearTimers();
                         } },
     /* The two moments only the enable path has. clearTimers so the navigator
        holds the frame: a reviewer looking at "waiting" is looking at the
        wait, not riding it into the handover. */
-    'biometrics/waiting': { label: 'Waiting for the phone', run: function () {
+    'biometrics/waiting': { label: 'Waiting for Face ID', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('success'); setCodeView('confirmed');
                           offerBiometrics(); clearTimers();
                           paintBioWaiting();
                         } },
-    'biometrics/failed': { label: 'Face or fingerprint not turned on', run: function () {
+    'biometrics/failed': { label: 'Face ID did not work', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('success'); setCodeView('confirmed');
                           offerBiometrics(); clearTimers();
                           paintBioFailed();
                         } },
-    'biometrics/enabled': { label: 'Face or fingerprint set', run: function () {
+    'biometrics/enabled': { label: 'Face ID ready', run: function () {
                           base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
                           S.otp = ['1','2','3','4','5','6']; paintOtp();
                           setOtpTone('success'); setCodeView('confirmed');
                           offerBiometrics(); clearTimers();
                           S.biometrics = 'enabled';
                           paintBioDone();
+                        } },
+    'biometrics/cancelled': { label: 'Face ID cancelled', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('success'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          paintBioCancelled();
+                        } },
+    'biometrics/notsetup': { label: 'Face ID not set up', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('success'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          paintBioNotSetup();
+                        } },
+    'biometrics/locked': { label: 'Face ID locked', run: function () {
+                          base('signup', '821234567'); goToCode({ fresh: true, quiet: true });
+                          S.otp = ['1','2','3','4','5','6']; paintOtp();
+                          setOtpTone('success'); setCodeView('confirmed');
+                          offerBiometrics(); clearTimers();
+                          paintBioLocked();
                         } }
   };
 
@@ -4024,7 +4098,7 @@ button { background: none; border: none; color: inherit; }
                  'code/err-expired', 'code/slow', 'code/resend-ready', 'code/resend-limit',
                  'code/sms-sent', 'code/err-offline', 'code/err-server', 'code/success'],
     navBlocked: ['blocked/suspended', 'blocked/fleet', 'blocked/locked'],
-    navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/failed', 'biometrics/enabled']
+    navDone:    ['success/signup', 'success/signin', 'biometrics/waiting', 'biometrics/failed', 'biometrics/cancelled', 'biometrics/notsetup', 'biometrics/locked', 'biometrics/enabled']
   };
 
   /* ════════════════════════════════════════════════════════════════════
@@ -4157,7 +4231,7 @@ button { background: none; border: none; color: inherit; }
     navNumber:  'Entering the number their company registered, and everything that can come back.',
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
-    navDone:    'The end of sign-up: the offer to skip the code next time, then the handover to the welcome flow.',
+    navDone:    'The end of sign-up: the Face ID offer and its every outcome, then the handover to the welcome flow.',
     'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
@@ -4223,6 +4297,7 @@ button { background: none; border: none; color: inherit; }
   var AWAY_STATES = {
     'engenxt-onboarding.html': {
       'after-signup': [
+        ['signup-link', 'Link a vehicle first'],
         ['signup-reward', 'Reward, 50 points'],
         ['home', 'One vehicle'],
         ['new-four-vehicles', 'Four vehicles'],
@@ -4271,6 +4346,9 @@ button { background: none; border: none; color: inherit; }
         ['fuel-approved', 'Approved, the QR'],
         ['fuel-live', 'Home, fill still open'],
         ['fuel-filling', 'Filling'],
+        ['fuel-code-expired', 'Fuel code expired'],
+        ['fill-refused', 'Station could not start the fill'],
+        ['fill-signal-lost', 'Live updates paused'],
         ['fuel-watching', 'Watching, not scanned yet'],
         ['fuel-filling-open', 'Filling, watched'],
         ['fuel-done', 'Done, the notification'],
@@ -4314,9 +4392,12 @@ button { background: none; border: none; color: inherit; }
                    ['blocked/fleet','Company inactive'],['blocked/locked','Locked 15 min']],
       navDone:    [['success/signup','Signed up, opens the welcome reward'],
                    ['success/signin','Signed in, opens home'],
-                   ['biometrics/waiting','Waiting for the phone'],
-                   ['biometrics/failed','Face or fingerprint not turned on'],
-                   ['biometrics/enabled','Face or fingerprint set']]
+                   ['biometrics/waiting','Waiting for Face ID'],
+                   ['biometrics/failed','Face ID did not work'],
+                   ['biometrics/cancelled','Face ID cancelled'],
+                   ['biometrics/notsetup','Face ID not set up'],
+                   ['biometrics/locked','Face ID locked'],
+                   ['biometrics/enabled','Face ID ready']]
     }
   };
 
@@ -4584,7 +4665,16 @@ button { background: none; border: none; color: inherit; }
   /* Idempotent by construction: offerBiometrics clears the pending timer, so
      a tap and the 700ms beat can both fire without a double journey. */
   el.codeContinue.addEventListener('click', function () { offerBiometrics(); });
-  el.bioEnable.addEventListener('click', function () { chooseBiometrics(true); });
+  el.bioEnable.addEventListener('click', function () {
+    /* From the not-set-up face the button opens phone settings; the prototype
+       plays the round trip and returns to the offer. */
+    if (S.bioFace === 'notsetup') {
+      announce('Opening phone settings.');
+      after(1400, function () { paintBioAsk(); announce('Back from settings. Face ID is now set up.'); });
+      return;
+    }
+    chooseBiometrics(true);
+  });
   el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
   el.bioContinue.addEventListener('click', function () { handOver(); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
