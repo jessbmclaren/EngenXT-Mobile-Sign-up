@@ -2932,12 +2932,29 @@ body {
    under a screen of nothing. Both margins auto, and the tail - note or
    action - anchors below on its own. */
 .o-filling__stage { margin-block: auto; display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
-.o-filling__dot {
-  width: 12px; height: 12px; border-radius: var(--radius-circle);
-  background: var(--color-success);
-  animation: livePulse 1.8s var(--ease-in-out) infinite;
-  margin-bottom: var(--sp-2);
+/* The vessel. The pulse dot said "alive"; a drop of fuel filling up says
+   what is alive. The liquid rides the same facts as the words - litres now
+   over the approved cap - so the picture and the figure cannot disagree.
+   Two waves drift at different speeds for depth, the drop sits in the
+   primary's own light - the marks' halo grammar - and on done the drift
+   stills, because a pump that has stopped does not slosh. */
+.o-filling__vessel { position: relative; margin-bottom: var(--sp-2); }
+.o-filling__vessel::before {
+  content: ''; position: absolute; inset: -26px;
+  border-radius: var(--radius-circle);
+  background: radial-gradient(closest-side, var(--color-primary), transparent 74%);
+  opacity: 0.14; pointer-events: none;
 }
+.o-filling__vessel svg { display: block; }
+/* Empty puts the surface at the drop's tip (y 22), full at its neck (y 5):
+   17 units of travel, eased so each tick pours rather than steps. */
+.o-filling__liquid {
+  transform: translateY(calc(22px - var(--fill-level, 0) * 17px));
+  transition: transform .7s var(--ease-out);
+}
+.o-filling__wave { animation: waveDrift 2.4s linear infinite; }
+.o-filling__wave--back { animation-duration: 3.4s; }
+@keyframes waveDrift { to { transform: translateX(-12px); } }
 .o-filling__litres {
   font-size: 64px; font-weight: 800; line-height: 1;
   letter-spacing: -1px; color: var(--color-text-primary);
@@ -2947,8 +2964,9 @@ body {
 .o-filling__facts { margin-top: var(--sp-4); font-size: var(--text-caption); color: var(--color-text-secondary); }
 .o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
 .o-filling__action { align-self: stretch; margin-top: var(--sp-4); }
-.o-filling[data-face="done"] .o-filling__dot { animation: none; }
-.o-filling[data-face="waiting"] .o-filling__dot { display: none; }
+.o-filling[data-face="done"] .o-filling__wave { animation-play-state: paused; }
+[data-motion="reduced"] .o-filling__wave { animation: none; }
+@media (prefers-reduced-motion: reduce) { .o-filling__wave { animation: none; } }
 .o-filling__spin { margin-bottom: var(--sp-2); }
 /* Waiting has no litres, and a placeholder drawn at the numeral's size read
    as a black brick. The waiting face speaks instead: the sentence takes the
@@ -3569,7 +3587,7 @@ body {
                size. Once litres flow, the counting number is the loader and
                the pulse takes over. -->
           <span class="o-filling__spin" id="fillingSpin" aria-hidden="true" hidden><svg class="a-spinner" width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12.5" stroke="var(--color-border)" stroke-width="3"/><path d="M17 4.5a12.5 12.5 0 0 1 12.5 12.5" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round"/></svg></span>
-          <span class="o-filling__dot" aria-hidden="true"></span>
+          <span class="o-filling__vessel" id="fillingVessel" aria-hidden="true" hidden><svg width="84" height="84" viewBox="0 0 24 24" fill="none"><defs><clipPath id="fillingDropClip"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z"/></clipPath></defs><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" fill="var(--color-primary-light)"/><g clip-path="url(#fillingDropClip)"><g class="o-filling__liquid"><path class="o-filling__wave o-filling__wave--back" d="M-24 -1.4q3 1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary-dark)" opacity="0.35"/><path class="o-filling__wave" d="M-24 0q3 -1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary)"/></g></g></svg></span>
           <span class="o-filling__litres" id="fillingLitres" role="status">31.4</span>
           <span class="o-filling__unit" id="fillingUnit">litres so far</span>
           <span class="o-filling__verdict" id="fillingVerdict" hidden></span>
@@ -4170,7 +4188,7 @@ body {
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
     filling: $('fillingScreen'), fillingLitres: $('fillingLitres'),
     fillingUnit: $('fillingUnit'), fillingVerdict: $('fillingVerdict'),
-    fillingSpin: $('fillingSpin'),
+    fillingSpin: $('fillingSpin'), fillingVessel: $('fillingVessel'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
     fillingClose: $('fillingClose'),
@@ -6731,6 +6749,11 @@ body {
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
     el.fillingSpin.hidden = !waiting;
+    el.fillingVessel.hidden = waiting;
+    /* The picture reads the cap the facts line reads: one number feeds both
+       the words and the water line. */
+    el.fillingVessel.style.setProperty('--fill-level', String(
+      Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES))));
     el.fillingLitres.hidden = waiting;
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
