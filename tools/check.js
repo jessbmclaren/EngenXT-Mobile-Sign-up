@@ -447,12 +447,12 @@ const SHARED_BLOCKS = [
   'a-notch', 'm-notch', 'm-status-bar', 'm-brand-lockup',
   't-device-frame', 'u-visually-hidden',
 ];
+/* THE REGISTER of deliberate one-sidedness. Every entry is a decision
+   with its reason; an absence here means "forgot to copy", and the gate
+   treats it that way. Comparison is comment-stripped by design: the
+   declarations are the shared truth, rationale lives where it was
+   written. */
 const SHARED_DIVERGENCE = new Set([
-  /* index has the offline states; the net readout and its driver live
-     only there, and onboarding deleted its dead copy on purpose. */
-  '.m-status-bar__net',
-  '[data-net="offline"] .m-status-bar__net',
-  '[data-net="offline"] .m-status-bar__signal',
 ]);
 /* Selectors a file may EXTEND with extra rules of its own - the shared
    base rule is still compared verbatim. Onboarding raises the device
@@ -594,9 +594,6 @@ const STYLED_ONLY = new Set([
   'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'a-handle', 'm-brand-lockup__tag',
 ]);
 const USED_ONLY = new Set([
-  /* the status bar svg keeps its name in both files so the bars read as
-     one component; only index, which has the offline state, styles it */
-  'm-status-bar__signal',
   /* the molecule's identity over the a-field shell; the shell carries
      the declarations */
   'm-phone-field',

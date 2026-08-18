@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-ZA" data-motion="system" data-text="default">
+<html lang="en-ZA" data-motion="system" data-text="default" data-net="online">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -619,6 +619,13 @@ body {
   animation-duration: .001ms !important; animation-iteration-count: 1 !important;
   animation-delay: 0s !important;
   transition-duration: .001ms !important; transition-delay: 0s !important;
+}
+/* The hooks the toggles flip. These were the two dead switches: the rail
+   wrote data-spec and data-grid and no rule ever read them here. */
+[data-spec="on"] .d-panel { display: flex; flex-direction: column; }
+[data-grid="on"] .d-gridOverlay { display: block; }
+@media (max-width: 900px) {
+  .d-panel { width: 100%; max-width: var(--d-panel-width); max-height: none; }
 }
 .d-panel {
   width: var(--d-panel-width); flex: 1 1 auto;
@@ -2313,6 +2320,14 @@ body {
 /* The device's own chrome stays on top of an app screen, the way it does on a
    phone. Without this the surface covered the clock and the battery. */
 .m-notch, .m-status-bar { z-index: var(--z-tool-top); }
+/* Connection state, shown where a phone shows it. Without this data-net was a
+   flag with no rendering, so Offline looked broken until you tried to send. */
+.m-status-bar__net {
+  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
+}
+[data-net="offline"] .m-status-bar__net { display: inline; }
+[data-net="offline"] .m-status-bar__signal { opacity: .35; }
 .o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: stretch; }
 
 /* ══ THE CHECK ════════════════════════════════════════════════════════
@@ -3342,6 +3357,7 @@ body {
       <div class="m-notch" aria-hidden="true"><div class="a-notch"></div></div>
       <div class="m-status-bar" data-tone="onDark" aria-hidden="true" id="statusBar">
         <span class="m-status-bar__time">9:41</span>
+          <span class="m-status-bar__net">No service</span>
         <span class="m-status-bar__icons">
           <svg class="m-status-bar__signal" width="17" height="12" viewBox="0 0 17 12" fill="none">
             <rect x="0" y="7" width="3" height="5" rx="1" fill="var(--color-on-dark-strong)"/>
@@ -5780,6 +5796,7 @@ body {
   }
 
   function hideScan() {
+    root.setAttribute('data-net', 'online');
     el.scan.hidden = true;
     el.scan.removeAttribute('data-state');
   }
@@ -5792,6 +5809,9 @@ body {
     setStatusTone(true);            /* the camera fills the screen */
     S.step = 'scan';
     S.scanFace = face || 'ready';
+    /* The one writer of the device's connection truth: only the scanner's
+       offline face claims no service, and the way out restores it. */
+    root.setAttribute('data-net', S.scanFace === 'offline' ? 'offline' : 'online');
     /* Whatever it caught last time is not what it is looking at now. A stale
        "Reading the number plate" over a fresh viewfinder is the app reporting a
        read it has not taken. Only the reading state carries one, and the rail
