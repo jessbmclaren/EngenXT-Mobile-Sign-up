@@ -4384,12 +4384,21 @@ body {
     confettiPlayed: false        // one burst, ever, per arrival on the screen
   };
 
+  /* The channel law. This array is the swap channel: everything in it dies
+     on every screen change, via clearTimers(). A timer that must survive
+     navigation lives in its own named channel with its own stopper - the
+     fill clock, the approval beat, the toast - and says so where it is
+     declared. The announcer's beat is cleared on swap AND superseded by
+     the next announcement, so a stale sentence can never speak over a new
+     screen. */
   var timers = [];
+  var announceId = null;
   function after(ms, fn) { var t = setTimeout(fn, ms); timers.push(t); return t; }
-  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; clearTimeout(announceId); }
   function announce(msg) {
+    clearTimeout(announceId);
     el.announcer.textContent = '';
-    setTimeout(function () { el.announcer.textContent = msg; }, 60);
+    announceId = setTimeout(function () { el.announcer.textContent = msg; }, 60);
   }
   /* Verbatim from index.html. Its own timer rather than the `timers` array on
      purpose: clearTimers() runs on every screen change, and a toast is allowed
@@ -4529,26 +4538,26 @@ body {
   /* ════════════════════════════════════════════════════════════════════
      SCREENS
      ════════════════════════════════════════════════════════════════════ */
+  /* Two species share the show/hide verbs. The SCREENS below are rooms:
+     one at a time, S.step names it, and hideAll clears every room before
+     a show* opens the next. Overlays - the code, the stations sheet, the
+     confirm, the push - lie over a room and come and go without touching
+     S.step, so their own show/hide pairs arm the tap guard themselves,
+     which rooms get from hideAll by construction. */
+  var SCREENS = [];
   function hideAll() {
     disarmTaps();
     /* Every route off the code screen goes through here as well as through
        hideFuel, including picking a state from the menu, so the hold is let go
        in the one place nothing can get past. */
     releaseScreen();
-    el.reward.hidden = true;  el.reward.removeAttribute('data-state');
-    el.home.hidden = true;    el.home.removeAttribute('data-state');
-    el.check.hidden = true;    el.check.removeAttribute('data-state');
-    el.fuel.hidden = true;    el.fuel.removeAttribute('data-state');
-    el.stations.hidden = true; el.stations.removeAttribute('data-state');
-    el.step.hidden = true;     el.step.removeAttribute('data-state');
-    el.scan.hidden = true;     el.scan.removeAttribute('data-state');
-    el.check.hidden = true;    el.check.removeAttribute('data-state');
-    el.earned.hidden = true;   el.earned.removeAttribute('data-state');
-    el.receipt.hidden = true;  el.receipt.removeAttribute('data-state');
-    el.history.hidden = true;  el.history.removeAttribute('data-state');
-    el.account.hidden = true;  el.account.removeAttribute('data-state');
-    el.rewards.hidden = true;  el.rewards.removeAttribute('data-state');
-    el.filling.hidden = true;  el.filling.removeAttribute('data-state'); el.filling.removeAttribute('data-face');
+    if (!SCREENS.length) {
+      SCREENS = [el.reward, el.home, el.check, el.fuel, el.stations, el.step,
+                 el.scan, el.earned, el.receipt, el.history, el.account,
+                 el.rewards, el.filling];
+    }
+    SCREENS.forEach(function (n) { n.hidden = true; n.removeAttribute('data-state'); });
+    el.filling.removeAttribute('data-face');
     /* Not the push. It is the phone's chrome, not an app screen: real
        notifications survive the app changing screens underneath them, and so
        does this one. reset() takes it down, because a state picked from the
@@ -6424,9 +6433,11 @@ body {
       announce('Choose a station. ' + STATIONS.filter(function (s) { return s.allowed; }).length +
                ' are allowed for your company.');
     });
+    after(60, function () { el.stationsBack.focus({ preventScroll: true }); });
   }
 
   function hideStations() {
+    disarmTaps();
     el.stations.hidden = true;
     el.stations.removeAttribute('data-state');
   }
@@ -6943,6 +6954,7 @@ body {
   /* `arriving` when a driver got here by asking. Landing on it from the menu
      is not a journey, so it is instant. */
   function showFuel(arriving) {
+    disarmTaps();
     S.step = 'fuel';
     setStatusTone(false);
     holdScreenAwake();
@@ -7081,6 +7093,7 @@ body {
       'Cancel the code for ' + (v ? v.plate : 'this fill') + '?';
     el.fuelConfirmBody.textContent =
       'This QR will stop working. You would have to choose a station again.';
+    disarmTaps();
     el.fuelConfirm.hidden = false;
     after(60, function () { el.fuelConfirmTitle.focus({ preventScroll: true }); });
     announce(el.fuelConfirmTitle.textContent + ' ' + el.fuelConfirmBody.textContent);
@@ -7089,13 +7102,19 @@ body {
     el.fuelConfirm.hidden = true;
     el.fuelCancel.focus({ preventScroll: true });
   });
-  el.fuelDrop.addEventListener('click', function () {
+  /* The one writer of the cancel transition. The pump's clock stops with
+     the fill it was counting: the till can read the code in the very beat
+     the confirm is open, and a cancelled fill must not leave litres
+     ticking in an idle state. */
+  function cancelFill() {
+    stopFillClock();
     el.fuelConfirm.hidden = true;
     S.fuel = 'idle';
     hideFuel();
     paintFuelAction();
     announce('Code cancelled. Nothing was approved.');
-  });
+  }
+  el.fuelDrop.addEventListener('click', cancelFill);
   /* Escape closes it the way the close button does, because a screen laid over
      another one has to be dismissible from the keyboard. It never cancels: a
      stray key press must not call off a fill somebody is standing at.

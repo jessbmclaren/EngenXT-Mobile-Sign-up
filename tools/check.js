@@ -513,6 +513,29 @@ function sharedRules(name) {
 }
 
 
+
+/* ── The focus gate ──────────────────────────────────────────────────
+   Every function that walks the driver into a new room must take focus
+   with it, or carry a written no-focus reason. The filling screen
+   shipped without the step once; this is the invariant as a test. */
+for (const name of FILES) {
+  for (const code of scriptsOf(src[name])) {
+    const noStrings = code.replace(/'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/g, "''");
+    for (const m of noStrings.matchAll(/function (\w+)\([^)]*\)\s*\{/g)) {
+      let depth = 1; let i = m.index + m[0].length; const start = i;
+      while (i < noStrings.length && depth) {
+        if (noStrings[i] === '{') { depth++; }
+        if (noStrings[i] === '}') { depth--; }
+        i++;
+      }
+      const body = noStrings.slice(start, i);
+      if (!/S\.step\s*=(?!=)/.test(body)) { continue; }
+      if (/\.focus\(/.test(body) || /no-focus:/.test(body)) { continue; }
+      fail(`${name}: ${m[1]}() moves S.step but never moves focus - add the focus step or a /* no-focus: reason */`);
+    }
+  }
+}
+
 /* ── The axis gate ───────────────────────────────────────────────────
    The data-* vocabulary is the component API, and it drifted into
    private dialects twice before this manifest existed (tones nobody

@@ -1442,12 +1442,14 @@ button { background: none; border: none; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important; animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+    animation-delay: 0s !important;
+    transition-duration: .001ms !important; transition-delay: 0s !important;
   }
 }
 [data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
   animation-duration: .001ms !important; animation-iteration-count: 1 !important;
-  transition-duration: .001ms !important;
+  animation-delay: 0s !important;
+  transition-duration: .001ms !important; transition-delay: 0s !important;
 }
 
 /* Forced colours discard every background and border colour, which is every
@@ -2409,7 +2411,12 @@ button { background: none; border: none; color: inherit; }
     fails: {}
   };
 
+  /* The channel law. This array is the swap channel: everything in it dies
+     on every stage change, via clearTimers(). A timer that must survive a
+     stage lives in its own named channel with its own stopper - the toast,
+     the resend countdown - and says so where it is declared. */
   var timers = [];
+  var announceId = null;
   var slowHintId = null;
   var autoSubmitId = null;
   function after(ms, fn) { var id = setTimeout(fn, ms); timers.push(id); return id; }
@@ -2453,7 +2460,11 @@ button { background: none; border: none; color: inherit; }
      clicked a state, which made Offline look broken. */
   var userNet = 'online';
   function applyNet(net) { el.root.setAttribute('data-net', net || userNet); syncModes(); }
-  function announce(msg) { el.announcer.textContent = ''; setTimeout(function () { el.announcer.textContent = msg; }, 60); }
+  function announce(msg) {
+    clearTimeout(announceId);
+    el.announcer.textContent = '';
+    announceId = setTimeout(function () { el.announcer.textContent = msg; }, 60);
+  }
   /* The shake answers something the driver just did. Jumping straight to a
      state from the navigator is not something they did, so the sheet stays
      still: a reviewer stepping down the list was getting a flinch per click
