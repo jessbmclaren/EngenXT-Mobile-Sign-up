@@ -3038,7 +3038,8 @@ body {
 /* Waiting has no litres, and a placeholder drawn at the numeral's size read
    as a black brick. The waiting face speaks instead: the sentence takes the
    stage at title weight, the pulse carries the life. */
-.o-filling[data-face="waiting"] .o-filling__unit {
+.o-filling[data-face="waiting"] .o-filling__unit,
+.o-filling[data-face="pump"] .o-filling__unit {
   font-size: var(--text-lead); font-weight: 800; color: var(--color-text-primary);
   letter-spacing: -0.4px;
 }
@@ -5313,6 +5314,9 @@ body {
       model: 'Toyota Hilux 2.4GD-6', litres: 31.0, pts: 310, odo: '83 402 km', ref: '355 118' }
   ];
   var FILL_TAKES_MS = 8000;
+  /* The beat between the scan and the first litres: the nozzle goes in
+     before anything flows, and the screen owes that moment its own name. */
+  var PUMP_TAKES_MS = 1500;
   /* What the square encodes.
 
      It used to be six digits printed on the screen for a person to read out and
@@ -6636,14 +6640,16 @@ body {
          the driver to keep holding it. */
       S.fuel = 'filling';
       S.fillLitresNow = 0;
-      if (S.step === 'fuel') { hideFuel(); }
-      if (S.step === 'filling-screen') { paintFilling(); }
+      /* A watcher is walked forward, never dropped: the scan lands and the
+         QR screen becomes the watched fill, opening on the pump beat. */
+      if (S.step === 'fuel') { showFilling(); }
+      else if (S.step === 'filling-screen') { paintFilling(); }
       paintFuelAction();
-      announce('The till has your code. Filling ' + (fillVehicle() ? fillVehicle().plate : 'your vehicle') + '.');
+      announce('Your code is scanned. Waiting for the pump.');
       return;
     }
     if (S.fuel === 'filling') {
-      var run = Math.min(1, (t - SCAN_AFTER_MS) / FILL_TAKES_MS);
+      var run = Math.min(1, Math.max(0, (t - SCAN_AFTER_MS - PUMP_TAKES_MS) / FILL_TAKES_MS));
       S.fillLitresNow = Math.round(FILL_LITRES * run * 10) / 10;
       paintFuelAction();
       if (S.step === 'filling-screen') { paintFilling(); }
@@ -6934,34 +6940,42 @@ body {
     var v = fillVehicle();
     var done = S.fuel === 'done';
     var waiting = S.fuel === 'live';
-    el.filling.setAttribute('data-face', done ? 'done' : waiting ? 'waiting' : 'running');
+    /* Scanned but not yet flowing: the pump beat wears the waiting face's
+       clothes with its own sentence. */
+    var pumpWait = S.fuel === 'filling' && !(S.fillLitresNow > 0);
+    el.filling.setAttribute('data-face',
+      done ? 'done' : waiting ? 'waiting' : pumpWait ? 'pump' : 'running');
     /* Before the attendant scans the code there are no litres, and a zero would
        be the screen inventing a fill that has not started. The waiting face
        says what is true; the first real tick replaces it. */
-    el.fillingSpin.hidden = !waiting;
+    el.fillingSpin.hidden = !(waiting || pumpWait);
     /* The reassurance may only speak while fuel is actually flowing. */
-    el.fillingHideNote.hidden = !(!done && !waiting);
-    el.fillingVessel.hidden = waiting;
+    el.fillingHideNote.hidden = !(!done && !waiting && !pumpWait);
+    el.fillingVessel.hidden = waiting || pumpWait;
     /* The picture reads the cap the facts line reads: one number feeds both
        the words and the water line. */
     el.fillingVessel.style.setProperty('--fill-level', String(
       Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES))));
-    el.fillingLitres.hidden = waiting;
+    el.fillingLitres.hidden = waiting || pumpWait;
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
     el.fillingUnit.textContent = done ? 'litres'
                                : waiting ? 'Waiting for the attendant'
+                               : pumpWait ? 'Waiting for the pump'
                                : 'litres so far';
     el.fillingVerdict.hidden = !done;
     el.fillingVerdict.textContent = fillPartial() ? 'The pump stopped early.' : 'Fill complete.';
     if (done && fillPartial()) { el.fillingVerdict.setAttribute('data-tone', 'warning'); }
     else { el.fillingVerdict.removeAttribute('data-tone'); }
-    el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES;
+    /* 10:11 is the same fixed clock the QR figures show: 9:41 plus the
+       half hour a forecourt approval is good for. */
+    el.fillingFacts.textContent = (v ? v.plate : '') + ' \u00b7 ' + stationName() + ' \u00b7 up to ' + FUEL_LITRES +
+      (waiting ? ' \u00b7 code valid until 10:11' : '');
     /* One line of pump truth on the running face only. The waiting face
        already says who we are waiting for, and the phone-away promise came
        off at the owner's call - the note may still not claim a pump that
        has not started. */
-    el.fillingNote.hidden = done || waiting;
+    el.fillingNote.hidden = done || waiting || pumpWait;
     el.fillingNote.textContent = 'The pump is running.';
     el.fillingCta.hidden = !done;
     /* Until the scan lands the code must stay reachable - the attendant can

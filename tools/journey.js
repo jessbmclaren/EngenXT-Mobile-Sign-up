@@ -253,23 +253,26 @@ async function fuelling() {
   await sleep(6400);                                     /* the attendant scans at 6s */
   s = await st();
   check('QR came down on its own once read', !s.fuelUp, JSON.stringify(s));
-  /* State was not enough once: an invisible home answers every question
-     about itself, and the driver sees a blank phone. Visibility is asserted
-     wherever a screen claims to be under the driver's thumb. */
-  check('home is standing under it', s.homeVisible);
+  /* The watcher is walked forward, not dropped home: the scan lands and
+     the screen becomes the watched fill, opening on the pump beat. */
+  const pw = JSON.parse(await ev(`JSON.stringify({
+    up: !document.getElementById('fillingScreen').hidden,
+    face: document.getElementById('fillingScreen').getAttribute('data-face') })`));
+  check('the scan walks the watcher to the pump beat', pw.up && pw.face === 'pump', JSON.stringify(pw));
   check('fuel is flowing', s.fuel === 'filling');
-  check('litres are counting', s.litres > 0 && s.litres < 52.4, s.litres);
   check('bar says Filling', s.barTitle === 'Filling', s.barTitle);
-  await sleep(8600);                                     /* the fill finishes */
+  await sleep(1800);                                     /* the nozzle goes in */
+  s = await st();
+  check('litres are counting', s.litres > 0 && s.litres < 52.4, s.litres);
+  await sleep(8400);                                     /* the fill finishes */
   s = await st();
   check('fill done', s.fuel === 'done', s.fuel);
-  check('the notification is up', s.pushUp);
+  check('watching means no notification', !s.pushUp);
   check('bar says Fill complete', s.barTitle === 'Fill complete', s.barTitle);
-  await ev(`document.getElementById('pushNote').click()`);
+  await ev(`document.getElementById('fillingCta').click()`);
   await sleep(1600);
   s = await st();
-  check('notification opens the points', s.earnedUp && s.step === 'earned', s.step);
-  check('notification came down', !s.pushUp);
+  check('the done face opens the points', s.earnedUp && s.step === 'earned', s.step);
   check('medal counted to 524', await ev(`document.getElementById('earnedValue').textContent`) === '524');
   await ev(`document.getElementById('earnedCta').click()`);
   await sleep(500);

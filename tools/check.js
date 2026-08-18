@@ -570,7 +570,7 @@ for (const name of FILES) {
 
 const AXES = {
   tone: ['error', 'info', 'locked', 'onDark', 'success', 'warning'],
-  face: ['done', 'running', 'waiting'],
+  face: ['done', 'pump', 'running', 'waiting'],
   phase: ['done', 'filling'],
   outcome: ['fail', 'pass', 'skipped'],
   verdict: ['block', 'clear'],
