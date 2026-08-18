@@ -1127,7 +1127,7 @@ button { background: none; border: none; color: inherit; }
   position: relative;
 }
 .o-signup-sheet__noteMore::before {
-  content: ''; position: absolute; inset: -16px -10px;
+  content: ''; position: absolute; inset: -17px -10px;   /* 15px of text to the 48px floor */
 }
 /* The opened card is part of the same thought, one base step below it. */
 #privacyCard:not([hidden]) { margin-top: var(--sp-2); }

@@ -25,3 +25,14 @@ jobs:
         with:
           node-version: '22'
       - run: node tools/check.js
+  # The behavioural suites need a browser, and the runner ships Chrome. A
+  # separate job so a parse failure reads as itself, not as a dead browser.
+  behave:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: CHROME="$(which google-chrome)" node tools/journey.js
+      - run: CHROME="$(which google-chrome)" node tools/sweep.js

@@ -210,6 +210,17 @@ async function fuelling() {
   await send('Page.enable'); await send('Runtime.enable');
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   const ev = async (expr) => (await send('Runtime.evaluate', { expression: expr, returnByValue: true })).result.value;
+  /* A beat is real when its condition is, not when a sleep guesses it is.
+     Poll for arrivals; keep fixed sleeps only where the test is that
+     nothing happens (the tap guard) or the clock itself is the subject. */
+  const until = async (expr, ms) => {
+    const end = Date.now() + (ms || 6000);
+    while (Date.now() < end) {
+      if (await ev(expr)) { return true; }
+      await sleep(100);
+    }
+    return false;
+  };
   const st = async () => JSON.parse(await ev(`JSON.stringify({
     step: Demo.S().step, fuel: Demo.S().fuel, litres: Demo.S().fillLitresNow || 0,
     fuelUp: !document.getElementById('fuelScreen').hidden,
@@ -413,6 +424,42 @@ async function fuelling() {
     await ev(`document.getElementById('receiptLitres').textContent`) === '23.1 Lof 60 L approved');
   check('partial receipt balance 2 681',
     await ev(`document.getElementById('receiptBalance').textContent`) === '2 681 pts');
+
+  console.log('\n── the account keeps its word, and the way out is real ──');
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=12#account` });
+  await until(`!document.getElementById('accountScreen').hidden`);
+  await sleep(600);                          /* past the arrival guard */
+  await ev(`document.getElementById('accountBio').click()`);
+  await sleep(250);
+  let ac = JSON.parse(await ev(`JSON.stringify({
+    checked: document.getElementById('accountBio').getAttribute('aria-checked'),
+    sub: document.getElementById('accountBioSub').textContent })`));
+  check('the biometrics switch flips fact and words together',
+    ac.checked === 'false' && /code/.test(ac.sub), JSON.stringify(ac));
+  await ev(`document.querySelector('[data-tab="home"]').click()`);
+  await sleep(700);
+  await ev(`document.querySelector('[data-tab="account"]').click()`);
+  await sleep(700);
+  ac = JSON.parse(await ev(`JSON.stringify({
+    checked: document.getElementById('accountBio').getAttribute('aria-checked') })`));
+  check('the setting survives leaving the room', ac.checked === 'false', JSON.stringify(ac));
+  await ev(`document.getElementById('accountOut').click()`);
+  const out = await until(`location.pathname.indexOf('index.html') !== -1`, 5000);
+  check('sign out lands on the sign-in front door',
+    out && await ev(`location.hash`) === '#home/default', String(out));
+
+  console.log('\n── the stations answer the search ──');
+  await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=13#fuel-stations` });
+  await until(`document.querySelectorAll('.m-station').length > 0`);
+  await sleep(600);
+  const beforeN = await ev(`document.querySelectorAll('.m-station').length`);
+  await ev(`(function(){var f=document.getElementById('stationSearch'); f.value='riv'; f.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await sleep(300);
+  const afterN = await ev(`document.querySelectorAll('.m-station').length`);
+  check('typing filters the station list', afterN < beforeN && afterN > 0, beforeN + ' -> ' + afterN);
+  await ev(`document.querySelector('.m-station').click()`);
+  const opened = await until(`!!document.getElementById('stationGo') && document.getElementById('stationGo').offsetParent !== null`, 4000);
+  check('a chosen station opens its sheet with the go door', opened);
 
   ws.close(); chrome.kill();
 }

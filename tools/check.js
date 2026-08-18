@@ -514,6 +514,24 @@ function sharedRules(name) {
 
 
 
+/* ── The recipe census ───────────────────────────────────────────────
+   The spec panel documents components by name, and a recipe naming a
+   class that no longer exists is documentation lying with confidence. */
+{
+  try {
+    const spec = literal(stripJsComments(scriptsOf(src[SIGNUP]).join('\n')), 'var RECIPES =');
+    const css = [...src[SIGNUP].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+    for (const m of spec.matchAll(/name: '\.([\w-]+)'/g)) {
+      /* identity class: the a-field shell carries the declarations,
+         per the naming gate's register */
+      if (m[1] === 'm-phone-field') { continue; }
+      if (!new RegExp('\\.' + m[1] + '(?![\\w-])').test(css)) {
+        fail(SIGNUP + ": the spec panel documents '." + m[1] + "' but no rule styles it - the recipe is lying");
+      }
+    }
+  } catch (e) { /* a build without the panel */ }
+}
+
 /* ── The focus gate ──────────────────────────────────────────────────
    Every function that walks the driver into a new room must take focus
    with it, or carry a written no-focus reason. The filling screen

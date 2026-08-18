@@ -24,8 +24,8 @@
            node tools/sweep.js index.html     one file
 
   Needs Chrome (set CHROME=/path/to/chrome to override the macOS default)
-  and a few minutes. Not wired into CI for that reason: run it before a
-  merge the way you run a test suite, and trust check.js for every push.
+  and a few minutes. Wired into CI as the behave job; run it locally
+  before a merge the way you run a test suite.
 
   States are enumerated from each page's own rail (window.Demo.states()), so
   a new state is swept the day it exists, with nothing to update here.
@@ -87,6 +87,10 @@ const AUDIT = `(function () {
   var f = document.querySelector('.t-device-frame');
   if (!f) { return JSON.stringify({ noFrame: true, small: [], stranded: [] }); }
   var fr = f.getBoundingClientRect();
+  /* One law, one writer: the floor is the token the spec panel reads,
+     not a number this file made up. */
+  var min = parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue('--size-target')) || 48;
   var small = [];
   f.querySelectorAll('button, a[href], [role="button"], input, select').forEach(function (el) {
     if (el.closest('.d-stateNav, .d-panel')) { return; }
@@ -112,7 +116,7 @@ const AUDIT = `(function () {
         if (!isNaN(pw)) { w = Math.max(w, pw); }
       }
     });
-    if (h < 44 || w < 44) {
+    if (h < min || w < min) {
       small.push(((el.className || '').toString().split(' ')[0] || el.tagName.toLowerCase()) +
         ' ' + Math.round(w) + 'x' + Math.round(h));
     }
