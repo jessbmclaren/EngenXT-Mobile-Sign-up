@@ -638,7 +638,7 @@ const STYLED_ONLY = new Set([
   /* The atom library is copied whole between the files, so a variant one
      file has not reached for yet is library, not death. */
   'a-btn--onDark', 'a-link', 'a-link--quiet', 'a-link--flush', 'a-link--onDark',
-  'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'a-handle', 'm-brand-lockup__tag',
+  'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'm-brand-lockup__tag',
 ]);
 const USED_ONLY = new Set([
   /* the molecule's identity over the a-field shell; the shell carries

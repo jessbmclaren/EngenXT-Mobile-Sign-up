@@ -180,6 +180,13 @@
      at 42px they read as a headline. */
   --text-display:  30px;
   --text-hero:     42px;
+  /* Above the hero, and the only step that is. It is the live litre
+     count on the filling screen: the one figure a driver watches from
+     arm's length while fuel goes in, so it is sized for the moment
+     rather than for the page. It was a raw 64px, which meant the ramp
+     claimed a 42px ceiling it did not have and the number was the one
+     thing on that screen which did not answer Large text. */
+  --text-figure:   64px;
   --text-title:    22px;
   --text-lead:    20px;
   --text-heading:  18px;
@@ -319,6 +326,7 @@
 [data-text="large"] {
   --text-display:  34px;   /* the ramp's +4, like the hero's */
   --text-hero:     46px;
+  --text-figure:   68px;   /* the ramp's +4 at this end, like the hero's */
   --text-title:    24px;
   --text-lead:    22px;
   --text-heading:  20px;
@@ -505,7 +513,7 @@ button { background: none; border: none; color: inherit; }
 .a-icon-wrap--mark[data-tone="info"]    { color: var(--color-primary); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
 .a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
-.a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
+.a-icon-wrap[data-tone="success"] { background: var(--color-success-bg); }
 .a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
 .a-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
 .a-notch { width: 126px; height: 34px; background: var(--color-hardware); border-radius: 0 0 var(--radius-notch) var(--radius-notch); }
@@ -923,7 +931,6 @@ button { background: none; border: none; color: inherit; }
    wrap takes the same on-dark treatment as everything else here. */
 .a-icon-wrap--onDark {
   background: var(--color-accent-on-dark-fill);
-  border-color: var(--color-accent-on-dark-line);
 }
 
 /* The colour behind the dark. Three soft fields drift under the content, so
@@ -2211,10 +2218,12 @@ button { background: none; border: none; color: inherit; }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .o-stations__sheet { background: var(--color-surface); }
 }
-.a-grabber {
-  align-self: center; width: 36px; height: 4px; flex-shrink: 0;
-  border-radius: var(--radius-pill); background: var(--color-border-strong);
-}
+/* The sheet's grab bar is the library's handle, placed. It used to be a
+   second atom under another name, one pixel thinner and in a lighter grey
+   than the one the sign-up sheet draws - two bars from one scale, differing
+   only by having been written twice. The atom carries the thickness and the
+   colour; the screen carries where it sits, which is the parent's business. */
+.o-stations__sheet .a-handle { align-self: center; flex-shrink: 0; }
 /* The wrapper the search, the list and the empty note share.
 
    It had no rule at all, so it was a plain block inside a flex column sheet.
@@ -3096,39 +3105,50 @@ button { background: none; border: none; color: inherit; }
 /* The rows fill in behind the card rather than arriving with it, so the slip
    reads as being written. Seven steps because seven is what the receipt
    holds; an eighth row simply lands with the seventh. */
-.o-receipt[data-state="visible"] .o-receipt__card .o-receipt__row {
+.o-receipt[data-state="visible"] .o-receipt__card .m-slip-row {
   animation: checkRise .42s var(--ease-out) both;
 }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(1) { animation-delay: .20s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(2) { animation-delay: .25s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(3) { animation-delay: .30s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(4) { animation-delay: .35s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(5) { animation-delay: .40s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(6) { animation-delay: .45s; }
-.o-receipt[data-state="visible"] .o-receipt__row:nth-child(n+7) { animation-delay: .50s; }
-.o-receipt__row {
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(1) { animation-delay: .20s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(2) { animation-delay: .25s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(3) { animation-delay: .30s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(4) { animation-delay: .35s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(5) { animation-delay: .40s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(6) { animation-delay: .45s; }
+.o-receipt[data-state="visible"] .m-slip-row:nth-child(n+7) { animation-delay: .50s; }
+/* m-slip-row. One fact on a filed slip: what it is, and what it was.
+   A molecule rather than an element of the receipt, because History renders
+   the same row inside o-history__card and an element may not outlive its
+   block's ancestry - the law this file states over a-screen-title and again
+   over the vehicle picker's builder. It was o-receipt__row, built into a
+   card belonging to another organism, which is exactly the shape both those
+   comments forbid. The receipt still owns the ARRIVAL of these rows; it does
+   not own the rows. */
+.m-slip-row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3);
   padding: var(--sp-3) 0; border-bottom: 1px solid var(--color-border-light);
 }
-.o-receipt__row:last-child { border-bottom: none; }
-.o-receipt__label { font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary); }
-.o-receipt__value {
+.m-slip-row:last-child { border-bottom: none; }
+.m-slip-row__label { font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary); }
+.m-slip-row__value {
   font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
   text-align: right; font-variant-numeric: tabular-nums;
 }
-.o-receipt__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
+.m-slip-row__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
 /* The one row this app added to the paper slip, so it is the one the screen
    is allowed to be pleased about. The wash bleeds to the card's edges - the
-   negative margin gives back exactly the padding the card holds - so it reads
-   as a band in the document rather than a chip dropped on it. */
-.o-receipt__row[data-tone="success"] {
+   negative margin gives back exactly the inline padding its card holds - so
+   it reads as a band in the document rather than a chip dropped on it.
+   Both cards that hold this row pad by --sp-4 on the inline axis, which is
+   what makes one value correct in both places; a card that pads differently
+   would have to say so here. */
+.m-slip-row[data-tone="success"] {
   margin-inline: calc(var(--sp-4) * -1); padding-inline: var(--sp-4);
   background: linear-gradient(90deg, var(--color-success-12), transparent 78%);
 }
-.o-receipt__row[data-tone="success"] .o-receipt__value { color: var(--color-success); }
+.m-slip-row[data-tone="success"] .m-slip-row__value { color: var(--color-success); }
 /* Points land rather than appear. A small spring on the one figure the driver
    was hoping for; everything else on the slip is a fact they already knew. */
-.o-receipt[data-state="visible"] .o-receipt__row[data-tone="success"] .o-receipt__value {
+.o-receipt[data-state="visible"] .m-slip-row[data-tone="success"] .m-slip-row__value {
   display: inline-block;
   animation: ptsLand .5s var(--ease-spring) .55s both;
 }
@@ -3422,7 +3442,7 @@ button { background: none; border: none; color: inherit; }
 .o-filling__wave--back { animation-duration: 3.4s; }
 @keyframes waveDrift { to { transform: translateX(-12px); } }
 .o-filling__litres {
-  font-size: 64px; font-weight: 800; line-height: 1;
+  font-size: var(--text-figure); font-weight: 800; line-height: 1;
   letter-spacing: -1px; color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
@@ -3966,33 +3986,33 @@ button { background: none; border: none; color: inherit; }
         <h1 class="a-screen-title" id="receiptTitle" tabindex="-1">Receipt</h1>
         <p class="o-receipt__when" id="receiptWhen">Today · 9:41</p>
         <div class="o-receipt__card">
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">Station</span>
-            <span class="o-receipt__value" id="receiptStation">Engen Bryanston</span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">Station</span>
+            <span class="m-slip-row__value" id="receiptStation">Engen Bryanston</span>
           </div>
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">Vehicle</span>
-            <span class="o-receipt__value" id="receiptVehicle">CA 123-456<small class="o-receipt__sub" id="receiptModel">Ford Transit Custom 2.0TDCi</small></span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">Vehicle</span>
+            <span class="m-slip-row__value" id="receiptVehicle">CA 123-456<small class="m-slip-row__sub" id="receiptModel">Ford Transit Custom 2.0TDCi</small></span>
           </div>
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">Fuel</span>
-            <span class="o-receipt__value" id="receiptLitres">52.4 L<small class="o-receipt__sub">of 60 L approved</small></span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">Fuel</span>
+            <span class="m-slip-row__value" id="receiptLitres">52.4 L<small class="m-slip-row__sub">of 60 L approved</small></span>
           </div>
-          <div class="o-receipt__row" data-tone="success">
-            <span class="o-receipt__label">Points earned</span>
-            <span class="o-receipt__value" id="receiptPoints">+524 pts</span>
+          <div class="m-slip-row" data-tone="success">
+            <span class="m-slip-row__label">Points earned</span>
+            <span class="m-slip-row__value" id="receiptPoints">+524 pts</span>
           </div>
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">New points balance</span>
-            <span class="o-receipt__value" id="receiptBalance">2 974 pts</span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">New points balance</span>
+            <span class="m-slip-row__value" id="receiptBalance">2 974 pts</span>
           </div>
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">Kilometre reading</span>
-            <span class="o-receipt__value" id="receiptOdo">84 230 km<small class="o-receipt__sub" id="receiptOdoNote" hidden></small></span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">Kilometre reading</span>
+            <span class="m-slip-row__value" id="receiptOdo">84 230 km<small class="m-slip-row__sub" id="receiptOdoNote" hidden></small></span>
           </div>
-          <div class="o-receipt__row">
-            <span class="o-receipt__label">Reference</span>
-            <span class="o-receipt__value" id="receiptRef">654 321</span>
+          <div class="m-slip-row">
+            <span class="m-slip-row__label">Reference</span>
+            <span class="m-slip-row__value" id="receiptRef">654 321</span>
           </div>
         </div>
         <div class="o-receipt__spacer"></div>
@@ -4513,7 +4533,7 @@ button { background: none; border: none; color: inherit; }
         <!-- The list is the control. The map says where, the list says which,
              and on a phone held in one hand the list is the half you can reach. -->
         <div class="o-stations__sheet">
-          <span class="a-grabber" aria-hidden="true"></span>
+          <span class="a-handle" aria-hidden="true"></span>
 
           <!-- The selected station lives here rather than on a card over the
                map. Floating it above meant the screen ran five interaction
@@ -7668,19 +7688,19 @@ button { background: none; border: none; color: inherit; }
       return '<p class="o-history__when">' + (r.when || 'Today · 9:41') + '</p>' +
         '<div class="o-history__card">' +
         row('Station', r.station) +
-        row('Vehicle', r.plate + '<small class="o-receipt__sub">' + r.model + '</small>') +
+        row('Vehicle', r.plate + '<small class="m-slip-row__sub">' + r.model + '</small>') +
         row('Fuel', r.litres + ' L') +
-        '<div class="o-receipt__row" data-tone="success">' +
-          '<span class="o-receipt__label">Points earned</span>' +
-          '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
+        '<div class="m-slip-row" data-tone="success">' +
+          '<span class="m-slip-row__label">Points earned</span>' +
+          '<span class="m-slip-row__value">+' + r.pts + ' pts</span></div>' +
         row('Kilometre reading', (r.odo || '') +
-            (r.odoLast ? '<small class="o-receipt__sub">last fill was ' + r.odoLast + '</small>' : '')) +
+            (r.odoLast ? '<small class="m-slip-row__sub">last fill was ' + r.odoLast + '</small>' : '')) +
         row('Reference', r.ref) +
         '</div>';
       function row(label, value) {
-        return '<div class="o-receipt__row">' +
-          '<span class="o-receipt__label">' + label + '</span>' +
-          '<span class="o-receipt__value">' + value + '</span></div>';
+        return '<div class="m-slip-row">' +
+          '<span class="m-slip-row__label">' + label + '</span>' +
+          '<span class="m-slip-row__value">' + value + '</span></div>';
       }
     }).join('');
     el.history.hidden = false;

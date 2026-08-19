@@ -177,6 +177,13 @@
      at 42px they read as a headline. */
   --text-display:  30px;
   --text-hero:     42px;
+  /* Above the hero, and the only step that is. It is the live litre
+     count on the filling screen: the one figure a driver watches from
+     arm's length while fuel goes in, so it is sized for the moment
+     rather than for the page. It was a raw 64px, which meant the ramp
+     claimed a 42px ceiling it did not have and the number was the one
+     thing on that screen which did not answer Large text. */
+  --text-figure:   64px;
   --text-title:    22px;
   --text-lead:    20px;
   --text-heading:  18px;
@@ -310,6 +317,7 @@
 [data-text="large"] {
   --text-display:  34px;   /* the ramp's +4, like the hero's */
   --text-hero:     46px;
+  --text-figure:   68px;   /* the ramp's +4 at this end, like the hero's */
   --text-title:    24px;
   --text-lead:    22px;
   --text-heading:  20px;
@@ -555,7 +563,6 @@ button { background: none; border: none; color: inherit; }
 /* Library carry from the app file: the dark-surface plate. */
 .a-icon-wrap--onDark {
   background: var(--color-accent-on-dark-fill);
-  border-color: var(--color-accent-on-dark-line);
 }
 /* The mark on a screen that stops someone.
 
@@ -594,7 +601,7 @@ button { background: none; border: none; color: inherit; }
 .a-icon-wrap--mark[data-tone="info"]    { color: var(--color-primary); }
 .a-icon-wrap[data-tone="error"]   { background: var(--color-secondary-bg); }
 .a-icon-wrap[data-tone="warning"] { background: var(--color-warning-bg); }
-.a-icon-wrap[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
+.a-icon-wrap[data-tone="success"] { background: var(--color-success-bg); }
 
 /* a-handle. 5px is a deliberate hairline bar thickness, not a grid value. */
 .a-handle { width: 36px; height: 5px; border-radius: var(--radius-pill); background: var(--color-handle); }
@@ -3116,7 +3123,11 @@ button { background: none; border: none; color: inherit; }
   function spinnerMarkup(size, track, arc) {
     var s = size || 22, r = (s / 22) * 8, c = s / 2;
     return '<svg class="a-spinner" width="' + s + '" height="' + s + '" viewBox="0 0 ' + s + ' ' + s + '" fill="none" aria-hidden="true">' +
-      '<circle cx="' + c + '" cy="' + c + '" r="' + r + '" stroke="' + (track || 'rgba(255,255,255,0.30)') + '" stroke-width="2.5"/>' +
+      /* The track's default is the on-dark line step, not a hand-written
+         alpha. 0.30 was not on the ramp - it runs .85/.72/.60/.45/.18/.10 -
+         and the app file already draws this same atom with the token. The arc
+         below always had it; only the track was written by hand. */
+      '<circle cx="' + c + '" cy="' + c + '" r="' + r + '" stroke="' + (track || 'var(--color-on-dark-line)') + '" stroke-width="2.5"/>' +
       '<path d="M' + c + ' ' + (c - r) + 'a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + r + '" stroke="' +
       (arc || 'var(--color-text-on-dark)') + '" stroke-width="2.5" stroke-linecap="round"/></svg>';
   }
@@ -4985,11 +4996,12 @@ button { background: none; border: none; color: inherit; }
         ['size', '40px, or 64px with --lg'],
         ['border-radius', 'var(--radius-card-sm), or var(--radius-circle) with --lg'],
         ['background', 'var(--color-primary-bg)'],
-        ['border', '1px solid var(--color-primary-08)']
+        ['border', 'none. A fill, not an outline: the tone tints already lift the plate off the surface, and a ring on top of them read as a border on the icon rather than as a plate behind it.'],
+        ['--onDark', 'var(--color-accent-on-dark-fill), for the plate on a dark surface.']
       ], states: [
-        ['[data-tone="error"]', 'var(--color-secondary-bg) on var(--color-secondary-12)'],
-        ['[data-tone="warning"]', 'var(--color-warning-bg) on var(--color-warning-25)'],
-        ['[data-tone="success"]', 'var(--color-success-bg) on var(--color-success-20)'],
+        ['[data-tone="error"]', 'background var(--color-secondary-bg)'],
+        ['[data-tone="warning"]', 'background var(--color-warning-bg)'],
+        ['[data-tone="success"]', 'background var(--color-success-bg)'],
         ['[data-motion="pop"]', 'animation: pop .5s var(--ease-spring). Collapses to a still frame under reduced motion.'],
         ['a11y', 'aria-hidden. The tone it carries is always also in the words beside it.']
       ] },
