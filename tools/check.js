@@ -719,7 +719,8 @@ const STYLED_ONLY = new Set([
   /* The atom library is copied whole between the files, so a variant one
      file has not reached for yet is library, not death. */
   'a-btn--onDark', 'a-btn--outlineOnDark', 'a-link', 'a-link--quiet', 'a-link--flush', 'a-link--onDark',
-  'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'm-brand-lockup__tag',
+  'a-icon-wrap--lg', 'a-icon-wrap--mark', 'a-icon-wrap--onDark', 'a-icon-wrap--bare',
+  'm-brand-lockup__tag',
   'm-brand-lockup--onDark',
 ]);
 const USED_ONLY = new Set([
@@ -821,6 +822,225 @@ for (const [name, whole] of Object.entries(src)) {
 }
 /* ── Report ───────────────────────────────────────── */
 
+/* ── The composition gate ────────────────────────────────────────────
+   "A parent may never RESTYLE a child's insides. A child that needs to
+   look different in a context carries a modifier for it."
+
+   That law is written on the Rules tab of the design panel and repeated
+   in the comments of both files, and until now it was enforced by
+   whoever happened to be reading. It is also the single law this
+   codebase has broken most: the verdict pill that owned none of its own
+   colour, the brand lockup painted by home, the outline button
+   recoloured by the scanner - three components that could not be lifted
+   out of the screen they were written in, all the same mistake.
+
+   It is the mistake a person new to design systems makes first and
+   notices last, because the screen looks right. So it is checked.
+
+   A parent placing a child is fine and expected - where a thing sits is
+   the parent's business. What the thing IS - its colour, its edge, its
+   type - belongs to the thing. The split below is that sentence as a
+   list. */
+
+const APPEARANCE = new Set([
+  'color', 'background', 'background-color', 'background-image',
+  'border', 'border-color', 'border-width', 'border-style', 'border-radius',
+  'border-top', 'border-right', 'border-bottom', 'border-left',
+  'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+  'border-top-width', 'border-bottom-width', 'border-left-width', 'border-right-width',
+  'box-shadow', 'font-size', 'font-weight', 'font-family', 'font-style',
+  'letter-spacing', 'line-height', 'text-transform', 'text-decoration',
+  'fill', 'stroke', 'backdrop-filter', '-webkit-backdrop-filter',
+]);
+
+/* Every one of these is a decision, not an oversight. An absence here is
+   read as the mistake it usually is, so an entry has to earn its place with
+   a reason someone else can check.
+
+   All four are the device frame, and the device frame is the one parent
+   whose job genuinely includes changing what its children are. It is not a
+   screen dressing a component: it is the hardware, and the hardware decides
+   whether this is an iPhone with a notch or an Android with a pill, and how
+   much room is left when a keyboard is up. A component cannot carry a
+   modifier for that, because it is not the component's fact. */
+const COMPOSITION_ALLOWED = new Set([
+  /* The Android width has no notch: the same cut-out becomes a pill, and
+     that is the device being a different device rather than the frame
+     restyling a part. */
+  '.t-device-frame[data-width="360"] .a-notch',
+  /* The compression order, written down at length beside the sheet: when
+     the keyboard takes half the screen something has to give, and the frame
+     is the only thing that knows the keyboard is there. The sheet squares
+     its corners and the hero's title steps down a size. */
+  '.t-device-frame[data-keyboard="open"] .o-signup-sheet',
+  '.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title',
+]);
+
+const blockOf = (cls) => cls.split('__')[0].split('--')[0];
+
+/* Ink is the one property a component may deliberately not own.
+
+   Several atoms here declare no `color` at all and take it from whatever
+   they are placed in - a-icon-wrap does it so the plate's glyph matches the
+   row it sits in, and the verdict's mark does it so the ring that leaves it
+   is the verdict's hue. Setting the colour those children were designed to
+   inherit is composition, not restyling: the child chose to ask.
+
+   So `color` only counts against a parent when the child declares a colour
+   of its own somewhere. Everything else on the appearance list counts
+   always, because nothing inherits a border or a shadow. */
+function declaresOwnColour(target) {
+  const esc = target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const own = new RegExp('^\\.' + esc + '(\\[[^\\]]*\\])?(:[a-z-]+)?$');
+  for (const name of FILES) {
+    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      for (let sel of m[1].split(',')) {
+        sel = sel.trim().replace(/\s+/g, ' ');
+        if (own.test(sel) && /(^|;)\s*color\s*:/.test(m[2])) { return true; }
+      }
+    }
+  }
+  return false;
+}
+
+{
+  for (const name of FILES) {
+    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const decls = m[2];
+      for (let sel of m[1].split(',')) {
+        sel = sel.trim().replace(/\s+/g, ' ');
+        if (!sel || sel.startsWith('@') || sel.includes('.d-')) { continue; }
+        if (COMPOSITION_ALLOWED.has(sel)) { continue; }
+        /* Descendant selectors only: one compound is a block styling
+           itself, which is its own business. */
+        const compounds = sel.split(/\s+|\s*>\s*/).filter(Boolean);
+        if (compounds.length < 2) { continue; }
+        const first = (compounds[0].match(/\.([a-z]-[\w-]*)/) || [])[1];
+        const last = (compounds[compounds.length - 1].match(/\.([a-z]-[\w-]*)/) || [])[1];
+        if (!first || !last) { continue; }
+        if (blockOf(first) === blockOf(last)) { continue; }
+        const bad = [];
+        for (const d of decls.split(';')) {
+          const prop = d.split(':')[0].trim().toLowerCase();
+          if (!APPEARANCE.has(prop)) { continue; }
+          if (prop === 'color' && !declaresOwnColour(last)) { continue; }
+          bad.push(prop);
+        }
+        if (bad.length) {
+          fail(`${name}: '${sel}' paints ${blockOf(last)} from inside ${blockOf(first)} ` +
+               `(${[...new Set(bad)].join(', ')})\n        a parent places a child; what it looks like belongs to the child. ` +
+               `Give ${blockOf(last)} a modifier and set it there, or register the selector in COMPOSITION_ALLOWED with its reason.`);
+        }
+      }
+    }
+  }
+}
+
+/* ── The level gate ──────────────────────────────────────────────────
+   Frost's layers, checked rather than asserted.
+
+   Every prefix in these files is a claim - that a- is a basic building
+   block, that m- is a small group of them doing one job, that o- is a
+   distinct section built from those. Nothing tested any of it, so the
+   letter was whatever the author typed, and a component filed at the
+   wrong level is not a naming quibble: it is a thing nobody can find
+   and everybody rebuilds.
+
+   The rule that can be checked from the markup is containment, and it
+   is the one Frost is clearest about. Atoms are the parts. Molecules
+   are groups of atoms. Organisms are made of molecules and atoms and
+   other organisms. So the arrow only points one way: an atom may not
+   contain a molecule or an organism, and a molecule may not contain an
+   organism. Organisms inside organisms are allowed, because Frost says
+   so in as many words.
+
+   Static markup only, and honestly so: markup built in a script is
+   assembled at runtime and this gate cannot see it. It catches the
+   nesting a person writes by hand, which is where the mistake is made.
+
+   It fails only on a clear inversion - a smaller thing holding a bigger
+   one. Same-level nesting is left alone on purpose, because Frost does
+   not forbid it and the calls are genuinely arguable. Three exist here
+   and are worth a designer's ruling rather than a build failure:
+
+     a-icon-btn holds a-badge   the bell wearing its dot. Two atoms, so
+                                strictly the pair is a molecule.
+     m-app-bar holds m-brand-lockup   a bar holding a lockup and two
+                                controls; arguably a small organism.
+     m-alert holds m-privacy    an alert holding a list of facts.
+
+   None of them costs anything today: each renders correctly, is used in
+   one place, and is found where you would look. Raising the rule to
+   catch them would fail the build on three judgement calls, which
+   teaches whoever meets it to reach for the exception list rather than
+   to think - and that is the opposite of what a gate is for. */
+
+const LEVEL = { a: 1, m: 2, o: 3, t: 4, p: 5 };
+const LEVEL_NAME = { a: 'atom', m: 'molecule', o: 'organism', t: 'template', p: 'page' };
+/* Deliberate inversions, each with its reason. */
+const LEVEL_ALLOWED = new Set([
+]);
+
+{
+  for (const name of FILES) {
+    const markup = markupOf(src[name]).replace(/<style[\s\S]*?<\/style>/g, ' ');
+    /* A stack of the open elements that carry a layer class, so the
+       nearest layered ancestor is the one asked about. */
+    const stack = [];
+    const VOID = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+    for (const m of markup.matchAll(/<(\/?)([a-zA-Z][\w-]*)([^>]*)>/g)) {
+      const closing = m[1] === '/';
+      const tag = m[2];
+      const attrs = m[3] || '';
+      if (closing) {
+        for (let i = stack.length - 1; i >= 0; i--) {
+          if (stack[i].tag.toLowerCase() === tag.toLowerCase()) { stack.length = i; break; }
+        }
+        continue;
+      }
+      const selfClosing = /\/\s*$/.test(attrs) || VOID.test(tag);
+      const cls = (attrs.match(/class="([^"]*)"/) || [])[1] || '';
+      const blocks = cls.split(/\s+/).filter(Boolean)
+        .filter((c) => /^[amotp]-/.test(c))
+        .map((c) => c.split('__')[0].split('--')[0]);
+      /* An element's own level is the highest layer it wears. */
+      let mine = 0, myName = '';
+      for (const b of blocks) {
+        const l = LEVEL[b[0]] || 0;
+        if (l > mine) { mine = l; myName = b; }
+      }
+      if (mine) {
+        for (let i = stack.length - 1; i >= 0; i--) {
+          const up = stack[i];
+          if (!up.level) { continue; }
+          /* Organisms may hold organisms; everything else may only hold
+             what is smaller than itself. */
+          if (up.level >= 3) { break; }
+          /* A block's own elements are the block, not something inside it. */
+          if (up.block === myName) { break; }
+          if (mine > up.level) {
+            const pair = up.block + ' > ' + myName;
+            if (!LEVEL_ALLOWED.has(pair)) {
+              fail(`${name}: ${LEVEL_NAME[up.block[0]]} '${up.block}' contains ` +
+                   `${LEVEL_NAME[myName[0]]} '${myName}'\n        ` +
+                   `the arrow points one way: an atom is a part, a molecule is a group of parts, ` +
+                   `an organism is a section built from those. Either '${up.block}' is really the ` +
+                   `bigger thing and should say so, or '${myName}' is really the smaller one. ` +
+                   `A deliberate inversion goes in LEVEL_ALLOWED with its reason.`);
+            }
+          }
+          break;
+        }
+      }
+      if (!selfClosing) { stack.push({ tag, level: mine, block: myName }); }
+    }
+  }
+}
+
 if (problems.length) {
   console.error(`\n  ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n`);
   for (const p of problems) { console.error(`    - ${p}`); }
@@ -837,4 +1057,5 @@ console.log('    the words stay plain');
 console.log('    sign-up may reach a person; nothing at the pump navigates away');
 console.log('    every class is shaped like the system, no dead names, tokens in their families');
 console.log('    the shared library is verbatim in both files, and both restate colour-only states');
-console.log('    the base layer agrees too: what a control inherits is the same on both sides\n');
+console.log('    the base layer agrees too: what a control inherits is the same on both sides');
+console.log('    no parent paints a child it did not make, and the layers nest the right way round\n');

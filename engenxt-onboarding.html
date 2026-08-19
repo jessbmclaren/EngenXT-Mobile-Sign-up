@@ -568,6 +568,9 @@ button { background: none; border: none; color: inherit; }
      than as a plate behind it. */
   background: var(--color-primary-bg); border: none;
 }
+/* No tint. The plate a row uses when what it holds is not available - the
+   ground shows through instead of the brand's own light. */
+.a-icon-wrap--bare { background: var(--color-surface); }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
 /* The mark on a screen that stops someone.
 
@@ -1206,8 +1209,9 @@ button { background: none; border: none; color: inherit; }
   top: 2px; right: 2px;
   min-width: 17px; height: 17px; padding: 0 4px;
 }
-/* On the bar the ring has to match what the bar is made of, not the page. */
-.o-tab-bar .a-badge { box-shadow: 0 0 0 2px var(--glass-bar-bg); }
+/* The ring has to match what it is standing on, so the badge says which
+   ground that is rather than the bar reaching in to paint it. */
+.a-badge--onBar { box-shadow: 0 0 0 2px var(--glass-bar-bg); }
 
 /* a-avatar. A person, reduced to the one letter that fits. */
 .a-avatar {
@@ -2934,7 +2938,12 @@ button { background: none; border: none; color: inherit; }
 .o-check[data-state="visible"] .m-verdict__mark path {
   animation: checkDraw .5s var(--ease-emphasis) .28s both;
 }
-.o-check[data-state="visible"] .m-verdict__mark::after {
+/* The ring is the molecule's, keyed on the answer it is wearing rather than
+   on the screen being up. It used to hang off .o-check[data-state], which
+   meant the pill's own edge was drawn by its parent - the same fault as the
+   colour, left behind when the colour moved. data-verdict lands at the same
+   moment, so the timing is unchanged. */
+.m-verdict[data-verdict] .m-verdict__mark::after {
   content: ""; position: absolute; inset: -2px;
   border-radius: inherit; border: 1.5px solid currentColor;
   animation: verdictHalo .9s var(--ease-out) .75s both;
@@ -2980,8 +2989,9 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card-sm);
 }
-/* The card's top edge does the first row's dividing. */
-.o-check__facts .m-fact:first-child { border-top: none; }
+/* The card's top edge does the first row's dividing, and that is the row's
+   own rule rather than something the card reaches in to say. */
+.m-fact:first-child { border-top: none; }
 
 /* m-fact. One line of the thing being authorised: what it is, and its value.
    Not ticked, because a tick means checked and these are declarations the app
@@ -3439,7 +3449,7 @@ button { background: none; border: none; color: inherit; }
 .m-bundle[data-state="short"] { background: var(--color-surface-sunken); box-shadow: none; cursor: default; }
 .m-bundle[data-state="short"] .m-bundle__size { color: var(--color-text-secondary); }
 .m-bundle[data-state="short"] .m-bundle__state { color: var(--color-text-secondary); font-weight: var(--weight-semibold); }
-.m-bundle[data-state="short"] .a-icon-wrap { color: var(--color-text-secondary); background: var(--color-surface); }
+.m-bundle[data-state="short"] .a-icon-wrap { color: var(--color-text-secondary); }
 /* Distance, not bookkeeping: the short row draws how close the balance is,
    so the missing points read as a journey with a length, not a wall. */
 .m-bundle__track {
@@ -3770,8 +3780,10 @@ button { background: none; border: none; color: inherit; }
   font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
   margin-bottom: var(--sp-2);
 }
-/* Only the hover differs now that the atom itself is on a light surface. */
-.m-confirm .a-quiet-link:hover { color: var(--color-error-text); }
+/* The link that undoes something says so itself. Only the hover differs -
+   the atom is already on a light surface - but which link it is belongs to
+   the link, not to whatever panel it was dropped into. */
+.a-quiet-link--danger:hover { color: var(--color-error-text); }
 
 /* High contrast. Under forced colors the system replaces every colour, so
    any state signalled by colour alone disappears. Signup wrote this law
@@ -4311,7 +4323,7 @@ button { background: none; border: none; color: inherit; }
             <h2 class="m-confirm__title" id="spendConfirmTitle" tabindex="-1"></h2>
             <p class="m-confirm__body" id="spendConfirmBody"></p>
             <button class="a-btn a-btn--primary" type="button" id="spendGo">Confirm</button>
-            <button class="a-quiet-link" type="button" id="spendCancel">Cancel</button>
+            <button class="a-quiet-link a-quiet-link--danger" type="button" id="spendCancel">Cancel</button>
           </div>
         </div>
       </section>
@@ -4576,7 +4588,7 @@ button { background: none; border: none; color: inherit; }
         <!-- The count is real or it is absent. It shipped saying "2 new"
              from the day it was drawn, on an empty drawer. -->
         <button class="o-tab-bar__tab" type="button" data-tab="history" aria-label="History">
-          <span class="o-tab-bar__icon"><span class="a-badge" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          <span class="o-tab-bar__icon"><span class="a-badge a-badge--onBar" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
           <span>History</span>
         </button>
         <button class="o-tab-bar__tab" type="button" data-tab="account">
@@ -7730,7 +7742,12 @@ button { background: none; border: none; color: inherit; }
              (short || status === 'processing' || status === 'sent' || status === 'delivered'
                ? ' aria-disabled="true"' : '') + '>' +
              '<span class="m-bundle__main">' +
-             '<span class="a-icon-wrap"' + (status === 'delivered' ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
+             /* Both class lists written out whole rather than concatenated, because a
+                class assembled from pieces is invisible to the dead-name gate: it
+                reads class="..." literals, and half of one is not a literal. */
+             (status === 'short' ? '<span class="a-icon-wrap a-icon-wrap--bare"'
+                                 : '<span class="a-icon-wrap"') +
+             (status === 'delivered' ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
              '<span><span class="m-bundle__size">' + b.label + ' of data</span>' +
              '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span>' + note + track + '</span>' +
              '</span>' +

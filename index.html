@@ -652,6 +652,9 @@ button { background: none; border: none; color: inherit; }
      than as a plate behind it. */
   background: var(--color-primary-bg); border: none;
 }
+/* No tint. The plate a row uses when what it holds is not available - the
+   ground shows through instead of the brand's own light. */
+.a-icon-wrap--bare { background: var(--color-surface); }
 .a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
 /* Library carry from the app file: the dark-surface plate. */
 .a-icon-wrap--onDark {
@@ -1083,9 +1086,6 @@ button { background: none; border: none; color: inherit; }
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 /* On the dark hero the same component takes the on-dark pair. */
-.m-alert__meta { display: flex; gap: var(--sp-5); margin-top: var(--sp-2h); }
-.m-alert__meta .m-figure__key { color: var(--color-on-dark-soft); }
-.m-alert__meta .m-figure__val { font-size: var(--text-callout); color: var(--color-text-on-dark); }
 .o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
 .o-auth-hero__actions .a-btn { width: 100%; }
 
@@ -3957,12 +3957,6 @@ button { background: none; border: none; color: inherit; }
           '<span class="m-alert__icon">' + iconMarkup(def.icon, 'var(--color-text-on-dark)') + '</span>' +
           '<span><p class="m-alert__title">' + def.title + '</p>' +
           '<p class="m-alert__body">' + def.body + '</p>' +
-          /* Figures a driver can read at a glance or repeat down a phone,
-             rather than dig out of a sentence. */
-          (def.meta ? '<span class="m-alert__meta">' + def.meta.map(function (m) {
-            return '<span class="m-figure"><span class="m-figure__key">' + m.key +
-                   '</span><span class="m-figure__val">' + m.val + '</span></span>';
-          }).join('') + '</span>' : '') +
           '</span>' +
         '</div></div>';
     el.homeNotice.hidden = false;
@@ -5087,7 +5081,7 @@ button { background: none; border: none; color: inherit; }
     /* ── Atoms ──────────────────────────────────────────────────────── */
     { name: '.a-label', level: 'atom', lines: [
         ['display', 'block'],
-        ['font', 'var(--text-caption) / 600'],
+        ['font', 'var(--text-caption) / var(--weight-semibold)'],
         ['color', 'var(--color-text-secondary)']
       ], states: [
         ['spacing', 'none of its own. The organism’s gap places it 8px above its field, which is the "parts of one thing" step.'],
@@ -5096,7 +5090,7 @@ button { background: none; border: none; color: inherit; }
     { name: '.a-link', level: 'atom', lines: [
         ['min-height', 'var(--size-target)'],
         ['padding', 'var(--sp-2) var(--sp-1)'],
-        ['font', 'var(--text-footnote) / 600, letter-spacing -0.1px'],
+        ['font', 'var(--text-footnote) / var(--weight-semibold), letter-spacing var(--tracking-tight)'],
         ['color', 'var(--color-primary-dark)'],
         ['font-variant-numeric', 'tabular-nums, so a countdown does not jitter as its digits change']
       ], states: [
@@ -5107,7 +5101,7 @@ button { background: none; border: none; color: inherit; }
         ['a11y', 'a button element unless it truly navigates. Disabled uses the real attribute, so it leaves the focus order.']
       ] },
     { name: '.a-icon-wrap', level: 'atom', lines: [
-        ['size', '40px, or 64px with --lg'],
+        ['size', 'var(--size-plate), or 64px with --lg'],
         ['border-radius', 'var(--radius-card-sm), or var(--radius-circle) with --lg'],
         ['background', 'var(--color-primary-bg)'],
         ['border', 'none. A fill, not an outline: the tone tints already lift the plate off the surface, and a ring on top of them read as a border on the icon rather than as a plate behind it.'],
@@ -5166,7 +5160,7 @@ button { background: none; border: none; color: inherit; }
     { name: '.m-sheet-header', level: 'molecule', lines: [
         ['layout', 'flex, align-items flex-start, space-between, gap var(--sp-3)'],
         ['margin-bottom', 'var(--sp-4)'],
-        ['__title', 'var(--text-title) / 800, letter-spacing -0.5px, margin-bottom var(--sp-1)'],
+        ['__title', 'var(--text-title) / var(--weight-heavy), letter-spacing var(--tracking-snug), margin-bottom var(--sp-1)'],
         ['__sub', 'var(--text-caption) / 1.5, var(--color-text-secondary). Its <b> is nowrap so a masked number never breaks across lines.'],
         ['__close', '36px circle, glyph centred in it, its own edge on the gutter. The 48px target is drawn out from a pseudo below and sideways only, because the sheet scroller clips above it and a clipped region is not pressable either.']
       ], states: [
@@ -5176,7 +5170,7 @@ button { background: none; border: none; color: inherit; }
     { name: '.m-status-bar', level: 'molecule', lines: [
         ['layout', 'flex, space-between'],
         ['padding-top', 'max(var(--size-status-bar) - 24px, env(safe-area-inset-top))'],
-        ['__time', 'var(--text-body) / 600'],
+        ['__time', 'var(--text-body) / var(--weight-semibold)'],
         ['__icons', 'gap var(--sp-1h)']
       ], states: [
         ['[data-tone="onDark"]', '__time takes var(--color-on-dark-strong)'],
@@ -5185,11 +5179,11 @@ button { background: none; border: none; color: inherit; }
     { name: '.m-brand-lockup', level: 'molecule', lines: [
         ['layout', 'flex, align-items center, gap var(--sp-2h)'],
         ['__mark', '36 square, var(--color-secondary), var(--radius-card-sm)'],
-        ['__name', 'var(--text-title) / 900. Its <em> is the brand red, not italic.'],
-        ['__tag', 'var(--text-micro) / 500, uppercase, letter-spacing 1.5px, var(--color-on-dark-faint)']
+        ['__name', 'var(--text-title) / var(--weight-black). Its <em> is the brand red, not italic.'],
+        ['__tag', 'var(--text-micro) / var(--weight-medium), uppercase, letter-spacing 1.5px (off the scale on purpose: em tracking is too tight on a 10px strapline), var(--color-on-dark-faint)']
       ], states: [['use', 'the hero only. It is the one place the brand speaks at full size.']] },
     { name: '.a-progress', level: 'atom', lines: [
-        ['font', 'var(--text-micro) / 700, uppercase, letter-spacing 0.08em'],
+        ['font', 'var(--text-micro) / var(--weight-bold), uppercase, letter-spacing var(--tracking-caps)'],
         ['colour', 'var(--color-text-secondary)'],
         ['margin-bottom', 'var(--sp-4)']
       ], states: [
@@ -5212,10 +5206,10 @@ button { background: none; border: none; color: inherit; }
     /* ── Organisms ──────────────────────────────────────────────────── */
     { name: '.o-outcome-panel', level: 'organism', lines: [
         ['layout', 'align-items center, text-align center, padding-top var(--sp-2), gap var(--sp-2)'],
-        ['__title', 'var(--text-heading) / 800, margin-top var(--sp-4) so the icon sits 24px away'],
+        ['__title', 'var(--text-heading) / var(--weight-heavy), margin-top var(--sp-4) so the icon sits 24px away'],
         ['__body', 'var(--text-caption) / 1.6, var(--color-text-secondary), 8px under the title'],
-        ['__clock', 'var(--text-title) / 800, tabular-nums, line-height 1.1'],
-        ['__meta', 'var(--text-caption2) / 500, margin-top var(--sp-4)'],
+        ['__clock', 'var(--text-title) / var(--weight-heavy), tabular-nums, line-height var(--leading-tight)'],
+        ['__meta', 'var(--text-caption2) / var(--weight-medium), margin-top var(--sp-4)'],
         ['__actions', 'column, gap var(--sp-2), margin-top var(--sp-6)']
       ], states: [
         ['rhythm', 'icon 24, title 8, body 8, clock 24, meta 8, actions. The title, sentence and clock are one statement; the meta and its button are the aside.'],
@@ -5226,7 +5220,7 @@ button { background: none; border: none; color: inherit; }
     { name: '.o-status-page', level: 'organism', lines: [
         ['position', 'absolute inset 0, z-index var(--z-overlay), padding var(--sp-6)'],
         ['__panel', 'var(--color-surface), var(--radius-sheet), padding var(--sp-7) var(--sp-6), centred'],
-        ['__title', 'var(--text-heading) / 800, margin var(--sp-4) 0 var(--sp-2)'],
+        ['__title', 'var(--text-heading) / var(--weight-heavy), margin var(--sp-4) 0 var(--sp-2)'],
         ['__body', 'var(--text-caption) / 1.6, margin-bottom var(--sp-5)'],
         ['__actions', 'column, gap var(--sp-2)']
       ], states: [
@@ -5275,11 +5269,11 @@ button { background: none; border: none; color: inherit; }
         ['min-height', 'var(--size-control)'], ['border-radius', 'var(--radius-pill)'],
         ['background', 'var(--gradient-primary)'],
         ['color', 'var(--color-text-on-dark)'],
-        ['font', 'var(--text-subhead) / 700, letter-spacing -0.3px'],
+        ['font', 'var(--text-subhead) / var(--weight-bold), letter-spacing var(--tracking-tight)'],
         ['box-shadow', 'var(--shadow-btn)'],
         ['transition', 'transform var(--dur-fast) var(--ease-in-out)']
       ], states: [
-        [':active', 'transform: scale(0.97)'],
+        [':active', 'transform: scale(var(--press-firm))'],
         ['[aria-disabled="true"], :disabled', 'background: var(--color-surface-sunken); color: var(--color-text-tertiary); box-shadow: none. The real disabled attribute is set too, so the control is inactive, not merely grey.']
       ] },
     { name: '.a-btn--onDark', level: 'atom', lines: [
@@ -5301,7 +5295,7 @@ button { background: none; border: none; color: inherit; }
       ] },
     { name: '.a-otp-cell', level: 'atom', lines: [
         ['flex', '1, max-width 52px'], ['aspect-ratio', '1 / 1'],
-        ['font', '22px / 700, centred'], ['border', 'var(--size-border) solid var(--color-border-field)'],
+        ['font', '22px / var(--weight-bold), centred'], ['border', 'var(--size-border) solid var(--color-border-field)'],
         ['border-radius', 'var(--radius-card-sm)'], ['background', 'var(--color-surface-sunken)']
       ], states: [
         ['two axes', 'data-state is what the driver typed, data-tone is what came back. A cell can be filled and wrong at the same time, so they are separate attributes and one attribute holds one value.'],
@@ -5323,7 +5317,7 @@ button { background: none; border: none; color: inherit; }
     { name: '.m-alert', level: 'molecule', lines: [
         ['padding', 'var(--sp-4)'], ['border-radius', 'var(--radius-card)'], ['gap', 'var(--sp-3)'],
         ['icon', '20px stroke 1.9, tone coloured'],
-        ['title', 'var(--text-footnote) / 700'],
+        ['title', 'var(--text-footnote) / var(--weight-bold)'],
         ['body', 'var(--text-caption2) / 1.55, var(--color-text-secondary)'],
         ['actions', 'stacked .a-btn--sm, full width']
       ], states: [
@@ -5336,15 +5330,15 @@ button { background: none; border: none; color: inherit; }
     { name: '.m-phone-field', level: 'molecule', lines: [
         ['composition', '.a-field .m-phone-field on one element, then __prefix and .a-field__input inside it'],
         ['__flag', 'var(--text-lead)'],
-        ['__code', 'var(--text-body) / 800, with a 1px divider after it'],
+        ['__code', 'var(--text-body) / var(--weight-heavy), with a 1px divider after it'],
         ['__prefix', 'flex, align-items center, gap var(--sp-2), flex-shrink 0'],
-        ['input', 'var(--text-subhead) / 600, caret var(--color-primary)']
+        ['input', 'var(--text-subhead) / var(--weight-semibold), caret var(--color-primary)']
       ], states: [
         ['the block has no rule of its own, on purpose', 'all of its appearance comes from .a-field, which it shares an element with. m-phone-field is the namespace its __ parts hang off, not a second box. Copy both classes onto one element or you get an unstyled field.'],
         ['note', 'no validity tick: nine digits is a complete number, not a recognised one, so only the server can confirm it']
       ] },
     { name: '.m-otp-group', level: 'molecule', lines: [
-        ['layout', 'flex, space-between, gap var(--sp-1h)'],
+        ['layout', 'flex, centred, gap var(--sp-2)'],
         ['children', 'six .a-otp-cell'],
         ['role', 'group, labelled "6 digit code"']
       ], states: [
@@ -5377,8 +5371,8 @@ button { background: none; border: none; color: inherit; }
     { name: '.o-auth-hero', level: 'organism', lines: [
         ['background', 'var(--gradient-hero)'],
         ['composition', 'orbs + notch + status bar + brand lockup + hero copy + actions'],
-        ['title', 'var(--text-hero) / 800, line-height 1.08, tracking -1.6px'],
-        ['lede', 'var(--text-body) / 400, line-height 1.6, white 60%'],
+        ['title', 'var(--text-hero) / var(--weight-heavy), line-height var(--leading-tight), tracking -1.6px (off the scale on purpose: the only 42px line in the pair)'],
+        ['lede', 'var(--text-body) / var(--weight-regular), line-height var(--leading-body), white 60%'],
         ['body padding', '0 var(--sp-6) max(40px, safe-area)']
       ], states: [['notice slot', 'optional .m-alert--onDark above the actions']] }
   ];
