@@ -76,6 +76,10 @@
   --color-success:       #166832;    /* 5.09:1 on the sheet glass */
   --color-success-bg:    #E8F5EE;
   --color-success-20: color-mix(in srgb, var(--color-success) 20%, transparent);
+  /* The verdict's light. The bloom over a cleared check reads this step:
+     enough to warm the top of the screen, faint enough that everything
+     with a measured contrast on white keeps it. */
+  --color-success-12: color-mix(in srgb, var(--color-success) 12%, transparent);
   --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
   --color-warning-25: color-mix(in srgb, var(--color-warning) 25%, transparent);  /* --color-warning at 0.25, same hue */
@@ -146,6 +150,16 @@
   --color-scan-2: #16203A;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  /* The verdict seal, shaded. One light source from above, like every shadow
+     in the scale: the hue lifted toward white at the top, sunk toward black at
+     the base, the flat hue itself holding the middle where the glyph sits, so
+     the mark never reads lighter than the colour it is measured as. */
+  --gradient-seal-clear: linear-gradient(165deg, color-mix(in srgb, var(--color-success) 78%, #fff) 0%, var(--color-success) 55%, color-mix(in srgb, var(--color-success) 82%, #000) 100%);
+  --gradient-seal-block: linear-gradient(165deg, color-mix(in srgb, var(--color-error-text) 80%, #fff) 0%, var(--color-error-text) 55%, color-mix(in srgb, var(--color-error-text) 82%, #000) 100%);
+  --gradient-seal-warn: linear-gradient(165deg, color-mix(in srgb, var(--color-warning) 78%, #fff) 0%, var(--color-warning) 55%, color-mix(in srgb, var(--color-warning) 82%, #000) 100%);
+  /* A band of light crossing a surface. Angle and softness live here so a
+     second surface that ever catches the light catches the same light. */
+  --gradient-sheen: linear-gradient(105deg, transparent 34%, rgba(255,255,255,0.30) 50%, transparent 66%);
 
   /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
@@ -219,6 +233,12 @@
   --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
+  /* The verdict seal's two elevations. A lit disc rather than a flat one: a
+     shadow in the mark's own hue, never grey, and a lit top edge. Paired with
+     --gradient-seal-* below, which shades the same disc. */
+  --shadow-seal-clear: 0 4px 14px var(--color-success-20), inset 0 1px 0 rgba(255,255,255,0.30);
+  --shadow-seal-block: 0 4px 14px var(--color-secondary-25), inset 0 1px 0 rgba(255,255,255,0.30);
+  --shadow-seal-warn:  0 4px 14px var(--color-warning-25), inset 0 1px 0 rgba(255,255,255,0.30);
 
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
@@ -422,7 +442,7 @@ body {
   font-size: var(--text-footnote); font-weight: 600; letter-spacing: -0.1px;
   color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
 }
-.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; }
+.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .a-link--flush { padding-inline: 0; }
 .a-link--onDark {
   color: var(--color-text-on-dark); text-decoration: underline;
@@ -932,6 +952,8 @@ body {
 .o-home {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
+  /* Clear of the bar the frame now draws beneath it. */
+  padding-bottom: calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
 }
 .o-home[data-state="visible"] { display: flex; }
@@ -1356,8 +1378,10 @@ body {
    screen does not jump when the driver picks one, and the question is asked
    where its answer will appear. */
 .m-vehicle-card[data-state="empty"] {
-  background: none;
-  border: 1px dashed var(--color-border-field);
+  /* Raised like the card it becomes, because it is a button and its
+     neighbour-in-waiting is a button. The dashed outline used to say
+     "placeholder" on a control and "notice" on the state next door. */
+  border: 1px solid var(--color-border-field);
 }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__art {
   background: var(--color-surface-sunken); color: var(--color-text-secondary);
@@ -2317,13 +2341,15 @@ body {
    sign-up flow strengthens its hairlines: at 8% black in direct sun the bar
    dissolves into the content it is meant to sit above. */
 .o-tab-bar {
-  flex-shrink: 0; display: flex;
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--z-overlay);
+  flex-shrink: 0; display: none;
   padding: var(--sp-2) var(--sp-2) calc(var(--sp-2) + env(safe-area-inset-bottom, 0px));
   background: var(--glass-bar-bg);
   -webkit-backdrop-filter: var(--glass-panel-bd);
   backdrop-filter: var(--glass-panel-bd);
   border-top: 1px solid var(--color-border-strong);
 }
+.o-tab-bar[data-state="visible"] { display: flex; }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .o-tab-bar { background: var(--color-surface); }
 }
@@ -2395,12 +2421,64 @@ body {
   border: 1px solid var(--color-border);
   text-align: left;
   /* Waiting to be answered. Each one arrives as its answer does, so the list
-     is a sequence of results rather than a block that appears finished. */
-  opacity: 0; transform: translateY(6px);
+     is a sequence of results rather than a block that appears finished. The
+     transform takes the spring, because an answer landing should settle like
+     a thing with weight rather than slide like a panel. */
+  opacity: 0; transform: translateY(10px) scale(.98);
   transition: opacity var(--dur-base) var(--ease-out),
-              transform var(--dur-base) var(--ease-out);
+              transform var(--dur-slow) var(--ease-spring);
 }
 .m-check[data-state="in"] { opacity: 1; transform: none; }
+/* The mark pops as its row lands and the glyph strokes itself in a beat
+   later, so each answer is watched being written rather than found finished.
+   The dasharray covers the longest path in tick, cross and dash alike. */
+/* The three self-drawing glyphs in this file (here, the verdict seal and the
+   refused fill's mark) hide themselves with a full dashoffset and rely on
+   checkDraw to pay it back. That makes an invisible tick one careless edit
+   away: this file's habit is to add `animation: none` per component under
+   reduced motion, and doing that here would delete the mark permanently
+   rather than still it. So reduced motion states the resting truth instead -
+   the glyph is simply drawn - and any future `animation: none` lands on top
+   of a mark that is already visible.
+
+   Both selectors carry a deliberate extra step of specificity, because the
+   three base rules they answer are written further down the file and a plain
+   `.m-check__mark svg path` here would be overridden by the very rule it
+   exists to correct. */
+[data-motion="reduced"] .m-check__mark svg path,
+[data-motion="reduced"] .m-verdict__mark path,
+[data-motion="reduced"] .o-filling__mark svg path { stroke-dashoffset: 0; }
+@media (prefers-reduced-motion: reduce) {
+  :root .m-check__mark svg path,
+  :root .m-verdict__mark path,
+  :root .o-filling__mark svg path { stroke-dashoffset: 0; }
+}
+.m-check__mark svg path { stroke-dasharray: 27; stroke-dashoffset: 27; }
+.m-check[data-state="in"] .m-check__mark {
+  animation: markPop var(--dur-slow) var(--ease-spring) both;
+}
+.m-check[data-state="in"] .m-check__mark svg path {
+  animation: checkDraw .45s var(--ease-emphasis) .12s both;
+}
+@keyframes markPop { from { opacity: 0; transform: scale(.4); } }
+/* The refusal announces itself once, in its own hue, and then stands still.
+   A pulse that repeats is an alarm, and the row is a reason.
+
+   Drawn as a ring on a pseudo that scales, not as a box-shadow whose spread
+   grows. Both look identical; only one is free. A spread animating from 0 to
+   14px repaints the row every frame for 1.1s, which is the objection the fuel
+   button's own comment already makes about animating `inset` - transform and
+   opacity are composited and cost the main thread nothing. This is the same
+   ring verdictHalo draws, at the size a 34px mark can carry. */
+.m-check[data-outcome="fail"][data-state="in"] .m-check__mark {
+  animation: markPop var(--dur-slow) var(--ease-spring) both;
+}
+.m-check[data-outcome="fail"][data-state="in"] .m-check__mark::after {
+  content: ""; position: absolute; inset: -1px;
+  border-radius: inherit; border: 1.5px solid currentColor;
+  pointer-events: none;
+  animation: verdictHalo 1.1s var(--ease-out) .45s both;
+}
 /* A passed check is a receipt, not news. It keeps its place so the list can be
    read back, and gives up its weight so the verdict and the action above it are
    what the eye lands on. */
@@ -2427,8 +2505,12 @@ body {
 .m-check[data-outcome="skipped"] .m-check__title {
   font-size: var(--text-caption); font-weight: 600; color: var(--color-text-tertiary);
 }
-.m-check[data-outcome="skipped"] .m-check__sub { display: none; }
+/* The skipped row keeps its sub-line, because that line is now the answer
+   ("Not checked yet") rather than a promise about a check that never ran. */
+.m-check[data-outcome="skipped"] .m-check__sub { color: var(--color-text-tertiary); }
 .m-check__mark {
+  /* Positioned so the refusal's ring has something to sit in. */
+  position: relative;
   flex-shrink: 0; width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
@@ -2436,7 +2518,16 @@ body {
   color: var(--color-success);
 }
 /* A refusal is the same row with the other answer, so the layout never moves
-   and the driver reads the list the same way whichever way it goes. */
+   and the driver reads the list the same way whichever way it goes. It is
+   also the one row the driver has to act on, so it alone keeps a card with a
+   lift and a wash of the refusing hue; the four quiet receipts around it
+   stay flat. */
+.m-check[data-outcome="fail"] {
+  background: linear-gradient(180deg, var(--color-secondary-04), transparent 70%),
+              var(--color-surface);
+  border-color: var(--color-secondary-18);
+  box-shadow: var(--shadow-card-sm);
+}
 .m-check[data-outcome="fail"] .m-check__mark {
   border-color: var(--color-secondary); color: var(--color-secondary);
 }
@@ -2507,6 +2598,32 @@ body {
   display: none; flex-direction: column;
   background: var(--color-surface);
 }
+/* The answer is also the light. The top of the screen is washed in the
+   verdict's hue - green over a fill that will be paid for, the brand red over
+   one that will not - so the driver has the answer before a single word lands.
+   Two pseudos, one per verdict, faded rather than repainted, because a driver
+   tapping an alternative station watches this screen change its mind in place.
+   Both stay under 12% and die out by mid-screen, so nothing that reads sits on
+   less contrast than it was measured for. */
+.o-check::before, .o-check::after {
+  content: ""; position: absolute; inset: 0 0 auto; height: 44%;
+  pointer-events: none; opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.o-check::before {
+  background:
+    radial-gradient(120% 72% at 50% -14%, var(--color-success-12) 0%, transparent 62%),
+    radial-gradient(64% 44% at 10% 4%, var(--color-tertiary-18) 0%, transparent 58%),
+    radial-gradient(78% 50% at 90% 0%, var(--color-primary-08) 0%, transparent 56%);
+}
+.o-check::after {
+  background:
+    radial-gradient(120% 72% at 50% -14%, var(--color-secondary-12) 0%, transparent 62%),
+    radial-gradient(64% 44% at 10% 4%, var(--color-warning-bg) 0%, transparent 55%),
+    radial-gradient(78% 50% at 90% 0%, var(--color-secondary-04) 0%, transparent 56%);
+}
+.o-check[data-verdict="clear"][data-state="visible"]::before { opacity: 1; }
+.o-check[data-verdict="block"][data-state="visible"]::after { opacity: 1; }
 .o-check[data-state="arriving"], .o-check[data-state="visible"] { display: flex; }
 .o-check[data-state="arriving"] { opacity: 0; transform: translateY(var(--sp-5)); }
 .o-check[data-state="visible"] {
@@ -2516,6 +2633,14 @@ body {
 }
 [data-motion="reduced"] .o-check[data-state="arriving"] { transform: none; }
 .o-check__scroll {
+  /* Above the bloom, the way every other organism here lifts its content off
+     its own wash. `position: relative` alone was not enough and the comment
+     that used to sit here said it was: the two washes are ::before and
+     ::after, and a generated ::after is the LAST child, so with everything at
+     z-index auto the refusal's red wash painted on top of the back button and
+     the verdict rather than behind them. The z-index is what actually does it,
+     and it is the same one o-home, o-step and o-scan use. */
+  position: relative; z-index: var(--z-content);
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   /* The status-bar clearance stays: every screen in the file uses it and the
      back button would otherwise sit under the clock. Everything below it is
@@ -2538,14 +2663,55 @@ body {
   font-size: var(--text-display); font-weight: 900; line-height: 1.05;
   letter-spacing: -1px; color: var(--color-text-primary);
 }
+/* Dimensional ink rather than flat: the name shades toward the brand blue at
+   its tail. Both ends stay darker than 12:1 on white, so the gradient costs
+   nothing that was measured.
+
+   Behind the @supports because the fallback has to be real. This said in a
+   comment that `color` would carry any engine that could not clip, and that
+   was simply false: `-webkit-text-fill-color` overrides `color` whether the
+   clipping works or not, so an engine without background-clip would have
+   painted the largest word on the screen in transparent. That is the same
+   silent disappearance this file has already been bitten by twice - the
+   undeclared token that took the reward meter down, and the one that took
+   the tertiary hue with it. A name a driver is standing in front of a pump to
+   read does not get to be the third. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .o-check__station {
+    background: linear-gradient(135deg, var(--color-text-primary) 45%,
+                color-mix(in srgb, var(--color-text-primary) 60%, var(--color-primary)) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
 .o-check__station:focus, .o-check__station:focus-visible { outline: none; box-shadow: none; }
 .o-check__km { font-size: var(--text-caption); color: var(--color-text-secondary); }
+/* The arrival is a sequence, not a page flip: verdict first because it is the
+   answer, then the station it is true of, then everything the answer rests on.
+   The name lands as a focus pull - soft, then sharp - which is the one blur in
+   the file and it is spent on the biggest type. Delays are choreography and
+   state their own times; the reduced-motion rules collapse all of it to a cut. */
+.o-check[data-state="visible"] .m-verdict { animation: checkRise .5s var(--ease-emphasis) both; }
+.o-check[data-state="visible"] .o-check__station { animation: checkFocus .6s var(--ease-emphasis) .06s both; }
+.o-check[data-state="visible"] .o-check__km { animation: checkRise .5s var(--ease-out) .14s both; }
+.o-check[data-state="visible"] .o-check__why { animation: checkRise .5s var(--ease-out) .18s both; }
+.o-check[data-state="visible"] .o-check__alts { animation: checkRise .5s var(--ease-out) .22s both; }
+.o-check[data-state="visible"] .o-check__facts { animation: checkRise .55s var(--ease-out) .24s both; }
+.o-check[data-state="visible"] .o-check__lead { animation: checkRise .5s var(--ease-out) .30s both; }
+@keyframes checkRise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes checkFocus {
+  from { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
 .o-check__alts { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); }
 .o-check__alt {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
   min-height: var(--size-target); padding: var(--sp-2) var(--sp-4);
   border: 1px solid var(--color-border); border-radius: var(--radius-card);
   background: var(--color-surface); cursor: pointer; text-align: left; font: inherit;
+  /* The doors out of a refusal are the two tappable things above the fold, so
+     they get the card's lift rather than sitting flush with the wash. */
+  box-shadow: var(--shadow-card-sm);
 }
 .o-check__altName { font-size: var(--text-footnote); font-weight: 700; color: var(--color-text-primary); }
 .o-check__altKm { font-size: var(--text-caption); color: var(--color-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -2554,6 +2720,7 @@ body {
   max-width: 34ch;
 }
 .o-check__action {
+  position: relative; z-index: var(--z-content);   /* above the bloom, like the scroll */
   flex-shrink: 0;
   /* Both buttons keep their own heights, so the 48dp target rule is untouched.
      Only the bar's own padding gives. */
@@ -2561,28 +2728,92 @@ body {
   padding: var(--sp-2) var(--sp-5) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border-light);
 }
+/* Once the fifth answer has landed, a single band of light crosses the
+   primary action: the moment the screen finishes saying yes, the way forward
+   catches it. Choreographed motion, so the delay states its own time - 1.5s
+   is the header sequence plus five rows at paintGate's cadence. Once, ever,
+   per arrival: a sheen that repeats is an advert. Clear verdict only,
+   because on a refusal the primary action is hidden and nothing here has
+   been earned. */
+.o-check[data-verdict="clear"][data-state="visible"] .o-check__action .a-btn--primary {
+  position: relative; overflow: hidden;
+}
+.o-check[data-verdict="clear"][data-state="visible"] .o-check__action .a-btn--primary::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--gradient-sheen);
+  transform: translateX(-110%); pointer-events: none;
+  animation: ctaSheen .9s var(--ease-in-out) 1.5s 1 both;
+}
+@keyframes ctaSheen { to { transform: translateX(110%); } }
 
 /* m-verdict. The answer, said as a word and a shape at once, so the colour is
-   never the only thing carrying it. */
+   never the only thing carrying it.
+
+   The seal of the screen, so it is the one place the flat language gives way
+   to a lit object: the mark carries a top light and a shadow in its own hue,
+   the glyph draws itself rather than appearing, and a halo rings out of it
+   once, after the glyph lands. The halo borrows currentColor, so it is the
+   verdict's hue in both answers without naming either. */
 .m-verdict {
   display: inline-flex; align-items: center; gap: var(--sp-2);
   padding: var(--sp-1h) var(--sp-3) var(--sp-1h) var(--sp-1h);
   border-radius: var(--radius-pill);
+  border: 1px solid transparent;
   font-size: var(--text-caption); font-weight: 700;
 }
 .m-verdict__mark {
-  width: 26px; height: 26px; flex-shrink: 0;
+  position: relative;
+  width: 28px; height: 28px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
 }
+/* The glyph waits, drawn in by checkDraw once the screen is visible. 27
+   covers the longest path in either mark, and an overrun hides in the gap. */
+.m-verdict__mark path { stroke-dasharray: 27; stroke-dashoffset: 27; }
+.o-check[data-state="visible"] .m-verdict__mark path {
+  animation: checkDraw .5s var(--ease-emphasis) .28s both;
+}
+.o-check[data-state="visible"] .m-verdict__mark::after {
+  content: ""; position: absolute; inset: -2px;
+  border-radius: inherit; border: 1.5px solid currentColor;
+  animation: verdictHalo .9s var(--ease-out) .75s both;
+}
+@keyframes checkDraw { to { stroke-dashoffset: 0; } }
+@keyframes verdictHalo {
+  from { opacity: .8; transform: scale(.7); }
+  to   { opacity: 0;  transform: scale(2.1); }
+}
 .o-check[data-verdict="clear"] .m-verdict {
   background: var(--color-success-bg); color: var(--color-success);
+  border-color: var(--color-success-20);
 }
-.o-check[data-verdict="clear"] .m-verdict__mark { background: var(--color-success); }
+.o-check[data-verdict="clear"] .m-verdict__mark {
+  background: var(--gradient-seal-clear); box-shadow: var(--shadow-seal-clear);
+}
 .o-check[data-verdict="block"] .m-verdict {
   background: var(--color-secondary-bg); color: var(--color-error-text);
+  border-color: var(--color-secondary-25);
 }
-.o-check[data-verdict="block"] .m-verdict__mark { background: var(--color-error-text); }
+.o-check[data-verdict="block"] .m-verdict__mark {
+  background: var(--gradient-seal-block); box-shadow: var(--shadow-seal-block);
+}
+
+/* The facts ride together on one raised card rather than as hairlines floating
+   on the page: what is being authorised is a single object, and an object
+   should read as one. Glass, not paper, so the tail of the bloom shows
+   through it; the card's own edge is the small shadow, which is why the
+   border stays at the light step. */
+.o-check__facts {
+  width: 100%;
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--glass-card-bg);
+  -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card-sm);
+}
+/* The card's top edge does the first row's dividing. */
+.o-check__facts .m-fact:first-child { border-top: none; }
 
 /* m-fact. One line of the thing being authorised: what it is, and its value.
    Not ticked, because a tick means checked and these are declarations the app
@@ -2642,8 +2873,8 @@ body {
 /* A dead code must not wear an approval: the tick goes, and the square the
    attendant can no longer scan steps back while the words lead. */
 .o-fuel[data-expired="true"] .o-fuel__tick { display: none; }
-.o-fuel[data-expired="true"] .a-qr,
-.o-fuel[data-expired="true"] .m-fallback { opacity: 0.4; }
+.o-fuel[data-expired="true"] .a-qr { opacity: 0.25; filter: grayscale(1); }
+.o-fuel[data-expired="true"] .m-fallback { display: none; }
 .o-fuel__title {
   font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
   color: var(--color-text-primary);
@@ -2785,6 +3016,40 @@ body {
   overflow-y: auto; overscroll-behavior: contain;
 }
 .o-receipt[data-state="visible"] { display: flex; }
+/* The filed screens stood on flat page grey, which is the one surface in this
+   file that reads as nothing. They get the bloom home already has, in the
+   success hue on the receipt because a filed fill is a fill that went well,
+   and in the brand's own on History because a drawer of slips is not news.
+   Absolute, not fixed. These two organisms are their own scroll containers and
+   sit inside a phone that is only a box on a page, so a fixed pseudo has no
+   transformed ancestor to be caught by: it would leave the phone and paint
+   across the whole browser window. Absolute is contained by construction, and
+   the cost is only that the light scrolls away with the first slip, which is
+   where it belongs anyway. */
+.o-receipt::before, .o-history::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 40%;
+  pointer-events: none;
+}
+.o-receipt::before {
+  background:
+    radial-gradient(120% 68% at 50% -12%, var(--color-success-12) 0%, transparent 62%),
+    radial-gradient(70% 44% at 88% 0%, var(--color-tertiary-18) 0%, transparent 58%);
+}
+.o-history::before {
+  background:
+    radial-gradient(120% 68% at 50% -12%, var(--color-primary-08) 0%, transparent 62%),
+    radial-gradient(70% 44% at 88% 0%, var(--color-tertiary-18) 0%, transparent 58%);
+}
+.o-receipt > *, .o-history > * { position: relative; }
+/* The slip arrives as one object and its rows fill in under it, which is the
+   order the driver reads them. */
+.o-receipt[data-state="visible"] .a-screen-title { animation: checkRise .5s var(--ease-out) both; }
+.o-receipt[data-state="visible"] .o-receipt__when { animation: checkRise .5s var(--ease-out) .06s both; }
+.o-receipt[data-state="visible"] .o-receipt__card { animation: slipIn .55s var(--ease-emphasis) .12s both; }
+.o-receipt[data-state="visible"] .o-receipt__action { animation: checkRise .5s var(--ease-out) .5s both; }
+@keyframes slipIn {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+}
 /* a-screen-title. One title for every filed screen: the receipt, History,
    Account, Rewards. It left o-receipt when three other organisms borrowed
    the element - an element may not outlive its block's ancestry. */
@@ -2804,9 +3069,25 @@ body {
 .o-receipt__card {
   margin-top: var(--sp-4);
   background: var(--color-surface); border: 1px solid var(--color-border);
+  /* The document, lifted off the page it is filed on. It is the only object
+     on the screen, so it takes the full card elevation rather than the step
+     meant for a control inside a row. */
   border-radius: var(--radius-card); padding: var(--sp-2) var(--sp-4);
-  box-shadow: var(--shadow-card-sm);
+  box-shadow: var(--shadow-card);
 }
+/* The rows fill in behind the card rather than arriving with it, so the slip
+   reads as being written. Seven steps because seven is what the receipt
+   holds; an eighth row simply lands with the seventh. */
+.o-receipt[data-state="visible"] .o-receipt__card .o-receipt__row {
+  animation: checkRise .42s var(--ease-out) both;
+}
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(1) { animation-delay: .20s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(2) { animation-delay: .25s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(3) { animation-delay: .30s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(4) { animation-delay: .35s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(5) { animation-delay: .40s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(6) { animation-delay: .45s; }
+.o-receipt[data-state="visible"] .o-receipt__row:nth-child(n+7) { animation-delay: .50s; }
 .o-receipt__row {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3);
   padding: var(--sp-3) 0; border-bottom: 1px solid var(--color-border-light);
@@ -2818,9 +3099,26 @@ body {
   text-align: right; font-variant-numeric: tabular-nums;
 }
 .o-receipt__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
+/* The one row this app added to the paper slip, so it is the one the screen
+   is allowed to be pleased about. The wash bleeds to the card's edges - the
+   negative margin gives back exactly the padding the card holds - so it reads
+   as a band in the document rather than a chip dropped on it. */
+.o-receipt__row[data-tone="success"] {
+  margin-inline: calc(var(--sp-4) * -1); padding-inline: var(--sp-4);
+  background: linear-gradient(90deg, var(--color-success-12), transparent 78%);
+}
 .o-receipt__row[data-tone="success"] .o-receipt__value { color: var(--color-success); }
+/* Points land rather than appear. A small spring on the one figure the driver
+   was hoping for; everything else on the slip is a fact they already knew. */
+.o-receipt[data-state="visible"] .o-receipt__row[data-tone="success"] .o-receipt__value {
+  display: inline-block;
+  animation: ptsLand .5s var(--ease-spring) .55s both;
+}
+@keyframes ptsLand { from { opacity: 0; transform: scale(.82); } }
 .o-receipt__spacer { flex: 1 1 auto; min-height: var(--sp-4); }
 .o-receipt__action { display: flex; flex-direction: column; gap: var(--sp-2); }
+/* Where the slip goes when the driver walks away, said once and quietly. */
+.o-receipt__filed { text-align: center; font-size: var(--text-caption); color: var(--color-text-tertiary); }
 
 /* a-switch. On or off, sized for a thumb, drawn from two tokens that waited
    years for a switch to exist: the track grey that clears 3:1, and the knob
@@ -2847,7 +3145,7 @@ body {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
-           calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+           calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
   overflow-y: auto; overscroll-behavior: contain;
 }
@@ -2939,6 +3237,9 @@ body {
 .m-bundle .a-icon-wrap { color: var(--color-primary); }
 .m-bundle__size { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
 .m-bundle__price { display: block; margin-top: 1px; font-size: var(--text-caption); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+/* The failure stays on the row for as long as the row is failed, so "Try
+   again" reads as a free retry of a named thing. */
+.m-bundle__note { display: block; margin-top: 2px; font-size: var(--text-caption); font-weight: 600; color: var(--color-warning); }
 .m-bundle__state { font-size: var(--text-footnote); font-weight: 700; color: var(--color-primary-dark); white-space: nowrap; }
 /* The verb wears a button's body. A text link asks to be read; a filled
    pill asks to be pressed, and pressing is the point. The row stays the
@@ -3006,7 +3307,61 @@ body {
   background: var(--color-surface-page);
 }
 .o-filling[data-state="visible"] { display: flex; }
+/* The outcome faces carry the light of their outcome, the way the check
+   screen does: a wash at the top in the hue of the news. The live faces get
+   nothing, because a fill in progress is not news yet and the vessel is
+   already the thing that glows. */
+.o-filling::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 42%;
+  pointer-events: none; opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.o-filling[data-face="refused"]::before, .o-filling[data-face="offline"]::before {
+  opacity: 1;
+  background:
+    radial-gradient(120% 70% at 50% -12%, var(--color-warning-bg) 0%, transparent 64%),
+    radial-gradient(70% 46% at 88% 0%, var(--color-secondary-04) 0%, transparent 58%);
+}
+.o-filling[data-face="done"]::before {
+  opacity: 1;
+  background:
+    radial-gradient(120% 70% at 50% -12%, var(--color-success-12) 0%, transparent 64%),
+    radial-gradient(70% 46% at 12% 0%, var(--color-tertiary-18) 0%, transparent 58%);
+}
+/* Everything the screen draws sits above that wash. */
+.o-filling__bar, .o-filling__stage, .o-filling__note, .o-filling__action { position: relative; }
 .o-filling__bar { align-self: stretch; display: flex; justify-content: flex-end; }
+/* The refusal's own object. Every other face of this screen has something to
+   look at - a spinner, a filling drop, a count - and the refusal had a
+   sentence alone in the middle of an empty screen. It is the check screen's
+   verdict seal at stage size: same light, same self-drawing glyph, same halo
+   that rings once and stops. The hue is the warning, not the error red,
+   because nothing has gone wrong with the driver's code or their litres. */
+.o-filling__mark {
+  position: relative;
+  width: 64px; height: 64px; margin-bottom: var(--sp-2);
+  display: grid; place-items: center;
+  border-radius: var(--radius-circle);
+  color: var(--color-warning);
+  background: var(--gradient-seal-warn); box-shadow: var(--shadow-seal-warn);
+}
+.o-filling__mark svg path { stroke-dasharray: 27; stroke-dashoffset: 27; }
+.o-filling[data-face="refused"] .o-filling__mark {
+  animation: markPop var(--dur-slow) var(--ease-spring) both;
+}
+.o-filling[data-face="refused"] .o-filling__mark svg path {
+  animation: checkDraw .5s var(--ease-emphasis) .22s both;
+}
+.o-filling[data-face="refused"] .o-filling__mark::after {
+  content: ""; position: absolute; inset: -3px;
+  border-radius: inherit; border: 2px solid currentColor;
+  animation: verdictHalo 1s var(--ease-out) .7s both;
+}
+/* The words follow the object, in the order they are read. */
+.o-filling[data-face="refused"] .o-filling__verdict { animation: checkRise .5s var(--ease-out) .30s both; }
+.o-filling[data-face="refused"] .o-filling__facts   { animation: checkRise .5s var(--ease-out) .38s both; }
+.o-filling[data-face="refused"] .o-filling__note    { animation: checkRise .5s var(--ease-out) .46s both; }
+.o-filling[data-face="refused"] .o-filling__action  { animation: checkRise .5s var(--ease-out) .54s both; }
 /* A word, not a full-width bar: the way out is quiet and cornered, sized
    to its own label plus the tap floor. */
 .o-filling__hideWrap { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-1); }
@@ -3063,7 +3418,7 @@ body {
 }
 /* The verdict is its own line, not a clause spliced into the unit. */
 .o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: 700; color: var(--color-success); }
-.o-filling__verdict[data-tone="warning"] { color: var(--color-warning); }
+.o-filling__verdict[data-tone="warning"] { color: var(--color-text-primary); }
 /* The number arrives. One spring on completion, a still frame under reduced
    motion - the medal's grammar, at the pump. */
 @keyframes fillingLand { 0% { transform: scale(0.92); opacity: 0.4; } 100% { transform: none; opacity: 1; } }
@@ -3075,7 +3430,7 @@ body {
   position: absolute; inset: 0; z-index: var(--z-overlay);
   display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
-           calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+           calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
   overflow-y: auto; overscroll-behavior: contain;
 }
@@ -3102,6 +3457,19 @@ body {
   border-radius: var(--radius-card); padding: var(--sp-1) var(--sp-4);
   box-shadow: var(--shadow-card-sm);
 }
+/* The drawer opens one slip at a time, newest first, which is the order they
+   were filed and the order a driver looks for them. Each date and the card
+   under it move together, because they are one slip. Four pairs are named
+   and everything past them lands with the fourth: a driver scrolling to their
+   ninth receipt is reading, not watching an entrance. */
+.o-history[data-state="visible"] .o-history__list > * {
+  animation: slipIn .5s var(--ease-emphasis) both;
+}
+.o-history[data-state="visible"] .o-history__list > :nth-child(-n+2) { animation-delay: .10s; }
+.o-history[data-state="visible"] .o-history__list > :nth-child(n+3):nth-child(-n+4) { animation-delay: .18s; }
+.o-history[data-state="visible"] .o-history__list > :nth-child(n+5):nth-child(-n+6) { animation-delay: .26s; }
+.o-history[data-state="visible"] .o-history__list > :nth-child(n+7) { animation-delay: .34s; }
+.o-history[data-state="visible"] .a-screen-title { animation: checkRise .5s var(--ease-out) both; }
 .m-empty-note--history { margin-top: var(--sp-4); }
 
 .o-fuel__action {
@@ -3485,18 +3853,15 @@ body {
             <div class="m-reward-goal__head">
               <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg></span>
               <span class="m-reward-goal__title">Data reward</span>
-              <span class="m-reward-goal__value" id="rewardGoalValue">50 MB of 5 GB</span>
+              <span class="m-reward-goal__value" id="rewardGoalValue">50 MB of 3 GB</span>
             </div>
             <div class="a-meter" id="rewardMeter" role="progressbar"
-                 aria-valuemin="0" aria-valuemax="5000" aria-valuenow="50"
-                 aria-valuetext="50 of 5 000 points, 50 MB of 5 GB"
+                 aria-valuemin="0" aria-valuemax="3000" aria-valuenow="50"
+                 aria-valuetext="50 of 3 000 points, 50 MB of 3 GB"
                  aria-label="Data earned so far">
               <div class="a-meter__fill" id="rewardMeterFill"></div>
             </div>
-            <div class="m-reward-goal__scale" aria-hidden="true">
-              <span>0</span><span>1 GB</span><span>2 GB</span>
-              <span>3 GB</span><span>4 GB</span><span>5 GB</span>
-            </div>
+            <div class="m-reward-goal__scale" id="rewardScale" aria-hidden="true"></div>
             <p class="m-reward-goal__next" id="rewardNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark-soft)" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
               <span>950 points to your first 1 GB</span>
             </p>
@@ -3534,7 +3899,7 @@ body {
         <!-- Plain words for a second-language reader: no idiom, subject first,
              one fact. "Pays you back" read as a promise or a threat depending
              on the reader's first language, and neither is what happened. -->
-        <h1 class="o-onboard__title" id="earnedTitle" tabindex="-1">You earned points for this fill</h1>
+        <h1 class="o-onboard__title" id="earnedTitle" tabindex="-1">524 points earned</h1>
 
         <div class="o-onboard__earned">
           <div class="m-earn-row" id="earnedRow">
@@ -3560,6 +3925,7 @@ body {
         <div class="o-onboard__spacer"></div>
         <div class="o-onboard__actions">
           <button class="a-btn a-btn--primary" id="earnedCta" type="button">See receipt</button>
+          <button class="a-quiet-link" type="button" id="earnedHome">Done</button>
         </div>
       </section>
 
@@ -3603,6 +3969,8 @@ body {
         <div class="o-receipt__spacer"></div>
         <div class="o-receipt__action">
           <button class="a-btn a-btn--primary" id="receiptDone" type="button">Done</button>
+          <button class="a-btn a-btn--outline" type="button" id="receiptSend">Send to my manager</button>
+          <p class="o-receipt__filed">Saved in History.</p>
         </div>
       </section>
 
@@ -3615,7 +3983,7 @@ body {
           <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
         <h1 class="a-screen-title" id="historyTitle" tabindex="-1">Fuel history</h1>
-        <div id="historyList"></div>
+        <div class="o-history__list" id="historyList"></div>
         <div class="m-empty-note m-empty-note--history" id="historyEmpty">
           <p class="m-empty-note__text">No fills yet. Receipts from your fills are kept here.</p>
         </div>
@@ -3653,7 +4021,7 @@ body {
         <div class="o-account__row">
           <span class="o-account__rowBody">
             <span class="o-account__rowTitle">Vehicles assigned by your company</span>
-            <span class="o-account__rowSub">Scan one to link it for today.</span>
+            <span class="o-account__rowSub">Linked one at a time, by scanning.</span>
           </span>
           <span class="o-account__value" id="accountVehicles">3</span>
         </div>
@@ -3682,6 +4050,19 @@ body {
         <p class="o-rewards__lead">Use your points</p>
         <div class="o-rewards__list" id="rewardsList" role="list"></div>
         <p class="o-rewards__earnNote">You earn 10 points for every litre you fuel. Mobile data will be sent to +27 82 ··· 567.</p>
+
+        <!-- Points are weeks of driving and the spend cannot be undone, so it
+             is asked before it is done - the same dialog the fuel code uses
+             before it voids one. -->
+        <div class="m-confirm" id="spendConfirm" role="dialog" aria-modal="true"
+             aria-labelledby="spendConfirmTitle" hidden>
+          <div class="m-confirm__panel">
+            <h2 class="m-confirm__title" id="spendConfirmTitle" tabindex="-1"></h2>
+            <p class="m-confirm__body" id="spendConfirmBody"></p>
+            <button class="a-btn a-btn--primary" type="button" id="spendGo">Confirm</button>
+            <button class="a-quiet-link" type="button" id="spendCancel">Cancel</button>
+          </div>
+        </div>
       </section>
 
       <!-- The fill, watched. Tapping the Filling bar opens the one screen in
@@ -3706,6 +4087,11 @@ body {
                the pulse takes over. -->
           <span class="o-filling__spin" id="fillingSpin" aria-hidden="true" hidden><svg class="a-spinner" width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12.5" stroke="var(--color-border)" stroke-width="3"/><path d="M17 4.5a12.5 12.5 0 0 1 12.5 12.5" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round"/></svg></span>
           <span class="o-filling__vessel" id="fillingVessel" aria-hidden="true" hidden><svg width="84" height="84" viewBox="0 0 24 24" fill="none"><defs><clipPath id="fillingDropClip"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z"/></clipPath></defs><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" fill="var(--color-primary-bg)"/><g clip-path="url(#fillingDropClip)"><g class="o-filling__liquid"><path class="o-filling__wave o-filling__wave--back" d="M-24 -1.4q3 1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary-dark)" opacity="0.35"/><path class="o-filling__wave" d="M-24 0q3 -1.2 6 0t6 0t6 0t6 0t6 0t6 0t6 0t6 0V26H-24Z" fill="var(--color-primary)"/></g></g></svg></span>
+          <!-- The refusal's object. Hidden on every other face, because the
+               vessel, the count and the spinner each own their own. -->
+          <span class="o-filling__mark" id="fillingMark" aria-hidden="true" hidden>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg>
+          </span>
           <!-- Not a live region: a reader hearing five updates a second of one
            number is being shouted at, the home bar's rule exactly. The
            arrival, the finish and the verdict all go through announce(). -->
@@ -3717,7 +4103,10 @@ body {
         <p class="o-filling__note" id="fillingNote">The pump is running.</p>
         <div class="o-filling__action">
           <button class="a-btn a-btn--outline" type="button" id="fillingShowCode" hidden>Show fuel code again</button>
-          <button class="a-btn a-btn--outline" type="button" id="fillingSupport" hidden>Message support</button>
+          <!-- The same exit as the pill above, in the corner of the screen a
+               thumb can actually reach mid-fill. -->
+          <button class="a-quiet-link" type="button" id="fillingCloseLow">Close live view</button>
+          <button class="a-btn a-btn--outline" type="button" id="fillingSupport" hidden>Message Engen support</button>
           <button class="a-btn a-btn--primary" type="button" id="fillingCta" hidden>See your points</button>
         </div>
       </section>
@@ -3763,7 +4152,7 @@ body {
           <div class="o-home__stats" id="homeStats">
             <span class="m-stat-pill" data-tone="success" id="homeLitres">
               <span class="m-stat-pill__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
-              <span><span class="m-stat-pill__figure">60 L</span> per fill</span>
+              <span>Limit: <span class="m-stat-pill__figure">60 L</span> per fill</span>
             </span>
           </div>
 
@@ -3862,8 +4251,8 @@ body {
           <button class="m-vehicle-card" type="button" id="homeVehicleEmpty" data-state="empty" hidden>
             <span class="m-vehicle-card__art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
             <span class="m-vehicle-card__body">
-              <span class="m-vehicle-card__plate">Link the vehicle you&rsquo;re driving today</span>
-              <span class="m-vehicle-card__note">Scan its licence disc or number plate.</span>
+              <span class="m-vehicle-card__plate">Scan the vehicle you&rsquo;re driving today</span>
+              <span class="m-vehicle-card__note">Its licence disc or number plate links it for the day.</span>
             </span>
           </button>
 
@@ -3909,27 +4298,33 @@ body {
           </button>
         </div>
 
-        <nav class="o-tab-bar" aria-label="Sections">
-          <button class="o-tab-bar__tab" type="button" data-tab="home" aria-current="page">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
-            <span>Home</span>
-          </button>
-          <button class="o-tab-bar__tab" type="button" data-tab="fuel">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
-            <span>Fuel</span>
-          </button>
-          <!-- The count is real or it is absent. It shipped saying "2 new"
-               from the day it was drawn, on an empty drawer. -->
-          <button class="o-tab-bar__tab" type="button" data-tab="history" aria-label="History">
-            <span class="o-tab-bar__icon"><span class="a-badge" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-            <span>History</span>
-          </button>
-          <button class="o-tab-bar__tab" type="button" data-tab="account">
-            <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span>Account</span>
-          </button>
-        </nav>
       </section>
+
+      <!-- The tab bar belongs to the app, not to Home. It used to live inside
+           the home screen, so History and Account - both reached by pressing a
+           tab - arrived with the bar gone and a back chevron in its place, and
+           "where am I" had no answer anywhere but Home. It now stands under
+           every tab destination and marks the one you are on. -->
+      <nav class="o-tab-bar" id="tabBar" aria-label="Sections">
+        <button class="o-tab-bar__tab" type="button" data-tab="home" aria-current="page">
+          <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+          <span>Home</span>
+        </button>
+        <button class="o-tab-bar__tab" type="button" data-tab="fuel">
+          <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg></span>
+          <span>Fuel</span>
+        </button>
+        <!-- The count is real or it is absent. It shipped saying "2 new"
+             from the day it was drawn, on an empty drawer. -->
+        <button class="o-tab-bar__tab" type="button" data-tab="history" aria-label="History">
+          <span class="o-tab-bar__icon"><span class="a-badge" id="historyBadge" data-count="0" aria-hidden="true" hidden>0</span><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          <span>History</span>
+        </button>
+        <button class="o-tab-bar__tab" type="button" data-tab="account">
+          <span class="o-tab-bar__icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span>Account</span>
+        </button>
+      </nav>
 
       <!-- FLOW 1 · one screen, three jobs.
            Account confirmation, vehicle confirmation and the location ask are
@@ -4015,7 +4410,7 @@ body {
              with the camera, so the camera has to be willing to look again. -->
         <div class="o-scan__typePanel" id="scanTypePanel" hidden>
           <label class="o-scan__typeLabel" for="scanPlateInput">Number plate</label>
-          <input class="o-scan__typeInput" id="scanPlateInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="CA 123-456">
+          <input class="o-scan__typeInput" id="scanPlateInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="e.g. ND 789-123">
           <p class="o-scan__typeErr" id="scanTypeErr" hidden>That plate is not assigned to you. Check it and try again.</p>
         </div>
         <div class="o-scan__actions">
@@ -4163,15 +4558,18 @@ body {
           <div class="o-check__alts" id="checkAlts" hidden></div>
 
           <!-- What is being authorised. Two lines, both of which a driver can
-               check against the vehicle in front of them. -->
-          <div class="m-fact">
-            <span class="m-fact__name">Vehicle</span>
-            <span class="m-fact__value" id="checkPlate">CA 123-456</span>
-            <span class="m-fact__sub" id="checkModel">Ford Transit Custom</span>
-          </div>
-          <div class="m-fact">
-            <span class="m-fact__name">Fuel</span>
-            <span class="m-fact__value">Up to 60 L</span>
+               check against the vehicle in front of them, riding one card
+               because they authorise one fill. -->
+          <div class="o-check__facts">
+            <div class="m-fact">
+              <span class="m-fact__name">Vehicle</span>
+              <span class="m-fact__value" id="checkPlate">CA 123-456</span>
+              <span class="m-fact__sub" id="checkModel">Ford Transit Custom</span>
+            </div>
+            <div class="m-fact">
+              <span class="m-fact__name">Fuel</span>
+              <span class="m-fact__value">Up to 60 L</span>
+            </div>
           </div>
 
           <!-- What the ring was counting. Quiet once passed, because five
@@ -4265,7 +4663,7 @@ body {
              same rank, so it stops being drawn as one and stops sitting under
              the thumb that has just finished reading a code. -->
         <div class="o-fuel__action">
-          <button class="a-btn a-btn--primary" type="button" id="fuelDone">Hide code</button>
+          <button class="a-btn a-btn--outline" type="button" id="fuelDone">Hide code</button>
           <button class="a-quiet-link" type="button" id="fuelCancel">Cancel this request</button>
         </div>
 
@@ -4318,21 +4716,23 @@ body {
     earnedValue: $('earnedValue'), earnedConfetti: $('earnedConfetti'),
     earnedTitle: $('earnedTitle'), earnedRow: $('earnedRow'),
     earnedRowLabel: $('earnedRowLabel'), earnedRowPill: $('earnedRowPill'),
-    earnedWorth: $('earnedWorth'), earnedCta: $('earnedCta'),
+    earnedWorth: $('earnedWorth'), earnedCta: $('earnedCta'), earnedHome: $('earnedHome'),
     receipt: $('receiptScreen'), receiptTitle: $('receiptTitle'),
     receiptStation: $('receiptStation'), receiptVehicle: $('receiptVehicle'),
     receiptModel: $('receiptModel'), receiptLitres: $('receiptLitres'),
     receiptPoints: $('receiptPoints'), receiptBalance: $('receiptBalance'),
-    receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptDone: $('receiptDone'),
+    receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptDone: $('receiptDone'), receiptSend: $('receiptSend'),
     rewards: $('rewardsScreen'), rewardsTitle: $('rewardsTitle'),
     rewardsPoints: $('rewardsPoints'), rewardsWorth: $('rewardsWorth'),
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
     filling: $('fillingScreen'), fillingLitres: $('fillingLitres'),
     fillingUnit: $('fillingUnit'), fillingVerdict: $('fillingVerdict'),
     fillingSpin: $('fillingSpin'), fillingHideNote: $('fillingHideNote'), fillingVessel: $('fillingVessel'),
+    fillingMark: $('fillingMark'),
     fillingFacts: $('fillingFacts'),
     fillingNote: $('fillingNote'), fillingCta: $('fillingCta'),
     fillingShowCode: $('fillingShowCode'), fillingSupport: $('fillingSupport'),
+    fillingCloseLow: $('fillingCloseLow'),
     fuelTitleWord: $('fuelTitleWord'), fuelLead: $('fuelLead'), fuelExpiry: $('fuelExpiry'),
     stationsVehicle: $('stationsVehicle'),
     fillingClose: $('fillingClose'),
@@ -4346,7 +4746,7 @@ body {
     historyList: $('historyList'), historyEmpty: $('historyEmpty'),
     historyBack: $('historyBack'),
     rewardGoalValue: $('rewardGoalValue'), rewardMeter: $('rewardMeter'),
-    rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'),
+    rewardMeterFill: $('rewardMeterFill'), rewardNext: $('rewardNext'), rewardScale: $('rewardScale'),
     /* One row now. The array stays because the sequence indexes it by e.row,
        so a second earning event only has to be added to S.earned and here. */
     earnRows: [$('earnRow1')],
@@ -4399,6 +4799,10 @@ body {
   el.fuelDone = $('fuelDone'); el.fuelConfirm = $('fuelConfirm');
   el.fuelConfirmTitle = $('fuelConfirmTitle'); el.fuelConfirmBody = $('fuelConfirmBody');
   el.fuelKeep = $('fuelKeep'); el.fuelDrop = $('fuelDrop');
+  el.tabBar = $('tabBar');
+  el.spendConfirm = $('spendConfirm'); el.spendConfirmTitle = $('spendConfirmTitle');
+  el.spendConfirmBody = $('spendConfirmBody'); el.spendGo = $('spendGo');
+  el.spendCancel = $('spendCancel');
   el.stations = $('stationsScreen'); el.stationList = $('stationList');
   el.stationPins = $('stationPins'); el.stationFilters = $('stationFilters');
   el.stationSearch = $('stationSearch'); el.stationEmpty = $('stationEmpty');
@@ -4439,6 +4843,9 @@ body {
     /* mb -> 'processing' | 'sent' | 'delivered' | 'failed'. Points spend at
        request time and come back on failure; the row narrates the rest. */
     redemptions: {},
+    /* Which bundle the confirm dialog is asking about. Null when nothing
+       is being asked. */
+    pendingBundle: null,
     /* Signing up is worth 50, the same as it is in the full app. Change this
        and the total, the meter, the goal line and the announcement all follow.
 
@@ -4650,8 +5057,21 @@ body {
      S.step, so their own show/hide pairs arm the tap guard themselves,
      which rooms get from hideAll by construction. */
   var SCREENS = [];
+  /* The bar's sole writer. A screen that is not a tab destination passes
+     nothing and the bar goes down with it, so a flow screen never wears
+     navigation it does not own. */
+  function paintTabs(active) {
+    if (!active) { el.tabBar.removeAttribute('data-state'); return; }
+    el.tabBar.setAttribute('data-state', 'visible');
+    Array.prototype.forEach.call(el.tabBar.querySelectorAll('[data-tab]'), function (t) {
+      if (t.getAttribute('data-tab') === active) { t.setAttribute('aria-current', 'page'); }
+      else { t.removeAttribute('aria-current'); }
+    });
+  }
+
   function hideAll() {
     disarmTaps();
+    paintTabs(null);
     /* Every route off the code screen goes through here as well as through
        hideFuel, including picking a state from the menu, so the hold is let go
        in the one place nothing can get past. */
@@ -4689,6 +5109,13 @@ body {
   function paintGoal(points) {
     var gb = points / S.ptsPerGb;
     var capPts = S.ptsPerGb * S.gbCap;
+    /* The ruler is drawn from the cap the bar fills towards. Typed once into
+       the markup it ran to 5 GB while every word on the card said 3, so the
+       fill landed at the wrong tick and the card argued with itself. */
+    var ticks = ['<span>0</span>'];
+    for (var t = 1; t <= S.gbCap; t++) { ticks.push('<span>' + t + ' GB</span>'); }
+    el.rewardScale.innerHTML = ticks.join('');
+    el.rewardMeter.setAttribute('aria-valuemax', capPts);
     var nextGb = Math.min(S.gbCap, Math.floor(gb) + 1);
     var toNext = Math.max(0, nextGb * S.ptsPerGb - points);
     el.rewardGoalValue.textContent =
@@ -5178,6 +5605,7 @@ body {
   function showHome(arriving, linked) {
     clearTimers(); hideAll();
     S.step = 'home';
+    paintTabs('home');
     setStatusTone(false);
     var points = balancePts();
     el.homePoints.textContent = groupNum(points) + ' pts';
@@ -5568,11 +5996,11 @@ body {
     odometer: {
       mark: ICON_GAUGE,
       title: 'Enter the kilometre reading',
-      body: 'Find this number on the dashboard. Your company checks fuel against distance.',
+      body: 'Find this number on the dashboard. Next: your fuel code.',
       go: 'Continue',
       build: function (host) {
         host.innerHTML =
-          '<input class="o-step__field" type="text" inputmode="numeric"' +
+          '<input class="o-step__field" type="text" inputmode="numeric" enterkeyhint="done"' +
           ' value="' + (S.odoReading || '84 230') + '"' +
           ' aria-label="Kilometre reading, from the dashboard">';
       },
@@ -5591,8 +6019,8 @@ body {
       /* Plain words. "Biometric authentication" is the bank's language, and a
          driver does not have to learn it to unlock their own phone. */
       body: 'Use your phone\u2019s screen lock, or a code we send you.',
-      go: 'Continue',
-      alt: 'Use a code instead',
+      go: 'Confirm with screen lock',
+      alt: 'Send me a WhatsApp code instead',
       onGo: function () {
         /* The lock opens first. 350ms of shackle is the confirmation felt
            before the next screen says it; under reduced motion the open
@@ -5635,6 +6063,12 @@ body {
          cannot be made to work is the manager, and the scanner says so. */
       body: 'Scan its licence disc or number plate. The disc is in the corner of the windscreen.',
       go: 'Open camera',
+      /* The one road is still scanning, and nothing here links a vehicle.
+         This only lets a driver who is nowhere near their van get on with
+         looking around; home asks again, and fuelling still cannot start
+         without a scan. */
+      alt: 'Not at the vehicle yet',
+      onAlt: function () { hideStep(); showHome(true); },
       /* The same pills as home, for the same reason and out of the same
          function. These used to be full width raised cards carrying the make
          and the model, which made the list the heaviest thing on a screen whose
@@ -5927,7 +6361,7 @@ body {
     el.scanRetry.dataset.act = notyours ? 'again'
                              : lightIt ? 'torch'
                              : douseIt ? 'torchoff' : 'again';
-    el.scanRetry.textContent = notyours ? 'Scan another vehicle'
+    el.scanRetry.textContent = notyours ? 'Scan again'
                              : lightIt ? 'Turn on the torch'
                              : douseIt ? 'Turn the torch off' : 'Try again';
     /* A person is the last resort, so it only leads when there is genuinely
@@ -5935,7 +6369,11 @@ body {
        cannot grant, or a vehicle that has now failed to read four times over.
        Not the network, and not a camera that will very likely come back. */
     el.scanType.setAttribute('data-lead', String((struggling && hardFail) || spent));
-    el.scanType.textContent = 'Ask your manager';
+    /* Before anything has failed the button has to say why it is there;
+       once a read has failed the face above it has already said so. */
+    el.scanType.textContent = (struggling || spent || hardFail)
+      ? 'Message my manager'
+      : 'Vehicle not on your list? Message my manager';
   }
 
   /* The read landing. Auto capture, so the driver is not holding a phone at a
@@ -6053,9 +6491,17 @@ body {
     /* Standing in front of a fill rather than starting a session, so it says so.
        A lock screen with no reason attached is the one people tap through. */
     if (key === 'account' && afterAccount) {
+      /* Per-fill, so it runs itself: the phone is already unlocked in the
+         driver's hand and a tap that only means "yes, carry on" is a tax on
+         every fill. The screen still shows what is being checked, and the
+         code road stays open while it plays. */
+      after(prefersReduced() ? 0 : 620, function () {
+        if (S.step === 'step:account' && afterAccount) { el.stepGo.click(); }
+      });
       el.stepTitle.textContent = 'Confirm it\u2019s you';
       el.stepBody.textContent =
-        'The fuel goes on your company\u2019s account, so we check who is asking.';
+        'The fuel goes on your company\u2019s account, so we check who is asking. ' +
+        'Your phone\u2019s screen lock does the checking.';
     }
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
@@ -6095,7 +6541,7 @@ body {
      and the screen can be screenshotted twice. */
   var STATIONS = [
     { id: 'fourways',  name: 'Engen Fourways',    km: 6.2,  x: 32, y: 12,
-      note: 'You have fuelled here once. Approved.', allowed: true, open: true,
+      note: 'You have fuelled here once.', allowed: true, open: true,
       street: 'William Nicol Dr and Witkoppen Rd', pumps: 8,
       has: ['Open 24 hours', 'Shop', 'Toilets', 'Car wash'],
       deals: [
@@ -6103,7 +6549,7 @@ body {
         { icon: '\u{1F355}', title: 'Free slice with a full tank', sub: 'While stocks last', tag: '40 L and up' }
       ] },
     { id: 'roodekop',  name: 'Engen Roodekop',    km: 14.6, x: 78, y: 34,
-      note: 'Cheapest allowed. More points per fill.', allowed: true, open: true,
+      note: 'Lowest fuel price of your approved stations.', allowed: true, open: true,
       street: 'Main Reef Rd, Roodekop', pumps: 6,
       has: ['Shop', 'Toilets'], deals: [] },
     { id: 'bryanston', name: 'Engen Bryanston',   km: 2.1,  x: 36, y: 47,
@@ -6129,11 +6575,11 @@ body {
   ];
 
   var STATION_SORTS = [
-    { key: 'near',  label: 'Nearest',      by: function (a, b) { return a.km - b.km; } },
-    { key: 'open',  label: 'Open 24 hours', by: function (a, b) {
+    { key: 'near',  label: 'Nearest first', by: function (a, b) { return a.km - b.km; } },
+    { key: 'open',  label: '24-hour first', by: function (a, b) {
         var oa = /24 hours/.test(a.note) ? 0 : 1, ob = /24 hours/.test(b.note) ? 0 : 1;
         return oa - ob || a.km - b.km; } },
-    { key: 'known', label: 'Fuelled here before', by: function (a, b) {
+    { key: 'known', label: 'Fuelled before', by: function (a, b) {
         var ka = /fuelled here/.test(a.note) ? 0 : 1, kb = /fuelled here/.test(b.note) ? 0 : 1;
         return ka - kb || a.km - b.km; } }
   ];
@@ -6398,7 +6844,7 @@ body {
         .slice().sort(function (x, y) { return x.km - y.km; }).slice(0, 2);
       el.checkAlts.innerHTML = alts.map(function (a) {
         return '<button class="o-check__alt" type="button" data-alt="' + a.id + '">' +
-               '<span class="o-check__altName">' + a.name + '</span>' +
+               '<span class="o-check__altName">Check ' + a.name + '</span>' +
                '<span class="o-check__altKm">' + a.km.toFixed(1) + ' km</span></button>';
       }).join('');
       Array.prototype.forEach.call(el.checkAlts.querySelectorAll('[data-alt]'), function (b) {
@@ -6455,7 +6901,7 @@ body {
     var hours = S.hours !== 'closed';
     return [
       { ok: !!st.allowed, shortName: 'Company list',
-        title: 'On your company list',
+        title: 'Station on your company list',
         sub: st.allowed ? st.name + ' is approved for you'
                         : st.name + ' is not one your company pays for' },
       /* Never a number, and never the word funds.
@@ -6466,8 +6912,8 @@ body {
          whether the fill can go ahead, and the failure hands them the one
          person who can fix it. */
       { ok: account, shortName: 'Company account',
-        title: account ? 'Your company account is active'
-                       : 'Your company cannot approve this fill',
+        title: account ? 'Company account active'
+                       : 'Company cannot approve this fill',
         sub: account ? 'Nothing is stopping this fill'
                      : 'Ask your manager to fix it.' },
       { ok: hours, shortName: 'Fuelling hours',
@@ -6492,6 +6938,9 @@ body {
     ];
   }
 
+  /* The rows below a failure never ran. A bare minus glyph is a shrug; the
+     word is the same one the screen reader already receives. */
+  var NOT_CHECKED = 'Not checked yet';
   var TICK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
     'stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
   var DASH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
@@ -6530,11 +6979,19 @@ body {
        only the words and a second-language reader trusts them over grey. */
     function neutraliseSkipped(row, c) {
       var title = row.querySelector('.m-check__title');
-      title.innerHTML = '<span class="u-visually-hidden">Not checked: </span>' + c.shortName;
+      title.textContent = c.shortName;
+      var sub = row.querySelector('.m-check__sub');
+      /* The eye gets the same word the ear already had. A bare dash is a
+         shrug; "Not checked yet" is an answer. */
+      if (sub) { sub.textContent = NOT_CHECKED; }
     }
 
     var rows = el.checkList.querySelectorAll('.m-check');
     var step = prefersReduced() ? 0 : 190;
+    /* The verdict, the station and the facts land first - their CSS stagger
+       runs about 300ms - and only then do the answers start arriving. Rows
+       landing under a header still in flight read as two screens moving. */
+    var hold = prefersReduced() ? 0 : 300;
 
     /* Answers land one at a time, and the ring stops at the first refusal
        rather than completing round a problem. */
@@ -6543,7 +7000,7 @@ body {
 
     checks.forEach(function (c, i) {
       if (i > stopAt) { return; }
-      after(step * i, function () {
+      after(hold + step * i, function () {
         if (rows[i]) { rows[i].setAttribute('data-state', 'in'); }
       });
     });
@@ -6551,7 +7008,7 @@ body {
        Leaving the tick on made the screen say a question had passed when the
        app had stopped before reaching it. */
     for (var j = stopAt + 1; j < n; j++) {
-      (function (r, c) { after(step * (stopAt + 1), function () {
+      (function (r, c) { after(hold + step * (stopAt + 1), function () {
         if (!r) { return; }
         r.setAttribute('data-state', 'in');
         r.setAttribute('data-outcome', 'skipped');
@@ -6596,9 +7053,18 @@ body {
     el.stationStatus.textContent = '';
     if (!keepChoice) { S.station = null; }
     var sv = activeVehicle();
+    var near = null;
+    if (arriving && !keepChoice && S.located) {
+      near = STATIONS.filter(function (s) { return s.allowed; })
+                     .sort(function (a, b) { return a.km - b.km; })[0] || null;
+      if (near) { S.station = near.id; }
+    }
     el.stationsVehicle.hidden = !sv;
     if (sv) { el.stationsVehicle.textContent = 'For ' + sv.plate + ' \u00b7 ' + sv.make + ' ' + sv.model; }
     paintStations();
+    /* Opened, not merely selected: the sheet is where the decision is made,
+       and the alternatives stay one press beneath it. */
+    if (near) { paintPeek(near); }
     el.stations.hidden = false;
     if (arriving && !prefersReduced()) {
       el.stations.setAttribute('data-state', 'arriving');
@@ -6731,7 +7197,8 @@ body {
     setStatusTone(true);
     bankFill();
     var v = fillVehicle();
-    el.earnedRowLabel.textContent = 'Fuelling ' + fillLitresFinal() + ' L';
+    el.earnedTitle.textContent = fillPts() + ' points earned';
+    el.earnedRowLabel.textContent = 'Fuel: ' + fillLitresFinal() + ' L';
     el.earnedRowPill.textContent = '+' + fillPts() + ' pts';
     el.earnedWorth.textContent = 'Worth about ' + dataLabel(fillPts() / S.ptsPerGb) + ' of mobile data';
     el.earnedMedal.setAttribute('aria-label', fillPts() + ' points earned for this fill');
@@ -6808,6 +7275,8 @@ body {
   function showRewards() {
     clearTimers(); hideAll();
     S.step = 'rewards';
+    el.spendConfirm.hidden = true;
+    S.pendingBundle = null;
     Object.keys(S.redemptions).forEach(function (mb) {
       if (S.redemptions[mb] === 'processing' || S.redemptions[mb] === 'sent') { armRedemption(mb); }
     });
@@ -6841,6 +7310,9 @@ body {
          to fill up again. "More points" collided with the price column at
          large text, and the word the line can spare is the one the row
          already says twice. */
+      var note = status === 'failed'
+        ? '<span class="m-bundle__note">Not sent \u2014 your ' + groupNum(b.pts) + ' pts are back in your balance</span>'
+        : '';
       var right = status === 'processing' ? '<span class="m-bundle__state">Processing\u2026</span>'
                 : status === 'sent' ? '<span class="m-bundle__state">Sent</span>'
                 : status === 'delivered' ? '<span class="m-bundle__state">Delivered \u2713</span>'
@@ -6856,7 +7328,7 @@ body {
              '<span class="m-bundle__main">' +
              '<span class="a-icon-wrap"' + (status === 'delivered' ? ' data-tone="success"' : '') + '>' + DATA_MARK + '</span>' +
              '<span><span class="m-bundle__size">' + b.label + ' of data</span>' +
-             '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span>' + track + '</span>' +
+             '<span class="m-bundle__price">' + groupNum(b.pts) + ' pts</span>' + note + track + '</span>' +
              '</span>' +
              right + '</button>';
     }).join('');
@@ -6883,6 +7355,27 @@ body {
       });
     });
   }
+  /* Every road to a spend runs through the question first. A failed bundle
+     asks again too: the retry is free, but it is still a spend. */
+  function askBundle(i) {
+    var b = BUNDLES[i];
+    if (!b) { return; }
+    var status = S.redemptions[b.mb];
+    if (status === 'processing' || status === 'sent' || status === 'delivered') { return; }
+    if (balancePts() < b.pts && status !== 'failed') {
+      reply('You need ' + groupNum(b.pts - balancePts()) + ' more points for ' + b.label + '.');
+      return;
+    }
+    S.pendingBundle = i;
+    el.spendConfirmTitle.textContent = 'Get ' + b.label + ' of mobile data?';
+    el.spendConfirmBody.textContent =
+      'This costs ' + groupNum(b.pts) + ' points. The data will be sent to +27 82 \u00b7\u00b7\u00b7 567.';
+    disarmTaps();
+    el.spendConfirm.hidden = false;
+    after(60, function () { el.spendConfirmTitle.focus({ preventScroll: true }); });
+    announce(el.spendConfirmTitle.textContent + ' ' + el.spendConfirmBody.textContent);
+  }
+
   function sendBundle(i) {
     var b = BUNDLES[i];
     if (!b) { return; }
@@ -6962,8 +7455,10 @@ body {
      no build step - so the demo driver arrives with it on, which is the state
      the sign-up flow's happy path produces. */
   function showAccount() {
+    /* Reached by a tab, so the bar stays and marks itself. */
     clearTimers(); hideAll();
     S.step = 'account';
+    paintTabs('account');
     setStatusTone(false);
     el.accountVehicles.textContent = String(S.vehicles.length || 0);
     paintBioSetting();
@@ -6983,8 +7478,10 @@ body {
      from its filed facts - the driver already learned to read this shape on
      the screen that filed it. */
   function showHistory() {
+    /* Reached by a tab, so the bar stays and marks itself. */
     clearTimers(); hideAll();
     S.step = 'history';
+    paintTabs('history');
     setStatusTone(false);
     S.newSlips = 0;
     paintHistoryBadge();
@@ -7045,17 +7542,24 @@ body {
     /* The reassurance may only speak while fuel is actually flowing. */
     el.fillingHideNote.hidden = !(!done && !waiting && !pumpWait) || !!fault;
     el.fillingVessel.hidden = waiting || pumpWait || fault === 'refused';
+    /* The refusal is the one face with nothing of its own to show, so it gets
+       its own mark rather than a sentence alone in an empty screen. */
+    el.fillingMark.hidden = fault !== 'refused';
     /* The picture reads the cap the facts line reads: one number feeds both
        the words and the water line. */
     el.fillingVessel.style.setProperty('--fill-level', String(
       Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES))));
     el.fillingLitres.hidden = waiting || pumpWait || fault === 'refused';
+    /* A number that stopped moving is not the truth any more; it is the last
+       thing we heard. It says so rather than looking live. */
+    el.fillingLitres.setAttribute('data-stale', String(fault === 'offline'));
     el.fillingUnit.hidden = fault === 'refused';
     el.fillingLitres.textContent = done ? String(fillLitresFinal())
                                         : (S.fillLitresNow || 0).toFixed(1);
     el.fillingUnit.textContent = done ? 'litres'
                                : waiting ? 'Waiting for the attendant'
                                : pumpWait ? 'Waiting for the station'
+                               : fault === 'offline' ? 'litres at 9:41 \u00b7 waiting for signal'
                                : 'litres so far';
     el.fillingVerdict.hidden = !done && fault !== 'refused';
     el.fillingVerdict.textContent =
@@ -7075,15 +7579,23 @@ body {
        finished fill leaves the line to the verdict above it. */
     el.fillingNote.hidden = done;
     el.fillingNote.textContent =
-      fault === 'refused' ? 'Your code and litres are safe. Show the code again, or message support.'
+      fault === 'refused' ? 'Your code and litres are safe.'
       : fault === 'offline' ? 'Live updates are paused. Fuelling will continue.'
       : waiting ? 'The fuel code has not been scanned yet.'
       : pumpWait ? 'The code was scanned. Waiting for the station to start the pump.'
       : 'The pump is running.';
     el.fillingCta.hidden = !done;
+    el.fillingCloseLow.hidden = done;
     /* Until the scan lands the code must stay reachable - the attendant can
        be slow to arrive. Once fuel flows, the code has done its work. */
     el.fillingShowCode.hidden = !(waiting || fault === 'refused');
+    /* Two identical outline buttons made the driver choose between showing the
+       code again and messaging support as though those were equal moves. They
+       are not: the code is the way this fill still happens, and support is the
+       fallback. The lead state is the atom's own, so nothing here restyles a
+       button - it says which one is the way forward. */
+    if (fault === 'refused') { el.fillingShowCode.setAttribute('data-lead', 'true'); }
+    else { el.fillingShowCode.removeAttribute('data-lead'); }
     el.fillingSupport.hidden = fault !== 'refused';
   }
 
@@ -7321,15 +7833,40 @@ body {
     showEarned();
   });
   el.earnedCta.addEventListener('click', function () { showReceipt(); });
+  /* The receipt is filed either way; this is the driver who does not need to
+     read it now. */
+  el.earnedHome.addEventListener('click', function () { finishFill(); });
   el.receiptDone.addEventListener('click', function () { finishFill(); });
+  /* The slip, in the words a manager needs, through the same prepared-message
+     door every other escalation uses. */
+  el.receiptSend.addEventListener('click', function () {
+    var v = fillVehicle();
+    reply('Message ready: ' + preparedMessage(
+      'Fuel slip: ' + fillLitresFinal() + ' L at ' + stationName() +
+      (v ? ' on ' + v.plate : '') + ', ' + fillPts() + ' points.',
+      fuelDigitsShown(fuelRef())));
+  });
   el.historyBack.addEventListener('click', function () { showHome(false); });
   el.accountBack.addEventListener('click', function () { showHome(false); });
   el.rewardsBack.addEventListener('click', function () { showHome(false); });
   el.rewardsList.addEventListener('click', function (e) {
     var b = e.target.closest('[data-bundle]');
-    if (b) { sendBundle(parseInt(b.getAttribute('data-bundle'), 10)); }
+    if (b) { askBundle(parseInt(b.getAttribute('data-bundle'), 10)); }
+  });
+  el.spendCancel.addEventListener('click', function () {
+    el.spendConfirm.hidden = true;
+    var back = el.rewardsList.querySelector('[data-bundle="' + S.pendingBundle + '"]');
+    if (back) { back.focus({ preventScroll: true }); }
+    S.pendingBundle = null;
+  });
+  el.spendGo.addEventListener('click', function () {
+    var i = S.pendingBundle;
+    el.spendConfirm.hidden = true;
+    S.pendingBundle = null;
+    if (i != null) { sendBundle(i); }
   });
   el.fillingClose.addEventListener('click', function () { showHome(false); });
+  el.fillingCloseLow.addEventListener('click', function () { el.fillingClose.click(); });
   el.scanSettings.addEventListener('click', function () {
     reply('Settings opens here. When you allow the camera, the scanner comes straight back.');
     /* The round trip, simulated: the driver grants it, and the app checks
@@ -7343,11 +7880,29 @@ body {
   });
   el.scanPlateType.addEventListener('click', function () { showScan('type'); });
   el.scanPlateInput.addEventListener('input', function () { el.scanTypeErr.hidden = true; });
+  el.scanPlateInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); el.scanPlateGo.click(); }
+  });
+  /* The step field is rebuilt per step, so the listener rides the container
+     it is built into rather than the field itself. */
+  el.stepGroup.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') { return; }
+    if (!e.target.classList || !e.target.classList.contains('o-step__field')) { return; }
+    e.preventDefault();
+    el.stepGo.click();
+  });
   el.scanPlateGo.addEventListener('click', function () {
     var typed = plateNorm(el.scanPlateInput.value);
     var hit = -1;
     S.vehicles.forEach(function (v, i) { if (plateNorm(v.plate) === typed) { hit = i; } });
+    if (!typed) {
+      el.scanTypeErr.textContent = 'Type the number plate first.';
+      el.scanTypeErr.hidden = false;
+      el.scanPlateInput.focus({ preventScroll: true });
+      return;
+    }
     if (hit < 0) {
+      el.scanTypeErr.textContent = 'That plate is not assigned to you. Check it and try again.';
       el.scanTypeErr.hidden = false;
       el.scanPlateInput.focus({ preventScroll: true });
       return;
@@ -7469,6 +8024,7 @@ body {
     if (S.step === 'history') { el.historyBack.click(); return; }
     if (S.step === 'account') { el.accountBack.click(); return; }
     if (S.step === 'rewards') { el.rewardsBack.click(); return; }
+    if (!el.spendConfirm.hidden) { el.spendCancel.click(); return; }
     if (S.step === 'filling-screen') { el.fillingClose.click(); return; }
     if (S.step === 'fuel') {
       /* Keep it, never Cancel it. Escape must not be able to void a code. */
@@ -7743,7 +8299,7 @@ body {
      no text to scrape. Tiles and tabs already read correctly, so they keep the
      fallback. */
   Array.prototype.forEach.call(
-    el.home.querySelectorAll('[data-tile], [data-tab], #homeAvatar'),
+    el.frame.querySelectorAll('[data-tile], [data-tab], #homeAvatar'),
     function (b) {
       b.addEventListener('click', function () {
         if (b.getAttribute('aria-current') === 'page') { return; }
@@ -7752,6 +8308,17 @@ body {
            to live. The other tabs keep the honest fallback. */
         if (b.getAttribute('data-tab') === 'history') { showHistory(); return; }
         if (b.getAttribute('data-tab') === 'account') { showAccount(); return; }
+        /* A tab named after the app's whole job may not answer that the job
+           is not built. It runs the same road the big button runs: the code
+           if one is live, the fill if one is running, the scan if nothing is
+           linked, otherwise the stations. */
+        if (b.getAttribute('data-tab') === 'fuel') {
+          if (S.fuel === 'live') { showFuel(true); return; }
+          if (S.fuel === 'filling') { showFilling(); return; }
+          if (S.fuel === 'done') { showEarned(); return; }
+          if (!activeVehicle()) { showStep('vehicle'); return; }
+          requestFuel(); return;
+        }
         if (b.getAttribute('data-tile') === 'rewards') { showRewards(); return; }
         var name = b.getAttribute('data-unbuilt') ||
                    b.textContent.trim().split('\n')[0] || 'That';

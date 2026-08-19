@@ -73,6 +73,10 @@
   --color-success:       #166832;    /* 5.09:1 on the sheet glass */
   --color-success-bg:    #E8F5EE;
   --color-success-20: color-mix(in srgb, var(--color-success) 20%, transparent);
+  /* The verdict's light. The bloom over a cleared check reads this step:
+     enough to warm the top of the screen, faint enough that everything
+     with a measured contrast on white keeps it. */
+  --color-success-12: color-mix(in srgb, var(--color-success) 12%, transparent);
   --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
   --color-warning-bg:    #FDF1E3;
   --color-warning-25: color-mix(in srgb, var(--color-warning) 25%, transparent);  /* --color-warning at 0.25, same hue */
@@ -143,6 +147,16 @@
   --color-scan-2: #16203A;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  /* The verdict seal, shaded. One light source from above, like every shadow
+     in the scale: the hue lifted toward white at the top, sunk toward black at
+     the base, the flat hue itself holding the middle where the glyph sits, so
+     the mark never reads lighter than the colour it is measured as. */
+  --gradient-seal-clear: linear-gradient(165deg, color-mix(in srgb, var(--color-success) 78%, #fff) 0%, var(--color-success) 55%, color-mix(in srgb, var(--color-success) 82%, #000) 100%);
+  --gradient-seal-block: linear-gradient(165deg, color-mix(in srgb, var(--color-error-text) 80%, #fff) 0%, var(--color-error-text) 55%, color-mix(in srgb, var(--color-error-text) 82%, #000) 100%);
+  --gradient-seal-warn: linear-gradient(165deg, color-mix(in srgb, var(--color-warning) 78%, #fff) 0%, var(--color-warning) 55%, color-mix(in srgb, var(--color-warning) 82%, #000) 100%);
+  /* A band of light crossing a surface. Angle and softness live here so a
+     second surface that ever catches the light catches the same light. */
+  --gradient-sheen: linear-gradient(105deg, transparent 34%, rgba(255,255,255,0.30) 50%, transparent 66%);
 
   /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
@@ -216,6 +230,12 @@
   --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
+  /* The verdict seal's two elevations. A lit disc rather than a flat one: a
+     shadow in the mark's own hue, never grey, and a lit top edge. Paired with
+     --gradient-seal-* below, which shades the same disc. */
+  --shadow-seal-clear: 0 4px 14px var(--color-success-20), inset 0 1px 0 rgba(255,255,255,0.30);
+  --shadow-seal-block: 0 4px 14px var(--color-secondary-25), inset 0 1px 0 rgba(255,255,255,0.30);
+  --shadow-seal-warn:  0 4px 14px var(--color-warning-25), inset 0 1px 0 rgba(255,255,255,0.30);
 
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
@@ -409,7 +429,10 @@ button { background: none; border: none; color: inherit; }
 }
 /* Quiet is still a live control, so it differentiates upward from disabled
    rather than sharing its grey. */
-.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; }
+.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+/* A countdown is a fact, not a control. While it is still running the resend
+   wears plain text so nothing invites a press that cannot work yet. */
+.o-signup-sheet__resend:disabled { text-decoration: none; font-weight: 600; }
 /* Flush drops the inline padding so the label sits on the container's content
    edge. The vertical padding stays, because the 48px target depends on it. */
 .a-link--flush { padding-inline: 0; }
@@ -1781,7 +1804,7 @@ button { background: none; border: none; color: inherit; }
         </div>
 
         <div class="o-auth-hero__body">
-          <h1 class="o-auth-hero__title">Fill up at Engen.<br>Earn airtime and data.</h1>
+          <h1 class="o-auth-hero__title">Fill up at Engen.<br>Earn mobile data.</h1>
           <p class="o-auth-hero__lede">Your manager added you to EngenXT. Sign in with the mobile number they registered for you.</p>
 
           <div class="o-auth-hero__notice" id="homeNotice" role="status" hidden></div>
@@ -1789,7 +1812,7 @@ button { background: none; border: none; color: inherit; }
           <div class="o-auth-hero__actions">
             <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Sign in with mobile number</button>
             <p class="o-auth-hero__how">No password needed. We'll send you a 6-digit code.</p>
-            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">My mobile number does not work</a>
+            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">Get help on WhatsApp</a>
           </div>
         </div>
       </section>
@@ -1843,7 +1866,7 @@ button { background: none; border: none; color: inherit; }
                 <span class="m-phone-field__flag">🇿🇦</span>
                 <span class="m-phone-field__code">+27</span>
               </span>
-              <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric"
+              <input class="a-field__input" id="phoneInput" type="tel" inputmode="numeric" enterkeyhint="send"
                      autocomplete="tel-national" placeholder="Example: 82 123 4567"
                      aria-describedby="phoneHelper">
             </label>
@@ -1853,7 +1876,7 @@ button { background: none; border: none; color: inherit; }
                  s18 asks that a person is told what is collected and why
                  BEFORE collection, in words they can follow. Layered: the
                  fact here, the detail one tap away, nothing bundled. -->
-            <p class="o-signup-sheet__note">Your company gave us this number so you can sign in. We only use it for EngenXT.
+            <p class="o-signup-sheet__note">We only use this number for EngenXT.
               <button class="a-link a-link--quiet a-link--flush o-signup-sheet__noteMore" id="privacyMore" type="button" aria-expanded="false">More about your information</button>
             </p>
             <!-- The primer pattern, not a paragraph: an icon, a short
@@ -1913,7 +1936,7 @@ button { background: none; border: none; color: inherit; }
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.103 1.523 5.824L.057 23.852a.5.5 0 0 0 .606.61l6.213-1.625A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.699-.504-5.243-1.385l-.371-.217-3.851 1.008 1.028-3.758-.229-.389A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
               </svg>
-              Check WhatsApp
+              Open WhatsApp
             </button>
 
             <!-- The two ways out of this stage, both quiet, because neither is
@@ -2181,11 +2204,11 @@ button { background: none; border: none; color: inherit; }
          only the company can register a number, so guessing is not a road.
          Checking for a typo is, and it leads. */
       body: function () {
-        return 'We checked ' + maskedPhone() + '. Check the number, or ask your manager to register it.';
+        return 'We checked ' + maskedPhone() + ' \u2014 it is not on your company\u2019s list.';
       },
       actions: function () {
         return [
-          { label: 'Check the number', kind: 'primary', act: 'clearNumber' },
+          { label: 'Edit the number', kind: 'primary', act: 'clearNumber' },
           { label: 'Message my manager', kind: 'outline',
             href: WA_MANAGER + encodeURIComponent(
               'Hi, I cannot sign in to EngenXT. Please check that ' + maskedPhone() + ' is registered to me.') }
@@ -2285,12 +2308,24 @@ button { background: none; border: none; color: inherit; }
     resendLimit: {
       tone: 'warning', icon: 'clock',
       title: 'You cannot request another code yet',
+      /* Support cannot lift a security limit, but a manager can get a driver
+         fuelling today, and no code arriving at all is their problem to
+         solve. The wall used to be the whole screen. */
+      escalateAfter: 1,
+      /* Built when it is needed, not when the file loads: the number it
+         quotes does not exist until the driver has typed one. */
+      escalation: function () {
+        return { label: 'No code arrived? Message my manager', kind: 'outline',
+          href: WA_MANAGER + encodeURIComponent(
+            'Hi, EngenXT is not sending my sign-in code and I cannot request another yet. Number: ' +
+            maskedPhone() + '. Time: 9:41.') };
+      },
       /* No action. Support cannot lift a security limit, and offering it here
          would send a driver to a dead end while the clock still runs. The
          body is rewritten every tick by showResendLimit, so the one thing
          the limit does NOT stop - entering the newest code - is said with
          the live clock in the sentence. */
-      body: 'Your newest code still works. Enter it now.',
+      body: 'The newest code we sent still works. Enter it now.',
       actions: []
     },
     offline: {
@@ -2369,7 +2404,7 @@ button { background: none; border: none; color: inherit; }
          here reads: 9:41 plus the fifteen-minute pause. The live count
          appears once, in the clock slot below. */
       title: 'Sign-in paused until 9:56',
-      body: 'Too many incorrect codes were entered. You can try again in:',
+      body: 'Too many wrong codes. Try again in:',
       /* Nobody can shorten a security timer - not support, not a manager -
          so the one person offered is offered for the one thing they can
          do: get the driver fuelling another way in the meantime. */
@@ -3000,7 +3035,7 @@ button { background: none; border: none; color: inherit; }
     if (!isMobilePrefix(d)) {
       el.phoneField.setAttribute('data-state', 'error');
       setBtn(el.phoneCta, false, 'Send my code');
-      setHelper(el.phoneHelper, 'Enter a mobile number. Use the number your company registered for you.', 'error');
+      setHelper(el.phoneHelper, 'That looks like a landline. Enter a mobile number, like 82 123 4567.', 'error');
       shake(el.phoneField);
       el.phoneInput.focus({ preventScroll: true });
       return;
@@ -3082,9 +3117,11 @@ button { background: none; border: none; color: inherit; }
     slow:        { resend: false, whatsapp: true,  channel: false, back: true },
     /* Requesting is what expired, so the card owns both ways to request. */
     expired:     { resend: false, whatsapp: false, channel: false, back: true },
-    /* The limit covers both channels, so offering SMS would read as a way
-       round it. Only the clock moves. */
-    resendLimit: { resend: true,  whatsapp: false, channel: false, back: true },
+    /* The limit covers requesting, not reading. Going to look at the code
+       already sent is the very thing this screen asks for, so that door
+       stays; only the second channel is closed, because switching would
+       read as a way round the limit. */
+    resendLimit: { resend: true,  whatsapp: true,  channel: false, back: true },
     /* The code arrived and is still in the boxes. Nothing about delivery
        helps, so nothing about delivery is shown. */
     offline:     { resend: false, whatsapp: false, channel: false, back: true },
@@ -3408,7 +3445,7 @@ button { background: none; border: none; color: inherit; }
       el.resendBtn.textContent = 'Request another code in ' + label;
       var alertBody = el.codeAlert.querySelector('.m-alert__body');
       if (alertBody) {
-        alertBody.textContent = 'Your newest code still works. Enter it now, or request another in ' + label + '.';
+        alertBody.textContent = 'The newest code we sent still works. Enter it now.';
       }
     }, function () {
       el.resendBtn.disabled = false;
@@ -3575,8 +3612,10 @@ button { background: none; border: none; color: inherit; }
     el.bioContinue.hidden = true;
     el.bioEnable.hidden = false;
     el.bioSkip.hidden = false;
-    setBtn(el.bioEnable, true, 'Open phone settings');
-    setBtn(el.bioSkip, true, 'Use a code instead');
+    /* Carrying on is the primary. Setting up Face ID is a phone errand, and
+       an errand must not outrank the job the driver came to finish. */
+    setBtn(el.bioEnable, true, 'Continue with a code');
+    setBtn(el.bioSkip, true, 'Open phone settings');
   }
 
   /* Too many failed tries on the phone side. Only the phone can unlock it,
@@ -3799,7 +3838,7 @@ button { background: none; border: none; color: inherit; }
       primary.setAttribute('aria-disabled', 'false');
       primary.dataset.action = 'enter';
       help.hidden = false;
-      help.textContent = 'My mobile number does not work';
+      help.textContent = 'Get help on WhatsApp';
       help.href = WA_SUPPORT;
     }
   }
@@ -4661,16 +4700,21 @@ button { background: none; border: none; color: inherit; }
      a tap and the 700ms beat can both fire without a double journey. */
   el.codeContinue.addEventListener('click', function () { offerBiometrics(); });
   el.bioEnable.addEventListener('click', function () {
-    /* From the not-set-up face the button opens phone settings; the prototype
-       plays the round trip and returns to the offer. */
+    /* On the not-set-up face the primary is carrying on with a code, which
+       is the answer "no" to an offer the phone cannot keep. */
+    if (S.bioFace === 'notsetup') { chooseBiometrics(false); return; }
+    chooseBiometrics(true);
+  });
+  el.bioSkip.addEventListener('click', function () {
+    /* And the quiet one is the phone errand: the prototype plays the round
+       trip and comes back to the offer with Face ID now available. */
     if (S.bioFace === 'notsetup') {
       announce('Opening phone settings.');
       after(1400, function () { paintBioAsk(); announce('Back from settings. Face ID is now set up.'); });
       return;
     }
-    chooseBiometrics(true);
+    chooseBiometrics(false);
   });
-  el.bioSkip.addEventListener('click', function () { chooseBiometrics(false); });
   el.bioContinue.addEventListener('click', function () { handOver(); });
   $('sheetGrab').addEventListener('click', function () { closeSheet(); });
   el.scrim.addEventListener('click', function () { closeSheet(); });

@@ -375,6 +375,14 @@ async function fuelling() {
   await send('Page.navigate', { url: `file://${STAGE}/engenxt-onboarding.html?w=11#rewards` });
   await sleep(1000);
   await ev(`document.querySelector('[data-bundle="1"]').click()`);
+  await sleep(500);
+  /* Points are weeks of driving, so the row asks before it spends. */
+  let ask = JSON.parse(await ev(`JSON.stringify({
+    open: !document.getElementById('spendConfirm').hidden,
+    title: document.getElementById('spendConfirmTitle').textContent
+  })`));
+  check('the spend is asked, not done', ask.open && /1 GB/.test(ask.title), JSON.stringify(ask));
+  await ev(`document.getElementById('spendGo').click()`);
   await sleep(400);
   let rw = JSON.parse(await ev(`JSON.stringify({
     pts: document.getElementById('rewardsPoints').textContent,
