@@ -1,0 +1,395 @@
+/* ══════════════════════════════════════════════════════════════════════
+   ORGANISMS
+
+   Distinct sections of interface, and the screens themselves.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer organisms {
+
+/* Peers of the secondary above them, one group along. 8 + 8 = 16. */
+.o-signup-sheet__stage > .m-resend-row { margin-top: var(--sp-2); }
+
+/* ══ ORGANISMS ═══════════════════════════════════════════════════════════ */
+
+/* o-auth-hero */
+.o-auth-hero {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--gradient-hero);
+}
+
+.o-auth-hero__orbs { position: absolute; inset: 0; z-index: var(--z-base); overflow: hidden; pointer-events: none; }
+
+/* The three washes behind this screen are static. They used to drift about
+   20px on 9, 11 and 13 second loops, which is below the amplitude anyone
+   consciously notices, so it bought nothing visible while holding three
+   composited layers alive on the one screen where a driver forms their
+   impression of how fast the app is. The colour is the point, not the
+   movement. */
+.o-auth-hero__orb { position: absolute; border-radius: var(--radius-circle); }
+
+.o-auth-hero__orb--a {
+  top: -80px; right: -60px; width: 360px; height: 360px;
+  background: radial-gradient(circle, var(--color-primary-30) 0%, var(--color-primary-08) 55%, transparent 75%);
+}
+
+.o-auth-hero__orb--aInner {
+  top: 40%; right: -40px; width: 180px; height: 180px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, transparent 70%);
+}
+
+.o-auth-hero__orb--b {
+  top: 180px; left: -60px; width: 260px; height: 260px;
+  background: radial-gradient(circle, var(--color-secondary-18) 0%, var(--color-secondary-04) 55%, transparent 75%);
+}
+
+.o-auth-hero__orb--c {
+  bottom: 200px; right: -30px; width: 200px; height: 200px;
+  background: radial-gradient(circle, var(--color-tertiary-18) 0%, var(--color-tertiary-04) 55%, transparent 75%);
+}
+
+/* --sp-5, the gutter the sheet uses. The sheet rises over the hero and the two
+   are read in sequence, so a 24px hero against a 20px sheet stepped the left
+   edge of the type inward exactly as the sheet arrived. */
+.o-auth-hero__brand { position: relative; z-index: var(--z-content); flex-shrink: 0; padding: var(--sp-7) var(--sp-5) 0; }
+
+/* margin-top:auto on the first child rather than justify-content:flex-end,
+   because flex-end plus overflow pushes the overflow past the top edge into
+   a region the scroll container does not reach. */
+.o-auth-hero__body {
+  position: relative; z-index: var(--z-content); flex: 1;
+  display: flex; flex-direction: column;
+  padding: 0 var(--sp-5) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+}
+
+/* 12px binds the 42px hero to its lede. The bind scales with the type it
+   holds: 4 under the sheet's 22px title, 8 under an 18px outcome heading,
+   12 under the hero. Space proportional to type, one rule, three sizes. */
+.o-auth-hero__title {
+  /* The owner's call, reversed on review: the promise reads from anywhere,
+     but the door must sit where the thumb rests. Everything real - headline,
+     lede, button, help - anchors to the bottom of the frame and the orbs
+     carry the air above it. */
+  margin-top: auto;
+  font-size: var(--text-hero); font-weight: var(--weight-heavy); color: var(--color-text-on-dark);
+  /* Off the scale: one headline optic. At 42px the display step is too
+     loose and the hero step too tight, and this is the only 42px line. */
+  line-height: var(--leading-tight); letter-spacing: -1.6px; margin-bottom: var(--sp-3);
+}
+
+.o-auth-hero__lede {
+  font-size: var(--text-body); font-weight: var(--weight-regular); line-height: var(--leading-body);
+  color: var(--color-on-dark-soft); margin-bottom: var(--sp-5);
+}
+
+/* How the door works, in one breath, so the button is an answer rather
+   than a question. */
+.o-auth-hero__how {
+  font-size: var(--text-caption); color: var(--color-on-dark-soft);
+  text-align: center;
+}
+
+/* The hero copy is pinned to the bottom of the frame, which is exactly where
+   the sheet rises to. On the shorter sheets the top edge landed part way down
+   the headline and sliced it, and hiding it left 40 per cent of the screen
+   holding nothing at all while the one sentence explaining the product was
+   thrown away.
+
+   So it moves rather than hides. With a sheet up the copy goes to the top of
+   the space instead of the bottom of it: the promise stays legible above the
+   glass, which is precisely when a driver is deciding whether this is worth the
+   data it costs, and nothing is ever cut. */
+.o-auth-hero__title, .o-auth-hero__lede {
+  transition: opacity var(--dur-base) var(--ease-out),
+              margin var(--dur-sheet) var(--ease-emphasis);
+}
+
+.o-signup-sheet[data-stage="blocked"] { min-height: 62%; }
+
+/* Without :has, the copy stays where it always was and nothing is hidden. */
+.o-auth-hero__notice { margin-bottom: var(--sp-4); }
+
+/* m-figure. A labelled number, for when the number is the point.
+
+   Two of them side by side, so a driver can compare the versions without
+   reading the sentence above them, and read either one out to their manager
+   without hunting through prose for it. */
+.o-status-page__meta {
+  display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4);
+  /* Centred as a pair. The row sat on the left edge of cards whose every
+     other line is centred - the one left-handed thing on the screen. */
+  justify-content: center;
+}
+
+/* And centred inside each figure too, which the row above stopped half way
+   short of. A key-over-value stack is left-aligned so that a COLUMN of them
+   shares one edge to read down. There is no column here: three figures stand
+   side by side on a panel that centres everything else, each its own island
+   with no neighbour above or below to line up with. So the left edge buys
+   nothing, and it costs the obvious thing - DOWNLOAD SIZE is twice the width
+   of 42 MB, so the number sits off under one end of its own label.
+
+   Scoped to this row on purpose. The same atom sits in the home notice on the
+   dark hero, in a block whose every line is left-aligned, and it is right to
+   stay left-aligned there. */
+.o-status-page__meta .m-figure { align-items: center; text-align: center; }
+
+/* On the dark hero the same component takes the on-dark pair. */
+.o-auth-hero__actions { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+
+.o-auth-hero__actions .a-btn { width: 100%; }
+
+/* o-status-page. A blocking status with one recovery action. Used whenever
+   the problem is technical, because an account choice is not the answer. */
+.o-status-page {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; align-items: center; justify-content: center;
+  padding: var(--sp-6);
+  background: var(--color-scrim-deep);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+
+.o-status-page[data-state="visible"] { display: flex; }
+
+.o-status-page__panel {
+  width: 100%; background: var(--color-surface); border-radius: var(--radius-sheet);
+  padding: var(--sp-7) var(--sp-6); text-align: center;
+}
+
+/* The mark's halo reaches 34px beyond it, soft to nothing at its edge, and
+   the panel's padding alone left it grazing the card's top corner and
+   dipping into the title. The mark carries its own clearance so the light
+   fades in air on both sides. */
+.o-status-page__panel .a-icon-wrap--mark {
+  margin-top: var(--sp-3); margin-bottom: var(--sp-3);
+}
+
+.o-status-page__icon { margin-inline: auto; }
+
+.o-status-page__title {
+  font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-tight);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.o-status-page__body {
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
+  margin-bottom: var(--sp-5);
+}
+
+.o-status-page__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* o-signup-sheet. The sheet does not scroll, its scroller does, so the grab
+   handle stays put and the horizontal travel of the stage animation cannot
+   create real scroll range. */
+.o-signup-sheet {
+  position: absolute; left: 0; right: 0; z-index: var(--z-sheet);
+  /* The keyboard is part of the layout, not something that happens to the
+     layout. The sheet sits above it and measures against what is left. */
+  bottom: var(--keyboard-inset, 0px);
+  max-height: calc(94% - var(--keyboard-inset, 0px));
+  max-height: calc(94dvh - var(--keyboard-inset, 0px));
+  overflow: hidden;
+  transition: height var(--dur-sheet) var(--ease-emphasis),
+              bottom var(--dur-base) var(--ease-emphasis),
+              max-height var(--dur-base) var(--ease-emphasis);
+  display: none; flex-direction: column;
+  background: var(--glass-sheet-bg);
+  backdrop-filter: var(--glass-sheet-bd); -webkit-backdrop-filter: var(--glass-sheet-bd);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  box-shadow: var(--shadow-sheet);
+}
+
+/* Without backdrop-filter, which is real on older Android WebViews, a
+   translucent panel over a near-black hero is unreadable. Go opaque. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  /* No filter means no lift, so the tint alone would sit at 0.35 over a
+     near-black hero. Go fully opaque instead of merely lighter. */
+  .o-signup-sheet { background: var(--glass-sheet-fallback); }
+}
+
+.o-signup-sheet__grab {
+  width: 100%; flex-shrink: 0; min-height: var(--size-target);
+  padding: var(--sp-4) 0 var(--sp-3);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* The scroller fades its bottom edge only while there is something below it,
+   so content cut off by the keyboard announces itself instead of just ending.
+   The flag is set by the same code that measures the keyboard. */
+.o-signup-sheet__scroll {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: clip;
+  scrollbar-width: none;
+}
+
+.o-signup-sheet__scroll::-webkit-scrollbar { display: none; }
+
+.o-signup-sheet[data-more="true"] .o-signup-sheet__scroll {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sp-7)), transparent 100%);
+}
+
+.o-signup-sheet__body {
+  /* The action needs visible room beneath it, and the device's own safe area
+     is on top of that rather than instead of it. max() gave whichever was
+     larger, so on a device with an indicator the button sat on it. */
+  padding: 0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column;
+}
+
+/* The organism owns the vertical rhythm. Nothing in the markup sets spacing.
+
+   ONE SCALE, THREE MEANINGS. The base gap is the tightest relationship on the
+   stage, and anything looser adds a step to it, so every rendered gap is 8, 16
+   or 24 and each number means one thing:
+
+     8   parts of one thing        label to its field, field to its helper,
+                                   the cells to the line that reports on them
+     16  one group to the next     the control block to the card about it
+     24  a decision, or a different route
+
+   Gaps used to be composed as 16 plus a 4px nudge, which rendered 18 and 20:
+   values close enough to the group step to read as noise rather than meaning. */
+.o-signup-sheet__stage { display: none; flex-direction: column; }
+
+.o-signup-sheet__stage[data-state="active"] {
+  display: flex; gap: var(--sp-2);
+  animation: stageIn var(--dur-sheet) var(--ease-out) both;
+}
+
+/* A card about the control above it is the next group along. 8 + 8 = 16. */
+.o-signup-sheet__stage > [id$="Alert"] { margin-top: var(--sp-2); }
+
+/* A decision, one step clear of a group boundary. 8 + 16 = 24. */
+.o-signup-sheet__cta { margin-top: var(--sp-4); }
+
+/* Resend belongs to the cells above it: it is what a driver does when the
+   code did not come, so it stays in that cluster at the base gap and sits on
+   their left edge rather than floating in the centre of the stage.
+
+   Worth knowing, and deliberately not corrected here: these gaps are authored
+   between boxes, and a 48px target holds about 18px of line, so it carries
+   ~15px of nothing above and below it. The eye is therefore shown roughly 23,
+   39 and 31 where the scale says 8, 24 and 16, and the countdown reads as
+   floating between the cells and the button. Pulling the dead space back out
+   with a negative margin was tried and overshot: it tightened the button gap
+   to 17 and closed the row to 1. Getting it right is a judgement about which
+   edges the eye actually pairs, not a number a script can settle, so it wants
+   a designer looking at it rather than a blind correction. */
+.o-signup-sheet__resend { align-self: flex-start; }
+
+/* Below here the driver has left the task and is taking another route, which
+   is a decision, so it earns the same separation the primary action gets. */
+.o-signup-sheet__secondary { margin-top: var(--sp-4); }
+
+.o-signup-sheet__secondary svg { flex: none; }
+
+/* A rule the driver keeps, not a helper about the current attempt: quiet,
+   one step under the ways out, present on every face of the code stage.
+   The number stage's copy of it carries the POPIA notice, with its
+   disclosure riding inline so the sentence and its door read as one. */
+.o-signup-sheet__note {
+  margin-top: var(--sp-2);
+  font-size: var(--text-caption2); line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.o-signup-sheet__noteMore {
+  min-height: 0; padding-block: 0;
+  font-size: var(--text-caption2); font-weight: var(--weight-semibold);
+  text-decoration: underline; text-underline-offset: 2px;
+  /* Drawn at the sentence's size, pressable at the rule's. The invisible
+     half of the target, the same answer the map pins use. */
+  position: relative;
+}
+
+.o-signup-sheet__noteMore::before {
+  content: ''; position: absolute; inset: -17px -10px;   /* 15px of text to the 48px floor */
+}
+
+/* o-outcome-panel. Named for its role, not its tone: it renders the blocked
+   states and the success state, and the tone lives on data-tone. */
+.o-signup-sheet__stage.o-outcome-panel[data-state="active"] {
+  align-items: center; text-align: center; padding-top: var(--sp-2);
+  /* The base is the tightest relation on the panel: a title and the line that
+     completes it. Everything looser adds to it. */
+  gap: var(--sp-2);
+}
+
+/* 8 + 16 = 24. The icon is the badge for the title, one group away. */
+.o-outcome-panel__title { margin-top: var(--sp-4); }
+
+/* 8 + 0 = 8. The body ends "Try again in:" and the clock finishes the
+   sentence, so they are one statement and sit as one. */
+/* 8 + 16 = 24. A different subject: not the wait, but the way round it. */
+.o-outcome-panel__meta { margin-top: var(--sp-4); }
+
+/* 8 + 24 = 32. The panel is one centred group and the action closes it. */
+.o-outcome-panel__actions { margin-top: var(--sp-6); }
+
+/* Centred across the panel, not just within its own width. A driver who cannot
+   get in is given the whole sheet on purpose, but nothing was spending the
+   height: the group stacked from the top and stopped, leaving 135px of panel
+   under the one action the screen has. The height was the right call. This is
+   the half of it that was missing. */
+.o-signup-sheet[data-stage="blocked"] .o-signup-sheet__scroll {
+  display: flex; flex-direction: column;
+}
+
+.o-signup-sheet[data-stage="blocked"] .o-signup-sheet__body { flex: 1; }
+
+.o-signup-sheet[data-stage="blocked"] .o-outcome-panel[data-state="active"] {
+  flex: 1; justify-content: center;
+}
+
+/* On success the header empties completely, so the group would otherwise start
+   8px under the handle. It gets the same run-in the header used to give it. */
+/* 8 + 0 = 8. When the aside is present the button belongs to it, not to the
+   clock. :not([hidden]) because an adjacent sibling still matches when the
+   sibling is display:none. */
+.o-outcome-panel__meta:not([hidden]) + .o-outcome-panel__actions { margin-top: 0; }
+
+/* The title takes focus so a screen reader announces the new screen. It is not
+   a tab stop, so no keyboard user ever lands on it by tabbing, and painting a
+   ring around a heading only makes it look like a control. */
+.o-outcome-panel__title:focus,
+.o-outcome-panel__title:focus-visible { outline: none; box-shadow: none; }
+
+/* Same for the status page's heading. It is focused by script so the screen is
+   announced, which is not the same as a driver having navigated to it, and a
+   ring drawn round a heading nobody moved to reads as a control. The sibling
+   panel already did this and this one was missed. */
+.o-status-page__title:focus-visible { outline: none; box-shadow: none; }
+
+.o-outcome-panel__title { font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-tight); }
+
+.o-outcome-panel__body { font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary); }
+
+.o-outcome-panel__clock {
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary); font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+}
+
+/* A supporting offer, not the outcome, so it sits below the clock and quieter
+   than both the title and the number. */
+.o-outcome-panel__meta {
+  font-size: var(--text-caption2); font-weight: var(--weight-medium); color: var(--color-text-secondary);
+}
+
+.o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* State drives motion, not classes. One emphasis curve for the sheet and the
+   scrim, so the two surfaces move as one object. */
+.o-signup-sheet[data-state="opening"] { animation: sheetUp var(--dur-sheet) var(--ease-emphasis) forwards; }
+
+.o-signup-sheet[data-state="closing"] { animation: sheetDown var(--dur-quick) var(--ease-emphasis) forwards; }
+  /* one exit time: the two surfaces really do move as one object */
+/* Visibility is the same state the motion reads: present means shown,
+   absent means gone. No inline display writes - the fact has one home. */
+.o-signup-sheet[data-state] { display: flex; }
+
+}

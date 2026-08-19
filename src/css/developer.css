@@ -1,0 +1,405 @@
+/* ══════════════════════════════════════════════════════════════════════
+   DEVELOPER
+
+   Tooling. Never ships. It may read product tokens because it documents them.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer developer {
+
+/* ── The sidebar, two panes on one surface ────────────────────────────
+   Sections on the left, the states of the highlighted one on the right, a
+   hairline between them. One card, not a card and a floating panel: a menu
+   that detaches from the thing that opened it has to be positioned, flipped,
+   dismissed and kept out of the way, and none of that work buys anything the
+   join does not already give you.
+
+   The right pane always holds something, so the menu is never a list of
+   closed doors. It follows hover as well as click, because on a surface this
+   size the pointer is already the fastest way to look around, and it follows
+   focus too, so the keyboard sees the same thing the mouse does. */
+.d-stateNav {
+  display: grid; grid-template-columns: 216px 264px;
+  /* The row that makes both panes scrollable, and without it neither ever did.
+     Both are written to scroll — min-height: 0 and overflow-y: auto on each —
+     but with no row track the implicit row is max-content, so each pane was
+     exactly as tall as its own list, never overflowed itself, and had nothing
+     for its overflow-y to act on. max-height and overflow: hidden up here then
+     cut the difference off, putting the tail of a long section below the fold
+     with no scrollbar to reach it. minmax(0, 1fr) bounds the row to this box
+     and gives the panes the definite height their own rules were waiting on. */
+  grid-template-rows: minmax(0, 1fr);
+  align-self: flex-start; flex-shrink: 0;
+  position: sticky; top: var(--sp-8);
+  max-height: calc(100vh - var(--sp-8) * 2);
+  background: var(--color-surface); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.d-stateNav__left {
+  display: flex; flex-direction: column;
+  min-height: 0; overflow-y: auto; scrollbar-width: thin;
+  padding: 0 var(--sp-2) var(--sp-3);
+  border-right: 1px solid var(--color-border-light);
+}
+
+.d-stateNav__right {
+  min-height: 0; overflow-y: auto; scrollbar-width: thin;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+}
+
+/* One heading, wherever it appears. */
+.d-stateNav__heading,
+.d-stateNav__flow {
+  padding: var(--sp-3) var(--sp-2) var(--sp-1);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+
+.d-stateNav__flow:first-child { padding-top: var(--sp-3); }
+
+/* One row. Everything clickable in this menu is this shape, and only the
+   trailing end changes: a count and a chevron, or a switch, or nothing. */
+.d-stateNav__group,
+.d-stateNav__toggle,
+.d-stateNav__item {
+  display: flex; align-items: center; gap: var(--sp-2);
+  width: 100%; min-height: 38px;
+  padding: var(--sp-1) var(--sp-2);
+  border: none; background: none; border-radius: var(--radius-chip);
+  text-align: left; text-decoration: none; cursor: pointer;
+  font-size: var(--text-caption2); font-weight: 600;
+  color: var(--color-text-primary);
+  transition: background .14s ease, color .14s ease;
+}
+
+.d-stateNav__group > span:first-child,
+.d-stateNav__toggle > span:first-child { flex: 1 1 auto; }
+
+.d-stateNav__group:hover,
+.d-stateNav__toggle:hover,
+.d-stateNav__item:hover { background: var(--color-surface-hover); }
+
+.d-stateNav__meta {
+  flex: 0 0 auto; display: flex; align-items: center; gap: var(--sp-1h);
+  color: var(--color-text-tertiary);
+}
+
+.d-stateNav__count {
+  font-size: var(--text-nano); font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 14px; text-align: right;
+}
+
+.d-stateNav__chev { flex-shrink: 0; opacity: .5; }
+
+/* The section being read. A filled row rather than a coloured one, because
+   the accent is spent on the state you are actually looking at. */
+.d-stateNav__group[aria-expanded="true"] {
+  background: var(--color-surface-sunken); color: var(--color-text-primary);
+}
+
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__meta { color: var(--color-text-secondary); }
+
+.d-stateNav__group[aria-expanded="true"] .d-stateNav__chev { opacity: .9; }
+
+/* The one thing on screen. It gets the only strong colour in the menu. */
+.d-stateNav__item[aria-current="true"] {
+  background: var(--color-primary-bg); color: var(--color-primary-dark); font-weight: 700;
+}
+
+/* The right pane's own heading and lead, which say what the section is for
+   rather than only listing what is in it. */
+.d-stateNav__paneTitle {
+  font-size: var(--text-caption); font-weight: 800; letter-spacing: -0.2px;
+  color: var(--color-text-primary);
+}
+
+.d-stateNav__paneLead {
+  margin-top: var(--sp-1); margin-bottom: var(--sp-4);
+  font-size: var(--text-nano); line-height: 1.55; color: var(--color-text-secondary);
+}
+
+.d-stateNav__paneLabel {
+  padding: 0 var(--sp-2) var(--sp-1);
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+
+.d-stateNav__rule { height: 1px; background: var(--color-border-light); margin: var(--sp-2) var(--sp-2); }
+
+/* The switcher sits above the left column only, so the two panes stay level. */
+.d-stateNav__switcher {
+  position: sticky; top: 0; z-index: var(--z-content);
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1);
+  margin-inline: calc(var(--sp-2) * -1);
+  padding: var(--sp-3) var(--sp-2) var(--sp-2);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.d-stateNav__tab {
+  min-height: 34px; cursor: pointer;
+  padding: var(--sp-1) var(--sp-1); border-radius: var(--radius-chip);
+  border: 1px solid transparent; background: none;
+  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.2px;
+  color: var(--color-text-secondary);
+  transition: background .14s ease, color .14s ease;
+}
+
+.d-stateNav__tab:hover { background: var(--color-surface-hover); }
+
+.d-stateNav__tab[data-state="active"] {
+  background: var(--color-surface-sunken); color: var(--color-text-primary);
+}
+
+.d-key { padding: var(--sp-1) var(--sp-2) var(--sp-2); }
+
+.d-key__row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-1) 0;
+  font-size: var(--text-nano); color: var(--color-text-secondary);
+}
+
+.d-key__code {
+  font-family: var(--font-mono); font-size: var(--text-nano);
+  color: var(--color-text-primary); white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  /* Not enough width for two panes beside a phone, so they stack. */
+  .d-stateNav { grid-template-columns: 1fr; max-height: none; position: static; }
+  .d-stateNav__left { border-right: none; border-bottom: 1px solid var(--color-border-light); }
+}
+
+.d-panel {
+  width: var(--d-panel-width); flex: 1 1 auto;
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--color-surface); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  display: none;
+}
+
+[data-spec="on"] .d-panel { display: flex; flex-direction: column; }
+
+.d-panel__head {
+  position: sticky; top: 0; z-index: var(--z-content);
+  background: var(--color-surface); border-bottom: 1px solid var(--color-border-light);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+}
+
+.d-panel__title { font-size: var(--text-callout); font-weight: 800; letter-spacing: -0.3px; }
+
+.d-panel__lede { font-size: var(--text-micro); color: var(--color-text-secondary); line-height: 1.5; margin-top: 3px; }
+
+.d-panel__tabs { display: flex; gap: var(--sp-1); margin-top: var(--sp-3); flex-wrap: wrap; }
+
+.d-tab {
+  padding: var(--sp-1) var(--sp-2h); border-radius: var(--radius-pill); cursor: pointer;
+  font-size: var(--text-micro); font-weight: 700;
+  background: var(--color-surface-sunken); color: var(--color-text-secondary);
+}
+
+.d-tab[data-state="active"] { background: var(--color-primary); color: var(--color-text-on-dark); }
+
+.d-section { padding: var(--sp-4); border-bottom: 1px solid var(--color-border-light); }
+
+.d-section[hidden] { display: none; }
+
+.d-section__title {
+  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--sp-3);
+}
+
+.d-section__note {
+  font-size: var(--text-micro); line-height: 1.55; color: var(--color-text-secondary);
+  margin-bottom: var(--sp-3);
+}
+
+/* Token rows */
+.d-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-1h) 0; border-bottom: 1px solid var(--d-rule);
+}
+
+.d-row:last-child { border-bottom: none; }
+
+.d-row__swatch {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: var(--radius-chip);
+  border: 1px solid var(--color-border); background-clip: padding-box;
+}
+
+.d-row__name {
+  flex: 1; min-width: 0;
+  font-family: var(--font-mono); font-size: var(--text-micro);
+  color: var(--color-text-primary); word-break: break-all;
+}
+
+.d-row__value {
+  font-family: var(--font-mono); font-size: var(--text-nano);
+  color: var(--color-text-secondary); text-align: right; flex-shrink: 0; max-width: 46%;
+  word-break: break-all;
+}
+
+.d-row__bar { height: 12px; border-radius: 3px; background: var(--color-primary); flex-shrink: 0; }
+
+.d-row__radius {
+  width: 44px; height: 34px; flex-shrink: 0;
+  border: 2px solid var(--color-primary); border-right: none; border-bottom: none;
+  background: var(--color-primary-bg);
+}
+
+.d-typeSample { color: var(--color-text-primary); line-height: 1.15; }
+
+.d-shadowSample {
+  width: 56px; height: 34px; flex-shrink: 0; border-radius: var(--radius-card-sm); background: var(--color-surface);
+}
+
+/* Component recipes */
+.d-recipe { border: 1px solid var(--color-border); border-radius: var(--radius-card-sm); margin-bottom: var(--sp-3); overflow: hidden; }
+
+.d-recipe__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3); background: var(--color-surface-sunken);
+}
+
+.d-recipe__name { font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 700; }
+
+.d-recipe__level {
+  font-size: var(--text-nano); font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase;
+  padding: 2px var(--sp-1h); border-radius: var(--radius-pill); color: var(--color-text-on-dark);
+}
+
+.d-recipe__level[data-level="atom"]     { background: var(--d-level-atom); }
+
+.d-recipe__level[data-level="molecule"] { background: var(--d-level-molecule); }
+
+.d-recipe__level[data-level="organism"] { background: var(--d-level-organism); }
+
+.d-recipe__level[data-level="template"] { background: var(--d-level-template); }
+
+.d-recipe__body { padding: var(--sp-2) var(--sp-3) var(--sp-3); }
+
+.d-recipe__line {
+  display: flex; gap: var(--sp-2); padding: 3px 0;
+  font-family: var(--font-mono); font-size: var(--text-nano); line-height: 1.5;
+}
+
+.d-recipe__key { color: var(--color-text-secondary); flex-shrink: 0; width: 96px; }
+
+.d-recipe__val { color: var(--color-text-primary); word-break: break-all; }
+
+.d-recipe__states { margin-top: var(--sp-2); padding-top: var(--sp-2); border-top: 1px dashed var(--color-border); }
+
+.d-copyBtn {
+  padding: 5px 10px; border-radius: var(--radius-chip); cursor: pointer;
+  font-size: var(--text-nano); font-weight: 700;
+  background: var(--color-primary-bg); color: var(--color-primary-dark);
+}
+
+.d-copyBtn:hover { background: var(--d-copy-hover); }
+
+/* d-demoHint. Prototype scaffolding sitting inside the device, marked as
+   developer furniture so it is never mistaken for copy that ships. */
+.d-demoHint {
+  margin-top: var(--sp-2);
+  font-size: var(--text-micro); font-weight: 600; letter-spacing: 0.2px;
+  color: var(--color-text-secondary);
+  border-left: 2px dashed var(--color-border-field);
+  padding-left: var(--sp-2);
+}
+
+.d-demoHint b { color: var(--color-text-primary); font-weight: 800; }
+
+/* Tooling must not change the layout it is there to help judge. With the
+   keyboard up the space is exactly what is under review, so the hint stands
+   down rather than spending 22dp of it. */
+.t-device-frame[data-keyboard="open"] .d-demoHint { display: none; }
+
+/* d-check. The prototype's own rules, run against the live page. */
+.d-check {
+  display: flex; gap: var(--sp-2); align-items: flex-start;
+  padding: var(--sp-2) 0; border-bottom: 1px solid var(--color-border-light);
+}
+
+.d-check__mark {
+  flex-shrink: 0; width: 18px; text-align: center;
+  font-size: var(--text-caption); font-weight: 800; line-height: 1.5;
+}
+
+.d-check[data-result="pass"] .d-check__mark { color: var(--color-success); }
+
+.d-check[data-result="fail"] .d-check__mark { color: var(--color-error-text); }
+
+.d-check[data-result="warn"] .d-check__mark { color: var(--color-warning); }
+
+.d-check[data-result="skip"] .d-check__mark { color: var(--color-text-tertiary); }
+
+.d-check__body { font-size: var(--text-micro); line-height: 1.5; color: var(--color-text-secondary); }
+
+.d-check__body b { color: var(--color-text-primary); }
+
+.d-check__detail { display: block; color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-nano); }
+
+.d-check__tally {
+  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  padding: var(--sp-2) 0 var(--sp-3);
+}
+
+.d-check__tally b { color: var(--color-error-text); }
+
+/* Inspector card, docked under the device */
+.d-inspect {
+  width: 300px; max-width: 100%; flex-shrink: 0; display: none;
+  background: var(--d-surface-ink); color: var(--color-text-on-dark); border-radius: var(--radius-card);
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  box-shadow: var(--shadow-inspect);
+}
+
+[data-inspect="on"] .d-inspect { display: block; }
+
+.d-inspect__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding-bottom: var(--sp-2); margin-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--d-on-ink-line);
+}
+
+.d-inspect__sel { font-family: var(--font-mono); font-size: var(--text-micro); font-weight: 700; word-break: break-all; }
+
+.d-inspect__hint { font-size: var(--text-nano); color: var(--d-on-ink-soft); flex-shrink: 0; }
+
+.d-inspect__grid { display: grid; grid-template-columns: 82px 1fr; gap: 2px var(--sp-2); }
+
+.d-inspect__k { font-size: var(--text-nano); color: var(--d-on-ink-soft); font-family: var(--font-mono); }
+
+.d-inspect__v { font-size: var(--text-nano); color: var(--color-text-on-dark); font-family: var(--font-mono); word-break: break-all; }
+
+.d-inspect__v em { font-style: normal; color: var(--d-accent-token); }
+
+.d-inspect__v b   { font-weight: 400; color: var(--d-accent-missing); }
+
+.d-gridOverlay {
+  position: absolute; inset: 0; z-index: var(--z-tool); pointer-events: none; display: none;
+  background-image:
+    repeating-linear-gradient(to bottom, var(--d-grid-line) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(to right,  var(--d-grid-line-soft) 0 1px, transparent 1px 4px);
+}
+
+[data-grid="on"] .d-gridOverlay { display: block; }
+
+.d-hoverRing {
+  position: absolute; z-index: var(--z-tool-top); pointer-events: none; display: none;
+  border: 1px solid var(--d-accent-inspect); background: var(--d-inspect-fill);
+  box-shadow: 0 0 0 1px var(--d-inspect-edge);
+}
+
+[data-inspect="on"] .d-hoverRing[data-state="visible"] { display: block; }
+
+@media (max-width: 900px) {
+  .d-panel { width: 100%; max-width: var(--d-panel-width); max-height: none; }
+}
+
+}

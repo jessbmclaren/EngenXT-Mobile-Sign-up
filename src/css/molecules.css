@@ -1,0 +1,281 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MOLECULES
+
+   Small groups of atoms doing one job.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer molecules {
+
+/* ══ MOLECULES ═══════════════════════════════════════════════════════════ */
+
+/* m-status-bar */
+.m-status-bar {
+  position: relative; z-index: var(--z-content); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
+  padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
+}
+
+.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
+
+.m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
+
+.m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
+
+/* Connection state, shown where a phone shows it. Without this data-net was a
+   flag with no rendering, so Offline looked broken until you tried to send. */
+/* "No service" follows the bar's tone, the way the clock above it does.
+   It was written in --color-on-dark-soft unconditionally - white at 60%,
+   a colour for a dark surface - so on every light screen it was white text
+   on near-white: 2.30:1 on home, 2.47:1 on the scan screen, and worst in
+   Large text, which is the mode a driver reading a phone in the sun turns
+   on. The one word telling them the phone has no signal is not the word to
+   lose. Dark ink is the default and the on-dark ramp is the exception,
+   which is the rule every other thing in this bar already follows. */
+.m-status-bar__net {
+  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight);
+  color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
+}
+
+.m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
+
+[data-net="offline"] .m-status-bar__net { display: inline; }
+
+[data-net="offline"] .m-status-bar__signal { opacity: .35; }
+
+/* m-notch */
+.m-notch {
+  position: absolute; top: 0; left: 0; right: 0; height: 50px; z-index: var(--z-hardware);
+  display: flex; justify-content: center; pointer-events: none;
+}
+
+/* m-brand-lockup */
+.m-brand-lockup { display: flex; align-items: center; gap: var(--sp-2h); }
+
+.m-brand-lockup__mark {
+  width: var(--size-object); height: var(--size-object); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-secondary); border-radius: var(--radius-chip);
+  box-shadow: var(--shadow-brand);
+}
+
+/* The ink defaults to the light surface, and the dark hero asks for its own.
+   It used to be the other way round: the name was written in the hero's white
+   and the app's home bar - a light surface - reached in with
+   `.o-home .m-brand-lockup__name` to put it back. That is a parent restyling a
+   child's insides, which the Composition law forbids in as many words, and it
+   was invisible to the parity gate, which drops any rule whose classes do not
+   all root into the manifest. So the gate went on proving the lockup identical
+   in both files while the two files rendered it in different colours.
+   Inverted, and the exception now carries a modifier, the way a-btn, a-link
+   and a-icon-wrap already do. */
+.m-brand-lockup__name {
+  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-primary);
+  letter-spacing: var(--tracking-snug); line-height: var(--leading-flush); margin-bottom: 2px;
+}
+
+.m-brand-lockup--onDark .m-brand-lockup__name { color: var(--color-text-on-dark); }
+
+.m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
+
+.m-brand-lockup__tag {
+  /* Off the tracking scale on purpose: this is a 10px uppercase strapline
+     under a wordmark, and em tracking at that size lands too tight to read
+     as a lockup rather than as a word. */
+  font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--color-on-dark-faint);
+}
+
+/* m-alert.
+   The tone rules are scoped away from the onDark modifier. Without :not() the
+   tone selector (0,2,0) beats the modifier (0,1,0) and paints white text on a
+   pale tint, which is how both home notices became blank boxes. */
+.m-alert {
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  padding: var(--sp-4); border-radius: var(--radius-card);
+  background: var(--color-primary-bg); border: 1px solid var(--color-primary-12);
+}
+
+.m-alert:not(.m-alert--onDark)[data-tone="info"]    { background: var(--color-primary-bg); border-color: var(--color-primary-12); }
+
+.m-alert:not(.m-alert--onDark)[data-tone="error"]   { background: var(--color-secondary-bg); border-color: var(--color-secondary-25); }
+
+.m-alert:not(.m-alert--onDark)[data-tone="warning"] { background: var(--color-warning-bg);   border-color: var(--color-warning-25); }
+
+.m-alert:not(.m-alert--onDark)[data-tone="success"] { background: var(--color-success-bg);   border-color: var(--color-success-20); }
+
+.m-alert__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
+
+.m-alert__icon { flex-shrink: 0; margin-top: -1px; }
+  /* optical, against cap height */
+.m-alert__title {
+  font-size: var(--text-footnote); font-weight: var(--weight-bold); line-height: var(--leading-snug);
+  color: var(--color-text-primary); margin-bottom: 3px;
+}
+
+.m-alert__body { font-size: var(--text-caption2); line-height: var(--leading-body); color: var(--color-text-secondary); }
+
+.m-alert__body b { color: var(--color-text-primary); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+
+.m-alert__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.m-alert--onDark {
+  background: var(--color-on-dark-fill); border-color: var(--color-on-dark-line);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+
+.m-alert--onDark .m-alert__title { color: var(--color-text-on-dark); }
+
+.m-alert--onDark .m-alert__body  { color: var(--color-on-dark-mid); }
+
+/* m-sheet-header */
+.m-sheet-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-4);
+}
+
+/* An outcome carries its own heading, so the header keeps only its close
+   control and lets that control hold the right edge on its own. */
+.m-sheet-header[data-heading="none"] { justify-content: flex-end; margin-bottom: 0; }
+
+.m-sheet-header__title {
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary); margin-bottom: var(--sp-1);
+}
+
+.m-sheet-header__sub {
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
+}
+
+/* The masked number is one token. Breaking it across two lines turns a
+   number the driver is checking against their handset into two fragments. */
+.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: var(--weight-bold); white-space: nowrap; }
+
+/* The glyph used to be shoved to the trailing edge of a 48px box, so that it
+   would land on the same gutter the title starts from. It did land there, and
+   it cost the thing the button actually is: the box is round and it lights up
+   on hover and on focus, and the cross sat jammed against the right of that
+   circle with ten pixels of empty space behind it. A control whose highlight
+   is visibly not centred on its own mark reads as broken, on every sheet in
+   the flow.
+
+   The circle is drawn at the size the mark deserves and the mark sits in the
+   middle of it, where it belongs. The circle's own edge now holds the gutter,
+   which is the alignment a reader actually sees. The 48px a thumb is owed is
+   drawn out from it below rather than by inflating what is visible - the same
+   trick the map pins and the vehicle chips already use.
+
+   It also sits flush with the top of the sheet's scroller, which clips on the
+   cross axis. A negative top margin used to lift it four pixels into that
+   clip: invisible while the button had no fill of its own, and a flat-topped
+   circle the moment it did. It is not lifted any more, and nothing it draws
+   or listens on reaches above the scroller's edge. */
+.m-sheet-header__close {
+  position: relative; flex-shrink: 0;
+  width: var(--size-object); height: var(--size-object);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-circle); cursor: pointer;
+}
+
+/* 36 + 12 = the 48 the tap floor asks for, taken downward and sideways only.
+   A clipped region is not pressable either, so a target that reached above
+   the scroller would have been a target the top of which nothing could tap. */
+.m-sheet-header__close::after {
+  content: ''; position: absolute; inset: 0 -6px -12px -6px;
+}
+
+.m-sheet-header__close:hover { background: var(--color-hover-wash); }
+
+/* m-phone-field */
+.m-phone-field__prefix {
+  display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0;
+  padding-right: var(--sp-3); border-right: 1px solid var(--color-primary-12);
+}
+
+.m-phone-field__flag { font-size: var(--text-lead); line-height: var(--leading-flush); }
+
+.m-phone-field__code { font-size: var(--text-body); font-weight: var(--weight-heavy); }
+
+/* m-otp-group. 6px between cells is optical, tuned so six squares and five
+   gaps fill the content width at 320. Error carries extra border weight as
+   well as colour, so the two outcomes differ by more than hue. */
+/* Centred rather than space-between. With the cells capped at --size-otp-cell,
+   space-between handed every spare pixel to the gaps: the declared 6px rendered
+   7.6px at 390 and about 15.6px at 430, so the row's rhythm changed with the
+   handset and the six boxes stopped reading as one group. The gap is the token
+   now, on every width, and the cells still divide what is left. */
+.m-otp-group { display: flex; gap: var(--sp-2); justify-content: center; }
+
+/* m-resend-row. Wraps rather than crushing its labels under large text, and
+   the negative inline margin pulls the links back onto the content edge that
+   the cells and the CTA hold. */
+.m-resend-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-2); row-gap: var(--sp-2); flex-wrap: wrap;
+}
+
+/* .a-link--flush is the atom's own variant for sitting on a content edge. It
+   is a modifier rather than a rule in the row, because the padding belongs to
+   the link and a molecule must not reach in and cancel it. */
+/* When a state withdraws one of the two, the survivor centres rather than
+   sitting hard left where its partner used to balance it. */
+.m-resend-row[data-single="true"] { justify-content: center; }
+
+.m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+
+.m-figure__key {
+  font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
+  text-transform: uppercase; color: var(--color-text-tertiary);
+}
+
+.m-figure__val {
+  font-size: var(--text-lead); font-weight: var(--weight-heavy);
+  font-variant-numeric: tabular-nums; color: var(--color-text-primary);
+}
+
+/* m-keyboard. The Android keypad the number and code stages actually raise,
+   drawn rather than described, so the sheet can be judged against the space it
+   really has. Both inputs are inputmode="numeric", so this is the numeric pad
+   Android shows them, not a full alphabetic layout. */
+.m-keyboard {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--z-toast);
+  height: var(--keyboard-inset, 0px);
+  display: none; overflow: hidden;
+  background: var(--kb-surface);
+  border-top: var(--size-hairline) solid var(--kb-divider);
+}
+
+.m-keyboard__svg { display: block; width: 100%; height: 100%; }
+
+/* These sizes deliberately sit outside the type ramp. The ramp exists so app
+   text answers the driver's text-size setting, and a drawing of Android's own
+   keyboard must not: a real keyboard does not grow when app text does. */
+.m-keyboard__digit {
+  font-family: var(--font-sans); font-size: 21px; font-weight: var(--weight-regular);
+  fill: var(--kb-text); text-anchor: middle;
+}
+
+.m-keyboard__sub {
+  font-family: var(--font-sans); font-size: 9px; font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps); fill: var(--kb-sub); text-anchor: middle;
+}
+
+/* m-privacy. Facts as rows: an icon naming the subject, a bold headline of
+   a few words, one plain line after it. A paragraph made a reader hold five
+   sentences; a row asks for one glance each. */
+.m-privacy { display: flex; flex-direction: column; gap: var(--sp-2h); margin-top: var(--sp-2); }
+
+.m-privacy__row {
+  display: flex; align-items: flex-start; gap: var(--sp-2h);
+  font-size: var(--text-caption2); line-height: var(--leading-body); color: var(--color-text-secondary);
+}
+
+.m-privacy__row b { color: var(--color-text-primary); font-weight: var(--weight-bold); }
+
+.m-privacy__icon { flex-shrink: 0; color: var(--color-primary); margin-top: 1px; }
+
+}

@@ -1,0 +1,85 @@
+/* ══════════════════════════════════════════════════════════════════════
+   FOUNDATIONS
+
+   The ground everything stands on: the reset, the focus ring, the motion laws, the keyframes.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer foundations {
+
+/* ══ BASE ════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: var(--color-surface-page);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text-primary);
+}
+
+input, button, a { font-family: inherit; }
+
+button { background: none; border: none; color: inherit; }
+
+/* One focus ring for the whole file. Two tone, so the dark core reads on the
+   light sheet and the light halo reads on the near-black hero. */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--color-focus-halo);
+}
+
+/* Hidden means gone, including from a flex row that would otherwise still
+   reserve its gap. */
+[hidden] { display: none !important; }
+
+/* The shake lives on the control the driver can correct, never on the stage.
+   Two animations on one element share one `animation` shorthand, so when the
+   shake ended the shorthand fell back to stageIn and replayed the entrance:
+   the field, the helper, the card and the button faded out and floated back
+   up half a second after the error arrived. Different elements, no shared
+   property, no replay. It also points at the thing that is wrong instead of
+   moving the whole column, including the parts that are fine. */
+[data-shake="true"] { animation: shakeX var(--dur-slow) ease; }
+
+/* The opened card is part of the same thought, one base step below it. */
+#privacyCard:not([hidden]) { margin-top: var(--sp-2); }
+
+/* ══ MOTION ══════════════════════════════════════════════════════════════ */
+@keyframes sheetUp   { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+@keyframes sheetDown { from { transform: translateY(0); opacity: 1 }    to { transform: translateY(100%); opacity: 0 } }
+
+@keyframes scrimIn   { from { opacity: 0 } to { opacity: 1 } }
+
+@keyframes scrimOut  { from { opacity: 1 } to { opacity: 0 } }
+
+@keyframes stageIn   { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+
+@keyframes shakeX    { 0%,100% { transform: translateX(0) } 25% { transform: translateX(calc(var(--sp-1) * -1)) } 75% { transform: translateX(var(--sp-1)) } }
+
+@keyframes pop       { from { opacity: 0; transform: scale(.5) } to { opacity: 1; transform: scale(1) } }
+
+@keyframes spin      { to { transform: rotate(360deg) } }
+
+/* Every animation collapses to a still frame when motion is reduced,
+   whether that comes from the OS or from the demo toggle. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .001ms !important; transition-delay: 0s !important;
+  }
+}
+
+[data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
+  animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+  animation-delay: 0s !important;
+  transition-duration: .001ms !important; transition-delay: 0s !important;
+}
+
+}

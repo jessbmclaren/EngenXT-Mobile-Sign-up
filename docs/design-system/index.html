@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en-ZA" data-motion="system" data-text="default" data-net="online">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EngenXT Design System</title>
+
+<!-- THE PRODUCTION STYLESHEET, exactly as the product loads it.
+
+     Same files, same order, no copy. Every component below is drawn by the
+     CSS that draws the real screens, so a specimen cannot drift from the
+     thing it documents: if one changes, both change, because there is only
+     one of them.
+
+     The product's CSS is entirely inside @layer. docs.css is not, and an
+     unlayered rule beats every layer - so the page around the components can
+     be styled without raising specificity, reaching for !important, or ever
+     touching a component. -->
+<link rel="stylesheet" href="../../src/css/tokens.css">
+<link rel="stylesheet" href="../../src/css/foundations.css">
+<link rel="stylesheet" href="../../src/css/atoms.css">
+<link rel="stylesheet" href="../../src/css/molecules.css">
+<link rel="stylesheet" href="../../src/css/organisms.css">
+<link rel="stylesheet" href="../../src/css/templates.css">
+<link rel="stylesheet" href="../../src/css/utilities.css">
+
+<!-- The shell. Layout, navigation and specimen frames only. -->
+<link rel="stylesheet" href="docs.css">
+</head>
+
+<body class="ds-body">
+<div class="ds-shell">
+
+<nav class="ds-rail" aria-label="Sections">
+  <p class="ds-rail__title">EngenXT Design System</p>
+  <p class="ds-rail__sub">Living documentation · no build</p>
+  <div class="ds-rail__nav">
+    <p class="ds-rail__group">Start</p>
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#naming">Naming</a>
+    <p class="ds-rail__group">Foundations</p>
+    <a href="#tokens">Tokens</a>
+    <a href="#spacing">Spacing</a>
+    <p class="ds-rail__group">Components</p>
+    <a href="#atoms">Atoms</a>
+    <a href="#molecules">Molecules</a>
+    <a href="#organisms">Organisms</a>
+    <a href="#templates">Templates</a>
+    <p class="ds-rail__group">Behaviour</p>
+    <a href="#states">States</a>
+    <a href="#accessibility">Accessibility</a>
+    <a href="#responsive">Responsive</a>
+    <p class="ds-rail__group">Reference</p>
+    <a href="#screens">Screens</a>
+    <a href="#traceability">Traceability</a>
+    <a href="#decisions">Decisions</a>
+  </div>
+</nav>
+
+<main class="ds-main">
+
+<!-- ═══ OVERVIEW ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="overview">
+  <h2>Overview</h2>
+  <p class="ds-lede">
+    The design system behind EngenXT, a fleet-fuelling app used by drivers standing
+    at a pump. This page is generated from the same CSS the product loads. Nothing
+    on it is a copy.
+  </p>
+
+  <p id="dsSource" class="ds-note">Reading the stylesheet…</p>
+
+  <h3>What it is for</h3>
+  <p>
+    Drivers use this app one-handed, outdoors, in daylight, with someone waiting behind
+    them. That constraint decides most of the system: high contrast, large targets, plain
+    words, and motion only where it costs nobody time.
+  </p>
+
+  <h3>Scope</h3>
+  <p>
+    Two pages share this system. <code>index.html</code> is sign-up and the home screen;
+    <code>engenxt-onboarding.html</code> is what a driver arrives in afterwards. Only
+    <code>index.html</code> has been migrated to linked CSS so far, so the components
+    documented here are the ones that page renders.
+  </p>
+</section>
+
+<!-- ═══ ARCHITECTURE ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="architecture">
+  <h2>Architecture</h2>
+
+  <h3>No build, and why that is a requirement rather than a shortcut</h3>
+  <p>
+    There is no package manager, no bundler and no build step. Both pages open by
+    double-clicking them, and the deployed site is those same files served statically.
+    A reviewer with no toolchain, on a plane, can open the product. That property is
+    load-bearing, so the system is expressed in plain <code>&lt;link&gt;</code> tags,
+    CSS custom properties and cascade layers — never in a compiler.
+  </p>
+
+  <h3>Dependency direction</h3>
+  <p>Everything flows one way. A layer may use what is above it and must not reach down.</p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>Layer</th><th>File</th><th>Holds</th><th>May use</th></tr></thead>
+      <tbody>
+        <tr><td><code>tokens</code></td><td><code>src/css/tokens.css</code></td><td>Every value the product may use, and nothing that uses them</td><td>—</td></tr>
+        <tr><td><code>foundations</code></td><td><code>src/css/foundations.css</code></td><td>Reset, focus ring, motion laws, keyframes</td><td>tokens</td></tr>
+        <tr><td><code>atoms</code></td><td><code>src/css/atoms.css</code></td><td>Parts that cannot be divided further and still mean anything</td><td>tokens, foundations</td></tr>
+        <tr><td><code>molecules</code></td><td><code>src/css/molecules.css</code></td><td>Small groups of atoms doing one job</td><td>above</td></tr>
+        <tr><td><code>organisms</code></td><td><code>src/css/organisms.css</code></td><td>Distinct sections, and the screens</td><td>above</td></tr>
+        <tr><td><code>templates</code></td><td><code>src/css/templates.css</code></td><td>The device frame and the page it sits on</td><td>above</td></tr>
+        <tr><td><code>utilities</code></td><td><code>src/css/utilities.css</code></td><td>One job, no opinion</td><td>above</td></tr>
+        <tr><td><code>developer</code></td><td><code>src/css/developer.css</code></td><td>Tooling. Never ships, and this page does not load it</td><td>above</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Why layers rather than specificity</h3>
+  <p>
+    The order is declared once, at the top of <code>tokens.css</code>. A later layer beats
+    an earlier one whatever the specificity — so a screen's override no longer has to
+    out-specify an atom, it simply lives further down the list. That is what keeps
+    selectors flat and removes the reason people reach for <code>!important</code>.
+  </p>
+  <p>
+    It has one consequence worth knowing. Two rules of equal specificity that relied on
+    which was typed first will flip when they land in different layers. Three such pairs
+    existed and are pinned to preserve today's rendering — see
+    <a href="#decisions">Decisions</a>.
+  </p>
+</section>
+
+<!-- ═══ NAMING ════════════════════════════════════════════════════════ -->
+<section class="ds-section" id="naming">
+  <h2>Naming</h2>
+  <p>Every class states its level in its first two characters. This is enforced by the build gate, not by convention.</p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>Prefix</th><th>Level</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>a-</code></td><td>Atom</td><td><code>a-btn</code></td></tr>
+        <tr><td><code>m-</code></td><td>Molecule</td><td><code>m-sheet-header</code></td></tr>
+        <tr><td><code>o-</code></td><td>Organism</td><td><code>o-signup-sheet</code></td></tr>
+        <tr><td><code>t-</code></td><td>Template</td><td><code>t-device-frame</code></td></tr>
+        <tr><td><code>p-</code></td><td>Page</td><td><code>p-signup-demo</code></td></tr>
+        <tr><td><code>u-</code></td><td>Utility</td><td><code>u-visually-hidden</code></td></tr>
+        <tr><td><code>d-</code></td><td>Developer tooling — never ships</td><td><code>d-panel</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Blocks are kebab-case; multi-word element and modifier tails are camelCase
+    (<code>__balanceCard</code>, <code>--outlineOnDark</code>). Elements never nest
+    (<code>block__a__b</code> is refused).
+  </p>
+  <h3>State is never a class</h3>
+  <p>
+    Runtime state rides a <code>data-*</code> attribute — <code>data-state</code>,
+    <code>data-tone</code>, <code>data-verdict</code>. There is no <code>is-open</code>
+    anywhere, and the gate fails the build if one appears. A class says what a thing
+    <em>is</em>; an attribute says what it is <em>doing</em>.
+  </p>
+</section>
+
+<!-- ═══ TOKENS ════════════════════════════════════════════════════════ -->
+<section class="ds-section" id="tokens">
+  <h2>Tokens</h2>
+  <p>
+    Read out of the live stylesheet when this page loads. Nothing below is typed by
+    hand, so a token cannot be documented at a value it no longer has.
+  </p>
+  <p>
+    The scale is copied verbatim into both pages, and the build gate compares them
+    property by property — a token that exists in one file and not the other fails the
+    build. Names must belong to a sanctioned family; a stray
+    <code>--brand-blue-2</code> is refused.
+  </p>
+  <div id="dsTokens">
+    <p class="ds-note">Token tables are drawn by <code>docs.js</code> from the linked CSS.</p>
+  </div>
+</section>
+
+<!-- ═══ SPACING ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="spacing">
+  <h2>Spacing</h2>
+  <p>
+    A 4px base with three half-steps, because 6, 10 and 18 are structural here rather
+    than exceptional, and a scale should be honest about what it contains. The tokens
+    and their resolved values are in the <a href="#tokens">Tokens</a> table under
+    <em>Spacing</em>.
+  </p>
+
+  <div class="ds-note">
+    <strong>Not yet done.</strong> A semantic spacing layer — <code>space-control-inline</code>,
+    <code>space-stack-related</code>, <code>space-section</code> and the rest — has been
+    specified but not built. Introducing it means re-pointing roughly 400 declarations and
+    deciding, case by case, which of two near-identical values is the intended one. That
+    is a design review, not a mechanical edit, and it changes pixels. It is listed under
+    <a href="#decisions">Decisions</a> as awaiting approval.
+  </div>
+
+  <h3>How spacing is applied</h3>
+  <ul>
+    <li><strong>Gap, not margin,</strong> between children of a flex or grid container.</li>
+    <li><strong>Container padding</strong> for internal boundaries.</li>
+    <li>A component does not impose its own external margins; the parent layout owns the space between components.</li>
+    <li>Inner spacing is smaller than the spacing that groups things — proximity is what says what belongs together.</li>
+  </ul>
+</section>
+
+<!-- ═══ ATOMS ═════════════════════════════════════════════════════════ -->
+<section class="ds-section" id="atoms">
+  <h2>Atoms</h2>
+  <p>
+    Twelve render on this page. Every specimen below is the real element with the real
+    classes, drawn by the production CSS.
+  </p>
+
+  <h3>a-btn</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-btn</span><span>primary · outline · disabled</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <button class="a-btn a-btn--primary" type="button">Send me a code</button>
+      <button class="a-btn a-btn--outline" type="button">Use a different number</button>
+      <button class="a-btn a-btn--primary" type="button" aria-disabled="true">Send me a code</button>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>
+    <strong>Internal padding</strong> comes from <code>--size-control</code> as a minimum
+    height, not from vertical padding, so a wrapped label cannot shrink the target.
+    <strong>Press</strong> is <code>--press-firm</code>. <strong>Accessibility:</strong>
+    disabled uses <code>aria-disabled</code> rather than the attribute, so the control keeps
+    its place in the focus order and can still explain itself.
+  </p>
+
+  <h3>a-link</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-link</span><span>default · quiet · flush</span></div>
+    <div class="ds-spec__stage">
+      <button class="a-link" type="button">Resend the code</button>
+      <button class="a-link a-link--quiet" type="button">Privacy</button>
+      <button class="a-link a-link--flush" type="button">Change number</button>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>Minimum height is <code>--size-target</code> (48px) even where the text is small, because a link in this product is tapped with a thumb.</p>
+
+  <h3>a-field and a-label</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-field</span><span>default · error</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <label class="a-label" for="dsPhone">Mobile number</label>
+      <span class="a-field"><input class="a-field__input" id="dsPhone" type="tel" value="82 123 4567"></span>
+      <span class="a-field" data-state="error"><input class="a-field__input" type="tel" value="82 000"></span>
+      <span class="a-helper" data-tone="error">Check the number and try again.</span>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>
+    The label is persistent, never a placeholder. The error message sits directly under the
+    control it belongs to, and the field carries <code>data-state="error"</code> so the
+    state is not colour alone — the border thickens as well.
+  </p>
+
+  <h3>a-icon-wrap</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-icon-wrap</span><span>default · tones · large · bare</span></div>
+    <div class="ds-spec__stage">
+      <span class="a-icon-wrap"></span>
+      <span class="a-icon-wrap" data-tone="error"></span>
+      <span class="a-icon-wrap" data-tone="warning"></span>
+      <span class="a-icon-wrap" data-tone="success"></span>
+      <span class="a-icon-wrap a-icon-wrap--bare"></span>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>
+    A fill, not an outline. The atom declares no <code>color</code>, deliberately: the glyph
+    takes the ink of whatever row it is placed in, which is why a parent setting its colour
+    is composition rather than an override.
+  </p>
+
+  <h3>a-spinner, a-handle, a-progress</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-handle · .a-progress</span><span>small parts</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <span class="a-handle"></span>
+      <p class="a-progress"><span>Step 1 of 2</span></p>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+</section>
+
+<!-- ═══ MOLECULES ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="molecules">
+  <h2>Molecules</h2>
+  <p>Eleven render on this page. Each is a small group of atoms doing one job.</p>
+
+  <h3>m-sheet-header</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.m-sheet-header</span><span>depends on: a-icon-btn shape</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <header class="m-sheet-header">
+        <div>
+          <h2 class="m-sheet-header__title">Your number</h2>
+          <p class="m-sheet-header__sub">We send a code to <b>082 123 4567</b>.</p>
+        </div>
+        <button class="m-sheet-header__close" type="button" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </header>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>
+    The close control is a 36px circle with the glyph centred in it and its own edge on the
+    gutter. Its 48px target is drawn out from a pseudo-element downward and sideways only,
+    because the sheet's scroller clips above it and a clipped region is not pressable.
+  </p>
+
+  <h3>m-alert</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.m-alert</span><span>tones: error · warning · success</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <div class="m-alert" data-tone="error">
+        <div class="m-alert__top"><p class="m-alert__title">That number is not on your company's list</p></div>
+        <p class="m-alert__body">Ask your manager to add it, or try another number.</p>
+      </div>
+      <div class="m-alert" data-tone="warning">
+        <div class="m-alert__top"><p class="m-alert__title">Check your signal</p></div>
+        <p class="m-alert__body">We could not reach the network. Try again in a moment.</p>
+      </div>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>Tone rides <code>data-tone</code>. Every tone carries a glyph as well as a colour, so the meaning survives for a reader who cannot separate the hues.</p>
+
+  <h3>m-otp-group</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.m-otp-group</span><span>six a-otp-cell · gap --sp-2</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <div class="m-otp-group" role="group" aria-label="6-digit code">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="1">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="2">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="3">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="">
+        <input class="a-otp-cell" inputmode="numeric" maxlength="1" value="">
+      </div>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>The group holds the outcome on <code>data-state</code> and mirrors it onto every cell as <code>data-tone</code>, so a cell can be filled and wrong at the same time without the two axes fighting.</p>
+
+  <h3>m-privacy</h3>
+  <div class="ds-spec">
+    <div class="ds-spec__head"><span class="ds-spec__name">.m-privacy</span><span>facts as rows</span></div>
+    <div class="ds-spec__stage ds-spec__stage--stack">
+      <div class="m-privacy">
+        <div class="m-privacy__row">
+          <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span>
+          <span><b>Your number</b> is used to sign you in and nothing else.</span>
+        </div>
+        <div class="m-privacy__row">
+          <span class="m-privacy__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <span><b>Your fuel history</b> stays with your company.</span>
+        </div>
+      </div>
+    </div>
+    <div class="ds-spec__foot"></div>
+  </div>
+  <p>A paragraph made a reader hold five sentences at once; a row asks for one glance each. The icons are decorative and hidden from assistive technology — each repeats a word already in its row.</p>
+</section>
+
+<!-- ═══ ORGANISMS ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="organisms">
+  <h2>Organisms</h2>
+  <p>
+    Four on this page: <code>o-auth-hero</code>, <code>o-signup-sheet</code>,
+    <code>o-status-page</code> and <code>o-outcome-panel</code>. They are full screens
+    rather than sections, which is discussed under <a href="#decisions">Decisions</a>.
+  </p>
+  <p>
+    They are not reproduced as specimens here. An organism in this product is a whole
+    screen that positions itself absolutely inside the device frame and shows or hides on
+    <code>data-state</code> — rendering one inside a documentation page would either
+    require faking the frame or would cover the page. The honest way to see them is the
+    real thing: open <code>index.html</code> and use the state rail, which lists all 43
+    states and deep-links to each.
+  </p>
+  <div class="ds-note">
+    <strong>Ownership.</strong> All four are product-specific. Nothing in the organism layer
+    is shared between the two pages today — the shared core is tokens, foundations and the
+    atom library.
+  </div>
+</section>
+
+<!-- ═══ TEMPLATES ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="templates">
+  <h2>Templates</h2>
+  <h3>t-device-frame</h3>
+  <p>
+    The phone. It owns the viewport the product is designed against — 390×844 by default,
+    with 375, 360 and 320 available as a stress test — and it is the containing block every
+    screen positions itself against.
+  </p>
+  <p>
+    It is also the one parent allowed to change what its children are, because it is the
+    hardware: at the Android width the notch becomes a pill, and when the keyboard is up
+    the sheet squares its corners and the hero's title steps down a size. A component
+    cannot carry a modifier for that, because it is not the component's fact.
+  </p>
+  <div class="ds-note">
+    <strong>Honest limit.</strong> <code>t-device-frame</code> is content-agnostic, which is
+    half of Frost's definition of a template, but it does not articulate a screen's content
+    structure. The second page has a real <code>t-screen</code> template; this page does not
+    yet need one, because it has a single sheet over a hero rather than twelve screens
+    repeating a skeleton.
+  </div>
+</section>
+
+<!-- ═══ STATES ════════════════════════════════════════════════════════ -->
+<section class="ds-section" id="states">
+  <h2>States and resilience</h2>
+  <p>Only states that actually exist in the screens are listed. Nothing here is invented.</p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>State</th><th>How it is expressed</th><th>Where to see it</th></tr></thead>
+      <tbody>
+        <tr><td>Default</td><td>—</td><td><code>#number/empty</code></td></tr>
+        <tr><td>Focus</td><td><code>:focus-visible</code> — 3px ring plus a white halo, two-tone so one ring works on the dark hero and the light sheet</td><td>Tab through any screen</td></tr>
+        <tr><td>Hover</td><td><code>--color-hover-wash</code> or <code>--color-hover-lift</code> by what the control stands on</td><td>Pointer devices only</td></tr>
+        <tr><td>Active</td><td><code>--press-firm</code> on controls, <code>--press-subtle</code> on rows</td><td>Any button</td></tr>
+        <tr><td>Disabled</td><td><code>aria-disabled</code> plus a flattened coat; stays focusable</td><td><code>#number/empty</code></td></tr>
+        <tr><td>Loading</td><td><code>a-spinner</code> inside the control that caused the wait</td><td><code>#number/sending</code></td></tr>
+        <tr><td>Error</td><td><code>data-state="error"</code> on the field, <code>a-helper[data-tone="error"]</code> beneath it</td><td><code>#number/err-server</code></td></tr>
+        <tr><td>Success</td><td><code>data-tone="success"</code></td><td><code>#code/valid</code></td></tr>
+        <tr><td>Empty</td><td>A stated sentence, never a blank region</td><td><code>#blocked/not-registered</code></td></tr>
+        <tr><td>Offline</td><td><code>data-net="offline"</code> on the root</td><td><code>#home/offline</code></td></tr>
+        <tr><td>Long content</td><td>Sheets scroll; the status bar clearance and edge masks hold</td><td>Large text mode</td></tr>
+        <tr><td>Reduced motion</td><td>Both the media query and a <code>data-motion</code> switch; animations collapse to a still frame, never to nothing</td><td>Rail toggle</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ ACCESSIBILITY ═════════════════════════════════════════════════ -->
+<section class="ds-section" id="accessibility">
+  <h2>Accessibility</h2>
+  <ul>
+    <li><strong>Keyboard.</strong> Every control is a real <code>&lt;button&gt;</code> or input. Disabled primary actions use <code>aria-disabled</code> so they keep their place in the focus order and can still explain why they are not available.</li>
+    <li><strong>Visible focus.</strong> One ring for the whole product, two-tone so it reads on the near-black hero and the light sheet alike.</li>
+    <li><strong>Labels.</strong> Persistent and visible. No placeholder-as-label anywhere.</li>
+    <li><strong>Errors.</strong> Placed against the control they belong to, and never carried by colour alone — a field in error thickens its border and gains a glyph.</li>
+    <li><strong>Landmarks.</strong> Each screen is a <code>&lt;section&gt;</code> labelled by its own heading; the device chrome is <code>aria-hidden</code>.</li>
+    <li><strong>Reduced motion.</strong> Honoured through the media query and an explicit switch, so it can be demonstrated without changing an OS setting.</li>
+    <li><strong>Contrast.</strong> Sampled from rendered pixels on all 43 states, not reasoned about from tokens — gradients and glass make the arithmetic unreliable.</li>
+    <li><strong>Targets.</strong> A 48px floor, measured including pseudo-element extensions, because the drawn size and the pressable size are allowed to differ and only the pressable one counts.</li>
+  </ul>
+  <h3>Known limitations</h3>
+  <ul>
+    <li>Screen-reader testing has been reasoned about and coded for, but not performed with an actual screen reader.</li>
+    <li>The status-bar contrast check samples one point per state; it would miss a failure elsewhere in the bar.</li>
+  </ul>
+</section>
+
+<!-- ═══ RESPONSIVE ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="responsive">
+  <h2>Responsive behaviour</h2>
+  <p>
+    The product is a phone app, so the design target is a phone and there is no desktop
+    layout to shrink from. What varies is the device width — 390, 375, 360 and 320 — and
+    whether the keyboard is up.
+  </p>
+  <h3>The compression order</h3>
+  <p>
+    When the keyboard takes half the screen, space is given up in a stated order, from what
+    the driver has already finished with: the tooling first, then the step counter, then
+    instruction that has already been acted on, then the loose gaps. The base gap between
+    related things is given up last, because it is what says which things belong together —
+    and that matters most when there is least room.
+  </p>
+  <p>Content reflows by priority. Nothing is hidden merely to make it fit, and no page scrolls sideways.</p>
+</section>
+
+<!-- ═══ SCREENS ═══════════════════════════════════════════════════════ -->
+<section class="ds-section" id="screens">
+  <h2>Screens</h2>
+  <p>43 states across three screens, each with a stable id and a deep link.</p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>Screen</th><th>Template</th><th>Source</th><th>States</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>o-auth-hero</code></td><td><code>t-device-frame</code></td><td><code>index.html</code></td><td>5</td><td><span class="ds-pill ds-pill--done">migrated</span></td></tr>
+        <tr><td><code>o-signup-sheet</code></td><td><code>t-device-frame</code></td><td><code>index.html</code></td><td>32</td><td><span class="ds-pill ds-pill--done">migrated</span></td></tr>
+        <tr><td><code>o-status-page</code></td><td><code>t-device-frame</code></td><td><code>index.html</code></td><td>4</td><td><span class="ds-pill ds-pill--done">migrated</span></td></tr>
+        <tr><td><code>o-outcome-panel</code></td><td><code>t-device-frame</code></td><td><code>index.html</code></td><td>2</td><td><span class="ds-pill ds-pill--done">migrated</span></td></tr>
+        <tr><td>The app after sign-up</td><td><code>t-screen</code></td><td><code>engenxt-onboarding.html</code></td><td>61</td><td><span class="ds-pill ds-pill--warn">not migrated</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ds-note">
+    <strong>No reference screenshots.</strong> There are none in this repository, so no
+    screenshot comparison was performed and none is claimed. Verification was done by
+    computed-style fingerprint instead: every element on every state, before and after,
+    compared property by property.
+  </div>
+</section>
+
+<!-- ═══ TRACEABILITY ══════════════════════════════════════════════════ -->
+<section class="ds-section" id="traceability">
+  <h2>Traceability</h2>
+  <p>Screen → template → organism → molecule → atom → tokens, for the sections of each screen.</p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>Screen section</th><th>Organism</th><th>Molecule</th><th>Atoms</th><th>Key tokens</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Hero, signed out</td><td><code>o-auth-hero</code></td><td><code>m-brand-lockup</code>, <code>m-status-bar</code></td>
+          <td><code>a-btn</code>, <code>a-link</code>, <code>a-icon-wrap</code></td>
+          <td><code>--gradient-hero</code>, <code>--color-on-dark-*</code>, <code>--text-hero</code></td>
+        </tr>
+        <tr>
+          <td>Number entry</td><td><code>o-signup-sheet</code></td><td><code>m-sheet-header</code>, <code>m-phone-field</code></td>
+          <td><code>a-label</code>, <code>a-field</code>, <code>a-helper</code>, <code>a-btn</code></td>
+          <td><code>--size-border</code>, <code>--color-border-field</code>, <code>--radius-card</code></td>
+        </tr>
+        <tr>
+          <td>Code entry</td><td><code>o-signup-sheet</code></td><td><code>m-otp-group</code>, <code>m-resend-row</code></td>
+          <td><code>a-otp-cell</code>, <code>a-link</code>, <code>a-spinner</code></td>
+          <td><code>--size-otp-cell</code>, <code>--color-primary-12</code>, <code>--dur-quick</code></td>
+        </tr>
+        <tr>
+          <td>Privacy card</td><td><code>o-signup-sheet</code></td><td><code>m-privacy</code></td>
+          <td>—</td><td><code>--text-caption2</code>, <code>--leading-body</code>, <code>--sp-2h</code></td>
+        </tr>
+        <tr>
+          <td>Refusal</td><td><code>o-outcome-panel</code></td><td><code>m-alert</code></td>
+          <td><code>a-icon-wrap--mark</code>, <code>a-btn</code></td>
+          <td><code>--color-secondary-bg</code>, <code>--color-error-text</code>, <code>--size-stage-lg</code></td>
+        </tr>
+        <tr>
+          <td>Update required</td><td><code>o-status-page</code></td><td><code>m-figure</code></td>
+          <td><code>a-icon-wrap--mark</code>, <code>a-btn</code></td>
+          <td><code>--color-warning-*</code>, <code>--text-nano</code>, <code>--tracking-caps-wide</code></td>
+        </tr>
+        <tr>
+          <td>Device chrome</td><td>—</td><td><code>m-notch</code>, <code>m-status-bar</code></td>
+          <td><code>a-notch</code></td><td><code>--color-hardware</code>, <code>--size-status-bar</code>, <code>--radius-phone</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ DECISIONS ═════════════════════════════════════════════════════ -->
+<section class="ds-section" id="decisions">
+  <h2>Decisions and open questions</h2>
+
+  <h3>Approved and done</h3>
+  <ul>
+    <li><strong>Linked CSS, no build.</strong> Eight layer files loaded by plain <code>&lt;link&gt;</code>. Verified to render identically over <code>file://</code> and http.</li>
+    <li><strong>Cascade layers.</strong> Order declared once. Every rule is filed by its owning block, not its target, so a screen's override stays with the screen.</li>
+    <li><strong>Gates keep their strictness.</strong> The three CLI gates learned to find linked CSS; not one assertion was relaxed.</li>
+  </ul>
+
+  <h3>Implementation assumptions</h3>
+  <ul>
+    <li>A rule is filed by the <em>leftmost</em> block in its selector. <code>.o-auth-hero__actions .a-btn</code> is the hero's rule about a button it contains, so it lives with the hero.</li>
+    <li>An at-rule is filed by what it contains, so a media override lands beside the rules it overrides rather than in front of them.</li>
+  </ul>
+
+  <h3>Inconsistencies that need a design ruling</h3>
+  <ul>
+    <li>
+      <strong>The resend button, three rules deep.</strong> Four rules of equal specificity
+      style one button — two on the atom, two on the organism — and which one wins was
+      decided entirely by the order they were typed in. Layers would have flipped two of
+      them, so they are pinned to preserve today's rendering. Today the countdown renders
+      at weight 500 from the atom, overriding the 600 the organism was written to set. One
+      of those two rules is dead intent and somebody should say which.
+    </li>
+    <li>
+      <strong>The semantic spacing layer.</strong> Specified, not built. It requires deciding,
+      case by case, which of two near-identical values is intended, and it moves pixels.
+    </li>
+    <li>
+      <strong>Same-level nesting.</strong> Three components hold another of their own level —
+      <code>a-icon-btn</code> holds <code>a-badge</code>, <code>m-app-bar</code> holds
+      <code>m-brand-lockup</code>, <code>m-alert</code> holds <code>m-privacy</code>. Strictly
+      each pair is one level up. The build deliberately does not fail on these, because a gate
+      that fails on judgement calls teaches people to reach for the exception list.
+    </li>
+  </ul>
+
+  <h3>Known limits of this page</h3>
+  <ul>
+    <li>Opened straight off disk, a browser will not let this page read the <em>authored</em> form of a token — only its resolved value. Serve the folder over http for the full table.</li>
+    <li>Organisms are described rather than rendered here; they are full screens and need the device frame to make sense.</li>
+    <li>Only <code>index.html</code> is migrated. The app's components are documented in its own in-page spec panel until it is.</li>
+  </ul>
+
+  <p class="ds-foot">
+    Source: <code>src/css/*.css</code> · Screens: <code>index.html</code> ·
+    Gates: <code>tools/check.js</code>, <code>tools/sweep.js</code>, <code>tools/journey.js</code>,
+    and the in-page Self-check on the rail's Design notes tab.
+  </p>
+</section>
+
+</main>
+</div>
+
+<script src="docs.js"></script>
+</body>
+</html>

@@ -96,6 +96,58 @@ function literal(s, declaration) {
    body is not resolved until it runs, and nothing here runs one. */
 const evaluate = (s, declaration) => new Function(`return (${literal(s, declaration)});`)();
 
+/* ── Finding the stylesheet ──────────────────────────────────────────────
+   A page's CSS used to be one inline <style>. index.html now links it in
+   layers instead, so every gate below would have found an empty stylesheet
+   and passed on nothing at all - which is worse than failing.
+
+   This returns exactly what those gates were written against: the page's own
+   CSS as one flat string. Inline blocks still count, linked files are read in
+   link order, and the @layer wrapper is unwrapped so a rule sits at the same
+   brace depth it did when it was inline. Nothing is filtered and nothing is
+   relaxed; the assertions are unchanged and simply see the whole sheet again.
+
+   Unwrapping matters more than it looks. Two gates read only depth-zero rules
+   to tell a bare element selector from one nested in a media query, and every
+   rule in a linked file is one level deeper than it used to be. Left wrapped,
+   the base-layer gate would have quietly stopped seeing anything. */
+function cssOf(name) {
+  const page = src[name];
+  let out = [...page.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+  const base = path.dirname(path.join(ROOT, name));
+  for (const m of page.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)) {
+    const href = (m[0].match(/href="([^"]+)"/) || [])[1];
+    if (!href || /^(https?:)?\/\//.test(href)) { continue; }
+    const file = path.join(base, href);
+    if (!fs.existsSync(file)) {
+      fail(`${name}: links '${href}', which is not a file in the repo`);
+      continue;
+    }
+    out += '\n' + fs.readFileSync(file, 'utf8');
+  }
+  return unwrapLayers(out);
+}
+
+/* Remove `@layer name {` and its matching close, leaving the rules inside at
+   the depth they were written at. A layer statement - `@layer a, b;` - has no
+   block and simply goes. */
+function unwrapLayers(css) {
+  let out = '', i = 0;
+  while (i < css.length) {
+    const m = /^@layer\s+([^;{]*)([;{])/.exec(css.slice(i));
+    if (!m) { out += css[i]; i++; continue; }
+    if (m[2] === ';') { i += m[0].length; continue; }
+    let depth = 0, j = i + m[0].length - 1;
+    for (; j < css.length; j++) {
+      if (css[j] === '{') { depth++; }
+      else if (css[j] === '}') { depth--; if (!depth) { break; } }
+    }
+    out += css.slice(i + m[0].length, j);
+    i = j + 1;
+  }
+  return out;
+}
+
 /* ── 1. The inline script parses ─────────────────────────────────────── */
 
 for (const name of FILES) {
@@ -256,8 +308,10 @@ function productTokens(s) {
 }
 
 {
-  const a = productTokens(src[SIGNUP]);
-  const b = productTokens(src[ONBOARD]);
+  /* The scale is linked now, not inlined, so it is read through cssOf
+     like every other gate rather than scraped off the page source. */
+  const a = productTokens(cssOf(SIGNUP));
+  const b = productTokens(cssOf(ONBOARD));
   for (const [k, v] of a) {
     if (!b.has(k)) { fail(`${ONBOARD} is missing \`${k}\`, which ${SIGNUP} declares — the scale is meant to be a verbatim copy`); }
     else if (b.get(k) !== v) {
@@ -272,8 +326,7 @@ function productTokens(s) {
   /* Any OTHER block that is only custom properties is a token block the
      gate cannot see - a theme landing outside the sanctioned scopes. */
   for (const name of FILES) {
-    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const css = cssOf(name).replace(/\/\*[\s\S]*?\*\//g, ' ');
     for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       const sel = m[1].trim().replace(/\s+/g, ' ');
       if (TOKEN_SCOPES.includes(sel) || sel.startsWith('@')) { continue; }
@@ -302,8 +355,7 @@ function productTokens(s) {
     'background: #FFFFFF',           /* the QR quiet zone must be spec-white, not theme-white */
   ];
   for (const name of FILES) {
-    let css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-      .map((m) => m[1]).join('\n');
+    let css = cssOf(name);
     for (const scope of TOKEN_SCOPES) {
       let i;
       while ((i = css.indexOf(scope + ' {')) !== -1) {
@@ -460,8 +512,7 @@ const SHARED_DIVERGENCE = new Set([
 const SHARED_EXTENSION = new Set(['.m-notch', '.m-status-bar']);
 
 function sharedRules(name) {
-  const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-    .map((m) => m[1]).join('\n')
+  const css = cssOf(name)
     .replace(/\/\*[\s\S]*?\*\//g, ' ');
   const rules = new Map();
   for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -506,7 +557,7 @@ function sharedRules(name) {
   }
   /* The high-contrast law must exist on both sides, not one. */
   for (const name of FILES) {
-    if (!/@media \(forced-colors: active\)/.test(src[name])) {
+    if (!/@media \(forced-colors: active\)/.test(cssOf(name))) {
       fail(`${name}: no @media (forced-colors: active) block - colour-only states have no restatement`);
     }
   }
@@ -533,8 +584,7 @@ const BASE_DIVERGENCE = new Set([
 ]);
 
 function baseRules(name) {
-  const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-    .map((m) => m[1]).join('\n')
+  const css = cssOf(name)
     .replace(/\/\*[\s\S]*?\*\//g, ' ');
   const rules = new Map();
   /* Depth-tracked, because the reset layer is top level and nothing else
@@ -601,7 +651,7 @@ function baseRules(name) {
 {
   try {
     const spec = literal(stripJsComments(scriptsOf(src[SIGNUP]).join('\n')), 'var RECIPES =');
-    const css = [...src[SIGNUP].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+    const css = cssOf(SIGNUP);
     for (const m of spec.matchAll(/name: '\.([\w-]+)'/g)) {
       /* identity class: the a-field shell carries the declarations,
          per the naming gate's register */
@@ -731,8 +781,7 @@ const USED_ONLY = new Set([
 const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|leading|tracking|radius|shadow|sp|size|press|z|ease|dur|d)-/;
 
 for (const name of FILES) {
-  const styleBlocks = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-    .map((m) => m[1]).join('\n');
+  const styleBlocks = cssOf(name);
   const styleNoComments = styleBlocks.replace(/\/\*[\s\S]*?\*\//g, ' ');
 
   /* Classes the stylesheets style. */
@@ -893,8 +942,7 @@ function declaresOwnColour(target) {
   const esc = target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const own = new RegExp('^\\.' + esc + '(\\[[^\\]]*\\])?(:[a-z-]+)?$');
   for (const name of FILES) {
-    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const css = cssOf(name).replace(/\/\*[\s\S]*?\*\//g, ' ');
     for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       for (let sel of m[1].split(',')) {
         sel = sel.trim().replace(/\s+/g, ' ');
@@ -907,8 +955,7 @@ function declaresOwnColour(target) {
 
 {
   for (const name of FILES) {
-    const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-      .map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const css = cssOf(name).replace(/\/\*[\s\S]*?\*\//g, ' ');
     for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       const decls = m[2];
       for (let sel of m[1].split(',')) {

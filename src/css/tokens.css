@@ -1,0 +1,477 @@
+/* ══════════════════════════════════════════════════════════════════════
+   TOKENS
+
+   The scale. Every value the product is allowed to use, and nothing that uses them.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* The layer order, declared once for the whole product.
+
+   A later layer beats an earlier one whatever the specificity, which is the
+   point: a screen's override no longer has to out-specify an atom, it simply
+   lives further down this list. Utilities sit last of the product layers
+   because a utility that can be beaten is not a utility, and tooling sits
+   after them because it draws over the product it documents. */
+@layer tokens, foundations, atoms, molecules, organisms, templates, utilities, developer;
+
+@layer tokens {
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ENGENXT · HOME AND SIGN UP
+
+   Atomic design levels as prefixes, BEM for structure, data-* attributes for
+   runtime state. State is never a class.
+
+     Block names are kebab-case; multi-word element and modifier names are
+     camelCase (__noteMore). State is never a class - it rides data-*.
+
+     tokens     CSS custom properties    --color-primary
+     atoms      a-                       a-btn, a-field, a-otp-cell
+     molecules  m-                       m-phone-field, m-keyboard
+     organisms  o-                       o-auth-hero, o-signup-sheet
+     templates  t-                       t-device-frame
+     pages      p-                       p-signup-demo
+     utilities  u-                       u-visually-hidden
+     developer  d-                       d-panel, d-stateNav, d-inspect
+                                         Tooling. Never ships. No product
+                                         component may read a --d- token.
+
+   THE FULL SPECIFICATION IS IN THE PANEL, not here. Turn on Design specs in
+   the sidebar for every token, every component recipe with its states and its
+   accessibility contract, the measured contrast pairs, and the rules. This
+   header is a map, deliberately not a second copy: a manifest in a comment
+   goes stale silently, and this one had, naming a template that no longer
+   exists and an attribute that never did.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ TOKENS ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --color-primary:       #1650B8;
+  --color-primary-dark:  #0D3A8A;
+  --color-primary-bg: #EEF3FF;
+  /* Derived, not restated: the numeric step is the mix percentage, so a
+     rebrand is one hex edit per hue and the steps cannot drift off it. */
+  --color-primary-06: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  --color-primary-08: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  --color-primary-12: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --color-primary-18: color-mix(in srgb, var(--color-primary) 18%, transparent);   /* the halo on the you-are-here dot */
+  --color-primary-30: color-mix(in srgb, var(--color-primary) 30%, transparent);   /* gradient stop and button shadow */
+
+  --color-secondary:     #E2231A;
+  --color-secondary-bg:  #FDEEEE;
+  --color-secondary-12: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+  --color-secondary-25: color-mix(in srgb, var(--color-secondary) 25%, transparent);
+  --color-secondary-30: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+  --color-secondary-40: color-mix(in srgb, var(--color-secondary) 40%, transparent);
+  --color-secondary-04: color-mix(in srgb, var(--color-secondary) 4%, transparent);
+  --color-secondary-18: color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  /* The faintest step, for a wash rather than a surface. Declared because
+     an undefined custom property takes its whole declaration down with it,
+     silently, which is how the reward meter went missing. */
+  --color-secondary-05: color-mix(in srgb, var(--color-secondary) 5%, transparent);
+
+  /* The base the two steps below are alpha of. It was never declared, and the
+     reward meter's fill asks for it, so the fill's gradient was invalid and the
+     bar rendered as nothing at all. An undefined custom property fails without
+     a word, which is how a designed element goes missing and stays missing. */
+  --color-tertiary:    #3DBCD4;
+  --color-tertiary-04: color-mix(in srgb, var(--color-tertiary) 4%, transparent);
+  --color-tertiary-18: color-mix(in srgb, var(--color-tertiary) 18%, transparent);
+
+  /* Semantic */
+  --color-success:       #166832;    /* 5.09:1 on the sheet glass */
+  --color-success-bg:    #E8F5EE;
+  --color-success-20: color-mix(in srgb, var(--color-success) 20%, transparent);
+  /* The verdict's light. The bloom over a cleared check reads this step:
+     enough to warm the top of the screen, faint enough that everything
+     with a measured contrast on white keeps it. */
+  --color-success-12: color-mix(in srgb, var(--color-success) 12%, transparent);
+  --color-warning:       #9C4708;    /* 4.69:1 on the sheet glass */
+  --color-warning-bg:    #FDF1E3;
+  --color-warning-25: color-mix(in srgb, var(--color-warning) 25%, transparent);  /* --color-warning at 0.25, same hue */
+  --color-whatsapp-dark: #0B6B5F;               /* 5.13:1 on the sheet glass */
+  /* Error TEXT is darker than the brand red. --color-secondary is the Engen red in
+     the logo, so it must not be darkened to satisfy a text contrast rule. */
+  --color-error-text:    #B81510;    /* 4.74:1 on the composited sheet */
+
+  /* Text */
+  --color-text-primary:   #0d1e2a;
+  --color-text-secondary: #4C5973;   /* 5.01:1 on the composited sheet */
+  --color-text-tertiary:  #6C6C70;   /* disabled and placeholder, 4.69:1 on sunken.
+                                        3.72:1 on the sheet, so it is for inert
+                                        controls only, never for a line being read. */
+  --color-text-muted:     #b0bcd0;   /* decorative only, never load-bearing text */
+  --color-text-on-dark:   #ffffff;
+
+  /* On-dark ramp, for anything sitting on the hero */
+  --color-on-dark-strong: rgba(255,255,255,0.85);
+  --color-on-dark-mid:    rgba(255,255,255,0.72);
+  --color-on-dark-soft:   rgba(255,255,255,0.60);
+  --color-on-dark-faint:  rgba(255,255,255,0.45);
+  /* The primary is too dark to read on the hero, so the dark screens get a
+     lifted version of it. The steps mirror --color-on-dark-* above: strong and
+     soft carry text, line draws an edge, fill sits behind an icon.
+     Soft is 0.90 rather than 0.80 because 0.80 composites to 4.40:1 on the
+     lightest stop of the hero, which is under AA for the small uppercase
+     labels this colour is for. */
+  --color-accent-on-dark:        #639EFF;
+  --color-accent-on-dark-soft:   color-mix(in srgb, var(--color-accent-on-dark) 90%, transparent);
+  --color-accent-on-dark-line:   color-mix(in srgb, var(--color-accent-on-dark) 28%, transparent);
+  /* Points, on a dark surface. The warning amber is mixed for white and
+     goes muddy on navy, so this is its on-dark twin. It is the same hue the
+     star carries wherever points are shown. */
+  --color-points-on-dark:      #FFB454;
+  --color-points-on-dark-glow:   color-mix(in srgb, var(--color-points-on-dark) 35%, transparent);
+  --color-accent-on-dark-fill:   color-mix(in srgb, var(--color-accent-on-dark) 15%, transparent);
+  --color-on-dark-line:   rgba(255,255,255,0.18);
+  --color-on-dark-fill:   rgba(255,255,255,0.10);
+
+  /* Surface and border */
+  --color-surface:        #ffffff;
+  --color-surface-sunken: #F2F2F7;
+  --color-surface-page:   #e4e6eb;
+  --color-surface-hover:  #f5f5f5;
+  --color-border:         rgba(0,0,0,0.08);
+  /* For an edge that has to survive daylight. The 8% line is right between
+     two calm surfaces and disappears where a fixed bar meets the content
+     scrolling under it, which is the one place the edge is load bearing. */
+  --color-border-strong:  rgba(0,0,0,0.14);
+  /* The bar's glass. Denser than the panel because labels sit directly on
+     it and whatever scrolls underneath must not lift them. */
+  --glass-bar-bg:         rgba(255,255,255,0.78);
+  --color-border-light:   rgba(0,0,0,0.06);
+  --color-border-field:   rgba(0,0,0,0.45);   /* 3.2:1 against the field fill */
+  --color-scrim:          rgba(0,0,0,0.45);
+  --color-scrim-deep:     rgba(10,22,40,0.72);
+
+  /* Hero */
+  --color-hero-1: #0a1628;
+  --color-hero-2: #0d2040;
+  --color-hero-3: #0a1830;
+  /* The scan screen's own dark: one step off the hero, so drawn camera
+     footage does not read as the marketing sky. Ordinals mark gradient
+     stops, top to base - the one numeric suffix that is not an alpha
+     percentage; --color-hero-* reads the same way. */
+  --color-scan-1: #0B1220;
+  --color-scan-2: #16203A;
+  --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+
+  /* Hover, by what the control is standing on. Two intentions, and the file
+     had both already without naming either: a control with no fill of its own
+     gains a faint wash, and a control sitting on a sunken plate lifts toward
+     white instead. Named so the next component picks one rather than
+     inventing a third. */
+  --color-hover-wash:   var(--color-border-light);
+  --color-hover-lift:   var(--color-surface-hover);
+  --color-hover-onDark: var(--color-on-dark-line);
+
+  /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
+  --color-focus:      var(--color-primary-dark);
+  --color-handle:     rgba(0,0,0,0.25);
+  --color-hardware:   #000;   /* the physical bezel, not a brand colour */
+  --color-switch-track:   #8A91A3;   /* 3:1 against white */
+  --color-focus-halo: rgba(255,255,255,0.92);
+
+  /* Android system keyboard. Not app surface: this is the operating system's
+     chrome, so it holds its own palette rather than borrowing EngenXT's. */
+  --kb-surface:    #ECEFF3;
+  --kb-key:        #FFFFFF;
+  --kb-key-alt:    #DCE0E6;
+  --kb-divider:    #D2D7DE;
+  --kb-hint:       #C7CDD6;
+  --kb-text:       #1B1E23;
+  --kb-sub:        #6B7280;
+  --kb-accent:     #1A73E8;
+  --kb-on-accent:  #FFFFFF;
+
+  /* Type */
+  /* --font-* is a sanctioned family beside --color-/--sp-/--text-*: the
+     faces; --text-* stays the size ramp. */
+  --font-sans: "SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-mono: "SF Mono","Menlo",monospace;
+  /* Between the title and the hero. A greeting set light at this size reads
+     as someone speaking; the same words at 22px read as a field label, and
+     at 42px they read as a headline. */
+  --text-display:  30px;
+  --text-hero:     42px;
+  /* Above the hero, and the only step that is. It is the live litre
+     count on the filling screen: the one figure a driver watches from
+     arm's length while fuel goes in, so it is sized for the moment
+     rather than for the page. It was a raw 64px, which meant the ramp
+     claimed a 42px ceiling it did not have and the number was the one
+     thing on that screen which did not answer Large text. */
+  --text-figure:   64px;
+  --text-title:    22px;
+  --text-lead:    20px;
+  --text-heading:  18px;
+  --text-subhead:  17px;
+  --text-callout:  16px;
+  --text-body:     15px;
+  --text-footnote: 14px;
+  --text-caption:  13px;
+  --text-caption2: 12px;
+  --text-micro:    11px;
+  --text-nano:     10px;
+
+  /* Weight. The vocabulary was already this short - four values carry
+     ninety-six per cent of the uses - it simply had no names, so nothing
+     could tell a considered 800 from a typo. Naming it is what makes it
+     enforceable: a stray 750 is now visibly not one of these.
+
+     The three at the ends are deliberate and each is used a handful of
+     times: black is the station name a driver reads at a pump, light is the
+     step title set to sound like someone speaking, regular is body prose
+     that must not shout. */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-heavy:    800;
+  --weight-black:    900;
+
+  /* Press. Two depths, because there are two kinds of thing to press: a
+     control you aim at, and a surface you tap. The file already used exactly
+     these two - 0.97 on the button, 0.985 on the rows and cards - plus one
+     0.99 on a station row that was doing the subtle job at a value of its
+     own. Naming them is what stops a third appearing.
+
+     The camera shutter keeps its own 0.92 and says why: it is imitating a
+     physical shutter, not a button, and the travel is the point. */
+  --press-firm:   0.97;
+  --press-subtle: 0.985;
+
+  /* Leading. Four jobs, which is what the file was already doing with
+     fourteen values: figures that must sit flush, display type that wants to
+     be tight, a two-line label that wants a little air, and running prose.
+     1.45, 1.5, 1.55 and 1.6 were four ways of saying "body"; 1.05, 1.08,
+     1.1, 1.18 and 1.2 were five ways of saying "headline". Nobody can tell
+     those apart, and having them meant every new component picked a number
+     rather than a job. */
+  --leading-flush: 1;
+  --leading-tight: 1.1;
+  --leading-snug:  1.35;
+  --leading-body:  1.5;
+
+  /* Tracking. Negative as type grows, positive when it goes uppercase -
+     which is the one part of the old spread that was real typography rather
+     than drift. These are the steps that repeat; a handful of headline
+     optics keep their own value and say so where they are written. */
+  --tracking-tight:     -0.3px;
+  --tracking-snug:      -0.5px;
+  --tracking-display:   -1px;
+  --tracking-caps:      0.08em;
+  --tracking-caps-wide: 0.16em;
+
+  /* Radius */
+  --radius-pill:   999px;
+  --radius-phone:  47px;   /* the real corner at 390pt */
+  --radius-notch:  22px;
+  --radius-sheet:  28px;
+  --radius-card:   16px;
+  --radius-card-sm:12px;
+  --radius-chip:   10px;
+  --radius-circle: 50%;
+
+  /* Elevation. One light source, from above. */
+  /* Elevation lives in this family. Focus rings and glows are optics,
+     drawn in place from colour tokens - they are not elevations. */
+  --shadow-phone:     0 60px 200px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.07);
+  --shadow-sheet:     inset 0 var(--size-hairline) 0 rgba(255,255,255,0.65),
+                      0 -12px 40px rgba(0,0,0,0.32), 0 -2px 8px rgba(0,0,0,0.16);
+  --shadow-btn:       0 6px 16px var(--color-primary-30), 0 1px 3px color-mix(in srgb, var(--color-primary-dark) 20%, transparent), inset 0 1px 0 rgba(255,255,255,0.16);
+  --shadow-btn-white: 0 8px 32px rgba(0,0,0,0.40);
+  --shadow-card:      0 1px 2px rgba(0,0,0,0.04), 0 4px 20px color-mix(in srgb, var(--color-primary) 9%, transparent);
+  /* A second step, for a control inside a row you glance past rather than a
+     destination you aim at. One blur used at two sizes is not a scale: the
+     same 20px on a 64px object reads far heavier than on a card three times
+     its area, so the chips optically floated above the tiles. */
+  --shadow-card-sm:   0 1px 2px rgba(0,0,0,0.04), 0 2px 8px color-mix(in srgb, var(--color-primary) 7%, transparent);
+  --shadow-field:     0 2px 14px var(--color-border-light);
+  --shadow-knob:      0 1px 3px rgba(0,0,0,0.25);
+  --shadow-overlay:   0 24px 64px rgba(0,0,0,0.30);
+  --shadow-toast:     0 4px 20px rgba(0,0,0,0.30);
+  --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
+  --shadow-brand:     0 4px 16px var(--color-secondary-40);
+  --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
+
+  /* Space. A 4px base with three half steps, because 6, 10 and 18 are
+     structural here rather than exceptional, and a scale should be honest. */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+
+  /* Hardware. The status bar keeps its own height token because layout has to
+     stop short of it, and the notch and time are drawn against the same value. */
+  --size-status-bar: 78px;
+  --sp-1h: 6px; --sp-2h: 10px;
+
+  /* Size. Values that are neither spacing nor type. */
+  --size-otp-cell: 52px;
+  --size-control:  56px;   /* primary control height */
+  --size-target:   48px;   /* minimum tap target */
+  /* The plate an icon sits on. a-icon-wrap is the atom that draws one,
+     and three molecules were each restating its width and height in raw
+     pixels - 40 here, 44 twice - so the object had a size the scale had
+     never heard of. Two steps, because the row plate and the card plate
+     are genuinely different objects: 40 sits in a list row, 44 heads a
+     card. */
+  --size-plate:    40px;
+  --size-plate-lg: 44px;
+  --size-action:   52px;   /* the primary CTA's one height, wherever it stands */
+  --size-hairline:      0.5px;
+  /* The edge a control draws around itself. 0.5px above is the finest
+     line the scale owns and its one real border is the drawn Android
+     keyboard - OS chrome, not this product. The width every field here
+     actually uses was 1.5, written by hand in all three of them. The
+     decorative rings keep their own literals: each states a reason, and
+     tying a field's edge to six animation rings would be worse than the
+     raw values it replaced. */
+  --size-border:        1.5px;
+
+  /* Object sizes. The scale had six members and none of them was the size of
+     a thing, so every round object in the file carried a number somebody
+     typed: a tick beside a line was 24px on the fuel screen, 26px on home and
+     28px on the check. Three components, one job, three answers.
+
+     These are the sizes of things, named for what the thing is doing.
+
+     --size-mark is a mark beside a line of text. --size-mark-lg is the same
+     mark while its row is still being answered, and --size-mark-sm is what it
+     shrinks to once the answer is a receipt rather than news - two states of
+     one component, which is a reason, unlike the three above.
+
+     --size-stage is a mark that leads a screen, and --size-stage-lg the one
+     that leads a ceremony. */
+  --size-mark:     26px;
+  --size-mark-sm:  22px;
+  --size-mark-lg:  34px;
+  --size-object:   36px;
+  --size-stage:    64px;
+  --size-stage-lg: 88px;
+  --size-glyph:    38px;
+  --size-control-sm: 32px;
+
+  /* Stacking. The only dimension where components genuinely couple, so it is
+     the one that most needed a scale. Hardware sits above everything the app
+     can draw. */
+  /* Page layers. A sibling raise inside one component (a pressed pin
+     above its neighbours) states a bare small integer instead - these
+     tokens name rooms, not shelves. */
+  --z-base:     0;
+  --z-content:  2;
+  --z-scrim:    9;
+  --z-sheet:    10;
+  --z-overlay:  30;
+  --z-toast:    40;
+  --z-hardware: 50;
+  /* Tooling overlays sit between the app and the hardware, never above it. */
+  --z-tool:     45;
+  --z-tool-top: 60;
+
+  /* Glass. Near opaque, because the sheet sits over a near-black hero and
+     0.72 alpha put every piece of secondary text below 2.5:1. */
+  --glass-push-bg: rgba(250,250,252,0.92); /* the OS's notification card, not
+                                              an app surface: near-opaque so
+                                              the news reads over anything */
+  --glass-sheet-bg: rgba(228,235,250,0.35);
+  --glass-sheet-bd: blur(40px) saturate(180%) contrast(0.25) brightness(2.10);
+  --glass-sheet-fallback: #E4EBFA;
+  --glass-card-bg:  rgba(255,255,255,0.62);
+
+  /* Light glass, for a panel sitting on the page rather than over the hero.
+     The sheet tokens above are tuned for a near-black backdrop and go milky on
+     a light one, so this is a second, measured pair rather than a reuse.
+
+     0.55 over the page grey lands the panel at roughly #F4F5F8, which holds
+     --color-text-primary at 14.6:1 and --color-text-secondary at 6.2:1, so the
+     glass never costs a contrast ratio. The line is what makes it read as glass
+     rather than as a flat translucent box: a lit top edge, nothing else. */
+  --glass-panel-bg:   rgba(255,255,255,0.55);
+  --glass-panel-bd:   blur(28px) saturate(180%);
+  --glass-panel-line: rgba(255,255,255,0.70);
+  /* The card nested inside a panel. Denser than its parent, because the thing
+     inside the glass has to sit on top of it rather than dissolve into it. */
+  --glass-inset-bg:   rgba(255,255,255,0.78);
+
+  /* The bloom behind home. Three of the brand hues at low alpha, so the page
+     has depth without the screen carrying a picture, and nothing under it ever
+     drops below its measured contrast. Colour, not decoration: the same three
+     hues the product is built from. */
+  --gradient-bloom:
+    radial-gradient(58% 42% at 22% 26%, var(--color-primary-12) 0%, transparent 70%),
+    radial-gradient(52% 38% at 82% 34%, var(--color-tertiary-18) 0%, transparent 68%),
+    radial-gradient(64% 40% at 62% 12%, var(--color-secondary-05) 0%, transparent 72%),
+    radial-gradient(70% 45% at 38% 58%, var(--color-warning-bg) 0%, transparent 66%);
+
+  /* Motion */
+  --ease-out:      cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
+  --ease-emphasis: cubic-bezier(0.32,0.72,0,1);
+  --ease-spring:   cubic-bezier(.34,1.4,.64,1);
+  /* The interaction scale. Choreographed motion (a lens crossfade, a
+     pour) may state its own time in place, beside a comment saying so. */
+  --dur-fast:  0.12s;
+  --dur-quick: 0.24s;
+  --dur-base:  0.30s;
+  /* A named motion role, kept deliberately: sheet travel is a distance,
+     not a speed, and every sheet must move alike. */
+  --dur-sheet: 0.38s;
+  --dur-slow:  0.42s;
+}
+
+/* Large text mode re-points the ramp. Components read tokens, so they follow. */
+[data-text="large"] {
+  --text-display:  34px;   /* the ramp's +4, like the hero's */
+  --text-hero:     46px;
+  --text-figure:   68px;   /* the ramp's +4 at this end, like the hero's */
+  --text-title:    24px;
+  --text-lead:    22px;
+  --text-heading:  20px;
+  --text-subhead:  19px;
+  --text-callout:  18px;
+  --text-body:     17px;
+  --text-footnote: 16px;
+  --text-caption:  15px;
+  --text-caption2: 14px;
+  --text-micro:    13px;
+  --text-nano:     12px;
+  --size-otp-cell: 60px;   /* the square has to keep containing its glyph */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DEVELOPER LAYER · d-
+   Not part of the product. This is the handoff tooling: the token reference,
+   the composition overlay, the 4px grid and the element inspector.
+   It is prefixed d- and kept out of the atomic layers on purpose, so nobody
+   ships it by accident.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Developer layer tokens. Separate from the product scale on purpose:
+     the boundary runs one way: tooling reads product tokens because it
+     documents them, but no product component may read a --d- token. */
+  --d-level-atom:      #2563EB;
+  --d-level-molecule:  #7C3AED;
+  --d-level-organism:  #059669;
+  --d-level-template:  #B45309;
+  --d-surface-ink:     var(--color-text-primary);
+  --d-accent-token:    #7DD3FC;
+  --d-accent-missing:  #FCA5A5;
+  --d-accent-inspect:  #38BDF8;
+  --d-inspect-fill:    rgba(56,189,248,0.12);
+  --d-inspect-edge:    rgba(0,0,0,0.35);
+  --d-grid-line:       rgba(226,35,26,0.16);
+  --d-grid-line-soft:  rgba(226,35,26,0.10);
+  --d-copy-hover:      #E2EAFB;
+  --d-rule:            #f4f5f7;
+  --d-on-ink-soft:     rgba(255,255,255,0.45);
+  --d-on-ink-line:     rgba(255,255,255,0.14);
+  --d-panel-width:     420px;
+}
+
+}

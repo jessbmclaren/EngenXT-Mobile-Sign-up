@@ -1,0 +1,20 @@
+/* ══════════════════════════════════════════════════════════════════════
+   UTILITIES
+
+   One job, no opinion. Loaded last so it can always win.
+
+   Lifted verbatim from the page's inline <style>. Rule text is unchanged;
+   only which file it lives in is new. Load order is set by the <link>
+   tags in the page and by the @layer statement in tokens.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+
+/* ══ UTILITIES ═══════════════════════════════════════════════════════════ */
+.u-visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+}

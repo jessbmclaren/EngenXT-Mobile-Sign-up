@@ -40,6 +40,24 @@ for (const name of ['index.html', 'engenxt-onboarding.html']) {
 </style>
 </head>`, 1);
   fs.writeFileSync(path.join(STAGE, name), src);
+  stageAssets(STAGE);
+}
+/* The pages link their stylesheet now instead of inlining it, and a harness
+   written to a temp directory would leave those links pointing at nothing -
+   the page would render unstyled and every check would report on a blank
+   screen rather than on the product. Copying src/ next to the staged page
+   keeps the relative paths true. Recursive, and only what the pages ask for. */
+function stageAssets(dir) {
+  const from = path.join(ROOT, 'src');
+  if (!fs.existsSync(from)) { return; }
+  const copy = (a, b) => {
+    fs.mkdirSync(b, { recursive: true });
+    for (const entry of fs.readdirSync(a, { withFileTypes: true })) {
+      const s = path.join(a, entry.name), d = path.join(b, entry.name);
+      if (entry.isDirectory()) { copy(s, d); } else { fs.copyFileSync(s, d); }
+    }
+  };
+  copy(from, path.join(dir, 'src'));
 }
 
 function cdp(ws) {
