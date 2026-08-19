@@ -436,6 +436,21 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-on-dark); font-weight: var(--weight-bold);
   box-shadow: var(--shadow-btn);
 }
+/* The outline button on a dark screen. The scanner used to get this by
+   reaching into the atom - `.o-scan__actions .a-btn--outline` set the border
+   and the ink from the organism - which is the Composition law's own worked
+   example of what a parent may not do. The variant was already promised in
+   the button's inventory entry and simply had never been written.
+
+   Self-contained rather than stacked on --outline, because the entry lists
+   these as alternatives to pick one of. Not to be confused with --onDark,
+   which is the solid white button and carries a shadow with it. */
+.a-btn--outlineOnDark {
+  min-height: var(--size-target); background: transparent;
+  color: var(--color-text-on-dark);
+  border: 1px solid var(--color-on-dark-line);
+  font-weight: var(--weight-semibold);
+}
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
 /* Disabled is driven by the real attribute as well as the ARIA one, so the
    control is honestly inactive rather than merely greyed. */
@@ -715,10 +730,21 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-secondary); border-radius: var(--radius-chip);
   box-shadow: var(--shadow-brand);
 }
+/* The ink defaults to the light surface, and the dark hero asks for its own.
+   It used to be the other way round: the name was written in the hero's white
+   and the app's home bar - a light surface - reached in with
+   `.o-home .m-brand-lockup__name` to put it back. That is a parent restyling a
+   child's insides, which the Composition law forbids in as many words, and it
+   was invisible to the parity gate, which drops any rule whose classes do not
+   all root into the manifest. So the gate went on proving the lockup identical
+   in both files while the two files rendered it in different colours.
+   Inverted, and the exception now carries a modifier, the way a-btn, a-link
+   and a-icon-wrap already do. */
 .m-brand-lockup__name {
-  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-on-dark);
+  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-primary);
   letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
 }
+.m-brand-lockup--onDark .m-brand-lockup__name { color: var(--color-text-on-dark); }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
   font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
@@ -805,17 +831,22 @@ button { background: none; border: none; color: inherit; }
 }
 .m-sheet-header__close:hover { background: var(--color-border-light); }
 
-/* m-progress. The display lives here rather than in a script-written inline
+/* a-progress. An atom, not a molecule: it bonds nothing. It is one line of
+   text with a span inside it that exists only as a textContent hook, and a
+   group of one is not a group - the same reasoning that files a-scrim as an
+   atom.
+
+   The display lives here rather than in a script-written inline
    style, because an inline display beats every rule in this file: the
    keyboard's own rule below asked for display:none and never once won. State
    is an attribute, and the attribute is the one the platform already has. */
-.m-progress {
+.a-progress {
   display: flex;
   font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
   margin-bottom: var(--sp-4);
 }
-.m-progress[hidden] { display: none; }
+.a-progress[hidden] { display: none; }
 
 /* m-phone-field */
 .m-phone-field__prefix {
@@ -1074,7 +1105,7 @@ button { background: none; border: none; color: inherit; }
       rule beside the rest of the developer layer.)
    2. Orientation. A driver who is mid-type knows which step they are on, so
       the step counter is the least useful height on the screen. */
-.t-device-frame[data-keyboard="open"] .m-progress { display: none; }
+.t-device-frame[data-keyboard="open"] .a-progress { display: none; }
 /* 3. Instruction, but only where it has been acted on. On the number stage the
       subtitle says which number to use and the driver is now typing it. On the
       code stage it names the channel and the masked number, which is exactly
@@ -1855,7 +1886,7 @@ button { background: none; border: none; color: inherit; }
         </div>
 
         <div class="o-auth-hero__brand">
-          <div class="m-brand-lockup">
+          <div class="m-brand-lockup m-brand-lockup--onDark">
             <span class="m-brand-lockup__mark" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0v-6.998a2 2 0 0 0-.59-1.42L18 5"/><path d="M14 21V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v16"/><path d="M2 21h13"/><path d="M3 9h11"/></svg>
             </span>
@@ -1919,7 +1950,7 @@ button { background: none; border: none; color: inherit; }
             </button>
           </header>
 
-          <p class="m-progress" id="progress"><span id="progressLabel">Step 1 of 2</span></p>
+          <p class="a-progress" id="progress"><span id="progressLabel">Step 1 of 2</span></p>
 
           <!-- STAGE · NUMBER -->
           <div class="o-signup-sheet__stage" id="stageNumber">
@@ -5108,7 +5139,7 @@ button { background: none; border: none; color: inherit; }
         ['__name', 'var(--text-title) / 900. Its <em> is the brand red, not italic.'],
         ['__tag', 'var(--text-micro) / 500, uppercase, letter-spacing 1.5px, var(--color-on-dark-faint)']
       ], states: [['use', 'the hero only. It is the one place the brand speaks at full size.']] },
-    { name: '.m-progress', level: 'molecule', lines: [
+    { name: '.a-progress', level: 'atom', lines: [
         ['font', 'var(--text-micro) / 700, uppercase, letter-spacing 0.08em'],
         ['colour', 'var(--color-text-secondary)'],
         ['margin-bottom', 'var(--sp-4)']

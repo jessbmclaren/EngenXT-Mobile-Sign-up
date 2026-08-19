@@ -478,6 +478,21 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-on-dark); font-weight: var(--weight-bold);
   box-shadow: var(--shadow-btn);
 }
+/* The outline button on a dark screen. The scanner used to get this by
+   reaching into the atom - `.o-scan__actions .a-btn--outline` set the border
+   and the ink from the organism - which is the Composition law's own worked
+   example of what a parent may not do. The variant was already promised in
+   the button's inventory entry and simply had never been written.
+
+   Self-contained rather than stacked on --outline, because the entry lists
+   these as alternatives to pick one of. Not to be confused with --onDark,
+   which is the solid white button and carries a shadow with it. */
+.a-btn--outlineOnDark {
+  min-height: var(--size-target); background: transparent;
+  color: var(--color-text-on-dark);
+  border: 1px solid var(--color-on-dark-line);
+  font-weight: var(--weight-semibold);
+}
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
 .a-btn[aria-disabled="true"], .a-btn:disabled {
   background: var(--color-surface-sunken); color: var(--color-text-tertiary);
@@ -648,10 +663,21 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-secondary); border-radius: var(--radius-chip);
   box-shadow: var(--shadow-brand);
 }
+/* The ink defaults to the light surface, and the dark hero asks for its own.
+   It used to be the other way round: the name was written in the hero's white
+   and the app's home bar - a light surface - reached in with
+   `.o-home .m-brand-lockup__name` to put it back. That is a parent restyling a
+   child's insides, which the Composition law forbids in as many words, and it
+   was invisible to the parity gate, which drops any rule whose classes do not
+   all root into the manifest. So the gate went on proving the lockup identical
+   in both files while the two files rendered it in different colours.
+   Inverted, and the exception now carries a modifier, the way a-btn, a-link
+   and a-icon-wrap already do. */
 .m-brand-lockup__name {
-  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-on-dark);
+  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-primary);
   letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
 }
+.m-brand-lockup--onDark .m-brand-lockup__name { color: var(--color-text-on-dark); }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
   font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
@@ -1062,9 +1088,6 @@ button { background: none; border: none; color: inherit; }
 /* m-app-bar. The mark, the name and the two things reachable from anywhere. */
 .m-app-bar { display: flex; align-items: center; gap: var(--sp-2h); }
 .m-app-bar__actions { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
-/* The lockup was written for the dark hero, so on a light surface the name
-   takes the ink colour and only the XT keeps the brand red. */
-.o-home .m-brand-lockup__name { color: var(--color-text-primary); }
 
 /* a-icon-btn. A round target holding a single icon, and nothing else.
    One glyph size for the atom: 20px at stroke 2, Lucide's own weight, on
@@ -1908,9 +1931,6 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-3) var(--sp-4) var(--sp-5);
 }
 .o-scan__actions .a-btn { min-height: var(--size-action); }
-.o-scan__actions .a-btn--outline {
-  border-color: var(--color-on-dark-line); color: var(--color-text-on-dark);
-}
 
 /* a-shutter. The driver's own capture.
 
@@ -2860,16 +2880,27 @@ button { background: none; border: none; color: inherit; }
   from { opacity: .8; transform: scale(.7); }
   to   { opacity: 0;  transform: scale(2.1); }
 }
-.o-check[data-verdict="clear"] .m-verdict {
+/* The verdict carries its own answer. These four rules used to be written on
+   the organism - .o-check[data-verdict] .m-verdict - which meant every pixel
+   of this molecule's identity belonged to its parent: lifted out of the check
+   screen it rendered as a transparent pill holding an unfilled disc, and the
+   attribute that decided which answer it wore was on a different element
+   entirely. m-check, one section up, has always done this properly.
+
+   The screen still reads data-verdict too, and must: the wash behind the whole
+   check is the organism's, not this pill's. Both carry the attribute now,
+   which is the honest arrangement - each element states the thing it is
+   actually responsible for drawing. */
+.m-verdict[data-verdict="clear"] {
   background: var(--color-success-bg); color: var(--color-success);
   border-color: var(--color-success-20);
 }
-.o-check[data-verdict="clear"] .m-verdict__mark { background: var(--color-success); }
-.o-check[data-verdict="block"] .m-verdict {
+.m-verdict[data-verdict="clear"] .m-verdict__mark { background: var(--color-success); }
+.m-verdict[data-verdict="block"] {
   background: var(--color-secondary-bg); color: var(--color-error-text);
   border-color: var(--color-secondary-25);
 }
-.o-check[data-verdict="block"] .m-verdict__mark { background: var(--color-error-text); }
+.m-verdict[data-verdict="block"] .m-verdict__mark { background: var(--color-error-text); }
 
 /* The facts ride together on one raised card rather than as hairlines floating
    on the page: what is being authorised is a single object, and an object
@@ -4523,8 +4554,8 @@ button { background: none; border: none; color: inherit; }
           <button class="a-btn a-btn--primary" type="button" id="scanRetry" hidden>Try again</button>
           <button class="a-btn a-btn--primary" type="button" id="scanSettings" hidden>Open phone settings</button>
           <button class="a-btn a-btn--primary" type="button" id="scanPlateGo" hidden>Use this vehicle</button>
-          <button class="a-btn a-btn--outline" type="button" id="scanPlateType" hidden>Enter the number plate instead</button>
-          <button class="a-btn a-btn--outline" type="button" id="scanType">Ask your manager</button>
+          <button class="a-btn a-btn--outlineOnDark" type="button" id="scanPlateType" hidden>Enter the number plate instead</button>
+          <button class="a-btn a-btn--outlineOnDark" type="button" id="scanType">Ask your manager</button>
         </div>
       </section>
 
@@ -7046,7 +7077,12 @@ button { background: none; border: none; color: inherit; }
     var clear = failed === null;
     var face = clear ? CHECK.clear : CHECK.block;
 
+    /* Both, and for different reasons. The screen wears the verdict because
+       the wash behind the whole check is the screen's; the pill wears it
+       because the pill's own colour is the pill's business, not something its
+       parent reaches in and paints. */
     el.check.setAttribute('data-verdict', clear ? 'clear' : 'block');
+    el.checkVerdict.setAttribute('data-verdict', clear ? 'clear' : 'block');
     /* The station's failure gets its own headline - the owner's sentence -
        because the generic refusal reads wrong over a station that WAS
        approved when the driver chose it. The other refusals keep theirs. */
