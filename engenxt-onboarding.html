@@ -365,6 +365,29 @@ body {
   -webkit-font-smoothing: antialiased;
   color: var(--color-text-primary);
 }
+/* A control does not inherit the page's face or its ink. It is the browser's
+   oldest surprise and this file had been paying for it: every one of the
+   seventy-seven buttons here was rendering in Arial, at the right size and the
+   right weight, on all sixty-one screens - which is exactly why it survived
+   being looked at. The letterforms were the only thing wrong.
+
+   The missing `color: inherit` cost the second half of it. a-icon-btn declares
+   no colour of its own, so its glyphs painted at the UA's flat #000 rather
+   than the ink token - the one raw black on screen was one this file never
+   wrote.
+
+   The sign-up file has carried these two lines all along; this is the copy of
+   them, verbatim. Note what had been happening instead: five components here
+   patch `font: inherit` or `font-family: inherit` by hand, one at a time, and
+   the other seventy-odd never got the fix. Those local patches are now
+   redundant rather than wrong, and are left where they are.
+
+   The parity gate cannot see this. It drops every selector with no class
+   before it compares the two files, so a rule like this one is invisible to
+   it by construction, and it will go on certifying a-btn byte-identical while
+   the atom renders in two different faces. */
+input, button, a { font-family: inherit; }
+button { background: none; border: none; color: inherit; }
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
