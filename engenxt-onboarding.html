@@ -7880,16 +7880,12 @@ body {
       } },
     'signup-reward':      { group: 'after-signup', label: 'Reward, 50 points',
       run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
-    'home':               { group: 'after-signup', label: 'Home, one vehicle',
-      run: function () { reset('new-driver', true, 1); showHome(); } },
-    'new-four-vehicles':  { group: 'after-signup', label: 'Home, four vehicles',
+    /* One home, not five. The unlinked home stopped changing with fleet
+       size when the vehicle list came off it, so four vans and a thousand
+       rendered the same frame five times over. The rail lists screens,
+       not data. */
+    'home':               { group: 'after-signup', label: 'Home, nothing linked yet',
       run: function () { reset('new-driver', true, 4); showHome(); } },
-    'new-five-vans':      { group: 'after-signup', label: 'Home, five vans',
-      run: function () { reset('new-driver', true, VANS); showHome(); } },
-    'new-nine-vehicles':  { group: 'after-signup', label: 'Home, nine vehicles',
-      run: function () { reset('new-driver', true, 9); showHome(); } },
-    'new-thousand-vehicles': { group: 'after-signup', label: 'Home, a thousand vehicles',
-      run: function () { reset('new-driver', true, 1000); showHome(); } },
 
     'returning-signin':   { group: 'returning', label: 'Signed in again',
       run: function () {
@@ -7932,7 +7928,7 @@ body {
       } },
     'returning-without-vehicle': { group: 'returning', label: 'No vehicle assigned',
       run: function () { reset('returning-driver', false); route(); } },
-    'returning-with-vehicle':    { group: 'returning', label: 'One vehicle',
+    'returning-with-vehicle':    { group: 'returning', label: 'Home, vehicle linked',
       run: function () {
         reset('returning-driver', true, 1);
         /* Linked, not merely assigned: the state's promise is a driver who
@@ -7940,14 +7936,8 @@ body {
         confirmByScan(readDisc());
         route();
       } },
-    'home-few-vehicles':  { group: 'returning', label: 'Four vehicles',
+    'home-few-vehicles':  { group: 'returning', label: 'Home, nothing linked yet',
       run: function () { reset('returning-driver', true, 4); showHome(); } },
-    'home-five-vans':     { group: 'returning', label: 'Five vans',
-      run: function () { reset('returning-driver', true, VANS); showHome(); } },
-    'home-many-vehicles': { group: 'returning', label: 'Nine vehicles',
-      run: function () { reset('returning-driver', true, 9); showHome(); } },
-    'home-thousand-vehicles': { group: 'returning', label: 'A thousand vehicles',
-      run: function () { reset('returning-driver', true, 1000); showHome(); } },
 
     /* Reached by asking, and each one reachable on its own. A driver at a pump
        is a returning driver with a van, so that is the setting all three carry:
@@ -8375,8 +8365,8 @@ body {
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up: the Face ID offer and its every outcome, then the handover to the welcome flow.',
-    'after-signup': 'Linking first, then the reward, then home at every size of fleet. Nothing driven yet.',
-    'returning':    'The same fleets, with the vehicles they have actually been in leading.',
+    'after-signup': 'Linking first, then the reward, then home. Nothing driven yet.',
+    'returning':    'Sign-in again: home linked, home unlinked, and nothing assigned at all.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
     'fuelling':     'Choosing where, the QR that comes back, the fill itself, and what it pays.'
   };
@@ -8441,12 +8431,9 @@ body {
   var AWAY_STATES = {
     'engenxt-onboarding.html': {
       'after-signup': [
+        ['signup-link', 'Link a vehicle first'],
         ['signup-reward', 'Reward, 50 points'],
-        ['home', 'One vehicle'],
-        ['new-four-vehicles', 'Four vehicles'],
-        ['new-five-vans', 'Five vans'],
-        ['new-nine-vehicles', 'Nine vehicles'],
-        ['new-thousand-vehicles', 'A thousand vehicles']
+        ['home', 'Home, nothing linked yet']
       ],
       'returning': [
         ['returning-signin', 'Signed in again'],
@@ -8454,11 +8441,8 @@ body {
                    ['rewards-spent', 'Rewards, after spending'],
                    ['account', 'Account'],
                    ['returning-without-vehicle', 'No vehicle assigned'],
-        ['returning-with-vehicle', 'One vehicle'],
-        ['home-few-vehicles', 'Four vehicles'],
-        ['home-five-vans', 'Five vans'],
-        ['home-many-vehicles', 'Nine vehicles'],
-        ['home-thousand-vehicles', 'A thousand vehicles']
+        ['returning-with-vehicle', 'Home, vehicle linked'],
+        ['home-few-vehicles', 'Home, nothing linked yet']
       ],
       'flow1': [
         ['flow1-account', '1 \u00b7 Confirm your account'],
