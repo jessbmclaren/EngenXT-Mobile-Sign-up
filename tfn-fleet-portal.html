@@ -330,7 +330,7 @@
   --focus-sheet-elevation: -1px 0 0 0 rgba(16, 19, 35, 0.08), -24px 0 48px -24px rgba(16, 19, 35, 0.18);
   --focus-sheet-header-height: 76px;
   --focus-sheet-footer-height: 68px;
-  --focus-sheet-breakpoint: 1100px;
+  --focus-sheet-breakpoint: 800px;
 
   /* The three overlay widths. Expressed against the viewport rather than as
      fixed numbers so none of them can reach an edge on a small laptop. */
@@ -339,10 +339,10 @@
      driver and the theft report be the same surface rather than three that
      happen to look alike.
 
-     The value is the 720-840 band specified for Add vehicle, not the 960 the
-     later overlay brief suggests. Flagged rather than chosen silently: the two
-     briefs disagree, and 840 is the one that was specified twice and built
-     against. Changing it is one line here and reaches all three sheets. */
+     840 is the maximum, decided: it gives two usable form columns while
+     leaving enough of the page behind visible to say where the sheet came
+     from, and at 960 it takes too much of an ordinary 1440 desktop. One
+     token, three wide sheets — Add vehicle, Add driver, the theft report. */
   --overlay-width-wide: clamp(720px, 58vw, 840px);
   --overlay-width-medium: min(680px, calc(100vw - 64px));
   --dialog-width-standard: min(600px, calc(100vw - 32px));
@@ -2535,9 +2535,10 @@ body.sheet-open .focus-sheet { display: flex; }
 /* Below the breakpoint a two-column form has nothing to gain and the sheet
    would be most of the window anyway. It takes all of it, and keeps its header
    and footer, so the shape a person learned on a laptop still holds. */
-@media (max-width: 1100px) {
+@media (max-width: 800px) {
   .focus-sheet {
     width: 100vw;
+    max-width: 100vw;
     border-left: 0;
   }
 }
@@ -2639,7 +2640,7 @@ body.sheet-open .focus-sheet { display: flex; }
 
 .sheet-grid > .field-wide { grid-column: 1 / -1; }
 
-@media (max-width: 1100px) {
+@media (max-width: 800px) {
   .sheet-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -9612,6 +9613,14 @@ function form(spec) {
       if (!document.body.classList.contains('drawer-open')) opener = document.activeElement;
       document.body.classList.add('drawer-open');
       root.classList.remove('hidden');
+      /* A form in a focus sheet is a place with an address, and opening it is
+         a navigation rather than a panel appearing. The sheet controller owns
+         the route, the backdrop, the inert background and the focus; it is
+         asked here so that every way into the form gets all four. */
+      if (root.classList.contains('focus-sheet') && window.__vehicleSheet
+          && !window.__vehicleSheet.isOpen()) {
+        window.__vehicleSheet.open();
+      }
       Object.values(forms).forEach(f => { if (f !== api) f.hide(); });
       applyState(state);
       document.addEventListener('keydown', trap, true);
@@ -15358,6 +15367,10 @@ window.addEventListener('hashchange', fromHash);
     )].filter(el => el.offsetParent !== null);
   }
 
+  /* Whether this sheet is the one the address is standing for. Only a
+     route-opened sheet is closed by leaving the route. */
+  let ownsRoute = false;
+
   function open(fromRoute) {
     if (isOpen()) return;
     opener = document.activeElement;
@@ -15370,12 +15383,19 @@ window.addEventListener('hashchange', fromHash);
       .forEach(el => el.setAttribute('inert', ''));
     syncCategory();
     syncTanks();
-    if (!fromRoute) { suppress = true; location.hash = ROUTE; suppress = false; }
+    /* The rail drives the sheet to its own per-state addresses, and taking the
+       route from underneath it would fight the thing that opened it. So the
+       route is claimed only when nothing else is already steering. */
+    const railDriven = document.body.classList.contains('demo') === false
+      && !!document.querySelector('.rail button[aria-current="true"][data-form]');
+    ownsRoute = !railDriven;
+    if (!fromRoute && ownsRoute) { suppress = true; location.hash = ROUTE; suppress = false; }
     const first = sheet.querySelector('#f-vin') || sheet;
     first.focus({ preventScroll: true });
   }
 
   function shut() {
+    ownsRoute = false;
     document.body.classList.remove('sheet-open');
     sheet.classList.add('hidden');
     document.querySelectorAll('[inert]').forEach(el => el.removeAttribute('inert'));
@@ -15465,8 +15485,10 @@ window.addEventListener('hashchange', fromHash);
   /* Back and reload. */
   window.addEventListener('hashchange', () => {
     if (suppress) return;
-    if (location.hash === ROUTE) open(true);
-    else if (isOpen()) shut();
+    if (location.hash === ROUTE) { open(true); ownsRoute = true; return; }
+    /* Leaving the route closes the sheet the route opened. A sheet the rail
+       put on screen at its own address is not the route's to close. */
+    if (isOpen() && ownsRoute) shut();
   });
   if (location.hash === ROUTE) open(true);
 
@@ -15512,10 +15534,9 @@ document.querySelectorAll('[data-next="add-driver"]').forEach(b => {
 document.querySelectorAll('[data-open]').forEach(b => {
   b.addEventListener('click', () => {
     const [name, state] = b.dataset.open.split(':');
+    /* open() raises the sheet itself now, so every entry point behaves the
+       same and this one has nothing extra to do. */
     Records.forms[name]?.open(state || 'blank');
-    /* The vehicle form lives in a focus sheet, which is a place with an
-       address rather than a panel that appears. */
-    if (name === 'vehicle' && window.__vehicleSheet) window.__vehicleSheet.open();
   });
 });
 
