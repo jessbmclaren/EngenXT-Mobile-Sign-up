@@ -2378,6 +2378,7 @@ a.stat-tile:focus-visible {
 
 </style>
 <style>
+.spec-alias { color: var(--color-on-surface-variant); }
 .spec-values { margin-top: var(--space-0-5); }
 .spec-values > summary {
   cursor: pointer;
@@ -5857,7 +5858,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                  not going to download a template; they want to know whether
                  what they have will do. This is that answer in one line, and
                  the full table below says what goes in each. -->
-            <p class="panel-note">Whatever you upload needs these seven columns:
+            <p class="panel-note" data-role="import-summary">Whatever you upload needs these seven columns:
               <span class="ident">registration</span>, <span class="ident">make</span>,
               <span class="ident">model</span>, <span class="ident">year</span>,
               <span class="ident">vehicle_type</span>, <span class="ident">fuel_type</span>,
@@ -5881,7 +5882,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
              single column. That is fixed in the stylesheet, not here. -->
         <div class="contract" id="import-contract">
           <h2 class="spec-h">What the file must contain</h2>
-          <p class="contract-note">Ten columns, in this order. The same fields the
+          <p class="contract-note" data-role="contract-count">Ten columns. The same fields the
             form asks for, so somebody who has added one vehicle by hand already
             knows the spreadsheet.</p>
 
@@ -5890,50 +5891,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                is what somebody compares their own header row against without
                having to translate anything. -->
           <p class="contract-label">The first two lines of a file that works</p>
-          <pre class="csv-sample"><code>registration,make,model,year,vehicle_type,fuel_type,tank_capacity_l,engine_capacity_cc,vin,fleet_number
-HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014</code></pre>
+          <pre class="csv-sample"><code data-role="csv-sample"></code></pre>
           <table class="spec">
             <thead><tr><th>Column</th><th>Required</th><th>What to enter</th></tr></thead>
-            <tbody>
-              <tr><td class="ident">registration</td><td>Yes</td><td>Any text. No format rule, so non-standard plates are fine.</td></tr>
-              <tr><td class="ident">make</td><td>Yes</td><td>One of the 25 listed makes, or your own.</td></tr>
-              <tr><td class="ident">model</td><td>Yes</td><td>Free text, up to 100 characters.</td></tr>
-              <tr><td class="ident">year</td><td>Yes</td><td>2000 to this year.</td></tr>
-              <tr>
-                <td class="ident">vehicle_type</td><td>Yes</td>
-                <td>One of thirteen values.
-                  <!-- Thirteen values printed inline would be the longest cell
-                       in the table and the one nobody reads. Behind a summary
-                       they are one click away, and the list is drawn from the
-                       same taxonomy the form's select uses, so the document
-                       cannot describe a value the importer would reject. -->
-                  <details class="spec-values">
-                    <summary>See the accepted values</summary>
-                    <ul data-role="type-values"></ul>
-                    <p class="spec-values__note">Older files using <code>LCV</code>,
-                      <code>HCV</code> or <code>Other</code> still import. Each one
-                      is matched to its closest category and shown to you at review
-                      before anything is added.</p>
-                  </details>
-                </td>
-              </tr>
-              <tr><td class="ident">fuel_type</td><td>Yes</td><td>Diesel or Petrol.</td></tr>
-              <tr><td class="ident">tank_capacity_l</td><td>Yes</td><td>The combined capacity of all fitted fuel tanks, in litres. Not the AdBlue tank.</td></tr>
-              <tr>
-                <td class="ident">engine_capacity_cc</td><td>On some</td>
-                <td>In cc. Required for motorcycles, scooters, courier motorcycles
-                  and three-wheelers, where it is the only way to tell a small
-                  engine from a small tank. Leave it empty for anything else.</td>
-              </tr>
-              <!-- VIN is required now. A registration changes when a vehicle is
-                   sold between branches or re-plated after a theft, and a fleet
-                   that matched on registration alone ended up with the same
-                   vehicle twice under two plates. The VIN is the one identifier
-                   that survives all of that, and it is on the licence disc, so
-                   it is not a number anyone has to go and find. -->
-              <tr><td class="ident">vin</td><td>Yes</td><td>Seventeen characters, from the licence disc. This is what identifies the vehicle if its plate ever changes.</td></tr>
-              <tr><td class="ident">fleet_number</td><td>No</td><td>Your own reference. You can add it later.</td></tr>
-            </tbody>
+            <tbody data-role="spec-rows"></tbody>
           </table>
         </div>
       </section>
@@ -8630,14 +8591,14 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <div class="form-field field-wide" data-field="vin">
           <label for="f-vin">VIN</label>
           <input class="field ident" id="f-vin" maxlength="17" autocomplete="off"
-                 placeholder="AHTFR22G30A123456">
+                 placeholder="e.g. AHTFR22G30A123456">
           <span class="help">Find it on the licence disc.</span>
         </div>
 
         <div class="form-field" data-field="registration">
           <label for="f-reg">Registration number</label>
           <input class="field ident" id="f-reg" maxlength="100" autocomplete="off"
-                 placeholder="HRV 482 GP">
+                 placeholder="e.g. HRV 482 GP">
         </div>
 
         <div class="form-field" data-field="fleetNumber">
@@ -8759,7 +8720,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <div class="form-field" data-field="engineCc">
         <label for="f-engine" data-role="engine-label">Engine capacity <span class="opt">Optional</span></label>
         <span class="suffix-wrap">
-          <input class="field" id="f-engine" inputmode="decimal" placeholder="2393">
+          <input class="field" id="f-engine" inputmode="decimal" placeholder="e.g. 2393">
           <span class="suffix">cc</span>
         </span>
         <span class="help" data-role="engine-help">In cc, not litres.</span>
@@ -8792,7 +8753,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <div class="form-field" data-field="tankCapacity" hidden>
         <label for="f-tank" data-role="tank-label">Tank capacity</label>
         <span class="suffix-wrap">
-          <input class="field" id="f-tank" inputmode="decimal" placeholder="80">
+          <input class="field" id="f-tank" inputmode="decimal" placeholder="e.g. 80">
           <span class="suffix">litres</span>
         </span>
         <span class="help" data-role="tank-help">Do not include the AdBlue tank.</span>
@@ -11689,15 +11650,139 @@ return {
   sync();
 })();
 
+/* import-schema.js */
+/* The canonical vehicle import. One list, and every fact about it derived.
+ *
+ * `key` is the CSV header and the stored field name. `aliases` are headers
+ * older exports still use, normalised on the way in rather than kept as a
+ * second field. `required` is the rule the manual form applies, so the two
+ * cannot disagree about what a vehicle needs.
+ */
+window.ImportSchema = (() => {
+
+const COLUMNS = [
+  { key: 'vin', label: 'VIN', required: true,
+    says: 'Seventeen characters, from the licence disc. This is what identifies the vehicle if its plate ever changes.',
+    example: 'AHTFR22G30A123456' },
+  { key: 'registration', label: 'Registration number', required: true,
+    says: 'Any text. No format rule, so non-standard plates are fine.',
+    example: 'HRV 482 GP' },
+  { key: 'make', label: 'Make', required: true,
+    says: 'One of the 25 listed makes, or your own.',
+    example: 'Toyota' },
+  { key: 'model', label: 'Model', required: true,
+    says: 'Free text, up to 100 characters.',
+    example: 'Hilux 2.4 GD-6' },
+  { key: 'year', label: 'Year', required: true,
+    says: '2000 to this year.',
+    example: '2021' },
+  { key: 'vehicle_category', label: 'Vehicle category', required: true,
+    aliases: ['vehicle_type'],
+    says: 'One of thirteen values.',
+    example: 'bakkie' },
+  { key: 'fuel_type', label: 'Fuel type', required: true,
+    says: 'Diesel or Petrol.',
+    example: 'Diesel' },
+  { key: 'total_tank_capacity_l', label: 'Total fuel-tank capacity', required: true,
+    aliases: ['tank_capacity_l'],
+    says: 'The combined capacity of all fitted fuel tanks, in litres. Not the AdBlue tank.',
+    example: '80' },
+  { key: 'engine_capacity_cc', label: 'Engine capacity', required: false, conditional: true,
+    says: 'In cc. Required for motorcycles, scooters, courier motorcycles and three-wheelers, where it is the only way to tell a small engine from a small tank. Leave it empty for anything else.',
+    example: '' },
+  { key: 'fleet_number', label: 'Fleet number', required: false,
+    says: 'Your own reference. You can add it later.',
+    example: 'FL-014' },
+];
+
+const required = () => COLUMNS.filter(c => c.required);
+const optional = () => COLUMNS.filter(c => !c.required);
+
+/* Spelt, because "8 required" in a sentence reads like a field name. */
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+  'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const word = n => WORDS[n] || String(n);
+
+/* A header a person can compare their own against, and a row that the parser
+   actually accepts — generated, so the example can never drift from the rule
+   it is illustrating. */
+const header = () => COLUMNS.map(c => c.key).join(',');
+const exampleRow = () => COLUMNS.map(c => c.example).join(',');
+
+/* Older headers normalised to the canonical name. One field, not two. */
+const canonical = name => {
+  const flat = String(name || '').trim().toLowerCase();
+  const hit = COLUMNS.find(c => c.key === flat || (c.aliases || []).includes(flat));
+  return hit ? hit.key : null;
+};
+
+return {
+  COLUMNS, required, optional, header, exampleRow, canonical, word,
+  counts: () => ({ required: required().length, optional: optional().length, total: COLUMNS.length }),
+  /* The one sentence, said once, in the two places that need it. */
+  sentence: () => {
+    const c = { required: required().length, optional: optional().length, total: COLUMNS.length };
+    return `${word(c.total).replace(/^./, m => m.toUpperCase())} columns: ` +
+      `${word(c.required)} required and ${word(c.optional)} optional.`;
+  },
+};
+
+})();
+
 /* csv-spec.js */
-/* Fills the accepted vehicle_type values in the CSV specification from the
-   taxonomy. The specification is a contract, and a contract that is maintained
-   in two places is a contract in one place and a rumour in the other. */
+/* Everything the import screens say about the file, written from the schema.
+   The specification is a contract, and a contract maintained in two places is
+   a contract in one place and a rumour in the other — which is how the page
+   came to say "seven columns… two more optional" above "Ten columns". */
 (() => {
-  const ul = document.querySelector('[data-role="type-values"]');
-  if (!ul || !window.VehicleTypes) return;
-  ul.innerHTML = VehicleTypes.list()
-    .map(t => `<li><code>${t.code}</code> <span>${t.label}</span></li>`).join('');
+  if (!window.ImportSchema) return;
+  const S = ImportSchema;
+  const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const ident = k => `<span class="ident">${esc(k)}</span>`;
+  const c = S.counts();
+
+  /* The summary above the dropzone: the required columns named, and the
+     optional ones counted. */
+  document.querySelectorAll('[data-role="import-summary"]').forEach(el => {
+    el.innerHTML = `Whatever you upload needs these ${S.word(c.required)} columns: ` +
+      S.required().map(x => ident(x.key)).join(', ') +
+      `. ${S.word(c.optional).replace(/^./, m => m.toUpperCase())} more are optional.`;
+  });
+
+  /* And the line over the specification table. */
+  document.querySelectorAll('[data-role="contract-count"]').forEach(el => {
+    el.innerHTML = `${S.sentence()} The same fields the form asks for, so ` +
+      'somebody who has added one vehicle by hand already knows the spreadsheet.';
+  });
+
+  /* The literal first two lines of a file that works — generated, so the
+     example can never illustrate a rule it would fail. */
+  document.querySelectorAll('[data-role="csv-sample"]').forEach(el => {
+    el.textContent = S.header() + '\n' + S.exampleRow();
+  });
+
+  /* The specification table. "On some" rather than "No" for a column that is
+     required by what is in another column: neither yes nor no is true of it. */
+  document.querySelectorAll('[data-role="spec-rows"]').forEach(el => {
+    el.innerHTML = S.COLUMNS.map(x => {
+      const need = x.required ? 'Yes' : (x.conditional ? 'On some' : 'No');
+      const values = x.key === 'vehicle_category'
+        ? `<details class="spec-values"><summary>See the accepted values</summary>
+             <ul>${VehicleTypes.list().map(t =>
+               `<li><code>${t.code}</code> <span>${esc(t.label)}</span></li>`).join('')}</ul>
+             <p class="spec-values__note">Older files using <code>vehicle_type</code> with
+               <code>LCV</code>, <code>HCV</code> or <code>Other</code> still import. Each one
+               is matched to its closest category and shown to you at review before anything
+               is added.</p>
+           </details>`
+        : '';
+      const alias = (x.aliases || []).length
+        ? ` <span class="spec-alias">Older files may call this ${x.aliases.map(a => `<code>${esc(a)}</code>`).join(' or ')}.</span>`
+        : '';
+      return `<tr><td class="ident">${esc(x.key)}</td><td>${need}</td>` +
+             `<td>${esc(x.says)}${alias}${values}</td></tr>`;
+    }).join('');
+  });
 })();
 
 /* capacity-rules.js */
