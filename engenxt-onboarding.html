@@ -151,6 +151,15 @@
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 
+  /* Hover, by what the control is standing on. Two intentions, and the file
+     had both already without naming either: a control with no fill of its own
+     gains a faint wash, and a control sitting on a sunken plate lifts toward
+     white instead. Named so the next component picks one rather than
+     inventing a third. */
+  --color-hover-wash:   var(--color-border-light);
+  --color-hover-lift:   var(--color-surface-hover);
+  --color-hover-onDark: var(--color-on-dark-line);
+
   /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
   --color-handle:     rgba(0,0,0,0.25);
@@ -216,6 +225,41 @@
   --weight-bold:     700;
   --weight-heavy:    800;
   --weight-black:    900;
+
+
+  /* Press. Two depths, because there are two kinds of thing to press: a
+     control you aim at, and a surface you tap. The file already used exactly
+     these two - 0.97 on the button, 0.985 on the rows and cards - plus one
+     0.99 on a station row that was doing the subtle job at a value of its
+     own. Naming them is what stops a third appearing.
+
+     The camera shutter keeps its own 0.92 and says why: it is imitating a
+     physical shutter, not a button, and the travel is the point. */
+  --press-firm:   0.97;
+  --press-subtle: 0.985;
+
+
+  /* Leading. Four jobs, which is what the file was already doing with
+     fourteen values: figures that must sit flush, display type that wants to
+     be tight, a two-line label that wants a little air, and running prose.
+     1.45, 1.5, 1.55 and 1.6 were four ways of saying "body"; 1.05, 1.08,
+     1.1, 1.18 and 1.2 were five ways of saying "headline". Nobody can tell
+     those apart, and having them meant every new component picked a number
+     rather than a job. */
+  --leading-flush: 1;
+  --leading-tight: 1.1;
+  --leading-snug:  1.35;
+  --leading-body:  1.5;
+
+  /* Tracking. Negative as type grows, positive when it goes uppercase -
+     which is the one part of the old spread that was real typography rather
+     than drift. These are the steps that repeat; a handful of headline
+     optics keep their own value and say so where they are written. */
+  --tracking-tight:     -0.3px;
+  --tracking-snug:      -0.5px;
+  --tracking-display:   -1px;
+  --tracking-caps:      0.08em;
+  --tracking-caps-wide: 0.16em;
 
   /* Radius */
   --radius-pill:   999px;
@@ -449,13 +493,13 @@ button { background: none; border: none; color: inherit; }
      it is the first thing you see. Variants that want a border declare one. */
   border: none;
   border-radius: var(--radius-pill);
-  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: -0.3px;
+  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight);
   text-decoration: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out),
               box-shadow var(--dur-fast) var(--ease-in-out),
               background var(--dur-base), color var(--dur-base), border-color var(--dur-base);
 }
-.a-btn:active { transform: scale(0.97); transition-duration: .1s; }
+.a-btn:active { transform: scale(var(--press-firm)); transition-duration: .1s; }
 .a-btn--primary {
   background: var(--gradient-primary);
   color: var(--color-text-on-dark); box-shadow: var(--shadow-btn);
@@ -470,7 +514,7 @@ button { background: none; border: none; color: inherit; }
   border: 1px solid var(--color-border-field);
   font-weight: var(--weight-semibold);
 }
-.a-btn--outline:hover { background: var(--color-border-light); }
+.a-btn--outline:hover { background: var(--color-hover-wash); }
 /* State is never a class: when a person becomes the last resort the scan
    sheet says so with data-lead, and the fact wears the primary coat. */
 .a-btn--outline[data-lead="true"] {
@@ -503,7 +547,7 @@ button { background: none; border: none; color: inherit; }
   min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: -0.1px;
+  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight);
   color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
 }
 .a-link--quiet { color: var(--color-text-secondary); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
@@ -589,7 +633,7 @@ button { background: none; border: none; color: inherit; }
 .a-toast {
   position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
   background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
-  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.45;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: var(--leading-body);
   padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
   box-shadow: var(--shadow-toast);
   opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
@@ -601,7 +645,7 @@ button { background: none; border: none; color: inherit; }
   padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
   padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
 }
-.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: -0.3px; }
+.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* d-demoHint. Prototype scaffolding, the developer prefix says it never
@@ -646,11 +690,11 @@ button { background: none; border: none; color: inherit; }
 }
 .m-push__body { flex: 1 1 auto; min-width: 0; }
 .m-push__app {
-  display: block; font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  display: block; font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .m-push__title { display: block; font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary); }
-.m-push__sub { display: block; font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary); }
+.m-push__sub { display: block; font-size: var(--text-caption); line-height: var(--leading-snug); color: var(--color-text-secondary); }
 
 .m-notch {
   position: absolute; top: 0; left: 0; right: 0; height: 50px; z-index: var(--z-hardware);
@@ -675,15 +719,39 @@ button { background: none; border: none; color: inherit; }
    and a-icon-wrap already do. */
 .m-brand-lockup__name {
   font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-primary);
-  letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
+  letter-spacing: var(--tracking-snug); line-height: var(--leading-flush); margin-bottom: 2px;
 }
 .m-brand-lockup--onDark .m-brand-lockup__name { color: var(--color-text-on-dark); }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
+  /* Off the tracking scale on purpose: this is a 10px uppercase strapline
+     under a wordmark, and em tracking at that size lands too tight to read
+     as a lockup rather than as a word. */
   font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--color-on-dark-faint);
 }
 [hidden] { display: none !important; }
+/* t-screen. The page-level shell every full screen in this app sits in.
+
+   Twelve organisms each opened with the same five declarations - absolute to
+   the frame, filling it, on the overlay layer, a hidden column - and each then
+   restated the status-bar clearance and the scroll behaviour underneath. That
+   is page layout, and an organism is meant to be a section of a page rather
+   than the page. The file's own placement test says it plainly: "Is it
+   arranging sections rather than being one? If yes, it is a template."
+
+   The shell moves here; what makes each screen itself - its ground, its
+   padding, whether it centres - stays on the organism. The visibility rules
+   stay there too, because several carry an arrival opacity or transform of
+   their own alongside the display switch.
+
+   Only this file has one. The sign-up flow is a single sheet over a hero and
+   has no repetition to lift. */
+.t-screen {
+  position: absolute; inset: 0; z-index: var(--z-overlay);
+  display: none; flex-direction: column;
+}
+
 .t-device-frame {
   position: relative; flex-shrink: 0;
   width: 390px; height: 844px;
@@ -836,13 +904,15 @@ button { background: none; border: none; color: inherit; }
   border: 1.5px dashed var(--color-accent-on-dark-line);
 }
 .a-medal__value {
-  font-size: var(--text-hero); font-weight: var(--weight-heavy); line-height: 1;
+  font-size: var(--text-hero); font-weight: var(--weight-heavy); line-height: var(--leading-flush);
+  /* Off the scale: the medal's figure is the largest numeral in the file
+     and closes up further than any display text would. */
   letter-spacing: -2px; color: var(--color-text-on-dark);
   font-variant-numeric: tabular-nums;
 }
 .a-medal__unit {
   margin-top: var(--sp-1);
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 /* With motion turned down the burst does not run, so the graphic carries the
@@ -965,7 +1035,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-reward-goal__title {
   flex: 1 1 auto;
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .m-reward-goal__value {
@@ -1024,8 +1094,6 @@ button { background: none; border: none; color: inherit; }
    through, so they are a column and a button. This is the app itself: a bar
    that stays put, and content that scrolls under it. */
 .o-home {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   /* Clear of the bar the frame now draws beneath it. */
   padding-bottom: calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
@@ -1101,13 +1169,13 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-surface-sunken); cursor: pointer;
   transition: background var(--dur-fast) var(--ease-in-out);
 }
-.a-icon-btn:hover { background: var(--color-surface-hover); }
+.a-icon-btn:hover { background: var(--color-hover-lift); }
 /* The screen says which surface the atom stands on; the atom dresses
    itself. Promoted from a .o-scan__bar descendant override, per the
    context law: overrides that restate another block's internals move to
    the atom as a tone. */
 .a-icon-btn[data-tone="onDark"] { background: var(--color-on-dark-fill); color: var(--color-text-on-dark); }
-.a-icon-btn[data-tone="onDark"]:hover { background: var(--color-on-dark-line); }  /* the line alpha, used as a lift */
+.a-icon-btn[data-tone="onDark"]:hover { background: var(--color-hover-onDark); }  /* the line alpha, used as a lift */
 /* A torch you cannot tell is on is a torch you press twice. Only aria-pressed
    changed before, which is a state for a screen reader and nobody else. */
 .a-icon-btn[data-tone="onDark"][aria-pressed="true"] {
@@ -1130,7 +1198,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-pill);
   background: var(--color-secondary);
   box-shadow: 0 0 0 2px var(--color-surface-sunken);
-  font-size: var(--text-nano); font-weight: var(--weight-heavy); line-height: 1;
+  font-size: var(--text-nano); font-weight: var(--weight-heavy); line-height: var(--leading-flush);
   color: var(--color-text-on-dark); font-variant-numeric: tabular-nums;
 }
 /* With a number in it, it needs room to be read. */
@@ -1158,8 +1226,8 @@ button { background: none; border: none; color: inherit; }
 .o-home__greeting { display: flex; flex-direction: column; }
 .o-home__eyebrow,
 .o-home__name {
-  font-size: var(--text-display); font-weight: var(--weight-light); line-height: 1.18;
-  letter-spacing: -0.6px; color: var(--color-text-primary);
+  font-size: var(--text-display); font-weight: var(--weight-light); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug); color: var(--color-text-primary);
   text-transform: none;
 }
 .o-home__name:focus, .o-home__name:focus-visible { outline: none; box-shadow: none; }
@@ -1170,8 +1238,8 @@ button { background: none; border: none; color: inherit; }
    prices it: a count you cannot price is not information, it is decoration. */
 .o-home__balance { display: flex; flex-direction: column; gap: var(--sp-1); }
 .o-home__points {
-  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: 1.1;
-  letter-spacing: -0.6px; color: var(--color-text-primary);
+  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug); color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 .o-home__worth { font-size: var(--text-caption); font-weight: var(--weight-medium); color: var(--color-text-secondary); }
@@ -1223,11 +1291,11 @@ button { background: none; border: none; color: inherit; }
 }
 .m-linked__body { display: flex; flex-direction: column; gap: 2px; }
 .m-linked__title {
-  font-size: var(--text-body); font-weight: var(--weight-bold); line-height: 1.3;
+  font-size: var(--text-body); font-weight: var(--weight-bold); line-height: var(--leading-snug);
   color: var(--color-success);
 }
 .m-linked__sub {
-  font-size: var(--text-caption); line-height: 1.35;
+  font-size: var(--text-caption); line-height: var(--leading-snug);
   color: var(--color-text-secondary);
 }
 /* Reduced motion still gets the message, it just arrives rather than slides. */
@@ -1266,14 +1334,14 @@ button { background: none; border: none; color: inherit; }
   display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3);
 }
 .m-empty-note__text {
-  font-size: var(--text-caption); line-height: 1.55;
+  font-size: var(--text-caption); line-height: var(--leading-body);
   color: var(--color-text-secondary);
 }
 
 .m-vehicle-picker { display: flex; flex-direction: column; gap: var(--sp-3); }
 .m-vehicle-picker__head { display: flex; align-items: center; gap: var(--sp-2); }
 .m-vehicle-picker__title {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-vehicle-picker__count {
@@ -1357,7 +1425,7 @@ button { background: none; border: none; color: inherit; }
 .a-vehicle-chip__art { display: flex; opacity: 0.75; }
 .a-vehicle-chip__act { display: inline-flex; color: var(--color-text-tertiary); }
 .a-vehicle-chip__plate {
-  font-size: var(--text-caption); font-weight: var(--weight-bold); line-height: 1.3;
+  font-size: var(--text-caption); font-weight: var(--weight-bold); line-height: var(--leading-snug);
   font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
   white-space: nowrap;
 }
@@ -1401,7 +1469,7 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-primary); text-align: left; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.m-vehicle-card:active { transform: scale(0.985); }
+.m-vehicle-card:active { transform: scale(var(--press-subtle)); }
 .m-vehicle-card__body { flex: 1 1 auto; min-width: 0; }
 .m-vehicle-card__label,
 .m-vehicle-card__plate,
@@ -1409,12 +1477,12 @@ button { background: none; border: none; color: inherit; }
 /* The eyebrow is redundant once the card sits under the picker's own heading,
    so it stops shouting and just orients. */
 .m-vehicle-card__label {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.14em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-vehicle-card__plate {
   margin-top: 2px;
-  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary);
 }
 .m-vehicle-card__model {
@@ -1595,7 +1663,7 @@ button { background: none; border: none; color: inherit; }
   text-align: left; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.m-live-bar:active { transform: scale(0.985); }
+.m-live-bar:active { transform: scale(var(--press-subtle)); }
 /* Alive rather than decorative: the one thing on home that is still happening.
    It settles to a solid dot under reduced motion, which still reads as a
    status light and not as a stray mark. */
@@ -1613,7 +1681,7 @@ button { background: none; border: none; color: inherit; }
 .m-live-bar__body { flex: 1 1 auto; min-width: 0; }
 .m-live-bar__title {
   display: block; font-size: var(--text-footnote); font-weight: var(--weight-heavy);
-  letter-spacing: -0.2px; color: var(--color-success);
+  letter-spacing: var(--tracking-tight); color: var(--color-success);
 }
 .m-live-bar__sub {
   display: block; font-size: var(--text-caption2);
@@ -1684,8 +1752,6 @@ button { background: none; border: none; color: inherit; }
    icons only: no blur behind moving content, no image assets, nothing that
    asks a 2GB phone to composite a layer it does not need. */
 .o-step {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   background: var(--color-surface-page);
 }
 .o-step[data-state="visible"] { display: flex; }
@@ -1750,19 +1816,21 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-primary-bg); color: var(--color-primary);
 }
 .o-step__title {
-  font-size: var(--text-display); font-weight: var(--weight-light); line-height: 1.18;
-  letter-spacing: -0.6px; color: var(--color-text-primary);
+  font-size: var(--text-display); font-weight: var(--weight-light); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug); color: var(--color-text-primary);
 }
 .o-step__title:focus, .o-step__title:focus-visible { outline: none; box-shadow: none; }
 /* 16sp, because this is the sentence the whole screen rests on and 13 is a
    caption. It wraps rather than truncating at large Android font settings. */
 .o-step__body {
-  font-size: var(--text-callout); line-height: 1.5; color: var(--color-text-secondary);
+  font-size: var(--text-callout); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 .o-step__field {
   width: 100%; min-height: var(--size-control);
   padding: 0 var(--sp-4);
   font: inherit; font-size: var(--text-lead); font-weight: var(--weight-bold);
+  /* A whisker of positive tracking, not the caps step: this is a typed
+     number, and the gap keeps digits from touching at speed. */
   font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
   color: var(--color-text-primary);
   background: var(--color-surface); border: var(--size-border) solid var(--color-border-field);
@@ -1788,7 +1856,7 @@ button { background: none; border: none; color: inherit; }
    alone. */
 .o-step__err {
   display: flex; align-items: flex-start; gap: var(--sp-1);
-  font-size: var(--text-caption2); line-height: 1.5; font-weight: var(--weight-semibold);
+  font-size: var(--text-caption2); line-height: var(--leading-body); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 .o-step__err svg { flex-shrink: 0; margin-top: 2px; }
@@ -1831,8 +1899,6 @@ button { background: none; border: none; color: inherit; }
    look, the honest fix is a frame that changes shape the moment the reader
    commits, not a tighter guess before it has seen anything. */
 .o-scan {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   background: var(--color-scan-1); color: var(--color-text-on-dark);
 }
 .o-scan[data-state="visible"] { display: flex; }
@@ -1855,14 +1921,14 @@ button { background: none; border: none; color: inherit; }
    card when the camera cannot be repaired from here. */
 .o-scan__typePanel { display: flex; flex-direction: column; gap: var(--sp-2); padding: 0 var(--sp-5) var(--sp-3); }
 .o-scan__typeLabel {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .o-scan__typeInput {
   min-height: var(--size-control); padding: 0 var(--sp-4);
   border: 1px solid var(--color-on-dark-line); border-radius: var(--radius-card-sm);
   background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
-  font-size: var(--text-callout); font-weight: var(--weight-bold); letter-spacing: 0.06em;
+  font-size: var(--text-callout); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   font-variant-numeric: tabular-nums;
 }
 .o-scan__typeInput::placeholder { color: var(--color-on-dark-faint); }
@@ -1920,7 +1986,7 @@ button { background: none; border: none; color: inherit; }
 .m-scan-note__title:focus-visible { outline: none; box-shadow: none; }
 .m-scan-note__body {
   display: block; margin-top: 2px;
-  font-size: var(--text-caption); line-height: 1.45; color: var(--color-on-dark-soft);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-on-dark-soft);
 }
 /* There was a pair of chips here, Licence disc and Number plate, sized up to 48
    for a gloved hand at arm's length. They are gone, and the styles with them.
@@ -1962,11 +2028,13 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-circle);
   background: var(--color-text-on-dark);
 }
+/* Not --press-firm. This is imitating a physical shutter rather than a
+   button, and the travel is the point of it. */
 .a-shutter:active .a-shutter__ring { transform: scale(0.92); }
 [data-motion="reduced"] .a-shutter__ring { transition: none; }
 .a-shutter__label {
   max-width: 32ch;
-  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.35;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: var(--leading-snug);
   color: var(--color-on-dark-soft); text-align: center;
 }
 
@@ -1974,7 +2042,7 @@ button { background: none; border: none; color: inherit; }
    on, and at 11px it gets no large-text allowance: it is a line being read, and
    tertiary is for controls that are switched off. */
 .o-step__label {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-step__note { font-size: var(--text-caption); color: var(--color-text-secondary); }
@@ -1984,8 +2052,6 @@ button { background: none; border: none; color: inherit; }
    control: the map answers "where", the list answers "which", and on a phone
    held in one hand the list is the half you can actually reach. */
 .o-stations {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   background: var(--color-surface-page);
 }
 .o-stations[data-state="visible"] { display: flex; }
@@ -2052,6 +2118,8 @@ button { background: none; border: none; color: inherit; }
   -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
   box-shadow: var(--shadow-card); color: var(--color-text-primary);
 }
+/* Not a wash: this one sits over map imagery and has to stay legible, so
+   hover takes it to the full surface rather than tinting what is behind. */
 .a-icon-btn--onMap:hover { background: var(--color-surface); }
 
 /* m-station-head. The selected station, at the top of the sheet.
@@ -2096,7 +2164,7 @@ button { background: none; border: none; color: inherit; }
 .m-station-head__body { flex: 1 1 auto; min-width: 0; }
 .m-station-head__name {
   display: block; font-size: var(--text-lead); font-weight: var(--weight-heavy);
-  letter-spacing: -0.4px; color: var(--color-text-primary);
+  letter-spacing: var(--tracking-snug); color: var(--color-text-primary);
 }
 /* Focused by script so the sheet is announced, which is not the same as a
    driver having navigated to it. The global ring sets a halo as well as an
@@ -2114,7 +2182,7 @@ button { background: none; border: none; color: inherit; }
 .m-station-head__where,
 .m-station-head__has {
   display: block; margin-top: 2px;
-  font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 .m-station-head__km {
   flex-shrink: 0; text-align: right;
@@ -2137,7 +2205,7 @@ button { background: none; border: none; color: inherit; }
   border: none; border-radius: var(--radius-circle);
   background: none; color: var(--color-text-tertiary); cursor: pointer;
 }
-.a-shut:hover { background: var(--color-surface-sunken); color: var(--color-text-primary); }
+.a-shut:hover { background: var(--color-hover-lift); color: var(--color-text-primary); }
 .o-stations__act { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 /* m-deals. What the station sells that is not fuel.
@@ -2167,7 +2235,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-card);
   background: var(--color-surface-sunken);
 }
-.m-deal__icon { font-size: 22px; line-height: 1; }
+.m-deal__icon { font-size: 22px; line-height: var(--leading-flush); }
 .m-deal__title {
   display: block; margin-top: var(--sp-2);
   font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-text-primary);
@@ -2328,7 +2396,7 @@ button { background: none; border: none; color: inherit; }
   transition: transform var(--dur-fast) var(--ease-in-out),
               background var(--dur-fast) var(--ease-out);
 }
-.m-station:active { transform: scale(0.99); }
+.m-station:active { transform: scale(var(--press-subtle)); }
 .m-station[aria-checked="true"] {
   background: var(--gradient-primary); border-color: var(--color-primary);
   box-shadow: var(--shadow-btn);
@@ -2423,7 +2491,7 @@ button { background: none; border: none; color: inherit; }
   text-align: left; cursor: pointer; width: 100%;
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.m-list-row:active { transform: scale(0.985); }
+.m-list-row:active { transform: scale(var(--press-subtle)); }
 .m-list-row__body { flex: 1 1 auto; min-width: 0; }
 .m-list-row__title { display: block; font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .m-list-row__sub   { display: block; font-size: var(--text-caption2); color: var(--color-text-secondary); }
@@ -2477,8 +2545,6 @@ button { background: none; border: none; color: inherit; }
 /* o-onboard. A full screen of its own, because the sign-up sheet has finished
    its job and a sheet over a hero would say the flow is still in progress. */
 .o-onboard {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-6)) var(--sp-5)
            calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto; overscroll-behavior: contain;
@@ -2498,7 +2564,7 @@ button { background: none; border: none; color: inherit; }
    lose. Dark ink is the default and the on-dark ramp is the exception,
    which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
-  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: -0.1px;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight);
   color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
 .m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
@@ -2518,7 +2584,7 @@ button { background: none; border: none; color: inherit; }
    who reads the heading five fills in knows the rules without being taught. */
 .o-check__lead {
   margin-top: var(--sp-4);
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-check__checks { display: flex; flex-direction: column; gap: var(--sp-1h); }
@@ -2649,7 +2715,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-check__sub {
   display: block; margin-top: 1px;
-  font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 .o-onboard--reward .o-onboard__eyebrow,
 .o-onboard--reward .o-onboard__title { text-align: center; }
@@ -2662,7 +2728,7 @@ button { background: none; border: none; color: inherit; }
 .o-onboard__earned { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
 
 .o-onboard__eyebrow {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-on-dark-soft);
   margin-bottom: var(--sp-6);
 }
@@ -2674,7 +2740,7 @@ button { background: none; border: none; color: inherit; }
 .o-onboard__title:focus, .o-onboard__title:focus-visible { outline: none; box-shadow: none; }
 .o-onboard__title {
   margin-top: var(--sp-6);
-  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
 }
 .o-onboard--reward .o-onboard__title { color: var(--color-text-on-dark); }
 /* The gap before the action is flexible, so the button sits at the bottom on a
@@ -2705,8 +2771,6 @@ button { background: none; border: none; color: inherit; }
    not on the company list opens this screen too and is refused here, in words,
    rather than swallowed by an announcement on the map. */
 .o-check {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   background: var(--color-surface);
 }
 /* The answer is also the light. The top of the screen is washed in the
@@ -2771,8 +2835,8 @@ button { background: none; border: none; color: inherit; }
   /* Display, not hero. At 42px the longest station name wrapped to two lines on
      a 320dp phone, which cost 55px on the width with the least room to give. It
      is still the biggest thing on the screen by a wide margin. */
-  font-size: var(--text-display); font-weight: var(--weight-black); line-height: 1.05;
-  letter-spacing: -1px; color: var(--color-text-primary);
+  font-size: var(--text-display); font-weight: var(--weight-black); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display); color: var(--color-text-primary);
 }
 /* Flat ink, like every other headline in this app. It briefly shaded toward
    the brand blue through background-clip: text, which was the only clipped
@@ -2812,7 +2876,7 @@ button { background: none; border: none; color: inherit; }
 .o-check__altName { font-size: var(--text-footnote); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .o-check__altKm { font-size: var(--text-caption); color: var(--color-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .o-check__why {
-  font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-snug); color: var(--color-text-secondary);
   max-width: 34ch;
 }
 .o-check__action {
@@ -2931,7 +2995,7 @@ button { background: none; border: none; color: inherit; }
   border-top: 1px solid var(--color-border-light);
 }
 .m-fact__name {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-fact__value {
@@ -2944,8 +3008,6 @@ button { background: none; border: none; color: inherit; }
 }
 
 .o-fuel {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   background: var(--color-surface);
 }
 .o-fuel[data-state="arriving"], .o-fuel[data-state="visible"] { display: flex; }
@@ -2980,7 +3042,7 @@ button { background: none; border: none; color: inherit; }
 .o-fuel[data-expired="true"] .a-qr { opacity: 0.25; filter: grayscale(1); }
 .o-fuel[data-expired="true"] .m-fallback { display: none; }
 .o-fuel__title {
-  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary);
 }
 .o-fuel__lead {
@@ -3014,6 +3076,8 @@ button { background: none; border: none; color: inherit; }
    when a driver finally needs it, it can be read. */
 .m-fallback__value {
   font-family: var(--font-mono); font-size: var(--text-title); font-weight: var(--weight-heavy);
+  /* Off the scale: the fallback reference is read aloud to an attendant
+     digit by digit, so it is spaced for dictation rather than for reading. */
   letter-spacing: 2px; font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
 }
@@ -3102,7 +3166,7 @@ button { background: none; border: none; color: inherit; }
 .m-fuel-figures__cell:nth-child(2) { align-items: center; text-align: center; }
 .m-fuel-figures__cell:last-child   { align-items: flex-end; text-align: right; }
 .m-fuel-figures__value {
-  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 .m-fuel-figures__label {
@@ -3112,8 +3176,6 @@ button { background: none; border: none; color: inherit; }
 /* Quiet, and outside the scroll, so calling the fill off is always available
    and never the thing a thumb finds first. */
 .o-receipt {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
            calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
   background: var(--color-surface-page);
@@ -3157,7 +3219,7 @@ button { background: none; border: none; color: inherit; }
 /* a-screen-title. One title for every filed screen: the receipt, History,
    Account, Rewards. It left o-receipt when three other organisms borrowed
    the element - an element may not outlive its block's ancestry. */
-.a-screen-title { font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px; }
+.a-screen-title { font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug); }
 .a-screen-title:focus, .a-screen-title:focus-visible { outline: none; box-shadow: none; }
 .o-receipt__when { margin-top: var(--sp-1); font-size: var(--text-caption); color: var(--color-text-secondary); }
 /* The card reads like the till slip it stands in for: one fact per row, the
@@ -3257,8 +3319,6 @@ button { background: none; border: none; color: inherit; }
 .a-switch[aria-checked="true"] .a-switch__knob { transform: translateX(20px); }
 
 .o-account {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
            calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
@@ -3273,7 +3333,7 @@ button { background: none; border: none; color: inherit; }
 .o-account__row:last-of-type { border-bottom: none; }
 .o-account__rowBody { flex: 1 1 auto; min-width: 0; }
 .o-account__rowTitle { display: block; font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary); }
-.o-account__rowSub { display: block; margin-top: 1px; font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary); }
+.o-account__rowSub { display: block; margin-top: 1px; font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary); }
 .o-account__value {
   font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
@@ -3292,8 +3352,6 @@ button { background: none; border: none; color: inherit; }
    the hero's light, the bundles wear the data mark, and the verb wears a
    button's body. */
 .o-rewards {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
            calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
   background: var(--color-surface-page);
@@ -3321,18 +3379,18 @@ button { background: none; border: none; color: inherit; }
 }
 .o-rewards__bolt { position: absolute; top: var(--sp-4); right: var(--sp-4); color: var(--color-points-on-dark); line-height: 0; }
 .o-rewards__balanceLabel {
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .o-rewards__points {
-  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: 1.1;
-  letter-spacing: -0.6px; color: var(--color-text-on-dark);
+  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug); color: var(--color-text-on-dark);
   font-variant-numeric: tabular-nums;
 }
 .o-rewards__worth { font-size: var(--text-caption); font-weight: var(--weight-medium); color: var(--color-on-dark-mid); }
 .o-rewards__lead {
   margin-top: var(--sp-6);
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-rewards__list { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); }
@@ -3345,7 +3403,7 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-card-sm);
   transition: transform var(--dur-fast) var(--ease-in-out);
 }
-.m-bundle:active { transform: scale(0.985); }
+.m-bundle:active { transform: scale(var(--press-subtle)); }
 .m-bundle__main { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
 /* The bundle is a prize, not a settings row: it carries the same data mark
    the earned screen wears, and the mark's colour follows the row's state. */
@@ -3406,7 +3464,7 @@ button { background: none; border: none; color: inherit; }
 }
 .o-rewards__earnNote {
   margin-top: var(--sp-5);
-  font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 
 /* o-filling. The fill, watched. The one screen in the app that is alive
@@ -3415,8 +3473,7 @@ button { background: none; border: none; color: inherit; }
    moment. The count is the known debt the owner kept: the comment on the
    bar carries the terms. */
 .o-filling {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column; align-items: center; text-align: center;
+  align-items: center; text-align: center;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
            calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
   background: var(--color-surface-page);
@@ -3519,13 +3576,13 @@ button { background: none; border: none; color: inherit; }
 .o-filling__wave--back { animation-duration: 3.4s; }
 @keyframes waveDrift { to { transform: translateX(-12px); } }
 .o-filling__litres {
-  font-size: var(--text-figure); font-weight: var(--weight-heavy); line-height: 1;
-  letter-spacing: -1px; color: var(--color-text-primary);
+  font-size: var(--text-figure); font-weight: var(--weight-heavy); line-height: var(--leading-flush);
+  letter-spacing: var(--tracking-display); color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 .o-filling__unit { font-size: var(--text-callout); font-weight: var(--weight-semibold); color: var(--color-text-secondary); }
 .o-filling__facts { margin-top: var(--sp-4); font-size: var(--text-caption); color: var(--color-text-secondary); }
-.o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
+.o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary); max-width: 30ch; }
 .o-filling__action { align-self: stretch; margin-top: var(--sp-4); }
 .o-filling[data-face="done"] .o-filling__wave { animation-play-state: paused; }
 [data-motion="reduced"] .o-filling__wave { animation: none; }
@@ -3537,7 +3594,7 @@ button { background: none; border: none; color: inherit; }
 .o-filling[data-face="waiting"] .o-filling__unit,
 .o-filling[data-face="pump"] .o-filling__unit {
   font-size: var(--text-lead); font-weight: var(--weight-heavy); color: var(--color-text-primary);
-  letter-spacing: -0.4px;
+  letter-spacing: var(--tracking-snug);
 }
 /* The verdict is its own line, not a clause spliced into the unit. */
 .o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-success); }
@@ -3550,8 +3607,6 @@ button { background: none; border: none; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .o-filling[data-face="done"] .o-filling__litres { animation: none; } }
 
 .o-history {
-  position: absolute; inset: 0; z-index: var(--z-overlay);
-  display: none; flex-direction: column;
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
            calc(var(--sp-8) + var(--sp-8) + var(--sp-1));
   background: var(--color-surface-page);
@@ -3570,7 +3625,7 @@ button { background: none; border: none; color: inherit; }
    learned to read it once, on the screen that filed it. */
 .o-history__when {
   margin-top: var(--sp-4);
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-history__card + .o-history__when { margin-top: var(--sp-5); }
@@ -3642,7 +3697,7 @@ button { background: none; border: none; color: inherit; }
 .m-confirm__title { font-size: var(--text-callout); font-weight: var(--weight-heavy); color: var(--color-text-primary); }
 .m-confirm__title:focus, .m-confirm__title:focus-visible { outline: none; box-shadow: none; }
 .m-confirm__body {
-  font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
   margin-bottom: var(--sp-2);
 }
 /* Only the hover differs now that the atom itself is on a light surface. */
@@ -3853,7 +3908,7 @@ button { background: none; border: none; color: inherit; }
 }
 .p-onboard-demo__caption {
   font-size: var(--text-micro); color: var(--color-text-secondary); text-align: center;
-  max-width: 390px; line-height: 1.5;
+  max-width: 390px; line-height: var(--leading-body);
 }
 @media (max-width: 900px) {
   .p-onboard-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
@@ -3945,7 +4000,7 @@ button { background: none; border: none; color: inherit; }
         </span>
       </button>
 
-      <section class="o-onboard o-onboard--reward" id="rewardScreen"
+      <section class="t-screen o-onboard o-onboard--reward" id="rewardScreen"
                aria-labelledby="rewardTitle" hidden>
         <div class="o-onboard__orbs" aria-hidden="true">
           <div class="o-onboard__orb o-onboard__orb--a"></div>
@@ -4004,7 +4059,7 @@ button { background: none; border: none; color: inherit; }
            medal, same wave, same burst, same earn row. Gamification that
            changes shape between screens stops reading as one system, so this
            screen is deliberately the other one with different facts. -->
-      <section class="o-onboard o-onboard--reward" id="earnedScreen"
+      <section class="t-screen o-onboard o-onboard--reward" id="earnedScreen"
                aria-labelledby="earnedTitle" hidden>
         <div class="o-onboard__orbs" aria-hidden="true">
           <div class="o-onboard__orb o-onboard__orb--a"></div>
@@ -4059,7 +4114,7 @@ button { background: none; border: none; color: inherit; }
            driver checks them against the pump: where, what, how much, and
            only then what it paid. It stays until Done because a receipt that
            walks away is not a receipt. -->
-      <section class="o-receipt" id="receiptScreen" aria-labelledby="receiptTitle" hidden>
+      <section class="t-screen o-receipt" id="receiptScreen" aria-labelledby="receiptTitle" hidden>
         <h1 class="a-screen-title" id="receiptTitle" tabindex="-1">Receipt</h1>
         <p class="o-receipt__when" id="receiptWhen">Today · 9:41</p>
         <div class="o-receipt__card">
@@ -4104,7 +4159,7 @@ button { background: none; border: none; color: inherit; }
            destroying it, because a receipt that cannot be found again is not
            a receipt, and the person who asks for it is usually not the
            driver - it is the manager, a week later. -->
-      <section class="o-history" id="historyScreen" aria-labelledby="historyTitle" hidden>
+      <section class="t-screen o-history" id="historyScreen" aria-labelledby="historyTitle" hidden>
         <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="historyBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
@@ -4119,7 +4174,7 @@ button { background: none; border: none; color: inherit; }
            Account" pointed at a locked tab; a promise a curious colleague can
            disprove in two taps is worse than no promise. Everything here is
            the driver's own facts and the one setting that is theirs. -->
-      <section class="o-account" id="accountScreen" aria-labelledby="accountTitle" hidden>
+      <section class="t-screen o-account" id="accountScreen" aria-labelledby="accountTitle" hidden>
         <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="accountBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
@@ -4162,7 +4217,7 @@ button { background: none; border: none; color: inherit; }
            priced in points, the unaffordable one honest about what it needs.
            The balance wears the hero's light: this is the room the app's
            promise is kept in, so the number is lit like the prize it is. -->
-      <section class="o-rewards" id="rewardsScreen" aria-labelledby="rewardsTitle" hidden>
+      <section class="t-screen o-rewards" id="rewardsScreen" aria-labelledby="rewardsTitle" hidden>
         <div class="m-screen-bar">
           <button class="a-icon-btn" type="button" id="rewardsBack" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
         </div>
@@ -4196,7 +4251,7 @@ button { background: none; border: none; color: inherit; }
            the pump finishes while they are looking, the screen says so and
            offers the points - no notification detour for a driver already
            here. -->
-      <section class="o-filling" id="fillingScreen" aria-labelledby="fillingFacts" hidden>
+      <section class="t-screen o-filling" id="fillingScreen" aria-labelledby="fillingFacts" hidden>
         <div class="o-filling__bar">
 <!-- A cross, at the owner's call, and the words did not go far.
                This was a worded pill because during live fuelling an X can
@@ -4246,7 +4301,7 @@ button { background: none; border: none; color: inherit; }
       </section>
 
       <!-- SCREEN TWO · the app the flow lands in -->
-      <section class="o-home" id="homeScreen" aria-labelledby="homeName" hidden>
+      <section class="t-screen o-home" id="homeScreen" aria-labelledby="homeName" hidden>
         <div class="o-home__scroll">
 
           <div class="m-app-bar">
@@ -4464,7 +4519,7 @@ button { background: none; border: none; color: inherit; }
            Account confirmation, vehicle confirmation and the location ask are
            the same shape, so they are the same organism with different content
            rather than three screens whose margins drift apart. -->
-      <section class="o-step" id="stepScreen" aria-labelledby="stepTitle" hidden>
+      <section class="t-screen o-step" id="stepScreen" aria-labelledby="stepTitle" hidden>
         <div class="o-step__scroll">
           <div class="o-step__bar">
             <button class="a-icon-btn" type="button" id="stepBack" aria-label="Back" hidden>
@@ -4499,7 +4554,7 @@ button { background: none; border: none; color: inherit; }
            So the camera takes whatever is put in front of it and names what it
            found. Aiming at the other one is now just moving the phone, which is
            what the driver was going to do anyway. -->
-      <section class="o-scan" id="scanScreen" aria-labelledby="scanNoteTitle" hidden>
+      <section class="t-screen o-scan" id="scanScreen" aria-labelledby="scanNoteTitle" hidden>
         <div class="o-scan__view" aria-hidden="true"></div>
         <div class="o-scan__bar">
           <button class="a-icon-btn" type="button" data-tone="onDark" id="scanClose" aria-label="Close the scanner">
@@ -4568,7 +4623,7 @@ button { background: none; border: none; color: inherit; }
            raster asset in the project. What a driver needs from it here is
            where the pins sit relative to each other and to them, and a drawing
            carries that at a fraction of the weight. -->
-      <section class="o-stations" id="stationsScreen" aria-labelledby="stationsTitle" hidden>
+      <section class="t-screen o-stations" id="stationsScreen" aria-labelledby="stationsTitle" hidden>
 
         <div class="o-stations__map">
           <svg class="o-stations__plan" viewBox="0 0 390 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -4672,7 +4727,7 @@ button { background: none; border: none; color: inherit; }
            over it rather than instead of it. -->
       <!-- Between the map and the QR. It answers one question, will this fill
            be paid for, and it answers it either way. -->
-      <section class="o-check" id="checkScreen" aria-labelledby="checkStation" hidden>
+      <section class="t-screen o-check" id="checkScreen" aria-labelledby="checkStation" hidden>
         <div class="o-check__scroll">
 
           <div class="o-check__bar">
@@ -4731,7 +4786,7 @@ button { background: none; border: none; color: inherit; }
         </div>
       </section>
 
-      <section class="o-fuel" id="fuelScreen" aria-labelledby="fuelTitle" hidden>
+      <section class="t-screen o-fuel" id="fuelScreen" aria-labelledby="fuelTitle" hidden>
         <div class="o-fuel__scroll">
 
           <div class="o-fuel__bar">

@@ -148,6 +148,15 @@
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 
+  /* Hover, by what the control is standing on. Two intentions, and the file
+     had both already without naming either: a control with no fill of its own
+     gains a faint wash, and a control sitting on a sunken plate lifts toward
+     white instead. Named so the next component picks one rather than
+     inventing a third. */
+  --color-hover-wash:   var(--color-border-light);
+  --color-hover-lift:   var(--color-surface-hover);
+  --color-hover-onDark: var(--color-on-dark-line);
+
   /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
   --color-handle:     rgba(0,0,0,0.25);
@@ -213,6 +222,41 @@
   --weight-bold:     700;
   --weight-heavy:    800;
   --weight-black:    900;
+
+
+  /* Press. Two depths, because there are two kinds of thing to press: a
+     control you aim at, and a surface you tap. The file already used exactly
+     these two - 0.97 on the button, 0.985 on the rows and cards - plus one
+     0.99 on a station row that was doing the subtle job at a value of its
+     own. Naming them is what stops a third appearing.
+
+     The camera shutter keeps its own 0.92 and says why: it is imitating a
+     physical shutter, not a button, and the travel is the point. */
+  --press-firm:   0.97;
+  --press-subtle: 0.985;
+
+
+  /* Leading. Four jobs, which is what the file was already doing with
+     fourteen values: figures that must sit flush, display type that wants to
+     be tight, a two-line label that wants a little air, and running prose.
+     1.45, 1.5, 1.55 and 1.6 were four ways of saying "body"; 1.05, 1.08,
+     1.1, 1.18 and 1.2 were five ways of saying "headline". Nobody can tell
+     those apart, and having them meant every new component picked a number
+     rather than a job. */
+  --leading-flush: 1;
+  --leading-tight: 1.1;
+  --leading-snug:  1.35;
+  --leading-body:  1.5;
+
+  /* Tracking. Negative as type grows, positive when it goes uppercase -
+     which is the one part of the old spread that was real typography rather
+     than drift. These are the steps that repeat; a handful of headline
+     optics keep their own value and say so where they are written. */
+  --tracking-tight:     -0.3px;
+  --tracking-snug:      -0.5px;
+  --tracking-display:   -1px;
+  --tracking-caps:      0.08em;
+  --tracking-caps-wide: 0.16em;
 
   /* Radius */
   --radius-pill:   999px;
@@ -406,13 +450,13 @@ button { background: none; border: none; color: inherit; }
      it is the first thing you see. Variants that want a border declare one. */
   border: none;
   border-radius: var(--radius-pill);
-  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: -0.3px;
+  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight);
   text-decoration: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out),
               box-shadow var(--dur-fast) var(--ease-in-out),
               background var(--dur-base), color var(--dur-base), border-color var(--dur-base);
 }
-.a-btn:active { transform: scale(0.97); transition-duration: .1s; }
+.a-btn:active { transform: scale(var(--press-firm)); transition-duration: .1s; }
 .a-btn--primary {
   background: var(--gradient-primary);
   color: var(--color-text-on-dark); box-shadow: var(--shadow-btn);
@@ -428,7 +472,7 @@ button { background: none; border: none; color: inherit; }
   border: 1px solid var(--color-border-field);
   font-weight: var(--weight-semibold);
 }
-.a-btn--outline:hover { background: var(--color-border-light); }
+.a-btn--outline:hover { background: var(--color-hover-wash); }
 /* State is never a class: when a person becomes the last resort the scan
    sheet says so with data-lead, and the fact wears the primary coat. */
 .a-btn--outline[data-lead="true"] {
@@ -465,7 +509,7 @@ button { background: none; border: none; color: inherit; }
   min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: -0.1px;
+  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight);
   color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
 }
 /* Quiet is still a live control, so it differentiates upward from disabled
@@ -581,7 +625,7 @@ button { background: none; border: none; color: inherit; }
 /* a-helper */
 .a-helper {
   display: block;
-  font-size: var(--text-caption2); line-height: 1.5;
+  font-size: var(--text-caption2); line-height: var(--leading-body);
   color: var(--color-text-secondary);
 }
 .a-helper[data-tone="error"]   { color: var(--color-error-text); font-weight: var(--weight-semibold); }
@@ -679,7 +723,7 @@ button { background: none; border: none; color: inherit; }
 .a-toast {
   position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
   background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
-  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.45;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: var(--leading-body);
   padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
   box-shadow: var(--shadow-toast);
   opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
@@ -695,7 +739,7 @@ button { background: none; border: none; color: inherit; }
   padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
   padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
 }
-.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: -0.3px; }
+.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* Connection state, shown where a phone shows it. Without this data-net was a
@@ -709,7 +753,7 @@ button { background: none; border: none; color: inherit; }
    lose. Dark ink is the default and the on-dark ramp is the exception,
    which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
-  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: -0.1px;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight);
   color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
 .m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
@@ -742,11 +786,14 @@ button { background: none; border: none; color: inherit; }
    and a-icon-wrap already do. */
 .m-brand-lockup__name {
   font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-primary);
-  letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
+  letter-spacing: var(--tracking-snug); line-height: var(--leading-flush); margin-bottom: 2px;
 }
 .m-brand-lockup--onDark .m-brand-lockup__name { color: var(--color-text-on-dark); }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
+  /* Off the tracking scale on purpose: this is a 10px uppercase strapline
+     under a wordmark, and em tracking at that size lands too tight to read
+     as a lockup rather than as a word. */
   font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--color-on-dark-faint);
 }
@@ -767,10 +814,10 @@ button { background: none; border: none; color: inherit; }
 .m-alert__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
 .m-alert__icon { flex-shrink: 0; margin-top: -1px; }  /* optical, against cap height */
 .m-alert__title {
-  font-size: var(--text-footnote); font-weight: var(--weight-bold); line-height: 1.35;
+  font-size: var(--text-footnote); font-weight: var(--weight-bold); line-height: var(--leading-snug);
   color: var(--color-text-primary); margin-bottom: 3px;
 }
-.m-alert__body { font-size: var(--text-caption2); line-height: 1.55; color: var(--color-text-secondary); }
+.m-alert__body { font-size: var(--text-caption2); line-height: var(--leading-body); color: var(--color-text-secondary); }
 .m-alert__body b { color: var(--color-text-primary); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
 .m-alert__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
 .m-alert--onDark {
@@ -789,11 +836,11 @@ button { background: none; border: none; color: inherit; }
    control and lets that control hold the right edge on its own. */
 .m-sheet-header[data-heading="none"] { justify-content: flex-end; margin-bottom: 0; }
 .m-sheet-header__title {
-  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary); margin-bottom: var(--sp-1);
 }
 .m-sheet-header__sub {
-  font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 /* The masked number is one token. Breaking it across two lines turns a
    number the driver is checking against their handset into two fragments. */
@@ -829,7 +876,7 @@ button { background: none; border: none; color: inherit; }
 .m-sheet-header__close::after {
   content: ''; position: absolute; inset: 0 -6px -12px -6px;
 }
-.m-sheet-header__close:hover { background: var(--color-border-light); }
+.m-sheet-header__close:hover { background: var(--color-hover-wash); }
 
 /* a-progress. An atom, not a molecule: it bonds nothing. It is one line of
    text with a span inside it that exists only as a textContent hook, and a
@@ -842,7 +889,7 @@ button { background: none; border: none; color: inherit; }
    is an attribute, and the attribute is the one the platform already has. */
 .a-progress {
   display: flex;
-  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--color-text-secondary);
   margin-bottom: var(--sp-4);
 }
@@ -853,7 +900,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; gap: var(--sp-2); flex-shrink: 0;
   padding-right: var(--sp-3); border-right: 1px solid var(--color-primary-12);
 }
-.m-phone-field__flag { font-size: var(--text-lead); line-height: 1; }
+.m-phone-field__flag { font-size: var(--text-lead); line-height: var(--leading-flush); }
 .m-phone-field__code { font-size: var(--text-body); font-weight: var(--weight-heavy); }
 
 
@@ -953,10 +1000,12 @@ button { background: none; border: none; color: inherit; }
      carry the air above it. */
   margin-top: auto;
   font-size: var(--text-hero); font-weight: var(--weight-heavy); color: var(--color-text-on-dark);
-  line-height: 1.08; letter-spacing: -1.6px; margin-bottom: var(--sp-3);
+  /* Off the scale: one headline optic. At 42px the display step is too
+     loose and the hero step too tight, and this is the only 42px line. */
+  line-height: var(--leading-tight); letter-spacing: -1.6px; margin-bottom: var(--sp-3);
 }
 .o-auth-hero__lede {
-  font-size: var(--text-body); font-weight: var(--weight-regular); line-height: 1.6;
+  font-size: var(--text-body); font-weight: var(--weight-regular); line-height: var(--leading-body);
   color: var(--color-on-dark-soft); margin-bottom: var(--sp-5);
 }
 /* How the door works, in one breath, so the button is an answer rather
@@ -983,7 +1032,7 @@ button { background: none; border: none; color: inherit; }
   /* Clear of the lockup rather than flush against it: margin-top:0 removed the
      push to the bottom and left the headline sitting on "DRIVER REWARDS". */
   margin-top: var(--sp-6);
-  font-size: var(--text-title); line-height: 1.2; letter-spacing: -0.6px;
+  font-size: var(--text-title); line-height: var(--leading-tight); letter-spacing: var(--tracking-snug);
 }
 /* The button and the help link are what opened the sheet. Leaving them behind
    it floats a dead control in the middle of the screen, and a driver who taps
@@ -1026,7 +1075,7 @@ button { background: none; border: none; color: inherit; }
 .o-status-page__meta .m-figure { align-items: center; text-align: center; }
 .m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .m-figure__key {
-  font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: 0.12em;
+  font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps-wide);
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-figure__val {
@@ -1063,11 +1112,11 @@ button { background: none; border: none; color: inherit; }
 }
 .o-status-page__icon { margin-inline: auto; }
 .o-status-page__title {
-  font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: -0.3px;
+  font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-tight);
   margin: var(--sp-4) 0 var(--sp-2);
 }
 .o-status-page__body {
-  font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary);
+  font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary);
   margin-bottom: var(--sp-5);
 }
 .o-status-page__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
@@ -1161,7 +1210,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-keyboard__sub {
   font-family: var(--font-sans); font-size: 9px; font-weight: var(--weight-semibold);
-  letter-spacing: 0.06em; fill: var(--kb-sub); text-anchor: middle;
+  letter-spacing: var(--tracking-caps); fill: var(--kb-sub); text-anchor: middle;
 }
 /* Without backdrop-filter, which is real on older Android WebViews, a
    translucent panel over a near-black hero is unreadable. Go opaque. */
@@ -1247,7 +1296,7 @@ button { background: none; border: none; color: inherit; }
    disclosure riding inline so the sentence and its door read as one. */
 .o-signup-sheet__note {
   margin-top: var(--sp-2);
-  font-size: var(--text-caption2); line-height: 1.5;
+  font-size: var(--text-caption2); line-height: var(--leading-body);
   color: var(--color-text-secondary);
 }
 .o-signup-sheet__noteMore {
@@ -1269,7 +1318,7 @@ button { background: none; border: none; color: inherit; }
 .m-privacy { display: flex; flex-direction: column; gap: var(--sp-2h); margin-top: var(--sp-2); }
 .m-privacy__row {
   display: flex; align-items: flex-start; gap: var(--sp-2h);
-  font-size: var(--text-caption2); line-height: 1.5; color: var(--color-text-secondary);
+  font-size: var(--text-caption2); line-height: var(--leading-body); color: var(--color-text-secondary);
 }
 .m-privacy__row b { color: var(--color-text-primary); font-weight: var(--weight-bold); }
 .m-privacy__icon { flex-shrink: 0; color: var(--color-primary); margin-top: 1px; }
@@ -1318,12 +1367,12 @@ button { background: none; border: none; color: inherit; }
    ring drawn round a heading nobody moved to reads as a control. The sibling
    panel already did this and this one was missed. */
 .o-status-page__title:focus-visible { outline: none; box-shadow: none; }
-.o-outcome-panel__title { font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: -0.3px; }
-.o-outcome-panel__body { font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary); }
+.o-outcome-panel__title { font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-tight); }
+.o-outcome-panel__body { font-size: var(--text-caption); line-height: var(--leading-body); color: var(--color-text-secondary); }
 .o-outcome-panel__clock {
-  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.6px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary); font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
 }
 /* A supporting offer, not the outcome, so it sits below the clock and quieter
    than both the title and the number. */
@@ -1527,7 +1576,7 @@ button { background: none; border: none; color: inherit; }
 }
 .p-signup-demo__caption {
   font-size: var(--text-micro); color: var(--color-text-secondary); text-align: center;
-  max-width: 390px; line-height: 1.5;
+  max-width: 390px; line-height: var(--leading-body);
 }
 
 @media (max-width: 900px) {
@@ -5745,7 +5794,11 @@ button { background: none; border: none; color: inherit; }
         '--size-action': 'the app’s one CTA height',
         '--text-figure': 'the app’s live litre count',
         '--size-plate-lg': 'the app’s station head and vehicle card plates',
-        '--weight-light': 'the app’s step title, set to sound like someone speaking'
+        '--weight-light': 'the app’s step title, set to sound like someone speaking',
+        '--press-subtle': 'the app’s rows and cards, which are tapped rather than aimed at',
+        '--tracking-display': 'the app’s station name and litre count',
+        '--color-hover-lift': 'the app’s icon buttons, which sit on a sunken plate',
+        '--color-hover-onDark': 'the app’s scanner, the one dark screen with controls on it'
       };
       var dead = Object.keys(declared).filter(function (d) {
         return !used[d] && !SPENT_BY_THE_OTHER_FLOW[d];

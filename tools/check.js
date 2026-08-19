@@ -727,7 +727,7 @@ const USED_ONLY = new Set([
      the declarations */
   'm-phone-field',
 ]);
-const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|radius|shadow|sp|size|z|ease|dur|d)-/;
+const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|leading|tracking|radius|shadow|sp|size|press|z|ease|dur|d)-/;
 
 for (const name of FILES) {
   const styleBlocks = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
@@ -780,7 +780,7 @@ for (const name of FILES) {
   /* Token definitions stay inside the sanctioned families. */
   for (const m of styleNoComments.matchAll(/^\s*(--[a-z][\w-]*)\s*:/gm)) {
     if (!TOKEN_FAMILY.test(m[1])) {
-      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --weight- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
+      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --weight- --leading- --tracking- --press- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
     }
   }
 }
