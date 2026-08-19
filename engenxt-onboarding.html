@@ -3546,7 +3546,7 @@ body {
                where the number just grew. -->
           <div class="m-earn-row" data-state="landed">
             <span class="a-icon-wrap a-icon-wrap--onDark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-on-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg></span>
-            <span class="m-earn-row__label" id="earnedWorth">Worth about 0.52 GB of mobile data</span>
+            <span class="m-earn-row__label" id="earnedWorth">Worth about 524 MB of mobile data</span>
           </div>
           <!-- The claim no other South African programme makes, said where it
                is truest: the driver just watched it happen. Two short
@@ -6424,7 +6424,7 @@ body {
        without a scan. */
     el.checkGo.setAttribute('aria-disabled', 'false');
     el.checkGo.textContent = v ? 'Show fuel code for ' + v.plate : 'Scan your vehicle';
-    el.checkOther.textContent = clear ? 'Choose another approved station' : 'Show approved stations';
+    el.checkOther.textContent = clear ? 'Choose another approved station' : 'Choose a station on the list';
 
     el.check.hidden = false;
     if (arriving && !prefersReduced()) {
@@ -6455,9 +6455,9 @@ body {
     var hours = S.hours !== 'closed';
     return [
       { ok: !!st.allowed, shortName: 'Company list',
-        title: st.allowed ? 'Approved by your company' : 'Station no longer approved',
+        title: 'On your company list',
         sub: st.allowed ? st.name + ' is approved for you'
-                        : st.name + ' came off your company list' },
+                        : st.name + ' is not one your company pays for' },
       /* Never a number, and never the word funds.
 
          A driver has no business seeing what their employer holds in an
@@ -6733,7 +6733,7 @@ body {
     var v = fillVehicle();
     el.earnedRowLabel.textContent = 'Fuelling ' + fillLitresFinal() + ' L';
     el.earnedRowPill.textContent = '+' + fillPts() + ' pts';
-    el.earnedWorth.textContent = 'About ' + dataLabel(fillPts() / S.ptsPerGb) + ' of data';
+    el.earnedWorth.textContent = 'Worth about ' + dataLabel(fillPts() / S.ptsPerGb) + ' of mobile data';
     el.earnedMedal.setAttribute('aria-label', fillPts() + ' points earned for this fill');
     el.earned.hidden = false;
     el.earned.setAttribute('data-state', 'visible');
@@ -6820,7 +6820,7 @@ body {
     el.rewards.hidden = false;
     el.rewards.setAttribute('data-state', 'visible');
     announce('Rewards. ' + groupNum(balancePts()) + ' points. About ' +
-             dataLabel(balancePts() / S.ptsPerGb) + ' of data.');
+             dataLabel(balancePts() / S.ptsPerGb) + ' of mobile data.');
     after(60, function () { el.rewardsTitle.focus({ preventScroll: true }); });
     after(900, function () { el.rewards.removeAttribute('data-motion'); });
   }
@@ -7880,15 +7880,15 @@ body {
       } },
     'signup-reward':      { group: 'after-signup', label: 'Reward, 50 points',
       run: function () { reset('new-driver', true, ASSIGNED_ON_ARRIVAL); showReward(); } },
-    'home':               { group: 'after-signup', label: 'One vehicle',
+    'home':               { group: 'after-signup', label: 'Home, one vehicle',
       run: function () { reset('new-driver', true, 1); showHome(); } },
-    'new-four-vehicles':  { group: 'after-signup', label: 'Four vehicles',
+    'new-four-vehicles':  { group: 'after-signup', label: 'Home, four vehicles',
       run: function () { reset('new-driver', true, 4); showHome(); } },
-    'new-five-vans':      { group: 'after-signup', label: 'Five vans',
+    'new-five-vans':      { group: 'after-signup', label: 'Home, five vans',
       run: function () { reset('new-driver', true, VANS); showHome(); } },
-    'new-nine-vehicles':  { group: 'after-signup', label: 'Nine vehicles',
+    'new-nine-vehicles':  { group: 'after-signup', label: 'Home, nine vehicles',
       run: function () { reset('new-driver', true, 9); showHome(); } },
-    'new-thousand-vehicles': { group: 'after-signup', label: 'A thousand vehicles',
+    'new-thousand-vehicles': { group: 'after-signup', label: 'Home, a thousand vehicles',
       run: function () { reset('new-driver', true, 1000); showHome(); } },
 
     'returning-signin':   { group: 'returning', label: 'Signed in again',
@@ -8375,7 +8375,7 @@ body {
     navCode:    'The six digits, and every way the code can fail to arrive or fail to match.',
     navBlocked: 'Full screens for a driver who cannot get past this from here.',
     navDone:    'The end of sign-up: the Face ID offer and its every outcome, then the handover to the welcome flow.',
-    'after-signup': 'The reward, then the app, at every size of fleet. Nothing driven yet.',
+    'after-signup': 'Linking first, then the reward, then home at every size of fleet. Nothing driven yet.',
     'returning':    'The same fleets, with the vehicles they have actually been in leading.',
     'flow1':        'Opening the app, confirming the vehicle, and landing on the map.',
     'fuelling':     'Choosing where, the QR that comes back, the fill itself, and what it pays.'
