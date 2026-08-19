@@ -323,6 +323,30 @@
      raw values it replaced. */
   --size-border:        1.5px;
 
+
+  /* Object sizes. The scale had six members and none of them was the size of
+     a thing, so every round object in the file carried a number somebody
+     typed: a tick beside a line was 24px on the fuel screen, 26px on home and
+     28px on the check. Three components, one job, three answers.
+
+     These are the sizes of things, named for what the thing is doing.
+
+     --size-mark is a mark beside a line of text. --size-mark-lg is the same
+     mark while its row is still being answered, and --size-mark-sm is what it
+     shrinks to once the answer is a receipt rather than news - two states of
+     one component, which is a reason, unlike the three above.
+
+     --size-stage is a mark that leads a screen, and --size-stage-lg the one
+     that leads a ceremony. */
+  --size-mark:     26px;
+  --size-mark-sm:  22px;
+  --size-mark-lg:  34px;
+  --size-object:   36px;
+  --size-stage:    64px;
+  --size-stage-lg: 88px;
+  --size-glyph:    38px;
+  --size-control-sm: 32px;
+
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
      can draw. */
@@ -655,7 +679,7 @@ button { background: none; border: none; color: inherit; }
 /* No tint. The plate a row uses when what it holds is not available - the
    ground shows through instead of the brand's own light. */
 .a-icon-wrap--bare { background: var(--color-surface); }
-.a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+.a-icon-wrap--lg { width: var(--size-stage); height: var(--size-stage); border-radius: var(--radius-circle); }
 /* Library carry from the app file: the dark-surface plate. */
 .a-icon-wrap--onDark {
   background: var(--color-accent-on-dark-fill);
@@ -676,7 +700,7 @@ button { background: none; border: none; color: inherit; }
    scratches, and concentric circles around a warning draw a target around
    bad news. Light carries presence without aiming at it. */
 .a-icon-wrap--mark {
-  width: 88px; height: 88px;
+  width: var(--size-stage-lg); height: var(--size-stage-lg);
   position: relative;
 }
 .a-icon-wrap--mark::before {
@@ -685,7 +709,7 @@ button { background: none; border: none; color: inherit; }
   background: radial-gradient(closest-side, currentColor, transparent 74%);
   opacity: 0.20; pointer-events: none;
 }
-.a-icon-wrap--mark svg { width: 38px; height: 38px; }
+.a-icon-wrap--mark svg { width: var(--size-glyph); height: var(--size-glyph); }
 /* The halo takes the tone's own colour, so a paused account glows amber and a
    dead end glows red without a second set of rules. */
 .a-icon-wrap--mark[data-tone="error"]   { color: var(--color-secondary); }
@@ -772,7 +796,7 @@ button { background: none; border: none; color: inherit; }
 /* m-brand-lockup */
 .m-brand-lockup { display: flex; align-items: center; gap: var(--sp-2h); }
 .m-brand-lockup__mark {
-  width: 36px; height: 36px; flex-shrink: 0;
+  width: var(--size-object); height: var(--size-object); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: var(--color-secondary); border-radius: var(--radius-chip);
   box-shadow: var(--shadow-brand);
@@ -869,7 +893,7 @@ button { background: none; border: none; color: inherit; }
    or listens on reaches above the scroller's edge. */
 .m-sheet-header__close {
   position: relative; flex-shrink: 0;
-  width: 36px; height: 36px;
+  width: var(--size-object); height: var(--size-object);
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle); cursor: pointer;
 }

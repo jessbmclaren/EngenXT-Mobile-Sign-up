@@ -326,6 +326,30 @@
      raw values it replaced. */
   --size-border:        1.5px;
 
+
+  /* Object sizes. The scale had six members and none of them was the size of
+     a thing, so every round object in the file carried a number somebody
+     typed: a tick beside a line was 24px on the fuel screen, 26px on home and
+     28px on the check. Three components, one job, three answers.
+
+     These are the sizes of things, named for what the thing is doing.
+
+     --size-mark is a mark beside a line of text. --size-mark-lg is the same
+     mark while its row is still being answered, and --size-mark-sm is what it
+     shrinks to once the answer is a receipt rather than news - two states of
+     one component, which is a reason, unlike the three above.
+
+     --size-stage is a mark that leads a screen, and --size-stage-lg the one
+     that leads a ceremony. */
+  --size-mark:     26px;
+  --size-mark-sm:  22px;
+  --size-mark-lg:  34px;
+  --size-object:   36px;
+  --size-stage:    64px;
+  --size-stage-lg: 88px;
+  --size-glyph:    38px;
+  --size-control-sm: 32px;
+
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
      can draw. */
@@ -571,7 +595,7 @@ button { background: none; border: none; color: inherit; }
 /* No tint. The plate a row uses when what it holds is not available - the
    ground shows through instead of the brand's own light. */
 .a-icon-wrap--bare { background: var(--color-surface); }
-.a-icon-wrap--lg { width: 64px; height: 64px; border-radius: var(--radius-circle); }
+.a-icon-wrap--lg { width: var(--size-stage); height: var(--size-stage); border-radius: var(--radius-circle); }
 /* The mark on a screen that stops someone.
 
    A driver who cannot get in is not reading a field label, they are working out
@@ -588,7 +612,7 @@ button { background: none; border: none; color: inherit; }
    scratches, and concentric circles around a warning draw a target around
    bad news. Light carries presence without aiming at it. */
 .a-icon-wrap--mark {
-  width: 88px; height: 88px;
+  width: var(--size-stage-lg); height: var(--size-stage-lg);
   position: relative;
 }
 .a-icon-wrap--mark::before {
@@ -597,7 +621,7 @@ button { background: none; border: none; color: inherit; }
   background: radial-gradient(closest-side, currentColor, transparent 74%);
   opacity: 0.20; pointer-events: none;
 }
-.a-icon-wrap--mark svg { width: 38px; height: 38px; }
+.a-icon-wrap--mark svg { width: var(--size-glyph); height: var(--size-glyph); }
 /* The halo takes the tone's own colour, so a paused account glows amber and a
    dead end glows red without a second set of rules. */
 .a-icon-wrap--mark[data-tone="error"]   { color: var(--color-secondary); }
@@ -687,7 +711,7 @@ button { background: none; border: none; color: inherit; }
 .m-push[data-state="visible"] { display: flex; animation: pushIn .5s var(--ease-spring) both; }
 @keyframes pushIn { from { transform: translateY(-140%); opacity: 0 } to { transform: none; opacity: 1 } }
 .m-push__icon {
-  flex-shrink: 0; width: 38px; height: 38px; border-radius: var(--radius-chip);
+  flex-shrink: 0; width: var(--size-glyph); height: var(--size-glyph); border-radius: var(--radius-chip);
   display: flex; align-items: center; justify-content: center;
   background: var(--color-secondary); color: var(--color-text-on-dark);
 }
@@ -705,7 +729,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-brand-lockup { display: flex; align-items: center; gap: var(--sp-2h); }
 .m-brand-lockup__mark {
-  width: 36px; height: 36px; flex-shrink: 0;
+  width: var(--size-object); height: var(--size-object); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: var(--color-secondary); border-radius: var(--radius-chip);
   box-shadow: var(--shadow-brand);
@@ -1288,7 +1312,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-linked__tick {
   flex-shrink: 0;
-  width: 26px; height: 26px;
+  width: var(--size-mark); height: var(--size-mark);
   display: grid; place-items: center;
   border-radius: var(--radius-circle);
   background: var(--color-success); color: var(--color-text-on-dark);
@@ -1403,7 +1427,7 @@ button { background: none; border: none; color: inherit; }
    this is a plate that answers when pressed. */
 .a-vehicle-chip {
   flex: 0 1 auto;
-  min-height: 32px;
+  min-height: var(--size-control-sm);
   padding: var(--sp-1) var(--sp-2h) var(--sp-1) var(--sp-2);
   display: inline-flex; align-items: center; gap: var(--sp-1h);
   border-radius: var(--radius-pill);
@@ -1500,7 +1524,7 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-primary-dark);
 }
 .m-vehicle-card__chev {
-  flex-shrink: 0; width: 32px; height: 32px;
+  flex-shrink: 0; width: var(--size-control-sm); height: var(--size-control-sm);
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle); background: var(--color-surface-sunken);
   color: var(--color-text-secondary);
@@ -2667,7 +2691,7 @@ button { background: none; border: none; color: inherit; }
   background: none; border-color: transparent; padding-block: var(--sp-1h);
 }
 .m-check[data-outcome="pass"] .m-check__mark {
-  width: 22px; height: 22px; border-width: 1.5px;
+  width: var(--size-mark-sm); height: var(--size-mark-sm); border-width: 1.5px;
 }
 .m-check[data-outcome="pass"] .m-check__title {
   font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-secondary);
@@ -2680,7 +2704,7 @@ button { background: none; border: none; color: inherit; }
   background: none; border-color: transparent; padding-block: var(--sp-1h);
 }
 .m-check[data-outcome="skipped"] .m-check__mark {
-  width: 22px; height: 22px; border-width: 1.5px;
+  width: var(--size-mark-sm); height: var(--size-mark-sm); border-width: 1.5px;
   border-color: var(--color-border-strong); color: var(--color-text-tertiary);
 }
 .m-check[data-outcome="skipped"] .m-check__title {
@@ -2692,7 +2716,7 @@ button { background: none; border: none; color: inherit; }
 .m-check__mark {
   /* Positioned so the refusal's ring has something to sit in. */
   position: relative;
-  flex-shrink: 0; width: 34px; height: 34px;
+  flex-shrink: 0; width: var(--size-mark-lg); height: var(--size-mark-lg);
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
   border: 1.5px solid var(--color-success);
@@ -2925,7 +2949,7 @@ button { background: none; border: none; color: inherit; }
    back to being the same shape home draws. */
 .m-verdict__mark {
   position: relative;
-  width: 28px; height: 28px; flex-shrink: 0;
+  width: var(--size-mark); height: var(--size-mark); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
 }
@@ -3041,7 +3065,7 @@ button { background: none; border: none; color: inherit; }
 .o-fuel__title:focus, .o-fuel__title:focus-visible { outline: none; box-shadow: none; }
 .o-fuel__tick {
   display: inline-grid; place-items: center;
-  width: 24px; height: 24px; margin-right: var(--sp-2);
+  width: var(--size-mark); height: var(--size-mark); margin-right: var(--sp-2);
   vertical-align: -5px;
   border-radius: var(--radius-circle);
   background: var(--color-success); color: var(--color-text-on-dark);
@@ -3311,7 +3335,7 @@ button { background: none; border: none; color: inherit; }
    years for a switch to exist: the track grey that clears 3:1, and the knob
    shadow. aria-checked is the state; the class never changes. */
 .a-switch {
-  flex-shrink: 0; width: 52px; height: 32px; padding: 2px;
+  flex-shrink: 0; width: 52px; height: var(--size-control-sm); padding: 2px;
   border: none; border-radius: var(--radius-pill);
   background: var(--color-switch-track); cursor: pointer;
   transition: background var(--dur-fast) var(--ease-in-out);
@@ -3556,7 +3580,7 @@ button { background: none; border: none; color: inherit; }
    because nothing has gone wrong with the driver's code or their litres. */
 .o-filling__mark {
   position: relative;
-  width: 64px; height: 64px; margin-bottom: var(--sp-2);
+  width: var(--size-stage); height: var(--size-stage); margin-bottom: var(--sp-2);
   display: grid; place-items: center;
   border-radius: var(--radius-circle);
   /* currentColor is the hue, so the ring that leaves this disc is the warning
