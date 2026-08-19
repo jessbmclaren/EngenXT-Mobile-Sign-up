@@ -9462,11 +9462,18 @@ function form(spec) {
 
     // Values first, then the complaints, so a field never shows an error about
     // a value it is no longer holding.
-    Object.entries(ID).forEach(([field, id]) => {
+    const writeValues = () => Object.entries(ID).forEach(([field, id]) => {
       const node = document.getElementById(id);
       if (node) node.value = s.values[field] ?? '';
     });
+    writeValues();
     sync();
+    /* Written again after sync, because a select whose options sync builds
+       could not hold its value the first time: assigning `double` to an empty
+       <select> silently leaves it empty, and the record's configuration was
+       lost between arriving and being shown. Idempotent, so every other field
+       is simply reassigned the value it already has. */
+    writeValues();
 
     root.querySelectorAll('.form-field').forEach(f => {
       f.classList.remove('invalid');
@@ -12176,7 +12183,7 @@ return { tank, engine, showEngine, BANDS, LEGACY, MODELS, resolveModel, bandFor 
  */
 const F = {
   REG: 0, FLEET: 1, MODEL: 2, YEAR: 3, TYPE: 4, FUEL: 5, CAP: 6,
-  BLOCK: 7, REASON: 8, STATUS: 9, NOTES: 10,
+  BLOCK: 7, REASON: 8, STATUS: 9, NOTES: 10, VIN: 11, CONFIG: 12,
 };
 
 /* Who the invitation goes to: the driver, on their mobile number. Confirmed by
@@ -12197,15 +12204,15 @@ const INVITE_TO = 'the driver’s mobile number';
 /* The eight sample vehicles the Flutter prototype imports, so the table reads
  * the same in both and a screenshot of one can be checked against the other. */
 const VEHICLES = [
-  ['HRV 482 GP', 'FL-014', 'Toyota Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
-  ['JTM 901 GP', 'FL-002', 'Isuzu D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Allowed', '', 'Active', []],
-  ['KPL 337 GP', 'FL-021', 'Ford Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
-  ['LDW 129 GP', 'FL-008', 'Nissan NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Allowed', '', 'Active', []],
-  ['MHB 664 GP', 'FL-011', 'Volkswagen Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Allowed', '', 'Active', []],
-  ['NCA 875 GP', 'FL-005', 'MAN TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Allowed', '', 'Active', []],
+  ['HRV 482 GP', 'FL-014', 'Toyota Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G30A123456', 'double'],
+  ['JTM 901 GP', 'FL-002', 'Isuzu D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Allowed', '', 'Active', [], 'ADMFR22G7L1234567', 'double'],
+  ['KPL 337 GP', 'FL-021', 'Ford Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AFAPXXMJ2PNE12345', 'double'],
+  ['LDW 129 GP', 'FL-008', 'Nissan NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Allowed', '', 'Active', [], 'ADNUJUD22Z0123456', 'single'],
+  ['MHB 664 GP', 'FL-011', 'Volkswagen Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Allowed', '', 'Active', [], 'AAVZZZ7HZMX123456', ''],
+  ['NCA 875 GP', 'FL-005', 'MAN TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Allowed', '', 'Active', [], 'WMA06XZZ8JM123456', ''],
   /* Uploaded this morning. Its invitation went out with the upload and it is
      an ordinary vehicle. */
-  ['JXR 771 GP', 'FL-023', 'Toyota Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
+  ['JXR 771 GP', 'FL-023', 'Toyota Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G50A987654', 'double'],
   /* A stolen vehicle belongs in the list. The product could report one, draw
      it a receipt and keep a record for it, and the directory had no row in
      that state and no way to filter for one. So the fleet screen quietly
@@ -12219,15 +12226,15 @@ const VEHICLES = [
      vehicle at 09:14" and "waiting for Ford to confirm the repair date" are
      read together or not at all. */
   ['PBK 550 GP', 'FL-007', 'Toyota Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Allowed', 'Hijacked', 'Reported stolen',
-    [{ kind: 'change', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Fuel access', from: 'Can fuel', to: 'Stolen lock' },
+    [{ kind: 'change', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Operational status', from: 'Active', to: 'Reported stolen' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Reason', from: '', to: 'Hijacked' },
-     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. SAPS case 411/8/2026 opened.' }]],
+     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. SAPS case 411/8/2026 opened.' }], 'AHTFB71J40A234567', 'single'],
   ['RTS 018 GP', '', 'Hino 300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Allowed', '', 'In maintenance',
-    [{ kind: 'change', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Fuel access', from: 'Can fuel', to: 'Cannot fuel' },
-     { kind: 'reason', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Reason', from: '', to: 'In for a service' },
+    [{ kind: 'change', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Operational status', from: 'Active', to: 'In maintenance' },
+     { kind: 'reason', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Reason', from: '', to: 'Booked in for a service' },
      { kind: 'note', who: 'Lerato Mokoena', at: '18 Aug, 09:15', text: 'Waiting for Ford to confirm the repair date.' },
-     { kind: 'note', who: 'Sipho Dube', at: '19 Aug, 07:02', text: 'Gearbox part is on back order. Two weeks at least.' }]],
-  ['VBN 442 GP', 'FL-019', 'Mercedes-Benz Sprinter 519', '2023', 'van', 'Diesel', 93, 'Allowed', 'Sold', 'Removed from fleet', []],
+     { kind: 'note', who: 'Sipho Dube', at: '19 Aug, 07:02', text: 'Gearbox part is on back order. Two weeks at least.' }], 'JHDFC9JEL0X123456', 'light'],
+  ['VBN 442 GP', 'FL-019', 'Mercedes-Benz Sprinter 519', '2023', 'van', 'Diesel', 93, 'Allowed', 'Sold', 'Removed from fleet', [], 'WDB9066332P123456', ''],
 ];
 
 /* The 25 governed makes. "Other" is not among them: it was a control rather
@@ -12685,6 +12692,32 @@ const form = Records.form({
      one required list and are filtered out here when they are not on screen.
      A required field that is not being shown must never appear in the error
      summary: it sends somebody looking for a control that is not there. */
+  /* Called by the engine whenever values arrive from anywhere other than the
+     keyboard. Everything it does is derived from the values themselves, so it
+     is safe to run at any time and produces the same screen for the same
+     record. */
+  sync: (get, root) => {
+    if (!window.__vehicleSheet) return;
+    /* The sheet controller owns which conditional fields are on screen, and
+       it derives all of them from the taxonomy and the tank answer. */
+    __vehicleSheet.syncCategory();
+
+    /* The tank questions have no control of their own in a scripted state:
+       the record carries a capacity, not an answer to "how many tanks". A
+       single capacity means one tank unless something says otherwise, which
+       is the reading a person would give it. */
+    const mirror = document.getElementById('f-tank-mode');
+    const chosen = root.querySelector('[name="tankMode"]:checked');
+    if (!chosen && get('tankCapacity')) {
+      const one = root.querySelector('[name="tankMode"][value="one"]');
+      if (one) {
+        one.checked = true;
+        if (mirror) mirror.value = 'one';
+      }
+    }
+    __vehicleSheet.syncTanks();
+  },
+
   applies: (field, get) => {
     /* Which capacity question is live depends on the tank count, and the count
        itself is always asked. Without this the form reported a missing
@@ -12714,7 +12747,11 @@ const form = Records.form({
        invitation on its own, so there is nothing left for a person to press. */
     const row = [v.registration, v.fleetNumber, `${v.make} ${v.model}`.trim(),
       v.year, v.vehicleType,
-      v.fuelType, Number(v.tankCapacity), 'Allowed', '', 'Active', []];
+      v.fuelType, Number(v.tankCapacity), 'Allowed', '', 'Active', [],
+      /* Stored normalised, so two people typing the same VIN two ways produce
+         one string to match on. */
+      (window.VIN ? VIN.normalise(v.vin) : v.vin) || '',
+      v.vehicleConfiguration || ''];
     if (state && state.editing) {
       const existing = VEHICLES.find(x => x[0] === state.editing);
       if (existing) {
@@ -13108,7 +13145,8 @@ const editState = r => {
     values: {
       registration: r[0], fleetNumber: r[1], make, model: model.join(' '),
       year: r[3], vehicleType: r[4], fuelType: r[5],
-      tankCapacity: String(r[6]), vin: '',
+      tankCapacity: String(r[6]), vin: r[F.VIN] || '',
+    vehicleConfiguration: r[F.CONFIG] || '',
     },
   };
 };
