@@ -3480,14 +3480,49 @@ button { background: none; border: none; color: inherit; }
 }
 .o-filling[data-state="visible"] { display: flex; }
 /* The outcome faces carry the light of their outcome, the way the check
-   screen does: a wash at the top in the hue of the news. The live faces get
-   nothing, because a fill in progress is not news yet and the vessel is
-   already the thing that glows. */
+   screen does: a wash at the top in the hue of the news. */
 .o-filling::before {
   content: ""; position: absolute; inset: 0 0 auto; height: 42%;
   pointer-events: none; opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-out);
 }
+/* And while fuel is actually going in, the room lights up with the tank.
+
+   This is the one screen in the app that is alive while nothing is asked of
+   the driver: they are standing at a pump for a few minutes with nothing to
+   tap. So it is the one screen allowed to be looked at rather than used, and
+   the whole of that budget is spent here - every other screen in this file
+   stays flat on purpose, because a screen that costs a driver time at a pump
+   has to earn it and this one has the time already.
+
+   It costs nothing to run. --fill-level is a number the JS was already
+   writing on every tick to move the water line; the wash simply reads the
+   same value, so there is no timer, no loop and no second thing to keep in
+   sync. It rises from nothing to a little under a fifth, which is dim enough
+   that every measured contrast on this screen survives it - checked at full
+   tank against the sweep's own status-bar sample.
+
+   Deliberately not a drift. The file's own rule about the home bloom applies
+   with more force here: three colours wandering behind a work tool is
+   movement nobody asked for and it costs composited layers on the phone this
+   is built for. This moves only when the fuel does.
+
+   It is declared on every face and lit on the live ones, rather than existing
+   only while fuel flows. That is what makes the end a handover instead of a
+   blink: at completion this fades down over the same beat the success wash
+   fades up, and the room changes colour rather than going out and coming back
+   on. A pseudo that only exists for one face cannot cross-fade with anything,
+   because there is nothing there to fade. */
+.o-filling::after {
+  content: ""; position: absolute; inset: 0;
+  pointer-events: none; opacity: 0;
+  transition: opacity .7s var(--ease-out);   /* the pour's own time, not a tap */
+  background:
+    radial-gradient(78% 46% at 50% 34%, var(--color-primary-18) 0%, transparent 66%),
+    radial-gradient(120% 52% at 50% 108%, var(--color-tertiary-18) 0%, transparent 62%);
+}
+.o-filling[data-face="running"]::after,
+.o-filling[data-face="pump"]::after { opacity: calc(var(--fill-level, 0) * 0.9); }
 .o-filling[data-face="refused"]::before, .o-filling[data-face="offline"]::before {
   opacity: 1;
   background:
@@ -3559,13 +3594,23 @@ button { background: none; border: none; color: inherit; }
    primary's own light - the marks' halo grammar - and on done the drift
    stills, because a pump that has stopped does not slosh. */
 .o-filling__vessel { position: relative; margin-bottom: var(--sp-2); }
+/* The drop's own light, and it brightens as the drop fills. It was a fixed
+   0.14 whether the tank was empty or full, which made the one element that
+   knows what is happening the one element that never changed. Same
+   --fill-level, same free ride: 0.10 at the tip, 0.22 at the neck. */
 .o-filling__vessel::before {
   content: ''; position: absolute; inset: -26px;
   border-radius: var(--radius-circle);
   background: radial-gradient(closest-side, var(--color-primary), transparent 74%);
-  opacity: 0.14; pointer-events: none;
+  opacity: calc(0.10 + var(--fill-level, 0) * 0.12);
+  transition: opacity .7s var(--ease-out);
+  pointer-events: none;
 }
-.o-filling__vessel svg { display: block; }
+/* Bigger, because it is the thing to look at. At 84 it sat under a 64px
+   numeral as an illustration beside a figure; the number is the fact and the
+   drop is the picture, and on the one screen a driver watches rather than
+   uses, the picture leads. */
+.o-filling__vessel svg { display: block; width: 108px; height: 108px; }
 /* Empty puts the surface at the drop's tip (y 22), full at its neck (y 5):
    17 units of travel, eased so each tick pours rather than steps. */
 .o-filling__liquid {
@@ -3599,12 +3644,37 @@ button { background: none; border: none; color: inherit; }
 /* The verdict is its own line, not a clause spliced into the unit. */
 .o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-success); }
 .o-filling__verdict[data-tone="warning"] { color: var(--color-text-primary); }
-/* The number arrives. One spring on completion, a still frame under reduced
-   motion - the medal's grammar, at the pump. */
+/* The finish, in beats.
+
+   It used to be one spring on the number while everything else simply was
+   there, which read as the screen having changed rather than the fill having
+   ended. A fill ending is the only event on this screen, and it is worth four
+   beats: the liquid settles at its final level, the number lands on it, the
+   verdict says what happened, and only then does the way onward appear.
+
+   About 700ms end to end, which is under the time it takes to look up from a
+   pump nozzle. The liquid's own .7s pour is already running underneath - the
+   sequence starts after it rather than fighting it. */
 @keyframes fillingLand { 0% { transform: scale(0.92); opacity: 0.4; } 100% { transform: none; opacity: 1; } }
-.o-filling[data-face="done"] .o-filling__litres { animation: fillingLand .45s var(--ease-spring) both; }
-[data-motion="reduced"] .o-filling[data-face="done"] .o-filling__litres { animation: none; }
-@media (prefers-reduced-motion: reduce) { .o-filling[data-face="done"] .o-filling__litres { animation: none; } }
+@keyframes fillingRise { from { opacity: 0; transform: translateY(8px); } }
+.o-filling[data-face="done"] .o-filling__litres { animation: fillingLand .45s var(--ease-spring) .10s both; }
+.o-filling[data-face="done"] .o-filling__verdict { animation: fillingRise .40s var(--ease-out) .34s both; }
+.o-filling[data-face="done"] .o-filling__facts   { animation: fillingRise .40s var(--ease-out) .44s both; }
+.o-filling[data-face="done"] .o-filling__action  { animation: fillingRise .40s var(--ease-out) .56s both; }
+/* The drop takes one breath as the pump stops. Scale only, on the element
+   that was already the centre of attention, and once. */
+@keyframes vesselSettle {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+.o-filling[data-face="done"] .o-filling__vessel { animation: vesselSettle .55s var(--ease-out) both; }
+[data-motion="reduced"] .o-filling[data-face="done"] .o-filling__litres,
+[data-motion="reduced"] .o-filling[data-face="done"] .o-filling__vessel { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .o-filling[data-face="done"] .o-filling__litres,
+  .o-filling[data-face="done"] .o-filling__vessel { animation: none; }
+}
 
 .o-history {
   padding: calc(var(--size-status-bar) + var(--sp-3)) var(--sp-5)
@@ -7882,9 +7952,12 @@ button { background: none; border: none; color: inherit; }
        its own mark rather than a sentence alone in an empty screen. */
     el.fillingMark.hidden = fault !== 'refused';
     /* The picture reads the cap the facts line reads: one number feeds both
-       the words and the water line. */
-    el.fillingVessel.style.setProperty('--fill-level', String(
-      Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES))));
+       the words and the water line. The screen reads it too, because the
+       light in the room rises with the tank - one value, three things
+       obeying it, and nothing animating that was not already moving. */
+    var level = Math.min(1, (done ? fillLitresFinal() : (S.fillLitresNow || 0)) / parseFloat(FUEL_LITRES));
+    el.fillingVessel.style.setProperty('--fill-level', String(level));
+    el.filling.style.setProperty('--fill-level', String(level));
     el.fillingLitres.hidden = waiting || pumpWait || fault === 'refused';
     /* A number that stopped moving is not the truth any more; it is the last
        thing we heard. It says so rather than looking live. */
