@@ -2712,6 +2712,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
   font-size: var(--font-size-body-md);
 }
 .tank-total b { font-variant-numeric: tabular-nums; }
+.tank-total__note--warn { color: var(--color-on-warning-container); }
 .tank-total .tank-total__note {
   display: block;
   margin-top: var(--space-0-5);
@@ -6962,7 +6963,12 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
           <div class="panel-links"><a href="#stolen-sighting"><svg data-lucide="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>See on map</a><a href="#stolen-sighting"><svg data-lucide="share-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>Copy details for SAPS</a></div>
           <div class="panel-foot">
             <p class="panel-scope">The fill was refused. The vehicle is still reported stolen. <a href="#stolen-filed">Add this to the report</a>, so the case number and the sighting sit in one place.</p>
-            <div class="panel-actions"><button class="btn btn-secondary">Mark recovered</button><button class="btn btn-primary">Back to requests</button></div>
+            <!-- Mark recovered does not belong on a fuel-attempt alert: an
+                 attempt to fuel a stolen vehicle is evidence of where it is,
+                 not evidence that anybody has it back. Recovery is reached
+                 from the vehicle's own record, where the person taking the
+                 decision can see its state. -->
+            <div class="panel-actions"><button class="btn btn-secondary" data-goto="stolen-record">View the vehicle</button><button class="btn btn-primary" data-goto="override-lands">Back to alerts</button></div>
           </div>
         </div>
         </div>
@@ -7269,7 +7275,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
                  station", which is true and says nothing about how much or for
                  how long. -->
             <p class="panel-scope"><b>Approve one transaction at Engen N1 City, up to 80 litres, within the next 10 minutes.</b> Nothing else changes: not Thabo&rsquo;s fuel rules, not this vehicle&rsquo;s status. A second fill outside his areas comes back to you.</p>
-            <div class="panel-actions"><button class="btn btn-secondary">Decline</button><button class="btn btn-primary">Approve one fill</button></div>
+            <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve one fill</button></div>
           </div>
         </div>
         </div>
@@ -7684,7 +7690,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
               <dl class="panel-facts"><dt>Driver</dt><dd>Sibusiso Mahlangu &middot; 072 111 3333</dd><dt>Vehicle</dt><dd><span class="ident">NCA 875 GP</span> &middot; MAN TGS 26.440</dd><dt>Tank capacity</dt><dd>400 litres, about R8 600</dd><dt>Your cap on a released fill</dt><dd>R2 000</dd><dt>Most this can pump</dt><dd><b>93 litres</b>, about R2 000 &mdash; the cap, which is lower than the tank</dd></dl>
               <div class="panel-foot">
                 <p class="panel-scope"><b>Approve one transaction at Engen Beaufort West, up to 93 litres, within the next 10 minutes.</b> That is a part tank. If he needs the full 400 litres, an administrator has to raise the cap on your policy &mdash; this screen cannot exceed it.</p>
-                <div class="panel-actions"><button class="btn btn-secondary">Decline</button><button class="btn btn-primary">Approve 93 litres</button></div>
+                <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve 93 litres</button></div>
               </div>
             </div>
         </div>
@@ -7715,7 +7721,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
           <b>Thabo is waiting at Engen N1 City.</b>
           <span>Outside his areas, 42 km from Centurion.</span>
           <span class="expiry">1:47 left</span>
-          <button class="btn btn-primary">Open request</button>
+          <button class="btn btn-primary" data-goto="override">Open request</button>
         </div>
         <div class="page-head">
           <div>
@@ -10951,7 +10957,14 @@ const recordPanel = (() => {
    would leave it stranded. Scrolling and resizing close it rather than chase
    it: the menu belongs to a row, and a row that has moved is a different
    question than the one being answered. */
-addEventListener('scroll', () => {
+addEventListener('scroll', e => {
+  /* Scrolling the popover is the popover being used, not the page moving out
+     from under it. The filter panel is 828px of content in a 512px box, so it
+     scrolls — and every wheel notch inside it reached this listener and shut
+     it. Its last facet group, its result count and its Clear filters button
+     could not be reached with a mouse at any viewport. */
+  const t = e.target;
+  if (t && t.closest && t.closest('.pop')) return;
   if (document.querySelector('.pop[style*="fixed"]:not(.hidden)')) closeAllPops();
 }, true);
 addEventListener('resize', () => closeAllPops());
@@ -12645,6 +12658,45 @@ function check(field, v, get, state) {
   if (field === 'vin') {
     const r = VIN.check(v, get('year'));
     if (r.level === 'error') return { error: r.message };
+  }
+
+  /* The multi-tank editor reports through its first tank field, and that
+     field holding the characters "abc" satisfied the ordinary required-field
+     rule: something was typed, so nothing was refused, and a vehicle was
+     created with a capacity of 0 litres. Every tank is checked here, and the
+     total with them, because the total is the number that decides what a
+     driver may draw at a pump. */
+  if (field === 'tanks') {
+    const inputs = [...document.querySelectorAll('[data-tank]')];
+    const typed = inputs.filter(i => String(i.value).trim() !== '');
+    if (!typed.length) return { error: 'Enter the capacity of each tank' };
+    const bad = typed.filter(i => {
+      const n = Number(String(i.value).trim());
+      return !Number.isFinite(n) || n <= 0;
+    });
+    if (bad.length) {
+      return { error: bad.length === 1
+        ? 'One tank capacity is not a number. Enter litres as digits'
+        : bad.length + ' tank capacities are not numbers. Enter litres as digits' };
+    }
+    if (typed.length < inputs.length) {
+      return { error: 'Enter a capacity for every tank, or remove the ones you do not need' };
+    }
+    const sum = typed.reduce((a2, i) => a2 + Number(String(i.value).trim()), 0);
+    if (!sum) return { error: 'The tanks add up to nothing. Check the figures' };
+    /* The combined figure is a capacity like any other, so it faces the same
+       plausibility check a single tank would. */
+    const r = Capacity.tank({
+      tankCapacityLitres: sum,
+      vehicleCategory: get('vehicleType'),
+      vehicleConfiguration: get('vehicleConfiguration'),
+      hasMultipleTanks: 'yes',
+      make: get('make'), model: get('model'),
+    });
+    if (r.level === 'error') return { error: r.message };
+    if (r.level === 'warning' || r.level === 'info') {
+      return { advice: [r.message, r.verify].filter(Boolean).join(' ') };
+    }
   }
 
   if (field === 'engineCc') {
@@ -15396,17 +15448,41 @@ function makeSheet(config) {
     const list = part('tank-list');
     const out = part('tank-total');
     if (!list || !out) return 0;
-    const nums = [...list.querySelectorAll('input')]
+
+    const fields = [...list.querySelectorAll('input')];
+    const typed = fields.filter(i => String(i.value).trim() !== '');
+    const nums = typed
       .map(i => Number(String(i.value).trim()))
       .filter(n => Number.isFinite(n) && n > 0);
+    /* Anything typed that is not a positive number. Counted rather than
+       ignored: a tank field holding "abc" used to contribute nothing to the
+       sum and nothing to the screen, so the only evidence of it was the total
+       being lower than the person expected. */
+    const unreadable = typed.length - nums.length;
     const sum = nums.reduce((a, b) => a + b, 0);
-    out.innerHTML = sum
-      ? '<b>Total tank capacity: ' + Records.groupNum(sum) + ' litres</b>' +
+
+    if (unreadable) {
+      out.innerHTML = '<span class="tank-total__note tank-total__note--warn">' +
+        (unreadable === 1 ? 'One tank does not read as a number.' : unreadable + ' tanks do not read as a number.') +
+        ' Enter litres as digits.</span>';
+    } else if (sum) {
+      out.innerHTML = '<b>Total tank capacity: ' + Records.groupNum(sum) + ' litres</b>' +
         '<span class="tank-total__note">Added up from ' + nums.length +
-        ' tank' + (nums.length === 1 ? '' : 's') + '. This is the figure we check.</span>'
-      : '<span class="tank-total__note">Enter each tank and we will add them up.</span>';
-    /* The engine validates one capacity field, so the total is what it sees. */
-    if (tankInput && tankMode() === 'many') tankInput.value = sum ? String(sum) : '';
+        ' tank' + (nums.length === 1 ? '' : 's') + '. This is the figure we check.</span>';
+    } else {
+      out.innerHTML = '<span class="tank-total__note">Enter each tank and we will add them up.</span>';
+    }
+
+    /* The engine validates one capacity field, so the total is what it sees —
+       and it must see nothing rather than zero when the tanks do not add up.
+       An empty value meets the ordinary required-field rule; a zero looks like
+       an answer. */
+    if (tankInput && tankMode() === 'many') {
+      tankInput.value = (!unreadable && sum) ? String(sum) : '';
+      /* Told, not just written: the engine repaints on input, and a value set
+         in script fires nothing. */
+      tankInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
     return sum;
   }
 
@@ -15852,39 +15928,28 @@ document.addEventListener('keydown', e => {
   Records.closeAllPops();
 });
 
-/* Approve and decline take a beat first: the decision goes to a pump, and a
- * result that appears instantly reads as though nothing was asked. */
-const GOTO = {
-  'Approve this fill': 'override-approved',
-  'Decline': 'override-declined',
-  /* The red button lands on its own receipt, not on the sighting: the sighting
-   * is an event that may be days away, and the moment after pressing is the
-   * one time somebody needs to be told plainly that the block took. */
-  'Report stolen': 'stolen-filed',
-  'Mark recovered': 'directory',
-  'Open request': 'override',
-  'Done': 'override-lands',
-  'See all notifications': 'override-lands',
-};
+/* A decision that goes to a pump takes a beat first: a result that appears
+   instantly reads as though nothing was asked. `data-beat` says which
+   buttons those are, on the button, rather than being inferred from its
+   wording — inference is what killed Approve.
 
-document.querySelectorAll('.btn').forEach(b => {
-  if (b.dataset.goto || b.dataset.open) return;
-  /* The dialog relabels its own buttons as it goes. One of them reads "Report
-     stolen" in the markup and something else entirely by the time anybody sees
-     it, so a table keyed on label text binds the wrong destination to it at
-     load and hijacks every later press. The dialog owns its own actions; this
-     rescue is for the screens. It is the failure the comment above [data-goto]
-     already describes, arriving from the other direction. */
-  if (b.closest('#status-dialog')) return;
-  const target = GOTO[b.textContent.trim()];
-  if (!target) return;
-  b.addEventListener('click', () => {
-    const slow = /Approve|Decline|Report stolen/.test(b.textContent);
-    const land = () => { go(target); setBell(false); };
-    if (!slow) return land();
+   There is no label table any more. Every one of these buttons names its own
+   destination in the markup, which is the rule the rest of the file already
+   follows and the reason renaming a button can no longer unwire it. */
+document.querySelectorAll('.btn[data-beat]').forEach(b => {
+  b.addEventListener('click', e => {
+    /* The ordinary [data-goto] handler will also fire. This one only adds the
+       pause, so it stops that one and lands the navigation itself. */
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    if (b.classList.contains('is-busy')) return;
     b.classList.add('is-busy');
-    setTimeout(() => { b.classList.remove('is-busy'); land(); }, 500);
-  });
+    setTimeout(() => {
+      b.classList.remove('is-busy');
+      go(b.dataset.goto);
+      setBell(false);
+    }, 500);
+  }, true);
 });
 
 /* ── Clean view ───────────────────────────────────────────────────────────
