@@ -331,6 +331,31 @@
   --focus-sheet-header-height: 76px;
   --focus-sheet-footer-height: 68px;
   --focus-sheet-breakpoint: 1100px;
+
+  /* The three overlay widths. Expressed against the viewport rather than as
+     fixed numbers so none of them can reach an edge on a small laptop. */
+  /* The wide overlay's width lives here, once, and the focus sheet reads it
+     rather than carrying its own clamp — that is what lets Add vehicle, Add
+     driver and the theft report be the same surface rather than three that
+     happen to look alike.
+
+     The value is the 720-840 band specified for Add vehicle, not the 960 the
+     later overlay brief suggests. Flagged rather than chosen silently: the two
+     briefs disagree, and 840 is the one that was specified twice and built
+     against. Changing it is one line here and reaches all three sheets. */
+  --overlay-width-wide: clamp(720px, 58vw, 840px);
+  --overlay-width-medium: min(680px, calc(100vw - 64px));
+  --dialog-width-standard: min(600px, calc(100vw - 32px));
+
+  /* One scrim, and it is flat.
+   *
+   * The old one carried a mask that faded it to nothing at 68% of its height,
+   * so the bottom third of the page showed through undimmed and the overlay
+   * looked like it stopped covering the viewport. A scrim exists to say "this
+   * layer is not available", and a scrim that fades says it of the top of the
+   * page only. */
+  --overlay-scrim-background: rgba(16, 24, 40, 0.42);
+  --overlay-scrim-nested: rgba(16, 24, 40, 0.32);
   --size-input-focused-border-width: 1.6px;
   --size-marker-border-width: 1.5px;
   --size-marker-diameter: 18px;
@@ -453,7 +478,12 @@
   --z-popover: 20;
   --z-scrim: 30;
   --z-drawer: 31;
-  --z-dialog: 32;   /* a dialog over the drawer */
+  /* A dialog needs its own scrim between it and the sheet it is about, so
+     the sheet stays visible and stops being reachable. Five layers, named,
+     because a nested overlay solved with an arbitrary number is how the two
+     rules that had to agree ended up a thousand lines apart. */
+  --z-dialog-scrim: 32;
+  --z-dialog: 33;
   --z-toast: 40;
 
   /* ── Tracking the theme does not carry ─────────────────────── */
@@ -1353,7 +1383,28 @@ textarea.field {
 }
 
 .next-step b { font-weight: var(--font-weight-label-md); color: var(--color-on-surface); }
-.next-step a { margin-left: auto; color: var(--color-brand-ink); font-weight: var(--font-weight-label-md); }
+.next-step a,
+.next-step__action {
+  margin-left: auto;
+  color: var(--color-brand-ink);
+  font-weight: var(--font-weight-label-md);
+}
+
+/* The action is a real button and says so to everything except the eye: it
+   carries the underline a link would, keeps a focus ring, and is reachable by
+   Tab and operable by Enter and Space without any of that being written. */
+.next-step__action {
+  flex: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: var(--font-weight-label-md);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.next-step__action:hover { text-decoration-thickness: 2px; }
 
 /* ── Form ─────────────────────────────────────────────────────────────────── */
 
@@ -2374,6 +2425,88 @@ a.stat-tile:focus-visible {
   color: var(--color-on-surface-variant);
 }
 
+/* ── Overlay: the scrim ──────────────────────────────────────────────────
+ * Fixed to the viewport, covering all of it, at one opacity. Nothing to see
+ * through, nothing to click, and no gradient anywhere.
+ */
+.overlay-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-scrim-background);
+  z-index: var(--z-scrim);
+  display: none;
+}
+/* Over a sheet rather than over the page, so the sheet stays legible
+   underneath the decision being taken about it. */
+.overlay-scrim--nested {
+  background: var(--overlay-scrim-nested);
+  z-index: var(--z-dialog-scrim);
+}
+
+/* ── Overlay: the medium detail sheet ────────────────────────────────────
+ * A record read from the side. Same anatomy as the focus sheet and a narrower
+ * body, because facts in a definition list do not want 960px of line length.
+ */
+.detail-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: var(--overlay-width-medium);
+  max-width: 100vw;
+  border-left: var(--size-border-hairline) solid var(--color-outline-variant);
+  box-shadow: var(--focus-sheet-elevation);
+  display: none;
+  flex-direction: column;
+  background: var(--color-surface);
+  z-index: var(--z-drawer);
+}
+
+@media (max-width: 720px) {
+  .detail-sheet { width: 100vw; border-left: 0; }
+}
+
+/* ── Overlay: the centred dialog ─────────────────────────────────────────
+ * One decision. It is centred because there is nothing else to look at, and
+ * it is small because a decision the size of a page reads as a bigger one
+ * than it is.
+ */
+.overlay-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3-0);
+  pointer-events: none;
+}
+.overlay-dialog > * {
+  pointer-events: auto;
+  width: var(--dialog-width-standard);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--elevation-high, var(--elevation-medium));
+  padding: var(--space-3-0);
+}
+.overlay-dialog h2 {
+  margin: 0 0 var(--space-1-5);
+  font-size: var(--font-size-heading-sm);
+}
+.overlay-dialog p { margin: 0 0 var(--space-3-0); color: var(--color-on-surface-variant); }
+/* Right-aligned and sized to their words: two half-width buttons make a
+   destructive answer look like the same weight of choice as the safe one. */
+.overlay-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1-5);
+}
+
+/* The three share their header, body and footer with the focus sheet, so a
+   change to one reaches all three. */
+.detail-sheet .focus-sheet__head,
+.overlay-dialog .focus-sheet__head { min-height: auto; }
+
 /* ── FocusSheet ───────────────────────────────────────────────────────────
  * A route-backed working surface, fixed to the right, over an inert directory.
  *
@@ -2387,9 +2520,7 @@ a.stat-tile:focus-visible {
   top: 0;
   right: 0;
   height: 100dvh;
-  width: clamp(var(--focus-sheet-width-min),
-               var(--focus-sheet-width-preferred),
-               var(--focus-sheet-width-max));
+  width: var(--overlay-width-wide);
   max-width: 100vw;
   border-left: var(--size-border-hairline) solid var(--color-outline-variant);
   box-shadow: var(--focus-sheet-elevation);
@@ -2592,24 +2723,38 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
  * fastest version of it is the right one.
  */
 .summary {
-  border: var(--size-border-hairline) solid var(--color-error);
-  border-radius: var(--radius-control);
-  padding: var(--space-2-0);
+  border-left: 3px solid var(--color-error);
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  padding: var(--space-1-5) var(--space-2-0);
   background: var(--color-surface);
 }
-.summary:focus { outline: none; box-shadow: var(--elevation-glow); }
+/* The ring goes on the rule, not around the block: focus has to be visible
+   without the summary growing a second outline the width of the sheet. */
+.summary:focus { outline: none; border-left-color: var(--color-brand-ink); box-shadow: none; }
+.summary:focus-visible { outline: 2px solid var(--color-brand-ink); outline-offset: 2px; }
 .summary h3 {
-  margin: 0 0 var(--space-1-0);
+  margin: 0 0 var(--space-0-5);
   font-size: var(--font-size-label-md);
   font-weight: var(--font-weight-label-md);
   color: var(--color-error);
 }
-.summary ul { margin: 0; padding-left: var(--space-2-5); display: flex; flex-direction: column; gap: var(--space-0-5); }
-.summary li { font-size: var(--font-size-body-sm); }
+.summary ul {
+  margin: 0;
+  padding-left: var(--space-2-0);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.summary li { font-size: var(--font-size-body-sm); line-height: 1.45; }
 .summary a { color: var(--color-error); }
 
 /* Inside a sheet the unit wrapper fills its grid cell: the column is already
    the constraint, and a second cap inside it left the suffix stranded. */
+/* Jumped to from the error summary, a field would otherwise land under the
+   sticky header — visibly focused and out of sight. */
+.focus-sheet .form-field,
+.focus-sheet .radio-group { scroll-margin-top: calc(var(--focus-sheet-header-height) + var(--space-2-0)); }
+
 .focus-sheet .suffix-wrap { width: 100%; }
 .focus-sheet .field { width: 100%; }
 
@@ -3863,6 +4008,19 @@ body.status-dialog-open .scrim { display: block; }
  * quiet, the exceptional ones keep their tone, and the caret is what says the
  * whole thing can be pressed.
  */
+/* Read-only, and it has to look it: the pill beside it is a control, and two
+   things that look alike where one is pressable is the complaint the status
+   cell already answered once. */
+/* An absent value, drawn as one: quiet enough not to be mistaken for a
+   reference somebody typed, and present enough to say the column was seen. */
+.cell-none { color: var(--color-on-surface-variant); }
+
+.status-derived {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
 .status-cell {
   display: flex;
   align-items: center;
@@ -5044,6 +5202,8 @@ tbody td .is-past { color: var(--color-on-danger-container); }
   z-index: 0;
   /* Dissolves rather than stops. A hard cut at a fixed height reads as a
      rendering fault; a fade reads as a list continuing under the dialog. */
+  /* The list behind fades out, because it is cropped and a hard cut reads as
+     a rendering fault. The scrim over it does not — see below. */
   -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
 }
@@ -5055,6 +5215,8 @@ tbody td .is-past { color: var(--color-on-danger-container); }
   height: var(--size-stage-crop);
   background: var(--color-scrim-dialog);
   z-index: var(--z-scrim);
+  /* The list behind fades out, because it is cropped and a hard cut reads as
+     a rendering fault. The scrim over it does not — see below. */
   -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
 }
@@ -5501,7 +5663,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         <div class="table-wrap">
           <table aria-busy="true">
-            <thead><tr><th>Registration</th><th>Fleet number</th><th>Vehicle</th><th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th></tr></thead>
+            <thead><tr><th>Registration</th><th>Fleet number</th><th>Vehicle</th><th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th></tr></thead>
             <tbody><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr></tbody>
           </table>
         </div>
@@ -5535,7 +5697,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="tabs" role="tablist">
           <button class="tab" role="tab" aria-selected="true">All <span class="count">10</span></button>
-          <button class="tab" role="tab" aria-selected="false">Needs attention <span class="count">1</span></button>
+          <button class="tab" role="tab" aria-selected="false">Needs review <span class="count">1</span></button>
         </div>
 
         <div class="toolbar">
@@ -5559,7 +5721,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -5609,7 +5771,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Registration</th><th>Fleet number</th><th>Vehicle</th><th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th></tr></thead>
+            <thead><tr><th>Registration</th><th>Fleet number</th><th>Vehicle</th><th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th></tr></thead>
             <tbody><tr><td colspan="7">
               <div class="table-empty">
                 <h2>We could not load your vehicles</h2>
@@ -5841,7 +6003,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -6063,7 +6225,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
         <p class="spec-note">A label, a figure, and one line saying what to do about it. Four atoms doing one job, which is what puts this at molecule rather than organism: there is one thing here, and it is a number. It carries its own card because it is used standalone in a grid. Dropping one into a panel would give it two borders, and that is the tell that it belongs at this level. Rendered as a link wherever the figure has somewhere to go, because a count of lapsed licences is not information, it is a queue.</p>
         <div class="spec-grid">
           <a class="stat-tile" href="#drivers-directory">
-            <span class="stat-label">Needs attention</span>
+            <span class="stat-label">Needs review</span>
             <span class="stat-figure"><span class="numeral numeral-sm trend-bad">2</span></span>
             <p class="stat-foot">A licence card or a PrDP has already lapsed. Open the list.</p>
           </a>
@@ -6260,7 +6422,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th scope="col">Registration</th><th scope="col">Fleet number</th><th scope="col">Vehicle</th>
-                <th scope="col">Vehicle type</th><th scope="col" class="num">Tank capacity</th><th scope="col" class="status-col">Status</th>
+                <th scope="col">Vehicle category</th><th scope="col" class="num">Tank capacity</th><th scope="col" class="status-col">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -6584,7 +6746,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -6730,7 +6892,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -6815,7 +6977,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -6918,7 +7080,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7026,7 +7188,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7130,7 +7292,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7211,7 +7373,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7284,7 +7446,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7361,7 +7523,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7453,7 +7615,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7581,10 +7743,13 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
           </div>
         </div>
 
-        <div class="next-step">
-          <b>Next: add drivers</b>
-          <span>Add drivers so every fuel purchase is linked to the right person.</span>
-          <a href="#">Add drivers</a>
+        <!-- Shown only while it is true. A permanent strip telling somebody to
+             do a thing they have done is the kind of chrome people learn to
+             read past, and it takes the genuine prompts with it. -->
+        <div class="next-step" data-role="next-drivers">
+          <b>Next step</b>
+          <span>Link fuel purchases to the correct person.</span>
+          <button class="next-step__action" data-next="add-driver">Add drivers</button>
         </div>
 
         <!-- These filter. They used to be painted on with counts that came
@@ -7595,7 +7760,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
              life of the fleet. -->
         <div class="tabs" role="tablist" aria-label="Filter vehicles" data-role="tabs">
           <button class="tab" role="tab" id="vehicles-tab-all" aria-selected="true" aria-controls="vehicles-panel">All <span class="count"></span></button>
-          <button class="tab" role="tab" id="vehicles-tab-attention" aria-selected="false" aria-controls="vehicles-panel">Needs attention <span class="count"></span></button>
+          <button class="tab" role="tab" id="vehicles-tab-attention" aria-selected="false" aria-controls="vehicles-panel">Needs review <span class="count"></span></button>
         </div>
 
         <div class="toolbar">
@@ -7631,10 +7796,10 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
                 <th scope="col" class="sortable" aria-sort="ascending">Registration <span class="arrow">↑</span></th>
                 <th scope="col">Fleet number</th>
                 <th scope="col">Vehicle</th>
-                <th scope="col">Vehicle type</th>
+                <th scope="col">Vehicle category</th>
                 <th scope="col">Fuel type</th>
                 <th scope="col" class="num">Tank capacity</th>
-                <th scope="col">Status</th>
+                <th scope="col">Operational status</th>
                 <th scope="col" class="row-actions" aria-label="Actions"></th>
               </tr>
             </thead>
@@ -7658,7 +7823,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
 
         <div class="tabs" role="tablist">
           <button class="tab" role="tab" aria-selected="true">All <span class="count">10</span></button>
-          <button class="tab" role="tab" aria-selected="false">Needs attention <span class="count">1</span></button>
+          <button class="tab" role="tab" aria-selected="false">Needs review <span class="count">1</span></button>
         </div>
 
         <div class="toolbar">
@@ -7674,7 +7839,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <thead>
               <tr>
                 <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle type</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
+                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -7824,7 +7989,7 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
                 <th scope="col">PrDP</th>
                 <th scope="col">PrDP expiry</th>
                 <th scope="col">Group</th>
-                <th scope="col">Status</th>
+                <th scope="col">Operational status</th>
                 <th scope="col" class="row-actions" aria-label="Actions"></th>
               </tr>
             </thead>
@@ -8319,11 +8484,14 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 <div class="discard-scrim hidden" id="discard-vehicle" role="dialog" aria-modal="true"
      aria-labelledby="discard-title">
   <div class="discard">
-    <h2 id="discard-title">Discard this vehicle?</h2>
-    <p>The information you entered will not be saved.</p>
+    <!-- "Discard this vehicle?" reads as though a vehicle already exists and
+         is about to be removed from the fleet. Nothing has been added yet;
+         what is at stake is what was typed. -->
+    <h2 id="discard-title">Discard entered details?</h2>
+    <p>The vehicle will not be added, and the details you entered will be lost.</p>
     <div class="discard-actions">
-      <button class="btn btn-secondary" data-role="keep">Continue editing</button>
-      <button class="btn btn-danger" data-role="discard">Discard</button>
+      <button class="btn btn-secondary" data-role="keep">Keep editing</button>
+      <button class="btn btn-danger" data-role="discard">Discard details</button>
     </div>
   </div>
 </div>
@@ -8386,7 +8554,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          the field it names in one step, and it is deliberately small: red is
          here to help a correction, not to redecorate the sheet. -->
     <div class="summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
-      <h3>Check the highlighted fields</h3>
+      <h3 data-role="summary-heading">There is a problem</h3>
       <ul data-role="summary-list"></ul>
     </div>
 
@@ -8663,7 +8831,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          the field it names in one step, and it is deliberately small: red is
          here to help a correction, not to redecorate the sheet. -->
     <div class="summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
-      <h3>Check the highlighted fields</h3>
+      <h3 data-role="summary-heading">There is a problem</h3>
       <ul data-role="summary-list"></ul>
     </div>
 
@@ -8958,6 +9126,14 @@ function form(spec) {
   const setCount = t => { if (footCount) footCount.textContent = t; };
   const summary = part('summary');
   const summaryList = part('summary-list');
+  const summaryHeading = part('summary-heading');
+
+  /* Said once, in the heading, so the list underneath can get straight to the
+     faults. */
+  function setSummaryHeading(n) {
+    if (!summaryHeading) return;
+    summaryHeading.textContent = n === 1 ? 'Check 1 field' : `Check ${n} fields`;
+  }
   const alertBox = part('alert');
   const statusLine = part('record-status');
   const subtitle = part('subtitle');
@@ -9087,8 +9263,12 @@ function form(spec) {
     // once more than one field is blocked, which is when a list earns its place.
     if (blocked.length > 1) {
       summary.classList.remove('hidden');
+      setSummaryHeading(blocked.length);
       summaryList.innerHTML = blocked
-        .map(([f, , message]) => `<li><a href="#${ID[f]}" data-field-link="${f}">${message}</a></li>`).join('');
+        .map(([f, , fallback]) => {
+          const actual = checkField(f).error || fallback;
+          return `<li><a href="#${ID[f]}" data-field-link="${f}">${actual}</a></li>`;
+        }).join('');
     } else {
       summary.classList.add('hidden');
     }
@@ -9295,9 +9475,12 @@ function form(spec) {
     const missing = REQUIRED.filter(r => errors.includes(r[0]) && applies(r[0], get));
     if (missing.length > 1) {
       summary.classList.remove('hidden');
+      setSummaryHeading(missing.length);
       summaryList.innerHTML = missing
-        .map(([field, , message]) => `<li><a href="#${ID[field]}" data-field-link="${field}">${message}</a></li>`)
-        .join('');
+        .map(([field, , fallback]) => {
+          const actual = checkField(field).error || fallback;
+          return `<li><a href="#${ID[field]}" data-field-link="${field}">${actual}</a></li>`;
+        }).join('');
     } else {
       summary.classList.add('hidden');
     }
@@ -11452,6 +11635,77 @@ return {
  * is worse than one that questions it. Only values that cannot be true —
  * missing, non-numeric, zero, negative — block.
  */
+/* vin-rules.js */
+window.VIN = (() => {
+
+/* Everything a VIN may contain. The three excluded letters are excluded by the
+   standard itself, not by preference. */
+const ALLOWED = /^[A-HJ-NPR-Z0-9]+$/;
+const CONFUSABLE = /[IOQ]/;
+const LENGTH = 17;
+
+/* Typed by a person off a licence disc, so the harmless differences are
+   absorbed rather than refused: surrounding whitespace, lower case, and the
+   spaces and hyphens people add to make a long string readable. What is left
+   is either a VIN or it is not. */
+function normalise(raw) {
+  return String(raw == null ? '' : raw).trim().toUpperCase().replace(/[\s-]+/g, '');
+}
+
+/* `year` decides which rule applies. Absent, the strict one is used: a fleet
+   being set up today is overwhelmingly modern, and a false refusal here is
+   recoverable in a way a bad match key is not. */
+function check(raw, year) {
+  const v = normalise(raw);
+  if (!v) return { level: 'error', message: 'Enter the VIN' };
+
+  /* Alphanumeric is the regulation's own requirement and applies to both. */
+  if (!/^[A-Z0-9]+$/.test(v)) {
+    return { level: 'error', value: v,
+      message: 'A VIN is letters and numbers only, with no punctuation' };
+  }
+
+  if (v.length > LENGTH) {
+    return { level: 'error', value: v,
+      message: `A VIN is ${LENGTH} characters. This one is ${v.length}` };
+  }
+
+  const y = Number(year);
+  const modern = !Number.isFinite(y) || y >= 1996;
+
+  if (modern) {
+    /* ISO 3779 excludes these three because they are read as 1 and 0, which is
+       the transcription error somebody copying off a licence disc makes. */
+    if (CONFUSABLE.test(v)) {
+      return { level: 'error', value: v,
+        message: 'A VIN never uses the letters I, O or Q. Check whether those are a 1 or a 0' };
+    }
+    if (!ALLOWED.test(v)) {
+      return { level: 'error', value: v,
+        message: 'A VIN is letters and numbers only, with no punctuation' };
+    }
+    if (v.length !== LENGTH) {
+      return { level: 'error', value: v,
+        message: `A VIN is ${LENGTH} characters. This one is ${v.length}` };
+    }
+  }
+
+  /* Pre-1996: the regulation asks for an alphanumeric chassis number of no
+     more than seventeen characters, and does not require the ISO form. A short
+     one is real, and refusing it would strand exactly the vehicles whose
+     paperwork is hardest to replace. */
+  if (!modern && v.length < 5) {
+    return { level: 'error', value: v,
+      message: 'A chassis number is at least 5 characters' };
+  }
+
+  return { level: 'ok', value: v };
+}
+
+return { check, normalise, LENGTH };
+
+})();
+
 window.Capacity = (() => {
 
 /* ── Fallback bands ───────────────────────────────────────────────────────
@@ -11849,7 +12103,7 @@ return { tank, engine, showEngine, BANDS, LEGACY, MODELS, resolveModel, bandFor 
  */
 const F = {
   REG: 0, FLEET: 1, MODEL: 2, YEAR: 3, TYPE: 4, FUEL: 5, CAP: 6,
-  ACCESS: 7, REASON: 8, LIFE: 9, NOTES: 10,
+  BLOCK: 7, REASON: 8, STATUS: 9, NOTES: 10,
 };
 
 /* Who the invitation goes to: the driver, on their mobile number. Confirmed by
@@ -11870,15 +12124,15 @@ const INVITE_TO = 'the driver’s mobile number';
 /* The eight sample vehicles the Flutter prototype imports, so the table reads
  * the same in both and a screenshot of one can be checked against the other. */
 const VEHICLES = [
-  ['HRV 482 GP', 'FL-014', 'Toyota Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Can fuel', '', 'In fleet', []],
-  ['JTM 901 GP', 'FL-002', 'Isuzu D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Can fuel', '', 'In fleet', []],
-  ['KPL 337 GP', 'FL-021', 'Ford Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Can fuel', '', 'In fleet', []],
-  ['LDW 129 GP', 'FL-008', 'Nissan NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Can fuel', '', 'In fleet', []],
-  ['MHB 664 GP', 'FL-011', 'Volkswagen Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Can fuel', '', 'In fleet', []],
-  ['NCA 875 GP', 'FL-005', 'MAN TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Can fuel', '', 'In fleet', []],
+  ['HRV 482 GP', 'FL-014', 'Toyota Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
+  ['JTM 901 GP', 'FL-002', 'Isuzu D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Allowed', '', 'Active', []],
+  ['KPL 337 GP', 'FL-021', 'Ford Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
+  ['LDW 129 GP', 'FL-008', 'Nissan NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Allowed', '', 'Active', []],
+  ['MHB 664 GP', 'FL-011', 'Volkswagen Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Allowed', '', 'Active', []],
+  ['NCA 875 GP', 'FL-005', 'MAN TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Allowed', '', 'Active', []],
   /* Uploaded this morning. Its invitation went out with the upload and it is
      an ordinary vehicle. */
-  ['JXR 771 GP', 'FL-023', 'Toyota Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Can fuel', '', 'In fleet', []],
+  ['JXR 771 GP', 'FL-023', 'Toyota Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', []],
   /* A stolen vehicle belongs in the list. The product could report one, draw
      it a receipt and keep a record for it, and the directory had no row in
      that state and no way to filter for one. So the fleet screen quietly
@@ -11891,16 +12145,16 @@ const VEHICLES = [
      column is only visible when they are interleaved: "Lerato stopped this
      vehicle at 09:14" and "waiting for Ford to confirm the repair date" are
      read together or not at all. */
-  ['PBK 550 GP', 'FL-007', 'Toyota Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Stolen lock', 'Hijacked', 'In fleet',
+  ['PBK 550 GP', 'FL-007', 'Toyota Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Allowed', 'Hijacked', 'Reported stolen',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Fuel access', from: 'Can fuel', to: 'Stolen lock' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Reason', from: '', to: 'Hijacked' },
      { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. SAPS case 411/8/2026 opened.' }]],
-  ['RTS 018 GP', '', 'Hino 300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Cannot fuel', 'In for a service', 'In fleet',
+  ['RTS 018 GP', '', 'Hino 300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Allowed', '', 'In maintenance',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Fuel access', from: 'Can fuel', to: 'Cannot fuel' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Reason', from: '', to: 'In for a service' },
      { kind: 'note', who: 'Lerato Mokoena', at: '18 Aug, 09:15', text: 'Waiting for Ford to confirm the repair date.' },
      { kind: 'note', who: 'Sipho Dube', at: '19 Aug, 07:02', text: 'Gearbox part is on back order. Two weeks at least.' }]],
-  ['VBN 442 GP', 'FL-019', 'Mercedes-Benz Sprinter 519', '2023', 'van', 'Diesel', 93, 'Can fuel', 'Sold', 'Removed from fleet', []],
+  ['VBN 442 GP', 'FL-019', 'Mercedes-Benz Sprinter 519', '2023', 'van', 'Diesel', 93, 'Allowed', 'Sold', 'Removed from fleet', []],
 ];
 
 /* The 25 governed makes. "Other" is not among them: it was a control rather
@@ -11937,36 +12191,85 @@ const accountMakes = ['Foton'];
  * use this week, not archived, or allowed to fuel, and the fuel field next to
  * it already answers the last one. In fleet answers exactly one question and
  * pairs with Removed from fleet as its own opposite. */
-const LIFE = {
-  'In fleet': {
-    badge: null, // The expected answer is drawn quiet, so exceptions stand out.
-    says: 'Yours, and on the books. Fuel access decides what happens at a pump.',
+/* What has happened to the vehicle. One value, always true, and the only one
+   of the three fields somebody chooses directly.
+
+   `fuels` is what the status implies at a pump, and it is read rather than
+   stored so the two can never disagree. `release` says whether a manager can
+   still let one fill through — the difference between a vehicle that is off
+   the road and one that has been taken. */
+const STATUS = {
+  Active: {
+    badge: null, // The ordinary answer is drawn quiet, so exceptions stand out.
+    fuels: true, release: true,
+    says: 'On the road and fuelling normally, inside the driver’s rules.',
+  },
+  'In maintenance': {
+    badge: 'badge-warning',
+    fuels: false, release: true,
+    says: 'Off the road. Fuel is blocked, and a manager can still release one fill at the pump.',
+  },
+  'Reported stolen': {
+    badge: 'badge-danger',
+    fuels: false, release: false,
+    says: 'Reported to the police. Fuel is blocked everywhere and nobody can release a fill, including you.',
   },
   'Removed from fleet': {
     badge: 'badge-neutral',
+    fuels: false, release: false,
     says: 'No longer yours. Its fills, invoices and history stay in your reports.',
   },
 };
 
-const ACCESS = {
-  'Can fuel': {
-    badge: null,
-    says: 'Fuel is allowed, inside the driver’s normal rules.',
-  },
-  'Cannot fuel': {
+/* The one thing a manager can say about fuelling that the operational status
+   does not already imply: stop this vehicle, for a reason of your own, while
+   nothing about its condition has changed. Only meaningful on an Active
+   vehicle — everything else is already blocked by its status, and offering a
+   second way to say so is how the two came to contradict each other. */
+const BLOCK = {
+  Allowed: { badge: null, says: 'No administrative block on this vehicle.' },
+  Blocked: {
     badge: 'badge-warning',
-    says: 'Fuel is blocked. A manager can still release one fill at the pump.',
+    says: 'Fuel is blocked by your own decision, not by the vehicle’s condition.',
   },
-  'Stolen lock': {
-    badge: 'badge-danger',
-    says: 'Fuel is blocked everywhere. Nobody can release a fill, including you.',
-  },
+};
+
+/* Derived, never stored. Three answers, because "not applicable" and "blocked"
+   are different things to a reader: one is a vehicle that could fuel and is
+   stopped, the other is a vehicle that is no longer in the fleet to fuel. */
+function fuelAccess(row) {
+  const st = STATUS[row[F.STATUS]];
+  if (!st) return 'Blocked';
+  if (row[F.STATUS] === 'Removed from fleet') return 'Not applicable';
+  if (!st.fuels) return 'Blocked';
+  return row[F.BLOCK] === 'Blocked' ? 'Blocked' : 'Allowed';
+}
+
+/* Why it is blocked, in the words that explain it. A reader who sees "Blocked"
+   next to an Active vehicle is owed the reason it is not the status. */
+function fuelAccessWhy(row) {
+  const access = fuelAccess(row);
+  if (access === 'Allowed') return null;
+  if (row[F.STATUS] === 'Removed from fleet') return 'Not in the fleet';
+  if (!STATUS[row[F.STATUS]]?.fuels) return row[F.STATUS];
+  return 'Blocked by you';
+}
+
+/* The names the two old fields used, and what each becomes. Kept because
+   imported files, saved filters and anything written before this change still
+   speak the old vocabulary, and an import that rejects last month's export is
+   a worse product than one that reads it. */
+const STATUS_LEGACY = {
+  'In fleet': 'Active',
+  'Can fuel': 'Active',
+  'Cannot fuel': 'In maintenance',
+  'Stolen lock': 'Reported stolen',
 };
 
 /* Kept for the places that still ask "what tone is this word", whichever field
    it came from. Two small maps beat a switch in four files. */
 const BADGE = Object.fromEntries(
-  [...Object.entries(LIFE), ...Object.entries(ACCESS)].map(([k, v]) => [k, v.badge]));
+  [...Object.entries(STATUS), ...Object.entries(BLOCK)].map(([k, v]) => [k, v.badge]));
 
 /* Both directions of a fuel-access change apply immediately and carry an undo.
  *
@@ -12256,6 +12559,14 @@ function check(field, v, get, state) {
     }
   }
 
+  /* The VIN is normalised as well as checked: what gets stored is the trimmed,
+     upper-case, unspaced form, so two records typed differently by two people
+     are the same string. */
+  if (field === 'vin') {
+    const r = VIN.check(v, get('year'));
+    if (r.level === 'error') return { error: r.message };
+  }
+
   if (field === 'engineCc') {
     const r = Capacity.engine({
       engineDisplacementCc: v,
@@ -12288,6 +12599,7 @@ const form = Records.form({
      typed; without vehicleConfiguration, a scooter kept a motorcycle-wide
      warning. */
   recheck: {
+    year: ['vin'],
     vehicleType: ['tankCapacity', 'engineCc'],
     vehicleConfiguration: ['tankCapacity', 'engineCc'],
     make: ['tankCapacity', 'engineCc'],
@@ -12329,15 +12641,15 @@ const form = Records.form({
        invitation on its own, so there is nothing left for a person to press. */
     const row = [v.registration, v.fleetNumber, `${v.make} ${v.model}`.trim(),
       v.year, v.vehicleType,
-      v.fuelType, Number(v.tankCapacity), 'Can fuel', '', 'In fleet', []];
+      v.fuelType, Number(v.tankCapacity), 'Allowed', '', 'Active', []];
     if (state && state.editing) {
       const existing = VEHICLES.find(x => x[0] === state.editing);
       if (existing) {
         // Editing the details never touches either status or the story: they
         // belong to the record, not to this form.
-        row[F.ACCESS] = existing[F.ACCESS];
+        row[F.BLOCK] = existing[F.BLOCK];
         row[F.REASON] = existing[F.REASON];
-        row[F.LIFE] = existing[F.LIFE];
+        row[F.STATUS] = existing[F.STATUS];
         row[F.NOTES] = existing[F.NOTES];
         VEHICLES[VEHICLES.indexOf(existing)] = row;
       }
@@ -12399,10 +12711,10 @@ const form = Records.form({
   statusLine: state => {
     const veh = VEHICLES.find(x => x[0] === state.editing);
     if (!veh) return null;
-    const which = veh[F.LIFE] === 'In fleet' ? veh[F.ACCESS] : veh[F.LIFE];
+    const which = veh[F.STATUS];
     const BACK = {
-      'Cannot fuel': 'Change fuel access on the row to allow it again.',
-      'Stolen lock': 'Mark recovered when it turns up.',
+      'In maintenance': 'Set it back to Active when it returns to the road.',
+      'Reported stolen': 'Mark recovered when it turns up.',
       'Removed from fleet': 'Only an administrator can bring this vehicle back.',
     };
     const tone = BADGE[which];
@@ -12440,16 +12752,16 @@ const form = Records.form({
  * booking.
  */
 const WHY = {
-  'Cannot fuel': {
-    label: 'Why it cannot fuel',
-    title: r => `Why can ${r[0]} not fuel?`,
+  'In maintenance': {
+    label: 'Why it is off the road',
+    title: r => `Why is ${r[0]} off the road?`,
     /* "Recovered, not yet checked" is on the list because Mark recovered now
        sets it. A reason a state can arrive holding has to be a reason somebody
        can also choose and change. */
     list: ['In for a service', 'Broken down', 'Accident damage', 'Waiting for parts',
       'Recovered, not yet checked', 'Driver suspended', 'Not in use'],
   },
-  'Stolen lock': {
+  'Reported stolen': {
     label: 'How it went missing',
     title: r => `How did ${r[0]} go missing?`,
     list: ['Hijacked', 'Taken overnight', 'Not returned from a trip', 'Not sure'],
@@ -12458,6 +12770,14 @@ const WHY = {
     label: 'What happened to it',
     title: r => `What happened to ${r[0]}?`,
     list: ['Sold', 'Written off', 'Scrapped', 'End of lease, returned', 'Something else'],
+  },
+  /* The block is a decision rather than a condition, so its reasons are the
+     manager's own — none of them says anything about the vehicle. */
+  Blocked: {
+    label: 'Why you stopped it',
+    title: r => `Why did you stop ${r[0]} fuelling?`,
+    list: ['Driver suspended', 'Under investigation', 'Not in use', 'Awaiting reassignment',
+      'Something else'],
   },
 };
 
@@ -12468,9 +12788,12 @@ const WHY = {
  * Both used to be offered an empty Reason line, which is a control asking a
  * question with no answer. */
 function REASON_FOR(r) {
-  if (r[F.LIFE] === 'Removed from fleet') return WHY['Removed from fleet'];
-  if (r[F.LIFE] !== 'In fleet') return null;
-  return WHY[r[F.ACCESS]] || null;
+  /* The operational status carries the reason wherever it has one. An Active
+     vehicle that a manager has stopped is the one case where the reason
+     belongs to the block instead, because the status has nothing to explain. */
+  if (WHY[r[F.STATUS]]) return WHY[r[F.STATUS]];
+  if (r[F.STATUS] === 'Active' && r[F.BLOCK] === 'Blocked') return WHY.Blocked;
+  return null;
 }
 
 
@@ -12498,7 +12821,7 @@ const vehicles = Records.directory({
   noun: 'vehicles',
   tabs: [
     ['All', () => true],
-    ['Needs attention', needsAttention, {
+    ['Needs review', needsAttention, {
       title: 'Nothing needs attention',
       body: 'Every vehicle has a fleet number and a capacity that fits its type.',
     }],
@@ -12509,13 +12832,13 @@ const vehicles = Records.directory({
     // The identity column keeps its width and the long descriptor gives it
     // up, the same bargain the driver list already makes with an email.
     ['Vehicle', false, 'truncate-wide'],
-    ['Vehicle type', false],
+    ['Vehicle category', false],
     // Off by default: a fleet manager scans this list for a plate and a
     // status, and diesel-or-petrol follows from the model for anyone who
     // needs it. One press in Columns brings it back.
     ['Fuel type', false, null, true],
     ['Tank capacity', false, 'num'],
-    ['Status', false, 'status-col'],
+    ['Operational status', false, 'status-col'],
   ],
   // Each facet reads its own column off the row. They used to be a table of
   // indexes written against the *rendered cells*, where the year is folded
@@ -12536,17 +12859,22 @@ const vehicles = Records.directory({
      reader to work out which kind of thing each value is before using any of
      them, which is the complaint the record model already answered. */
   facets: [
-    ['Vehicle type', 'type',
+    ['Vehicle category', 'type',
       VehicleTypes.list().map(t => t.code).filter(c => VEHICLES.some(v => v[4] === c)),
       r => r[4], c => VehicleTypes.label(c)],
     ['Fuel type', 'fuel', ['Diesel', 'Petrol'], r => r[5]],
-    ['Fuel access', 'access', Object.keys(ACCESS), r => r[F.ACCESS]],
-    ['Fleet status', 'life', Object.keys(LIFE), r => r[F.LIFE]],
+    /* Fuel access is derived, so the filter derives it too rather than
+       reading a stored field that may not agree. */
+    ['Fuel access', 'access', ['Allowed', 'Blocked', 'Not applicable'], r => fuelAccess(r)],
+    ['Operational status', 'status', Object.keys(STATUS), r => r[F.STATUS]],
   ],
   // A registration is unique per account, so it is what a clicked row is.
   rowKey: r => r[0],
   rowLabel: r => r[0],
-  searchable: r => [r[0], r[1], r[2], r[3], r[4], r[5], r[F.ACCESS], r[F.LIFE], r[F.REASON]].filter(Boolean).join(' '),
+  /* Fuel access is searchable by its derived word, so typing "blocked" finds
+     the vehicles a manager means by it. */
+  searchable: r => [r[0], r[1], r[2], r[3], r[4], r[5], r[F.STATUS], fuelAccess(r), r[F.REASON]]
+    .filter(Boolean).join(' '),
   // `80 L` and `400 L` are strings, and as strings 400 sorts before 80.
   sortValue: (r, col) => (col === 'Tank capacity' ? r[6] : undefined),
   /* What is left in the row menu.
@@ -12564,8 +12892,8 @@ const vehicles = Records.directory({
     /* Reporting is a security move and removal is final, so both keep the
        dialog, and both stay in the menu rather than sitting in the table where
        somebody aiming at Cannot fuel can reach them. */
-    ...(r[F.LIFE] === 'Removed from fleet' ? [] : [
-      ...(r[F.ACCESS] === 'Stolen lock'
+    ...(r[F.STATUS] === 'Removed from fleet' ? [] : [
+      ...(r[F.STATUS] === 'Reported stolen'
         ? [{ act: 'recovered', label: 'Mark recovered' }]
         : [{ act: 'stolen', label: 'Report stolen…', danger: true }]),
       { act: 'remove', label: 'Remove from fleet…', danger: true },
@@ -12578,8 +12906,8 @@ const vehicles = Records.directory({
   onBulk: (keys, act) => {
     const RULE = {
       service: {
-        to: 'Cannot fuel', said: 'stopped', why: 'not fuelling',
-        can: x => x[F.LIFE] === 'In fleet' && x[F.ACCESS] === 'Can fuel',
+        to: 'Blocked', said: 'stopped', why: 'already stopped or off the road',
+        can: x => x[F.STATUS] === 'Active' && x[F.BLOCK] !== 'Blocked',
       },
       /* Only from the one state a bulk press should be able to leave. It used
          to admit anything that was not already fuelling, which meant ticking a
@@ -12591,8 +12919,8 @@ const vehicles = Records.directory({
          vehicle that has left the fleet has no fuel access to give back, and a
          stolen lock is not something a bulk press gets to lift. */
       activate: {
-        to: 'Can fuel', said: 'allowed to fuel', why: 'not stopped',
-        can: x => x[F.LIFE] === 'In fleet' && x[F.ACCESS] === 'Cannot fuel',
+        to: 'Allowed', said: 'allowed to fuel', why: 'not stopped by you',
+        can: x => x[F.STATUS] === 'Active' && x[F.BLOCK] === 'Blocked',
       },
     }[act];
     if (!RULE) return null;
@@ -12600,8 +12928,8 @@ const vehicles = Records.directory({
     const rows = keys.map(k => VEHICLES.find(x => x[0] === k)).filter(Boolean);
     const eligible = rows.filter(RULE.can);
     const skipped = rows.length - eligible.length;
-    const was = eligible.map(x => [x, x[F.ACCESS], x[F.REASON]]);
-    was.forEach(([x]) => { x[F.ACCESS] = RULE.to; });
+    const was = eligible.map(x => [x, x[F.BLOCK], x[F.REASON]]);
+    was.forEach(([x]) => { x[F.BLOCK] = RULE.to; });
 
     const plural = n => `${n} vehicle${n === 1 ? '' : 's'}`;
     if (!eligible.length) {
@@ -12610,7 +12938,7 @@ const vehicles = Records.directory({
     return {
       message: `${plural(eligible.length)} ${RULE.said}.` +
         (skipped ? ` ${plural(skipped)} ${skipped === 1 ? 'was' : 'were'} ${RULE.why}.` : ''),
-      revert: () => was.forEach(([x, access, why]) => { x[F.ACCESS] = access; x[F.REASON] = why; }),
+      revert: () => was.forEach(([x, access, why]) => { x[F.BLOCK] = access; x[F.REASON] = why; }),
     };
   },
   onRowOpen: key => {
@@ -12624,8 +12952,11 @@ const vehicles = Records.directory({
   onCell: (key, kind, el) => {
     const vehicle = VEHICLES.find(x => x[0] === key);
     if (!vehicle) return;
-    if (kind === 'pill:life') return lifeMenu(vehicle, el);
-    if (kind === 'pill:access') return accessMenu(vehicle, el);
+    /* One pill now, so one menu. Both names are still accepted because the
+       driver list draws its own two-pill cell through the same engine. */
+    if (kind === 'pill:status' || kind === 'pill:life' || kind === 'pill:access') {
+      return accessMenu(vehicle, el);
+    }
     if (kind === 'why') return askReason(key, el);
     if (kind === 'notes') {
       Records.recordPanel.open(panelSpec(vehicle, 'activity'), el);
@@ -12648,9 +12979,12 @@ const vehicles = Records.directory({
    * separation is the whole review note.
    */
   cell: r => {
-    const life = r[F.LIFE];
-    const access = r[F.ACCESS];
-    const gone = life !== 'In fleet';
+    const status = r[F.STATUS];
+    const access = fuelAccess(r);
+    /* Shown only where the status does not already say it. On a vehicle in
+       maintenance "Blocked" is a restatement; on an Active one it is the whole
+       story. */
+    const showAccess = status === 'Active' && access !== 'Allowed';
     /* Notes, not entries. The activity column also holds the generated line
        for every change, and counting those would put a rising number beside a
        vehicle nobody has said anything about. The panel's own tab counts the
@@ -12671,9 +13005,11 @@ const vehicles = Records.directory({
 
     return [
       `<a class="rec" href="#">${r[0]}</a>`,
-      r[1] || 'None', `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${r[6]} L`,
+      r[1] || '<span class="cell-none">Not assigned</span>',
+      `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${r[6]} L`,
       `<span class="status-cell">
-         ${gone ? pill(life, 'life', 'In the fleet') : pill(access, 'access', 'Fuel access')}
+         ${pill(status, 'status', 'Operational status')}
+         ${showAccess ? '<span class="status-derived">Fuel blocked</span>' : ''}
          ${why}
          <button class="status-notes${notes ? '' : ' is-empty'}" data-notes="1"
                  aria-label="${notes} note${notes === 1 ? '' : 's'} and activity">
@@ -12865,23 +13201,30 @@ function addNote(vehicle, text) {
    row. */
 function panelSpec(vehicle, tab) {
   const why = REASON_FOR(vehicle);
-  const tone = BADGE[vehicle[F.ACCESS]];
-  const life = vehicle[F.LIFE];
-  const inFleet = life === 'In fleet';
+  const tone = BADGE[vehicle[F.STATUS]];
+  const life = vehicle[F.STATUS];
+  const access = fuelAccess(vehicle);
+  const accessWhy = fuelAccessWhy(vehicle);
   return {
     title: vehicle[0],
     sub: `${vehicle[2]} · ${vehicle[3]}`,
     tab,
     /* The same one-or-the-other rule the row draws by: a vehicle that has left
        the fleet is not shown a fuel access value it can never use. */
+    /* Two rows, in the order they are decided: the status somebody set, then
+       what it means at a pump. Fuel access is never editable here because it
+       is not stored — changing it means changing the status or lifting the
+       block, and offering it as a field would invite the contradiction the
+       split exists to prevent. */
     status: [
-      ...(inFleet
-        ? [['Fuel access', tone ? `<span class="badge ${tone}">${vehicle[F.ACCESS]}</span>` : vehicle[F.ACCESS]]]
-        : [['Fleet lifecycle', `<span class="badge ${BADGE[life]}">${life}</span>`]]),
+      ['Operational status', `<span class="badge ${tone || 'badge-quiet'}">${life}</span>`],
+      ['Fuel access', accessWhy
+        ? `${access} <span class="rp-none">— ${esc(accessWhy)}</span>`
+        : access],
       ...(why ? [['Reason', vehicle[F.REASON]
         ? esc(vehicle[F.REASON])
         : '<span class="rp-none">Not given</span>']] : []),
-      ['At a pump', PUMP[inFleet ? vehicle[F.ACCESS] : life] || ''],
+      ['At a pump', PUMP[vehicle[F.BLOCK] === 'Blocked' && life === 'Active' ? 'Blocked' : life] || ''],
     ],
     details: [
       ['Registration', `<span class="ident">${esc(vehicle[F.REG])}</span>`],
@@ -12911,10 +13254,13 @@ function panelSpec(vehicle, tab) {
    the forecourt. Written once and read by the panel, the drawer and the states
    screen. */
 const PUMP = {
-  'Can fuel': 'Fuel flows, inside the driver’s rules.',
-  'Cannot fuel': 'No fuel. A manager can still release one fill at the pump.',
-  'Stolen lock': 'No fuel, anywhere. Nobody can release a fill. An attempt tells you the station and the time.',
+  Active: 'Fuel flows, inside the driver’s rules.',
+  'In maintenance': 'No fuel. A manager can still release one fill at the pump.',
+  'Reported stolen': 'No fuel, anywhere. Nobody can release a fill. An attempt tells you the station and the time.',
   'Removed from fleet': 'No fuel. Nobody can release one, not even an administrator.',
+  /* Said of the administrative block rather than of a status, because the
+     vehicle is otherwise ordinary and that is the point of it. */
+  Blocked: 'No fuel, because you stopped it. A manager can still release one fill at the pump.',
 };
 
 function vehicleAction(key, act, extra) {
@@ -12939,9 +13285,14 @@ function vehicleAction(key, act, extra) {
    * vehicle from the fleet are the same shape of gesture while staying two
    * entirely different changes.
    */
-  if (act === 'set-life' || act === 'set-access') {
-    const field = act === 'set-life' ? F.LIFE : F.ACCESS;
-    const to = extra;
+  if (act === 'set-status' || act === 'set-life' || act === 'set-access'
+      || act === 'block' || act === 'unblock') {
+    /* The two block verbs are the same change with the value implied, which is
+       what lets one line in a menu read "Stop fuelling" rather than making
+       somebody choose a value for a field they should not have to know about. */
+    const isBlock = act === 'block' || act === 'unblock';
+    const field = isBlock ? F.BLOCK : F.STATUS;
+    const to = isBlock ? (act === 'block' ? 'Blocked' : 'Allowed') : extra;
     const was = vehicle[field];
     const wasWhy = vehicle[F.REASON];
     if (was === to) return;
@@ -12964,7 +13315,11 @@ function vehicleAction(key, act, extra) {
     // A reason belongs to the state that needed one. Carrying it across is
     // how a vehicle ends up back on the road still labelled "In for a service".
     if (!REASON_FOR(vehicle)) vehicle[F.REASON] = '';
-    logChange(vehicle, act === 'set-life' ? 'Fleet lifecycle' : 'Fuel access', was, to);
+    /* Leaving a status that carried a block behind takes the block with it: a
+       vehicle sent for a service while stopped should not come back to Active
+       still quietly blocked by a decision nobody remembers making. */
+    if (!isBlock && to !== 'Active') vehicle[F.BLOCK] = 'Allowed';
+    logChange(vehicle, isBlock ? 'Fuel access' : 'Operational status', was, to);
     vehicles.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(panelSpec(vehicle, 'activity'));
 
@@ -13022,7 +13377,7 @@ function vehicleAction(key, act, extra) {
       calm: 'It stays in your fleet and nothing is deleted. Mark recovered undoes it, and the vehicle comes back stopped so somebody can look it over.',
       fields: `<div class="form-field"><span class="label">How did it go missing? <span class="opt">Optional</span></span>
           <div class="seg is-stacked" role="radiogroup" aria-label="How it went missing">
-            ${WHY['Stolen lock'].list.map(w => `<label><input type="radio" name="cf-took">${w}</label>`).join('')}
+            ${WHY['Reported stolen'].list.map(w => `<label><input type="radio" name="cf-took">${w}</label>`).join('')}
           </div></div>`,
       read: slot => {
         const picked = slot.querySelector('input[name="cf-took"]:checked');
@@ -13063,11 +13418,11 @@ function vehicleAction(key, act, extra) {
   }
 
   if (act === 'stolen-confirmed') {
-    const wasAccess = vehicle[F.ACCESS];
+    const wasAccess = vehicle[F.BLOCK];
     const wasReason = vehicle[F.REASON];
-    vehicle[F.ACCESS] = 'Stolen lock';
+    vehicle[F.STATUS] = 'Reported stolen';
     vehicle[F.REASON] = extra || '';
-    logChange(vehicle, 'Fuel access', wasAccess, 'Stolen lock');
+    logChange(vehicle, 'Operational status', wasAccess, 'Reported stolen');
     if (extra) logChange(vehicle, 'Reason', wasReason, extra, 'reason');
     logEvent(vehicle, 'Reported stolen. Blocked at every Engen site.');
     vehicles.render();
@@ -13079,9 +13434,9 @@ function vehicleAction(key, act, extra) {
   }
 
   if (act === 'removed-confirmed') {
-    const wasLife = vehicle[F.LIFE];
+    const wasLife = vehicle[F.STATUS];
     const wasReason = vehicle[F.REASON];
-    vehicle[F.LIFE] = 'Removed from fleet';
+    vehicle[F.STATUS] = 'Removed from fleet';
     vehicle[F.REASON] = extra || '';
     logChange(vehicle, 'Fleet lifecycle', wasLife, 'Removed from fleet');
     if (extra) logChange(vehicle, 'Reason', wasReason, extra, 'reason');
@@ -13102,10 +13457,10 @@ function vehicleAction(key, act, extra) {
        the vehicle in the fleet — which a recovered vehicle never stopped
        being. */
     const wasReason = vehicle[F.REASON];
-    vehicle[F.ACCESS] = 'Cannot fuel';
+    vehicle[F.STATUS] = 'In maintenance';
     vehicle[F.REASON] = 'Recovered, not yet checked';
     logEvent(vehicle, 'Marked recovered.');
-    logChange(vehicle, 'Fuel access', 'Stolen lock', 'Cannot fuel');
+    logChange(vehicle, 'Operational status', 'Reported stolen', 'In maintenance');
     logChange(vehicle, 'Reason', wasReason, 'Recovered, not yet checked', 'reason');
     vehicles.render();
     Records.toast(`${vehicle[0]} is off the stolen list and stopped. Allow fuelling once it has been looked over.`,
@@ -13130,7 +13485,7 @@ const openerFor = key =>
 function lifeMenu(vehicle, anchor) {
   Records.statusMenu.open(anchor, {
     label: 'In the fleet',
-    value: vehicle[F.LIFE],
+    value: vehicle[F.STATUS],
     groups: [{ items: [{ label: 'Removed from fleet', says: 'Only an administrator can bring a vehicle back. Nothing here can undo this.' }] }],
     help: 'states',
   }, () => {});
@@ -13142,31 +13497,57 @@ function lifeMenu(vehicle, anchor) {
  * the week is never one slip away from removing it from the fleet.
  */
 function accessMenu(vehicle, anchor) {
-  if (vehicle[F.ACCESS] === 'Stolen lock') {
+  const status = vehicle[F.STATUS];
+
+  /* A removed vehicle has nothing left to set. The menu says what it is and
+     offers nothing, rather than presenting controls with no effect. */
+  if (status === 'Removed from fleet') {
     return Records.statusMenu.open(anchor, {
-      label: 'Fuel access',
-      value: vehicle[F.ACCESS],
+      label: 'Operational status',
+      value: status,
+      groups: [{ items: [{ label: 'Removed from fleet', says: STATUS['Removed from fleet'].says }] }],
+      help: 'states',
+    }, () => {});
+  }
+
+  if (status === 'Reported stolen') {
+    return Records.statusMenu.open(anchor, {
+      label: 'Operational status',
+      value: status,
       groups: [
-        { items: [{ label: 'Stolen lock', says: ACCESS['Stolen lock'].says }] },
+        { items: [{ label: 'Reported stolen', says: STATUS['Reported stolen'].says }] },
         /* No ellipsis: in this product it means "asks you something first", and
-           this one does not. It is the only way back from a stolen lock and it
-           is deliberately one press. */
-        { title: 'Security', items: [{ label: 'Mark recovered', act: 'recovered', says: 'The vehicle is back. It comes back stopped, so somebody looks it over before it fuels.' }] },
-        { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true, says: LIFE['Removed from fleet'].says }] },
+           this one does not. It is the only way back from a theft report and
+           it is deliberately one press. */
+        { title: 'Security', items: [{ label: 'Mark recovered', act: 'recovered', says: 'The vehicle is back. It comes back off the road, so somebody looks it over before it fuels.' }] },
+        { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true, says: STATUS['Removed from fleet'].says }] },
       ],
       help: 'states',
     }, item => item.act && vehicleAction(vehicle[0], item.act));
   }
+
+  const blocked = vehicle[F.BLOCK] === 'Blocked';
   Records.statusMenu.open(anchor, {
-    label: 'Fuel access',
-    value: vehicle[F.ACCESS],
+    label: 'Operational status',
+    value: status,
     groups: [
-      { items: ['Can fuel', 'Cannot fuel'].map(v => ({ value: v, says: ACCESS[v].says })) },
-      { title: 'Security', items: [{ label: 'Report stolen…', act: 'stolen', danger: true, says: ACCESS['Stolen lock'].says }] },
-      { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true, says: LIFE['Removed from fleet'].says }] },
+      /* The two everyday states, and they are states of the vehicle. */
+      { items: ['Active', 'In maintenance'].map(v => ({ value: v, says: STATUS[v].says })) },
+      /* Separately: a decision about fuel that says nothing about the
+         vehicle's condition. Only offered on an Active one, because on
+         anything else the status has already blocked it and a second control
+         saying so is how the two came to contradict each other. */
+      ...(status === 'Active' ? [{
+        title: 'Fuel',
+        items: [blocked
+          ? { label: 'Allow fuelling', act: 'unblock', says: 'Lifts your block. The vehicle fuels normally again.' }
+          : { label: 'Stop fuelling', act: 'block', says: BLOCK.Blocked.says }],
+      }] : []),
+      { title: 'Security', items: [{ label: 'Report stolen…', act: 'stolen', danger: true, says: STATUS['Reported stolen'].says }] },
+      { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true, says: STATUS['Removed from fleet'].says }] },
     ],
     help: 'states',
-  }, item => vehicleAction(vehicle[0], item.act || 'set-access', item.value));
+  }, item => vehicleAction(vehicle[0], item.act || 'set-status', item.value));
 }
 
 /* The reason, picked the same way the status is picked. It is a preset, so it
@@ -13193,7 +13574,7 @@ function askReason(key, anchor) {
    `const VEHICLE_STATUS = 7`, which is a second copy of this file's column
    order living in another file, and the kind of thing that is correct until
    somebody inserts a column. */
-window.VehicleFixtures = { VEHICLES, STATES, ID, F, LIFE, ACCESS, PUMP };
+window.VehicleFixtures = { VEHICLES, STATES, ID, F, STATUS, BLOCK, PUMP, fuelAccess, fuelAccessWhy };
 
 })();
 </script>
@@ -13451,7 +13832,7 @@ const drivers = Records.directory({
     ['PrDP', false, 'nowrap'],
     ['PrDP expiry', false, 'nowrap', true],
     ['Group', false, 'nowrap'],
-    ['Status', false, 'status-col'],
+    ['Operational status', false, 'status-col'],
   ],
   facets: [
     ['Licence code', 'code', LICENCE_CODES, d => d.licenceCode],
@@ -14312,7 +14693,7 @@ const VF = window.VehicleFixtures.F;
 /* The in-fleet lifecycle value, read off the vehicle record's own vocabulary
    rather than retyped. LIFE is ordered with the live value first, so this
    survives a rename of the label. */
-const VLIFE = Object.keys(window.VehicleFixtures.LIFE)[0];
+const VLIFE = Object.keys(window.VehicleFixtures.STATUS)[0];
 
 /* ILLUSTRATIVE. There is no fuel transaction anywhere in this prototype: no
  * litres, no pump, no date. There is nothing to compute a rebate from and
@@ -14341,7 +14722,7 @@ const soonPrdp = d => d.prdp !== 'No PrDP' && R.expiresWithin(d.prdpExpiry, SOON
 
 /* On the road means the driver could fuel right now: employed, not suspended,
    and holding a card and a permit that have not lapsed. It is the same
-   predicate the directory's "Needs attention" tab filters on, negated, so the
+   predicate the directory's "Needs review" tab filters on, negated, so the
    two cannot drift apart. */
 const active = DRIVERS.filter(d => d.lifecycle === 'Active' && d.fuel === 'Can fuel');
 const blocked = active.filter(needsAttention);
@@ -14361,11 +14742,13 @@ const counts = {
      fleet' and silently counted nothing — a dashboard showing 0 of 9 on a
      fleet where six vehicles were fuelling. Reading the key off the exported
      map means the next rename cannot do it again. */
-  vehiclesReady: VEHICLES.filter(v => v[VF.LIFE] === VLIFE && v[VF.ACCESS] === 'Can fuel').length,
+  /* Reads the derived answer rather than a stored field, so the dashboard
+     and the list can never disagree about how many vehicles can fuel. */
+  vehiclesReady: VEHICLES.filter(v => window.VehicleFixtures.fuelAccess(v) === 'Allowed').length,
   /* The fleet, not the table. A vehicle that has been sold is a row somebody
      can still find and report on, and it is not one of the vehicles this
      figure is out of: "6 of 10" counted a Sprinter that left in June. */
-  vehicles: VEHICLES.filter(v => v[VF.LIFE] !== 'Removed from fleet').length,
+  vehicles: VEHICLES.filter(v => v[VF.STATUS] !== 'Removed from fleet').length,
 };
 
 /* Five readings, in the order a fleet manager cares about them.
@@ -14442,14 +14825,14 @@ function focusCard() {
   const list = DRIVERS.filter(needsAttention);
   el.innerHTML = `
     <div class="focus-head">
-      <h2>Needs attention</h2>
+      <h2>Needs review</h2>
       <span class="focus-count">${list.length}</span>
     </div>
     ${list.length ? `
       <ul class="focus-list">
         ${list.map(d => `<li><b>${name(d)}</b><span>${reason(d)}</span></li>`).join('')}
       </ul>
-      <a class="btn btn-secondary" href="#drivers-directory" data-goto-tab="Needs attention">Open the list</a>
+      <a class="btn btn-secondary" href="#drivers-directory" data-goto-tab="Needs review">Open the list</a>
     ` : '<p class="focus-clear">Every licence card and permit on file is current.</p>'}`;
 }
 
@@ -14581,7 +14964,17 @@ function showScreen(name) {
   });
 }
 
-const closeForms = () => Object.values(Records.forms).forEach(f => f.close());
+/* Every generic way out of a form goes through here, so this is where the
+   question gets asked. A sheet with something typed in it does not close on
+   Escape, on Cancel, on its own close button or on a backdrop click — it asks,
+   and stays exactly where it is while the answer is decided. */
+const closeForms = () => {
+  if (window.__vehicleSheet && __vehicleSheet.isOpen() && __vehicleSheet.isDirty()) {
+    __vehicleSheet.tryClose();
+    return;
+  }
+  Object.values(Records.forms).forEach(f => f.close());
+};
 
 /* A rail button either shows a screen, or opens a drawer over the screen the
  * record would land on. `data-form` says which drawer; without it, it is an
@@ -14881,6 +15274,19 @@ window.addEventListener('hashchange', fromHash);
     }
   }
 
+  /* Two people typing the same VIN two ways produce one stored string. Done on
+     the way out of the field so the caret is never moved mid-answer. */
+  const vinField = document.getElementById('f-vin');
+  if (vinField) {
+    vinField.addEventListener('blur', () => {
+      const tidy = VIN.normalise(vinField.value);
+      if (tidy && tidy !== vinField.value) {
+        vinField.value = tidy;
+        vinField.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  }
+
   sheet.addEventListener('change', e => {
     if (e.target.name === 'tankMode') {
       const mirror = document.getElementById('f-tank-mode');
@@ -14937,6 +15343,12 @@ window.addEventListener('hashchange', fromHash);
   const ROUTE = '#vehicles/new';
   let opener = null;
   let suppress = false;
+  /* What Keep editing has to put back. The scroll position matters as much as
+     the values: somebody who scrolled to the fuel section, pressed Cancel by
+     mistake and came back to the top of the form has been made to find their
+     place again for no reason. */
+  let sheetScroll = 0;
+  let discardTrigger = null;
 
   const isOpen = () => document.body.classList.contains('sheet-open');
 
@@ -14982,12 +15394,39 @@ window.addEventListener('hashchange', fromHash);
   }
 
   function tryClose() {
+    /* Nothing typed: close at once. A confirmation over an empty form is the
+       kind people learn to click through, which is how the one that matters
+       gets dismissed too. */
     if (!dirty()) { back(); return; }
     const dlg = document.getElementById('discard-vehicle');
-    if (dlg) { dlg.classList.remove('hidden'); document.body.classList.add('discard-open');
-      const keep = dlg.querySelector('[data-role="keep"]');
-      if (keep) keep.focus({ preventScroll: true });
-    } else back();
+    if (!dlg) { back(); return; }
+
+    /* Remembered before the confirmation takes focus, not after. */
+    sheetScroll = body ? body.scrollTop : 0;
+    discardTrigger = sheet.contains(document.activeElement) ? document.activeElement : null;
+
+    dlg.classList.remove('hidden');
+    document.body.classList.add('discard-open');
+    /* The sheet stays mounted, visible and full of what was typed — it is the
+       thing being asked about. It goes inert so nothing behind the
+       confirmation can be tabbed to or clicked. */
+    sheet.setAttribute('inert', '');
+    const keep = dlg.querySelector('[data-role="keep"]');
+    if (keep) keep.focus({ preventScroll: true });
+  }
+
+  /* Keep editing. Closes one surface, restores two things. */
+  function resume() {
+    const dlg = document.getElementById('discard-vehicle');
+    if (dlg) dlg.classList.add('hidden');
+    document.body.classList.remove('discard-open');
+    sheet.removeAttribute('inert');
+    if (body) body.scrollTop = sheetScroll;
+    const back = (discardTrigger && sheet.contains(discardTrigger) && discardTrigger.offsetParent !== null)
+      ? discardTrigger
+      : sheet.querySelector('#f-vin');
+    if (back) back.focus({ preventScroll: true });
+    discardTrigger = null;
   }
 
   function back() {
@@ -14995,10 +15434,20 @@ window.addEventListener('hashchange', fromHash);
     if (location.hash === ROUTE) { suppress = true; location.hash = '#directory'; suppress = false; }
   }
 
-  window.__vehicleSheet = { open, shut, tryClose, back, syncCategory, syncTanks };
+  window.__vehicleSheet = {
+    open, shut, tryClose, back, resume, syncCategory, syncTanks,
+    isOpen, isDirty: dirty,
+  };
 
   sheet.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { e.preventDefault(); tryClose(); return; }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      /* The document also listens for Escape and would close the form from
+         under the confirmation this is about to open. */
+      e.stopPropagation();
+      tryClose();
+      return;
+    }
     if (e.key !== 'Tab') return;
     const f = focusables();
     if (!f.length) return;
@@ -15007,8 +15456,10 @@ window.addEventListener('hashchange', fromHash);
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
-  sheet.querySelectorAll('[data-close-form]').forEach(b =>
-    b.addEventListener('click', e => { e.preventDefault(); tryClose(); }));
+  /* Cancel and the close button are already wired to closeForms, which asks
+     the question. Binding them here as well is what made one press both open
+     the confirmation and close the sheet behind it. Only the backdrop needs
+     its own, because it is not a [data-close-form]. */
   if (backdrop) backdrop.addEventListener('click', tryClose);
 
   /* Back and reload. */
@@ -15027,6 +15478,31 @@ window.addEventListener('hashchange', fromHash);
       if (submit.dataset.busy === '1') return;
     }, true);
   }
+})();
+
+/* The next-step strip's action. Two steps, in the order a person would take
+   them: the drivers page first, so closing the form lands somewhere that makes
+   sense, then the form over it. */
+document.querySelectorAll('[data-next="add-driver"]').forEach(b => {
+  b.addEventListener('click', () => {
+    location.hash = 'drivers-directory';
+    /* After the hashchange, so the form opens over the page the driver will
+       land on rather than over the vehicle list. */
+    setTimeout(() => Records.forms.driver?.open('blank'), 0);
+  });
+});
+
+/* Shown only while there is nothing on the drivers list. The strip is a
+   prompt, and a prompt that outlives the thing it is prompting for becomes
+   furniture. */
+(() => {
+  const strip = document.querySelector('[data-role="next-drivers"]');
+  if (!strip) return;
+  const drivers = window.DriverFixtures && DriverFixtures.DRIVERS;
+  /* No fixture to read means the question cannot be answered, and a prompt
+     shown by default is the safer of the two mistakes: it is visible and
+     dismissible, where a hidden one is neither. */
+  if (Array.isArray(drivers) && drivers.length > 0) strip.hidden = true;
 })();
 
 /* Buttons on the screens themselves: `data-open="driver:blank"` opens a
@@ -15048,20 +15524,42 @@ document.querySelectorAll('[data-open]').forEach(b => {
 (() => {
   const dlg = document.getElementById('discard-vehicle');
   if (!dlg) return;
-  const shut = () => { dlg.classList.add('hidden'); document.body.classList.remove('discard-open'); };
-  dlg.querySelector('[data-role="keep"]')?.addEventListener('click', () => {
-    shut();
-    document.getElementById('f-vin')?.focus({ preventScroll: true });
-  });
+
+  /* Keep editing is the safe answer, so it is the one Escape performs and the
+     one focus lands on. Neither of them touches the sheet. */
+  const keep = () => window.__vehicleSheet && __vehicleSheet.resume();
+
+  dlg.querySelector('[data-role="keep"]')?.addEventListener('click', keep);
+
   dlg.querySelector('[data-role="discard"]')?.addEventListener('click', () => {
-    shut();
+    dlg.classList.add('hidden');
+    document.body.classList.remove('discard-open');
+    document.getElementById('vehicle-drawer')?.removeAttribute('inert');
     document.querySelectorAll('#vehicle-drawer input, #vehicle-drawer select').forEach(el => {
       if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
       else el.value = '';
     });
+    /* Both surfaces go, and focus lands back on the button that started all
+       of this. */
+    Records.forms.vehicle?.close();
     window.__vehicleSheet?.back();
   });
-  dlg.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); shut(); } });
+
+  dlg.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); keep(); return; }
+    /* The confirmation keeps the keyboard too, or Tab walks into the inert
+       sheet behind it and appears to vanish. */
+    if (e.key !== 'Tab') return;
+    const f = [...dlg.querySelectorAll('button')].filter(b => b.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  /* A backdrop click on a confirmation about losing work is an accident, not
+     an answer. It does nothing. */
+  dlg.addEventListener('click', e => { if (e.target === dlg) e.stopPropagation(); });
 })();
 
 /* `data-goto-search` carries a search term across with the screen change, which
