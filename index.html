@@ -196,6 +196,24 @@
   --text-micro:    11px;
   --text-nano:     10px;
 
+
+  /* Weight. The vocabulary was already this short - four values carry
+     ninety-six per cent of the uses - it simply had no names, so nothing
+     could tell a considered 800 from a typo. Naming it is what makes it
+     enforceable: a stray 750 is now visibly not one of these.
+
+     The three at the ends are deliberate and each is used a handful of
+     times: black is the station name a driver reads at a pump, light is the
+     step title set to sound like someone speaking, regular is body prose
+     that must not shout. */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-heavy:    800;
+  --weight-black:    900;
+
   /* Radius */
   --radius-pill:   999px;
   --radius-phone:  47px;   /* the real corner at 390pt */
@@ -242,8 +260,24 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
+  /* The plate an icon sits on. a-icon-wrap is the atom that draws one,
+     and three molecules were each restating its width and height in raw
+     pixels - 40 here, 44 twice - so the object had a size the scale had
+     never heard of. Two steps, because the row plate and the card plate
+     are genuinely different objects: 40 sits in a list row, 44 heads a
+     card. */
+  --size-plate:    40px;
+  --size-plate-lg: 44px;
   --size-action:   52px;   /* the primary CTA's one height, wherever it stands */
   --size-hairline:      0.5px;
+  /* The edge a control draws around itself. 0.5px above is the finest
+     line the scale owns and its one real border is the drawn Android
+     keyboard - OS chrome, not this product. The width every field here
+     actually uses was 1.5, written by hand in all three of them. The
+     decorative rings keep their own literals: each states a reason, and
+     tying a field's edge to six animation rings would be worse than the
+     raw values it replaced. */
+  --size-border:        1.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
@@ -372,7 +406,7 @@ button { background: none; border: none; color: inherit; }
      it is the first thing you see. Variants that want a border declare one. */
   border: none;
   border-radius: var(--radius-pill);
-  font-size: var(--text-subhead); font-weight: 700; letter-spacing: -0.3px;
+  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: -0.3px;
   text-decoration: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out),
               box-shadow var(--dur-fast) var(--ease-in-out),
@@ -392,14 +426,14 @@ button { background: none; border: none; color: inherit; }
   /* The AA-checked border, because an outline button on glass is only as
      visible as its edge. */
   border: 1px solid var(--color-border-field);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .a-btn--outline:hover { background: var(--color-border-light); }
 /* State is never a class: when a person becomes the last resort the scan
    sheet says so with data-lead, and the fact wears the primary coat. */
 .a-btn--outline[data-lead="true"] {
   background: var(--gradient-primary); border-color: transparent;
-  color: var(--color-text-on-dark); font-weight: 700;
+  color: var(--color-text-on-dark); font-weight: var(--weight-bold);
   box-shadow: var(--shadow-btn);
 }
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
@@ -416,15 +450,15 @@ button { background: none; border: none; color: inherit; }
   min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--text-footnote); font-weight: 600; letter-spacing: -0.1px;
+  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: -0.1px;
   color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
 }
 /* Quiet is still a live control, so it differentiates upward from disabled
    rather than sharing its grey. */
-.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.a-link--quiet { color: var(--color-text-secondary); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
 /* A countdown is a fact, not a control. While it is still running the resend
    wears plain text so nothing invites a press that cannot work yet. */
-.o-signup-sheet__resend:disabled { text-decoration: none; font-weight: 600; }
+.o-signup-sheet__resend:disabled { text-decoration: none; font-weight: var(--weight-semibold); }
 /* Flush drops the inline padding so the label sits on the container's content
    edge. The vertical padding stays, because the 48px target depends on it. */
 .a-link--flush { padding-inline: 0; }
@@ -436,11 +470,11 @@ button { background: none; border: none; color: inherit; }
 /* a-label */
 .a-label {
   display: block;
-  font-size: var(--text-caption); font-weight: 600;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 .a-link:disabled, .a-link[disabled] {
-  color: var(--color-text-tertiary); font-weight: 500; cursor: default;
+  color: var(--color-text-tertiary); font-weight: var(--weight-medium); cursor: default;
 }
 /* Except this one. Disabled, it is not a control being ignored: it is the
    sentence telling a driver when they can try again, read one-handed on a
@@ -448,7 +482,7 @@ button { background: none; border: none; color: inherit; }
    the countdown is content, so it takes the colour content takes. */
 /* On the final attempt the safest recovery leads: the resend link takes
    the lead coat and outranks the channel button beside it. */
-.o-signup-sheet__resend[data-lead="true"] { font-weight: 800; color: var(--color-primary-dark); }
+.o-signup-sheet__resend[data-lead="true"] { font-weight: var(--weight-heavy); color: var(--color-primary-dark); }
 .o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }
 
 /* a-field. Two orthogonal axes: data-state for idle, pending and error,
@@ -458,7 +492,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; gap: var(--sp-3);
   min-height: var(--size-control); padding: 0 var(--sp-4);
   background: var(--glass-card-bg);
-  border: 1.5px solid var(--color-border-field);
+  border: var(--size-border) solid var(--color-border-field);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-field);
   transition: border-color var(--dur-base), background var(--dur-base),
@@ -476,12 +510,12 @@ button { background: none; border: none; color: inherit; }
 .a-field[data-state="pending"] { opacity: .85; }
 .a-field__input {
   flex: 1; min-width: 0; border: none; background: transparent;
-  font-size: var(--text-subhead); font-weight: 600;
+  font-size: var(--text-subhead); font-weight: var(--weight-semibold);
   color: var(--color-text-primary); caret-color: var(--color-primary);
 }
 /* The ring lives on the field, not the bare input, so it follows the border. */
 .a-field__input:focus { outline: none; }
-.a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: 500; }
+.a-field__input::placeholder { color: var(--color-text-tertiary); font-weight: var(--weight-medium); }
 /* The field is a label (below), so the whole 56px focuses the input. The
    first cure stretched the input instead, and its own background rode over
    the field's rounded corners as a square block: geometry was the wrong
@@ -491,10 +525,10 @@ button { background: none; border: none; color: inherit; }
 /* a-otp-cell */
 .a-otp-cell {
   flex: 1; min-width: 0; max-width: var(--size-otp-cell); aspect-ratio: 1 / 1;
-  text-align: center; font-size: var(--text-title); font-weight: 700;
+  text-align: center; font-size: var(--text-title); font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   background: var(--color-surface-sunken);
-  border: 1.5px solid var(--color-border-field);
+  border: var(--size-border) solid var(--color-border-field);
   border-radius: var(--radius-card-sm);
   padding: 0; appearance: none;
   caret-color: var(--color-primary);
@@ -535,23 +569,23 @@ button { background: none; border: none; color: inherit; }
   font-size: var(--text-caption2); line-height: 1.5;
   color: var(--color-text-secondary);
 }
-.a-helper[data-tone="error"]   { color: var(--color-error-text); font-weight: 600; }
-.a-helper[data-tone="success"] { color: var(--color-success); font-weight: 600; }
-.a-helper[data-tone="warning"] { color: var(--color-warning); font-weight: 600; }
+.a-helper[data-tone="error"]   { color: var(--color-error-text); font-weight: var(--weight-semibold); }
+.a-helper[data-tone="success"] { color: var(--color-success); font-weight: var(--weight-semibold); }
+.a-helper[data-tone="warning"] { color: var(--color-warning); font-weight: var(--weight-semibold); }
 /* Tone is never carried by colour alone. The icon is injected by setHelper. */
 .a-helper__icon { flex-shrink: 0; vertical-align: -2px; margin-right: var(--sp-1); }
 /* A consequence is not the error. It gets its own line and its own weight, so
    "one attempt left" is not read as one sentence with "signing in pauses". */
 .a-helper__note {
   display: block; margin-top: var(--sp-1);
-  font-weight: 500; color: var(--color-text-secondary);
+  font-weight: var(--weight-medium); color: var(--color-text-secondary);
 }
 .a-helper .a-spinner { vertical-align: -3px; margin-right: var(--sp-2); }
 
 
 /* a-icon-wrap */
 .a-icon-wrap {
-  width: 40px; height: 40px; flex-shrink: 0;
+  width: var(--size-plate); height: var(--size-plate); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm);
   /* A fill, not an outline. The tone tints already separate the plate from the
@@ -630,7 +664,7 @@ button { background: none; border: none; color: inherit; }
 .a-toast {
   position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
   background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
-  font-size: var(--text-caption); font-weight: 600; line-height: 1.45;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.45;
   padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
   box-shadow: var(--shadow-toast);
   opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
@@ -646,7 +680,7 @@ button { background: none; border: none; color: inherit; }
   padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
   padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
 }
-.m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
+.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: -0.3px; }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* Connection state, shown where a phone shows it. Without this data-net was a
@@ -660,7 +694,7 @@ button { background: none; border: none; color: inherit; }
    lose. Dark ink is the default and the on-dark ramp is the exception,
    which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
-  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: -0.1px;
   color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
 .m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
@@ -682,12 +716,12 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-brand);
 }
 .m-brand-lockup__name {
-  font-size: var(--text-title); font-weight: 900; color: var(--color-text-on-dark);
+  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-on-dark);
   letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
 }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
-  font-size: var(--text-micro); font-weight: 500; letter-spacing: 1.5px;
+  font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--color-on-dark-faint);
 }
 
@@ -707,11 +741,11 @@ button { background: none; border: none; color: inherit; }
 .m-alert__top { display: flex; align-items: flex-start; gap: var(--sp-3); }
 .m-alert__icon { flex-shrink: 0; margin-top: -1px; }  /* optical, against cap height */
 .m-alert__title {
-  font-size: var(--text-footnote); font-weight: 700; line-height: 1.35;
+  font-size: var(--text-footnote); font-weight: var(--weight-bold); line-height: 1.35;
   color: var(--color-text-primary); margin-bottom: 3px;
 }
 .m-alert__body { font-size: var(--text-caption2); line-height: 1.55; color: var(--color-text-secondary); }
-.m-alert__body b { color: var(--color-text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+.m-alert__body b { color: var(--color-text-primary); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
 .m-alert__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
 .m-alert--onDark {
   background: var(--color-on-dark-fill); border-color: var(--color-on-dark-line);
@@ -729,7 +763,7 @@ button { background: none; border: none; color: inherit; }
    control and lets that control hold the right edge on its own. */
 .m-sheet-header[data-heading="none"] { justify-content: flex-end; margin-bottom: 0; }
 .m-sheet-header__title {
-  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
   color: var(--color-text-primary); margin-bottom: var(--sp-1);
 }
 .m-sheet-header__sub {
@@ -737,7 +771,7 @@ button { background: none; border: none; color: inherit; }
 }
 /* The masked number is one token. Breaking it across two lines turns a
    number the driver is checking against their handset into two fragments. */
-.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: 700; white-space: nowrap; }
+.m-sheet-header__sub b { color: var(--color-text-primary); font-weight: var(--weight-bold); white-space: nowrap; }
 /* The glyph used to be shoved to the trailing edge of a 48px box, so that it
    would land on the same gutter the title starts from. It did land there, and
    it cost the thing the button actually is: the box is round and it lights up
@@ -777,7 +811,7 @@ button { background: none; border: none; color: inherit; }
    is an attribute, and the attribute is the one the platform already has. */
 .m-progress {
   display: flex;
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
   margin-bottom: var(--sp-4);
 }
@@ -789,7 +823,7 @@ button { background: none; border: none; color: inherit; }
   padding-right: var(--sp-3); border-right: 1px solid var(--color-primary-12);
 }
 .m-phone-field__flag { font-size: var(--text-lead); line-height: 1; }
-.m-phone-field__code { font-size: var(--text-body); font-weight: 800; }
+.m-phone-field__code { font-size: var(--text-body); font-weight: var(--weight-heavy); }
 
 
 /* m-otp-group. 6px between cells is optical, tuned so six squares and five
@@ -887,11 +921,11 @@ button { background: none; border: none; color: inherit; }
      lede, button, help - anchors to the bottom of the frame and the orbs
      carry the air above it. */
   margin-top: auto;
-  font-size: var(--text-hero); font-weight: 800; color: var(--color-text-on-dark);
+  font-size: var(--text-hero); font-weight: var(--weight-heavy); color: var(--color-text-on-dark);
   line-height: 1.08; letter-spacing: -1.6px; margin-bottom: var(--sp-3);
 }
 .o-auth-hero__lede {
-  font-size: var(--text-body); font-weight: 400; line-height: 1.6;
+  font-size: var(--text-body); font-weight: var(--weight-regular); line-height: 1.6;
   color: var(--color-on-dark-soft); margin-bottom: var(--sp-5);
 }
 /* How the door works, in one breath, so the button is an answer rather
@@ -961,11 +995,11 @@ button { background: none; border: none; color: inherit; }
 .o-status-page__meta .m-figure { align-items: center; text-align: center; }
 .m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .m-figure__key {
-  font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.12em;
+  font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-figure__val {
-  font-size: var(--text-lead); font-weight: 800;
+  font-size: var(--text-lead); font-weight: var(--weight-heavy);
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 /* On the dark hero the same component takes the on-dark pair. */
@@ -998,7 +1032,7 @@ button { background: none; border: none; color: inherit; }
 }
 .o-status-page__icon { margin-inline: auto; }
 .o-status-page__title {
-  font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px;
+  font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: -0.3px;
   margin: var(--sp-4) 0 var(--sp-2);
 }
 .o-status-page__body {
@@ -1091,11 +1125,11 @@ button { background: none; border: none; color: inherit; }
    text answers the driver's text-size setting, and a drawing of Android's own
    keyboard must not: a real keyboard does not grow when app text does. */
 .m-keyboard__digit {
-  font-family: var(--font-sans); font-size: 21px; font-weight: 400;
+  font-family: var(--font-sans); font-size: 21px; font-weight: var(--weight-regular);
   fill: var(--kb-text); text-anchor: middle;
 }
 .m-keyboard__sub {
-  font-family: var(--font-sans); font-size: 9px; font-weight: 600;
+  font-family: var(--font-sans); font-size: 9px; font-weight: var(--weight-semibold);
   letter-spacing: 0.06em; fill: var(--kb-sub); text-anchor: middle;
 }
 /* Without backdrop-filter, which is real on older Android WebViews, a
@@ -1187,7 +1221,7 @@ button { background: none; border: none; color: inherit; }
 }
 .o-signup-sheet__noteMore {
   min-height: 0; padding-block: 0;
-  font-size: var(--text-caption2); font-weight: 600;
+  font-size: var(--text-caption2); font-weight: var(--weight-semibold);
   text-decoration: underline; text-underline-offset: 2px;
   /* Drawn at the sentence's size, pressable at the rule's. The invisible
      half of the target, the same answer the map pins use. */
@@ -1206,7 +1240,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: flex-start; gap: var(--sp-2h);
   font-size: var(--text-caption2); line-height: 1.5; color: var(--color-text-secondary);
 }
-.m-privacy__row b { color: var(--color-text-primary); font-weight: 700; }
+.m-privacy__row b { color: var(--color-text-primary); font-weight: var(--weight-bold); }
 .m-privacy__icon { flex-shrink: 0; color: var(--color-primary); margin-top: 1px; }
 
 /* o-outcome-panel. Named for its role, not its tone: it renders the blocked
@@ -1253,17 +1287,17 @@ button { background: none; border: none; color: inherit; }
    ring drawn round a heading nobody moved to reads as a control. The sibling
    panel already did this and this one was missed. */
 .o-status-page__title:focus-visible { outline: none; box-shadow: none; }
-.o-outcome-panel__title { font-size: var(--text-heading); font-weight: 800; letter-spacing: -0.3px; }
+.o-outcome-panel__title { font-size: var(--text-heading); font-weight: var(--weight-heavy); letter-spacing: -0.3px; }
 .o-outcome-panel__body { font-size: var(--text-caption); line-height: 1.6; color: var(--color-text-secondary); }
 .o-outcome-panel__clock {
-  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.6px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.6px;
   color: var(--color-text-primary); font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 /* A supporting offer, not the outcome, so it sits below the clock and quieter
    than both the title and the number. */
 .o-outcome-panel__meta {
-  font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary);
+  font-size: var(--text-caption2); font-weight: var(--weight-medium); color: var(--color-text-secondary);
 }
 .o-outcome-panel__actions { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
 
@@ -5040,12 +5074,21 @@ button { background: none; border: none; color: inherit; }
       ], states: [['note', 'device hardware, not product. It exists so the design can be judged against a real screen.']] },
 
     /* ── Molecules ──────────────────────────────────────────────────── */
+    { name: '.m-privacy', level: 'molecule', lines: [
+        ['layout', 'flex column, gap var(--sp-2h), margin-top var(--sp-2)'],
+        ['__row', 'flex, align-items flex-start, gap var(--sp-2h). var(--text-caption2) / 1.5, var(--color-text-secondary).'],
+        ['__row b', 'var(--color-text-primary) at 700 - the few-word headline the plain line completes.'],
+        ['__icon', '18px, var(--color-primary), 1px of optical lift. Names the subject of the row.'],
+        ['why rows', 'a paragraph made a reader hold five sentences at once; a row asks for one glance each.']
+      ], states: [
+        ['a11y', 'the icons are aria-hidden. Every one of them repeats a word that is already in the row beside it.']
+      ] },
     { name: '.m-sheet-header', level: 'molecule', lines: [
         ['layout', 'flex, align-items flex-start, space-between, gap var(--sp-3)'],
         ['margin-bottom', 'var(--sp-4)'],
         ['__title', 'var(--text-title) / 800, letter-spacing -0.5px, margin-bottom var(--sp-1)'],
         ['__sub', 'var(--text-caption) / 1.5, var(--color-text-secondary). Its <b> is nowrap so a masked number never breaks across lines.'],
-        ['__close', 'var(--size-target) square, glyph pushed to the trailing edge']
+        ['__close', '36px circle, glyph centred in it, its own edge on the gutter. The 48px target is drawn out from a pseudo below and sideways only, because the sheet scroller clips above it and a clipped region is not pressable either.']
       ], states: [
         ['[data-heading="none"]', 'justify-content: flex-end, margin-bottom 0. Used on the outcome stages, where the panel carries its own heading and a second one above it would compete.'],
         ['bind', 'title to sub is 4px. The bind scales with its type: 4 here, 8 under an 18px outcome heading, 12 under the 42px hero.']
@@ -5168,7 +5211,7 @@ button { background: none; border: none; color: inherit; }
       ], states: [['use', 'only for an action that leaves the app for WhatsApp']] },
     { name: '.a-field', level: 'atom', lines: [
         ['min-height', 'var(--size-control)'], ['padding', '0 var(--sp-4)'], ['gap', 'var(--sp-3)'],
-        ['border', '1.5px solid var(--color-border-field)'], ['border-radius', 'var(--radius-card)'],
+        ['border', 'var(--size-border) solid var(--color-border-field)'], ['border-radius', 'var(--radius-card)'],
         ['background', 'var(--glass-card-bg)'], ['box-shadow', 'var(--shadow-field)']
       ], states: [
         [':focus-within', 'border-color: var(--color-primary) plus a 3px var(--color-primary-12) ring'],
@@ -5178,7 +5221,7 @@ button { background: none; border: none; color: inherit; }
       ] },
     { name: '.a-otp-cell', level: 'atom', lines: [
         ['flex', '1, max-width 52px'], ['aspect-ratio', '1 / 1'],
-        ['font', '22px / 700, centred'], ['border', '1.5px solid var(--color-border-field)'],
+        ['font', '22px / 700, centred'], ['border', 'var(--size-border) solid var(--color-border-field)'],
         ['border-radius', 'var(--radius-card-sm)'], ['background', 'var(--color-surface-sunken)']
       ], states: [
         ['two axes', 'data-state is what the driver typed, data-tone is what came back. A cell can be filled and wrong at the same time, so they are separate attributes and one attribute holds one value.'],
@@ -5655,8 +5698,32 @@ button { background: none; border: none; color: inherit; }
       (document.documentElement.innerHTML.match(/var\((--[\w-]+)/g) || []).forEach(function (v) {
         used[v.slice(4)] = 1;
       });
-      var dead = Object.keys(declared).filter(function (d) { return !used[d]; });
-      return { pass: !dead.length, detail: dead.length ? dead.join(', ') : Object.keys(declared).length + ' tokens, all consumed' };
+      /* The scale is one union, copied whole into both flows, and check.js
+         records that as debt carried on purpose: "byte-identical union means
+         each file carries tokens only the other uses." A token this flow
+         declares and the other flow spends is therefore not dead, and this
+         check used to call it dead - so the panel and the build gate stood in
+         the same repo contradicting each other about the same two tokens,
+         which is how a self-check teaches you to stop reading it.
+
+         Named rather than pattern-matched, so the day one of them stops being
+         used on BOTH sides it comes back as a failure rather than hiding in a
+         rule. Anything not on this list is still dead the moment it is unused. */
+      var SPENT_BY_THE_OTHER_FLOW = {
+        '--text-display': 'the app’s greeting and balance',
+        '--size-action': 'the app’s one CTA height',
+        '--text-figure': 'the app’s live litre count',
+        '--size-plate-lg': 'the app’s station head and vehicle card plates',
+        '--weight-light': 'the app’s step title, set to sound like someone speaking'
+      };
+      var dead = Object.keys(declared).filter(function (d) {
+        return !used[d] && !SPENT_BY_THE_OTHER_FLOW[d];
+      });
+      var lent = Object.keys(SPENT_BY_THE_OTHER_FLOW).filter(function (d) { return declared[d] && !used[d]; });
+      return { pass: !dead.length,
+               detail: dead.length ? dead.join(', ')
+                 : Object.keys(declared).length + ' tokens, all consumed' +
+                   (lent.length ? ' (' + lent.length + ' of them by the app flow)' : '') };
     }],
 
     ['Accessibility', 'every icon-only control is named', function () {
@@ -5837,13 +5904,22 @@ button { background: none; border: none; color: inherit; }
      a one-off decorative gradient whose every stop is a colour token is not
      the same defect as a hardcoded colour, and saying "no token" for both
      trains a developer to ignore the warning that matters. */
+  /* color() as well as rgb(). The scale is built on color-mix(), and Chrome
+     serialises a mixed value as `color(srgb 0.086 0.313 0.721 / 0.3)` rather
+     than as rgba(). This matched only rgba(), so every stop of the hero orbs
+     came back unresolved and the panel reported its own tokens as
+     untokenised values - on every state, for as long as the browser has
+     serialised it that way. The map above is keyed through the same
+     normaliser, so both forms land on the same key; only the reading of the
+     value out of a gradient string was too narrow. */
   function composedOf(raw) {
     var found = [], seen = {};
-    String(raw).replace(/rgba?\([^)]*\)/g, function (c) {
-      /* transparent computes to rgba(0, 0, 0, 0). It is the absence of a
-         colour, not an untokenised one, so it neither resolves nor counts
-         against the value. */
+    String(raw).replace(/(?:rgba?|color)\([^)]*\)/g, function (c) {
+      /* transparent computes to rgba(0, 0, 0, 0), or to the srgb form of the
+         same nothing. It is the absence of a colour, not an untokenised one,
+         so it neither resolves nor counts against the value. */
       if (/^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/.test(c)) { return c; }
+      if (/^color\(srgb\s+0\s+0\s+0\s*\/\s*0\s*\)$/.test(c)) { return c; }
       var t = MAPS.colour[normColour(c)];
       if (t && !seen[t]) { seen[t] = 1; found.push(t); }
       else if (!t) { found.push(null); }

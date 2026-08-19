@@ -512,6 +512,87 @@ function sharedRules(name) {
   }
 }
 
+/* ── The base layer ───────────────────────────────────────────────────
+   The gate above compares only rules whose every class roots into the
+   manifest, and it drops any selector with no class at all before it
+   starts. That is most of a stylesheet's foundation: the element reset,
+   the focus policy, the box-sizing law, what a button inherits.
+
+   It cost a real bug. `input, button, a { font-family: inherit; }` and
+   `button { ... color: inherit; }` lived in one file and not the other, so
+   every one of seventy-seven buttons in the app rendered in the UA's Arial
+   at the right size and the right weight - and this gate went on certifying
+   a-btn byte-identical the whole time, truthfully, because the atom's own
+   rule really was identical. The difference was in a rule it could not see.
+
+   So the bare-element rules are compared too. Same shape as the library
+   gate: per selector, comment-stripped, declaration bodies compared. A
+   selector one file needs and the other genuinely does not goes in
+   BASE_DIVERGENCE with its reason, the way SHARED_DIVERGENCE works. */
+const BASE_DIVERGENCE = new Set([
+]);
+
+function baseRules(name) {
+  const css = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1]).join('\n')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ');
+  const rules = new Map();
+  /* Depth-tracked, because the reset layer is top level and nothing else
+     here is. A flat regex reads the steps inside @keyframes as bare element
+     selectors - `from`, `to`, `50%` - and reads a rule inside @media as
+     though it stood beside its unconditioned twin. Only depth 0 is the
+     foundation; everything nested belongs to its at-rule. */
+  let depth = 0, i = 0, chunk = '';
+  while (i < css.length) {
+    const ch = css[i];
+    if (ch === '{') {
+      if (depth === 0) {
+        const close = (() => {
+          let d = 0;
+          for (let j = i; j < css.length; j++) {
+            if (css[j] === '{') { d++; }
+            else if (css[j] === '}') { d--; if (!d) { return j; } }
+          }
+          return -1;
+        })();
+        const sels = chunk.trim();
+        const body = close === -1 ? '' : css.slice(i + 1, close);
+        /* An at-rule's own block is not a rule; skip past it whole. */
+        if (!sels.startsWith('@') && !/[{}]/.test(body)) {
+          const flat = body.trim().replace(/\s+/g, ' ');
+          for (let sel of sels.split(',')) {
+            sel = sel.trim().replace(/\s+/g, ' ');
+            /* Bare element selectors only: no class, no id, no attribute.
+               `*` and `:focus-visible` count - they are foundation too. */
+            if (!sel || /[.#\[]/.test(sel)) { continue; }
+            if (!rules.has(sel)) { rules.set(sel, []); }
+            rules.get(sel).push(flat);
+          }
+        }
+        i = close === -1 ? css.length : close + 1;
+        chunk = '';
+        continue;
+      }
+      depth++;
+    } else if (ch === '}') { depth--; }
+    chunk += ch;
+    i++;
+  }
+  return rules;
+}
+{
+  const a = baseRules(SIGNUP), b = baseRules(ONBOARD);
+  const seen = new Set([...a.keys(), ...b.keys()]);
+  for (const sel of seen) {
+    if (BASE_DIVERGENCE.has(sel)) { continue; }
+    if (!a.has(sel)) { fail(`base layer: '${sel}' is styled in ${ONBOARD} but not in ${SIGNUP}`); continue; }
+    if (!b.has(sel)) { fail(`base layer: '${sel}' is styled in ${SIGNUP} but not in ${ONBOARD}`); continue; }
+    if (a.get(sel).join('|') !== b.get(sel).join('|')) {
+      fail(`base layer: '${sel}' drifted between the files\n        ${SIGNUP} : ${a.get(sel).join(' | ')}\n        ${ONBOARD}: ${b.get(sel).join(' | ')}`);
+    }
+  }
+}
+
 
 
 /* ── The recipe census ───────────────────────────────────────────────
@@ -645,7 +726,7 @@ const USED_ONLY = new Set([
      the declarations */
   'm-phone-field',
 ]);
-const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|radius|shadow|sp|size|z|ease|dur|d)-/;
+const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|radius|shadow|sp|size|z|ease|dur|d)-/;
 
 for (const name of FILES) {
   const styleBlocks = [...src[name].matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
@@ -698,7 +779,7 @@ for (const name of FILES) {
   /* Token definitions stay inside the sanctioned families. */
   for (const m of styleNoComments.matchAll(/^\s*(--[a-z][\w-]*)\s*:/gm)) {
     if (!TOKEN_FAMILY.test(m[1])) {
-      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
+      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --weight- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
     }
   }
 }
@@ -754,4 +835,5 @@ console.log(`    ${counts.tokens} product tokens, identical in both files`);
 console.log('    the words stay plain');
 console.log('    sign-up may reach a person; nothing at the pump navigates away');
 console.log('    every class is shaped like the system, no dead names, tokens in their families');
-console.log('    the shared library is verbatim in both files, and both restate colour-only states\n');
+console.log('    the shared library is verbatim in both files, and both restate colour-only states');
+console.log('    the base layer agrees too: what a control inherits is the same on both sides\n');

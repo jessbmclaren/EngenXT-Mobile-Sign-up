@@ -199,6 +199,24 @@
   --text-micro:    11px;
   --text-nano:     10px;
 
+
+  /* Weight. The vocabulary was already this short - four values carry
+     ninety-six per cent of the uses - it simply had no names, so nothing
+     could tell a considered 800 from a typo. Naming it is what makes it
+     enforceable: a stray 750 is now visibly not one of these.
+
+     The three at the ends are deliberate and each is used a handful of
+     times: black is the station name a driver reads at a pump, light is the
+     step title set to sound like someone speaking, regular is body prose
+     that must not shout. */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-heavy:    800;
+  --weight-black:    900;
+
   /* Radius */
   --radius-pill:   999px;
   --radius-phone:  47px;   /* the real corner at 390pt */
@@ -245,8 +263,24 @@
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
   --size-target:   48px;   /* minimum tap target */
+  /* The plate an icon sits on. a-icon-wrap is the atom that draws one,
+     and three molecules were each restating its width and height in raw
+     pixels - 40 here, 44 twice - so the object had a size the scale had
+     never heard of. Two steps, because the row plate and the card plate
+     are genuinely different objects: 40 sits in a list row, 44 heads a
+     card. */
+  --size-plate:    40px;
+  --size-plate-lg: 44px;
   --size-action:   52px;   /* the primary CTA's one height, wherever it stands */
   --size-hairline:      0.5px;
+  /* The edge a control draws around itself. 0.5px above is the finest
+     line the scale owns and its one real border is the drawn Android
+     keyboard - OS chrome, not this product. The width every field here
+     actually uses was 1.5, written by hand in all three of them. The
+     decorative rings keep their own literals: each states a reason, and
+     tying a field's edge to six animation rings would be worse than the
+     raw values it replaced. */
+  --size-border:        1.5px;
 
   /* Stacking. The only dimension where components genuinely couple, so it is
      the one that most needed a scale. Hardware sits above everything the app
@@ -415,7 +449,7 @@ button { background: none; border: none; color: inherit; }
      it is the first thing you see. Variants that want a border declare one. */
   border: none;
   border-radius: var(--radius-pill);
-  font-size: var(--text-subhead); font-weight: 700; letter-spacing: -0.3px;
+  font-size: var(--text-subhead); font-weight: var(--weight-bold); letter-spacing: -0.3px;
   text-decoration: none; cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-in-out),
               box-shadow var(--dur-fast) var(--ease-in-out),
@@ -434,14 +468,14 @@ button { background: none; border: none; color: inherit; }
   min-height: var(--size-target); background: transparent; color: var(--color-text-secondary);
   
   border: 1px solid var(--color-border-field);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 .a-btn--outline:hover { background: var(--color-border-light); }
 /* State is never a class: when a person becomes the last resort the scan
    sheet says so with data-lead, and the fact wears the primary coat. */
 .a-btn--outline[data-lead="true"] {
   background: var(--gradient-primary); border-color: transparent;
-  color: var(--color-text-on-dark); font-weight: 700;
+  color: var(--color-text-on-dark); font-weight: var(--weight-bold);
   box-shadow: var(--shadow-btn);
 }
 .a-btn--sm { min-height: var(--size-target); font-size: var(--text-footnote); }
@@ -454,20 +488,20 @@ button { background: none; border: none; color: inherit; }
   min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: var(--text-footnote); font-weight: 600; letter-spacing: -0.1px;
+  font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: -0.1px;
   color: var(--color-primary-dark); cursor: pointer; background: none; border: none;
 }
-.a-link--quiet { color: var(--color-text-secondary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.a-link--quiet { color: var(--color-text-secondary); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
 .a-link--flush { padding-inline: 0; }
 .a-link--onDark {
   color: var(--color-text-on-dark); text-decoration: underline;
   text-underline-offset: 3px; text-decoration-color: var(--color-on-dark-faint);
 }
 .a-link:disabled, .a-link[disabled] {
-  color: var(--color-text-tertiary); font-weight: 500; cursor: default;
+  color: var(--color-text-tertiary); font-weight: var(--weight-medium); cursor: default;
 }
 .a-icon-wrap {
-  width: 40px; height: 40px; flex-shrink: 0;
+  width: var(--size-plate); height: var(--size-plate); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm);
   /* A fill, not an outline. The tone tints already separate the plate from the
@@ -540,7 +574,7 @@ button { background: none; border: none; color: inherit; }
 .a-toast {
   position: absolute; left: var(--sp-6); right: var(--sp-6); bottom: 96px; z-index: var(--z-toast);
   background: var(--color-text-primary); color: var(--color-text-on-dark); text-align: center;
-  font-size: var(--text-caption); font-weight: 600; line-height: 1.45;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.45;
   padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-card-sm);
   box-shadow: var(--shadow-toast);
   opacity: 0; pointer-events: none; transition: opacity var(--dur-base) ease;
@@ -552,7 +586,7 @@ button { background: none; border: none; color: inherit; }
   padding: calc(var(--size-status-bar) - 24px) var(--sp-6) 0;
   padding-top: max(calc(var(--size-status-bar) - 24px), env(safe-area-inset-top, 0px));
 }
-.m-status-bar__time { font-size: var(--text-body); font-weight: 600; letter-spacing: -0.3px; }
+.m-status-bar__time { font-size: var(--text-body); font-weight: var(--weight-semibold); letter-spacing: -0.3px; }
 .m-status-bar__icons { display: flex; align-items: center; gap: var(--sp-1h); }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* d-demoHint. Prototype scaffolding, the developer prefix says it never
@@ -597,10 +631,10 @@ button { background: none; border: none; color: inherit; }
 }
 .m-push__body { flex: 1 1 auto; min-width: 0; }
 .m-push__app {
-  display: block; font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.08em;
+  display: block; font-size: var(--text-nano); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
 }
-.m-push__title { display: block; font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary); }
+.m-push__title { display: block; font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .m-push__sub { display: block; font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary); }
 
 .m-notch {
@@ -615,12 +649,12 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-brand);
 }
 .m-brand-lockup__name {
-  font-size: var(--text-title); font-weight: 900; color: var(--color-text-on-dark);
+  font-size: var(--text-title); font-weight: var(--weight-black); color: var(--color-text-on-dark);
   letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px;
 }
 .m-brand-lockup__name em { font-style: normal; color: var(--color-secondary); }
 .m-brand-lockup__tag {
-  font-size: var(--text-micro); font-weight: 500; letter-spacing: 1.5px;
+  font-size: var(--text-micro); font-weight: var(--weight-medium); letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--color-on-dark-faint);
 }
 [hidden] { display: none !important; }
@@ -776,13 +810,13 @@ button { background: none; border: none; color: inherit; }
   border: 1.5px dashed var(--color-accent-on-dark-line);
 }
 .a-medal__value {
-  font-size: var(--text-hero); font-weight: 800; line-height: 1;
+  font-size: var(--text-hero); font-weight: var(--weight-heavy); line-height: 1;
   letter-spacing: -2px; color: var(--color-text-on-dark);
   font-variant-numeric: tabular-nums;
 }
 .a-medal__unit {
   margin-top: var(--sp-1);
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 /* With motion turned down the burst does not run, so the graphic carries the
@@ -862,7 +896,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-earn-row__label {
   flex: 1 1 auto; min-width: 0;
-  font-size: var(--text-caption); font-weight: 600;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold);
   color: var(--color-text-on-dark);
 }
 /* Never shrinks: the amount is the point of the row, so the label wraps
@@ -873,7 +907,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-pill);
   background: var(--color-on-dark-fill);
   border: 1px solid var(--color-on-dark-faint);
-  font-size: var(--text-caption2); font-weight: 700;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums; color: var(--color-on-dark-soft);
   transition: color var(--dur-base) var(--ease-out),
               border-color var(--dur-base) var(--ease-out);
@@ -905,11 +939,11 @@ button { background: none; border: none; color: inherit; }
 }
 .m-reward-goal__title {
   flex: 1 1 auto;
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .m-reward-goal__value {
-  font-size: var(--text-caption2); font-weight: 700;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums; color: var(--color-accent-on-dark);
 }
 /* The scale is the set of targets the meter is measured against, so it sits
@@ -923,7 +957,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; gap: var(--sp-2);
   padding-top: var(--sp-3);
   border-top: 1px solid var(--color-on-dark-faint);
-  font-size: var(--text-caption2); font-weight: 600;
+  font-size: var(--text-caption2); font-weight: var(--weight-semibold);
   color: var(--color-on-dark-soft);
 }
 
@@ -1073,7 +1107,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-pill);
   background: var(--color-secondary);
   box-shadow: 0 0 0 2px var(--color-surface-sunken);
-  font-size: var(--text-nano); font-weight: 800; line-height: 1;
+  font-size: var(--text-nano); font-weight: var(--weight-heavy); line-height: 1;
   color: var(--color-text-on-dark); font-variant-numeric: tabular-nums;
 }
 /* With a number in it, it needs room to be read. */
@@ -1091,7 +1125,7 @@ button { background: none; border: none; color: inherit; }
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: var(--radius-circle);
   background: var(--gradient-primary); color: var(--color-text-on-dark);
-  font-size: var(--text-callout); font-weight: 800; cursor: pointer;
+  font-size: var(--text-callout); font-weight: var(--weight-heavy); cursor: pointer;
 }
 
 /* The greeting is a sentence, so it is set as one: two lines, light, in the
@@ -1101,7 +1135,7 @@ button { background: none; border: none; color: inherit; }
 .o-home__greeting { display: flex; flex-direction: column; }
 .o-home__eyebrow,
 .o-home__name {
-  font-size: var(--text-display); font-weight: 300; line-height: 1.18;
+  font-size: var(--text-display); font-weight: var(--weight-light); line-height: 1.18;
   letter-spacing: -0.6px; color: var(--color-text-primary);
   text-transform: none;
 }
@@ -1113,11 +1147,11 @@ button { background: none; border: none; color: inherit; }
    prices it: a count you cannot price is not information, it is decoration. */
 .o-home__balance { display: flex; flex-direction: column; gap: var(--sp-1); }
 .o-home__points {
-  font-size: var(--text-display); font-weight: 800; line-height: 1.1;
+  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: 1.1;
   letter-spacing: -0.6px; color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
-.o-home__worth { font-size: var(--text-caption); font-weight: 500; color: var(--color-text-secondary); }
+.o-home__worth { font-size: var(--text-caption); font-weight: var(--weight-medium); color: var(--color-text-secondary); }
 
 /* m-stat-pill. A figure and the icon that says what kind of figure it is.
    Both tones carry their own text colour, which clears AA on their own
@@ -1129,7 +1163,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  font-size: var(--text-caption); font-weight: 700;
+  font-size: var(--text-caption); font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 /* The pill sits on the neutral base and only its icon carries a hue. It was
@@ -1142,7 +1176,7 @@ button { background: none; border: none; color: inherit; }
 .m-stat-pill[data-tone="success"] .m-stat-pill__icon { color: var(--color-success); }
 /* The entitlement is the figure that decides whether a driver can fill up, so
    it takes its weight from type rather than from an alert colour. */
-.m-stat-pill__figure { font-size: var(--text-callout); font-weight: 800; }
+.m-stat-pill__figure { font-size: var(--text-callout); font-weight: var(--weight-heavy); }
 
 /* m-linked. The scan worked, said where the driver landed.
 
@@ -1166,7 +1200,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-linked__body { display: flex; flex-direction: column; gap: 2px; }
 .m-linked__title {
-  font-size: var(--text-body); font-weight: 700; line-height: 1.3;
+  font-size: var(--text-body); font-weight: var(--weight-bold); line-height: 1.3;
   color: var(--color-success);
 }
 .m-linked__sub {
@@ -1216,12 +1250,12 @@ button { background: none; border: none; color: inherit; }
 .m-vehicle-picker { display: flex; flex-direction: column; gap: var(--sp-3); }
 .m-vehicle-picker__head { display: flex; align-items: center; gap: var(--sp-2); }
 .m-vehicle-picker__title {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-vehicle-picker__count {
   margin-left: auto;
-  font-size: var(--text-caption2); font-weight: 600; color: var(--color-text-secondary);
+  font-size: var(--text-caption2); font-weight: var(--weight-semibold); color: var(--color-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 /* Wraps rather than scrolls.
@@ -1241,7 +1275,7 @@ button { background: none; border: none; color: inherit; }
    honest sentence and the two doors that actually help - a new search, or
    the person who owns the list. */
 .o-stations__empty { display: flex; flex-direction: column; gap: var(--sp-3); padding-block: var(--sp-2); }
-.o-stations__emptyTitle { font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary); }
+.o-stations__emptyTitle { font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .o-stations__emptyActions { display: flex; flex-direction: column; gap: var(--sp-2); }
 
 /* a-vehicle-chip. A registration, listed.
@@ -1300,7 +1334,7 @@ button { background: none; border: none; color: inherit; }
 .a-vehicle-chip__art { display: flex; opacity: 0.75; }
 .a-vehicle-chip__act { display: inline-flex; color: var(--color-text-tertiary); }
 .a-vehicle-chip__plate {
-  font-size: var(--text-caption); font-weight: 700; line-height: 1.3;
+  font-size: var(--text-caption); font-weight: var(--weight-bold); line-height: 1.3;
   font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
   white-space: nowrap;
 }
@@ -1352,12 +1386,12 @@ button { background: none; border: none; color: inherit; }
 /* The eyebrow is redundant once the card sits under the picker's own heading,
    so it stops shouting and just orients. */
 .m-vehicle-card__label {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.14em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-vehicle-card__plate {
   margin-top: 2px;
-  font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px;
   color: var(--color-text-primary);
 }
 .m-vehicle-card__model {
@@ -1367,7 +1401,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-vehicle-card__change {
   display: block; margin-top: var(--sp-1);
-  font-size: var(--text-caption); font-weight: 700;
+  font-size: var(--text-caption); font-weight: var(--weight-bold);
   color: var(--color-primary-dark);
 }
 .m-vehicle-card__chev {
@@ -1377,7 +1411,7 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-secondary);
 }
 .m-vehicle-card__art {
-  flex-shrink: 0; width: 44px; height: 44px;
+  flex-shrink: 0; width: var(--size-plate-lg); height: var(--size-plate-lg);
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm); background: var(--color-primary-bg);
   color: var(--color-primary);
@@ -1403,7 +1437,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__art { background: var(--color-surface-sunken); }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__plate {
-  font-size: var(--text-callout); font-weight: 700;
+  font-size: var(--text-callout); font-weight: var(--weight-bold);
   letter-spacing: normal; color: var(--color-text-primary);
 }
 .m-vehicle-card[data-state="empty"] .m-vehicle-card__note { color: var(--color-text-secondary); }
@@ -1555,7 +1589,7 @@ button { background: none; border: none; color: inherit; }
 .m-live-bar[data-phase="done"] .m-live-bar__dot { animation: none; }
 .m-live-bar__body { flex: 1 1 auto; min-width: 0; }
 .m-live-bar__title {
-  display: block; font-size: var(--text-footnote); font-weight: 800;
+  display: block; font-size: var(--text-footnote); font-weight: var(--weight-heavy);
   letter-spacing: -0.2px; color: var(--color-success);
 }
 .m-live-bar__sub {
@@ -1563,7 +1597,7 @@ button { background: none; border: none; color: inherit; }
   color: var(--color-text-secondary);
 }
 .m-live-bar__cta {
-  flex-shrink: 0; font-size: var(--text-caption); font-weight: 700;
+  flex-shrink: 0; font-size: var(--text-caption); font-weight: var(--weight-bold);
   color: var(--color-success);
 }
 
@@ -1693,7 +1727,7 @@ button { background: none; border: none; color: inherit; }
   background: var(--color-primary-bg); color: var(--color-primary);
 }
 .o-step__title {
-  font-size: var(--text-display); font-weight: 300; line-height: 1.18;
+  font-size: var(--text-display); font-weight: var(--weight-light); line-height: 1.18;
   letter-spacing: -0.6px; color: var(--color-text-primary);
 }
 .o-step__title:focus, .o-step__title:focus-visible { outline: none; box-shadow: none; }
@@ -1705,13 +1739,25 @@ button { background: none; border: none; color: inherit; }
 .o-step__field {
   width: 100%; min-height: var(--size-control);
   padding: 0 var(--sp-4);
-  font: inherit; font-size: var(--text-lead); font-weight: 700;
+  font: inherit; font-size: var(--text-lead); font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
   color: var(--color-text-primary);
-  background: var(--color-surface); border: 1.5px solid var(--color-border-field);
+  background: var(--color-surface); border: var(--size-border) solid var(--color-border-field);
   border-radius: var(--radius-card-sm);
 }
-.o-step__field:focus { outline: none; border-color: var(--color-primary); }
+/* The same rule as every other control that draws its own edge - a-field,
+   a-otp-cell and the station search all say exactly this. This one had been
+   the exception twice over: it kept the border and dropped the ring, and it
+   keyed off :focus rather than :focus-visible. That second half was the
+   damaging one. Its `outline: none` fired for a keyboard user too, killing
+   the core of the global focus ring while leaving that rule's 6px white halo
+   behind - so tabbing to the field a driver types their odometer into gave a
+   white glow around nothing. */
+.o-step__field:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-12);
+}
 /* The sentence a driver can return to. A toast says a thing once and takes it
    away again, which is the wrong shape for an answer the driver has to act on
    while looking at a dashboard. This one stays under the field until the
@@ -1719,7 +1765,7 @@ button { background: none; border: none; color: inherit; }
    alone. */
 .o-step__err {
   display: flex; align-items: flex-start; gap: var(--sp-1);
-  font-size: var(--text-caption2); line-height: 1.5; font-weight: 600;
+  font-size: var(--text-caption2); line-height: 1.5; font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 .o-step__err svg { flex-shrink: 0; margin-top: 2px; }
@@ -1742,7 +1788,7 @@ button { background: none; border: none; color: inherit; }
 .o-step__tertiary {
   align-self: center; min-height: 48px; padding: 0 var(--sp-3);
   border: none; background: none; cursor: pointer;
-  font-size: var(--text-callout); font-weight: 600; color: var(--color-primary);
+  font-size: var(--text-callout); font-weight: var(--weight-semibold); color: var(--color-primary);
 }
 
 /* o-scan. Reading a licence disc or a number plate, whichever it is shown.
@@ -1786,14 +1832,14 @@ button { background: none; border: none; color: inherit; }
    card when the camera cannot be repaired from here. */
 .o-scan__typePanel { display: flex; flex-direction: column; gap: var(--sp-2); padding: 0 var(--sp-5) var(--sp-3); }
 .o-scan__typeLabel {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .o-scan__typeInput {
   min-height: var(--size-control); padding: 0 var(--sp-4);
   border: 1px solid var(--color-on-dark-line); border-radius: var(--radius-card-sm);
   background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
-  font-size: var(--text-callout); font-weight: 700; letter-spacing: 0.06em;
+  font-size: var(--text-callout); font-weight: var(--weight-bold); letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
 }
 .o-scan__typeInput::placeholder { color: var(--color-on-dark-faint); }
@@ -1843,7 +1889,7 @@ button { background: none; border: none; color: inherit; }
   border: 1px solid var(--color-on-dark-faint);
   text-align: center;
 }
-.m-scan-note__title { display: block; font-size: var(--text-callout); font-weight: 700; }
+.m-scan-note__title { display: block; font-size: var(--text-callout); font-weight: var(--weight-bold); }
 /* Focused by script so the state is announced, which is not the driver having
    navigated to it. Third time this has bitten: the global ring sets a halo as
    well as an outline, so both have to go. */
@@ -1900,7 +1946,7 @@ button { background: none; border: none; color: inherit; }
 [data-motion="reduced"] .a-shutter__ring { transition: none; }
 .a-shutter__label {
   max-width: 32ch;
-  font-size: var(--text-caption); font-weight: 600; line-height: 1.35;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); line-height: 1.35;
   color: var(--color-on-dark-soft); text-align: center;
 }
 
@@ -1908,7 +1954,7 @@ button { background: none; border: none; color: inherit; }
    on, and at 11px it gets no large-text allowance: it is a line being read, and
    tertiary is for controls that are switched off. */
 .o-step__label {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-step__note { font-size: var(--text-caption); color: var(--color-text-secondary); }
@@ -2022,14 +2068,14 @@ button { background: none; border: none; color: inherit; }
 .o-stations__act { flex-shrink: 0; }
 .m-station-head { display: flex; align-items: flex-start; gap: var(--sp-3); }
 .m-station-head__art {
-  flex-shrink: 0; width: 44px; height: 44px;
+  flex-shrink: 0; width: var(--size-plate-lg); height: var(--size-plate-lg);
   display: grid; place-items: center;
   border-radius: var(--radius-card-sm);
   background: var(--color-primary-bg); color: var(--color-primary);
 }
 .m-station-head__body { flex: 1 1 auto; min-width: 0; }
 .m-station-head__name {
-  display: block; font-size: var(--text-lead); font-weight: 800;
+  display: block; font-size: var(--text-lead); font-weight: var(--weight-heavy);
   letter-spacing: -0.4px; color: var(--color-text-primary);
 }
 /* Focused by script so the sheet is announced, which is not the same as a
@@ -2042,7 +2088,7 @@ button { background: none; border: none; color: inherit; }
    sits with the name rather than among the facilities. */
 .m-station-head__status {
   display: block; margin-top: 2px;
-  font-size: var(--text-caption); font-weight: 700; color: var(--color-success);
+  font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-success);
 }
 .m-station-head__status[data-allowed="false"] { color: var(--color-error-text); }
 .m-station-head__where,
@@ -2052,11 +2098,11 @@ button { background: none; border: none; color: inherit; }
 }
 .m-station-head__km {
   flex-shrink: 0; text-align: right;
-  font-size: var(--text-title); font-weight: 800; font-variant-numeric: tabular-nums;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
 }
 .m-station-head__km small {
-  display: block; font-size: var(--text-nano); font-weight: 600; color: var(--color-text-tertiary);
+  display: block; font-size: var(--text-nano); font-weight: var(--weight-semibold); color: var(--color-text-tertiary);
 }
 /* Closing is not an action of the same rank as choosing, so it is not drawn as
    one. It was a 56dp circle sitting beside the primary button, which read as a
@@ -2088,8 +2134,8 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-card);
 }
 .m-deals__head { display: flex; align-items: baseline; gap: var(--sp-2); }
-.m-deals__title { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
-.m-deals__count { font-size: var(--text-caption); font-weight: 700; color: var(--color-secondary); }
+.m-deals__title { font-size: var(--text-callout); font-weight: var(--weight-heavy); color: var(--color-text-primary); }
+.m-deals__count { font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-secondary); }
 .m-deals__note {
   margin-top: 2px; font-size: var(--text-caption2); color: var(--color-text-tertiary);
 }
@@ -2104,14 +2150,14 @@ button { background: none; border: none; color: inherit; }
 .m-deal__icon { font-size: 22px; line-height: 1; }
 .m-deal__title {
   display: block; margin-top: var(--sp-2);
-  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-text-primary);
 }
 .m-deal__sub { display: block; margin-top: 1px; font-size: var(--text-caption2); color: var(--color-text-secondary); }
 .m-deal__tag {
   display: inline-block; margin-top: var(--sp-2h);
   padding: 1px var(--sp-2); border-radius: var(--radius-pill);
   background: var(--color-secondary-bg); color: var(--color-error-text);
-  font-size: var(--text-nano); font-weight: 800;
+  font-size: var(--text-nano); font-weight: var(--weight-heavy);
 }
 
 /* a-filter-chip. Sorting, not choosing. It takes the same selected treatment as
@@ -2125,7 +2171,7 @@ button { background: none; border: none; color: inherit; }
   background: var(--glass-bar-bg);
   -webkit-backdrop-filter: var(--glass-panel-bd); backdrop-filter: var(--glass-panel-bd);
   box-shadow: var(--shadow-card-sm);
-  font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-text-primary);
   cursor: pointer; white-space: nowrap;
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
@@ -2239,7 +2285,7 @@ button { background: none; border: none; color: inherit; }
 }
 /* The vehicle the search is for. A fact line, never a control. */
 .o-stations__vehicle {
-  font-size: var(--text-caption); font-weight: 600;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 .o-stations__list {
@@ -2268,7 +2314,7 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-btn);
 }
 .m-station__art {
-  flex-shrink: 0; width: 40px; height: 40px;
+  flex-shrink: 0; width: var(--size-plate); height: var(--size-plate);
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-card-sm);
   background: var(--color-primary-bg); color: var(--color-primary);
@@ -2278,7 +2324,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-station__body { flex: 1 1 auto; min-width: 0; }
 .m-station__name {
-  display: block; font-size: var(--text-callout); font-weight: 700;
+  display: block; font-size: var(--text-callout); font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 .m-station__note {
@@ -2292,11 +2338,11 @@ button { background: none; border: none; color: inherit; }
    figure under figure. */
 .m-station__km {
   flex-shrink: 0; text-align: right;
-  font-size: var(--text-callout); font-weight: 800;
+  font-size: var(--text-callout); font-weight: var(--weight-heavy);
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 .m-station__km small {
-  display: block; font-size: var(--text-nano); font-weight: 600;
+  display: block; font-size: var(--text-nano); font-weight: var(--weight-semibold);
   color: var(--color-text-tertiary);
 }
 .m-station[aria-checked="true"] .m-station__km { color: var(--color-text-on-dark); }
@@ -2359,7 +2405,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-list-row:active { transform: scale(0.985); }
 .m-list-row__body { flex: 1 1 auto; min-width: 0; }
-.m-list-row__title { display: block; font-size: var(--text-caption); font-weight: 700; color: var(--color-text-primary); }
+.m-list-row__title { display: block; font-size: var(--text-caption); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .m-list-row__sub   { display: block; font-size: var(--text-caption2); color: var(--color-text-secondary); }
 .m-list-row__chev  { flex-shrink: 0; display: flex; }
 
@@ -2393,7 +2439,7 @@ button { background: none; border: none; color: inherit; }
   flex: 1 1 0; min-height: var(--size-target);
   display: flex; flex-direction: column; align-items: center; gap: var(--sp-1);
   border: none; background: none; cursor: pointer;
-  font-size: var(--text-nano); font-weight: 600;
+  font-size: var(--text-nano); font-weight: var(--weight-semibold);
   color: var(--color-text-tertiary);
 }
 .o-tab-bar__icon {
@@ -2405,7 +2451,7 @@ button { background: none; border: none; color: inherit; }
   border-radius: var(--radius-pill);
   transition: background var(--dur-base) var(--ease-out);
 }
-.o-tab-bar__tab[aria-current="page"] { color: var(--color-primary); font-weight: 700; }
+.o-tab-bar__tab[aria-current="page"] { color: var(--color-primary); font-weight: var(--weight-bold); }
 .o-tab-bar__tab[aria-current="page"] .o-tab-bar__icon { background: var(--color-primary-bg); }
 
 /* o-onboard. A full screen of its own, because the sign-up sheet has finished
@@ -2432,7 +2478,7 @@ button { background: none; border: none; color: inherit; }
    lose. Dark ink is the default and the on-dark ramp is the exception,
    which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
-  font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
+  font-size: var(--text-caption2); font-weight: var(--weight-bold); letter-spacing: -0.1px;
   color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
 .m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
@@ -2452,7 +2498,7 @@ button { background: none; border: none; color: inherit; }
    who reads the heading five fills in knows the rules without being taught. */
 .o-check__lead {
   margin-top: var(--sp-4);
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-check__checks { display: flex; flex-direction: column; gap: var(--sp-1h); }
@@ -2534,7 +2580,7 @@ button { background: none; border: none; color: inherit; }
   width: 22px; height: 22px; border-width: 1.5px;
 }
 .m-check[data-outcome="pass"] .m-check__title {
-  font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary);
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-secondary);
 }
 .m-check[data-outcome="pass"] .m-check__sub { display: none; }
 /* Never asked, because the app stopped before it got here. It keeps its place
@@ -2548,7 +2594,7 @@ button { background: none; border: none; color: inherit; }
   border-color: var(--color-border-strong); color: var(--color-text-tertiary);
 }
 .m-check[data-outcome="skipped"] .m-check__title {
-  font-size: var(--text-caption); font-weight: 600; color: var(--color-text-tertiary);
+  font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-tertiary);
 }
 /* The skipped row keeps its sub-line, because that line is now the answer
    ("Not checked yet") rather than a promise about a check that never ran. */
@@ -2578,7 +2624,7 @@ button { background: none; border: none; color: inherit; }
 }
 .m-check__body { flex: 1 1 auto; min-width: 0; }
 .m-check__title {
-  display: block; font-size: var(--text-callout); font-weight: 700;
+  display: block; font-size: var(--text-callout); font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 .m-check__sub {
@@ -2596,7 +2642,7 @@ button { background: none; border: none; color: inherit; }
 .o-onboard__earned { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
 
 .o-onboard__eyebrow {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
   margin-bottom: var(--sp-6);
 }
@@ -2608,7 +2654,7 @@ button { background: none; border: none; color: inherit; }
 .o-onboard__title:focus, .o-onboard__title:focus-visible { outline: none; box-shadow: none; }
 .o-onboard__title {
   margin-top: var(--sp-6);
-  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
 }
 .o-onboard--reward .o-onboard__title { color: var(--color-text-on-dark); }
 /* The gap before the action is flexible, so the button sits at the bottom on a
@@ -2705,7 +2751,7 @@ button { background: none; border: none; color: inherit; }
   /* Display, not hero. At 42px the longest station name wrapped to two lines on
      a 320dp phone, which cost 55px on the width with the least room to give. It
      is still the biggest thing on the screen by a wide margin. */
-  font-size: var(--text-display); font-weight: 900; line-height: 1.05;
+  font-size: var(--text-display); font-weight: var(--weight-black); line-height: 1.05;
   letter-spacing: -1px; color: var(--color-text-primary);
 }
 /* Flat ink, like every other headline in this app. It briefly shaded toward
@@ -2743,7 +2789,7 @@ button { background: none; border: none; color: inherit; }
      they get the card's lift rather than sitting flush with the wash. */
   box-shadow: var(--shadow-card-sm);
 }
-.o-check__altName { font-size: var(--text-footnote); font-weight: 700; color: var(--color-text-primary); }
+.o-check__altName { font-size: var(--text-footnote); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .o-check__altKm { font-size: var(--text-caption); color: var(--color-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .o-check__why {
   font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-secondary);
@@ -2780,7 +2826,7 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-1h) var(--sp-3) var(--sp-1h) var(--sp-1h);
   border-radius: var(--radius-pill);
   border: 1px solid transparent;
-  font-size: var(--text-caption); font-weight: 700;
+  font-size: var(--text-caption); font-weight: var(--weight-bold);
 }
 /* A flat disc in the verdict's own hue, which is what every mark in this app
    is: m-linked's tick on home, the fuel screen's tick, the step marks. It was
@@ -2854,11 +2900,11 @@ button { background: none; border: none; color: inherit; }
   border-top: 1px solid var(--color-border-light);
 }
 .m-fact__name {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.16em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--color-text-tertiary);
 }
 .m-fact__value {
-  font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 .m-fact__sub {
@@ -2903,7 +2949,7 @@ button { background: none; border: none; color: inherit; }
 .o-fuel[data-expired="true"] .a-qr { opacity: 0.25; filter: grayscale(1); }
 .o-fuel[data-expired="true"] .m-fallback { display: none; }
 .o-fuel__title {
-  font-size: var(--text-title); font-weight: 800; letter-spacing: -0.5px;
+  font-size: var(--text-title); font-weight: var(--weight-heavy); letter-spacing: -0.5px;
   color: var(--color-text-primary);
 }
 .o-fuel__lead {
@@ -2924,7 +2970,7 @@ button { background: none; border: none; color: inherit; }
   margin-top: calc(var(--sp-2) * -1);
 }
 .m-fallback__label {
-  font-size: var(--text-nano); font-weight: 600;
+  font-size: var(--text-nano); font-weight: var(--weight-semibold);
   color: var(--color-text-tertiary);
 }
 /* Read out loud, across a counter, in sun, off a scratched screen, by somebody
@@ -2936,7 +2982,7 @@ button { background: none; border: none; color: inherit; }
    square rather than beside it, so the hierarchy survives. What changes is that
    when a driver finally needs it, it can be read. */
 .m-fallback__value {
-  font-family: var(--font-mono); font-size: var(--text-title); font-weight: 800;
+  font-family: var(--font-mono); font-size: var(--text-title); font-weight: var(--weight-heavy);
   letter-spacing: 2px; font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
 }
@@ -2989,7 +3035,7 @@ button { background: none; border: none; color: inherit; }
 .m-place {
   display: inline-flex; align-items: center; gap: var(--sp-1h);
   margin-top: calc(var(--sp-3) * -1);
-  font-size: var(--text-footnote); font-weight: 600;
+  font-size: var(--text-footnote); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 .m-place__pin { display: flex; flex-shrink: 0; }
@@ -3025,11 +3071,11 @@ button { background: none; border: none; color: inherit; }
 .m-fuel-figures__cell:nth-child(2) { align-items: center; text-align: center; }
 .m-fuel-figures__cell:last-child   { align-items: flex-end; text-align: right; }
 .m-fuel-figures__value {
-  font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px;
+  font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px;
   font-variant-numeric: tabular-nums; color: var(--color-text-primary);
 }
 .m-fuel-figures__label {
-  font-size: var(--text-caption2); font-weight: 600;
+  font-size: var(--text-caption2); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
 /* Quiet, and outside the scroll, so calling the fill off is always available
@@ -3080,7 +3126,7 @@ button { background: none; border: none; color: inherit; }
 /* a-screen-title. One title for every filed screen: the receipt, History,
    Account, Rewards. It left o-receipt when three other organisms borrowed
    the element - an element may not outlive its block's ancestry. */
-.a-screen-title { font-size: var(--text-lead); font-weight: 800; letter-spacing: -0.4px; }
+.a-screen-title { font-size: var(--text-lead); font-weight: var(--weight-heavy); letter-spacing: -0.4px; }
 .a-screen-title:focus, .a-screen-title:focus-visible { outline: none; box-shadow: none; }
 .o-receipt__when { margin-top: var(--sp-1); font-size: var(--text-caption); color: var(--color-text-secondary); }
 /* The card reads like the till slip it stands in for: one fact per row, the
@@ -3128,12 +3174,12 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-3) 0; border-bottom: 1px solid var(--color-border-light);
 }
 .m-slip-row:last-child { border-bottom: none; }
-.m-slip-row__label { font-size: var(--text-caption); font-weight: 600; color: var(--color-text-secondary); }
+.m-slip-row__label { font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-text-secondary); }
 .m-slip-row__value {
-  font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary);
   text-align: right; font-variant-numeric: tabular-nums;
 }
-.m-slip-row__sub { display: block; font-size: var(--text-caption2); font-weight: 500; color: var(--color-text-secondary); }
+.m-slip-row__sub { display: block; font-size: var(--text-caption2); font-weight: var(--weight-medium); color: var(--color-text-secondary); }
 /* The one row this app added to the paper slip, so it is the one the screen
    is allowed to be pleased about. The wash bleeds to the card's edges - the
    negative margin gives back exactly the inline padding its card holds - so
@@ -3195,10 +3241,10 @@ button { background: none; border: none; color: inherit; }
 }
 .o-account__row:last-of-type { border-bottom: none; }
 .o-account__rowBody { flex: 1 1 auto; min-width: 0; }
-.o-account__rowTitle { display: block; font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary); }
+.o-account__rowTitle { display: block; font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary); }
 .o-account__rowSub { display: block; margin-top: 1px; font-size: var(--text-caption); line-height: 1.45; color: var(--color-text-secondary); }
 .o-account__value {
-  font-size: var(--text-callout); font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
   /* One token. A masked number split over two lines is two fragments to a
      driver checking it against their SIM. */
@@ -3244,18 +3290,18 @@ button { background: none; border: none; color: inherit; }
 }
 .o-rewards__bolt { position: absolute; top: var(--sp-4); right: var(--sp-4); color: var(--color-points-on-dark); line-height: 0; }
 .o-rewards__balanceLabel {
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .o-rewards__points {
-  font-size: var(--text-display); font-weight: 800; line-height: 1.1;
+  font-size: var(--text-display); font-weight: var(--weight-heavy); line-height: 1.1;
   letter-spacing: -0.6px; color: var(--color-text-on-dark);
   font-variant-numeric: tabular-nums;
 }
-.o-rewards__worth { font-size: var(--text-caption); font-weight: 500; color: var(--color-on-dark-mid); }
+.o-rewards__worth { font-size: var(--text-caption); font-weight: var(--weight-medium); color: var(--color-on-dark-mid); }
 .o-rewards__lead {
   margin-top: var(--sp-6);
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-rewards__list { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); }
@@ -3273,12 +3319,12 @@ button { background: none; border: none; color: inherit; }
 /* The bundle is a prize, not a settings row: it carries the same data mark
    the earned screen wears, and the mark's colour follows the row's state. */
 .m-bundle .a-icon-wrap { color: var(--color-primary); }
-.m-bundle__size { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
+.m-bundle__size { font-size: var(--text-callout); font-weight: var(--weight-heavy); color: var(--color-text-primary); }
 .m-bundle__price { display: block; margin-top: 1px; font-size: var(--text-caption); color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
 /* The failure stays on the row for as long as the row is failed, so "Try
    again" reads as a free retry of a named thing. */
-.m-bundle__note { display: block; margin-top: 2px; font-size: var(--text-caption); font-weight: 600; color: var(--color-warning); }
-.m-bundle__state { font-size: var(--text-footnote); font-weight: 700; color: var(--color-primary-dark); white-space: nowrap; }
+.m-bundle__note { display: block; margin-top: 2px; font-size: var(--text-caption); font-weight: var(--weight-semibold); color: var(--color-warning); }
+.m-bundle__state { font-size: var(--text-footnote); font-weight: var(--weight-bold); color: var(--color-primary-dark); white-space: nowrap; }
 /* The verb wears a button's body. A text link asks to be read; a filled
    pill asks to be pressed, and pressing is the point. The row stays the
    tap target - the pill is drawn, not nested, so no button sits inside
@@ -3288,7 +3334,7 @@ button { background: none; border: none; color: inherit; }
   min-height: 36px; padding: 0 var(--sp-4);
   border-radius: var(--radius-pill);
   background: var(--gradient-primary); color: var(--color-text-on-dark);
-  font-size: var(--text-footnote); font-weight: 700; white-space: nowrap;
+  font-size: var(--text-footnote); font-weight: var(--weight-bold); white-space: nowrap;
 }
 /* Sent keeps its place and goes quiet-green; short stays visible and says
    what is missing, because a hidden option teaches nothing. */
@@ -3303,7 +3349,7 @@ button { background: none; border: none; color: inherit; }
 .m-bundle[data-state="failed"] { border-color: var(--color-warning-25); background: var(--color-warning-bg); }
 .m-bundle[data-state="short"] { background: var(--color-surface-sunken); box-shadow: none; cursor: default; }
 .m-bundle[data-state="short"] .m-bundle__size { color: var(--color-text-secondary); }
-.m-bundle[data-state="short"] .m-bundle__state { color: var(--color-text-secondary); font-weight: 600; }
+.m-bundle[data-state="short"] .m-bundle__state { color: var(--color-text-secondary); font-weight: var(--weight-semibold); }
 .m-bundle[data-state="short"] .a-icon-wrap { color: var(--color-text-secondary); background: var(--color-surface); }
 /* Distance, not bookkeeping: the short row draws how close the balance is,
    so the missing points read as a journey with a length, not a wall. */
@@ -3442,11 +3488,11 @@ button { background: none; border: none; color: inherit; }
 .o-filling__wave--back { animation-duration: 3.4s; }
 @keyframes waveDrift { to { transform: translateX(-12px); } }
 .o-filling__litres {
-  font-size: var(--text-figure); font-weight: 800; line-height: 1;
+  font-size: var(--text-figure); font-weight: var(--weight-heavy); line-height: 1;
   letter-spacing: -1px; color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
-.o-filling__unit { font-size: var(--text-callout); font-weight: 600; color: var(--color-text-secondary); }
+.o-filling__unit { font-size: var(--text-callout); font-weight: var(--weight-semibold); color: var(--color-text-secondary); }
 .o-filling__facts { margin-top: var(--sp-4); font-size: var(--text-caption); color: var(--color-text-secondary); }
 .o-filling__note { padding-top: var(--sp-5); font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary); max-width: 30ch; }
 .o-filling__action { align-self: stretch; margin-top: var(--sp-4); }
@@ -3459,11 +3505,11 @@ button { background: none; border: none; color: inherit; }
    stage at title weight, the pulse carries the life. */
 .o-filling[data-face="waiting"] .o-filling__unit,
 .o-filling[data-face="pump"] .o-filling__unit {
-  font-size: var(--text-lead); font-weight: 800; color: var(--color-text-primary);
+  font-size: var(--text-lead); font-weight: var(--weight-heavy); color: var(--color-text-primary);
   letter-spacing: -0.4px;
 }
 /* The verdict is its own line, not a clause spliced into the unit. */
-.o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: 700; color: var(--color-success); }
+.o-filling__verdict { margin-top: var(--sp-1); font-size: var(--text-callout); font-weight: var(--weight-bold); color: var(--color-success); }
 .o-filling__verdict[data-tone="warning"] { color: var(--color-text-primary); }
 /* The number arrives. One spring on completion, a still frame under reduced
    motion - the medal's grammar, at the pump. */
@@ -3493,7 +3539,7 @@ button { background: none; border: none; color: inherit; }
    learned to read it once, on the screen that filed it. */
 .o-history__when {
   margin-top: var(--sp-4);
-  font-size: var(--text-micro); font-weight: 700; letter-spacing: 0.08em;
+  font-size: var(--text-micro); font-weight: var(--weight-bold); letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--color-text-secondary);
 }
 .o-history__card + .o-history__when { margin-top: var(--sp-5); }
@@ -3541,7 +3587,7 @@ button { background: none; border: none; color: inherit; }
   padding: var(--sp-2) var(--sp-4);
   display: inline-flex; align-items: center; justify-content: center;
   border: none; background: none; cursor: pointer;
-  font-size: var(--text-caption); font-weight: 600;
+  font-size: var(--text-caption); font-weight: var(--weight-semibold);
   color: var(--color-text-secondary); text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -3562,7 +3608,7 @@ button { background: none; border: none; color: inherit; }
   box-shadow: var(--shadow-overlay);
   text-align: center;
 }
-.m-confirm__title { font-size: var(--text-callout); font-weight: 800; color: var(--color-text-primary); }
+.m-confirm__title { font-size: var(--text-callout); font-weight: var(--weight-heavy); color: var(--color-text-primary); }
 .m-confirm__title:focus, .m-confirm__title:focus-visible { outline: none; box-shadow: none; }
 .m-confirm__body {
   font-size: var(--text-caption); line-height: 1.5; color: var(--color-text-secondary);
