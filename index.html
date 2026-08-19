@@ -644,10 +644,19 @@ button { background: none; border: none; color: inherit; }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* Connection state, shown where a phone shows it. Without this data-net was a
    flag with no rendering, so Offline looked broken until you tried to send. */
+/* "No service" follows the bar's tone, the way the clock above it does.
+   It was written in --color-on-dark-soft unconditionally - white at 60%,
+   a colour for a dark surface - so on every light screen it was white text
+   on near-white: 2.30:1 on home, 2.47:1 on the scan screen, and worst in
+   Large text, which is the mode a driver reading a phone in the sun turns
+   on. The one word telling them the phone has no signal is not the word to
+   lose. Dark ink is the default and the on-dark ramp is the exception,
+   which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
   font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
-  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
+  color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
+.m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
 [data-net="offline"] .m-status-bar__net { display: inline; }
 [data-net="offline"] .m-status-bar__signal { opacity: .35; }
 
