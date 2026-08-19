@@ -956,13 +956,15 @@ body {
   mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)), #000 calc(100% - var(--sp-4)), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--size-status-bar) - var(--sp-2)), #000 calc(var(--size-status-bar) + var(--sp-3)), #000 calc(100% - var(--sp-4)), transparent 100%);
 }
-/* The owner's call: the work reads directly under the greeting and the
-   balance - a driver opens this screen to do a job, not to admire a
-   number. Only the one control a thumb needs mid-stride, the fuel CTA,
-   keeps the bottom anchor, and the bloom shows in the gap that remains. */
+/* The owner's call: the greeting and the balance open the screen, and the
+   work - the vehicle card, the rewards row, the fuel CTA - anchors to the
+   bottom where the thumb rests. The bloom shows in the gap between. */
 .o-home__stack {
-  margin-top: var(--sp-6);
-  flex: 1 1 auto;
+  /* auto margin, not flex-grow: the stack keeps its own height and rides
+     the bottom of the scroll, so the cards sit where the thumb is and the
+     bloom shows through the gap above them. */
+  margin-top: auto;
+  flex: 0 0 auto;
   display: flex; flex-direction: column; gap: var(--sp-2h);
 }
 .o-home__fuel { margin-top: auto; }
@@ -3748,6 +3750,15 @@ body {
             <h1 class="o-home__name" id="homeName" tabindex="-1">David</h1>
           </div>
 
+          <!-- The balance opens the screen - the owner's layout call: the
+               greeting and the number read first, and the work waits at the
+               thumb. The figure and what it buys are still one thought. -->
+          <p class="o-home__balance">
+            <span class="u-visually-hidden">Your balance.</span>
+            <span class="o-home__points" id="homePoints">2 450 pts</span>
+            <span class="o-home__worth" id="homeWorth">About 2.45 GB of mobile data earned</span>
+          </p>
+
 
           <div class="o-home__stats" id="homeStats">
             <span class="m-stat-pill" data-tone="success" id="homeLitres">
@@ -3876,15 +3887,6 @@ body {
           </button>
 
           </div><!-- /o-home__stack -->
-
-          <!-- The balance, after the work - the owner's launch call: a
-               driver opens home to do a job, and the number waits its turn.
-               The figure and what it buys are still one thought. -->
-          <p class="o-home__balance">
-            <span class="u-visually-hidden">Your balance.</span>
-            <span class="o-home__points" id="homePoints">2 450 pts</span>
-            <span class="o-home__worth" id="homeWorth">About 2.45 GB of mobile data earned</span>
-          </p>
         </div>
 
         <!-- The reason the app exists, and the one control that never scrolls.
@@ -5452,7 +5454,7 @@ body {
       el.homeFuel.textContent = 'I want to fuel';
       el.homeFuel.setAttribute('aria-disabled', 'false');
     } else if (S.vehicles.length) {
-      el.homeFuel.textContent = 'Open camera';
+      el.homeFuel.textContent = 'Scan my vehicle';
       el.homeFuel.setAttribute('aria-disabled', 'false');
     } else {
       /* Not an invitation that fails on press: the fact, in the button. */
