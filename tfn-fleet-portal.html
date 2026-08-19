@@ -2756,6 +2756,41 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 .focus-sheet .form-field,
 .focus-sheet .radio-group { scroll-margin-top: calc(var(--focus-sheet-header-height) + var(--space-2-0)); }
 
+/* Inside a sheet, a field group is a two-column grid — the same grid the
+   vehicle form's sections use, so the two sheets cannot drift apart. Outside
+   one, .fields stays the single column the record drawer wants. */
+.focus-sheet .fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-3-0);
+  row-gap: var(--space-3-0);
+  align-items: start;
+}
+.focus-sheet .fields > .field-wide,
+.focus-sheet .fields > fieldset { grid-column: 1 / -1; }
+
+@media (max-width: 800px) {
+  .focus-sheet .fields { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Section headings inside a sheet take the sheet's rhythm: a rule above and
+   air, rather than a card around each group. */
+.focus-sheet .sheet-section__title {
+  margin: var(--space-5-0) 0 var(--space-2-0);
+  padding-top: var(--space-4-0);
+  border-top: var(--size-border-hairline) solid var(--color-outline-variant);
+}
+.focus-sheet .sheet-section__title:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.focus-sheet .group-note {
+  margin: calc(var(--space-2-0) * -1) 0 var(--space-2-0);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
 .focus-sheet .suffix-wrap { width: 100%; }
 .focus-sheet .field { width: 100%; }
 
@@ -7722,10 +7757,12 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <svg data-lucide="truck" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
           </div>
           <h2>No vehicles yet</h2>
-          <p>Add a vehicle manually or import a CSV to get started.</p>
+          <p>Add one vehicle, or import multiple vehicles from a CSV file.</p>
           <div class="actions">
             <button class="btn btn-primary" data-open="vehicle:blank"><svg data-lucide="plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add vehicle</button>
-            <button class="btn btn-secondary" data-goto="import">Import CSV</button>
+            <!-- "Import vehicles" is the thing somebody wants to do. CSV is how
+                 it is done, and the next screen is where that matters. -->
+            <button class="btn btn-secondary" data-goto="import">Import vehicles</button>
           </div>
         </div>
         </div>
@@ -7903,6 +7940,9 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
         <div class="page-head">
           <div>
             <h1>Drivers</h1>
+            <!-- The same description the populated page carries. An empty state
+                 that drops it makes the page look like a different one. -->
+            <p>The people who fuel your vehicles.</p>
           </div>
         </div>
         <div class="empty-stage">
@@ -7911,17 +7951,13 @@ HRV 482 GP,Toyota,Hilux 2.4 GD-6,2021,bakkie,Diesel,80,,AHTFR22G30A123456,FL-014
             <svg data-lucide="user" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <h2>No drivers yet</h2>
-          <p>Add a driver, or import a CSV.</p>
+          <p>Add one driver, or import multiple drivers from a CSV file.</p>
           <div class="actions">
             <button class="btn btn-primary" data-open="driver:blank"><svg data-lucide="plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add driver</button>
-            <button class="btn btn-secondary" data-goto="drivers-import">Import CSV</button>
+            <!-- "Import drivers" is the thing somebody wants to do. CSV is how
+                 it is done, and the next screen is where that matters. -->
+            <button class="btn btn-secondary" data-goto="drivers-import">Import drivers</button>
           </div>
-          <!-- The same sentence as the vehicle screen, because it is the same
-               surprise: a record that exists and cannot fuel yet. The two
-               screens should not teach this differently. -->
-          <p class="empty-note"><b>A new driver cannot fuel yet either.</b>
-            They arrive <span class="badge badge-info">Invited</span> and stay
-            there until they set up the app on their own phone.</p>
         </div>
         </div>
       </section>
@@ -8482,6 +8518,22 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 
 <!-- Shown only when something has been typed. A confirmation over an empty
      form is the kind that teaches people to click through confirmations. -->
+
+<!-- The driver sheet's own confirmation. Same component, same anatomy, same
+     answers; the only difference is the noun, which is the only difference
+     between the two tasks. -->
+<div class="discard-scrim hidden" id="discard-driver" role="dialog" aria-modal="true"
+     aria-labelledby="discard-driver-title">
+  <div class="discard">
+    <h2 id="discard-driver-title">Discard entered details?</h2>
+    <p>The driver will not be added, and the details you entered will be lost.</p>
+    <div class="discard-actions">
+      <button class="btn btn-secondary" data-role="keep">Keep editing</button>
+      <button class="btn btn-danger" data-role="discard">Discard details</button>
+    </div>
+  </div>
+</div>
+
 <div class="discard-scrim hidden" id="discard-vehicle" role="dialog" aria-modal="true"
      aria-labelledby="discard-title">
   <div class="discard">
@@ -8764,11 +8816,14 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
      choosing the answer is what puts the next field on screen. A form that
      showed an ID number *and* a passport would be asking every driver for a
      document half of them do not hold. -->
-<aside class="drawer hidden" id="driver-drawer" role="dialog" aria-modal="true" aria-labelledby="driver-drawer-title" tabindex="-1">
-  <div class="drawer-head">
-    <div class="drawer-heading">
-      <h2 id="driver-drawer-title" data-role="title">Add a driver</h2>
-      <p class="drawer-sub hidden" data-role="subtitle"></p>
+<aside class="focus-sheet hidden" id="driver-drawer" role="dialog" aria-modal="true" aria-labelledby="driver-drawer-title" tabindex="-1">
+  <div class="focus-sheet__head">
+    <div class="focus-sheet__heading">
+      <h2 class="focus-sheet__title" id="driver-drawer-title" data-role="title">Add a driver</h2>
+      <!-- The same standing line the vehicle sheet carries. It replaced a live
+           count of missing fields, which is a scoreboard on a form and goes
+           wrong the moment a conditional field appears. -->
+      <p class="focus-sheet__sub" data-role="subtitle">Fields marked Optional can be left blank.</p>
     </div>
     <!-- Stripe puts a record's actions in two places: the row it sits on, and
          the record itself. Somebody who has a driver open should not have to
@@ -8818,7 +8873,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     <button data-state="editgap" aria-pressed="false">Edit incomplete</button>
   </div>
 
-  <div class="drawer-body">
+  <div class="focus-sheet__body">
     <!-- Nothing on this form can fix a save that failed or a permission that
          is missing, so none of them sit under a field. -->
     <div class="form-alert hidden" data-role="alert"></div>
@@ -8836,7 +8891,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <ul data-role="summary-list"></ul>
     </div>
 
-    <h3 class="group-title">Who they are</h3>
+    <h3 class="sheet-section__title">Driver details</h3>
     <div class="fields">
       <div class="form-field" data-field="first">
         <label for="d-first">First name</label>
@@ -8849,6 +8904,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <div class="form-field" data-field="mobile">
         <label for="d-mobile">Mobile number</label>
         <input class="field ident" id="d-mobile" inputmode="tel" autocomplete="off" placeholder="e.g. 082 123 4567">
+        <!-- Said where the number is typed, because this field is the reason
+             the driver ever hears from the product. -->
+        <span class="help">We’ll send the app invitation to this number.</span>
         <!-- The rule is the driver sign-up flow's, not a second opinion: this
              is the number they type to reach the app. -->
         <span class="help">The number they sign in to the app with.</span>
@@ -8857,18 +8915,15 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <label for="d-email">Email <span class="opt">Optional</span></label>
         <input class="field" id="d-email" type="email" autocomplete="off">
       </div>
-      <div class="form-field" data-field="photo">
-        <label for="d-photo">Profile photo <span class="opt">Optional</span></label>
-        <div class="photo-pick">
-          <span class="photo-thumb" aria-hidden="true"><svg data-lucide="user" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-          <input class="field" id="d-photo" readonly placeholder="No photo chosen">
-          <button class="btn btn-secondary" type="button">Choose</button>
-        </div>
-        <span class="help">JPEG, PNG or HEIC, up to 5 MB.</span>
+      <!-- Profile photo was here. Removed from the initial workflow: nothing
+           downstream uses it, and it is personal information asked for before
+           there is a purpose for it. It returns as an optional field the day a
+           documented operational requirement exists, with its retention and
+           who-may-view-it settled first. -->
       </div>
     </div>
 
-    <h3 class="group-title">Identity</h3>
+    <h3 class="sheet-section__title">Identification</h3>
     <p class="group-note">One document, not both. Some of your drivers will not
       hold a South African ID.</p>
     <div class="fields">
@@ -8896,16 +8951,34 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
     </div>
 
-    <h3 class="group-title">Licence</h3>
+    <h3 class="sheet-section__title">Driving licence</h3>
     <p class="group-note">What they are allowed to drive, and what they are
       allowed to carry.</p>
     <div class="fields">
-      <div class="form-field" data-field="licenceCode">
-        <label for="d-code">Licence code</label>
+      <div class="form-field field-wide" data-field="licenceCode">
+        <label for="d-code">Driving licence code</label>
         <select class="field" id="d-code"></select>
       </div>
+      <div class="form-field" data-field="licenceNumber">
+        <label for="d-licnum">Driving licence number <span class="opt">Optional</span></label>
+        <input class="field ident" id="d-licnum" maxlength="20" autocomplete="off">
+      </div>
+      <div class="form-field" data-field="licenceExpiry">
+        <!-- Named for the document rather than for the concept: a driver has a
+             licence expiry and a permit expiry, and "Licence expiry" alone was
+             the label on one of two dates that both exist. -->
+        <label for="d-licexp">Driving licence expiry <span class="opt">Optional</span></label>
+        <input class="field" id="d-licexp" type="date">
+      </div>
+      <p class="group-note is-review">Both optional, settled 14 August. Needs
+        attention only covers drivers who have an expiry on file.</p>
+      </div>
+
+      <h3 class="sheet-section__title">Professional driving permit</h3>
+      <p class="group-note">Record whether this driver has a professional driving permit.</p>
+      <div class="fields">
       <div class="form-field" data-field="prdp">
-        <label for="d-prdp">PrDP</label>
+        <label for="d-prdp">PrDP category</label>
         <select class="field" id="d-prdp"></select>
         <!-- "No PrDP" is an answer. A blank means nobody has been asked, and
              those two must not look the same on a permit that decides what a
@@ -8916,23 +8989,13 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <label for="d-prdpexp">PrDP expiry</label>
         <input class="field" id="d-prdpexp" type="date">
       </div>
-      <div class="form-field" data-field="licenceNumber">
-        <label for="d-licnum">Licence number <span class="opt">Optional</span></label>
-        <input class="field ident" id="d-licnum" maxlength="20" autocomplete="off">
-      </div>
-      <div class="form-field" data-field="licenceExpiry">
-        <label for="d-licexp">Licence expiry <span class="opt">Optional</span></label>
-        <input class="field" id="d-licexp" type="date">
-      </div>
-      <p class="group-note is-review">Both optional, settled 14 August. Needs
-        attention only covers drivers who have an expiry on file.</p>
     </div>
 
-    <h3 class="group-title">Your references</h3>
-    <p class="group-note">Optional, and useful later.</p>
+    <h3 class="sheet-section__title">Fleet details</h3>
+    <p class="group-note">Optional information used by your organisation.</p>
     <div class="fields">
       <div class="form-field" data-field="employeeId">
-        <label for="d-emp">Employee ID <span class="opt">Optional</span></label>
+        <label for="d-emp">Employee number <span class="opt">Optional</span></label>
         <input class="field ident" id="d-emp" autocomplete="off">
       </div>
       <div class="form-field" data-field="group">
@@ -8942,10 +9005,10 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     </div>
   </div>
 
-  <div class="drawer-foot">
+  <div class="focus-sheet__foot">
     <span class="count" data-role="count">Ready to add</span>
     <button class="btn btn-secondary" data-close-form>Cancel</button>
-    <button class="btn btn-primary" data-role="submit">Add driver</button>
+    <button class="btn btn-primary" data-role="submit">Add driver and send invite</button>
   </div>
 </aside>
 
@@ -9617,9 +9680,9 @@ function form(spec) {
          a navigation rather than a panel appearing. The sheet controller owns
          the route, the backdrop, the inert background and the focus; it is
          asked here so that every way into the form gets all four. */
-      if (root.classList.contains('focus-sheet') && window.__vehicleSheet
-          && !window.__vehicleSheet.isOpen()) {
-        window.__vehicleSheet.open();
+      if (root.classList.contains('focus-sheet')) {
+        const sh = root.id === 'driver-drawer' ? window.__driverSheet : window.__vehicleSheet;
+        if (sh && !sh.isOpen()) sh.open();
       }
       Object.values(forms).forEach(f => { if (f !== api) f.hide(); });
       applyState(state);
@@ -9638,8 +9701,9 @@ function form(spec) {
       /* The sheet is a place with an address, so leaving it is a navigation
          rather than a hidden panel. Guarded on the root, because this same
          engine drives the driver drawer, which is not a sheet. */
-      if (root.classList.contains('focus-sheet') && window.__vehicleSheet) {
-        window.__vehicleSheet.back();
+      if (root.classList.contains('focus-sheet')) {
+        const sh = root.id === 'driver-drawer' ? window.__driverSheet : window.__vehicleSheet;
+        if (sh) sh.back();
       }
       document.removeEventListener('keydown', trap, true);
       // Back where they came from. Closing a drawer and landing at the top of
@@ -13667,8 +13731,33 @@ const lapsed = d => !!d.licenceExpiry && R.isExpired(d.licenceExpiry);
 const prdpLapsed = d => !!d.prdpExpiry && d.prdp !== 'No PrDP' && R.isExpired(d.prdpExpiry);
 const needsAttention = d => lapsed(d) || prdpLapsed(d);
 
-const LICENCE_CODES = ['Code A', 'Code A1', 'Code B', 'Code C1', 'Code C', 'Code EB', 'Code EC1', 'Code EC'];
-const PRDP = ['No PrDP', 'PrDP G', 'PrDP P', 'PrDP D'];
+const LICENCE_CODES = [
+  ['A1', 'Motorcycle up to 125 cc'],
+  ['A', 'Motorcycle over 125 cc'],
+  ['B', 'Light motor vehicle up to 3 500 kg'],
+  ['C1', 'Heavy vehicle from 3 500 kg to 16 000 kg'],
+  ['C', 'Heavy vehicle over 16 000 kg'],
+  ['EB', 'Light articulated vehicle, or light vehicle with a qualifying trailer'],
+  ['EC1', 'Heavy articulated combination up to 16 000 kg'],
+  ['EC', 'Extra-heavy articulated combination'],
+  ['Not sure', 'Needs review'],
+];
+
+/* A driving licence code says which class of vehicle somebody may drive. A
+   PrDP category says what they may be paid to carry. They are different
+   questions about different documents, and the old values — "PrDP G", "PrDP
+   P", "PrDP D" — put the letter from the permit where a reader had to know
+   the scheme to decode it. */
+const PRDP = [
+  ['No PrDP', 'No professional driving permit'],
+  ['Goods', 'May be paid to carry goods'],
+  ['Passengers', 'May be paid to carry passengers'],
+  ['Dangerous goods', 'May be paid to carry dangerous goods'],
+  ['Not sure', 'Needs review'],
+];
+
+/* Both lists are pairs now, and several places want only the value. */
+const codeValues = list => list.map(x => (Array.isArray(x) ? x[0] : x));
 /* GAP: a real form takes the full country list. These are the neighbours a
  * Gauteng courier actually employs, enough to review the question with. */
 const COUNTRIES = ['Zimbabwe', 'Mozambique', 'Lesotho', 'Eswatini', 'Botswana', 'Namibia', 'Malawi', 'Zambia'];
@@ -13844,8 +13933,8 @@ const drivers = Records.directory({
     ['Operational status', false, 'status-col'],
   ],
   facets: [
-    ['Licence code', 'code', LICENCE_CODES, d => d.licenceCode],
-    ['PrDP', 'prdp', PRDP, d => d.prdp],
+    ['Driving licence code', 'code', codeValues(LICENCE_CODES), d => d.licenceCode],
+    ['PrDP category', 'prdp', codeValues(PRDP), d => d.prdp],
     ['Account status', 'life', Object.keys(DLIFE), d => d.lifecycle],
     ['Fuel access', 'access', Object.keys(DACCESS), d => d.fuel],
   ],
@@ -14346,7 +14435,10 @@ Records.form({
       back: meaning.back || null,
     };
   },
-  submitLabel: 'Add driver',
+  /* The button says both halves of what pressing it does. Creating the
+     record and sending the invitation are one gesture to the person doing it
+     and two operations underneath, and the second is the one they cannot see. */
+  submitLabel: 'Add driver and send invite',
   readyText: 'Ready to add',
   noun: 'required detail',
   backdrop: key => (key === 'blank' ? 'drivers-empty' : 'drivers-directory'),
@@ -14384,8 +14476,22 @@ function fill(id, values, placeholder) {
   sel.innerHTML = `<option value="">${placeholder}</option>` +
     values.map(v => `<option>${v}</option>`).join('');
 }
-fill('d-code', LICENCE_CODES, 'Select');
-fill('d-prdp', PRDP, 'Select');
+
+/* The same, for a list whose entries carry what they mean. The value stored is
+   the code alone — the description is there to be read while the answer is
+   chosen, and would be noise in every table, filter and export afterwards. */
+function fillPairs(id, pairs, placeholder) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  sel.innerHTML = `<option value="">${placeholder}</option>` +
+    pairs.map(([code, says]) =>
+      `<option value="${code}">${code} — ${says}</option>`).join('');
+}
+/* Filled from the pairs, so the code leads and its meaning follows it. A
+   select is the one place the explanation is worth the width: it is read once,
+   while the answer is being decided, and never again. */
+fillPairs('d-code', LICENCE_CODES, 'Select a licence code');
+fillPairs('d-prdp', PRDP, 'Select a PrDP category');
 fill('d-country', COUNTRIES, 'Select');
 fill('d-group', ['Sales fleet', 'Gauteng deliveries', 'Service crew'], 'None');
 
@@ -14656,7 +14762,7 @@ function dAskReason(key, anchor) {
 }
 
 
-window.DriverFixtures = { DRIVERS, STATES, ID, LICENCE_CODES, PRDP, COUNTRIES, needsAttention };
+window.DriverFixtures = { DRIVERS, STATES, ID, LICENCE_CODES, PRDP, COUNTRIES, needsAttention, codeValues };
 
 })();
 </script>
@@ -14978,10 +15084,8 @@ function showScreen(name) {
    Escape, on Cancel, on its own close button or on a backdrop click — it asks,
    and stays exactly where it is while the answer is decided. */
 const closeForms = () => {
-  if (window.__vehicleSheet && __vehicleSheet.isOpen() && __vehicleSheet.isDirty()) {
-    __vehicleSheet.tryClose();
-    return;
-  }
+  const open = window.__openSheet && window.__openSheet();
+  if (open && open.isDirty()) { open.tryClose(); return; }
   Object.values(Records.forms).forEach(f => f.close());
 };
 
@@ -15120,9 +15224,9 @@ window.addEventListener('hashchange', fromHash);
  * and the directory underneath is never unmounted, so there is nothing to
  * rebuild.
  */
-(() => {
-  const sheet = document.getElementById('vehicle-drawer');
-  if (!sheet) return;
+function makeSheet(config) {
+  const sheet = document.getElementById(config.id);
+  if (!sheet) return null;
 
   const backdrop = document.querySelector('[data-role="sheet-backdrop"]');
   const body = sheet.querySelector('.focus-sheet__body');
@@ -15131,6 +15235,10 @@ window.addEventListener('hashchange', fromHash);
   const part = r => sheet.querySelector('[data-role="' + r + '"]');
   const field = f => sheet.querySelector('[data-field="' + f + '"]');
 
+  /* The capacity and taxonomy wiring below belongs to the vehicle form. On the
+     driver sheet every one of these lookups returns null and the handlers
+     guard on it, so the controller stays one implementation instead of two
+     with a shared name. */
   const typeSel = document.getElementById('f-type');
   const configWrap = field('vehicleConfiguration');
   const configSel = document.getElementById('f-config');
@@ -15349,7 +15457,7 @@ window.addEventListener('hashchange', fromHash);
    * opens the sheet over the directory, and closing puts the address back to
    * the directory rather than to a blank page.
    */
-  const ROUTE = '#vehicles/new';
+  const ROUTE = config.route;
   let opener = null;
   let suppress = false;
   /* What Keep editing has to put back. The scroll position matters as much as
@@ -15359,7 +15467,12 @@ window.addEventListener('hashchange', fromHash);
   let sheetScroll = 0;
   let discardTrigger = null;
 
-  const isOpen = () => document.body.classList.contains('sheet-open');
+  /* Per sheet, not per page. There are two sheets now and `body.sheet-open`
+     says only that one of them is up — so opening the driver form while the
+     vehicle form was up saw the flag already set, skipped its own open(), and
+     left a sheet that was never raised. */
+  let opened = false;
+  const isOpen = () => opened;
 
   function focusables() {
     return [...sheet.querySelectorAll(
@@ -15371,9 +15484,19 @@ window.addEventListener('hashchange', fromHash);
      route-opened sheet is closed by leaving the route. */
   let ownsRoute = false;
 
+  /* Does this address belong to a rail state? Asked of the rail itself rather
+     than inferred, so it stays true however the rail is displayed. */
+  function railOwns(hash) {
+    const key = String(hash || '').replace('#', '');
+    if (!key) return false;
+    return [...document.querySelectorAll('.rail button')]
+      .some(b => (b.dataset.hash || b.dataset.state || b.dataset.screen) === key);
+  }
+
   function open(fromRoute) {
     if (isOpen()) return;
     opener = document.activeElement;
+    opened = true;
     document.body.classList.add('sheet-open');
     sheet.classList.remove('hidden');
     /* Everything behind the sheet stops being reachable — by pointer, by tab
@@ -15383,19 +15506,18 @@ window.addEventListener('hashchange', fromHash);
       .forEach(el => el.setAttribute('inert', ''));
     syncCategory();
     syncTanks();
-    /* The rail drives the sheet to its own per-state addresses, and taking the
-       route from underneath it would fight the thing that opened it. So the
-       route is claimed only when nothing else is already steering. */
-    const railDriven = document.body.classList.contains('demo') === false
-      && !!document.querySelector('.rail button[aria-current="true"][data-form]');
-    ownsRoute = !railDriven;
+    /* The rail gives every state its own address. If the address names one,
+       the rail is steering and this sheet does not own it — claiming it would
+       fight the thing that just opened the sheet. */
+    ownsRoute = !railOwns(location.hash);
     if (!fromRoute && ownsRoute) { suppress = true; location.hash = ROUTE; suppress = false; }
-    const first = sheet.querySelector('#f-vin') || sheet;
+    const first = sheet.querySelector(config.firstField) || sheet;
     first.focus({ preventScroll: true });
   }
 
   function shut() {
     ownsRoute = false;
+    opened = false;
     document.body.classList.remove('sheet-open');
     sheet.classList.add('hidden');
     document.querySelectorAll('[inert]').forEach(el => el.removeAttribute('inert'));
@@ -15418,7 +15540,7 @@ window.addEventListener('hashchange', fromHash);
        kind people learn to click through, which is how the one that matters
        gets dismissed too. */
     if (!dirty()) { back(); return; }
-    const dlg = document.getElementById('discard-vehicle');
+    const dlg = document.getElementById(config.dialog);
     if (!dlg) { back(); return; }
 
     /* Remembered before the confirmation takes focus, not after. */
@@ -15437,14 +15559,14 @@ window.addEventListener('hashchange', fromHash);
 
   /* Keep editing. Closes one surface, restores two things. */
   function resume() {
-    const dlg = document.getElementById('discard-vehicle');
+    const dlg = document.getElementById(config.dialog);
     if (dlg) dlg.classList.add('hidden');
     document.body.classList.remove('discard-open');
     sheet.removeAttribute('inert');
     if (body) body.scrollTop = sheetScroll;
     const back = (discardTrigger && sheet.contains(discardTrigger) && discardTrigger.offsetParent !== null)
       ? discardTrigger
-      : sheet.querySelector('#f-vin');
+      : sheet.querySelector(config.firstField);
     if (back) back.focus({ preventScroll: true });
     discardTrigger = null;
   }
@@ -15453,11 +15575,6 @@ window.addEventListener('hashchange', fromHash);
     shut();
     if (location.hash === ROUTE) { suppress = true; location.hash = '#directory'; suppress = false; }
   }
-
-  window.__vehicleSheet = {
-    open, shut, tryClose, back, resume, syncCategory, syncTanks,
-    isOpen, isDirty: dirty,
-  };
 
   sheet.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
@@ -15486,9 +15603,10 @@ window.addEventListener('hashchange', fromHash);
   window.addEventListener('hashchange', () => {
     if (suppress) return;
     if (location.hash === ROUTE) { open(true); ownsRoute = true; return; }
-    /* Leaving the route closes the sheet the route opened. A sheet the rail
-       put on screen at its own address is not the route's to close. */
-    if (isOpen() && ownsRoute) shut();
+    /* Leaving the route closes the sheet the route opened, and only that one.
+       An address that names a rail state belongs to the rail, which has
+       already opened whichever form it wanted. */
+    if (isOpen() && ownsRoute && !railOwns(location.hash)) shut();
   });
   if (location.hash === ROUTE) open(true);
 
@@ -15500,7 +15618,26 @@ window.addEventListener('hashchange', fromHash);
       if (submit.dataset.busy === '1') return;
     }, true);
   }
-})();
+
+  return { open, shut, tryClose, back, resume, isOpen, isDirty: dirty,
+           syncCategory, syncTanks, sheet };
+}
+
+/* The two sheets. Same controller, different form. */
+window.__vehicleSheet = makeSheet({
+  id: 'vehicle-drawer', route: '#vehicles/new',
+  firstField: '#f-vin', dialog: 'discard-vehicle',
+});
+window.__driverSheet = makeSheet({
+  id: 'driver-drawer', route: '#drivers/new',
+  firstField: '#d-first', dialog: 'discard-driver',
+});
+
+/* Whichever is on screen. Everything generic — closeForms, the engine's own
+   open and close — asks this rather than naming one of them. */
+window.__openSheet = () =>
+  [window.__vehicleSheet, window.__driverSheet].find(x => x && x.isOpen()) || null;
+
 
 /* The next-step strip's action. Two steps, in the order a person would take
    them: the drivers page first, so closing the form lands somewhere that makes
@@ -15542,28 +15679,29 @@ document.querySelectorAll('[data-open]').forEach(b => {
 
 /* The discard dialog's two answers. Continue editing is first and focused,
    because it is the one that loses nothing. */
-(() => {
-  const dlg = document.getElementById('discard-vehicle');
+function wireDiscard(dialogId, sheetKey) {
+  const dlg = document.getElementById(dialogId);
   if (!dlg) return;
 
   /* Keep editing is the safe answer, so it is the one Escape performs and the
      one focus lands on. Neither of them touches the sheet. */
-  const keep = () => window.__vehicleSheet && __vehicleSheet.resume();
+  const keep = () => window[sheetKey] && window[sheetKey].resume();
 
   dlg.querySelector('[data-role="keep"]')?.addEventListener('click', keep);
 
   dlg.querySelector('[data-role="discard"]')?.addEventListener('click', () => {
     dlg.classList.add('hidden');
     document.body.classList.remove('discard-open');
-    document.getElementById('vehicle-drawer')?.removeAttribute('inert');
-    document.querySelectorAll('#vehicle-drawer input, #vehicle-drawer select').forEach(el => {
+    const sh = window[sheetKey];
+    sh && sh.sheet && sh.sheet.removeAttribute('inert');
+    (sh && sh.sheet ? sh.sheet.querySelectorAll('input, select') : []).forEach(el => {
       if (el.type === 'radio' || el.type === 'checkbox') el.checked = false;
       else el.value = '';
     });
     /* Both surfaces go, and focus lands back on the button that started all
        of this. */
-    Records.forms.vehicle?.close();
-    window.__vehicleSheet?.back();
+    Records.forms[sheetKey === '__driverSheet' ? 'driver' : 'vehicle']?.close();
+    sh && sh.back();
   });
 
   dlg.addEventListener('keydown', e => {
@@ -15581,7 +15719,11 @@ document.querySelectorAll('[data-open]').forEach(b => {
   /* A backdrop click on a confirmation about losing work is an accident, not
      an answer. It does nothing. */
   dlg.addEventListener('click', e => { if (e.target === dlg) e.stopPropagation(); });
-})();
+}
+
+/* Both dialogs, one implementation. */
+wireDiscard('discard-vehicle', '__vehicleSheet');
+wireDiscard('discard-driver', '__driverSheet');
 
 /* `data-goto-search` carries a search term across with the screen change, which
  * is how "Try again" on a failed list is a resume rather than a reset. The
