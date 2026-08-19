@@ -41,6 +41,7 @@
     <a href="#naming">Naming</a>
     <p class="ds-rail__group">Foundations</p>
     <a href="#tokens">Tokens</a>
+    <a href="#primitives">Primitives</a>
     <a href="#spacing">Spacing</a>
     <p class="ds-rail__group">Components</p>
     <a href="#atoms">Atoms</a>
@@ -113,9 +114,21 @@
         <tr><td><code>organisms</code></td><td><code>src/css/organisms.css</code></td><td>Distinct sections, and the screens</td><td>above</td></tr>
         <tr><td><code>templates</code></td><td><code>src/css/templates.css</code></td><td>The device frame and the page it sits on</td><td>above</td></tr>
         <tr><td><code>utilities</code></td><td><code>src/css/utilities.css</code></td><td>One job, no opinion</td><td>above</td></tr>
-        <tr><td><code>developer</code></td><td><code>src/css/developer.css</code></td><td>Tooling. Never ships, and this page does not load it</td><td>above</td></tr>
+        <tr><td><code>developer</code></td><td><code>src/css/developer.css</code></td><td>Tooling. Last in the order, so it can never affect product rendering. The prototype does load it — see the note below — and this documentation page does not</td><td>above</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="ds-note">
+    <strong>Two honest exceptions to the table above.</strong> The prototype
+    <em>does</em> load <code>developer.css</code> — it is the eighth
+    <code>&lt;link&gt;</code> in <code>index.html</code> — because the demo tooling has to
+    work in the deployed prototype. It is last in the layer order, so it cannot affect how
+    a product component renders; it is the one file to drop when the prototype becomes a
+    product. And five tooling rules live in <code>templates.css</code> rather than in the
+    developer layer, three of which read <code>--d-</code> tokens. The scale states that no
+    product component may read a <code>--d-</code> token; these are tooling wearing a
+    product file's name, and they should move.
   </div>
 
   <h3>Why layers rather than specificity</h3>
@@ -127,8 +140,16 @@
   </p>
   <p>
     It has one consequence worth knowing. Two rules of equal specificity that relied on
-    which was typed first will flip when they land in different layers. Three such pairs
-    existed and are pinned to preserve today's rendering — see
+    which was typed first will flip when they land in different layers. Splitting the
+    stylesheet did exactly that, and the flips were caught by comparing every computed
+    property on every element before and after. The rules involved were pinned into their
+    original file so today's rendering is preserved.
+  </p>
+  <p>
+    The cost of pinning is that those rules are now filed against the naming law: three
+    <code>.o-signup-sheet__resend</code> rules sit in <code>atoms.css</code>. Preserving
+    the pixels and obeying the filing law are in genuine conflict there, and resolving it
+    needs a design decision rather than a refactor — see
     <a href="#decisions">Decisions</a>.
   </p>
 </section>
@@ -156,6 +177,31 @@
     (<code>__balanceCard</code>, <code>--outlineOnDark</code>). Elements never nest
     (<code>block__a__b</code> is refused).
   </p>
+  <h3>How a token is named</h3>
+  <p>
+    A token opens with the family it belongs to — <code>--color-</code>,
+    <code>--text-</code>, <code>--sp-</code>, <code>--radius-</code>,
+    <code>--dur-</code> and the rest. The family is enforced: the gate keeps a
+    list, and a name outside it fails the build, so nobody can quietly start a
+    <code>--brand-blue-2</code> alongside the scale.
+  </p>
+  <p>
+    After the family, the name says what the value is <strong>for</strong>, not
+    what it <strong>is</strong>. <code>--color-text-secondary</code>, not
+    <code>--color-grey-60</code>. This is the rule that lets a value change
+    without a rename, and it is followed almost everywhere — see
+    <a href="#tokens">how many tiers there are</a> for the count.
+    <code>--d-</code> marks the developer panel, which never ships.
+  </p>
+  <p>
+    Token names are kebab-case, with <strong>one exception</strong>:
+    <code>--color-hover-onDark</code>. That is not a slip. <em>onDark</em> is a
+    single concept throughout this codebase — <code>data-tone="onDark"</code>,
+    <code>.a-btn--outlineOnDark</code> — and it is spelled the same way in all
+    three places. The cost is that you cannot assume a token is kebab-case and
+    autocomplete your way to it. It is the only one.
+  </p>
+
   <h3>State is never a class</h3>
   <p>
     Runtime state rides a <code>data-*</code> attribute — <code>data-state</code>,
@@ -178,8 +224,217 @@
     build. Names must belong to a sanctioned family; a stray
     <code>--brand-blue-2</code> is refused.
   </p>
+
+  <h3>How many tiers there are</h3>
+  <p>
+    A mature scale usually has two or three: a palette of raw values
+    (<code>--blue-60</code>), a semantic layer that gives each one a job
+    (<code>--color-text-primary: var(--blue-60)</code>), and sometimes a third
+    per component. This one has <strong>a single tier</strong>, and it is named as
+    though it had two.
+  </p>
+  <p>
+    That is worth understanding before you change anything. The names already say
+    what a value is <em>for</em> rather than what it <em>is</em> — which is the
+    hard half of the work, and it is done. What is missing is the indirection
+    underneath: <code>--color-text-primary</code> holds <code>#0d1e2a</code>
+    directly, so two roles that happen to share a colour today have no way of
+    saying they are the same colour. The counts below are measured from the live
+    stylesheet, not asserted.
+  </p>
+  <div id="dsTiers"></div>
+  <p class="ds-note">
+    <strong>Do not "fix" this by adding a palette tier on a quiet afternoon.</strong>
+    It is a safe change only if every value is preserved exactly, and the way to
+    prove that is the fingerprint instrument described under
+    <a href="#traceability">Traceability</a> — not by eye. A half-done palette,
+    where some roles point at it and some still hold literals, is worse than the
+    single tier you started with.
+  </p>
+
+  <h3>The scale has a second setting</h3>
+  <p>
+    Fifteen tokens are declared twice. The second set lives under
+    <code>[data-text="large"]</code> and takes over when the driver turns
+    large text on — one attribute on the root, and the whole flow resizes,
+    because no component holds a font size of its own.
+  </p>
+  <p>
+    This is the payoff for having a type scale at all, and it is easy to break
+    without noticing: a hard-coded <code>font-size: 15px</code> looks identical
+    to <code>var(--text-body)</code> until somebody switches this on, and then
+    it is the one line of text on the screen that did not grow.
+  </p>
+  <div id="dsLarge"></div>
+  <p>
+    The steps are not uniform, and that is deliberate. Body sizes gain 2px,
+    the three display sizes gain 4px, and the OTP cell gains 8px so the digits
+    keep their room. In proportion that means the smallest text grows most —
+    around a fifth at <code>--text-nano</code> against a sixteenth at
+    <code>--text-figure</code> — which is the right way round, since the small
+    text is what people turn this on for.
+  </p>
+
+  <h3>Every token</h3>
   <div id="dsTokens">
     <p class="ds-note">Token tables are drawn by <code>docs.js</code> from the linked CSS.</p>
+  </div>
+</section>
+
+<!-- ═══ PRIMITIVES ════════════════════════════════════════════════════ -->
+<section class="ds-section" id="primitives">
+  <h2>Primitives</h2>
+  <p class="ds-lede">
+    The rules that apply to bare elements, before any class exists. A primitive
+    has no name you can call — you get it by using the element. That makes this
+    the one layer a developer inherits without knowing it is there, so it is the
+    one most worth reading before you write anything.
+  </p>
+  <p>
+    All of it lives in <code>src/css/foundations.css</code>, inside
+    <code>@layer&nbsp;foundations</code> — second of eight, so every one of these
+    rules is beaten by any atom, molecule or screen that has an opinion, whatever
+    the specificity. A primitive sets the default. It never wins an argument.
+  </p>
+
+  <h3>The reset</h3>
+  <p>
+    Three declarations, applied to everything including generated boxes. Border-box
+    means a width is the width you see, so a padded field still fits its column.
+    Zeroing margin and padding means every gap on the page was asked for by
+    somebody — there is no browser default quietly contributing.
+  </p>
+  <pre class="ds-code">*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }</pre>
+
+  <h3>The ground</h3>
+  <p>
+    <code>body</code> paints the page colour and sets the family and ink that
+    everything else inherits. It is the only place in the system that names a
+    font family; every other rule inherits it or is a bug.
+  </p>
+  <pre class="ds-code">body {
+  min-height: 100vh;
+  background: var(--color-surface-page);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text-primary);
+}</pre>
+  <p>
+    Form controls do not inherit type from their parent — browsers give them a
+    system face instead — so the inheritance is repaired explicitly, and
+    <code>button</code> is stripped back to a plain box so that every button on
+    the page gets its appearance from a class rather than from the user agent.
+  </p>
+  <pre class="ds-code">input, button, a { font-family: inherit; }
+button { background: none; border: none; color: inherit; }</pre>
+
+  <h3>The focus ring</h3>
+  <p>
+    One ring for the entire system, and it is two-tone on purpose. The dark core
+    reads against the white sheet; the light halo around it reads against the
+    near-black hero. A single-colour ring would disappear on one of the two, and
+    the sign-up flow uses both.
+  </p>
+  <pre class="ds-code">:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--color-focus-halo);
+}</pre>
+  <p>
+    <code>:focus-visible</code> rather than <code>:focus</code>, so the ring
+    appears for a keyboard and not for a tap. Never remove it from a component.
+    If it looks wrong on something you are building, the something is too tight
+    against its neighbour — give it room rather than taking the ring away.
+  </p>
+  <div class="ds-spec">
+    <div class="ds-spec__head">
+      <span class="ds-spec__name">:focus-visible</span>
+      <span>Press Tab to move through these — the ring is the real one, from the production CSS</span>
+    </div>
+    <div class="ds-spec__stage">
+      <button type="button" class="a-btn a-btn--primary">Continue</button>
+      <button type="button" class="a-btn a-btn--outline">Not now</button>
+      <a class="a-link" href="#primitives">A link</a>
+    </div>
+    <div class="ds-spec__stage ds-spec__stage--dark">
+      <button type="button" class="a-btn a-btn--primary">On the hero</button>
+      <button type="button" class="a-btn a-btn--outlineOnDark">Not now</button>
+      <a class="a-link a-link--onDark" href="#primitives">A link on the hero</a>
+    </div>
+  </div>
+
+  <h3>Hiding</h3>
+  <p>
+    <code>[hidden]</code> is forced to <code>display: none</code>. This is the one
+    <code>!important</code> in the foundations layer and it earns its place: a
+    hidden child of a flex row still takes its share of the <code>gap</code> if
+    something else set it to <code>display: flex</code>, which leaves a hole
+    nobody can see the cause of.
+  </p>
+  <pre class="ds-code">[hidden] { display: none !important; }</pre>
+  <p>
+    Use the attribute, not a class. Hiding is state, and
+    <a href="#naming">state is never a class</a> here.
+  </p>
+
+  <h3>The nudge</h3>
+  <p>
+    A wrong entry shakes the control the driver can actually correct — the field,
+    not the screen. Moving the whole column moves the parts that are fine too,
+    which reads as "everything is wrong" when one thing is.
+  </p>
+  <pre class="ds-code">[data-shake="true"] { animation: shakeX var(--dur-slow) ease; }</pre>
+  <div class="ds-note">
+    <strong>Why it is on the field and not the card.</strong> Two animations on
+    one element share one <code>animation</code> shorthand. When the shake
+    finished, the shorthand fell back to the card's <code>stageIn</code> and
+    replayed the entrance — field, helper, card and button faded out and floated
+    back up half a second after the error appeared. Different elements, no shared
+    property, no replay. If you ever add a second animation to an element that
+    already has one, this is the trap.
+  </div>
+
+  <h3>Motion</h3>
+  <p>
+    Every keyframe in the system is declared here, so a component can reach for
+    an existing movement instead of inventing a near-copy. Read out of the live
+    stylesheet below, at a fixed demo duration — in the product each one plays at
+    its own duration token.
+  </p>
+  <div id="dsMotion"></div>
+  <p>
+    Durations and easings are tokens, not numbers:
+    <code>--dur-fast</code> through <code>--dur-slow</code>, and four easings.
+    <code>--ease-out</code> is the default for anything arriving,
+    <code>--ease-emphasis</code> for the sheet, <code>--ease-spring</code> only
+    where an overshoot is wanted. Full values are in
+    <a href="#tokens">Tokens</a> under Duration and Easing.
+  </p>
+
+  <h4>Reduced motion is honoured twice</h4>
+  <p>
+    Once for the operating system setting, and once for the demo toggle in the
+    developer panel — because a stakeholder watching on a borrowed laptop cannot
+    change the OS preference, and the flow still has to be reviewable with the
+    movement off.
+  </p>
+  <pre class="ds-code">@media (prefers-reduced-motion: reduce) { /* … */ }
+[data-motion="reduced"] *, [data-motion="reduced"] *::before, … { /* … */ }</pre>
+  <p>
+    Both collapse animation and transition to <code>0.001ms</code> rather than
+    <code>0</code>, so anything waiting on a <code>transitionend</code> or
+    <code>animationend</code> event still receives it and the flow does not stall.
+    Both reset <code>animation-delay</code> and
+    <code>animation-iteration-count</code> too, so a staggered entrance does not
+    leave the last element invisible for half a second and a loop does not run
+    forever at a millisecond a turn.
+  </p>
+  <div class="ds-note">
+    Because they are <code>!important</code> and apply to every element, a new
+    component gets reduced-motion support for free. You do not need to write
+    anything. You <em>do</em> need to make sure the end state is the readable one:
+    if an element animates <em>in</em> from <code>opacity: 0</code>, it must not
+    be left at zero when the animation is skipped.
   </div>
 </section>
 
@@ -187,10 +442,12 @@
 <section class="ds-section" id="spacing">
   <h2>Spacing</h2>
   <p>
-    A 4px base with three half-steps, because 6, 10 and 18 are structural here rather
-    than exceptional, and a scale should be honest about what it contains. The tokens
-    and their resolved values are in the <a href="#tokens">Tokens</a> table under
-    <em>Spacing</em>.
+    A 4px base — <code>--sp-1</code> through <code>--sp-8</code>, 4px to 32px — with
+    <strong>two</strong> half-steps, <code>--sp-1h</code> (6px) and <code>--sp-2h</code>
+    (10px), because both are structural here rather than exceptional. There is no 18:
+    gaps that composed to 18 and 20 sat close enough to the group step to read as noise
+    rather than meaning, and were removed. The tokens and their resolved values are in
+    the <a href="#tokens">Tokens</a> table under <em>Spacing</em>.
   </p>
 
   <div class="ds-note">
@@ -215,7 +472,12 @@
 <section class="ds-section" id="atoms">
   <h2>Atoms</h2>
   <p>
-    Twelve render on this page. Every specimen below is the real element with the real
+    <strong>Thirteen atom blocks exist in <code>src/css/atoms.css</code>; nine are rendered
+    below.</strong> Twelve appear in the sign-up page's markup and the thirteenth,
+    <code>a-otp-cell</code>, is created by script — it is shown here inside the
+    <code>m-otp-group</code> specimen. Four have no specimen yet:
+    <code>a-spinner</code>, <code>a-scrim</code>, <code>a-notch</code> and
+    <code>a-toast</code>. Every specimen below is the real element with the real
     classes, drawn by the production CSS.
   </p>
 
@@ -254,21 +516,37 @@
     <div class="ds-spec__head"><span class="ds-spec__name">.a-field</span><span>default · error</span></div>
     <div class="ds-spec__stage ds-spec__stage--stack">
       <label class="a-label" for="dsPhone">Mobile number</label>
-      <span class="a-field"><input class="a-field__input" id="dsPhone" type="tel" value="82 123 4567"></span>
-      <span class="a-field" data-state="error"><input class="a-field__input" type="tel" value="82 000"></span>
+      <label class="a-field"><input class="a-field__input" id="dsPhone" type="tel" value="82 123 4567"></label>
+      <label class="a-field" data-state="error"><input class="a-field__input" type="tel" value="82 000"></label>
       <span class="a-helper" data-tone="error">Check the number and try again.</span>
     </div>
     <div class="ds-spec__foot"></div>
   </div>
   <p>
-    The label is persistent, never a placeholder. The error message sits directly under the
-    control it belongs to, and the field carries <code>data-state="error"</code> so the
-    state is not colour alone — the border thickens as well.
+    <strong>The field is a <code>&lt;label&gt;</code>, not a <code>&lt;span&gt;</code>.</strong>
+    That is what makes the whole 56px box focus the input when a thumb lands anywhere on
+    it. Geometry was tried first and was the wrong tool. In the sign-up flow the same
+    element also carries <code>m-phone-field</code> — both classes on one element, because
+    the field supplies the box and the molecule supplies the country prefix inside it.
   </p>
+  <p>
+    The label is persistent, never a placeholder. The error message sits directly under the
+    control it belongs to, and the field carries <code>data-state="error"</code>.
+  </p>
+  <div class="ds-note">
+    <strong>What the error state actually changes: border colour and background, both
+    colour.</strong> The non-colour cue is not the border width — the border is
+    <code>--size-border</code> in every state. It is the glyph the helper gains beneath
+    the field, and the shake on the control itself. Under
+    <code>@media (forced-colors: active)</code>, where every colour is discarded, the field
+    restates itself structurally with <code>outline: 2px dashed</code>
+    (<code>atoms.css</code>) — solid for valid, dashed for error. That branch is what keeps
+    the state readable when colour is gone, and it is required by the build gate.
+  </div>
 
   <h3>a-icon-wrap</h3>
   <div class="ds-spec">
-    <div class="ds-spec__head"><span class="ds-spec__name">.a-icon-wrap</span><span>default · tones · large · bare</span></div>
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-icon-wrap</span><span>default · tones · bare</span></div>
     <div class="ds-spec__stage">
       <span class="a-icon-wrap"></span>
       <span class="a-icon-wrap" data-tone="error"></span>
@@ -286,10 +564,14 @@
 
   <h3>a-spinner, a-handle, a-progress</h3>
   <div class="ds-spec">
-    <div class="ds-spec__head"><span class="ds-spec__name">.a-handle · .a-progress</span><span>small parts</span></div>
+    <div class="ds-spec__head"><span class="ds-spec__name">.a-spinner · .a-handle · .a-progress</span><span>small parts</span></div>
     <div class="ds-spec__stage ds-spec__stage--stack">
       <span class="a-handle"></span>
       <p class="a-progress"><span>Step 1 of 2</span></p>
+      <button type="button" class="a-btn a-btn--primary">
+        <svg class="a-spinner" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="var(--color-on-dark-line)" stroke-width="2.5"/><path d="M11 3a8 8 0 0 1 8 8" stroke="var(--color-text-on-dark)" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Sending…
+      </button>
     </div>
     <div class="ds-spec__foot"></div>
   </div>
@@ -298,7 +580,14 @@
 <!-- ═══ MOLECULES ═════════════════════════════════════════════════════ -->
 <section class="ds-section" id="molecules">
   <h2>Molecules</h2>
-  <p>Eleven render on this page. Each is a small group of atoms doing one job.</p>
+  <p>
+    <strong>Eleven molecule blocks exist in <code>src/css/molecules.css</code>; four are
+    rendered below.</strong> Each is a small group of atoms doing one job. Seven have no
+    specimen yet: <code>m-brand-lockup</code>, <code>m-phone-field</code>,
+    <code>m-resend-row</code> and <code>m-figure</code> are product molecules;
+    <code>m-status-bar</code>, <code>m-notch</code> and <code>m-keyboard</code> are device
+    chrome drawn by the frame rather than by the product.
+  </p>
 
   <h3>m-sheet-header</h3>
   <div class="ds-spec">
@@ -324,15 +613,34 @@
 
   <h3>m-alert</h3>
   <div class="ds-spec">
-    <div class="ds-spec__head"><span class="ds-spec__name">.m-alert</span><span>tones: error · warning · success</span></div>
+    <div class="ds-spec__head"><span class="ds-spec__name">.m-alert</span><span>tones: info (default) · error · warning · success</span></div>
     <div class="ds-spec__stage ds-spec__stage--stack">
+      <div class="m-alert" data-tone="info">
+        <div class="m-alert__top">
+          <span class="m-alert__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+          <span>
+            <p class="m-alert__title">We will send a code to this number</p>
+            <p class="m-alert__body">It arrives on WhatsApp. Standard data rates apply.</p>
+          </span>
+        </div>
+      </div>
       <div class="m-alert" data-tone="error">
-        <div class="m-alert__top"><p class="m-alert__title">That number is not on your company's list</p></div>
-        <p class="m-alert__body">Ask your manager to add it, or try another number.</p>
+        <div class="m-alert__top">
+          <span class="m-alert__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+          <span>
+            <p class="m-alert__title">That number is not on your company's list</p>
+            <p class="m-alert__body">Ask your manager to add it, or try another number.</p>
+          </span>
+        </div>
       </div>
       <div class="m-alert" data-tone="warning">
-        <div class="m-alert__top"><p class="m-alert__title">Check your signal</p></div>
-        <p class="m-alert__body">We could not reach the network. Try again in a moment.</p>
+        <div class="m-alert__top">
+          <span class="m-alert__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+          <span>
+            <p class="m-alert__title">Check your signal</p>
+            <p class="m-alert__body">We could not reach the network. Try again in a moment.</p>
+          </span>
+        </div>
       </div>
     </div>
     <div class="ds-spec__foot"></div>
@@ -438,8 +746,8 @@
         <tr><td>Disabled</td><td><code>aria-disabled</code> plus a flattened coat; stays focusable</td><td><code>#number/empty</code></td></tr>
         <tr><td>Loading</td><td><code>a-spinner</code> inside the control that caused the wait</td><td><code>#number/sending</code></td></tr>
         <tr><td>Error</td><td><code>data-state="error"</code> on the field, <code>a-helper[data-tone="error"]</code> beneath it</td><td><code>#number/err-server</code></td></tr>
-        <tr><td>Success</td><td><code>data-tone="success"</code></td><td><code>#code/valid</code></td></tr>
-        <tr><td>Empty</td><td>A stated sentence, never a blank region</td><td><code>#blocked/not-registered</code></td></tr>
+        <tr><td>Success</td><td><code>data-tone="success"</code></td><td><code>#code/success</code></td></tr>
+        <tr><td>Empty</td><td>A stated sentence, never a blank region</td><td><code>#number/err-unregistered</code></td></tr>
         <tr><td>Offline</td><td><code>data-net="offline"</code> on the root</td><td><code>#home/offline</code></td></tr>
         <tr><td>Long content</td><td>Sheets scroll; the status bar clearance and edge masks hold</td><td>Large text mode</td></tr>
         <tr><td>Reduced motion</td><td>Both the media query and a <code>data-motion</code> switch; animations collapse to a still frame, never to nothing</td><td>Rail toggle</td></tr>
@@ -455,7 +763,8 @@
     <li><strong>Keyboard.</strong> Every control is a real <code>&lt;button&gt;</code> or input. Disabled primary actions use <code>aria-disabled</code> so they keep their place in the focus order and can still explain why they are not available.</li>
     <li><strong>Visible focus.</strong> One ring for the whole product, two-tone so it reads on the near-black hero and the light sheet alike.</li>
     <li><strong>Labels.</strong> Persistent and visible. No placeholder-as-label anywhere.</li>
-    <li><strong>Errors.</strong> Placed against the control they belong to, and never carried by colour alone — a field in error thickens its border and gains a glyph.</li>
+    <li><strong>Errors.</strong> Placed against the control they belong to, and never carried by colour alone — a field in error gains a glyph in its helper and shakes once.</li>
+    <li><strong>Forced colours.</strong> <code>@media (forced-colors: active)</code> discards every background and border colour, which is every cue the OTP group and the field have. Both re-express their state structurally instead: a solid outline for valid, a dashed one for error. The build gate fails any page without that block, so this is enforced rather than remembered.</li>
     <li><strong>Landmarks.</strong> Each screen is a <code>&lt;section&gt;</code> labelled by its own heading; the device chrome is <code>aria-hidden</code>.</li>
     <li><strong>Reduced motion.</strong> Honoured through the media query and an explicit switch, so it can be demonstrated without changing an OS setting.</li>
     <li><strong>Contrast.</strong> Sampled from rendered pixels on all 43 states, not reasoned about from tokens — gradients and glass make the arithmetic unreliable.</li>
@@ -577,12 +886,24 @@
   <h3>Inconsistencies that need a design ruling</h3>
   <ul>
     <li>
-      <strong>The resend button, three rules deep.</strong> Four rules of equal specificity
-      style one button — two on the atom, two on the organism — and which one wins was
-      decided entirely by the order they were typed in. Layers would have flipped two of
-      them, so they are pinned to preserve today's rendering. Today the countdown renders
-      at weight 500 from the atom, overriding the 600 the organism was written to set. One
-      of those two rules is dead intent and somebody should say which.
+      <strong>The resend button is filed in the wrong place, and that is the real problem.</strong>
+      Four rules style it. <em>Three of them are in <code>atoms.css</code></em> even though
+      their leftmost block is <code>.o-signup-sheet__resend</code> — an organism — which
+      breaks the filing law stated above. Only one, <code>align-self</code>, is in
+      <code>organisms.css</code>.
+      <br><br>
+      The visible symptom: the countdown's weight is decided between
+      <code>.o-signup-sheet__resend:disabled</code> (semibold) and
+      <code>.a-link:disabled</code> (medium). Both are the same specificity and
+      <em>both are inside <code>@layer atoms</code></em>, so the layer order cannot
+      separate them — source order alone decides, and medium wins. An earlier note here
+      claimed layers would have flipped them and that they were pinned; that was wrong,
+      and it was wrong because it assumed the rules were in the layers their names imply.
+      <br><br>
+      Move the three rules to <code>organisms.css</code> and two things happen at once: the
+      filing law holds again, and the layer order decides the weight instead of typing
+      order — at which point "is 500 or 600 intended?" becomes a one-line answer rather
+      than a standing question.
     </li>
     <li>
       <strong>The semantic spacing layer.</strong> Specified, not built. It requires deciding,

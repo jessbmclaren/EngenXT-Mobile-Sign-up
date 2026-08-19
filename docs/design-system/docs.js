@@ -154,6 +154,193 @@
     host.innerHTML = html;
   }
 
+  /* ── How many tiers the scale has ─────────────────────────────────── */
+
+  /* A name whose tail is a position on a scale - a number, a t-shirt size, a
+     light/dark modifier - describes what the value IS. Any other tail
+     describes what it is FOR. That distinction is the whole difference
+     between a palette and a semantic layer, and it can be read off the name
+     alone, which is why this half of the count works even off disk. */
+  var SCALE_TAIL = /-(\d+|xs|sm|md|lg|xl|xxl|light|dark|darker|lighter)$/;
+
+  function tierTable(host) {
+    if (!host) { return; }
+    var n = { roleLit: 0, roleVar: 0, scaleLit: 0, scaleVar: 0 };
+    TOKENS.forEach(function (t) {
+      var role = !SCALE_TAIL.test(t.name);
+      /* Indirection can only be seen in the authored text. A computed value
+         has already resolved every var(), so off disk this is unknowable -
+         and reporting every token as a literal would be a lie the reader
+         could not detect. The table says so instead. */
+      var indirect = READABLE && t.authored.indexOf('var(') !== -1;
+      n[(role ? 'role' : 'scale') + (indirect ? 'Var' : 'Lit')]++;
+    });
+
+    var html = '<div class="ds-tablewrap"><table class="ds-table ds-tier">' +
+      '<thead><tr><th>Of ' + TOKENS.length + ' tokens</th>' +
+      '<th>Holds a literal<br><span class="ds-th-sub">a value of its own</span></th>' +
+      '<th>Points at another token<br><span class="ds-th-sub">an alias or a derived step</span></th>' +
+      '</tr></thead><tbody>' +
+      row('Named for its <strong>job</strong>', '--color-text-primary', n.roleLit, n.roleVar) +
+      row('Named for its <strong>place on a scale</strong>', '--sp-4', n.scaleLit, n.scaleVar) +
+      '</tbody></table></div>';
+
+    if (!READABLE) {
+      html += '<p class="ds-note">The second column cannot be counted here. ' +
+        'Opened off disk a browser will not let this page read the stylesheet ' +
+        'text, and a computed value has already resolved its <code>var()</code> ' +
+        'references — so every token would appear to hold a literal. Serve the ' +
+        'folder over http for the real split.</p>';
+    } else {
+      var semantic = Math.round((n.roleLit + n.roleVar) / TOKENS.length * 100);
+      html += '<p><strong>' + semantic + '% of the scale is named for its job.</strong> ' +
+        'The naming is semantic almost throughout; the structure underneath it is ' +
+        'flat. Only <strong>' + (n.roleVar + n.scaleVar) + '</strong> tokens are ' +
+        'built from another token — the gradients, a handful of hover and focus ' +
+        'aliases, and the <code>color-mix()</code> steps that tint the primary and ' +
+        'secondary. Everything else stands alone.</p>';
+    }
+    host.innerHTML = html;
+  }
+
+  function row(label, eg, lit, ind) {
+    return '<tr><td>' + label + '<br><code class="ds-eg">' + esc(eg) + '</code></td>' +
+      '<td class="ds-num ds-big">' + lit + '</td>' +
+      '<td class="ds-num ds-big">' + (READABLE ? ind : '<span class="ds-unknown">—</span>') + '</td></tr>';
+  }
+
+  /* ── The second type scale ────────────────────────────────────────── */
+
+  /* Every custom property declared by rules matching one selector, wherever in
+     the eight sheets it lives. Used for the large-text override, which is the
+     only place the scale is declared twice. */
+  function declarationsFor(selectorText) {
+    var out = {};
+    function scan(rules) {
+      if (!rules) { return; }
+      for (var i = 0; i < rules.length; i++) {
+        var r = rules[i];
+        if (r.cssRules && r.cssRules.length && r.type !== 7) { scan(r.cssRules); }
+        if (!r.style || r.selectorText !== selectorText) { continue; }
+        for (var k = 0; k < r.style.length; k++) {
+          var name = r.style[k];
+          if (name.indexOf('--') === 0) { out[name] = r.style.getPropertyValue(name).trim(); }
+        }
+      }
+    }
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      try { scan(document.styleSheets[s].cssRules); } catch (e) { /* unreadable off disk */ }
+    }
+    return out;
+  }
+
+  function largeTable(host) {
+    if (!host) { return; }
+    var large = declarationsFor('[data-text="large"]');
+    var names = Object.keys(large);
+    if (!names.length) {
+      host.innerHTML = '<p class="ds-note">The large-text scale cannot be listed ' +
+        'here. Opened off disk a browser will not let this page read the rules of ' +
+        'a linked stylesheet, and the override only exists as a rule — nothing on ' +
+        'this page is in that mode, so there is no computed value to fall back to. ' +
+        'Serve the folder over http to see it.</p>';
+      return;
+    }
+    var html = '<div class="ds-tablewrap"><table class="ds-table"><thead><tr>' +
+      '<th>Token</th><th>Default</th><th>Large</th><th>Step</th><th>Growth</th>' +
+      '<th colspan="2">Side by side</th></tr></thead><tbody>';
+    names.forEach(function (n) {
+      var base = getComputedStyle(root).getPropertyValue(n).trim();
+      var a = parseFloat(base), b = parseFloat(large[n]);
+      var step = (!isNaN(a) && !isNaN(b)) ? '+' + (b - a) + 'px' : '';
+      var pct = (!isNaN(a) && !isNaN(b) && a) ? '+' + Math.round((b / a - 1) * 100) + '%' : '';
+      /* Capped for the specimen only - --text-figure is 64px and would set the
+         row height for the whole table. The numbers beside it are the real ones. */
+      var cap = function (v) { return Math.min(parseFloat(v), 28) + 'px'; };
+      html += '<tr><td><code>' + esc(n) + '</code></td>' +
+        '<td class="ds-mono ds-num">' + esc(base) + '</td>' +
+        '<td class="ds-mono ds-num">' + esc(large[n]) + '</td>' +
+        '<td class="ds-mono ds-num">' + step + '</td>' +
+        '<td class="ds-mono ds-num">' + pct + '</td>' +
+        '<td style="font-size:' + cap(base) + ';line-height:1.1">Aa</td>' +
+        '<td style="font-size:' + cap(large[n]) + ';line-height:1.1">Aa</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    host.innerHTML = html;
+  }
+
+  /* ── The movement catalogue ───────────────────────────────────────── */
+
+  /* Every @keyframes in the system, read from the sheet rather than listed,
+     so a movement added to the CSS appears here without anyone remembering
+     to write it down. */
+  function keyframeRules() {
+    var out = [], seen = {};
+    function scan(rules) {
+      if (!rules) { return; }
+      for (var i = 0; i < rules.length; i++) {
+        var r = rules[i];
+        /* A keyframes rule holds rules of its own - the frames - so it has to
+           be matched before the recursion, or the frames get walked as though
+           they were selectors. */
+        if (r.type === 7 || (window.CSSKeyframesRule && r instanceof window.CSSKeyframesRule)) {
+          if (!seen[r.name]) { seen[r.name] = 1; out.push(r); }
+        } else if (r.cssRules && r.cssRules.length) {
+          scan(r.cssRules);
+        }
+      }
+    }
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      try { scan(document.styleSheets[s].cssRules); } catch (e) { /* unreadable off disk */ }
+    }
+    return out;
+  }
+
+  /* Played at one duration for all of them, so the shapes can be compared.
+     The product plays each at its own token, which is why this says so on
+     the page rather than implying these are the real timings. */
+  var DEMO_MS = 700;
+
+  function motionCatalogue(host) {
+    if (!host) { return; }
+    var frames = keyframeRules();
+    if (!frames.length) {
+      host.innerHTML = '<p class="ds-note">The keyframes cannot be listed here. ' +
+        'Opened off disk a browser will not let this page read the rules of a ' +
+        'linked stylesheet. Serve the folder over http to see them.</p>';
+      return;
+    }
+    var html = '';
+    frames.forEach(function (r, i) {
+      var body = String(r.cssText).replace(/^@keyframes\s+[\w-]+\s*\{/, '').replace(/\}\s*$/, '');
+      body = body.replace(/\)\s*\{/g, ') {').replace(/;\s*\}/g, '; }').trim();
+      html += '<div class="ds-motion">' +
+        '<div class="ds-motion__head">' +
+          '<code class="ds-spec__name">' + esc(r.name) + '</code>' +
+          '<button type="button" class="ds-copy ds-play" data-anim="' + esc(r.name) + '">Play</button>' +
+        '</div>' +
+        '<div class="ds-motion__body">' +
+          '<div class="ds-motion__stage"><span class="ds-motion__box" data-slot="' + i + '"></span></div>' +
+          '<pre class="ds-code ds-motion__code">' + esc(body) + '</pre>' +
+        '</div>' +
+      '</div>';
+    });
+    host.innerHTML = html;
+
+    host.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.ds-play') : null;
+      if (!btn) { return; }
+      var box = btn.parentNode.parentNode.querySelector('.ds-motion__box');
+      var name = btn.getAttribute('data-anim');
+      box.style.animation = 'none';
+      /* Reading offsetWidth forces the style change to land before the new
+         animation is set, so clicking Play twice actually replays it. */
+      void box.offsetWidth;
+      box.style.animation = name + ' ' + DEMO_MS + 'ms ' +
+        (name === 'spin' ? 'linear' : 'var(--ease-out)') + ' both';
+    });
+  }
+
   /* ── Specimens ────────────────────────────────────────────────────── */
 
   function esc(s) {
@@ -261,6 +448,9 @@
   ready(function () {
     var host = document.getElementById('dsTokens');
     if (host) { tokenTable(host); }
+    tierTable(document.getElementById('dsTiers'));
+    largeTable(document.getElementById('dsLarge'));
+    motionCatalogue(document.getElementById('dsMotion'));
     stampSource();
     wireSpecimens();
     wireRail();

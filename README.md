@@ -5,6 +5,12 @@ for a South African fleet-fuel app used by drivers at the pump.
 
 **Live:** https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up/
 
+**Design system:** https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up/docs/design-system/
+— the tokens, primitives and components, drawn by the same CSS the product
+loads. Serve it over http rather than opening it off disk: a browser will not
+let a page read a linked stylesheet's rules from `file://`, and three of its
+tables are generated from exactly that.
+
 Two self-contained HTML files. No build, no dependencies, no network calls.
 Open either directly if you prefer.
 
@@ -87,7 +93,7 @@ Three tools, no dependencies beyond Node and Chrome:
   readers, held by a tool instead of a reviewer's memory).
 - `node tools/sweep.js [--large]` — renders every state headless and
   measures what a driver would meet: status-bar contrast sampled off real
-  pixels, tap targets at 44px counting pseudo-element hit areas, nothing
+  pixels, tap targets against `--size-target` (48px) counting pseudo-element hit areas, nothing
   stranded past a scroller, nothing thrown. A few minutes; run before a
   merge.
 - `node tools/journey.js` — walks the flows with real events and the real

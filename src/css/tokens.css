@@ -300,8 +300,10 @@
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
 
-  /* Space. A 4px base with three half steps, because 6, 10 and 18 are
-     structural here rather than exceptional, and a scale should be honest. */
+  /* Space. A 4px base with two half steps, 6 and 10, because both are
+     structural here rather than exceptional, and a scale should be honest.
+     There is no 18: gaps composed to 18 and 20 read as noise against the
+     group step and were removed. See organisms.css. */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
   --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
 
