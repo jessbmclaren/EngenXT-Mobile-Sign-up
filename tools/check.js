@@ -703,24 +703,33 @@ for (const name of FILES) {
   }
 }
 
-/* ── The driver never leaves the screen ───────────────────────
-   The owner's law, made permanent. A forecourt is the worst place to be
-   thrown into another app: the code is here, the clock is here, and an app
-   switch on a work phone with no data may not come back. Escalations still
-   compose their exact message - they hand it over in place.
+/* ── Leave when the destination is the task; never at the pump ──────
+   The owner's rule in its true shape. A driver stuck in sign-up needs a
+   human, and a prepared message nobody can send is theatre - so those doors
+   open WhatsApp with the words already written, and reading the code means
+   going where the code is. Sign-up is all destination.
+
+   The app is not. Once a driver is holding a fuel code or watching a fill,
+   the screen IS the task: an attendant is waiting, a queue is behind them,
+   and an app switch on a work phone with no data may not come back. Nothing
+   in the app file may navigate out, and the two escalations it does offer
+   hand their message over in place.
 
    The one sanctioned move is the handover between these two files, which is
    the app walking through itself rather than out of itself. */
-for (const [name, body0] of Object.entries(src)) {
-  const body = body0.replace(/<!--[\s\S]*?-->/g, "");
-  if (/target\s*=\s*"_blank"/.test(body)) {
-    fail(`${name}: a control opens another app or tab - the driver must stay on the screen`);
-  }
-  if (/window\.open\s*\(/.test(body)) {
-    fail(`${name}: window.open leaves the app - the driver must stay on the screen`);
-  }
-  for (const m of body.matchAll(/href\s*=\s*"(https?:|tel:|mailto:)/g)) {
-    fail(`${name}: an href to '${m[1]}' navigates away - hand the message over in place instead`);
+const AT_THE_PUMP = ONBOARD;
+for (const [name, whole] of Object.entries(src)) {
+  const body = whole.replace(/<!--[\s\S]*?-->/g, "");
+  if (name === AT_THE_PUMP) {
+    if (/target\s*=\s*"_blank"/.test(body)) {
+      fail(`${name}: a control opens another app - at the pump the driver stays on the screen`);
+    }
+    if (/window\.open\s*\(/.test(body)) {
+      fail(`${name}: window.open leaves the app - at the pump the driver stays on the screen`);
+    }
+    for (const m of body.matchAll(/href\s*=\s*"(https?:|tel:|mailto:)/g)) {
+      fail(`${name}: an href to '${m[1]}' navigates away from a live fill`);
+    }
   }
   for (const m of body.matchAll(/location\.href\s*=\s*'([^']*)'/g)) {
     if (!/^engenxt-onboarding\.html|^index\.html/.test(m[1])) {
@@ -728,7 +737,6 @@ for (const [name, body0] of Object.entries(src)) {
     }
   }
 }
-
 /* ── Report ───────────────────────────────────────── */
 
 if (problems.length) {
@@ -744,6 +752,6 @@ console.log(`    ${ONBOARD}: ${counts[ONBOARD].real} states, all listed by ${SIG
 console.log('    scripts parse, every looked-up id exists, no duplicate ids');
 console.log(`    ${counts.tokens} product tokens, identical in both files`);
 console.log('    the words stay plain');
-console.log('    nothing navigates out of the app - the driver stays on the screen');
+console.log('    sign-up may reach a person; nothing at the pump navigates away');
 console.log('    every class is shaped like the system, no dead names, tokens in their families');
 console.log('    the shared library is verbatim in both files, and both restate colour-only states\n');

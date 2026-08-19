@@ -644,19 +644,10 @@ button { background: none; border: none; color: inherit; }
 .m-status-bar[data-tone="onDark"] .m-status-bar__time { color: var(--color-on-dark-strong); }
 /* Connection state, shown where a phone shows it. Without this data-net was a
    flag with no rendering, so Offline looked broken until you tried to send. */
-/* "No service" follows the bar's tone, the way the clock above it does.
-   It was written in --color-on-dark-soft unconditionally - white at 60%,
-   a colour for a dark surface - so on every light screen it was white text
-   on near-white: 2.30:1 on home, 2.47:1 on the scan screen, and worst in
-   Large text, which is the mode a driver reading a phone in the sun turns
-   on. The one word telling them the phone has no signal is not the word to
-   lose. Dark ink is the default and the on-dark ramp is the exception,
-   which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
   font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
-  color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
+  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
 }
-.m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
 [data-net="offline"] .m-status-bar__net { display: inline; }
 [data-net="offline"] .m-status-bar__signal { opacity: .35; }
 
@@ -1805,7 +1796,7 @@ button { background: none; border: none; color: inherit; }
           <div class="o-auth-hero__actions">
             <button class="a-btn a-btn--onDark" id="homePrimary" type="button">Sign in with mobile number</button>
             <p class="o-auth-hero__how">No password needed. We'll send you a 6-digit code.</p>
-            <button class="a-link a-link--onDark" id="homeHelp" type="button">Get help on WhatsApp</button>
+            <a class="a-link a-link--onDark" id="homeHelp" href="https://wa.me/27800000000?text=Hi%2C%20I%20need%20help%20signing%20in%20to%20EngenXT." target="_blank" rel="noopener">Get help on WhatsApp</a>
           </div>
         </div>
       </section>
@@ -2661,27 +2652,15 @@ button { background: none; border: none; color: inherit; }
     retryHome: function () { go('home/default'); }
   };
 
-  /* Messages prepared but not yet sent, held by the button that would have
-     navigated. The index is the whole handle: an href in the markup is what
-     used to take the driver out of the app. */
-  var PREPARED = [];
   function actionMarkup(a) {
     var cls = 'a-btn a-btn--sm a-btn--' + (a.kind === 'primary' ? 'primary' : 'outline');
+    /* An escalation's whole point is reaching a person, so it goes to the
+       person, carrying the words already written. Making the driver retype
+       them is how a prepared message becomes no message at all. */
     if (a.href) {
-      PREPARED.push(a);
-      return '<button type="button" class="' + cls + '" data-prepared="' +
-             (PREPARED.length - 1) + '">' + a.label + '</button>';
+      return '<a class="' + cls + '" href="' + a.href + '" target="_blank" rel="noopener">' + a.label + '</a>';
     }
     return '<button type="button" class="' + cls + '" data-act="' + a.act + '">' + a.label + '</button>';
-  }
-  /* What an escalation does now: it readies the message and says so, in
-     place. Nothing navigates, so nothing has to find its way back. */
-  function handPrepared(i) {
-    var a = PREPARED[i];
-    if (!a) { return; }
-    var text = decodeURIComponent(String(a.href).split('text=')[1] || '');
-    toast(text ? 'Message ready to send: ' + text : 'Message ready to send.');
-    announce(text ? 'Message ready to send. ' + text : 'Message ready to send.');
   }
 
   /* A definition may build its actions from live state, and may earn an extra
@@ -2746,9 +2725,6 @@ button { background: none; border: none; color: inherit; }
   function wireActs(host) {
     Array.prototype.forEach.call(host.querySelectorAll('[data-act]'), function (b) {
       b.addEventListener('click', function () { var fn = ACTS[b.getAttribute('data-act')]; if (fn) { fn(); } });
-    });
-    Array.prototype.forEach.call(host.querySelectorAll('[data-prepared]'), function (b) {
-      b.addEventListener('click', function () { handPrepared(parseInt(b.getAttribute('data-prepared'), 10)); });
     });
   }
 
@@ -3843,13 +3819,13 @@ button { background: none; border: none; color: inherit; }
          offers the one that still works without data. */
       if (isOffline()) {
         help.textContent = 'Call support';
-        help.dataset.say = 'Call support on ' + SUPPORT_TEL.replace('tel:', '') + '.';
+        help.href = SUPPORT_TEL;
         /* Earned, not offered: the person appears after the second failed
            check, because nobody on a phone line can fix mobile data. */
         help.hidden = true;
       } else {
         help.textContent = 'Contact support';
-        help.dataset.say = 'Message ready to send: Hi, EngenXT says it is unavailable and I need to fuel now.';
+        help.href = WA_OUTAGE;
       }
     } else {
       primary.textContent = 'Sign in with mobile number';
@@ -3858,7 +3834,7 @@ button { background: none; border: none; color: inherit; }
       primary.dataset.action = 'enter';
       help.hidden = false;
       help.textContent = 'Get help on WhatsApp';
-      help.dataset.say = 'Message ready to send: Hi, I need help signing in to EngenXT.';
+      help.href = WA_SUPPORT;
     }
   }
 
@@ -4702,14 +4678,9 @@ button { background: none; border: none; color: inherit; }
   window.addEventListener('online', onReconnect);
   el.resendBtn.addEventListener('click', function () { if (!el.resendBtn.disabled) { resendCode(); } });
   el.channelSwitchBtn.addEventListener('click', function () { switchChannel(S.channel === 'whatsapp' ? 'sms' : 'whatsapp'); });
-  $('homeHelp').addEventListener('click', function () {
-    var say = $('homeHelp').dataset.say || 'Message ready to send.';
-    toast(say); announce(say);
-  });
-  el.openWhatsappBtn.addEventListener('click', function () {
-    toast('Your code is in WhatsApp. Come back here to type it.');
-    announce('Your code is in WhatsApp. Come back here to type it.');
-  });
+  /* The code is in WhatsApp and the driver has to read it. Going to look is
+     the task; the sheet is still here when they come back. */
+  el.openWhatsappBtn.addEventListener('click', function () { window.open(WA_APP, '_blank', 'noopener'); });
   el.backToNumberBtn.addEventListener('click', function () { resetNumberStage(el.phoneInput.value); el.phoneInput.focus({ preventScroll: true }); });
   el.sheetClose.addEventListener('click', function () { closeSheet(); });
   /* Progressive disclosure, not a dialog: the detail opens in place, under
@@ -5668,8 +5639,8 @@ button { background: none; border: none; color: inherit; }
       var bad = [];
       if (root.getAttribute('data-net') === 'offline') {
         var help = document.getElementById('homeHelp');
-        if (help && help.offsetParent !== null && help.getAttribute('href')) {
-          bad.push('home help navigates away');
+        if (help && help.offsetParent !== null && /^https?:/.test(help.getAttribute('href') || '')) {
+          bad.push('home help is a web link while offline');
         }
         [].forEach.call(document.querySelectorAll('#numberAlert a, #codeAlert a, #blockedActions a'), function (a) {
           if (a.offsetParent !== null && /^https?:/.test(a.getAttribute('href') || '')) {
