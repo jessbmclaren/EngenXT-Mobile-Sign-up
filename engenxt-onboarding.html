@@ -150,16 +150,6 @@
   --color-scan-2: #16203A;
   --gradient-hero: linear-gradient(175deg, var(--color-hero-1) 0%, var(--color-hero-2) 45%, var(--color-hero-3) 100%);
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  /* The verdict seal, shaded. One light source from above, like every shadow
-     in the scale: the hue lifted toward white at the top, sunk toward black at
-     the base, the flat hue itself holding the middle where the glyph sits, so
-     the mark never reads lighter than the colour it is measured as. */
-  --gradient-seal-clear: linear-gradient(165deg, color-mix(in srgb, var(--color-success) 78%, #fff) 0%, var(--color-success) 55%, color-mix(in srgb, var(--color-success) 82%, #000) 100%);
-  --gradient-seal-block: linear-gradient(165deg, color-mix(in srgb, var(--color-error-text) 80%, #fff) 0%, var(--color-error-text) 55%, color-mix(in srgb, var(--color-error-text) 82%, #000) 100%);
-  --gradient-seal-warn: linear-gradient(165deg, color-mix(in srgb, var(--color-warning) 78%, #fff) 0%, var(--color-warning) 55%, color-mix(in srgb, var(--color-warning) 82%, #000) 100%);
-  /* A band of light crossing a surface. Angle and softness live here so a
-     second surface that ever catches the light catches the same light. */
-  --gradient-sheen: linear-gradient(105deg, transparent 34%, rgba(255,255,255,0.30) 50%, transparent 66%);
 
   /* Focus. Two tone so one ring works on the dark hero and the light sheet. */
   --color-focus:      var(--color-primary-dark);
@@ -233,12 +223,6 @@
   --shadow-sheet-up:  0 -8px 32px rgba(0,0,0,0.10);
   --shadow-brand:     0 4px 16px var(--color-secondary-40);
   --shadow-inspect:   0 8px 32px rgba(0,0,0,0.28);
-  /* The verdict seal's two elevations. A lit disc rather than a flat one: a
-     shadow in the mark's own hue, never grey, and a lit top edge. Paired with
-     --gradient-seal-* below, which shades the same disc. */
-  --shadow-seal-clear: 0 4px 14px var(--color-success-20), inset 0 1px 0 rgba(255,255,255,0.30);
-  --shadow-seal-block: 0 4px 14px var(--color-secondary-25), inset 0 1px 0 rgba(255,255,255,0.30);
-  --shadow-seal-warn:  0 4px 14px var(--color-warning-25), inset 0 1px 0 rgba(255,255,255,0.30);
 
   /* Space. A 4px base with three half steps, because 6, 10 and 18 are
      structural here rather than exceptional, and a scale should be honest. */
@@ -1284,6 +1268,7 @@ body {
 }
 .a-vehicle-chip:active { background: var(--color-border); }
 .a-vehicle-chip__art { display: flex; opacity: 0.75; }
+.a-vehicle-chip__act { display: inline-flex; color: var(--color-text-tertiary); }
 .a-vehicle-chip__plate {
   font-size: var(--text-caption); font-weight: 700; line-height: 1.3;
   font-variant-numeric: tabular-nums; color: var(--color-text-secondary);
@@ -2387,10 +2372,19 @@ body {
 .m-notch, .m-status-bar { z-index: var(--z-tool-top); }
 /* Connection state, shown where a phone shows it. Without this data-net was a
    flag with no rendering, so Offline looked broken until you tried to send. */
+/* "No service" follows the bar's tone, the way the clock above it does.
+   It was written in --color-on-dark-soft unconditionally - white at 60%,
+   a colour for a dark surface - so on every light screen it was white text
+   on near-white: 2.30:1 on home, 2.47:1 on the scan screen, and worst in
+   Large text, which is the mode a driver reading a phone in the sun turns
+   on. The one word telling them the phone has no signal is not the word to
+   lose. Dark ink is the default and the on-dark ramp is the exception,
+   which is the rule every other thing in this bar already follows. */
 .m-status-bar__net {
   font-size: var(--text-caption2); font-weight: 700; letter-spacing: -0.1px;
-  color: var(--color-on-dark-soft); margin-left: var(--sp-2); display: none;
+  color: var(--color-text-secondary); margin-left: var(--sp-2); display: none;
 }
+.m-status-bar[data-tone="onDark"] .m-status-bar__net { color: var(--color-on-dark-soft); }
 [data-net="offline"] .m-status-bar__net { display: inline; }
 [data-net="offline"] .m-status-bar__signal { opacity: .35; }
 .o-onboard--reward { background: var(--gradient-hero); text-align: center; align-items: stretch; }
@@ -2663,46 +2657,31 @@ body {
   font-size: var(--text-display); font-weight: 900; line-height: 1.05;
   letter-spacing: -1px; color: var(--color-text-primary);
 }
-/* Dimensional ink rather than flat: the name shades toward the brand blue at
-   its tail. Both ends stay darker than 12:1 on white, so the gradient costs
-   nothing that was measured.
-
-   Behind the @supports because the fallback has to be real. This said in a
-   comment that `color` would carry any engine that could not clip, and that
-   was simply false: `-webkit-text-fill-color` overrides `color` whether the
-   clipping works or not, so an engine without background-clip would have
-   painted the largest word on the screen in transparent. That is the same
-   silent disappearance this file has already been bitten by twice - the
-   undeclared token that took the reward meter down, and the one that took
-   the tertiary hue with it. A name a driver is standing in front of a pump to
-   read does not get to be the third. */
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .o-check__station {
-    background: linear-gradient(135deg, var(--color-text-primary) 45%,
-                color-mix(in srgb, var(--color-text-primary) 60%, var(--color-primary)) 100%);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-}
+/* Flat ink, like every other headline in this app. It briefly shaded toward
+   the brand blue through background-clip: text, which was the only clipped
+   text in the file and needed an @supports guard of its own to stop an engine
+   that could not clip from painting the largest word on the screen in
+   transparent. A gradient that costs a feature query and can fail to nothing
+   is a lot of machinery for a tint nobody asked for on a name read at arm's
+   length in daylight. */
 .o-check__station:focus, .o-check__station:focus-visible { outline: none; box-shadow: none; }
 .o-check__km { font-size: var(--text-caption); color: var(--color-text-secondary); }
 /* The arrival is a sequence, not a page flip: verdict first because it is the
    answer, then the station it is true of, then everything the answer rests on.
-   The name lands as a focus pull - soft, then sharp - which is the one blur in
-   the file and it is spent on the biggest type. Delays are choreography and
-   state their own times; the reduced-motion rules collapse all of it to a cut. */
+   One movement, used for all of it, because that is how the rest of the app
+   arrives - linkedLand, rewardsIn and detailRise are each a single rise and
+   nothing else. The name briefly landed as a focus pull instead, soft then
+   sharp, which was the only animated blur in the file: a second vocabulary
+   invented for one word. Delays are choreography and state their own times;
+   the reduced-motion rules collapse all of it to a cut. */
 .o-check[data-state="visible"] .m-verdict { animation: checkRise .5s var(--ease-emphasis) both; }
-.o-check[data-state="visible"] .o-check__station { animation: checkFocus .6s var(--ease-emphasis) .06s both; }
+.o-check[data-state="visible"] .o-check__station { animation: checkRise .5s var(--ease-emphasis) .06s both; }
 .o-check[data-state="visible"] .o-check__km { animation: checkRise .5s var(--ease-out) .14s both; }
 .o-check[data-state="visible"] .o-check__why { animation: checkRise .5s var(--ease-out) .18s both; }
 .o-check[data-state="visible"] .o-check__alts { animation: checkRise .5s var(--ease-out) .22s both; }
 .o-check[data-state="visible"] .o-check__facts { animation: checkRise .55s var(--ease-out) .24s both; }
 .o-check[data-state="visible"] .o-check__lead { animation: checkRise .5s var(--ease-out) .30s both; }
 @keyframes checkRise { from { opacity: 0; transform: translateY(12px); } }
-@keyframes checkFocus {
-  from { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(6px); }
-  to   { opacity: 1; transform: none; filter: blur(0); }
-}
 .o-check__alts { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); }
 .o-check__alt {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
@@ -2728,32 +2707,23 @@ body {
   padding: var(--sp-2) var(--sp-5) calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border-light);
 }
-/* Once the fifth answer has landed, a single band of light crosses the
-   primary action: the moment the screen finishes saying yes, the way forward
-   catches it. Choreographed motion, so the delay states its own time - 1.5s
-   is the header sequence plus five rows at paintGate's cadence. Once, ever,
-   per arrival: a sheen that repeats is an advert. Clear verdict only,
-   because on a refusal the primary action is hidden and nothing here has
-   been earned. */
-.o-check[data-verdict="clear"][data-state="visible"] .o-check__action .a-btn--primary {
-  position: relative; overflow: hidden;
-}
-.o-check[data-verdict="clear"][data-state="visible"] .o-check__action .a-btn--primary::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit;
-  background: var(--gradient-sheen);
-  transform: translateX(-110%); pointer-events: none;
-  animation: ctaSheen .9s var(--ease-in-out) 1.5s 1 both;
-}
-@keyframes ctaSheen { to { transform: translateX(110%); } }
+/* A band of light used to cross the primary action once the fifth answer had
+   landed, at 1.5s, running to 2.4s. Two things were wrong with it. The screen
+   already says yes in four places by then, so the sweep was a fifth voice
+   arriving after the driver had finished reading; and a light sweep exists in
+   this file for exactly one purpose, the skeleton's loading shimmer, so
+   putting one on a live button borrowed the vocabulary of "not ready yet" for
+   the one control that was. The button is the brand gradient and the only
+   filled thing on the screen. It does not need help being found. */
 
 /* m-verdict. The answer, said as a word and a shape at once, so the colour is
    never the only thing carrying it.
 
-   The seal of the screen, so it is the one place the flat language gives way
-   to a lit object: the mark carries a top light and a shadow in its own hue,
-   the glyph draws itself rather than appearing, and a halo rings out of it
-   once, after the glyph lands. The halo borrows currentColor, so it is the
-   verdict's hue in both answers without naming either. */
+   The mark is drawn flat, like every other mark in the app. What this screen
+   spends is motion, not material: the glyph draws itself rather than
+   appearing, and a halo rings out of it once, after the glyph lands. The halo
+   borrows currentColor, so it is the verdict's hue in both answers without
+   naming either. */
 .m-verdict {
   display: inline-flex; align-items: center; gap: var(--sp-2);
   padding: var(--sp-1h) var(--sp-3) var(--sp-1h) var(--sp-1h);
@@ -2761,12 +2731,22 @@ body {
   border: 1px solid transparent;
   font-size: var(--text-caption); font-weight: 700;
 }
+/* A flat disc in the verdict's own hue, which is what every mark in this app
+   is: m-linked's tick on home, the fuel screen's tick, the step marks. It was
+   briefly a lit object - a shaded gradient, a coloured drop shadow and an
+   inset highlight - and that was a material this file does not otherwise own.
+   The glyph drawing itself and the ring leaving the edge are motion, and
+   motion is where this screen is allowed its moment; the disc itself goes
+   back to being the same shape home draws. */
 .m-verdict__mark {
   position: relative;
   width: 28px; height: 28px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle);
 }
+/* No `color` here on purpose: the glyph carries its own white stroke from the
+   markup, and currentColor is left inherited from m-verdict so the ring that
+   leaves this disc is the verdict's hue rather than white. */
 /* The glyph waits, drawn in by checkDraw once the screen is visible. 27
    covers the longest path in either mark, and an overrun hides in the gap. */
 .m-verdict__mark path { stroke-dasharray: 27; stroke-dashoffset: 27; }
@@ -2787,16 +2767,12 @@ body {
   background: var(--color-success-bg); color: var(--color-success);
   border-color: var(--color-success-20);
 }
-.o-check[data-verdict="clear"] .m-verdict__mark {
-  background: var(--gradient-seal-clear); box-shadow: var(--shadow-seal-clear);
-}
+.o-check[data-verdict="clear"] .m-verdict__mark { background: var(--color-success); }
 .o-check[data-verdict="block"] .m-verdict {
   background: var(--color-secondary-bg); color: var(--color-error-text);
   border-color: var(--color-secondary-25);
 }
-.o-check[data-verdict="block"] .m-verdict__mark {
-  background: var(--gradient-seal-block); box-shadow: var(--shadow-seal-block);
-}
+.o-check[data-verdict="block"] .m-verdict__mark { background: var(--color-error-text); }
 
 /* The facts ride together on one raised card rather than as hairlines floating
    on the page: what is being authorised is a single object, and an object
@@ -3342,8 +3318,11 @@ body {
   width: 64px; height: 64px; margin-bottom: var(--sp-2);
   display: grid; place-items: center;
   border-radius: var(--radius-circle);
+  /* currentColor is the hue, so the ring that leaves this disc is the warning
+     and the flat fill below is the same one. The glyph carries its own white
+     stroke from the markup. */
   color: var(--color-warning);
-  background: var(--gradient-seal-warn); box-shadow: var(--shadow-seal-warn);
+  background: currentColor;
 }
 .o-filling__mark svg path { stroke-dasharray: 27; stroke-dashoffset: 27; }
 .o-filling[data-face="refused"] .o-filling__mark {
@@ -4242,7 +4221,7 @@ body {
               <span class="m-vehicle-card__note" id="homeVehicleNote">Your next fill goes on this vehicle.</span>
               <span class="m-vehicle-card__change">Change vehicle</span>
             </span>
-            <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+            <span class="m-vehicle-card__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
           </button>
 
           <!-- The card's slot when nothing has been chosen. Same size and the
@@ -4345,6 +4324,9 @@ body {
         <div class="o-step__actions">
           <button class="a-btn a-btn--primary" type="button" id="stepGo"></button>
           <button class="a-btn a-btn--outline" type="button" id="stepAlt" hidden></button>
+          <!-- The same exit as the chevron above, where the thumb already is
+               on a step that raises a keyboard. -->
+          <button class="a-quiet-link" type="button" id="stepBackLow" hidden>Back</button>
           <button class="o-step__tertiary" type="button" id="stepThird" hidden></button>
         </div>
       </section>
@@ -4767,7 +4749,7 @@ body {
     scanLine: $('scanLine'),
     scanShutter: $('scanShutter'), scanShutterLabel: $('scanShutterLabel'),
     scanType: $('scanType'), scanRetry: $('scanRetry'),
-    scanClose: $('scanClose'), scanTorch: $('scanTorch'),
+    scanClose: $('scanClose'), scanTorch: $('scanTorch'), stepBackLow: $('stepBackLow'),
     step: $('stepScreen'), stepMark: $('stepMark'), stepTitle: $('stepTitle'),
     stepBody: $('stepBody'), stepGroup: $('stepGroup'), stepGo: $('stepGo'),
     stepAlt: $('stepAlt'), stepThird: $('stepThird'), stepBack: $('stepBack'),
@@ -5506,6 +5488,10 @@ body {
 
      The label says the whole of it out loud, because "CA 118-402, button" would
      promise a selection this cannot make. */
+  var CHIP_CAMERA = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>' +
+    '<circle cx="12" cy="13" r="3"/></svg>';
   function vehicleChip(v) {
     return '<li>' +
            '<button type="button" class="a-vehicle-chip" data-chip ' +
@@ -5513,6 +5499,10 @@ body {
            '<span class="a-vehicle-chip__art">' +
            vehicleArt(v.type, 14, 'currentColor') + '</span>' +
            '<span class="a-vehicle-chip__plate">' + v.plate + '</span>' +
+           /* The chips are not a picker: pressing any of them opens the
+              camera, because only a scan can link a vehicle. The glyph says
+              so before the tap rather than after it. */
+           '<span class="a-vehicle-chip__act" aria-hidden="true">' + CHIP_CAMERA + '</span>' +
            '</button></li>';
   }
 
@@ -6513,6 +6503,9 @@ body {
 
        Every step is entered from home, so back always means home. */
     el.stepBack.hidden = false;
+    /* Only where a keyboard will cover the top of the screen. Everywhere
+       else the chevron is reachable and a second exit is clutter. */
+    el.stepBackLow.hidden = key !== 'odometer';
     el.stepGo.textContent = def.go;
     el.stepGo.onclick = def.onGo;
     el.stepAlt.hidden = !def.alt;
@@ -8158,6 +8151,7 @@ body {
   el.homeVehicleEmpty.addEventListener('click', function () {
     showStep('vehicle');
   });
+  el.stepBackLow.addEventListener('click', function () { el.stepBack.click(); });
   el.stepBack.addEventListener('click', function () {
     var back = stepBackTo;
     stepBackTo = null; afterAccount = null;
