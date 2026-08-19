@@ -193,7 +193,30 @@ const ratio = (a, b) => {
       checked++;
       const notes = [];
 
-      /* The clock, sampled from the pixels actually rendered behind it. */
+      /* The clock, sampled from the pixels actually rendered behind it.
+
+         The bar's own contents are hidden for the shot, and the sample is
+         taken at the clock's own centre rather than at a fixed x.
+
+         Both corrections are the same bug. The bar lays its three children out
+         space-between, so the middle slot - empty on almost every screen - is
+         the "No service" label on the two offline ones, and it centres at very
+         nearly x=200. The old sample read that label's glyphs and called them
+         the background, so it measured the clock against text and reported
+         home/offline at 2.30:1 and flow1-scan-offline at 2.47:1. Neither
+         screen had a fault: both draw a white clock on the near-black scan
+         and page surfaces, which is about 15:1. The check invented them, and
+         it only failed in Large text because a bigger clock moves the sample
+         row far enough to catch a different part of the same glyphs.
+
+         visibility, not display: the layout does not move, so the clock's box
+         is still exactly where it was and what is behind it is all that is
+         left to photograph. */
+      await send('Runtime.evaluate', { expression: `(() => {
+        const s = document.createElement('style'); s.id = '__sweepBar';
+        s.textContent = '.m-status-bar > * { visibility: hidden !important; }';
+        document.head.appendChild(s);
+      })()` });
       const shot = await send('Page.captureScreenshot', { format: 'png' });
       const sampled = await send('Runtime.evaluate', {
         awaitPromise: true, returnByValue: true,
@@ -205,9 +228,12 @@ const ratio = (a, b) => {
           const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
           const g = c.getContext('2d'); g.drawImage(img, 0, 0);
           const r = tm.getBoundingClientRect(); const dpr = img.width / 390;
-          const px = g.getImageData(Math.round(200 * dpr), Math.round((r.top + r.height / 2) * dpr), 1, 1).data;
+          const px = g.getImageData(Math.round((r.left + r.width / 2) * dpr),
+                                    Math.round((r.top + r.height / 2) * dpr), 1, 1).data;
           return JSON.stringify({ colour: getComputedStyle(tm).color, bg: [px[0], px[1], px[2]] });
         })()` });
+      await send('Runtime.evaluate', {
+        expression: `(() => { const s = document.getElementById('__sweepBar'); if (s) { s.remove(); } })()` });
       if (sampled.result.value !== 'none') {
         const o = JSON.parse(sampled.result.value);
         const m = o.colour.match(/[\d.]+/g).map(Number);
