@@ -731,17 +731,36 @@ button { background: none; border: none; color: inherit; }
 /* The masked number is one token. Breaking it across two lines turns a
    number the driver is checking against their handset into two fragments. */
 .m-sheet-header__sub b { color: var(--color-text-primary); font-weight: 700; white-space: nowrap; }
-/* The negative margin pulls a 48px target back to the visual box without
-   pushing the header down. */
+/* The glyph used to be shoved to the trailing edge of a 48px box, so that it
+   would land on the same gutter the title starts from. It did land there, and
+   it cost the thing the button actually is: the box is round and it lights up
+   on hover and on focus, and the cross sat jammed against the right of that
+   circle with ten pixels of empty space behind it. A control whose highlight
+   is visibly not centred on its own mark reads as broken, on every sheet in
+   the flow.
+
+   The circle is drawn at the size the mark deserves and the mark sits in the
+   middle of it, where it belongs. The circle's own edge now holds the gutter,
+   which is the alignment a reader actually sees. The 48px a thumb is owed is
+   drawn out from it below rather than by inflating what is visible - the same
+   trick the map pins and the vehicle chips already use.
+
+   It also sits flush with the top of the sheet's scroller, which clips on the
+   cross axis. A negative top margin used to lift it four pixels into that
+   clip: invisible while the button had no fill of its own, and a flat-topped
+   circle the moment it did. It is not lifted any more, and nothing it draws
+   or listens on reaches above the scroller's edge. */
 .m-sheet-header__close {
-  flex-shrink: 0;
-  width: var(--size-target); height: var(--size-target);
-  margin-top: calc(var(--sp-1) * -1);
-  /* The glyph is pushed to the button's trailing edge so it lands on the same
-     gutter the title starts from, which a centred 48px box would miss by 16px.
-     No negative margin, so the header can never overflow the sheet. */
-  display: flex; align-items: center; justify-content: flex-end;
+  position: relative; flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
   border-radius: var(--radius-circle); cursor: pointer;
+}
+/* 36 + 12 = the 48 the tap floor asks for, taken downward and sideways only.
+   A clipped region is not pressable either, so a target that reached above
+   the scroller would have been a target the top of which nothing could tap. */
+.m-sheet-header__close::after {
+  content: ''; position: absolute; inset: 0 -6px -12px -6px;
 }
 .m-sheet-header__close:hover { background: var(--color-border-light); }
 
@@ -918,11 +937,21 @@ button { background: none; border: none; color: inherit; }
 .o-status-page__meta {
   display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4);
   /* Centred as a pair. The row sat on the left edge of cards whose every
-     other line is centred - the one left-handed thing on the screen. Each
-     figure keeps its own left-aligned key-over-value stack, which is how a
-     label and its number read; only the pair takes the centre. */
+     other line is centred - the one left-handed thing on the screen. */
   justify-content: center;
 }
+/* And centred inside each figure too, which the row above stopped half way
+   short of. A key-over-value stack is left-aligned so that a COLUMN of them
+   shares one edge to read down. There is no column here: three figures stand
+   side by side on a panel that centres everything else, each its own island
+   with no neighbour above or below to line up with. So the left edge buys
+   nothing, and it costs the obvious thing - DOWNLOAD SIZE is twice the width
+   of 42 MB, so the number sits off under one end of its own label.
+
+   Scoped to this row on purpose. The same atom sits in the home notice on the
+   dark hero, in a block whose every line is left-aligned, and it is right to
+   stay left-aligned there. */
+.o-status-page__meta .m-figure { align-items: center; text-align: center; }
 .m-figure { display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .m-figure__key {
   font-size: var(--text-nano); font-weight: 700; letter-spacing: 0.12em;
@@ -4378,6 +4407,8 @@ button { background: none; border: none; color: inherit; }
         ['fuel-stations-searched', 'Station search, no match'],
         ['fuel-check', 'Check before the code'],
         ['fuel-odometer', 'The odometer'],
+        ['fuel-odometer-empty', 'Odometer, nothing typed'],
+        ['fuel-odometer-low', 'Odometer, below the last fill'],
         ['fuel-check-blocked', 'Check, station refused'],
         ['fuel-check-no-account', 'Check, account on hold'],
         ['fuel-check-hours', 'Check, outside hours'],

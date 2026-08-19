@@ -17,7 +17,7 @@ anywhere.
 
 ## What it covers
 
-102 states, not just the happy path: 43 in sign-up and 59 in the app. Drivers
+104 states, not just the happy path: 43 in sign-up and 61 in the app. Drivers
 are registered by their company, so a number the system does not hold is a
 routine outcome rather than an edge case, and it has a designed state that
 tells the driver what to do about it.

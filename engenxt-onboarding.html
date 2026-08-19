@@ -1682,6 +1682,25 @@ body {
   border-radius: var(--radius-card-sm);
 }
 .o-step__field:focus { outline: none; border-color: var(--color-primary); }
+/* The sentence a driver can return to. A toast says a thing once and takes it
+   away again, which is the wrong shape for an answer the driver has to act on
+   while looking at a dashboard. This one stays under the field until the
+   number changes. The glyph rides with it, because tone is never colour
+   alone. */
+.o-step__err {
+  display: flex; align-items: flex-start; gap: var(--sp-1);
+  font-size: var(--text-caption2); line-height: 1.5; font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.o-step__err svg { flex-shrink: 0; margin-top: 2px; }
+.o-step__err[data-tone="error"]   { color: var(--color-error-text); }
+.o-step__err[data-tone="warning"] { color: var(--color-warning); }
+/* Only when the value itself is at fault. A reading that is merely lower than
+   the last one may well be right - a replaced cluster reads from zero - so
+   that case leaves the field alone and argues in words instead. */
+.o-step__field[data-state="error"] {
+  border-color: var(--color-error-text); background: var(--color-secondary-bg);
+}
 .o-step__group { display: flex; flex-direction: column; gap: var(--sp-3); }
 /* One column, always. Side by side at 320dp is two cramped buttons and a
    wrapped label on each. */
@@ -3344,8 +3363,13 @@ body {
 /* A word, not a full-width bar: the way out is quiet and cornered, sized
    to its own label plus the tap floor. */
 .o-filling__hideWrap { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-1); }
-.o-filling__hide { width: auto; min-width: var(--size-target); padding-inline: var(--sp-5); }
-.o-filling__hideNote { font-size: var(--text-caption2); color: var(--color-text-secondary); }
+/* The note reads as a line of prose, not as a caption hanging off a 48px
+   circle, so it is allowed to run wider than the control above it and to
+   set its own right edge against the screen rather than against the cross. */
+.o-filling__hideNote {
+  font-size: var(--text-caption2); color: var(--color-text-secondary);
+  max-width: 24ch; text-align: right;
+}
 /* True centre on every face. margin-top alone let the cluster fall to the
    bottom the moment the note hid: the completion huddled over the button
    under a screen of nothing. Both margins auto, and the tail - note or
@@ -3522,6 +3546,9 @@ body {
   /* Sent and short bundles keep their words; the pressable one was told
      apart by a filled pill, so the row states it with a border. */
   .m-bundle[data-state="can"] { border-width: 2px; }
+  /* The refused reading was a red border and a pink fill, and forced colours
+     take both. The sentence under the field survives on its own words. */
+  .o-step__field[data-state="error"] { outline: 2px dashed; outline-offset: 2px; }
 }
 
 
@@ -3938,7 +3965,7 @@ body {
           </div>
           <div class="o-receipt__row">
             <span class="o-receipt__label">Kilometre reading</span>
-            <span class="o-receipt__value" id="receiptOdo">84 230 km</span>
+            <span class="o-receipt__value" id="receiptOdo">84 230 km<small class="o-receipt__sub" id="receiptOdoNote" hidden></small></span>
           </div>
           <div class="o-receipt__row">
             <span class="o-receipt__label">Reference</span>
@@ -4051,12 +4078,20 @@ body {
            here. -->
       <section class="o-filling" id="fillingScreen" aria-labelledby="fillingFacts" hidden>
         <div class="o-filling__bar">
-<!-- Words, not an icon: during live fuelling an X reads as "stop the
-               fill", and the one thing this button must never seem to do is
-               that. It hides the screen; the fill carries on, and the note
-               and the live bar both say so. -->
+<!-- A cross, at the owner's call, and the words did not go far.
+               This was a worded pill because during live fuelling an X can
+               read as "stop the fill", and that is the one thing this control
+               must never seem to do. What keeps that true now is not this
+               button's label but its neighbours: the note directly under it
+               says fuelling continues, the same exit spells itself out in
+               words at the bottom of the screen where a thumb reaches it
+               mid-fill, and the accessible name here is still the sentence.
+               Nothing that a screen reader or a hesitating driver relies on
+               was in the visible label alone. -->
           <div class="o-filling__hideWrap">
-            <button class="a-btn a-btn--outline a-btn--sm o-filling__hide" type="button" id="fillingClose">Close live view</button>
+            <button class="a-icon-btn" type="button" id="fillingClose" aria-label="Close live view">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
             <span class="o-filling__hideNote" id="fillingHideNote">Fuelling will continue if you close this screen.</span>
           </div>
         </div>
@@ -4703,7 +4738,8 @@ body {
     receiptStation: $('receiptStation'), receiptVehicle: $('receiptVehicle'),
     receiptModel: $('receiptModel'), receiptLitres: $('receiptLitres'),
     receiptPoints: $('receiptPoints'), receiptBalance: $('receiptBalance'),
-    receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptDone: $('receiptDone'), receiptSend: $('receiptSend'),
+    receiptRef: $('receiptRef'), receiptOdo: $('receiptOdo'), receiptOdoNote: $('receiptOdoNote'),
+    receiptDone: $('receiptDone'), receiptSend: $('receiptSend'),
     rewards: $('rewardsScreen'), rewardsTitle: $('rewardsTitle'),
     rewardsPoints: $('rewardsPoints'), rewardsWorth: $('rewardsWorth'),
     rewardsList: $('rewardsList'), rewardsBack: $('rewardsBack'),
@@ -5969,6 +6005,81 @@ body {
     return i;
   }
 
+  /* ── The kilometre reading, and the two ways it can be wrong ──────────
+     Two, and they are different in kind.
+
+     Nothing typed is a block. There is no number to file, and no controller
+     can put one back later. Letting it through would not record a gap, it
+     would let the fallback below write 84 230 km onto the receipt and onto
+     the slip a fleet audit reads, as though the driver had said so.
+
+     A reading that does not move forward from this driver's last fill on this
+     vehicle is a warning and never a block. Odometers do not run backwards;
+     this record does. A replaced instrument cluster reads from zero, a fill
+     gets filed against the wrong van, and - the one that settles it - the
+     PREVIOUS reading may be the typo. A rule that blocked would lock a
+     vehicle out of fuelling over a data error the driver did not make and
+     cannot reach, at a pump, with a queue behind them. So it names the number
+     it disagrees with, takes one deliberate second press, and marks the slip
+     so the disagreement is on the record rather than in the driver's way. */
+  var odoSeed = '';      /* the digits build() wrote: the app never judges its own prefill */
+  var odoPending = '';   /* the reading a warning named, held until the driver presses again */
+
+  var ICON_ALERT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+
+  /* The dashboard's tenths are not kilometres. Stripping every separator
+     turns 84 230,5 into 842 305 - ten times the distance, filed as fact on a
+     slip nobody reads back. Exactly three digits after a separator is how
+     this country groups thousands, so those stay; one or two are the trip
+     meter, and they go. Everything else is still stripped without comment:
+     the field is prefilled with a space in it, the dashboard says km, and
+     scolding a driver for typing back what the screen showed them buys
+     nothing. */
+  function odoDigits(value) {
+    return String(value == null ? '' : value)
+      .replace(/[.,](\d{1,2})(?!\d)/g, '')
+      .replace(/[^0-9]/g, '');
+  }
+
+  /* This driver's own last filed slip for this vehicle. S.receipts is newest
+     first, so the first plate match is the last reading. Empty when this
+     driver has never filled this vehicle, which is the common case, and every
+     comparison below goes quiet on it rather than announcing that it could
+     not check. */
+  function lastOdoFor(plate) {
+    if (!plate) { return ''; }
+    for (var i = 0; i < S.receipts.length; i += 1) {
+      if (S.receipts[i].plate === plate) { return S.receipts[i].odo || ''; }
+    }
+    return '';
+  }
+
+  /* One sentence under the field, which is the thing a toast could never be:
+     a toast fades, and a driver who has looked away at the dashboard and back
+     has nothing to return to. */
+  function setStepErr(msg, tone, atFault) {
+    var err = el.stepGroup.querySelector('.o-step__err');
+    var field = el.stepGroup.querySelector('.o-step__field');
+    if (!err) { return; }
+    err.innerHTML = ICON_ALERT + msg;
+    err.setAttribute('data-tone', tone);
+    err.hidden = false;
+    if (field && atFault) {
+      field.setAttribute('data-state', 'error');
+      field.setAttribute('aria-invalid', 'true');
+    }
+  }
+  /* Every part goes together - the colour, the aria, the sentence and the
+     armed second press - because half a cleared error is a lie. */
+  function clearStepErr() {
+    var err = el.stepGroup.querySelector('.o-step__err');
+    var field = el.stepGroup.querySelector('.o-step__field');
+    odoPending = '';
+    if (err) { err.hidden = true; err.innerHTML = ''; err.removeAttribute('data-tone'); }
+    if (field) { field.removeAttribute('data-state'); field.removeAttribute('aria-invalid'); }
+    if (S.step === 'step:odometer') { el.stepGo.textContent = STEPS.odometer.go; }
+  }
+
   var STEPS = {
     /* Only when something has changed: a new phone, an expired session, a
        different number, a manually typed registration, or a code about to be
@@ -5989,16 +6100,52 @@ body {
       body: 'Find this number on the dashboard. Next: your fuel code.',
       go: 'Continue',
       build: function (host) {
+        var seed = S.odoReading || '84 230';
+        odoSeed = odoDigits(seed);
         host.innerHTML =
           '<input class="o-step__field" type="text" inputmode="numeric" enterkeyhint="done"' +
-          ' value="' + (S.odoReading || '84 230') + '"' +
-          ' aria-label="Kilometre reading, from the dashboard">';
+          ' value="' + seed + '"' +
+          ' aria-describedby="stepErr"' +
+          ' aria-label="Kilometre reading, from the dashboard">' +
+          '<p class="o-step__err" id="stepErr" hidden></p>';
       },
       onGo: function () {
         var field = el.stepGroup.querySelector('.o-step__field');
-        var raw = (field && field.value ? field.value : '').replace(/[^0-9]/g, '');
-        if (!raw) { reply('Type the km number first.'); if (field) { field.focus(); } return; }
+        var raw = odoDigits(field && field.value ? field.value : '');
+        if (!raw) {
+          setStepErr('Type the km number first.', 'error', true);
+          announce('Type the km number first.');
+          if (field) { field.focus({ preventScroll: true }); }
+          return;
+        }
+        var v = activeVehicle();
+        var last = v ? lastOdoFor(v.plate) : '';
+        var lastNum = last ? parseInt(odoDigits(last), 10) : NaN;
+        /* Never about the value the app itself prefilled. The field is seeded
+           with the reading this driver filed last time, so on a second fill of
+           the same vehicle an untouched field is identical to the slip it
+           would be measured against. A warning nobody typed is the fastest way
+           to teach a driver to press past the one that matters. */
+        if (raw !== odoSeed && last && !isNaN(lastNum) && parseInt(raw, 10) <= lastNum) {
+          if (odoPending !== last) {
+            odoPending = last;
+            setStepErr('Your last fill on ' + v.plate + ' was at ' + last +
+                       '. Check the dashboard again.', 'warning', false);
+            announce('Your last fill on ' + v.plate + ' was at ' +
+                     last.replace(/ km$/, ' kilometres') +
+                     '. Check the dashboard again. Press Use this reading to carry on.');
+            el.stepGo.textContent = 'Use this reading';
+            return;
+          }
+          /* Pressed a second time on the same number. Recording the exception
+             is the whole reason this does not block: a warning that leaves no
+             trace on the slip bought nothing. */
+          S.odoLast = last;
+        } else {
+          S.odoLast = '';
+        }
         S.odoReading = groupNum(parseInt(raw, 10));
+        clearStepErr();
         hideStep();
         authoriseFill();
       }
@@ -6495,6 +6642,10 @@ body {
     }
     el.stepGroup.innerHTML = '';
     el.stepGroup.removeAttribute('role');
+    /* The group is already wiped, so this is for the state that outlives the
+       nodes: the armed second press and the button's borrowed label. A screen
+       re-entered must never still be holding a driver's last mistake. */
+    clearStepErr();
     if (def.build) { def.build(el.stepGroup); }
     /* The way out. This button has been in the markup since the step screen was
        written, hidden and wired to nothing, so every step was a closed loop: the
@@ -7104,6 +7255,9 @@ body {
        which van the fuel went into. A fleet audit reads the receipt. */
     S.fillVehicle = activeVehicle() || null;
     S.fillOdo = S.odoReading || '84 230';
+    /* The disagreement belongs to the fill it was raised against, so it is
+       snapshotted with the rest of it rather than read live off S later. */
+    S.fillOdoLast = S.odoLast || '';
     S.fillFault = null;
     S.fuelExpiryLeft = FUEL_CODE_SECS;
     stopAuthorise();
@@ -7239,7 +7393,14 @@ body {
     el.receiptPoints.textContent = '+' + fillPts() + ' pts';
     el.receiptBalance.textContent = groupNum(balancePts()) + ' pts';
     el.receiptRef.textContent = fuelDigitsShown(fuelRef());
-    el.receiptOdo.textContent = (S.fillOdo || S.odoReading || '84 230') + ' km';
+    /* firstChild, not textContent: the note below it is a child of this same
+       value, and rewriting the whole node would take the note with it. */
+    el.receiptOdo.firstChild.textContent = (S.fillOdo || S.odoReading || '84 230') + ' km';
+    /* A reading the app argued with says so on the slip, quietly and once.
+       This is the only trace the warning leaves, and it is the reason the
+       warning is allowed not to block. */
+    el.receiptOdoNote.textContent = S.fillOdoLast ? 'last fill was ' + S.fillOdoLast : '';
+    el.receiptOdoNote.hidden = !S.fillOdoLast;
     el.receipt.hidden = false;
     el.receipt.setAttribute('data-state', 'visible');
     announce('Receipt. ' + FILL_LITRES + ' litres at ' + stationName() + '. ' +
@@ -7432,6 +7593,7 @@ body {
       litres: fillLitresFinal(),
       pts: fillPts(),
       odo: (S.fillOdo || S.odoReading || '84 230') + ' km',
+      odoLast: S.fillOdoLast || '',
       ref: fuelDigitsShown(fuelRef())
     });
     S.fuel = 'idle';
@@ -7488,7 +7650,8 @@ body {
         '<div class="o-receipt__row" data-tone="success">' +
           '<span class="o-receipt__label">Points earned</span>' +
           '<span class="o-receipt__value">+' + r.pts + ' pts</span></div>' +
-        row('Kilometre reading', r.odo || '') +
+        row('Kilometre reading', (r.odo || '') +
+            (r.odoLast ? '<small class="o-receipt__sub">last fill was ' + r.odoLast + '</small>' : '')) +
         row('Reference', r.ref) +
         '</div>';
       function row(label, value) {
@@ -7883,6 +8046,12 @@ body {
     if (!e.target.classList || !e.target.classList.contains('o-step__field')) { return; }
     e.preventDefault();
     el.stepGo.click();
+  });
+  /* A changed number is a new answer, so the old one stops being shown and the
+     armed second press disarms. Same container, same reason as above. */
+  el.stepGroup.addEventListener('input', function (e) {
+    if (!e.target.classList || !e.target.classList.contains('o-step__field')) { return; }
+    clearStepErr();
   });
   el.scanPlateGo.addEventListener('click', function () {
     var typed = plateNorm(el.scanPlateInput.value);
@@ -8373,6 +8542,9 @@ body {
     S.fillVehicle = null;
     S.fillOdo = '';
     S.odoReading = '';
+    S.odoLast = '';
+    S.fillOdoLast = '';
+    odoPending = '';
     S.fillBanked = false;
     S.bankedPts = 0;
     S.receipts = userType === 'returning-driver' ? PAST_RECEIPTS.slice() : [];
@@ -8612,6 +8784,33 @@ body {
         afterAccount = function () { showStep('odometer'); };
         stepBackTo = function () { showCheck(S.checking, true); };
         showStep('odometer'); clearTimers();
+      } },
+    /* The two ways the reading can be wrong, each reachable on its own. The
+       press is made through onGo rather than through the button, because the
+       tap guard swallows clicks for a moment after a screen arrives and the
+       state would open on a screen that had quietly done nothing. */
+    'fuel-odometer-empty': { group: 'fuelling', label: 'Odometer, nothing typed',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
+        afterAccount = function () { showStep('odometer'); };
+        stepBackTo = function () { showCheck(S.checking, true); };
+        showStep('odometer'); clearTimers();
+        el.stepGroup.querySelector('.o-step__field').value = '';
+        STEPS.odometer.onGo();
+      } },
+    /* CA 123-456 last filed 61 220 km, so 61 000 is a reading that does not
+       move forward. Warned, never refused: the press that carries on is on
+       the button, and the slip records that it was taken. */
+    'fuel-odometer-low': { group: 'fuelling', label: 'Odometer, below the last fill',
+      run: function () {
+        reset('returning-driver', true, 1); confirmByScan(readDisc());
+        S.station = 'bryanston'; S.checking = 'bryanston'; showHome(); clearTimers();
+        afterAccount = function () { showStep('odometer'); };
+        stepBackTo = function () { showCheck(S.checking, true); };
+        showStep('odometer'); clearTimers();
+        el.stepGroup.querySelector('.o-step__field').value = '61 000';
+        STEPS.odometer.onGo();
       } },
     'fuel-confirm-you': { group: 'fuelling', label: 'Confirm it is you',
       /* The same screen as step 1, standing in front of a fill rather than
