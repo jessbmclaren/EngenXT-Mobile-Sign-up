@@ -1518,55 +1518,13 @@ textarea.field {
 .form-field.invalid .field { border-color: var(--color-error); }
 
 select.field { appearance: none; background-image: none; }
+/* The error summary that used to live here is gone. It listed the field
+ * names as one wrapping sentence separated by middots, under the heading
+ * "Complete the required details" — a shape the component no longer has. It
+ * is .error-summary now: a real list, one fault per row, each saying what the
+ * field itself says. The class was also claimed by two components at once,
+ * which is how the import review came to paint the form. */
 
-/* ── Error summary ────────────────────────────────────────────────────────── */
-
-.summary {
-  background: var(--color-danger-container);
-  color: var(--color-on-danger-container);
-  border: var(--size-border-hairline) solid var(--color-error);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2-0);
-  margin-bottom: var(--space-3-0);
-}
-
-.summary h3 {
-  margin: 0 0 var(--space-1-0);
-  font-size: var(--font-size-heading-sm);
-  display: flex;
-  gap: var(--space-1-0);
-  align-items: center;
-}
-
-.summary ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-0-5) var(--space-1-0);
-  font-size: var(--font-size-body-sm);
-}
-
-/* A middot between routes, not a bullet: the list is one sentence of links,
-   and it wraps mid-sentence rather than becoming a column of items. */
-.summary li:not(:last-child)::after {
-  content: "·";
-  margin-left: var(--space-1-0);
-  color: var(--color-on-danger-container);
-}
-
-/* These are the way out of a blocked form, so they are sized to be hit rather
-   than only read. */
-.summary a {
-  display: inline-block;
-  padding: var(--space-0-5) 0;
-  color: var(--color-brand-ink);
-  text-decoration: none;
-  font-weight: var(--font-weight-label-md);
-}
-
-.summary a:hover, .summary a:focus-visible { text-decoration: underline; }
 
 /* ── Make: create inside the list ─────────────────────────────────────────
  * The pattern Notion, Linear and Airtable use for "pick one, or make a new
@@ -1670,7 +1628,7 @@ select.field { appearance: none; background-image: none; }
 .form-field .advice,
 .form-field .notice,
 .form-field .consequence,
-.summary {
+.error-summary {
   animation: answer var(--duration-fast) var(--ease-standard);
 }
 
@@ -2736,7 +2694,9 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
  * Compact, and made of links. Its job is to get somebody to the field, so the
  * fastest version of it is the right one.
  */
-.summary {
+/* Named for what it is, because .summary was claimed by the import review as
+   well and the two were painting each other. */
+.error-summary {
   border-left: 3px solid var(--color-error);
   border-radius: 0 var(--radius-control) var(--radius-control) 0;
   padding: var(--space-1-5) var(--space-2-0);
@@ -2744,23 +2704,23 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 }
 /* The ring goes on the rule, not around the block: focus has to be visible
    without the summary growing a second outline the width of the sheet. */
-.summary:focus { outline: none; border-left-color: var(--color-brand-ink); box-shadow: none; }
-.summary:focus-visible { outline: 2px solid var(--color-brand-ink); outline-offset: 2px; }
-.summary h3 {
+.error-summary:focus { outline: none; border-left-color: var(--color-brand-ink); box-shadow: none; }
+.error-summary:focus-visible { outline: 2px solid var(--color-brand-ink); outline-offset: 2px; }
+.error-summary h3 {
   margin: 0 0 var(--space-0-5);
   font-size: var(--font-size-label-md);
   font-weight: var(--font-weight-label-md);
   color: var(--color-error);
 }
-.summary ul {
+.error-summary ul {
   margin: 0;
   padding-left: var(--space-2-0);
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-.summary li { font-size: var(--font-size-body-sm); line-height: 1.45; }
-.summary a { color: var(--color-error); }
+.error-summary li { font-size: var(--font-size-body-sm); line-height: 1.45; }
+.error-summary a { color: var(--color-error); }
 
 /* Inside a sheet the unit wrapper fills its grid cell: the column is already
    the constraint, and a second cap inside it left the suffix stranded. */
@@ -4167,6 +4127,20 @@ body.status-dialog-open .scrim { display: block; }
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
+}
+
+/* The default, so a control added tomorrow is already covered. An allow-list
+   of class names is a list somebody has to remember to join, and the one that
+   forgot was the close button on the product's main working surface. */
+:where(a[href], button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--size-focus-ring-width, 2px) solid var(--color-brand-ink);
+  outline-offset: 2px;
+}
+
+.result-count {
+  margin: var(--space-1-5) 0 0;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
 }
 
 .status-derived {
@@ -6417,9 +6391,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <h2 class="spec-h">Error summary</h2>
         <p class="spec-note">A route, not a second count. One link per blocked field, and the number is said once, in the footer.</p>
-        <div class="summary" style="max-width:440px">
-          <h2>&#9888; Complete the required details</h2>
-          <ul><li><a href="#molecules">Registration</a></li><li><a href="#molecules">Make</a></li><li><a href="#molecules">Model</a></li></ul>
+        <!-- The real component, so the specimen cannot show a shape the
+             product no longer has. -->
+        <div class="error-summary" style="max-width:440px">
+          <h3>Check 3 fields</h3>
+          <ul><li><a href="#molecules">Enter the VIN</a></li><li><a href="#molecules">Choose a make</a></li><li><a href="#molecules">Enter or choose a model</a></li></ul>
         </div>
         <div id="molecules-doc"></div>
 
@@ -7937,6 +7913,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
               <div class="pop hidden" data-role="cols-pop" role="dialog" aria-label="Choose columns"></div>
             </div>
           </div>
+          <!-- How many rows are left, beside the controls that decide it. The only
+               count used to live inside the Filter panel, which is shut while
+               somebody is looking at the result. Announced politely, because it
+               changes on every keystroke in the search box. -->
+          <p class="result-count" data-role="result-count" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
 
         <div class="chips hidden" data-role="chips"></div>
@@ -8124,6 +8105,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
               <div class="pop hidden" data-role="cols-pop" role="dialog" aria-label="Choose columns"></div>
             </div>
           </div>
+          <!-- How many rows are left, beside the controls that decide it. The only
+               count used to live inside the Filter panel, which is shut while
+               somebody is looking at the result. Announced politely, because it
+               changes on every keystroke in the search box. -->
+          <p class="result-count" data-role="result-count" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
 
         <div class="chips hidden" data-role="chips"></div>
@@ -8831,7 +8817,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          still filling the form in. It is a list of links, so a keyboard reaches
          the field it names in one step, and it is deliberately small: red is
          here to help a correction, not to redecorate the sheet. -->
-    <div class="summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
+    <div class="error-summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
       <h3 data-role="summary-heading">There is a problem</h3>
       <ul data-role="summary-list"></ul>
     </div>
@@ -9111,7 +9097,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          still filling the form in. It is a list of links, so a keyboard reaches
          the field it names in one step, and it is deliberately small: red is
          here to help a correction, not to redecorate the sheet. -->
-    <div class="summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
+    <div class="error-summary hidden" data-role="summary" tabindex="-1" role="alert" aria-live="polite">
       <h3 data-role="summary-heading">There is a problem</h3>
       <ul data-role="summary-list"></ul>
     </div>
@@ -10071,6 +10057,9 @@ function directory(spec) {
    * sorting cannot quietly move a tick from one driver to another. */
   const selected = new Set();
   const bulkBar = part('bulk');
+  /* Announced politely: it changes on every keystroke in the search box, and
+     an assertive region would talk over the typing. */
+  const resultCount = part('result-count');
   const searchBox = part('search');
   let query = '';
 
@@ -10279,11 +10268,28 @@ function directory(spec) {
       arrow.textContent = active ? (sort.dir === 1 ? '\u2191' : '\u2193') : '';
     });
 
+    /* Counted from what is on screen rather than from the filters that were
+       ticked: search, tab and facets all narrow the list, and a count that
+       knows about one of the three is worse than none. */
+    if (resultCount) {
+      const total = spec.data.length;
+      resultCount.textContent = rows.length === total
+        ? `${total} ${spec.noun}`
+        : `Showing ${rows.length} of ${total} ${spec.noun}`;
+    }
+
     if (spec.bulk) paintBulk(rows);
 
     /* The trigger says how many, as a number. A colour change alone leaves a
        filtered table looking like an unfiltered one to anybody who does not
        separate the two blues, and leaves everybody guessing how many. */
+    /* A facet's label function, so anything that prints a chosen value prints
+       what the filter panel called it. The chips were showing "rigid_truck"
+       where the panel had offered "Rigid truck". */
+    const facetLabel = (key, value) => {
+      const f = spec.facets.find(x => x[1] === key);
+      return (f && f[4]) ? f[4](value) : value;
+    };
     const active = Object.values(chosen).reduce((n, s) => n + s.size, 0);
     if (filterCount) filterCount.textContent = active || '';
     filterBtn?.classList.toggle('is-on', active > 0);
@@ -10295,16 +10301,27 @@ function directory(spec) {
     if (clearBtn) clearBtn.hidden = active === 0;
     const summary = filterPop?.querySelector('[data-role="filter-summary"]');
     if (summary) {
-      summary.textContent = active
-        ? `${rows.length} of ${spec.data.length} ${spec.noun}`
-        : `All ${spec.data.length} ${spec.noun}`;
+      /* The same arithmetic as the line outside, so the two cannot disagree.
+         It used to say "All 10 vehicles" whenever no facet was ticked, over a
+         table a search had cut to one row. */
+      summary.textContent = rows.length === spec.data.length
+        ? `All ${spec.data.length} ${spec.noun}`
+        : `${rows.length} of ${spec.data.length} ${spec.noun}`;
     }
     colsBtn?.classList.toggle('is-on', !sameAsDefault());
 
     const all = Object.entries(chosen).flatMap(([k, s]) => [...s].map(v => [k, v]));
     chipsBox.classList.toggle('hidden', !all.length);
+    /* The chip reads back what the panel offered. It was printing the stored
+       code — 'rigid_truck' where the filter said 'Rigid truck' — so the two
+       halves of the same control spoke different vocabularies. The value the
+       button removes is still the code, because that is what matching is done
+       against. */
     chipsBox.innerHTML = all
-      .map(([k, v]) => `<span class="chip">${v}<button data-off="${k}|${v}" aria-label="Remove ${v}">&times;</button></span>`)
+      .map(([k, v]) => {
+        const said = esc(facetLabel(k, v));
+        return `<span class="chip">${said}<button data-off="${esc(k)}|${esc(v)}" aria-label="Remove ${said}">&times;</button></span>`;
+      })
       .join('');
 
     if (tabsBox) {
