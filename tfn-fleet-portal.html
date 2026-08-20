@@ -4756,6 +4756,11 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
   box-shadow: var(--elevation-medium);
   font-size: var(--font-size-body-sm);
   opacity: 0;
+  /* Out of the tab order and the accessibility tree with the pixels. Opacity
+     alone left an Undo somebody could still reach, and press, long after the
+     change it belonged to. visibility is the one that leaves, and it still
+     permits the fade below. */
+  visibility: hidden;
   transform: translateY(var(--space-1-0));
   pointer-events: none;
   transition: opacity var(--duration-base) var(--ease-decelerate),
@@ -4763,6 +4768,7 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 }
 
 .toast.is-up {
+  visibility: visible;
   opacity: 1;
   transform: none;
   pointer-events: auto;
@@ -9458,6 +9464,12 @@ function form(spec) {
 
     // Values first, then the complaints, so a field never shows an error about
     // a value it is no longer holding.
+    /* Controls the ID map does not name — radios, tick boxes — are reset with
+       the rest of the form. Without this a value survives from one record to
+       the next and disagrees with the field the engine actually reads. */
+    root.querySelectorAll('input[type="radio"], input[type="checkbox"]')
+      .forEach(c => { if (!c.closest('.row-tick')) c.checked = false; });
+
     const writeValues = () => Object.entries(ID).forEach(([field, id]) => {
       const node = document.getElementById(id);
       if (node) node.value = s.values[field] ?? '';
@@ -9917,6 +9929,25 @@ function directory(spec) {
       </div></td>`;
   }
 
+  /* Both are reachable from two places: the delegated handler on the
+     directory, and a direct binding on the popover the button lives in —
+     because a popover's own clicks do not reach the directory, which is how
+     Clear filters and Reset to default came to be controls that did nothing. */
+  function clearAllFacets() {
+    Object.values(chosen).forEach(x => x.clear());
+    filterPop?.querySelectorAll('[data-facet]').forEach(i => { i.checked = false; });
+    render();
+  }
+
+  function resetCols() {
+    hidden.clear();
+    spec.columns.filter(c => c[3]).forEach(c => hidden.add(c[0]));
+    colsPop?.querySelectorAll('[data-col]').forEach(i => {
+      i.checked = !hidden.has(i.dataset.col);
+    });
+    render();
+  }
+
   function render() {
     const rows = showing();
     /* A selection is only meaningful against what is on screen. Search and the
@@ -10066,6 +10097,14 @@ function directory(spec) {
           : `<label><input type="checkbox" data-col="${name}"${off ? '' : ' checked'}> ${name}</label>`,
       ).join('') + '<div class="pop-foot"><button class="btn btn-tertiary" data-role="reset-cols">Reset to default</button></div>';
     }
+
+    /* Bound on the popovers themselves. Their clicks do not reach the
+       directory root the delegated handler sits on, which is why these two
+       were controls that looked live and did nothing. */
+    filterPop?.querySelector('[data-role="clear-filters"]')
+      ?.addEventListener('click', e => { e.preventDefault(); clearAllFacets(); });
+    colsPop?.querySelector('[data-role="reset-cols"]')
+      ?.addEventListener('click', e => { e.preventDefault(); resetCols(); });
   }
 
   function popover(btn, pop) {
@@ -10204,6 +10243,25 @@ function directory(spec) {
       return;
     }
 
+    /* Anywhere inside an open popover belongs to the popover, including the
+       parts of it that are not controls — so a press on a menu's padding or on
+       a separator no longer falls through to the row and opens the record.
+
+       Its own controls are exempt: the footer buttons and the tick boxes are
+       serviced by the branches below, and swallowing them here would make
+       Clear filters and Reset to default the dead controls they were already
+       accused of being. */
+    const inPop = e.target.closest('.pop');
+    if (inPop) {
+      /* Its own controls are serviced by the branches below and must pass.
+         The match has to be inside the popover: closest() walks the whole
+         ancestor chain, and the tbody carries a data-role of its own, so an
+         unscoped test exempted every click in the table and the guard never
+         fired at all. */
+      const own = e.target.closest('[data-role], [data-facet], [data-col], [data-pick]');
+      if (!own || !inPop.contains(own)) { e.stopPropagation(); return; }
+    }
+
     const more = e.target.closest('.row-more');
     if (more) {
       e.stopPropagation();
@@ -10279,20 +10337,8 @@ function directory(spec) {
       render();
       searchBox?.focus();
     }
-    if (role === 'clear-all' || role === 'clear-filters') {
-      e.preventDefault();
-      Object.values(chosen).forEach(s => s.clear());
-      filterPop?.querySelectorAll('[data-facet]').forEach(i => { i.checked = false; });
-      render();
-    }
-    if (role === 'reset-cols') {
-      hidden.clear();
-      spec.columns.filter(c => c[3]).forEach(c => hidden.add(c[0]));
-      colsPop?.querySelectorAll('[data-col]').forEach(i => {
-        i.checked = !hidden.has(i.dataset.col);
-      });
-      render();
-    }
+    if (role === 'clear-all' || role === 'clear-filters') { e.preventDefault(); clearAllFacets(); }
+    if (role === 'reset-cols') { e.preventDefault(); resetCols(); }
     const t = e.target.closest('.tab');
     if (t && tabsBox && tabsBox.contains(t)) {
       tab = [...tabsBox.querySelectorAll('.tab')].indexOf(t);
@@ -10560,10 +10606,22 @@ function pinPop(anchor, pop) {
   pop.style.left = '0px';
   pop.style.right = 'auto';
 
-  const p = pop.getBoundingClientRect();
   const gap = 8;
-  const room = window.innerHeight - a.bottom;
-  const above = room < p.height + gap && a.top > p.height + gap;
+  /* Measured before a height is imposed, so `above` is decided on what the
+     panel actually wants rather than on a cap already applied to it. */
+  let p = pop.getBoundingClientRect();
+  const below = window.innerHeight - a.bottom - gap * 2;
+  const over = a.top - gap * 2;
+  const above = below < p.height && over > below;
+
+  /* Whichever side it lands on, it may not exceed the room there. Below a
+     floor it stops shrinking and scrolls instead: a menu two options tall is
+     worse than a menu that scrolls. */
+  const room = Math.max(180, above ? over : below);
+  pop.style.maxHeight = room + 'px';
+  pop.style.overflowY = 'auto';
+  /* Re-measured, because the cap may have changed its height. */
+  p = pop.getBoundingClientRect();
 
   /* Aligned to the trigger's left edge, which is where the eye already is
      after pressing it. It only flips to the right edge when a panel started at
@@ -10572,13 +10630,20 @@ function pinPop(anchor, pop) {
   if (left + p.width > window.innerWidth - gap) left = a.right - p.width;
   left = Math.max(gap, Math.min(left, window.innerWidth - p.width - gap));
 
-  pop.style.top = (above ? a.top - p.height - gap : a.bottom + gap) + 'px';
+  let top = above ? a.top - p.height - gap : a.bottom + gap;
+  /* And clamped, so a panel can never be placed with its head above the
+     viewport or its foot below it. */
+  top = Math.max(gap, Math.min(top, window.innerHeight - p.height - gap));
+  pop.style.top = top + 'px';
   pop.style.left = left + 'px';
 }
 
 function unpinPop(pop) {
   if (!pop.style.position) return;
   pop.style.position = pop.style.top = pop.style.left = pop.style.right = '';
+  /* The measured cap belongs to one placement. Left behind, it would shrink
+     the panel the next time it opened somewhere with more room. */
+  pop.style.maxHeight = pop.style.overflowY = '';
 }
 
 /* ── Changing an everyday value: a menu, beside the thing it changes ──────
@@ -10630,14 +10695,30 @@ const statusMenu = (() => {
 
   function close() {
     if (!pop) return;
+    /* Whether the keyboard was inside the thing being hidden. If it was, it
+       has to be put somewhere; if it was not, moving it would steal focus
+       from wherever the person actually is. */
+    const had = pop.contains(document.activeElement);
     pop.classList.add('hidden');
     unpinPop(pop);
     document.removeEventListener('keydown', keys, true);
-    pop._anchor?.setAttribute('aria-expanded', 'false');
+    const anchor = pop._anchor;
+    anchor?.setAttribute('aria-expanded', 'false');
+    /* Restored on every path, not just Escape. Choosing a value used to leave
+       focus inside a hidden element, which is the same as losing it. */
+    if (had && anchor && document.contains(anchor)) anchor.focus({ preventScroll: true });
   }
 
   function keys(e) {
-    if (e.key === 'Escape') { e.preventDefault(); close(); pop._anchor?.focus(); return; }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      /* The record panel listens for Escape on the document too, so one press
+         used to close the menu and the panel behind it. A layer closes itself
+         and stops there. */
+      e.stopImmediatePropagation();
+      close();
+      return;
+    }
     if (e.key !== 'Tab') return;
     const items = [...pop.querySelectorAll('[data-pick], a')];
     if (!items.length) return;
@@ -10725,6 +10806,10 @@ const statusDialog = (() => {
 
 
   function keys(e) {
+    /* A menu or popover opened from inside the panel owns Escape while it is
+       up. Without this the panel closes underneath the thing the person was
+       actually dismissing, and two layers go on one press. */
+    if (document.querySelector('.status-pop:not(.hidden), .pop:not(.hidden)')) return;
     if (e.key === 'Escape') { e.preventDefault(); return close(); }
     if (e.key !== 'Tab') return;
     const items = [...box.querySelectorAll(FOCUSABLE)].filter(n => n.offsetParent !== null);
@@ -12923,10 +13008,15 @@ const form = Records.form({
     const chosen = root.querySelector('[name="tankMode"]:checked');
     if (!chosen && get('tankCapacity')) {
       const one = root.querySelector('[name="tankMode"][value="one"]');
-      if (one) {
-        one.checked = true;
-        if (mirror) mirror.value = 'one';
-      }
+      if (one) one.checked = true;
+    }
+    /* The mirror is written from whatever the radios now say, every time.
+       Setting it only on the branch that inferred an answer left it blank on
+       every other path — so an existing vehicle showed "One tank" and refused
+       to save because the field behind it held nothing. */
+    if (mirror) {
+      const on = root.querySelector('[name="tankMode"]:checked');
+      mirror.value = on ? on.value : '';
     }
     __vehicleSheet.syncTanks();
   },
