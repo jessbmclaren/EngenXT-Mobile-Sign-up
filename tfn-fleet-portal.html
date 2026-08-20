@@ -1572,7 +1572,12 @@ select.field { appearance: none; background-image: none; }
 }
 
 .combo-list li[aria-selected="true"],
-.combo-list li:hover { background: var(--color-surface-hover); }
+.combo-list li:hover,
+.combo-list li.is-active { background: var(--color-surface-hover); }
+
+/* The keyboard's position is not the same fact as the current value, so it is
+   not drawn the same way. */
+.combo-list li.is-active { box-shadow: inset 2px 0 0 var(--color-brand-ink); }
 
 /* The create row is separated and quieter: it is the way out, not the answer,
    and it should be reached past the matches rather than landed on. */
@@ -2968,6 +2973,23 @@ body.theft-open .sheet-backdrop { display: block; }
   color: var(--color-on-surface-variant);
 }
 .select-list > div:first-child .select-group { margin-top: 0; }
+
+/* Only on a list long enough to need it, and held at the top of the panel it
+   filters: scrolled away, it leaves a short list with no visible reason for
+   being short. */
+.select-search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: var(--space-1-0);
+  background: var(--color-surface);
+}
+.select-none {
+  margin: 0;
+  padding: var(--space-1-5);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
+}
 
 /* organisms.css */
 /* Organisms: what a screen is actually built from.
@@ -12295,6 +12317,200 @@ return {
 })();
 
 
+
+/* combobox-field.js */
+/* A searchable field, shared.
+ *
+ * Make already had one, hand-built. Model was a plain text box and Country was
+ * a native select of eight, so three fields that all answer "which one of
+ * these" answered it three ways: type-and-filter, type-anything, and an
+ * operating-system menu.
+ *
+ * Which control a field takes is decided by the list behind it, not by
+ * preference. A short fixed list is a select — Fuel type has two options and
+ * search would be furniture. A long one, or one that depends on another
+ * answer, is a combobox. Model depends on Make; Country is long enough that
+ * scrolling it is worse than typing three letters.
+ *
+ * ── What it offers ──────────────────────────────────────────────────────
+ *
+ * The suggestions are what the fleet already uses, not a catalogue this
+ * product does not have. Typing a model nobody has entered before is allowed
+ * and is the point: the list is there to stop the same vehicle being spelt
+ * four ways, not to refuse the fifth.
+ */
+(() => {
+  function build(input, opts) {
+    if (!input || input.dataset.combo) return null;
+    input.dataset.combo = '1';
+
+    const id = input.id;
+    const list = document.createElement('ul');
+    list.className = 'combo-list hidden';
+    list.id = id + '-list';
+    list.setAttribute('role', 'listbox');
+
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-controls', list.id);
+    input.setAttribute('aria-autocomplete', 'list');
+    input.autocomplete = 'off';
+
+    const holder = document.createElement('div');
+    holder.className = 'combo';
+    input.parentNode.insertBefore(holder, input);
+    holder.append(input, list);
+
+    let rows = [];
+    let at = -1;
+    let writing = false;
+
+    function open() {
+      if (writing) return;
+      const q = input.value.trim().toLowerCase();
+      const source = opts.source() || [];
+      const hits = source
+        .filter(v => {
+          const n = String(v).toLowerCase();
+          return !q || n.includes(q) || q.includes(n);
+        })
+        .sort((a, b) => {
+          const as = String(a).toLowerCase().startsWith(q) ? 0 : 1;
+          const bs = String(b).toLowerCase().startsWith(q) ? 0 : 1;
+          return as - bs || String(a).localeCompare(String(b));
+        })
+        .slice(0, 40);
+
+      list.textContent = '';
+      rows = [];
+      if (hits.length) {
+        hits.forEach((v, i) => {
+          const li = document.createElement('li');
+          li.setAttribute('role', 'option');
+          li.id = id + '-o' + i;
+          li.dataset.value = v;
+          li.textContent = v;
+          li.setAttribute('aria-selected', String(String(v) === input.value));
+          list.append(li);
+          rows.push(li);
+        });
+      } else {
+        const none = document.createElement('li');
+        none.className = 'none';
+        /* Not an error. A model nobody has entered before is the ordinary
+           case for a fleet adding its first of something. */
+        none.textContent = opts.empty || 'No matches. What you type will be used.';
+        list.append(none);
+      }
+
+      list.classList.remove('hidden');
+      input.setAttribute('aria-expanded', 'true');
+      at = -1;
+    }
+
+    function close() {
+      list.classList.add('hidden');
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+      at = -1;
+    }
+
+    function move(i) {
+      if (!rows.length) return;
+      at = (i + rows.length) % rows.length;
+      rows.forEach((r, n) => r.classList.toggle('is-active', n === at));
+      input.setAttribute('aria-activedescendant', rows[at].id);
+      rows[at].scrollIntoView({ block: 'nearest' });
+    }
+
+    function pick(i) {
+      const row = rows[i];
+      if (!row) return;
+      writing = true;
+      input.value = row.dataset.value;
+      /* Both events still fire: the form engine validates on input and the
+         dependent fields listen for change. */
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      close();
+      input.focus({ preventScroll: true });
+      writing = false;
+    }
+
+    input.addEventListener('input', () => { if (!input.disabled) open(); });
+    input.addEventListener('focus', () => { if (!input.disabled) open(); });
+    input.addEventListener('blur', () => setTimeout(close, 120));
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (list.classList.contains('hidden')) open(); else move(at + 1); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); move(at - 1); return; }
+      if (e.key === 'Enter' && at >= 0) { e.preventDefault(); pick(at); return; }
+      if (e.key === 'Escape' && !list.classList.contains('hidden')) {
+        /* Closes without changing what was typed. A combobox that reverts on
+           Escape throws away an answer somebody is halfway through. */
+        e.preventDefault(); e.stopPropagation(); close();
+      }
+    });
+
+    list.addEventListener('mousedown', e => {
+      /* mousedown, because blur would close the list before a click landed. */
+      const li = e.target.closest('li[role="option"]');
+      if (!li) return;
+      e.preventDefault();
+      pick(rows.indexOf(li));
+    });
+
+    return { open, close, refresh: () => { if (!list.classList.contains('hidden')) open(); } };
+  }
+
+  window.__combobox = build;
+})();
+
+/* model-and-country.js */
+/* The two fields the shared combobox was built for. */
+(() => {
+  const model = document.getElementById('f-model');
+  const make = document.getElementById('f-make');
+
+  if (model && make) {
+    /* Suggested from what the fleet already runs under that make. There is no
+       model catalogue in this product, and inventing one would be a list of
+       guesses somebody has to correct. Stopping the same vehicle being spelt
+       four ways is the whole job. */
+    window.__combobox(model, {
+      source: () => {
+        const m = make.value.trim().toLowerCase();
+        if (!m) return [];
+        const seen = new Set();
+        (window.VehicleFixtures ? VehicleFixtures.VEHICLES : []).forEach(r => {
+          const [mk, ...rest] = String(r[2] || '').split(' ');
+          if (mk.toLowerCase() === m && rest.length) seen.add(rest.join(' '));
+        });
+        return [...seen].sort();
+      },
+      empty: 'No models recorded for this make yet. What you type will be used.',
+    });
+
+    /* Until a make is chosen there is nothing to suggest and nothing to check
+       a model against, so the field says so rather than accepting a value it
+       cannot place. */
+    function sync() {
+      const has = make.value.trim() !== '';
+      model.disabled = !has;
+      model.placeholder = has ? 'Search or type a model' : 'Select a make first';
+      /* A model belonging to the previous make is not a model of this one. It
+         is cleared rather than left to be saved against the wrong vehicle. */
+      if (!has && model.value) {
+        model.value = '';
+        model.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+    make.addEventListener('input', sync);
+    make.addEventListener('change', sync);
+    sync();
+  }
+})();
+
 /* select-field.js */
 /* One opened menu, in the product's own colours.
  *
@@ -12387,12 +12603,42 @@ return {
 
     let active = -1;
     let rows = [];
+    let filter = null;
+
+    /* Twelve is where scanning stops being faster than typing. Below it a
+       search box is one more thing to look past; above it, hunting a year in a
+       column of twenty-seven is worse than typing two digits. */
+    const LONG = 12;
+    const isLong = () => sel.querySelectorAll('option').length > LONG;
 
     /* Built from the select, so a field whose options are filled later — the
        taxonomy, the licence codes, the makes — is right the moment it is. */
-    function draw() {
+    function draw(query) {
       rows = [];
       list.textContent = '';
+      const q = String(query || '').trim().toLowerCase();
+
+      /* The search box belongs to the list, so it appears and disappears with
+         the list's length rather than with anybody's decision about it. */
+      if (isLong()) {
+        const box = document.createElement('input');
+        box.type = 'search';
+        box.className = 'field select-search';
+        box.placeholder = 'Search';
+        box.setAttribute('aria-label', 'Search the list');
+        box.value = query || '';
+        box.addEventListener('input', () => { draw(box.value); box.focus(); move(0); });
+        box.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); move(active + 1); return; }
+          if (e.key === 'ArrowUp') { e.preventDefault(); move(active - 1); return; }
+          if (e.key === 'Enter') { e.preventDefault(); pick(active); return; }
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+        });
+        list.append(box);
+        filter = box;
+      } else { filter = null; }
+
+      const keep = o => !q || o.textContent.toLowerCase().includes(q);
       [...sel.children].forEach(node => {
         if (node.tagName === 'OPTGROUP') {
           const head = document.createElement('p');
@@ -12401,17 +12647,27 @@ return {
           head.textContent = node.label;
           /* A heading is not a choice. It is announced as the group's name and
              cannot be arrowed onto or clicked. */
+          const kept = [...node.children].filter(keep);
+          /* A group with nothing left in it is not a group. */
+          if (!kept.length) return;
           const group = document.createElement('div');
           group.setAttribute('role', 'group');
           group.setAttribute('aria-labelledby', head.id);
           group.append(head);
-          [...node.children].forEach(o => group.append(option(o)));
+          kept.forEach(o => group.append(option(o)));
           list.append(group);
-        } else {
+        } else if (keep(node)) {
           const row = option(node);
           if (row) list.append(row);
         }
       });
+
+      if (!rows.length) {
+        const none = document.createElement('p');
+        none.className = 'select-none';
+        none.textContent = 'Nothing matches that.';
+        list.append(none);
+      }
     }
 
     function option(o) {
@@ -12463,6 +12719,10 @@ return {
       if (typeof Records !== 'undefined' && Records.pinPop) Records.pinPop(trigger, list);
       const at = rows.findIndex(r => r.dataset.value === sel.value);
       move(at < 0 ? 0 : at);
+      /* Typing is the point of a long list, so the caret starts where typing
+         goes. On a short one the trigger keeps focus and type-ahead does the
+         same job without a box to look past. */
+      if (filter) filter.focus({ preventScroll: true });
       OPEN.add(api);
     }
 
@@ -12504,6 +12764,15 @@ return {
     });
 
     trigger.addEventListener('keydown', e => {
+      /* Closing is never delegated. Whatever has the caret, Escape shuts the
+         panel and Tab leaves it. */
+      if (e.key === 'Escape' && !list.classList.contains('hidden')) {
+        e.preventDefault(); e.stopPropagation(); close(true); return;
+      }
+      if (e.key === 'Tab') { close(false); return; }
+      /* Everything else belongs to the search box while it has the caret:
+         arrows move its cursor, letters filter rather than type-ahead. */
+      if (filter && document.activeElement === filter) return;
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (list.classList.contains('hidden')) { open(); return; }
@@ -12513,10 +12782,6 @@ return {
       }
       if (e.key === 'Home' && !list.classList.contains('hidden')) { e.preventDefault(); move(0); return; }
       if (e.key === 'End' && !list.classList.contains('hidden')) { e.preventDefault(); move(rows.length - 1); return; }
-      if (e.key === 'Escape' && !list.classList.contains('hidden')) {
-        e.preventDefault(); e.stopPropagation(); close(true); return;
-      }
-      if (e.key === 'Tab') { close(false); return; }
       /* Type-ahead, which a native select gives for free and a custom one has
          to earn: a long list of years or licence codes is unusable without it. */
       if (e.key.length === 1 && /\S/.test(e.key)) {
