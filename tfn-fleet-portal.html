@@ -4155,6 +4155,20 @@ body.status-dialog-open .scrim { display: block; }
 }
 .pick-now { color: var(--color-on-surface-variant); font-weight: 400; }
 
+/* An action offered at the point of failure has to do something. */
+.form-alert .alert-act {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin-left: var(--space-1-0);
+  font: inherit;
+  font-weight: var(--font-weight-label-md);
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .status-derived {
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
@@ -4435,6 +4449,9 @@ body.record-panel-open .page { padding-right: var(--size-drawer-width); }
 .record-panel .tabs { padding: 0 var(--space-3-0); margin: 0; }
 
 .record-panel__body {
+  /* Vertical only. overflow-y alone computes overflow-x to auto, which is how
+     one long word made the panel scroll sideways. */
+  overflow-x: hidden;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -4467,6 +4484,10 @@ body.record-panel-open .page { padding-right: var(--size-drawer-width); }
 
 /* The latest note, quoted, because it is somebody's own words and the rest of
    this tab is generated. */
+/* Free text can arrive as one unbroken run — a VIN, a URL, a reference. It
+   breaks rather than pushing the record sideways under the reader. */
+.rp-note, .activity-what, .activity-move { overflow-wrap: anywhere; }
+
 .rp-note {
   margin: 0;
   padding-left: var(--space-1-5);
@@ -5758,7 +5779,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
       <div class="topbar-actions">
         <div class="bell-anchor">
           <button class="icon-btn" id="bell" aria-label="Notifications, 1 waiting"
-                  aria-haspopup="true" aria-expanded="false">
+                  aria-haspopup="dialog" aria-expanded="false">
             <svg data-lucide="bell" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
             <span class="bell-dot" aria-hidden="true"></span>
           </button>
@@ -5980,11 +6001,15 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                  not going to download a template; they want to know whether
                  what they have will do. This is that answer in one line, and
                  the full table below says what goes in each. -->
-            <p class="panel-note" data-role="import-summary">Whatever you upload needs these seven columns:
-              <span class="ident">registration</span>, <span class="ident">make</span>,
-              <span class="ident">model</span>, <span class="ident">year</span>,
-              <span class="ident">vehicle_type</span>, <span class="ident">fuel_type</span>,
-              <span class="ident">tank_capacity_l</span>. Two more are optional.
+            <!-- Written from the import schema at start-up. Kept here as the
+               same sentence the schema produces, so the file reads correctly
+               before a line of it has run. -->
+          <p class="panel-note" data-role="import-summary">Whatever you upload needs these eight columns:
+              <span class="ident">vin</span>, <span class="ident">registration</span>,
+              <span class="ident">make</span>, <span class="ident">model</span>,
+              <span class="ident">year</span>, <span class="ident">vehicle_category</span>,
+              <span class="ident">fuel_type</span>,
+              <span class="ident">total_tank_capacity_l</span>. Two more are optional.
               <a href="#import-contract">What goes in each</a>.</p>
           </div>
           <div class="dropzone">
@@ -7898,14 +7923,14 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
           <input class="field search" type="search" data-role="search" placeholder="Search vehicles" aria-label="Search vehicles">
           <div class="controls">
             <div class="pop-anchor">
-              <button class="btn btn-tertiary" data-role="filter-btn" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-tertiary" data-role="filter-btn" aria-haspopup="dialog" aria-expanded="false">
                 <svg data-lucide="list-filter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
                 Filter<span class="filter-count" data-role="filter-count"></span>
               </button>
               <div class="pop hidden" data-role="filter-pop" role="dialog" aria-label="Filter vehicles"></div>
             </div>
             <div class="pop-anchor">
-              <button class="btn btn-tertiary" data-role="cols-btn" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-tertiary" data-role="cols-btn" aria-haspopup="dialog" aria-expanded="false">
                 <svg data-lucide="columns-3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
                 Columns
               </button>
@@ -8085,14 +8110,14 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
           <input class="field search" type="search" data-role="search" placeholder="Search drivers" aria-label="Search drivers">
           <div class="controls">
             <div class="pop-anchor">
-              <button class="btn btn-tertiary" data-role="filter-btn" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-tertiary" data-role="filter-btn" aria-haspopup="dialog" aria-expanded="false">
                 <svg data-lucide="list-filter" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
                 Filter<span class="filter-count" data-role="filter-count"></span>
               </button>
               <div class="pop hidden" data-role="filter-pop" role="dialog" aria-label="Filter drivers"></div>
             </div>
             <div class="pop-anchor">
-              <button class="btn btn-tertiary" data-role="cols-btn" aria-haspopup="true" aria-expanded="false">
+              <button class="btn btn-tertiary" data-role="cols-btn" aria-haspopup="dialog" aria-expanded="false">
                 <svg data-lucide="columns-3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
                 Columns
               </button>
@@ -8765,7 +8790,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          close the drawer and find the row again to suspend them. Hidden while
          adding, because there is no record to act on yet. -->
     <div class="pop-anchor">
-      <button class="icon-btn hidden" data-role="actions" aria-haspopup="true" aria-expanded="false" aria-label="Actions">
+      <button class="icon-btn hidden" data-role="actions" aria-haspopup="menu" aria-expanded="false" aria-label="Actions">
         <svg data-lucide="ellipsis" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
       </button>
       <div class="pop row-menu hidden" data-role="actions-menu" role="menu"></div>
@@ -9030,7 +9055,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
          close the drawer and find the row again to suspend them. Hidden while
          adding, because there is no record to act on yet. -->
     <div class="pop-anchor">
-      <button class="icon-btn hidden" data-role="actions" aria-haspopup="true" aria-expanded="false" aria-label="Actions">
+      <button class="icon-btn hidden" data-role="actions" aria-haspopup="menu" aria-expanded="false" aria-label="Actions">
         <svg data-lucide="ellipsis" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
       </button>
       <div class="pop row-menu hidden" data-role="actions-menu" role="menu"></div>
@@ -9715,8 +9740,37 @@ function form(spec) {
     if (s.alert) {
       const [tone, text, action] = s.alert;
       alertBox.className = `form-alert form-alert-${tone}`;
-      alertBox.innerHTML = `<p>${text}</p>` +
-        (action ? `<p class="form-alert-do"><button class="btn btn-secondary" type="button">${action}</button></p>` : '');
+      /* Wired below. The tuple carries a label and nothing to run, so the
+         handler re-applies the state the alert belongs to — which is what
+         "try again" means on a form whose save failed: put me back where I
+         was and let me press Save again. */
+      /* Built from nodes: the alert text names the record on some states,
+         and a registration is free text. */
+      alertBox.textContent = '';
+      const line = document.createElement('p');
+      line.textContent = text;
+      alertBox.append(line);
+      if (action) {
+        const holder = document.createElement('p');
+        holder.className = 'form-alert-do';
+        const again = document.createElement('button');
+        again.className = 'btn btn-secondary';
+        again.type = 'button';
+        again.textContent = action;
+        /* The one thing all three of these actions mean: put the form back
+           as it was and let the person try again. Retrying a failed save, a
+           reference list that did not load and a record somebody else
+           changed are the same gesture. The alert is dismissed first, so a
+           second failure reads as a second failure rather than as a message
+           that never moved. */
+        again.addEventListener('click', () => {
+          alertBox.className = 'form-alert hidden';
+          alertBox.textContent = '';
+          applyState(Object.assign({}, s, { alert: null }));
+        });
+        holder.append(again);
+        alertBox.append(holder);
+      }
     }
 
     const errors = (s.errors || []).filter(f => applies(f, get));
@@ -10005,6 +10059,12 @@ function directory(spec) {
    * rail leaves behind, and the one that gives way should be the one nobody
    * scans a list by. It is one press in Columns to bring it back. */
   const hidden = new Set(spec.columns.filter(c => c[3]).map(c => c[0]));
+  /* What the table ships with. The trigger's active treatment means "you have
+     changed something", and a column that starts hidden is not a change — the
+     control was announcing a customisation nobody had made. */
+  const DEFAULT_HIDDEN = new Set(hidden);
+  const sameAsDefault = () => hidden.size === DEFAULT_HIDDEN.size
+    && [...hidden].every(c => DEFAULT_HIDDEN.has(c));
   /* The first column, ascending, which is what the arrow always claimed. */
   let sort = { col: spec.columns[0][0], dir: 1 };
   /* Which rows are ticked. Kept by key rather than by index, so filtering and
@@ -10127,7 +10187,7 @@ function directory(spec) {
     if (!items.length) return '<td class="row-actions"></td>';
     return `<td class="row-actions">
       <div class="pop-anchor">
-        <button class="icon-btn row-more" aria-haspopup="true" aria-expanded="false"
+        <button class="icon-btn row-more" aria-haspopup="menu" aria-expanded="false"
                 aria-label="Actions for ${spec.rowLabel ? spec.rowLabel(r) : 'this row'}">
           <svg data-lucide="ellipsis" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
         </button>
@@ -10239,7 +10299,7 @@ function directory(spec) {
         ? `${rows.length} of ${spec.data.length} ${spec.noun}`
         : `All ${spec.data.length} ${spec.noun}`;
     }
-    colsBtn?.classList.toggle('is-on', hidden.size > 0);
+    colsBtn?.classList.toggle('is-on', !sameAsDefault());
 
     const all = Object.entries(chosen).flatMap(([k, s]) => [...s].map(v => [k, v]));
     chipsBox.classList.toggle('hidden', !all.length);
@@ -10382,7 +10442,7 @@ function directory(spec) {
       const anchor = document.createElement('span');
       anchor.className = 'pop-anchor col-help';
       anchor.innerHTML =
-        `<button class="col-help-btn" type="button" aria-haspopup="true" aria-expanded="false"
+        `<button class="col-help-btn" type="button" aria-haspopup="dialog" aria-expanded="false"
                  aria-label="What the ${col[0].toLowerCase()} values mean">i</button>
          <div class="pop col-help-pop hidden">${help}</div>`;
       th.appendChild(anchor);
@@ -10489,6 +10549,31 @@ function directory(spec) {
       /* Placed after it is shown, because a hidden element measures zero and
          the menu has to know its own height to decide whether it fits below. */
       if (open) pinPop(more, pop);
+      /* The menu declares role="menu", which promises a keyboard. Opening it
+         puts focus on the first item, and the handler below moves between
+         them — a role that promises arrow keys and answers none is worse than
+         no role at all, because it tells somebody to expect them. */
+      if (open) {
+        const items = [...pop.querySelectorAll('[data-act]')];
+        if (items.length) items[0].focus();
+        pop.onkeydown = ev => {
+          const list = [...pop.querySelectorAll('[data-act]')];
+          if (!list.length) return;
+          const at = list.indexOf(document.activeElement);
+          const STEP = { ArrowDown: 1, ArrowUp: -1 };
+          if (STEP[ev.key] !== undefined) {
+            ev.preventDefault();
+            list[(at + STEP[ev.key] + list.length) % list.length].focus();
+            return;
+          }
+          if (ev.key === 'Home') { ev.preventDefault(); list[0].focus(); return; }
+          if (ev.key === 'End') { ev.preventDefault(); list[list.length - 1].focus(); return; }
+          if (ev.key === 'Escape') {
+            ev.preventDefault(); ev.stopPropagation();
+            closeAllPops(); more.focus();
+          }
+        };
+      }
       return;
     }
     const item = e.target.closest('[data-act]');
@@ -10935,10 +11020,25 @@ const statusMenu = (() => {
       close();
       return;
     }
-    if (e.key !== 'Tab') return;
     const items = [...pop.querySelectorAll('[data-pick], a')];
     if (!items.length) return;
     const first = items[0], last = items[items.length - 1];
+    const at = items.indexOf(document.activeElement);
+
+    /* The contract the role promises. */
+    const STEP = { ArrowDown: 1, ArrowUp: -1 };
+    if (STEP[e.key] !== undefined) {
+      e.preventDefault();
+      const next = at < 0
+        ? (e.key === 'ArrowDown' ? 0 : items.length - 1)
+        : (at + STEP[e.key] + items.length) % items.length;
+      items[next].focus();
+      return;
+    }
+    if (e.key === 'Home') { e.preventDefault(); first.focus(); return; }
+    if (e.key === 'End') { e.preventDefault(); last.focus(); return; }
+
+    if (e.key !== 'Tab') return;
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
@@ -13781,7 +13881,7 @@ const vehicles = Records.directory({
     const pill = (value, kind, label) => {
       const tone = BADGE[value];
       return `<button class="status-pill${tone ? ' ' + tone : ''}" data-pill="${kind}"
-                      aria-haspopup="true" aria-expanded="false"
+                      aria-haspopup="menu" aria-expanded="false"
                       aria-label="${label}: ${value}. Change it">${value}<svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
     };
 
@@ -14967,7 +15067,7 @@ const drivers = Records.directory({
     const pill = (value, kind, label) => {
       const tone = STATUS_TONE[value];
       return `<button class="status-pill${tone ? ' ' + tone : ''}" data-pill="${kind}"
-                      aria-haspopup="true" aria-expanded="false"
+                      aria-haspopup="menu" aria-expanded="false"
                       title="${STATUS_MEANING[value] ? STATUS_MEANING[value].pump : ''}"
                       aria-label="${label}: ${value}. Change it">${value}<svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
     };
@@ -16053,15 +16153,26 @@ const keyOf = btn => btn.dataset.hash || btn.dataset.state || btn.dataset.screen
  * works, and it is the difference between a demo and a dead page where it
  * does not.
  */
-function setHash(key) {
+function setHash(key, replace) {
   try {
     if (location.hash.replace('#', '') !== key) {
-      history.replaceState(null, '', '#' + key);
+      /* A move somebody made earns a history entry. Only the initial sync,
+         which corrects the address without anybody having navigated, replaces
+         — otherwise Back would step through states nobody visited. */
+      if (replace) history.replaceState(null, '', '#' + key);
+      else history.pushState(null, '', '#' + key);
     }
   } catch (e) {
     // Opaque origin. The screen changed; the address just cannot say so.
   }
 }
+
+/* And the browser's own Back and Forward drive the rail, so the history the
+   pushes create is history somebody can actually walk. */
+window.addEventListener('popstate', () => {
+  const key = location.hash.replace('#', '');
+  if (key) go(key);
+});
 
 /* The tab buttons are in the rail too, so they must not be mistaken for
    screen buttons: keyOf would return undefined for them and the hash router
