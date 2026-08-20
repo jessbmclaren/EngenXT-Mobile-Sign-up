@@ -6817,7 +6817,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                 </li>
                 <li class="invite-row">
                   <span class="invite-who">
-                    <span class="ident">NCA 875 GP</span>
+                    <!-- Not NCA 875 GP: that is the row the review screen
+                         offers to leave out, and listing it here as invited
+                         told somebody the product had done the exact thing
+                         they had just declined. -->
+                    <span class="ident">KPL 337 GP</span>
                     <span class="invite-to">Driver: Sibusiso Mahlangu · 072 111 3333</span>
                   </span>
                   <span class="invite-state is-done"><svg data-lucide="check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Invitation sent</span>
@@ -10361,6 +10365,8 @@ function directory(spec) {
       const f = spec.facets.find(x => x[1] === key);
       return (f && f[4]) ? f[4](value) : value;
     };
+    /* A facet's values may be a list or a function that builds one. */
+    const facetValues = f => (typeof f[2] === 'function' ? f[2]() : f[2]);
     const active = Object.values(chosen).reduce((n, s) => n + s.size, 0);
     if (filterCount) filterCount.textContent = active || '';
     filterBtn?.classList.toggle('is-on', active > 0);
@@ -10445,7 +10451,8 @@ function directory(spec) {
           const words = labelFor || (v => v);
           return `<div class="filter-group" role="group" aria-labelledby="${id}">
             <p class="group-label" id="${id}">${label}</p>
-            ${values.map(v => `<label><input type="checkbox" data-facet="${key}" value="${esc(v)}"> <span>${esc(words(v))}</span></label>`).join('')}
+            ${(typeof values === 'function' ? values() : values)
+              .map(v => `<label><input type="checkbox" data-facet="${key}" value="${esc(v)}"> <span>${esc(words(v))}</span></label>`).join('')}
           </div>`;
         },
       ).join('') +
@@ -13842,7 +13849,10 @@ const vehicles = Records.directory({
      them, which is the complaint the record model already answered. */
   facets: [
     ['Vehicle category', 'type',
-      VehicleTypes.list().map(t => t.code).filter(c => VEHICLES.some(v => v[4] === c)),
+      /* A function, so the list is built when the panel is drawn rather than
+         once at start-up. Add a bus to a fleet of bakkies and Bus is on the
+         filter; it used to offer the fleet as it was when the page loaded. */
+      () => VehicleTypes.list().map(t => t.code).filter(c => VEHICLES.some(v => v[4] === c)),
       r => r[4], c => VehicleTypes.label(c)],
     ['Fuel type', 'fuel', ['Diesel', 'Petrol'], r => r[5]],
     /* Fuel access is derived, so the filter derives it too rather than
@@ -17451,9 +17461,11 @@ function rowHtml(r, i) {
 
   /* The unit sits inside the box, using the form's own suffix. A capacity
      field that does not say litres is a field somebody types "400 L" into. */
+  /* The error is named and the field points at it, so the reason arrives with
+     the field rather than only beside it. */
   const input = `<input id="review-fix-${i}" class="field ${r.fix.width}${r.fix.ident ? ' ident' : ''}"
                value="${esc(s.value)}" placeholder="${esc(r.fix.placeholder)}"
-               aria-describedby="review-hint-${i}">`;
+               ${s.error ? 'aria-invalid="true" ' : ''}aria-describedby="${s.error ? `review-error-${i} ` : ''}review-hint-${i}">`;
 
   const fixField = fixing ? `
     <div class="review-fix">
@@ -17462,7 +17474,7 @@ function rowHtml(r, i) {
         ${r.fix.suffix
           ? `<span class="suffix-wrap">${input}<span class="suffix">${esc(r.fix.suffix)}</span></span>`
           : input}
-        ${s.error ? `<span class="error">${esc(s.error)}</span>` : ''}
+        ${s.error ? `<span class="error" id="review-error-${i}">${esc(s.error)}</span>` : ''}
       </div>
       <button class="btn btn-primary" data-review="save" data-i="${i}">Save</button>
       <button class="btn btn-tertiary" data-review="cancel" data-i="${i}">Cancel</button>
