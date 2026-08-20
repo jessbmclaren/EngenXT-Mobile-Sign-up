@@ -2799,7 +2799,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
   border-top: 0;
 }
 .focus-sheet .group-note {
-  margin: calc(var(--space-2-0) * -1) 0 var(--space-2-0);
+  margin: calc(var(--space-1-0) * -1) 0 var(--space-2-5);
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
 }
@@ -2842,6 +2842,85 @@ tbody tr.is-new > td {
 @media (prefers-reduced-motion: reduce) {
   tbody tr.is-new > td { animation: none; }
 }
+
+/* ── The detail sheet's contents ─────────────────────────────────────────
+ * Facts in a definition list, because that is what they are: a term and its
+ * value, in pairs, scannable without reading sentences.
+ */
+.focus-sheet__eyebrow {
+  margin: 0 0 var(--space-0-5);
+  font-size: var(--font-size-label-sm);
+  font-weight: var(--font-weight-label-md);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-error);
+}
+
+.fact-list {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-1-0) var(--space-3-0);
+  margin: 0;
+  font-size: var(--font-size-body-md);
+}
+.fact-list dt { color: var(--color-on-surface-variant); }
+.fact-list dd { margin: 0; }
+
+.detail-note {
+  margin: var(--space-3-0) 0 0;
+  padding-left: var(--space-2-0);
+  border-left: 3px solid var(--color-outline-variant);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1-5);
+  margin-top: var(--space-3-0);
+}
+
+/* Whether the block took. The one thing on the theft sheet that protects the
+   vehicle, so it is stated before anything optional. */
+.block-state {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1-0);
+  padding: var(--space-2-0);
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-body-sm);
+}
+.block-state--ok { background: var(--color-surface-muted); }
+.block-state--failed {
+  background: var(--color-error-container, var(--color-surface-muted));
+  border-left: 3px solid var(--color-error);
+}
+.block-state b { color: var(--color-on-surface); }
+
+.attempt-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1-0); }
+.attempt-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2-0);
+  padding: var(--space-1-5) 0;
+  border-top: var(--size-border-hairline) solid var(--color-outline-variant);
+  font-size: var(--font-size-body-sm);
+}
+.attempt-list .none { border: 0; color: var(--color-on-surface-variant); }
+
+/* The save state sits at the left of the footer, away from the action. */
+.save-state {
+  margin-right: auto;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-on-surface-variant);
+}
+.save-state--failed { color: var(--color-error); }
+
+body.detail-open .detail-sheet,
+body.theft-open .focus-sheet#theft-sheet { display: flex; }
+body.detail-open .sheet-backdrop,
+body.theft-open .sheet-backdrop { display: block; }
 
 /* organisms.css */
 /* Organisms: what a screen is actually built from.
@@ -8530,6 +8609,113 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 <div class="scrim" data-close-form aria-hidden="true"></div>
 <div class="sheet-backdrop" data-role="sheet-backdrop"></div>
 
+<!-- ── A refused fuel attempt ────────────────────────────────────────────
+     Read, not edited, so: medium width, definition-list facts, and actions
+     that are about the event rather than about the vehicle. Marking a vehicle
+     recovered is deliberately not among them — an attempt to fuel a stolen
+     vehicle is evidence of where it is, not evidence that anybody has it
+     back. -->
+<aside class="detail-sheet hidden" id="incident-sheet" role="dialog" aria-modal="true"
+       aria-labelledby="incident-sheet-title" tabindex="-1">
+  <div class="focus-sheet__head">
+    <div class="focus-sheet__heading">
+      <p class="focus-sheet__eyebrow" data-role="inc-outcome">Refused</p>
+      <h2 class="focus-sheet__title" id="incident-sheet-title" data-role="inc-title">Fuel attempt refused</h2>
+      <p class="focus-sheet__sub" data-role="inc-sub"></p>
+    </div>
+    <button class="focus-sheet__close" data-role="inc-close" aria-label="Close fuel attempt details">
+      <svg data-lucide="x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="focus-sheet__body">
+    <dl class="fact-list" data-role="inc-facts"></dl>
+
+    <!-- The explanation lives in the body, not squeezed into the footer beside
+         the buttons. -->
+    <p class="detail-note">The assigned driver may not be the person who
+      presented the card. Nothing here identifies who attempted the fill.</p>
+
+    <div class="detail-actions">
+      <button class="btn btn-secondary" data-role="inc-copy">Copy incident details</button>
+      <button class="btn btn-secondary" data-role="inc-add">Add to theft report</button>
+    </div>
+  </div>
+
+  <div class="focus-sheet__foot">
+    <button class="btn btn-secondary" data-role="inc-back">Back to alerts</button>
+    <button class="btn btn-primary" data-role="inc-vehicle">View the vehicle</button>
+  </div>
+</aside>
+
+<!-- ── The theft report ──────────────────────────────────────────────────
+     The same wide sheet Add vehicle and Add driver use. Everything on it is
+     optional and none of it holds up the block, which happened the moment the
+     report was made. -->
+<aside class="focus-sheet hidden" id="theft-sheet" role="dialog" aria-modal="true"
+       aria-labelledby="theft-sheet-title" tabindex="-1">
+  <div class="focus-sheet__head">
+    <div class="focus-sheet__heading">
+      <h2 class="focus-sheet__title" id="theft-sheet-title" data-role="theft-title">Report details</h2>
+      <p class="focus-sheet__sub">These details are optional and can be added later.</p>
+    </div>
+    <button class="focus-sheet__close" data-role="theft-close" aria-label="Close report details">
+      <svg data-lucide="x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="focus-sheet__body">
+    <!-- The block, and whether it took. Stated first because it is the only
+         thing on this sheet that protects the vehicle. -->
+    <div class="block-state" data-role="theft-block"></div>
+
+    <h3 class="sheet-section__title">About the theft</h3>
+    <div class="fields">
+      <fieldset class="radio-group field-wide" role="radiogroup" aria-labelledby="theft-how-q">
+        <legend id="theft-how-q">What happened?</legend>
+        <label class="radio"><input type="radio" name="theft-how" value="Hijacking"> <span>Hijacking</span></label>
+        <label class="radio"><input type="radio" name="theft-how" value="Stolen while parked"> <span>Stolen while parked</span></label>
+        <label class="radio"><input type="radio" name="theft-how" value="Vehicle not returned"> <span>Vehicle not returned</span></label>
+        <label class="radio"><input type="radio" name="theft-how" value="Not sure"> <span>Not sure</span></label>
+      </fieldset>
+      <div class="form-field field-wide">
+        <label for="theft-notes">Additional details <span class="opt">Optional</span></label>
+        <textarea class="field" id="theft-notes" rows="4"
+          placeholder="Add the last known location, who was driving and any identifying information."></textarea>
+        <span class="help">These notes stay on the vehicle’s incident record.</span>
+      </div>
+    </div>
+
+    <h3 class="sheet-section__title">Police reference</h3>
+    <!-- Said plainly, because the opposite belief is the dangerous one: typing
+         a case number here does not open a case, update one, or discharge
+         anybody's duty to report. -->
+    <p class="group-note">Recording a reference here files it against this
+      incident. It does not open or update a case with SAPS, and it does not
+      replace reporting the theft to them.</p>
+    <div class="fields">
+      <div class="form-field">
+        <label for="theft-cas">SAPS CAS number <span class="opt">Optional</span></label>
+        <input class="field ident" id="theft-cas" autocomplete="off" placeholder="e.g. 411/8/2026">
+        <span class="help">Add this after SAPS has registered the case.</span>
+      </div>
+      <div class="form-field">
+        <label for="theft-station">Police station <span class="opt">Optional</span></label>
+        <input class="field" id="theft-station" autocomplete="off" placeholder="e.g. Sandton">
+      </div>
+    </div>
+
+    <h3 class="sheet-section__title">Fuel attempts</h3>
+    <p class="group-note">Attempts recorded against this vehicle since it was reported.</p>
+    <ul class="attempt-list" data-role="theft-attempts"></ul>
+  </div>
+
+  <div class="focus-sheet__foot">
+    <span class="save-state" data-role="theft-save" role="status" aria-live="polite"></span>
+    <button class="btn btn-primary" data-role="theft-done">Done</button>
+  </div>
+</aside>
+
 <!-- Shown only when something has been typed. A confirmation over an empty
      form is the kind that teaches people to click through confirmations. -->
 
@@ -12065,6 +12251,14 @@ return {
  */
 window.Incidents = (() => {
 
+/* The refused attempts the prototype can show. Real events with real
+   identities, so the detail sheet and the report read the same thing. */
+const ATTEMPTS = [
+  { id: 'ATT-1', reg: 'HRV 482 GP', station: 'Engen N1 City, Goodwood',
+    at: '19 Aug, 14:41', ago: '9 minutes ago', cardLast4: '4821',
+    driver: 'Thabo Mokoena', outcome: 'Refused' },
+];
+
 let seq = 400;
 const all = [];
 
@@ -12134,7 +12328,9 @@ function forVehicle(reg) {
     .slice(-1)[0] || null;
 }
 
-return { open, file, blockResult, addAttempt, forVehicle, all: () => all.slice(), now };
+return { open, file, blockResult, addAttempt, forVehicle, all: () => all.slice(), now,
+  attempts: () => ATTEMPTS.slice(),
+  attemptFor: reg => ATTEMPTS.find(a => a.reg === reg) || null };
 
 })();
 
@@ -13482,7 +13678,8 @@ const vehicles = Records.directory({
        somebody aiming at Cannot fuel can reach them. */
     ...(r[F.STATUS] === 'Removed from fleet' ? [] : [
       ...(r[F.STATUS] === 'Reported stolen'
-        ? [{ act: 'recovered', label: 'Mark as recovered…' }]
+        ? [{ act: 'report', label: 'Theft report…' },
+           { act: 'recovered', label: 'Mark as recovered…' }]
         : r[F.STATUS] === 'Recovered — inspection required'
           ? [{ act: 'inspect', label: 'Put back into service…' }]
           : [{ act: 'stolen', label: 'Report stolen…', danger: true }]),
@@ -14037,6 +14234,9 @@ function vehicleAction(key, act, extra) {
        not a vehicle that is protected, and no screen may show one as the
        other. */
     Incidents.blockResult(incident, true);
+    /* Offered, never required. The block is done; this is only the moment
+       somebody is most likely to have the details to hand. */
+    setTimeout(() => window.__theftOverlays && __theftOverlays.openReport(incident), 400);
     if (extra) logChange(vehicle, 'Reason', wasReason, extra, 'reason');
     logEvent(vehicle, 'Reported stolen. Blocked at every Engen site.');
     vehicles.render();
@@ -14185,6 +14385,14 @@ function vehicleAction(key, act, extra) {
   /* ── Inspection and reactivation ───────────────────────────────────────
    * The only route from recovered back to the road, and it is deliberately a
    * decision somebody takes rather than a status they pick. */
+  /* The report, reopened. A SAPS reference arrives hours after the theft, so
+     the sheet has to be reachable long after the moment it was first offered. */
+  if (act === 'report') {
+    const incident = Incidents.forVehicle(vehicle[0]);
+    if (!incident) return void Records.toast('No theft report on this vehicle.');
+    return void (window.__theftOverlays && __theftOverlays.openReport(incident));
+  }
+
   if (act === 'inspect') {
     return void Records.statusDialog.ask({
       eyebrow: 'Recovered — inspection required',
@@ -16387,6 +16595,198 @@ window.__driverSheet = makeSheet({
 window.__openSheet = () =>
   [window.__vehicleSheet, window.__driverSheet].find(x => x && x.isOpen()) || null;
 
+
+/* theft-overlays.js */
+/* The two surfaces the theft journey reads and writes through.
+ *
+ * Both are opened with a subject and take everything else from the incident
+ * record, so nothing on either screen is a fact typed into markup that can
+ * drift from the model behind it.
+ */
+(() => {
+  const inc = document.getElementById('incident-sheet');
+  const theft = document.getElementById('theft-sheet');
+  if (!inc || !theft) return;
+
+  const esc = t => String(t == null ? '' : t);
+  let opener = null;
+  let current = null;   // the attempt on screen
+  let report = null;    // the incident on screen
+
+  /* ── Shared open and close ─────────────────────────────────────────────
+   * The same contract the form sheets follow: the page goes inert, focus
+   * moves in, and closing gives it back to whatever opened the overlay. */
+  function show(el, cls) {
+    opener = document.activeElement;
+    document.body.classList.add(cls);
+    el.classList.remove('hidden');
+    document.querySelectorAll('.app > *').forEach(x => x.setAttribute('inert', ''));
+    el.focus({ preventScroll: true });
+  }
+
+  function hide(el, cls) {
+    document.body.classList.remove(cls);
+    el.classList.add('hidden');
+    if (!document.body.classList.contains('detail-open')
+        && !document.body.classList.contains('theft-open')) {
+      document.querySelectorAll('.app > *').forEach(x => x.removeAttribute('inert'));
+    }
+    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    opener = null;
+  }
+
+  function trap(el) {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); el.__close(); return; }
+      if (e.key !== 'Tab') return;
+      const f = [...el.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])')]
+        .filter(x => x.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+  trap(inc); trap(theft);
+
+  const part = (root, role) => root.querySelector('[data-role="' + role + '"]');
+
+  /* ── The attempt ───────────────────────────────────────────────────────
+   * The outcome and the vehicle lead, because those are what a person needs
+   * first. The relative time is a supporting line rather than the heading it
+   * used to be: "9 min ago" is not the most important thing about a refused
+   * attempt on a stolen vehicle. */
+  function openAttempt(attempt, vehicle) {
+    current = attempt;
+    report = Incidents.forVehicle(attempt.reg);
+    part(inc, 'inc-title').textContent = 'Fuel attempt refused';
+    part(inc, 'inc-sub').textContent = attempt.reg + ' · ' + attempt.station + ' · ' + attempt.ago;
+
+    const facts = [
+      ['Outcome', 'Refused'],
+      ['Vehicle', attempt.reg + (vehicle ? ' · ' + vehicle[2] : '')],
+      ['Fuel station', attempt.station],
+      ['Attempted at', attempt.at],
+      /* Four digits, never the card. */
+      ['Card ending', attempt.cardLast4],
+      ['Assigned driver', attempt.driver],
+      ['Reported stolen', report ? report.openedAt : 'Not recorded'],
+      ['Incident reference', report ? report.ref : 'Not recorded'],
+    ];
+    part(inc, 'inc-facts').innerHTML = facts
+      .map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd>').join('');
+
+    const add = part(inc, 'inc-add');
+    const already = report && report.attempts.some(a => a.id === attempt.id);
+    add.textContent = already ? 'Added to report' : 'Add to theft report';
+    add.disabled = !!already;
+
+    show(inc, 'detail-open');
+  }
+
+  inc.__close = () => hide(inc, 'detail-open');
+  part(inc, 'inc-close').addEventListener('click', inc.__close);
+  part(inc, 'inc-back').addEventListener('click', inc.__close);
+  part(inc, 'inc-vehicle').addEventListener('click', () => {
+    const reg = current && current.reg;
+    inc.__close();
+    if (reg) Records.forms.vehicle && location.assign('#directory');
+  });
+
+  /* Only what is relevant, and nothing that identifies a person beyond the
+     driver the vehicle is assigned to. */
+  part(inc, 'inc-copy').addEventListener('click', async () => {
+    const btn = part(inc, 'inc-copy');
+    const lines = [...part(inc, 'inc-facts').querySelectorAll('dt')]
+      .map(dt => dt.textContent + ': ' + dt.nextElementSibling.textContent);
+    const said = btn.textContent;
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      btn.textContent = 'Copied';
+    } catch (e) {
+      /* Visible rather than silent: a copy that did not happen and says
+         nothing is worse than one that admits it. */
+      btn.textContent = 'Could not copy';
+    }
+    setTimeout(() => { btn.textContent = said; }, 2000);
+  });
+
+  part(inc, 'inc-add').addEventListener('click', () => {
+    if (!report || !current) return;
+    const added = Incidents.addAttempt(report, current);
+    const btn = part(inc, 'inc-add');
+    btn.textContent = 'Added to report';
+    btn.disabled = true;
+    Records.toast(added
+      ? 'Fuel attempt added to the theft report.'
+      : 'That attempt is already on the report.');
+  });
+
+  /* ── The report ────────────────────────────────────────────────────────
+   * Everything on it is optional and none of it holds up the block, which
+   * happened when the report was made. */
+  function openReport(incident) {
+    report = incident;
+    part(theft, 'theft-title').textContent = 'Report details';
+
+    const block = part(theft, 'theft-block');
+    const ok = incident.block === 'blocked';
+    block.className = 'block-state ' + (ok ? 'block-state--ok' : 'block-state--failed');
+    block.innerHTML = ok
+      ? '<b>Fuel access blocked.</b> Purchases for this vehicle have been blocked at stations in the TFN network since ' + esc(incident.openedAt) + '.'
+      : '<b>Fuel access could not be blocked.</b> The request did not reach the fuel network. This vehicle is not protected. Try again, and tell your TFN contact if it keeps failing.';
+
+    theft.querySelectorAll('[name="theft-how"]').forEach(r => { r.checked = r.value === incident.how; });
+    theft.querySelector('#theft-notes').value = incident.notes || '';
+    theft.querySelector('#theft-cas').value = incident.caseNumber || '';
+    theft.querySelector('#theft-station').value = incident.station || '';
+
+    const list = part(theft, 'theft-attempts');
+    list.innerHTML = incident.attempts.length
+      ? incident.attempts.map(a =>
+          '<li><span>' + esc(a.station) + '</span><span>' + esc(a.at) + ' · Refused</span></li>').join('')
+      : '<li class="none">No attempts recorded yet. If one is made, it will appear here with the station and the time.</li>';
+
+    part(theft, 'theft-save').textContent = '';
+    show(theft, 'theft-open');
+  }
+
+  theft.__close = () => hide(theft, 'theft-open');
+  part(theft, 'theft-close').addEventListener('click', theft.__close);
+  part(theft, 'theft-done').addEventListener('click', theft.__close);
+
+  /* Autosave, with states that are true. "Saved as you type" is a claim; this
+     says which of the three things is actually happening. */
+  let saveTimer = null;
+  function save() {
+    if (!report) return;
+    const state = part(theft, 'theft-save');
+    state.className = 'save-state';
+    state.textContent = 'Saving…';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      const how = theft.querySelector('[name="theft-how"]:checked');
+      const before = { how: report.how, caseNumber: report.caseNumber };
+      report.how = how ? how.value : '';
+      report.notes = theft.querySelector('#theft-notes').value.trim();
+      /* Surrounding whitespace absorbed; the reference itself left exactly as
+         it was given, because a case number is somebody else's identifier. */
+      report.caseNumber = theft.querySelector('#theft-cas').value.trim();
+      report.station = theft.querySelector('#theft-station').value.trim();
+      if (before.caseNumber !== report.caseNumber && report.caseNumber) {
+        Incidents.file(report, 'SAPS reference recorded', { ref: report.caseNumber });
+      }
+      if (before.how !== report.how && report.how) {
+        Incidents.file(report, 'Report details updated', { how: report.how });
+      }
+      state.textContent = 'Saved at ' + Incidents.now().split(', ')[1];
+    }, 400);
+  }
+  theft.addEventListener('input', e => { if (e.target.closest('.focus-sheet__body')) save(); });
+  theft.addEventListener('change', e => { if (e.target.closest('.focus-sheet__body')) save(); });
+
+  window.__theftOverlays = { openAttempt, openReport };
+})();
 
 /* The next-step strip's action. Two steps, in the order a person would take
    them: the drivers page first, so closing the form lands somewhere that makes
