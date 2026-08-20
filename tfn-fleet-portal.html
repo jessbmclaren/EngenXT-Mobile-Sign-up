@@ -2899,6 +2899,76 @@ body.theft-open .focus-sheet#theft-sheet { display: flex; }
 body.detail-open .sheet-backdrop,
 body.theft-open .sheet-backdrop { display: block; }
 
+/* ── SelectField ─────────────────────────────────────────────────────────
+ * The trigger is the same shell as a text input, because a field that opens a
+ * list and a field you type into are both fields — they were different heights
+ * and different type before, on rows a centimetre apart.
+ */
+.select-field { position: relative; }
+
+/* Kept for its value and out of the tab order: the button is the control. */
+.select-native {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1-0);
+  text-align: left;
+  cursor: pointer;
+}
+.select-trigger:hover:not(:focus) { border-color: var(--color-on-surface-variant); }
+.select-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The placeholder reads as a placeholder, in the same colour a text input
+   uses for one, so an unanswered select and an unanswered input look the
+   same amount of unanswered. */
+.select-value.is-placeholder { color: var(--color-form-placeholder-text); }
+.select-caret { flex: none; color: var(--color-on-surface-variant); }
+
+.select-list {
+  min-width: 100%;
+  padding: var(--space-0-5);
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-0);
+  min-height: var(--size-control-height);
+  padding: var(--space-1-0) var(--space-1-5);
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-body-md);
+  cursor: pointer;
+}
+/* Three states that have to stay apart: the row under the pointer or the
+   arrow keys, and the row that is the answer. They were one colour before. */
+.select-option.is-active { background: var(--color-surface-hover); }
+.select-option[aria-selected="true"] { font-weight: var(--font-weight-label-md); }
+.select-tick {
+  flex: none;
+  width: 1em;
+  color: var(--color-brand-ink);
+}
+
+/* Quieter than an option and legible against the surface, with air above so a
+   group reads as a group rather than as a row. */
+.select-group {
+  margin: var(--space-1-5) 0 var(--space-0-5);
+  padding: 0 var(--space-1-5);
+  font-size: var(--font-size-label-sm);
+  font-weight: var(--font-weight-label-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+.select-list > div:first-child .select-group { margin-top: 0; }
+
 /* organisms.css */
 /* Organisms: what a screen is actually built from.
  *
@@ -8934,7 +9004,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <div class="form-field" data-field="year">
         <label for="f-year">Year</label>
         <select class="field" id="f-year">
-          <option value="">Select</option>
+          <option value="">Select year</option>
           <option>2026</option>
           <option>2025</option>
           <option>2024</option>
@@ -11551,7 +11621,7 @@ addEventListener('scroll', e => {
 }, true);
 addEventListener('resize', () => closeAllPops());
 
-return { form, directory, forms, closeAllPops, groupNum, toast, hideToast,
+return { form, directory, forms, closeAllPops, groupNum, toast, hideToast, pinPop, unpinPop,
   statusDialog, statusMenu, recordPanel, wrapWideTables, pending };
 })();
 </script>
@@ -12224,6 +12294,275 @@ return {
 
 })();
 
+
+/* select-field.js */
+/* One opened menu, in the product's own colours.
+ *
+ * Nine fields were native <select>s and one was a hand-built combobox, so the
+ * form opened a dark operating-system menu for Fuel type and a white
+ * application menu for Make — different type, different option heights,
+ * different selected indicators, different keyboard, on two fields a
+ * centimetre apart. The opened part of a native select cannot be styled, so
+ * matching them means not using it.
+ *
+ * ── Enhanced, not replaced ───────────────────────────────────────────────
+ *
+ * The <select> stays in the DOM and stays the value. Everything in this file
+ * reads a field with getElementById(id).value and writes it back the same
+ * way; the form engine, the capacity service, the taxonomy sync and
+ * every scripted state depend on that. So the native element remains the
+ * source of truth and a button plus a listbox are drawn over it. Choosing an
+ * option writes the select and fires the change event the rest of the product
+ * already listens for.
+ *
+ * It also means the form still works if this file does not run.
+ *
+ * ── The placeholder is not an option ────────────────────────────────────
+ *
+ * A native select shows its first option when nothing is chosen, so "Select"
+ * appeared in the menu as a value with a tick beside it — a thing you could
+ * pick, which meant unpicking your answer by choosing the word "Select". Here
+ * the empty option is the trigger's placeholder and is not in the list at all.
+ */
+(() => {
+  const OPEN = new Set();
+
+  function closeAll(except) {
+    OPEN.forEach(c => { if (c !== except) c.close(); });
+  }
+
+  function build(sel) {
+    if (sel.dataset.enhanced) return;
+    sel.dataset.enhanced = '1';
+
+    const id = sel.id || ('sel-' + Math.floor(performance.now() * 1000));
+    sel.id = id;
+
+    /* The native element keeps the value and leaves the tab order: the button
+       below is what a person reaches, and two stops for one field is a field
+       that has to be tabbed past twice. */
+    sel.setAttribute('aria-hidden', 'true');
+    sel.tabIndex = -1;
+    sel.classList.add('select-native');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'select-field';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'field select-trigger';
+    trigger.id = id + '-trigger';
+    trigger.setAttribute('role', 'combobox');
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', id + '-list');
+    /* The label points at the select; the button is the thing being labelled,
+       so it borrows the same name. */
+    const label = document.querySelector('label[for="' + id + '"]');
+    if (label) trigger.setAttribute('aria-labelledby', (label.id = label.id || id + '-label') + ' ' + id + '-value');
+
+    const value = document.createElement('span');
+    value.className = 'select-value';
+    value.id = id + '-value';
+
+    const caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    caret.setAttribute('class', 'select-caret');
+    caret.setAttribute('width', '16'); caret.setAttribute('height', '16');
+    caret.setAttribute('viewBox', '0 0 24 24'); caret.setAttribute('fill', 'none');
+    caret.setAttribute('stroke', 'currentColor'); caret.setAttribute('stroke-width', '2');
+    caret.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'm6 9 6 6 6-6');
+    caret.append(path);
+
+    trigger.append(value, caret);
+
+    const list = document.createElement('div');
+    list.className = 'pop select-list hidden';
+    list.id = id + '-list';
+    list.setAttribute('role', 'listbox');
+
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.append(sel, trigger, list);
+
+    let active = -1;
+    let rows = [];
+
+    /* Built from the select, so a field whose options are filled later — the
+       taxonomy, the licence codes, the makes — is right the moment it is. */
+    function draw() {
+      rows = [];
+      list.textContent = '';
+      [...sel.children].forEach(node => {
+        if (node.tagName === 'OPTGROUP') {
+          const head = document.createElement('p');
+          head.className = 'select-group';
+          head.id = id + '-g' + rows.length;
+          head.textContent = node.label;
+          /* A heading is not a choice. It is announced as the group's name and
+             cannot be arrowed onto or clicked. */
+          const group = document.createElement('div');
+          group.setAttribute('role', 'group');
+          group.setAttribute('aria-labelledby', head.id);
+          group.append(head);
+          [...node.children].forEach(o => group.append(option(o)));
+          list.append(group);
+        } else {
+          const row = option(node);
+          if (row) list.append(row);
+        }
+      });
+    }
+
+    function option(o) {
+      /* The empty option is the placeholder. It is the trigger's resting text
+         and never a row in the list, because choosing "Select" is not a thing
+         somebody means to do. */
+      if (o.value === '') return null;
+      const row = document.createElement('div');
+      row.className = 'select-option';
+      row.setAttribute('role', 'option');
+      row.id = id + '-o' + rows.length;
+      row.dataset.value = o.value;
+      row.setAttribute('aria-selected', String(o.value === sel.value));
+      const tick = document.createElement('span');
+      tick.className = 'select-tick';
+      tick.setAttribute('aria-hidden', 'true');
+      tick.textContent = o.value === sel.value ? '✓' : '';
+      const text = document.createElement('span');
+      text.textContent = o.textContent;
+      row.append(tick, text);
+      rows.push(row);
+      return row;
+    }
+
+    function paint() {
+      const chosen = [...sel.options].find(o => o.value === sel.value && o.value !== '');
+      value.textContent = chosen ? chosen.textContent : placeholder();
+      value.classList.toggle('is-placeholder', !chosen);
+      rows.forEach(r => {
+        const on = r.dataset.value === sel.value;
+        r.setAttribute('aria-selected', String(on));
+        r.firstChild.textContent = on ? '✓' : '';
+      });
+    }
+
+    const placeholder = () => {
+      const empty = [...sel.options].find(o => o.value === '');
+      return empty ? empty.textContent : 'Select';
+    };
+
+    function open() {
+      if (!list.classList.contains('hidden')) return;
+      draw(); paint();
+      closeAll(api);
+      list.classList.remove('hidden');
+      trigger.setAttribute('aria-expanded', 'true');
+      /* Records is a top-level const, not a property of window: guarding on
+         window.Records was false every time and the list was never placed. */
+      if (typeof Records !== 'undefined' && Records.pinPop) Records.pinPop(trigger, list);
+      const at = rows.findIndex(r => r.dataset.value === sel.value);
+      move(at < 0 ? 0 : at);
+      OPEN.add(api);
+    }
+
+    function close(focusBack) {
+      if (list.classList.contains('hidden')) return;
+      list.classList.add('hidden');
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.removeAttribute('aria-activedescendant');
+      if (typeof Records !== 'undefined' && Records.unpinPop) Records.unpinPop(list);
+      OPEN.delete(api);
+      if (focusBack) trigger.focus({ preventScroll: true });
+    }
+
+    function move(i) {
+      if (!rows.length) return;
+      active = Math.max(0, Math.min(i, rows.length - 1));
+      rows.forEach((r, n) => r.classList.toggle('is-active', n === active));
+      trigger.setAttribute('aria-activedescendant', rows[active].id);
+      rows[active].scrollIntoView({ block: 'nearest' });
+    }
+
+    function pick(i) {
+      const row = rows[i];
+      if (!row) return;
+      sel.value = row.dataset.value;
+      /* The event the rest of the product listens for. Assigning .value in
+         script fires nothing on its own. */
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      sel.dispatchEvent(new Event('input', { bubbles: true }));
+      paint();
+      close(true);
+    }
+
+    trigger.addEventListener('click', e => {
+      /* The list is a .pop, and the document handler that closes popovers on an
+         outside click was hiding it in the same click that opened it. */
+      e.stopPropagation();
+      list.classList.contains('hidden') ? open() : close(true);
+    });
+
+    trigger.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (list.classList.contains('hidden')) { open(); return; }
+        if (e.key === 'Enter' || e.key === ' ') { pick(active); return; }
+        move(active + (e.key === 'ArrowDown' ? 1 : -1));
+        return;
+      }
+      if (e.key === 'Home' && !list.classList.contains('hidden')) { e.preventDefault(); move(0); return; }
+      if (e.key === 'End' && !list.classList.contains('hidden')) { e.preventDefault(); move(rows.length - 1); return; }
+      if (e.key === 'Escape' && !list.classList.contains('hidden')) {
+        e.preventDefault(); e.stopPropagation(); close(true); return;
+      }
+      if (e.key === 'Tab') { close(false); return; }
+      /* Type-ahead, which a native select gives for free and a custom one has
+         to earn: a long list of years or licence codes is unusable without it. */
+      if (e.key.length === 1 && /\S/.test(e.key)) {
+        if (list.classList.contains('hidden')) open();
+        const from = active + 1;
+        const hit = rows.findIndex((r, n) =>
+          n >= from && r.textContent.trim().toLowerCase().startsWith(e.key.toLowerCase()));
+        const wrapped = hit >= 0 ? hit
+          : rows.findIndex(r => r.textContent.trim().toLowerCase().startsWith(e.key.toLowerCase()));
+        if (wrapped >= 0) move(wrapped);
+      }
+    });
+
+    list.addEventListener('click', e => {
+      const row = e.target.closest('.select-option');
+      if (!row) return;
+      e.stopPropagation();
+      pick(rows.indexOf(row));
+    });
+
+    list.addEventListener('mousemove', e => {
+      const row = e.target.closest('.select-option');
+      if (row) move(rows.indexOf(row));
+    });
+
+    /* Anything that rewrites the options — the taxonomy, the licence codes —
+       or writes the value in script. */
+    const api = { close, refresh: () => { draw(); paint(); }, trigger, sel };
+    sel.addEventListener('change', paint);
+    new MutationObserver(() => { if (!list.classList.contains('hidden')) draw(); paint(); })
+      .observe(sel, { childList: true });
+
+    draw(); paint();
+    return api;
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.select-field')) closeAll(null);
+  });
+
+  /* Everything present at start-up, and anything added later. */
+  function enhanceAll() { document.querySelectorAll('select:not([data-enhanced])').forEach(build); }
+  enhanceAll();
+  window.__enhanceSelects = enhanceAll;
+})();
+
 /* type-select.js */
 /* Draws the vehicle-type select from the taxonomy, and makes the engine field
    ask for itself only where the answer matters.
@@ -12237,7 +12576,7 @@ return {
   const sel = document.getElementById('f-type');
   if (!sel || !window.VehicleTypes) return;
 
-  sel.innerHTML = '<option value="">Select</option>' +
+  sel.innerHTML = '<option value="">Select vehicle category</option>' +
     VehicleTypes.groups().map(g =>
       `<optgroup label="${g.name}">` +
       g.types.map(t => `<option value="${t.code}">${t.label}</option>`).join('') +
@@ -16432,7 +16771,7 @@ function makeSheet(config) {
         useText.hidden = !use.free;
         useSel.hidden = !!use.free;
         if (!use.free) {
-          useSel.innerHTML = '<option value="">Select</option>' +
+          useSel.innerHTML = '<option value="">Select a use</option>' +
             use.options.map(o => '<option value="' + o.code + '">' + o.label + '</option>').join('');
         }
       }
