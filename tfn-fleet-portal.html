@@ -2754,27 +2754,9 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 .radio input { flex: none; }
 .radio input { width: 16px; height: 16px; accent-color: var(--color-brand-ink); margin: 0; }
 
-/* ── MultiTankEditor ────────────────────────────────────────────────────
- * One row per tank, and the total is calculated. The form does the addition
- * because the form is the thing that then checks it.
- */
-.tank-list { display: flex; flex-direction: column; gap: var(--space-1-5); }
-.tank-row { display: flex; align-items: flex-end; gap: var(--space-1-5); }
-.tank-row .form-field { flex: 1; min-width: 0; }
-.tank-total {
-  margin: var(--space-2-0) 0 0;
-  padding-top: var(--space-1-5);
-  border-top: var(--size-border-hairline) solid var(--color-outline-variant);
-  font-size: var(--font-size-body-md);
-}
-.tank-total b { font-variant-numeric: tabular-nums; }
-.tank-total__note--warn { color: var(--color-on-warning-container); }
-.tank-total .tank-total__note {
-  display: block;
-  margin-top: var(--space-0-5);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-on-surface-variant);
-}
+/* MultiTankEditor's styles were here: a row per tank, and a total ruled off
+   below them. The form asks for one combined figure now, so the rows and the
+   total went with the question, and these had nothing left to paint. */
 
 /* ── ErrorSummary ───────────────────────────────────────────────────────
  * Compact, and made of links. Its job is to get somebody to the field, so the
@@ -9354,7 +9336,12 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <!-- Appears once a category with configurations is chosen, and takes the
            full width because its options carry weights: "Medium, 8 to 16 tons"
            does not fit in half a sheet and does not mean anything trimmed. -->
-      <div class="form-field field-wide" data-field="vehicleConfiguration" hidden>
+      <!-- Vehicle configuration was here: single cab against double cab, light
+           against heavy truck, street against off-road. Every one of those was
+           a fact about a granular category, and the categories are now LCV,
+           HCV and Motorcycle. A configuration list that covered a whole
+           category would be a guess in a field somebody has to answer. -->
+      <div class="form-field field-wide hidden" data-field="vehicleConfiguration" hidden>
         <label for="f-config">Vehicle configuration</label>
         <select class="field" id="f-config"></select>
         <span class="help" data-role="config-help"></span>
@@ -9401,51 +9388,22 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
            motorcycles only, labelled "Engine capacity, Optional" in cc, saying
            what it is for. -->
 
-      <!-- Three named answers, not a dropdown showing "Not sure".
-           The old control was a select whose resting label was the least
-           informative of its options, so the commonest reading of the form was
-           that the product had already decided the vehicle had one tank and
-           was unsure about it. Radios say what the three answers are without
-           being opened, and "Not sure" stays a real answer because a manager
-           adding somebody else's truck often does not know. -->
-      <!-- role="radiogroup" so the group, not the hidden input holding its
-           answer, is what carries aria-invalid and the error description. The
-           form engine already resolves a radio question to its group; this
-           fieldset simply had not said it was one. The legend still supplies
-           the accessible name. -->
-      <fieldset class="form-field field-wide radio-group" data-field="tankMode"
-               role="radiogroup" aria-labelledby="tank-mode-legend">
-        <legend id="tank-mode-legend">Fuel tanks</legend>
-        <!-- The group's answer, for the form engine, which reads every field
-             through one element. Kept in step by the sheet controller. -->
-        <input type="hidden" id="f-tank-mode">
-        <label class="radio"><input type="radio" name="tankMode" value="one"> <span>One tank</span></label>
-        <label class="radio"><input type="radio" name="tankMode" value="many"> <span>Two tanks</span></label>
-        <label class="radio"><input type="radio" name="tankMode" value="unsure"> <span>Not sure</span></label>
-      </fieldset>
+      <!-- How many physical tanks a vehicle has was asked here, as One tank,
+           Two tanks or Not sure, with a per-tank editor behind the second
+           answer. It is gone. A fuel check needs the total the vehicle can
+           hold; how many tanks add up to it changes nothing the product does,
+           and it was a required question with a "Not sure" answer, which is
+           the shape of a question nobody should have had to answer.
 
-      <!-- One tank, or not sure: a single figure. -->
-      <div class="form-field" data-field="tankCapacity" hidden>
-        <label for="f-tank" data-role="tank-label">Tank capacity</label>
+           Records written before this may still carry a tank count. Nothing
+           reads it, nothing requires it, and it does not stop a save. -->
+      <div class="form-field field-wide" data-field="tankCapacity">
+        <label for="f-tank">Total fuel-tank capacity</label>
         <span class="suffix-wrap">
           <input class="field" id="f-tank" inputmode="decimal" placeholder="e.g. 80">
           <span class="suffix">litres</span>
         </span>
-        <span class="help" data-role="tank-help">Do not include the AdBlue tank.</span>
-      </div>
-
-      <!-- Two tanks, each on its own, and the total worked out here. Asking
-           somebody to add up their own tanks is asking them to do arithmetic
-           the product is about to validate.
-
-           Two is the limit. The editor used to grow a row on every press of
-           "Add another tank" with nothing stopping it, while the answer above
-           said "More than one tank" and left how many open. Both now say the
-           same thing, so nobody is offered a third row and then asked why the
-           total looks wrong. -->
-      <div class="form-field field-wide" data-field="tanks" hidden>
-        <span class="tank-list" data-role="tank-list"></span>
-        <p class="tank-total" data-role="tank-total"></p>
+        <span class="help">Enter the combined capacity of all the vehicle’s fuel tanks.</span>
       </div>
       </div>
     </section>
@@ -9842,7 +9800,10 @@ function form(spec) {
      faults. */
   function setSummaryHeading(n) {
     if (!summaryHeading) return;
-    summaryHeading.textContent = n === 1 ? 'Check 1 field' : `Check ${n} fields`;
+    /* Nothing to check reads as no heading. "Check 0 fields" is the same kind
+       of leftover as the list underneath it. */
+    summaryHeading.textContent = !n ? ''
+      : n === 1 ? 'Check 1 field' : `Check ${n} fields`;
   }
   const alertBox = part('alert');
   const statusLine = part('record-status');
@@ -9998,7 +9959,15 @@ function form(spec) {
           return `<li><a href="#${ID[f]}" data-field-link="${f}">${actual}</a></li>`;
         }).join('');
     } else {
+      /* Emptied, not just hidden. display:none takes the list off the screen
+         and out of the accessibility tree, but it leaves the sentences in the
+         document, and they are sentences about faults that have been fixed.
+         Anything that reads the markup rather than the screen — a test, an
+         export, the next person to open the inspector — is told the form is
+         still blocked by fields that are answered. */
       summary.classList.add('hidden');
+      summaryList.innerHTML = '';
+      setSummaryHeading(0);
     }
   }
 
@@ -10269,7 +10238,10 @@ function form(spec) {
           return `<li><a href="#${ID[field]}" data-field-link="${field}">${actual}</a></li>`;
         }).join('');
     } else {
+      /* Same as paintSummary: the list goes with the box it is in. */
       summary.classList.add('hidden');
+      summaryList.innerHTML = '';
+      setSummaryHeading(0);
     }
 
     // The number is said once, here.
@@ -12441,151 +12413,150 @@ window.VehicleTypes = (() => {
    `group` drives the optgroups. A flat list of thirteen is a wall; grouped,
    a manager finds their vehicle in one glance without the list hiding
    anything from them. */
-/* Seven, in the three groups this fleet actually runs: light commercial,
-   heavy commercial, and two and three wheels.
-
-   Thirteen were offered before, which meant offering passenger cars, minibuses,
-   buses, a special-purpose free-text branch and an "Other" escape hatch to a
-   product for bakkies, vans, trucks and bikes. A list is a claim about what
-   you support, and five of those were not claims anybody meant to make.
-
-   An import naming one of the removed kinds no longer resolves silently. It
-   arrives unrecognised and is surfaced at review, which is the honest answer:
-   the product does not carry that vehicle. */
+/* Three categories, and one place that says what any older value becomes.
+ *
+ * The list was thirteen, then eight. Both were a claim about what the product
+ * carries, and both were finer than anything downstream could use: a fuel
+ * check needs to know roughly how big the tank should be, and a bakkie and a
+ * van answer that identically. Splitting them bought nothing and cost a
+ * decision at every Add vehicle.
+ *
+ * Stored values are not rewritten. A record saved as `bakkie` stays `bakkie`
+ * and is read as LCV through normalise() below, which is the only function in
+ * this file allowed to turn a written-down category into a current one. The
+ * form, the filter, the table, the importer and the export all go through it.
+ */
 const TYPES = [
-  { code: 'motorcycle',         label: 'Motorcycle',              group: 'Two and three wheels', band: 'motorcycle.street',    engine: 'required' },
-  { code: 'scooter',            label: 'Scooter',                 group: 'Two and three wheels', band: 'motorcycle.scooter',   engine: 'required' },
-  { code: 'courier_motorcycle', label: 'Courier motorcycle',      group: 'Two and three wheels', band: 'motorcycle.underbone', engine: 'required' },
-  { code: 'three_wheeler',      label: 'Three-wheeler',           group: 'Two and three wheels', band: 'motorcycle.tricycle',  engine: 'required' },
-
-  { code: 'bakkie',             label: 'Bakkie',                  group: 'Light commercial', band: 'bakkie',    engine: 'optional' },
-  { code: 'van',                label: 'Van',                     group: 'Light commercial', band: 'van',       engine: 'optional' },
-
-  { code: 'rigid_truck',        label: 'Rigid truck',             group: 'Heavy commercial', band: 'truck.medium', engine: 'optional' },
-  { code: 'tractor_unit',       label: 'Tractor unit',            group: 'Heavy commercial', band: 'truck.heavy',  engine: 'optional' },
+  { code: 'lcv',        label: 'LCV',        long: 'LCV — Light commercial vehicle', band: 'lcv' },
+  { code: 'hcv',        label: 'HCV',        long: 'HCV — Heavy commercial vehicle', band: 'hcv' },
+  { code: 'motorcycle', label: 'Motorcycle', long: 'Motorcycle',                     band: 'motorcycle' },
 ];
 
-const BY_CODE = Object.fromEntries(TYPES.map(t => [t.code, t]));
-
-/* Configurations, per category, and only where they narrow a band.
- *
- * A category with no entry here has no configuration question, and that is a
- * statement rather than an omission: a scooter is a scooter, and inventing
- * three kinds of one so that every category has a second dropdown would be
- * asking a fleet manager to answer a question the product does nothing with.
- *
- * `band` is the capacity-service key this configuration resolves to, so
- * answering the question is what buys the tighter range. */
+/* A configuration is offered only where the answer is still true of the whole
+   category. On a motorcycle it is, and it changes the tank a great deal. LCV
+   and HCV have none: single cab against double cab was a fact about bakkies,
+   and inventing a list that covers every light commercial vehicle would be
+   guessing in a field somebody has to answer. */
 const CONFIGS = {
   motorcycle: [
     { code: 'street',  label: 'Street',        band: 'motorcycle.street' },
     { code: 'dual',    label: 'Dual-purpose',  band: 'motorcycle.dual' },
     { code: 'offroad', label: 'Off-road',      band: 'motorcycle.offroad' },
   ],
-  rigid_truck: [
-    { code: 'light',  label: 'Light, up to 8 tons',   band: 'truck.light' },
-    { code: 'medium', label: 'Medium, 8 to 16 tons',  band: 'truck.medium' },
-    { code: 'heavy',  label: 'Heavy, over 16 tons',   band: 'truck.heavy' },
-  ],
-  bakkie: [
-    { code: 'single', label: 'Single cab', band: 'bakkie' },
-    { code: 'double', label: 'Double cab', band: 'bakkie' },
-  ],
 };
 
-/* Primary use. Asked on one category and no others.
+/* ── What an older value becomes ──────────────────────────────────────────
  *
- * On a three-wheeler it is the difference between a delivery box and a
- * passenger cab, and those do not carry the same tank. It was also asked on
- * `other` and `special_purpose`, where it was the only field saying what the
- * vehicle was; both categories are gone. Everywhere else the answer would
- * change nothing, and the brief's own rule applies: do not ask. */
-const USES = {
-  three_wheeler: {
-    required: true,
-    label: 'Primary use',
-    options: [
-      { code: 'cargo',     label: 'Cargo or delivery', band: 'motorcycle.tricycle' },
-      { code: 'passenger', label: 'Carrying passengers', band: 'motorcycle.tricycle' },
-    ],
-  },
+ * One map, one function, used by the form, the filter, the table, the CSV
+ * importer and the export. The rule is that a value only maps when the answer
+ * is not in doubt.
+ */
+const TO_CURRENT = {
+  /* Light commercial. */
+  lcv: 'lcv', 'light commercial vehicle': 'lcv',
+  bakkie: 'lcv', van: 'lcv', panelvan: 'lcv', 'panel van': 'lcv',
+  ute: 'lcv', pickup: 'lcv', 'pick up': 'lcv',
+
+  /* Heavy commercial. */
+  hcv: 'hcv', 'heavy commercial vehicle': 'hcv',
+  'heavy commercial vehicle (≤8 ton)': 'hcv',
+  rigid_truck: 'hcv', 'rigid truck': 'hcv', rigid: 'hcv', truck: 'hcv',
+  tractor_unit: 'hcv', 'tractor unit': 'hcv', 'truck tractor': 'hcv',
+  horse: 'hcv', tractor: 'hcv',
+
+  /* Two wheels. */
+  motorcycle: 'motorcycle', motorbike: 'motorcycle', bike: 'motorcycle',
+  moto: 'motorcycle', scooter: 'motorcycle',
+  courier_motorcycle: 'motorcycle', 'courier motorcycle': 'motorcycle',
 };
 
-/* What a spreadsheet might carry instead of the code. The three old values are
-   here because files exported before this change are still being uploaded, and
-   an import that rejects last month's export is a worse product than one that
-   reads it. LCV becomes a bakkie because that is what an LCV in this fleet
-   nearly always is; HCV becomes a rigid truck. Both are a guess, so both are
-   surfaced at review rather than applied silently. */
-const ALIASES = {
-  lcv: 'bakkie', 'light commercial vehicle': 'bakkie',
-  hcv: 'rigid_truck', 'heavy commercial vehicle': 'rigid_truck',
-  'heavy commercial vehicle (≤8 ton)': 'rigid_truck',
-  bike: 'motorcycle', motorbike: 'motorcycle', moto: 'motorcycle',
-  ute: 'bakkie', pickup: 'bakkie', 'pick-up': 'bakkie', 'pick up': 'bakkie',
-  /* car, sedan, hatchback, suv, taxi, combi, kombi and coach used to resolve
-     here. The product does not carry those vehicles, so a file naming one is
-     not quietly turned into something else; it is flagged at review. */
-  panelvan: 'van', 'panel van': 'van',
-  truck: 'rigid_truck', 'rigid': 'rigid_truck',
-  'horse': 'tractor_unit', 'truck tractor': 'tractor_unit', 'tractor': 'tractor_unit',
-  trike: 'three_wheeler', tuktuk: 'three_wheeler', 'tuk-tuk': 'three_wheeler',
-};
+/* Values that are genuinely open questions. A passenger car is not a light
+   commercial vehicle, a minibus is not a bus, and a three-wheeler is not a
+   motorcycle for the purpose of guessing a tank. Turning any of them into an
+   LCV to keep a list tidy writes a fact nobody checked into a record that a
+   fuel limit is later read from, so they are preserved as written and marked
+   for somebody to answer. */
+const NEEDS_REVIEW = new Set([
+  'passenger_car', 'passenger car', 'car', 'sedan', 'hatchback', 'suv',
+  'minibus', 'taxi', 'combi', 'kombi',
+  'bus', 'coach',
+  'three_wheeler', 'three wheeler', 'trike', 'tuktuk', 'tuk tuk',
+  'special_purpose', 'special purpose vehicle', 'special purpose',
+  'other',
+]);
+
+const flatten = v => String(v == null ? '' : v).trim().toLowerCase()
+  .replace(/[\s_-]+/g, ' ').trim();
+
+/* The one reading of a stored or imported category.
+
+   Returns the current code, or null with review:true when the value is
+   recognised but ambiguous, or null with unknown:true when it is not
+   recognised at all. `stored` is always the value as written, because that is
+   what stays on the record. */
+function normalise(value) {
+  const stored = value == null ? '' : String(value).trim();
+  const flat = flatten(stored);
+  if (!flat) return { code: null, stored: stored, review: false, unknown: true };
+  const squashed = flat.replace(/ /g, '_');
+  const hit = TO_CURRENT[flat] || TO_CURRENT[squashed];
+  if (hit) return { code: hit, stored: stored, review: false, unknown: false };
+  if (NEEDS_REVIEW.has(flat) || NEEDS_REVIEW.has(squashed)) {
+    return { code: null, stored: stored, review: true, unknown: false };
+  }
+  const byLabel = TYPES.find(t => t.label.toLowerCase() === flat);
+  if (byLabel) return { code: byLabel.code, stored: stored, review: false, unknown: false };
+  return { code: null, stored: stored, review: false, unknown: true };
+}
 
 /* Tolerant on the way in, exact on the way out. A CSV is typed by a person, so
-   case, spaces, hyphens and underscores are all the same thing here. */
+   case, spaces, hyphens and underscores are all the same thing here. It is
+   normalise() underneath, because a spreadsheet and a stored record are the
+   same question asked twice and there is one answer to it. */
 function parse(value) {
-  if (value == null) return null;
-  const raw = String(value).trim();
-  if (!raw) return null;
-  const flat = raw.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
-  const squashed = flat.replace(/ /g, '_');
-  if (BY_CODE[squashed]) return squashed;
-  if (ALIASES[flat]) return ALIASES[flat];
-  const byLabel = TYPES.find(t => t.label.toLowerCase() === flat);
-  return byLabel ? byLabel.code : null;
+  return normalise(value).code;
 }
 
-/* An unrecognised value still has to be shown to somebody, and showing it
-   verbatim is how they work out what to fix. */
+/* What to show for a value. A current code gives its short label; a recognised
+   older one gives the label of what it maps to, so a record stored as `bakkie`
+   reads LCV without being rewritten. Anything else is shown as written, which
+   is how somebody works out what to fix. */
 function label(code) {
-  return BY_CODE[code] ? BY_CODE[code].label : (code || '');
+  const r = normalise(code);
+  if (r.code) return BY_CODE[r.code].label;
+  if (!r.stored) return '';
+  return r.stored.replace(/[_-]+/g, ' ').replace(/^./, m => m.toUpperCase());
 }
 
-function groups() {
-  const out = [];
-  for (const t of TYPES) {
-    let g = out.find(x => x.name === t.group);
-    if (!g) out.push(g = { name: t.group, types: [] });
-    g.types.push(t);
-  }
-  return out;
-}
+const BY_CODE = Object.fromEntries(TYPES.map(t => [t.code, t]));
 
 return {
   list: () => TYPES.slice(),
-  groups,
   byCode: c => BY_CODE[c] || null,
   label,
+  /* The expanded reading, for the open menu. */
+  long: c => (BY_CODE[normalise(c).code] || {}).long || label(c),
   parse,
+  normalise,
+  /* Convenience for the places that only need the yes or no. */
+  needsReview: v => normalise(v).review,
   /* The band a category and configuration resolve to together. A configuration
      always wins, because it is the more specific answer to the same question;
      without one the category's own band applies, which is wider on purpose. */
   bandFor: (c, config) => {
-    if (config && CONFIGS[c]) {
-      const found = CONFIGS[c].find(x => x.code === config);
+    const code = normalise(c).code;
+    if (config && CONFIGS[code]) {
+      const found = CONFIGS[code].find(x => x.code === config);
       if (found) return found.band;
     }
-    return BY_CODE[c] ? BY_CODE[c].band : null;
+    return BY_CODE[code] ? BY_CODE[code].band : null;
   },
-  configsFor: c => (CONFIGS[c] || []).slice(),
-  hasConfigs: c => !!CONFIGS[c],
-  useFor: c => USES[c] || null,
+  configsFor: c => (CONFIGS[normalise(c).code] || []).slice(),
+  hasConfigs: c => !!CONFIGS[normalise(c).code],
   /* The exact strings the CSV specification publishes, so the document and the
      parser cannot disagree about what is accepted. */
   csvValues: () => TYPES.map(t => t.code),
 };
-
 })();
 
 
@@ -13232,11 +13203,13 @@ return {
   const sel = document.getElementById('f-type');
   if (!sel || !window.VehicleTypes) return;
 
+  /* Three, so no groups: an optgroup over a list of three is a heading over
+     a heading. The option text is the expanded reading, because "LCV" alone is
+     an abbreviation somebody has to already know; tables and other compact
+     places use the short label through VehicleTypes.label(). */
   sel.innerHTML = '<option value="">Select vehicle category</option>' +
-    VehicleTypes.groups().map(g =>
-      `<optgroup label="${g.name}">` +
-      g.types.map(t => `<option value="${t.code}">${t.label}</option>`).join('') +
-      '</optgroup>').join('');
+    VehicleTypes.list()
+      .map(t => `<option value="${t.code}">${t.long}</option>`).join('');
 
 })();
 
@@ -13268,8 +13241,12 @@ const COLUMNS = [
     example: '2021' },
   { key: 'vehicle_category', label: 'Vehicle category', required: true,
     aliases: ['vehicle_type'],
-    says: 'One of seven values.',
-    example: 'bakkie' },
+    says: 'lcv, hcv or motorcycle. Older words for the same three are read as '
+      + 'well: bakkie, van and pickup are an LCV; rigid truck, tractor unit and '
+      + 'horse are an HCV; scooter and motorbike are a motorcycle. Anything '
+      + 'that could be more than one of them is not guessed at, and comes back '
+      + 'at review for you to answer.',
+    example: 'lcv' },
   { key: 'fuel_type', label: 'Fuel type', required: true,
     says: 'Diesel or Petrol.',
     example: 'Diesel' },
@@ -13601,6 +13578,22 @@ const BANDS = {
   'motorcycle.tricycle':   { review: null, warn: [1, 120], label: 'motor tricycle' },
   'motorcycle.quad':       { review: null, warn: [1, 120], label: 'quadricycle or utility ATV' },
 
+  /* ── The three current categories ──────────────────────────────────────
+     Each is the union of the bands it replaces, so no vehicle that passed
+     before is warned about now. LCV is bakkie and van, which carried the same
+     range as each other. HCV spans light through heavy truck. Motorcycle
+     spans scooter through dual-purpose. Wider than the old per-kind ranges by
+     design: the category no longer claims to know which kind it is, so the
+     band must not pretend otherwise. */
+  'lcv':         { review: [50, 120],  warn: [30, 200],   label: 'light commercial vehicle' },
+  'hcv':         { review: [70, 1510], warn: [40, 1600],  label: 'heavy commercial vehicle' },
+  'motorcycle':  { review: [4, 35],    warn: [2, 45],     label: 'motorcycle' },
+
+  /* ── Kept for what is already stored ───────────────────────────────────
+     Nothing selectable resolves here, but a record written before the
+     taxonomy narrowed still carries one of these, and a motorcycle
+     configuration still resolves to its own key, which is narrower and
+     better than the category's. */
   'bakkie':      { review: [50, 120],  warn: [30, 200],   label: 'bakkie' },
   /* An SUV carries noticeably more than a hatchback, and a coach more than
      twice what a midibus does. Both were inside one band that had to stretch
@@ -13626,13 +13619,15 @@ const BANDS = {
 
 /* Where the old three-value taxonomy lands, so existing records and imports
    keep working while the richer categories are adopted. */
+/* The three strings that predate the taxonomy and still arrive in old exports,
+   pointed at the current bands. "Other" is not mapped: it was two different
+   vehicles depending on tonnage, and guessing which is what the review flag
+   exists to avoid. */
 const LEGACY = {
-  'LCV': 'bakkie',
-  'Light Commercial Vehicle': 'bakkie',
-  'HCV': 'truck.medium',
-  'Heavy Commercial Vehicle (≤8 ton)': 'truck.medium',
-  'Other': 'truck.heavy',
-  'Other (>8 ton)': 'truck.heavy',
+  'LCV': 'lcv',
+  'Light Commercial Vehicle': 'lcv',
+  'HCV': 'hcv',
+  'Heavy Commercial Vehicle (≤8 ton)': 'hcv',
 };
 
 /* ── Model specifications ─────────────────────────────────────────────────
@@ -13675,11 +13670,10 @@ function bandFor({ vehicleCategory, vehicleConfiguration }) {
      was not. */
   const key = (window.VehicleTypes && VehicleTypes.bandFor(vehicleCategory, vehicleConfiguration))
     || LEGACY[vehicleCategory] || vehicleCategory;
-  if (key in BANDS) return BANDS[key];
-  if (mapped in BANDS) return BANDS[mapped];
-  /* A category with configurations but none chosen: no confident band. */
-  const family = Object.keys(BANDS).find(k => k.startsWith(mapped + '.'));
-  return family ? null : null;
+  /* `mapped` used to be read on the next two lines and was never declared in
+     this function. It could not fire while every category had a band, so it
+     sat here as a ReferenceError waiting for the first one that did not. */
+  return (key in BANDS) ? BANDS[key] : null;
 }
 
 const round = n => (Math.round(n * 100) / 100);
@@ -13696,7 +13690,7 @@ const grouped = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 function tank(input = {}) {
   const {
     tankCapacityLitres: raw, vehicleCategory, vehicleConfiguration,
-    hasMultipleTanks, make, model,
+    make, model,
   } = input;
 
   const text = String(raw == null ? '' : raw).trim();
@@ -13798,7 +13792,6 @@ function tank(input = {}) {
 
   const low = v < rlo;
   const firm = v < wlo || v > whi;
-  const multi = hasMultipleTanks === 'yes';
 
   const why = low
     /* "a off-road motorcycle". The article was fixed at "a" and the band
@@ -13807,11 +13800,12 @@ function tank(input = {}) {
     ? `${round(v)}L is unusually low for ${article(what)} ${what}.`
     : `${round(v)}L is unusually high for ${article(what)} ${what}.`;
 
+  /* The reader is never asked how many tanks the vehicle has, so the high
+     figure is answered by naming the thing that most often explains it
+     rather than by repeating an answer back at somebody. */
   const verify = low
     ? 'Check the manufacturer’s specification and confirm that all fitted fuel tanks are included.'
-    : multi
-      ? 'You have said this vehicle has more than one tank, so a higher figure may well be right. Confirm the combined usable capacity.'
-      : 'Check whether the vehicle has an auxiliary tank and enter the combined usable capacity.';
+    : 'Check whether the vehicle has an auxiliary tank and enter the combined usable capacity.';
 
   return {
     level: 'warning', field: 'tankCapacity', kind: 'band',
@@ -13826,8 +13820,9 @@ function tank(input = {}) {
  * specification is available to check against. */
 function engine(input = {}) {
   const { engineDisplacementCc: raw, vehicleCategory, make, model } = input;
-  const mapped = LEGACY[vehicleCategory] || vehicleCategory || '';
-  const isBike = mapped.startsWith('motorcycle');
+  const isBike = window.VehicleTypes
+    ? VehicleTypes.normalise(vehicleCategory).code === 'motorcycle'
+    : String(LEGACY[vehicleCategory] || vehicleCategory || '').startsWith('motorcycle');
   const text = String(raw == null ? '' : raw).trim();
 
   if (!text) {
@@ -13898,14 +13893,8 @@ function engine(input = {}) {
 
 /* How an engine size is written for a reader. Stored as cc always; a
    motorcycle is spoken of in cc and everything else in litres. */
-function showEngine(ccValue, vehicleCategory) {
-  if (ccValue == null || ccValue === '') return '';
-  const mapped = LEGACY[vehicleCategory] || vehicleCategory || '';
-  if (mapped.startsWith('motorcycle')) return `${Math.round(ccValue)}cc`;
-  return `${(ccValue / 1000).toFixed(1)}L`;
-}
 
-return { tank, engine, showEngine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
+return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
 })();
 </script>
 <script>
@@ -14172,21 +14161,17 @@ const REQUIRED = [
   ['model', 'Model', 'Enter or choose a model'],
   ['year', 'Year', 'Choose the vehicle year'],
   ['vehicleType', 'Vehicle category', 'Choose a vehicle category'],
-  /* Conditional: required only where the chosen category has configurations.
-     The engine skips a required field that is hidden, so this entry is inert
-     on a scooter and binding on a rigid truck without either being special
-     cased at the call site. */
-  ['vehicleConfiguration', 'Vehicle configuration', 'Choose a vehicle configuration'],
-  ['primaryUse', 'Primary use', 'Say what this vehicle is used for'],
+  /* Vehicle configuration was the conditional entry here, required only where
+     the chosen category had configurations. No category is asked for one now,
+     so the list is eight questions asked of every vehicle and `applies` is
+     the constant it says it is. */
   ['fuelType', 'Fuel type', 'Choose a fuel type'],
-  ['tankMode', 'Fuel tanks', 'Say how many fuel tanks this vehicle has'],
-  ['tankCapacity', 'Tank capacity', 'Enter the tank capacity'],
-  ['tanks', 'Tank 1 capacity', 'Enter the capacity of each tank'],
+  ['tankCapacity', 'Total fuel-tank capacity', 'Enter the total fuel-tank capacity'],
 ];
 
 const FILLED = {
   registration: 'CA 123 456', make: 'Toyota', model: 'Hilux 2.4 GD-6',
-  year: '2021', vehicleType: 'bakkie', vehicleConfiguration: 'double',
+  year: '2021', vehicleType: 'lcv',
   fuelType: 'Diesel', tankCapacity: '80', fleetNumber: '',
   vin: 'AHTFR22G30A123456',
 };
@@ -14194,12 +14179,10 @@ const FILLED = {
 const ID = {
   registration: 'f-reg', make: 'f-make', model: 'f-model', year: 'f-year',
   vehicleType: 'f-type', fuelType: 'f-fuel', tankCapacity: 'f-tank',
-  vehicleConfiguration: 'f-config', primaryUse: 'f-use',
+  vehicleConfiguration: 'f-config',
   fleetNumber: 'f-fleet', vin: 'f-vin',
-  /* The radio group reports through its checked input; the multi-tank editor
-     through its first tank, which is the control a summary link should land
-     on when several tanks are being entered. */
-  tankMode: 'f-tank-mode', tanks: 'f-tank-0',
+  /* A radio group reports through its checked input; every other field is
+     the control a summary link lands on. */
 };
 
 /* Each state: the values the form holds, which fields are refused, and any
@@ -14425,8 +14408,6 @@ function check(field, v, get, state) {
       tankCapacityLitres: v,
       vehicleCategory: get('vehicleType'),
       vehicleConfiguration: get('vehicleConfiguration'),
-      hasMultipleTanks: (document.querySelector('[name="tankMode"]:checked') || {}).value === 'many'
-        ? 'yes' : undefined,
       make: get('make'),
       model: get('model'),
     });
@@ -14444,44 +14425,9 @@ function check(field, v, get, state) {
     if (r.level === 'error') return { error: r.message };
   }
 
-  /* The multi-tank editor reports through its first tank field, and that
-     field holding the characters "abc" satisfied the ordinary required-field
-     rule: something was typed, so nothing was refused, and a vehicle was
-     created with a capacity of 0 litres. Every tank is checked here, and the
-     total with them, because the total is the number that decides what a
-     driver may draw at a pump. */
-  if (field === 'tanks') {
-    const inputs = [...document.querySelectorAll('[data-tank]')];
-    const typed = inputs.filter(i => String(i.value).trim() !== '');
-    if (!typed.length) return { error: 'Enter the capacity of each tank' };
-    const bad = typed.filter(i => {
-      const n = Number(String(i.value).trim());
-      return !Number.isFinite(n) || n <= 0;
-    });
-    if (bad.length) {
-      return { error: bad.length === 1
-        ? 'One tank capacity is not a number. Enter litres as digits'
-        : bad.length + ' tank capacities are not numbers. Enter litres as digits' };
-    }
-    if (typed.length < inputs.length) {
-      return { error: 'Enter a capacity for every tank, or remove the ones you do not need' };
-    }
-    const sum = typed.reduce((a2, i) => a2 + Number(String(i.value).trim()), 0);
-    if (!sum) return { error: 'The tanks add up to nothing. Check the figures' };
-    /* The combined figure is a capacity like any other, so it faces the same
-       plausibility check a single tank would. */
-    const r = Capacity.tank({
-      tankCapacityLitres: sum,
-      vehicleCategory: get('vehicleType'),
-      vehicleConfiguration: get('vehicleConfiguration'),
-      hasMultipleTanks: 'yes',
-      make: get('make'), model: get('model'),
-    });
-    if (r.level === 'error') return { error: r.message };
-    if (r.level === 'warning' || r.level === 'info') {
-      return { advice: [r.message, r.verify].filter(Boolean).join(' ') };
-    }
-  }
+  /* The per-tank branch was here: every tank checked, the total checked with
+     them, and a plausibility band run over the sum. The form asks for the
+     total directly now, and the branch above is the one that checks it. */
 
   return {};
 }
@@ -14525,43 +14471,13 @@ const form = Records.form({
        it derives all of them from the taxonomy and the tank answer. */
     __vehicleSheet.syncCategory();
 
-    /* The tank questions have no control of their own in a scripted state:
-       the record carries a capacity, not an answer to "how many tanks". A
-       single capacity means one tank unless something says otherwise, which
-       is the reading a person would give it. */
-    const mirror = document.getElementById('f-tank-mode');
-    const chosen = root.querySelector('[name="tankMode"]:checked');
-    if (!chosen && get('tankCapacity')) {
-      const one = root.querySelector('[name="tankMode"][value="one"]');
-      if (one) one.checked = true;
-    }
-    /* The mirror is written from whatever the radios now say, every time.
-       Setting it only on the branch that inferred an answer left it blank on
-       every other path — so an existing vehicle showed "One tank" and refused
-       to save because the field behind it held nothing. */
-    if (mirror) {
-      const on = root.querySelector('[name="tankMode"]:checked');
-      mirror.value = on ? on.value : '';
-    }
-    __vehicleSheet.syncTanks();
   },
 
-  applies: (field, get) => {
-    /* Which capacity question is live depends on the tank count, and the count
-       itself is always asked. Without this the form reported a missing
-       capacity before it had established there was one tank to have a
-       capacity for. */
-    if (field === 'tankCapacity' || field === 'tanks') {
-      const on = document.querySelector('[name="tankMode"]:checked');
-      const mode = on ? on.value : '';
-      if (!mode) return false;
-      return field === 'tanks' ? mode === 'many' : mode !== 'many';
-    }
-    if (!window.VehicleTypes) return true;
-    if (field === 'vehicleConfiguration') return VehicleTypes.hasConfigs(get('vehicleType'));
-    if (field === 'primaryUse') return !!VehicleTypes.useFor(get('vehicleType'));
-    return true;
-  },
+  /* Every question this form asks, it asks of every vehicle. Total fuel-tank
+     capacity was conditional on a tank count that no longer exists, and
+     vehicle configuration was conditional on a category granular enough to
+     have configurations, which no category is now. */
+  applies: () => true,
   menu: state => {
     const veh = VEHICLES.find(x => x[0] === state.editing);
     return veh ? vehicles.menuFor(veh).filter(i => i.act !== 'edit') : [];
@@ -14755,6 +14671,13 @@ function REASON_FOR(r) {
    vehicles are odd. */
 function needsAttention(r) {
   if (!r[1]) return true;
+  /* A category nobody can resolve is a question waiting for somebody, and the
+     Needs review tab is where questions wait. Nothing rewrites the stored
+     value; it is shown as written until it is answered. */
+  if (window.VehicleTypes) {
+    const cat = VehicleTypes.normalise(r[4]);
+    if (!cat.code && cat.stored) return true;
+  }
   const [make, ...model] = String(r[2] || '').split(' ');
   return Capacity.tank({
     tankCapacityLitres: r[6],
@@ -14811,8 +14734,12 @@ const vehicles = Records.directory({
       /* A function, so the list is built when the panel is drawn rather than
          once at start-up. Add a bus to a fleet of bakkies and Bus is on the
          filter; it used to offer the fleet as it was when the page loaded. */
-      () => VehicleTypes.list().map(t => t.code).filter(c => VEHICLES.some(v => v[4] === c)),
-      r => r[4], c => VehicleTypes.label(c)],
+      /* Matched through normalise, so a fleet stored as bakkies and vans still
+         answers the LCV filter without any record being rewritten. */
+      () => VehicleTypes.list().map(t => t.code)
+        .filter(c => VEHICLES.some(v => VehicleTypes.normalise(v[4]).code === c)),
+      r => VehicleTypes.normalise(r[4]).code || r[4],
+      c => VehicleTypes.label(c)],
     ['Fuel type', 'fuel', ['Diesel', 'Petrol'], r => r[5]],
     /* Fuel access is derived, so the filter derives it too rather than
        reading a stored field that may not agree. */
@@ -14990,7 +14917,15 @@ const editState = r => {
     editing: r[0],
     values: {
       registration: r[0], fleetNumber: r[1], make, model: model.join(' '),
-      year: r[3], vehicleType: r[4], fuelType: r[5],
+      year: r[3],
+      /* The record keeps the word it was written with; the form has to offer
+         one of three. A recognised older value resolves to its current
+         category here and nowhere else, so the row is untouched until somebody
+         saves. An ambiguous one resolves to nothing, which leaves the field
+         empty and required: that is the review the taxonomy asks for, arriving
+         at the moment the record is next opened. */
+      vehicleType: (window.VehicleTypes ? VehicleTypes.normalise(r[4]).code : '') || '',
+      fuelType: r[5],
       tankCapacity: String(r[6]), vin: r[F.VIN] || '',
     vehicleConfiguration: r[F.CONFIG] || '',
     },
@@ -17347,9 +17282,6 @@ function makeSheet(config) {
   const useWrap = field('primaryUse');
   const useSel = document.getElementById('f-use');
   const useText = document.getElementById('f-use-text');
-  const tankWrap = field('tankCapacity');
-  const tanksWrap = field('tanks');
-  const tankInput = document.getElementById('f-tank');
 
   /* ── Conditional fields ───────────────────────────────────────────────
    * Everything below hangs off the category, and all of it is derived: no
@@ -17360,41 +17292,15 @@ function makeSheet(config) {
     const T = window.VehicleTypes;
     if (!T) return;
 
-    const configs = T.configsFor(code);
-    if (configWrap) {
-      configWrap.hidden = configs.length === 0;
-      if (configs.length) {
-        const keep = configSel.value;
-        configSel.innerHTML = '<option value="">Select configuration</option>' +
-          configs.map(c => '<option value="' + c.code + '">' + c.label + '</option>').join('');
-        /* A configuration that still exists under the new category is kept.
-           Clearing it on every category change would lose a correct answer
-           whenever somebody corrected a neighbouring field. */
-        if (configs.some(c => c.code === keep)) configSel.value = keep;
-      } else {
-        configSel.innerHTML = '';
-      }
-    }
+    /* No category has configurations any more, so the field never appears.
+       The element stays in the markup holding whatever a legacy record had in
+       it, which is what keeps that value on the record through a save. */
+    if (configWrap) { configWrap.hidden = true; }
 
-    const use = T.useFor(code);
-    if (useWrap) {
-      useWrap.hidden = !use;
-      if (use) {
-        const label = useWrap.querySelector('[data-role="use-label"]');
-        const help = useWrap.querySelector('[data-role="use-help"]');
-        if (label) label.textContent = use.label;
-        if (help) { help.textContent = use.help || ''; help.hidden = !use.help; }
-        /* Free text where the category has told us nothing, a list where the
-           answer is one of two known things. Same field, same name, two
-           controls, because "tipper with a crane" is not a dropdown. */
-        useText.hidden = !use.free;
-        useSel.hidden = !!use.free;
-        if (!use.free) {
-          useSel.innerHTML = '<option value="">Select a use</option>' +
-            use.options.map(o => '<option value="' + o.code + '">' + o.label + '</option>').join('');
-        }
-      }
-    }
+    /* Primary use was asked on three-wheelers, special-purpose vehicles and
+       Other, and on nothing else. None of those is a category any more, so
+       there is no longer a category that asks for it. */
+    if (useWrap) { useWrap.hidden = true; }
 
     /* Engine capacity had a second show-and-hide here, and the two writers
        disagreed. This one ended `!!code && !required && false`, which is never
@@ -17402,110 +17308,9 @@ function makeSheet(config) {
        every vehicle type. Both are gone with the field. */
   }
 
-  /* ── Tanks ────────────────────────────────────────────────────────────
-   * One tank, several, or not known. The total is calculated in every case,
-   * and it is the total the capacity service is given — asking somebody to
-   * add up their own tanks and then checking their arithmetic would be an
-   * odd way to spend their attention.
-   */
-  /* Two, and not a variable. */
-  const TANK_COUNT = 2;
-
-  function tankMode() {
-    const on = sheet.querySelector('[name="tankMode"]:checked');
-    return on ? on.value : '';
-  }
-
-  function renderTanks() {
-    const list = part('tank-list');
-    if (!list) return;
-    const held = [...list.querySelectorAll('input')].map(i => i.value);
-    let html = '';
-    for (let i = 0; i < TANK_COUNT; i++) {
-      html += '<span class="tank-row">' +
-        '<span class="form-field">' +
-          '<label for="f-tank-' + i + '">Tank ' + (i + 1) + ' capacity</label>' +
-          '<span class="suffix-wrap">' +
-            '<input class="field" id="f-tank-' + i + '" data-tank="' + i + '" ' +
-              'inputmode="decimal" value="' + (held[i] || '') + '">' +
-            '<span class="suffix">litres</span>' +
-          '</span>' +
-        '</span>' +
-        '</span>';
-    }
-    list.innerHTML = html;
-    total();
-  }
-
-  function total() {
-    const list = part('tank-list');
-    const out = part('tank-total');
-    if (!list || !out) return 0;
-
-    const fields = [...list.querySelectorAll('input')];
-    const typed = fields.filter(i => String(i.value).trim() !== '');
-    const nums = typed
-      .map(i => Number(String(i.value).trim()))
-      .filter(n => Number.isFinite(n) && n > 0);
-    /* Anything typed that is not a positive number. Counted rather than
-       ignored: a tank field holding "abc" used to contribute nothing to the
-       sum and nothing to the screen, so the only evidence of it was the total
-       being lower than the person expected. */
-    const unreadable = typed.length - nums.length;
-    const sum = nums.reduce((a, b) => a + b, 0);
-
-    if (unreadable) {
-      out.innerHTML = '<span class="tank-total__note tank-total__note--warn">' +
-        (unreadable === 1 ? 'One tank does not read as a number.' : unreadable + ' tanks do not read as a number.') +
-        ' Enter litres as digits.</span>';
-    } else if (sum) {
-      out.innerHTML = '<b>Total tank capacity: ' + Records.groupNum(sum) + ' litres</b>' +
-        '<span class="tank-total__note">Added up from ' + nums.length +
-        ' tank' + (nums.length === 1 ? '' : 's') + '. This is the figure we check.</span>';
-    } else {
-      out.innerHTML = '<span class="tank-total__note">Enter each tank and we will add them up.</span>';
-    }
-
-    /* The engine validates one capacity field, so the total is what it sees —
-       and it must see nothing rather than zero when the tanks do not add up.
-       An empty value meets the ordinary required-field rule; a zero looks like
-       an answer. */
-    if (tankInput && tankMode() === 'many') {
-      tankInput.value = (!unreadable && sum) ? String(sum) : '';
-      /* Told, not just written: the engine repaints on input, and a value set
-         in script fires nothing. */
-      tankInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    return sum;
-  }
-
-  /* Cleared when the sheet opens, with the rest of the form. The count lived
-     in the closure and outlived the record it belonged to. */
-  function resetTanks() {
-    const list = part('tank-list');
-    if (list) list.innerHTML = '';
-    const out = part('tank-total');
-    if (out) out.textContent = '';
-  }
-
-  function syncTanks() {
-    const mode = tankMode();
-    if (tankWrap) {
-      tankWrap.hidden = mode !== 'one' && mode !== 'unsure';
-      const label = tankWrap.querySelector('[data-role="tank-label"]');
-      const help = tankWrap.querySelector('[data-role="tank-help"]');
-      if (label) label.textContent = mode === 'unsure' ? 'Total tank capacity' : 'Tank capacity';
-      if (help) {
-        help.textContent = mode === 'unsure'
-          ? 'Enter the combined capacity if the vehicle has more than one tank. Do not include the AdBlue tank.'
-          : 'Do not include the AdBlue tank.';
-      }
-    }
-    if (tanksWrap) {
-      tanksWrap.hidden = mode !== 'many';
-      if (mode === 'many') renderTanks();
-    }
-  }
+  /* The multi-tank editor was here: a tank count, a row per tank, a running
+     total and a reset, all of it turning several figures into one. The form
+     asks for that one figure now. */
 
   /* Two people typing the same VIN two ways produce one stored string. Done on
      the way out of the field so the caret is never moved mid-answer. */
@@ -17521,20 +17326,7 @@ function makeSheet(config) {
   }
 
   sheet.addEventListener('change', e => {
-    if (e.target.name === 'tankMode') {
-      const mirror = document.getElementById('f-tank-mode');
-      if (mirror) {
-        mirror.value = e.target.value;
-        /* Told, not just written: the engine repaints on input, and a value
-           set in script fires nothing. */
-        mirror.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-      syncTanks();
-    }
     if (e.target === typeSel) syncCategory();
-  });
-  sheet.addEventListener('input', e => {
-    if (e.target.dataset && e.target.dataset.tank !== undefined) total();
   });
   /* ── The error summary ────────────────────────────────────────────────
    * Links, so a keyboard reaches the field in one step, and focus moves to
@@ -17604,12 +17396,10 @@ function makeSheet(config) {
        the only way the three stay in agreement. */
     document.querySelectorAll('.app > *:not(.focus-sheet):not(.sheet-backdrop)')
       .forEach(el => el.setAttribute('inert', ''));
-    /* The tank rows are closure state and outlived the record they belonged
-       to: adding a vehicle with four tanks left the next sheet offering four
-       empty rows. */
-    resetTanks();
+    /* Run on every open, not only on a category change: the wrappers this
+       hides are legacy markup that a reopened sheet would otherwise show
+       whatever the last record left them in. */
     syncCategory();
-    syncTanks();
     /* The rail gives every state its own address. If the address names one,
        the rail is steering and this sheet does not own it — claiming it would
        fight the thing that just opened the sheet. */
@@ -17747,7 +17537,7 @@ function makeSheet(config) {
   }
 
   return { open, shut, tryClose, back, resume, isOpen, isDirty: dirty,
-           syncCategory, syncTanks, sheet };
+           syncCategory, sheet };
 }
 
 /* The two sheets. Same controller, different form. */
@@ -17915,7 +17705,6 @@ window.__openSheet = () =>
 
     theft.querySelectorAll('[name="theft-how"]').forEach(r => { r.checked = r.value === incident.how; });
     theft.querySelector('#theft-notes').value = incident.notes || '';
-    theft.querySelector('#theft-station').value = incident.station || '';
 
     const list = part(theft, 'theft-attempts');
     list.innerHTML = incident.attempts.length
@@ -18391,6 +18180,38 @@ const ROWS = [
       skipped: 'Left out of this import',
     };
   })(),
+
+  /* A category the taxonomy will not guess at.
+   *
+   * Bakkie, van and pickup resolve to LCV; rigid truck and horse to HCV;
+   * scooter and motorbike to Motorcycle. Minibus resolves to none of them, and
+   * turning it into an LCV to keep the import tidy would write a fact nobody
+   * checked into the field a fuel limit is later read from. So it comes back
+   * here with the answer left to a person, and the word the file used is kept
+   * on the record until they give one. */
+  {
+    row: 9,
+    level: 'warning',
+    reg: 'TBN 220 GP',
+    what: 'Toyota Quantum, 2021, minibus',
+    why: 'Choose whether this vehicle is an LCV, HCV or Motorcycle.',
+    fix: {
+      label: 'Vehicle category',
+      hint: 'lcv, hcv or motorcycle. The file says minibus, which could be any of them.',
+      placeholder: 'lcv',
+      width: 'field-sm',
+      valid: v => {
+        const r = window.VehicleTypes ? VehicleTypes.normalise(v) : { code: null };
+        if (r.code) return null;
+        return v.trim()
+          ? 'Not one of the three. Type lcv, hcv or motorcycle'
+          : 'Choose whether this vehicle is an LCV, HCV or Motorcycle';
+      },
+      said: v => `Importing as ${VehicleTypes.label(v)}`,
+    },
+    approved: 'Importing with minibus kept as written, for review later',
+    skipped: 'Left out of this import',
+  },
 ];
 
 /* undecided | fixing | fixed | approved | skipped. `fixing` is a state of the
@@ -19070,7 +18891,7 @@ const REGISTRY = [
     variants: 'default',
     states: 'default, answered, error',
     a11y: 'A <fieldset> with a <legend>, so the question is read before each answer.',
-    good: 'Fuel tanks: one, more than one, not sure.',
+    good: '“What happened?” with the four circumstances a theft is reported under.',
     bad: 'Radios with a floating label that no screen reader ties to them.',
     uses: ['Radio', 'Label'] },
 
@@ -19097,15 +18918,6 @@ const REGISTRY = [
     good: 'The same sentence in the summary and beside the field.',
     bad: 'A list of field names, which makes somebody visit each one to find out what is wrong.',
     uses: ['ErrorText'] },
-
-  { name: 'MultiTankEditor', level: 'organism', sel: 'tank-list',
-    purpose: 'Several tanks, entered separately, totalled by the product.',
-    variants: 'two tanks, more',
-    states: 'default, added, removable, totalled',
-    a11y: 'Each tank is a labelled field; the total is text, not a disabled input.',
-    good: 'Doing the addition, because the product is what then checks it.',
-    bad: 'Asking somebody to add up their own tanks and validating their arithmetic.',
-    uses: ['InputWithUnit', 'Button', 'FormField'] },
 
   { name: 'UnsavedChangesDialog', level: 'molecule', sel: 'discard',
     purpose: 'Closing something with unsaved information in it.',

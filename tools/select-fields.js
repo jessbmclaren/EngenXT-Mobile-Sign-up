@@ -70,7 +70,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const FIELDS = [
   { id: 'f-year',  name: 'Year',             typeahead: '2', grouped: false },
-  { id: 'f-type',  name: 'Vehicle category', typeahead: 'v', grouped: true },
+  /* Three options, so no optgroups: a heading over three items is a heading
+     over a heading. Type-ahead on "m" reaches Motorcycle. */
+  { id: 'f-type',  name: 'Vehicle category', typeahead: 'm', grouped: false },
   { id: 'f-fuel',  name: 'Fuel type',        typeahead: 'p', grouped: false },
 ];
 
@@ -236,6 +238,12 @@ function cdp(ws) {
         `${geo.heads.length} headings, ${bad.length} of them selectable`);
       check(F, 'groups are announced', geo.groups.length > 0 && geo.groups.every((g) => g.label),
         `${geo.groups.length} groups, all labelled`);
+    } else if (f.id === 'f-type') {
+      /* The opposite assertion, and it is the one that matters here: three
+         options must not be grouped, and every one of them is selectable. */
+      check(F, 'three options carry no group heading',
+        geo.heads.length === 0 && geo.groups.length === 0 && geo.opts.length === 3,
+        `${geo.opts.length} options, ${geo.groups.length} groups`);
     }
     if (geo.lh >= geo.maxH - 1) {
       check(F, 'a long list scrolls inside itself', geo.scrolls && geo.overflowY === 'auto',
@@ -327,21 +335,21 @@ function cdp(ws) {
     var t=document.getElementById('f-type-trigger');
     t.click();
     var row=[].filter.call(document.querySelectorAll('#f-type-list [role="option"]'),
-      function(o){return o.dataset.value==='bakkie';})[0];
-    if(!row) return JSON.stringify({err:'no bakkie option'});
+      function(o){return o.dataset.value==='lcv';})[0];
+    if(!row) return JSON.stringify({err:'no lcv option'});
     row.click();
     var sheet=[].filter.call(document.querySelectorAll('.focus-sheet'),function(x){return x.getBoundingClientRect().height>50;})[0];
     var cfg=sheet.querySelector('[data-field="vehicleConfiguration"]');
-    var cfgSel=document.getElementById('f-config');
+    var v=document.querySelector('#f-type-trigger .select-value');
     return JSON.stringify({
       value: document.getElementById('f-type').value,
-      configShown: cfg ? !cfg.hidden : false,
-      configOptions: cfgSel ? cfgSel.options.length : 0,
-      configEnhanced: cfgSel ? cfgSel.dataset.enhanced==='1' : false
+      shown: v?v.textContent.trim():null,
+      configShown: cfg ? !cfg.hidden : false
     });})()`));
-  check('shared', 'a choice drives dependent fields',
-    dependent.value === 'bakkie' && dependent.configShown && dependent.configOptions > 1,
-    dependent.err || `category "${dependent.value}" revealed configuration with ${dependent.configOptions} options`);
+  check('shared', 'a choice takes, and reveals no dependent field',
+    dependent.value === 'lcv' && /LCV/.test(dependent.shown || '') && dependent.configShown === false,
+    dependent.err || `chose "${dependent.value}", trigger reads "${dependent.shown}", ` +
+    'no configuration field appears because no category has one');
 
   const validation = JSON.parse(await run(`(function(){
     var sheet=[].filter.call(document.querySelectorAll('.focus-sheet'),function(x){return x.getBoundingClientRect().height>50;})[0];
@@ -450,7 +458,12 @@ function cdp(ws) {
     `disabled ${state.disabled}, opened while disabled ${state.openedWhileDisabled}, ` +
     `aria-required ${state.required}`);
 
-  /* 4. A dependent field cleared clears what it shows. */
+  /* 4. Vehicle configuration was the only dependent field and it is gone with
+        the granular categories that gave it its lists. What is left to assert
+        is that nothing appears: covered by 'a choice takes, and reveals no
+        dependent field' above and by tools/vehicle-taxonomy.js. */
+  /* (was: a dependent field cleared clears what it shows) */
+  if (false) {
   const dep = JSON.parse(await runAsync(`(function(){
     var type=document.getElementById('f-type'), cfg=document.getElementById('f-config'),
         ct=document.getElementById('f-config-trigger');
@@ -471,10 +484,7 @@ function cdp(ws) {
           hidden: wrap?wrap.hidden:null}));
       }, 60);
     });})()`, true));
-  check('lifecycle', 'clearing a dependent field clears its trigger',
-    dep.had === 'Double cab' && !dep.value && (dep.hidden === true || dep.placeholder === true),
-    `bakkie showed "${dep.had}"; a van has no configurations, so the value cleared ` +
-    `to "${dep.value}" and the field ${dep.hidden ? 'is hidden' : 'reads "' + dep.now + '"'}`);
+  }
 
   /* 5. Re-initialising must not wrap twice or bind twice. */
   const reinit = JSON.parse(await run(`(function(){
@@ -533,15 +543,17 @@ function cdp(ws) {
 
   /* 8 and 9. Zoomed to 200%, which halves the CSS viewport. */
   await openSheet(720, 450);
-  await run(`(function(){var t=document.getElementById('f-type-trigger'); if(t) t.click();})()`);
+  /* Year, not category: three options do not overflow a 288px menu, and the
+     assertion here is that a long one scrolls inside itself. */
+  await run(`(function(){var t=document.getElementById('f-year-trigger'); if(t) t.click();})()`);
   await sleep(250);  /* the popup re-places on the next frame once layout settles */
   const zoom = JSON.parse(await run(`(function(){
-    var t=document.getElementById('f-type-trigger');
+    var t=document.getElementById('f-year-trigger');
     if(!t) return JSON.stringify({err:'no trigger'});
     /* Already opened above. Clicking again here would toggle it shut and
        measure a hidden box, which is what this check spent a while reporting
        as a placement fault. */
-    var l=document.getElementById('f-type-list');
+    var l=document.getElementById('f-year-list');
     var tr=t.getBoundingClientRect(), lr=l.getBoundingClientRect();
     return JSON.stringify({
       tw:Math.round(tr.width), lw:Math.round(lr.width), vw:innerWidth, vh:innerHeight,
@@ -585,7 +597,7 @@ function cdp(ws) {
     zoomWhy || `${zoom.vw}×${zoom.vh} CSS px: popup ${zoom.lw}px on a ${zoom.tw}px trigger, scrolls internally`);
   check('lifecycle', 'option text never widens the popup past the viewport',
     !zoom.err && zoom.lw <= zoom.vw && Math.abs(zoom.lw - zoom.tw) <= 2,
-    `longest option is "Special-purpose vehicle"; popup ${zoom.lw}px inside ${zoom.vw}px`);
+    `popup ${zoom.lw}px inside ${zoom.vw}px`);
 
   /* An edited vehicle must arrive with its model editable. Not a SelectField,
      but the same fault: a value written in script that nothing was told about. */
