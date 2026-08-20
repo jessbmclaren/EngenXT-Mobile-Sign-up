@@ -99,9 +99,18 @@
    rather than sharing its grey. */
 .a-link--quiet { color: var(--color-text-secondary); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
 
-/* A countdown is a fact, not a control. While it is still running the resend
-   wears plain text so nothing invites a press that cannot work yet. */
-.o-signup-sheet__resend:disabled { text-decoration: none; font-weight: var(--weight-semibold); }
+/* One component, two states, and the weight is how you tell them apart.
+
+   Waiting: the countdown is a fact, not a control. It wears plain text and
+   weight 500 so nothing invites a press that cannot work yet.
+   Ready: "Resend" is a real action again and takes the link's own weight 600.
+
+   500 comes from `.a-link:disabled` below and 600 from `.a-link` itself, so
+   neither is restated here. This rule used to set 600 on the waiting state as
+   well - the opposite of the intent - and was inert only because a later rule
+   of equal specificity happened to be typed after it. Removing it changes no
+   pixels and removes the contradiction. */
+.o-signup-sheet__resend:disabled { text-decoration: none; }
 
 /* Flush drops the inline padding so the label sits on the container's content
    edge. The vertical padding stays, because the 48px target depends on it. */

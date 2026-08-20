@@ -39,6 +39,7 @@ const FILES = [SIGNUP, ONBOARD];
 
 const problems = [];
 const fail = (msg) => problems.push(msg);
+let docsSummary = '';
 
 /* ── Reading the files ───────────────────────────────────────────────── */
 
@@ -1088,6 +1089,139 @@ const LEVEL_ALLOWED = new Set([
   }
 }
 
+/* ── 11. The documentation says what the code says ───────────────────────
+
+   Every number on the design-system page that a person typed had drifted:
+   the atom count, the spacing scale, the per-screen state counts, and two
+   deep links pointing at states that do not exist. The README's numbers had
+   not drifted, because this file derives them.
+
+   So the same treatment. Four assertions, and none of them touches an
+   existing check:
+
+     1. Every state a doc links to is a real state.
+     2. Every block the stylesheets define is mentioned on the page, so a
+        component cannot ship undocumented.
+     3. Every block the page mentions is real, so it cannot document a
+        component that does not exist. (It documented a-icon-btn for a while,
+        which lives only in the unmigrated file.)
+     4. Every count the page states matches the count this file computes.
+        The page carries them in data-count so there is something to compare;
+        prose is left alone.
+
+   Numbers a computer can count should never be typed.                      */
+
+const DOCS = 'docs/design-system/index.html';
+const docsPath = path.join(ROOT, DOCS);
+
+/* The page may also name a component from the file that has not been migrated
+   yet — it documents both, and the app's screens are real even though their
+   CSS is still inline. Rather than keep a hand-written allowlist, which would
+   be one more thing to forget, that page's own stylesheet is the allowlist.
+   A name in neither place is a component that does not exist anywhere. */
+function blocksDefinedIn(name) {
+  const out = new Set();
+  const css = cssOf(name).replace(/\/\*[\s\S]*?\*\//g, ' ');
+  for (const m of css.matchAll(/(^|[},])\s*((?:\.[A-Za-z0-9_-]+|[^{},])*)\s*\{/g)) {
+    for (const cls of (m[2] || '').matchAll(/\.([amotpu]-[A-Za-z0-9_-]+)/g)) {
+      out.add(blockOf(cls[1]));
+    }
+  }
+  return out;
+}
+
+if (!fs.existsSync(docsPath)) {
+  fail(`${DOCS} is missing — the design system has no documentation to check`);
+} else {
+  const docs = fs.readFileSync(docsPath, 'utf8');
+
+  /* Every block defined by the stylesheets, by level. A block is the part
+     before __element or --modifier, so one entry per component. */
+  const cssBlocks = new Map();
+  const cssDir = path.join(ROOT, 'src', 'css');
+  for (const file of fs.readdirSync(cssDir).filter((f) => f.endsWith('.css'))) {
+    if (file === 'developer.css') { continue; }          /* tooling, never documented */
+    const css = unwrapLayers(fs.readFileSync(path.join(cssDir, file), 'utf8'))
+      .replace(/\/\*[\s\S]*?\*\//g, ' ');
+    for (const m of css.matchAll(/(^|[},])\s*((?:\.[A-Za-z0-9_-]+|[^{},])*)\s*\{/g)) {
+      for (const cls of (m[2] || '').matchAll(/\.([amotpu]-[A-Za-z0-9_-]+)/g)) {
+        const block = blockOf(cls[1]);
+        if (!cssBlocks.has(block)) { cssBlocks.set(block, file); }
+      }
+    }
+  }
+
+  /* 11a. Every state the documentation links to is a real state. */
+  const realStates = new Set();
+  for (const name of FILES) {
+    for (const s of parsed[name].states) { realStates.add(s.id); }
+  }
+  const linked = new Set();
+  for (const m of docs.matchAll(/#([a-z0-9]+\/[a-z0-9-]+)/g)) { linked.add(m[1]); }
+  for (const id of linked) {
+    if (!realStates.has(id)) {
+      fail(`${DOCS} links to '#${id}', which is not a state in either file — dead deep link`);
+    }
+  }
+
+  /* 11b. Every block the stylesheets define is named on the page. */
+  for (const [block, file] of cssBlocks) {
+    if (!docs.includes(block)) {
+      fail(`${DOCS} never mentions '${block}' (defined in src/css/${file}) — ` +
+           `a component that ships undocumented`);
+    }
+  }
+
+  /* 11c. Every block the page names is real. */
+  const namedInDocs = new Set();
+  for (const m of docs.matchAll(/\b([amotpu]-[a-z][A-Za-z0-9_-]*)\b/g)) {
+    namedInDocs.add(blockOf(m[1]));
+  }
+  const unmigrated = blocksDefinedIn(ONBOARD);
+  for (const block of namedInDocs) {
+    if (cssBlocks.has(block) || unmigrated.has(block)) { continue; }
+    fail(`${DOCS} documents '${block}', which neither src/css nor ${ONBOARD} defines — ` +
+         `a component that exists nowhere`);
+  }
+
+  /* 11d. Every count the page states is the count this file computes. */
+  const levelCount = (prefix) =>
+    [...cssBlocks.keys()].filter((b) => b.startsWith(prefix)).length;
+
+  const computed = {
+    atoms: levelCount('a-'),
+    molecules: levelCount('m-'),
+    organisms: levelCount('o-'),
+    templates: levelCount('t-') + levelCount('p-'),
+    tokens: counts.tokens,
+    'states-signup': parsed[SIGNUP].states.length,
+    'states-app': parsed[ONBOARD].states.length,
+  };
+
+  let checkedCounts = 0;
+  for (const m of docs.matchAll(/data-count="([a-z-]+)"[^>]*>([^<]+)</g)) {
+    const [, key, shown] = m;
+    if (!(key in computed)) {
+      fail(`${DOCS} states a count for '${key}', which this gate does not compute. ` +
+           `Add it to the computed map or remove the attribute.`);
+      continue;
+    }
+    checkedCounts++;
+    if (String(computed[key]) !== shown.trim()) {
+      fail(`${DOCS} says ${key} is ${shown.trim()}; the code says ${computed[key]}`);
+    }
+  }
+  for (const key of Object.keys(computed)) {
+    if (!docs.includes(`data-count="${key}"`)) {
+      fail(`${DOCS} states no count for '${key}' — every level must carry one so it ` +
+           `cannot drift (expected ${computed[key]})`);
+    }
+  }
+
+  docsSummary = `${cssBlocks.size} blocks all documented, ${linked.size} deep links all real, ` +
+                `${checkedCounts} counts match the code`;
+}
+
 if (problems.length) {
   console.error(`\n  ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n`);
   for (const p of problems) { console.error(`    - ${p}`); }
@@ -1105,4 +1239,5 @@ console.log('    sign-up may reach a person; nothing at the pump navigates away'
 console.log('    every class is shaped like the system, no dead names, tokens in their families');
 console.log('    the shared library is verbatim in both files, and both restate colour-only states');
 console.log('    the base layer agrees too: what a control inherits is the same on both sides');
-console.log('    no parent paints a child it did not make, and the layers nest the right way round\n');
+console.log('    no parent paints a child it did not make, and the layers nest the right way round');
+console.log(`    the documentation agrees with the code: ${docsSummary}\n`);

@@ -820,3 +820,127 @@ misclassification (P0-5), the app's 13 undocumented screens (P1-12), and the tra
 inventory (P1-6).
 
 And P0-1 stands: until a gate reads this directory, these numbers will drift again.
+
+---
+
+## Second pass — the approved corrections
+
+The design owner ruled on the three production questions and approved the documentation
+work. What follows was done after the report above was written.
+
+### Production changes, each against its ruling
+
+**The error field** — *ruling: keep the border thickness so validation causes no layout
+shift; carry the state with colour plus a visible icon and descriptive text; add
+`aria-invalid` and associate the message with `aria-describedby`.*
+
+The border is unchanged. `aria-describedby` and the helper glyph already existed;
+`aria-invalid` did not, on two of the five paths that turn the field red — the
+wrong-length number and the landline. A field went red and a screen reader was told
+nothing was wrong.
+
+Fixed at the cause rather than the two sites: the look and the announcement are now one
+call, `setFieldState()`, used by all twelve places that change the field's state. Error is
+the only state that sets `aria-invalid`; pending is not invalid, the number is fine and is
+being sent.
+
+**The `<main>` landmark** — *ruling: yes, one top-level `<main>` around the unique primary
+content of each page, with no visual or layout change.*
+
+Both pages had none, and the only `<nav>` was the developer state rail. The stage element
+that holds the phone is now `<main>` rather than `<div>` — a tag swap, not a new element,
+and both are block-level, so nothing moves. Its selector was already class-based. Verified
+by the full sweep: 104 states, no change.
+
+**The resend button** — *ruling: weight 500 while it is a non-interactive countdown, 600
+when Resend becomes an available action; document them as two states of one component.*
+
+That is already what renders — 600 from `.a-link`, 500 from `.a-link:disabled`. The defect
+was a third rule *trying* to set 600 on the countdown, kept inert only because a later rule
+of equal specificity happened to be typed after it. Removing it changes no pixels and
+removes the contradiction, so the ruling is now what the stylesheet says rather than what
+it accidentally does.
+
+### The gate now reads the documentation (P0-1)
+
+`check.js` gained a section, additive — no existing assertion was touched or weakened. Four
+new checks:
+
+1. Every state the docs deep-link to is a real key of `STATES`.
+2. Every block defined in `src/css` is mentioned on the page, so a component cannot ship
+   undocumented.
+3. Every block the page names exists — in `src/css`, or in the unmigrated page, whose own
+   stylesheet is the allowlist rather than a hand-written list that would go stale.
+4. Every count the page states matches the count the gate computes. The page carries them
+   in `data-count` so there is something to compare.
+
+It earned its place immediately: it caught a component name the documentation had invented
+(`a-filter-chips`, where production has `a-filter-chip`), and it rejects a fabricated class
+in a negative test.
+
+### Structure
+
+The fifteen required sections, in order. Architecture folded into Overview, which is what it
+was explaining; Naming folded into Contribution, which is when you need it; Spacing demoted
+into Foundations and tokens, because spacing is a token family and not a level of the UI
+hierarchy. Verified word-for-word that nothing was lost in the move: the only text that
+changed was section titles.
+
+Written: **UI principles** (twelve rules, each with the file and line that enforces it and
+the exception the code actually takes), **Typography** (all 37 text styles), **Contribution
+and governance**, and the **thirteen app screens**, whose state counts sum to 61.
+
+The page also gained an `<h1>`; its name had been carried by a `<p>`.
+
+### Typography, and what was deliberately not done
+
+All 37 styles are documented with role, size, weight, leading, tracking, colour, element and
+when not to use them. Two findings are recorded rather than fixed:
+
+- **21 of the 37 set no `line-height`** and inherit the UA's `normal`, which is not a step on
+  the `--leading-*` scale. That is the largest gap in the type system and it is where
+  two-line labels collide under large text.
+- **Nine consolidation candidates** are listed as proposals with their risks. None is
+  applied. Production typography does not change without a ruling, and several would move
+  pixels.
+
+### Two instruments were wrong, and are corrected
+
+Recorded because a review that trusts its own tools is worth less than one that checks them.
+
+- **The focus-ring count.** The integrity probe focused each control with `el.focus()` and
+  asked whether it had a ring. Programmatic focus does not reliably match `:focus-visible`,
+  which is a keyboard affordance — so the check was measuring nothing, and its earlier
+  "0 without a ring" was luck rather than evidence. Rebuilt to press real Tab keys: 130
+  controls, 0 without a ring. Prose links take the documentation's 2px ring, and scroll
+  containers fall through to the product's 3px `--color-focus`, which is correct.
+- **Journey failures that were not real.** Six, then nine, then eight failures appeared, each
+  run naming different tests. The cause was ~60 leaked Chrome processes from this review's
+  own instruments starving the machine, plus a runaway system extension; `journey.js` walks
+  the flows on the real clock and is load-sensitive. On a quiet machine, a worktree at HEAD
+  and the working tree both return 71/71. The lesson is in the repo's own notes already:
+  measure before diagnosing, and check whether the failing check is itself wrong.
+
+One failure in that noise **was** real and is fixed: the `setFieldState` helper had been
+written recursive by the same script that introduced it — the pass that rewrote every
+`removeAttribute('data-state')` into a call to the helper also rewrote the helper's own. Every
+clear was a stack overflow.
+
+### Gate results after this pass
+
+| Gate | Result |
+|---|---|
+| `node tools/check.js` | pass, including the new documentation section |
+| `node tools/journey.js` | 71 passed, 0 failed |
+| `node tools/sweep.js` | 104 states, 0 with failures |
+| `node tools/sweep.js --large` | 104 states, 0 with failures |
+| Documentation page | 15 sections, no duplicate ids, no dead anchors, no heading skips, 0 console errors, no sideways scroll at 1280/900/600/390 |
+
+### Still open
+
+Unchanged from the list above, minus what this pass closed. Still needing a ruling or still
+unbuilt: the semantic spacing layer; the `line-height` gap; the nine typography
+consolidations; moving the tooling rules out of `templates.css`; declaring
+`--keyboard-inset`; moving three component margins to their parents; and the three
+`.o-signup-sheet__resend` rules filed under atoms, where preserving the pixels and obeying
+the filing law genuinely conflict.

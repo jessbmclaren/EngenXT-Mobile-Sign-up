@@ -202,6 +202,27 @@ body.ds-body {
 .ds-foot { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--ds-rule);
   font-size: 13px; color: var(--ds-ink-soft); }
 
+/* Secondary detail inside a dense cell: a file reference, a caveat, the tail of
+   a token's own comment. Present but not competing with the value beside it. */
+.ds-more { color: var(--ds-ink-soft); font-size: 11.5px; }
+
+/* The type catalogue is eight columns wide on purpose - the point is comparing
+   styles across every axis at once - so it scrolls inside its wrapper and its
+   first column stays narrow enough to read as a label. */
+.ds-table--type td { vertical-align: top; }
+.ds-table--type td:first-child { white-space: nowrap; }
+.ds-table--type td:nth-child(2), .ds-table--type td:last-child { min-width: 22ch; }
+
+/* A principle's provenance line: quieter than the rule, and monospaced where it
+   cites a file, so the rule reads as the statement and this reads as the proof. */
+.ds-where {
+  margin-top: 4px; padding-left: 12px;
+  border-left: 2px solid var(--ds-rule);
+  font-size: 13px; color: var(--ds-ink-soft);
+}
+.ds-where code { font-size: 12px; }
+.ds-where + .ds-where { margin-top: 6px; }
+
 /* ── The tier count ───────────────────────────────────────────────────── */
 
 .ds-tier td { padding-block: 12px; vertical-align: middle; }

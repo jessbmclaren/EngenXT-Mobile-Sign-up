@@ -67,7 +67,7 @@
   </nav>
 
   <!-- ══ DEVICE ═════════════════════════════════════════════════════════ -->
-  <div class="p-signup-demo__stage">
+  <main class="p-signup-demo__stage">
     <div class="t-device-frame" id="deviceFrame">
 
       <!-- HOME -->
@@ -371,7 +371,7 @@
 
     <p class="p-signup-demo__caption" id="caption">Pick a state on the left, or drive the flow with the numbers in the key.</p>
 
-  </div>
+  </main>
 
   <!-- The right rail. Readouts belong beside the thing they describe, not under
        it: docking the inspector below the phone made a driver of the reviewer,
@@ -896,6 +896,23 @@
     if (tone) { node.setAttribute('data-tone', tone); } else { node.removeAttribute('data-tone'); }
   }
 
+  /* The field's look and the field's announcement are one state, so they are
+     set in one place.
+
+     They had already drifted. Five paths turn the field red; two of them - the
+     wrong-length number and the landline - never set aria-invalid, so the
+     field went red and a screen reader was told nothing was wrong. The message
+     still arrived through aria-describedby, which is why it was easy to miss.
+
+     Error is the only state that is invalid. Pending is not: the number is
+     fine, it is being sent. */
+  function setFieldState(state) {
+    if (state) { el.phoneField.setAttribute('data-state', state); }
+    else { el.phoneField.removeAttribute('data-state'); }
+    if (state === 'error') { el.phoneInput.setAttribute('aria-invalid', 'true'); }
+    else { el.phoneInput.removeAttribute('aria-invalid'); }
+  }
+
   function digitsOf(v) { return (v || '').replace(/\D/g, ''); }
 
   /* Accepts 082…, 82…, +2782…, 002782… and lands on the national 10 digits. */
@@ -1245,9 +1262,8 @@
     S.sending = false;
     el.phoneInput.value = value ? formatPhone(value) : '';
     el.phoneInput.readOnly = false;
-    el.phoneInput.removeAttribute('aria-invalid');
     el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
-    el.phoneField.removeAttribute('data-state');
+    setFieldState(null);
     el.phoneCta.hidden = false;
     hideAlert(el.numberAlert);
     /* The card folds with the stage. Detail lives one tap behind the
@@ -1283,11 +1299,9 @@
     var atFault = def.field !== 'neutral';
 
     if (atFault) {
-      el.phoneField.setAttribute('data-state', 'error');
-      el.phoneInput.setAttribute('aria-invalid', 'true');
+      setFieldState('error');
     } else {
-      el.phoneField.removeAttribute('data-state');
-      el.phoneInput.removeAttribute('aria-invalid');
+      setFieldState(null);
     }
     /* Either way the helper stops advertising a send that is not happening. */
     setHelper(el.phoneHelper, '');
@@ -1336,7 +1350,7 @@
     var d = phoneDigits();
 
     if (d.length !== 9) {
-      el.phoneField.setAttribute('data-state', 'error');
+      setFieldState('error');
       setBtn(el.phoneCta, false, 'Send my code');
       setHelper(el.phoneHelper, d.length === 0
         ? 'Enter your mobile number.'
@@ -1346,7 +1360,7 @@
       return;
     }
     if (!isMobilePrefix(d)) {
-      el.phoneField.setAttribute('data-state', 'error');
+      setFieldState('error');
       setBtn(el.phoneCta, false, 'Send my code');
       setHelper(el.phoneHelper, 'That looks like a landline. Enter a mobile number, like 82 123 4567.', 'error');
       shake(el.phoneField);
@@ -1368,7 +1382,7 @@
         showNumberError('slow');
       }
     });
-    el.phoneField.setAttribute('data-state', 'pending');
+    setFieldState('pending');
     /* readonly, not disabled, so the number the driver typed stays readable
        and the field keeps its place in the reading order. */
     el.phoneInput.readOnly = true;
@@ -1378,7 +1392,7 @@
     after(900, function () {
       S.sending = false;
       el.phoneInput.readOnly = false;
-      el.phoneField.removeAttribute('data-state');
+      setFieldState(null);
       el.phoneCta.textContent = 'Continue';
       paintPhoneValidity();
 
@@ -2267,7 +2281,7 @@
     'number/valid':          { label: 'Valid',              run: function () { base('signup', '821234567'); paintPhoneValidity(); } },
     'number/sending':        { label: 'Sending',            run: function () {
                                  base('signup', '821234567');
-                                 el.phoneField.setAttribute('data-state', 'pending');
+                                 setFieldState('pending');
                                  el.phoneInput.readOnly = true;
                                  el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
                                  setBtn(el.phoneCta, false);
@@ -2275,7 +2289,7 @@
                                } },
     'number/sending-slow':   { label: 'Sending, slower than expected', run: function () {
                                  base('signup', '821234567');
-                                 el.phoneField.setAttribute('data-state', 'pending');
+                                 setFieldState('pending');
                                  el.phoneInput.readOnly = true;
                                  el.phoneCta.innerHTML = spinnerMarkup() + '<span>Sending code\u2026</span>';
                                  setBtn(el.phoneCta, false);
@@ -2958,8 +2972,7 @@
   el.phoneInput.addEventListener('input', function () {
     reformatPhone(el.phoneInput);
     if (el.phoneField.getAttribute('data-state') === 'error' || !el.numberAlert.hidden) {
-      el.phoneField.removeAttribute('data-state');
-      el.phoneInput.removeAttribute('aria-invalid');
+      setFieldState(null);
       el.phoneInput.setAttribute('aria-describedby', 'phoneHelper');
       el.phoneCta.hidden = false;
       setHelper(el.phoneHelper, sendHelper());
@@ -2980,8 +2993,7 @@
   el.phoneInput.addEventListener('blur', function () {
     var d = phoneDigits();
     if (S.sending || d.length === 0 || phoneComplete()) { return; }
-    el.phoneField.setAttribute('data-state', 'error');
-    el.phoneInput.setAttribute('aria-invalid', 'true');
+    setFieldState('error');
     setHelper(el.phoneHelper, 'Enter the full mobile number. Example: 82 123 4567.', 'error');
   });
   el.phoneCta.addEventListener('click', submitPhone);
