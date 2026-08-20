@@ -138,6 +138,10 @@
   --color-on-warning-container: #A82C00;
   --color-outline: #D8DCE5;
   --color-outline-variant: #E5E8F0;
+  /* The boundary of a control, as opposed to a rule between things. 3.2:1 on
+     white, which is the floor WCAG 2.2 sets for a control somebody has to be
+     able to find the edge of. Separators keep the hairline above. */
+  --color-outline-control: #8A93A8;
   --color-page-background: #FAFBFD;
   --color-primary: #15259B;
   --color-scrim-backdrop: #EFF1F659;
@@ -1210,7 +1214,9 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
   font-size: var(--font-size-body-sm);
   background: var(--color-surface);
   color: var(--color-on-surface);
-  border: var(--size-input-border-width) solid var(--color-outline-variant);
+  /* A control boundary rather than a separator: the tab has to be findable
+     as a control, which the hairline token is too faint to do. */
+  border: var(--size-input-border-width) solid var(--color-outline-control);
   border-radius: var(--radius-control);
   padding: var(--space-1-0) var(--space-1-5);
   cursor: pointer;
@@ -1237,7 +1243,10 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
   font-size: var(--font-size-body-md);
   color: var(--color-on-surface);
   background: var(--color-surface);
-  border: var(--size-input-border-width) solid var(--color-outline);
+  /* The field's own boundary, which somebody has to be able to find before
+     they can tell it is a field. #D8DCE5 measured 1.5:1 against the surface;
+     WCAG 2.2 asks for 3:1 on a control boundary. */
+  border: var(--size-input-border-width) solid var(--color-outline-control);
   border-radius: var(--radius-control);
   padding: 0 var(--space-2-0);
   min-height: var(--size-control-height);
@@ -4141,6 +4150,19 @@ body.status-dialog-open .scrim { display: block; }
   margin: var(--space-1-5) 0 0;
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
+}
+
+/* The whole cell, so aiming at the row's tick does not require aiming at
+   thirteen pixels of it. */
+.tick-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--size-touch-min);
+  margin: calc(var(--space-1-0) * -1) calc(var(--space-2-0) * -1);
+  padding: var(--space-1-0) var(--space-2-0);
+  cursor: pointer;
 }
 
 .status-derived {
@@ -9612,7 +9634,15 @@ function form(spec) {
     // Leaving a field is the moment it is finished with, so it is the moment
     // to answer it. Typing into one already complained about re-checks as you
     // fix it, which is how the error goes away without a second press.
+    //
+    // Leaving a field somebody never touched is not the same event. Opening
+    // the sheet focuses the first field, so tabbing past it — or clicking
+    // anywhere else — fired blur on an empty box and complained that it was
+    // empty, before anybody had done anything. A field is answered when
+    // somebody has put something in it or has already been told about it.
     node.addEventListener('blur', () => {
+      const answered = String(node.value || '').trim() !== '';
+      if (!answered && !touched.has(field)) return;
       scripted = null;
       touched.add(field);
       sync();
@@ -10167,7 +10197,10 @@ function directory(spec) {
    * which is Polaris's rule: a menu that conceals the dangerous one is how
    * somebody presses it by accident. */
   const selectCell = r => (spec.bulk
-    ? `<td class="select"><input type="checkbox" class="row-tick" ${selected.has(spec.rowKey(r)) ? 'checked' : ''} aria-label="Select ${spec.rowLabel ? spec.rowLabel(r) : 'row'}"></td>`
+    /* The label fills the cell, so the target is the cell rather than the
+       13px box inside it. The box was below every minimum-target guideline and
+       the rest of the cell did nothing at all. */
+    ? `<td class="select"><label class="tick-target"><input type="checkbox" class="row-tick" ${selected.has(spec.rowKey(r)) ? 'checked' : ''} aria-label="Select ${spec.rowLabel ? spec.rowLabel(r) : 'row'}"></label></td>`
     : '');
 
   function menuCell(r) {
@@ -10246,7 +10279,15 @@ function directory(spec) {
           const body = cells.map((c, i) => {
             const [name, , cls] = spec.columns[i];
             if (hidden.has(name)) return '';
-            return `<td${cls ? ` class="${cls}"` : ''}>${c}</td>`;
+            /* A column that gives up its width has to give the value back
+               some other way. The stylesheet promised a tooltip on the
+               truncating columns and nothing ever set one, so a clipped
+               vehicle descriptor could not be read at all. */
+            const full = (cls && /truncate/.test(cls))
+              ? String(c).replace(/<[^>]*>/g, '').trim()
+              : '';
+            const titled = full ? ` title="${esc(full)}"` : '';
+            return `<td${cls ? ` class="${cls}"` : ''}${titled}>${c}</td>`;
           }).join('');
           const key = spec.rowKey ? spec.rowKey(r) : '';
           return `<tr${key ? ` data-row="${key}" tabindex="-1"` : ''}${selected.has(key) ? ' class="is-selected"' : ''}>${selectCell(r)}${body}${menuCell(r)}</tr>`;
@@ -13908,7 +13949,9 @@ const vehicles = Records.directory({
       : '';
 
     return [
-      `<a class="rec" href="#">${r[0]}</a>`,
+      /* .ident as well as .rec: the treatment belongs to what the value is,
+         not to whether it happens to be a link. */
+      `<a class="rec ident" href="#">${r[0]}</a>`,
       r[1] || '<span class="cell-none">Not assigned</span>',
       `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${r[6]} L`,
       `<span class="status-cell">
