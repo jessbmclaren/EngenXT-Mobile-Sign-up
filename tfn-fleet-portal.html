@@ -1502,7 +1502,18 @@ textarea.field {
   font-size: var(--font-size-body-sm);
 }
 
-.form-field .notice a { color: var(--color-brand-ink); font-weight: var(--font-weight-label-md); }
+.form-field .link-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-brand-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.notice a { color: var(--color-brand-ink); font-weight: var(--font-weight-label-md); }
 
 .form-field.invalid .field { border-color: var(--color-error); }
 
@@ -9252,7 +9263,25 @@ function form(spec) {
       const [lead, action, tail] = notice;
       const n = document.createElement('p');
       n.className = 'notice';
-      n.innerHTML = `${lead}<a href="#">${action}</a>${tail || ''}`;
+      /* A button, not an anchor.
+       *
+       * It was <a href="#">, which does two wrong things at once. It has no
+       * handler, so the offer it makes — "use these details", "split it into
+       * the fields" — applied nothing when taken. And a bare # rewrites the
+       * address, which on a route-owned sheet is a navigation: the sheet came
+       * down and everything typed went with it, without the discard question
+       * being asked. An offer that loses the work it was offering to tidy.
+       *
+       * Built from nodes as well, because lead and tail carry values the person
+       * typed. */
+      n.append(document.createTextNode(lead));
+      const act = document.createElement('button');
+      act.type = 'button';
+      act.className = 'link-button';
+      act.textContent = action;
+      act.dataset.noticeAct = field;
+      n.append(act);
+      if (tail) n.append(document.createTextNode(tail));
       say(field, 'notice', n);
     } else {
       say(field, null, null);
@@ -9491,7 +9520,16 @@ function form(spec) {
       if (!wrap) return;
       const n = document.createElement('p');
       n.className = 'notice';
-      n.innerHTML = `${lead}<a href="#">${action}</a>${tail || ''}`;
+      /* Same as the live path: a button rather than an anchor, and text nodes
+         rather than markup, because these strings carry typed values. */
+      n.append(document.createTextNode(lead));
+      const act = document.createElement('button');
+      act.type = 'button';
+      act.className = 'link-button';
+      act.textContent = action;
+      act.dataset.noticeAct = field;
+      n.append(act);
+      if (tail) n.append(document.createTextNode(tail));
       wrap.appendChild(n);
     });
 
@@ -9881,6 +9919,13 @@ function directory(spec) {
 
   function render() {
     const rows = showing();
+    /* A selection is only meaningful against what is on screen. Search and the
+       tabs already cleared it; facets, columns and Clear filters did not, so a
+       tick could survive out of sight and be acted on later. */
+    if (selected.size && spec.rowKey) {
+      const visible = new Set(rows.map(r => spec.rowKey(r)));
+      [...selected].forEach(k => { if (!visible.has(k)) selected.delete(k); });
+    }
     const shown = spec.columns.filter(c => !hidden.has(c[0]));
 
     rowsBox.innerHTML = rows.length
@@ -9984,7 +10029,9 @@ function directory(spec) {
     if (!bulkBar) return;
     const n = selected.size;
     bulkBar.classList.toggle('hidden', n === 0);
-    if (!n) return;
+    /* Emptied as well as hidden. A hidden bar holding '3 selected' is a stale
+       count that assistive technology and any later reader can still find. */
+    if (!n) { bulkBar.textContent = ''; return; }
     bulkBar.innerHTML =
       `<span class="bulk-count">${n} selected</span>` +
       `<div class="bulk-actions">` +
@@ -10131,13 +10178,26 @@ function directory(spec) {
     if (bulk) {
       e.stopPropagation();
       const act = bulk.dataset.bulk;
-      const keys = [...selected];
-      selected.clear();
-      if (act === 'clear') { render(); return; }
-      // Twelve records is twelve round trips. Clearing is instant because
-      // nothing leaves the browser.
+      if (act === 'clear') { selected.clear(); render(); return; }
+
+      /* Only what is on screen. A tick made before a filter narrowed the list
+         is not consent to act on a row the person can no longer see, and a
+         fuel decision is the last place to assume otherwise. */
+      const visible = new Set(spec.rowKey ? showing().map(r => spec.rowKey(r)) : []);
+      const keys = [...selected].filter(k => visible.has(k));
+      if (!keys.length) {
+        toast('Nothing to change. The rows you ticked are not in this view.');
+        return;
+      }
+
+      /* The button is held for the beat, and the selection is emptied inside
+         it — so a second press within the beat finds the same rows rather than
+         an empty list, and cannot report "nothing changed" over the undo for
+         the change that did land. */
+      if (bulk.dataset.busy === '1') return;
       pending(bulk, () => {
         const undo = spec.onBulk?.(keys, act);
+        selected.clear();
         render();
         if (undo) toast(undo.message, undo.revert && (() => { undo.revert(); render(); }));
       });
@@ -10360,9 +10420,25 @@ function toast(message, undo, extra) {
   }
   /* Undo last, and closest to the edge: it is the one somebody grabs at inside
      ten seconds, and the two additions can wait. */
-  box.innerHTML = `<span>${message}</span>` +
-    extras.map((e, i) => `<button class="toast-extra" type="button" data-extra="${i}">${e.label}</button>`).join('') +
-    (undo ? '<button class="toast-undo" type="button">Undo</button>' : '');
+  box.textContent = '';
+  const line = document.createElement('span');
+  line.textContent = message;
+  box.append(line);
+  extras.forEach((e, i) => {
+    const b = document.createElement('button');
+    b.className = 'toast-extra';
+    b.type = 'button';
+    b.dataset.extra = String(i);
+    b.textContent = e.label;
+    box.append(b);
+  });
+  if (undo) {
+    const u = document.createElement('button');
+    u.className = 'toast-undo';
+    u.type = 'button';
+    u.textContent = 'Undo';
+    box.append(u);
+  }
   box.classList.add('is-up');
   clearTimeout(toastTimer);
   // Long enough to read a sentence and reach the button, short enough not to
@@ -13421,27 +13497,37 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => (
  * Nobody types these and nobody can edit them, which is the whole difference
  * between activity and a note: one is what happened, the other is what
  * somebody wanted to say about it. */
+/* Remove one known entry from a log, wherever it now sits. Undo used to take
+   the last one, which is only the right entry when nothing has happened since
+   — and the ten seconds an undo toast stays up is exactly long enough for
+   something to have happened. */
+function unlog(list, entry) {
+  if (!list || !entry) return;
+  const i = list.indexOf(entry);
+  if (i > -1) list.splice(i, 1);
+}
+
 function logChange(vehicle, field, from, to, kind = 'change') {
-  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push({
-    kind, field, from, to, who: 'You', at: stamp(),
-  });
+  const entry = { kind, field, from, to, who: 'You', at: stamp() };
+  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push(entry);
+  return entry;
 }
 
 /* Something that happened to the record with no before and after to show. */
 function logEvent(vehicle, text) {
-  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push({
-    kind: 'event', text, who: 'You', at: stamp(),
-  });
+  const entry = { kind: 'event', text, who: 'You', at: stamp() };
+  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push(entry);
+  return entry;
 }
 
 /* A note never touches the status. It is filed, the row's count goes up, and
    nothing else about the vehicle moves — which is the guarantee that makes a
    note safe to leave in a hurry. */
 function addNote(vehicle, text) {
-  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push({
-    kind: 'note', who: 'You', at: stamp(), text,
-  });
+  const entry = { kind: 'note', who: 'You', at: stamp(), text };
+  (vehicle[F.NOTES] = vehicle[F.NOTES] || []).push(entry);
   vehicles.render();
+  return entry;
 }
 
 /* What the panel shows for a vehicle. Overview is what is true now; Activity is
@@ -13567,14 +13653,14 @@ function vehicleAction(key, act, extra) {
        vehicle sent for a service while stopped should not come back to Active
        still quietly blocked by a decision nobody remembers making. */
     if (!isBlock && to !== 'Active') vehicle[F.BLOCK] = 'Allowed';
-    logChange(vehicle, isBlock ? 'Fuel access' : 'Operational status', was, to);
+    const entry = logChange(vehicle, isBlock ? 'Fuel access' : 'Operational status', was, to);
     vehicles.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(panelSpec(vehicle, 'activity'));
 
     const undo = () => {
       vehicle[field] = was;
       vehicle[F.REASON] = wasWhy;
-      (vehicle[F.NOTES] || []).pop();
+      unlog(vehicle[F.NOTES], entry);
       vehicles.render();
     };
 
@@ -13600,12 +13686,12 @@ function vehicleAction(key, act, extra) {
   if (act === 'reason-set') {
     const was = vehicle[F.REASON];
     vehicle[F.REASON] = extra || '';
-    logChange(vehicle, 'Reason', was, extra || '', 'reason');
+    const entry = logChange(vehicle, 'Reason', was, extra || '', 'reason');
     vehicles.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(panelSpec(vehicle, 'activity'));
     Records.toast(extra ? `Reason saved: ${extra}.` : 'Reason cleared.', () => {
       vehicle[F.REASON] = was;
-      (vehicle[F.NOTES] || []).pop();
+      unlog(vehicle[F.NOTES], entry);
       vehicles.render();
     });
     return;
@@ -14698,13 +14784,15 @@ const dStamp = () => new Date().toLocaleString('en-ZA', {
    that renders them is one component and a report over them should be one
    query. */
 function dLog(person, field, from, to, kind = 'change') {
-  (person.notes = person.notes || []).push({
-    kind, field, from, to, who: 'You', at: dStamp(),
-  });
+  const entry = { kind, field, from, to, who: 'You', at: dStamp() };
+  (person.notes = person.notes || []).push(entry);
+  return entry;
 }
 
 function dEvent(person, text) {
-  (person.notes = person.notes || []).push({ kind: 'event', text, who: 'You', at: dStamp() });
+  const entry = { kind: 'event', text, who: 'You', at: dStamp() };
+  (person.notes = person.notes || []).push(entry);
+  return entry;
 }
 
 const dEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => (
@@ -14785,7 +14873,7 @@ function driverAction(key, act, extra) {
 
     person[field] = to;
     if (!DREASON_FOR(person)) person.reason = '';
-    dLog(person, act === 'set-life' ? 'Account status' : 'Fuel access', was, to);
+    const entry = dLog(person, act === 'set-life' ? 'Account status' : 'Fuel access', was, to);
     drivers.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(dPanelSpec(person, 'activity'));
 
@@ -14798,7 +14886,7 @@ function driverAction(key, act, extra) {
       () => {
         person[field] = was;
         person.reason = wasWhy;
-        (person.notes || []).pop();
+        unlog(person.notes, entry);
         drivers.render();
       },
       [
@@ -14811,12 +14899,12 @@ function driverAction(key, act, extra) {
   if (act === 'reason-set') {
     const was = person.reason;
     person.reason = extra || '';
-    dLog(person, 'Reason', was, extra || '', 'reason');
+    const entry = dLog(person, 'Reason', was, extra || '', 'reason');
     drivers.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(dPanelSpec(person, 'activity'));
     Records.toast(person.reason ? `Reason saved: ${person.reason}.` : 'Reason cleared.', () => {
       person.reason = was;
-      (person.notes || []).pop();
+      unlog(person.notes, entry);
       drivers.render();
     });
     return;
@@ -15716,6 +15804,10 @@ function makeSheet(config) {
 
   function shut() {
     ownsRoute = false;
+    /* Only a sheet that was open has page-global state to give back. Calling
+       shut() on the sheet that is not on screen used to strip the class the
+       other one is displayed by. */
+    if (!opened) return;
     opened = false;
     document.body.classList.remove('sheet-open');
     sheet.classList.add('hidden');
@@ -15796,7 +15888,14 @@ function makeSheet(config) {
      the question. Binding them here as well is what made one press both open
      the confirmation and close the sheet behind it. Only the backdrop needs
      its own, because it is not a [data-close-form]. */
-  if (backdrop) backdrop.addEventListener('click', tryClose);
+  /* One backdrop element serves both sheets, and each makeSheet call bound
+     its own exit to it. So a click reached the vehicle sheet's tryClose and
+     the driver sheet's, and whichever was not on screen ran back() — which
+     cleared the page-global sheet-open class and hid the sheet the other one
+     was in the middle of asking about. Keep editing then returned to an
+     invisible form behind a full-page scrim, and the only lit control was
+     Discard. */
+  if (backdrop) backdrop.addEventListener('click', () => { if (isOpen()) tryClose(); });
 
   /* Back and reload. */
   window.addEventListener('hashchange', () => {
