@@ -779,7 +779,12 @@ const USED_ONLY = new Set([
      the declarations */
   'm-phone-field',
 ]);
-const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|leading|tracking|radius|shadow|sp|size|press|z|ease|dur|d)-/;
+/* `space` is the semantic spacing layer: names for what a gap is FOR, each
+   pointing at a step of the `sp` reference scale. `keyboard` is the one
+   runtime-owned property, written by the page and read by three layers.
+   Both are listed separately from `sp` because `--space-` and `--keyboard-`
+   share no prefix boundary with it. */
+const TOKEN_FAMILY = /^--(color|glass|gradient|kb|font|text|weight|leading|tracking|radius|shadow|sp|space|size|press|z|ease|dur|keyboard|d)-/;
 
 for (const name of FILES) {
   const styleBlocks = cssOf(name);
@@ -831,7 +836,7 @@ for (const name of FILES) {
   /* Token definitions stay inside the sanctioned families. */
   for (const m of styleNoComments.matchAll(/^\s*(--[a-z][\w-]*)\s*:/gm)) {
     if (!TOKEN_FAMILY.test(m[1])) {
-      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --text- --weight- --leading- --tracking- --press- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --d-)`);
+      fail(`${name}: token '${m[1]}' belongs to no sanctioned family (--color- --sp- --space- --text- --weight- --leading- --tracking- --press- --radius- --size- --shadow- --z- --dur- --ease- --glass- --gradient- --font- --kb- --keyboard- --d-)`);
     }
   }
 }
@@ -1140,7 +1145,7 @@ if (!fs.existsSync(docsPath)) {
   const cssBlocks = new Map();
   const cssDir = path.join(ROOT, 'src', 'css');
   for (const file of fs.readdirSync(cssDir).filter((f) => f.endsWith('.css'))) {
-    if (file === 'developer.css') { continue; }          /* tooling, never documented */
+    if (file.startsWith('developer')) { continue; }       /* tooling, never documented */
     const css = unwrapLayers(fs.readFileSync(path.join(cssDir, file), 'utf8'))
       .replace(/\/\*[\s\S]*?\*\//g, ' ');
     for (const m of css.matchAll(/(^|[},])\s*((?:\.[A-Za-z0-9_-]+|[^{},])*)\s*\{/g)) {

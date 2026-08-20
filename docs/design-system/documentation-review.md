@@ -944,3 +944,127 @@ consolidations; moving the tooling rules out of `templates.css`; declaring
 `--keyboard-inset`; moving three component margins to their parents; and the three
 `.o-signup-sheet__resend` rules filed under atoms, where preserving the pixels and obeying
 the filing law genuinely conflict.
+
+---
+
+## Third pass — the four architectural items
+
+All four were approved against a passing baseline. The question each had to answer was not
+"does it look right" but "did any computed style change", so a fingerprint was taken first:
+**every element on every state, both pages, both text sizes — 89,850 element-state records**
+— and compared afterwards.
+
+### Establishing what noise looks like
+
+The same build, snapshotted twice, does not produce identical files. Anything mid-animation
+is sampled at whatever frame it reached. On the sign-up page that is 3 records (a spinner's
+rotation). On the app page it is **50** — entrance reveals, a pulsing live dot, a medal
+wave — across 17 element types and exactly two properties, transform and opacity.
+
+That control mattered. A first pass filtered only on `matrix(` and reported six opacity
+samples as a regression; they were `.m-live-bar__dot` mid-pulse. The correct rule is about
+the element, not the value: if either side is animating, it is noise.
+
+### Result
+
+| Page | Text size | Real differences |
+|---|---|---|
+| `index.html` | default | **0** |
+| `index.html` | large | **0** |
+| `engenxt-onboarding.html` | default | 53 records, all in the noise band (control: 50) |
+| `engenxt-onboarding.html` | large | 60 records, all in the noise band |
+
+The app-page differences hit the same 17 element types and the same two properties as the
+control does on an unchanged build. **No computed style changed. No pixel moved.**
+
+### 1 · The semantic spacing layer — built
+
+Seven aliases, each pointing at the reference step it already rendered:
+
+| Token | Points at | Renders | Means |
+|---|---|---|---|
+| `--space-control-inline` | `--sp-4` | 16px | inside a control, left and right |
+| `--space-control-block` | `--sp-2` | 8px | inside a control, top and bottom |
+| `--space-stack-related` | `--sp-2` | 8px | parts of one thing |
+| `--space-stack-default` | `--sp-3` | 12px | a plain stack of its own children |
+| `--space-group` | `--sp-4` | 16px | one group to the next |
+| `--space-section` | `--sp-6` | 24px | a decision, or a different route |
+| `--space-page-inline` | `--sp-5` | 20px | the screen's own left and right |
+
+Every value was taken from a rule that already rendered it for that reason. None is
+aspirational and none renames a value it does not already have.
+
+Each alias is *consumed*, not merely declared — the in-page self-check fails any token
+nothing uses, and it is right to: a semantic name with no consumer is decoration. Eight
+call sites were re-pointed, each matched in full and asserted unique before any write.
+Adoption stops there deliberately; choosing which of two near-identical values is
+*intended* is a design review, not this edit.
+
+### 2 · Tooling out of `templates.css`
+
+Six rules moved to `src/css/developer-layout.css`.
+
+It declares `@layer templates` rather than `@layer developer`, and that is the whole
+design. Promoting them into the developer layer would move them past utilities and into a
+source-order fight with `developer.css`, which already styles the same two blocks and
+already outranks them — a cascade change wearing a tidy-up's clothes. The file is linked
+immediately after `templates.css`, so within that layer the rules sit exactly where they
+sat. **They changed address, not rank**, which is why the fingerprint is unchanged.
+
+### 3 · `--keyboard-inset` declared
+
+Now `--keyboard-inset: 0px`, documented as the one runtime-owned property. All six
+consumers were written `var(--keyboard-inset, 0px)`, so it resolved only because each
+carried its own fallback — the fallbacks were load-bearing rather than defensive, and
+dropping one would have collapsed the sheet with nothing to fail. Zero is the whole of the
+default; the real height comes from the OS at runtime.
+
+### 4 · The resend rules — moved, and the exception was not needed
+
+The ruling allowed leaving them in place as a documented cascade exception if moving them
+changed computed styles. It was tested rather than assumed: all four
+`.o-signup-sheet__resend` rules are now in `organisms.css`, and the fingerprint is
+unchanged at both text sizes. **The move stands and no exception was required.** The filing
+law holds again, and the countdown's 500 / ready 600 split is now what the stylesheet says
+rather than what source order happened to produce.
+
+### The gate learned two more families
+
+`check.js` gained `--space-` and `--keyboard-` as sanctioned token families, and its docs
+section now skips any `developer*` stylesheet as tooling. Both additive; no existing
+assertion was touched. The gates then caught two things immediately: `.a-link` had drifted
+between the two files, and the token count had moved from 205 to 213 — neither of which
+would have been noticed by eye.
+
+### A fifth check had never actually run
+
+Verifying that the eight new tokens were consumed meant running the in-page self-check —
+and running it properly, which means over http. Off disk a browser will not let a page read
+a linked stylesheet, so the unused-token check had been reporting *"stylesheet rules are
+unreadable here, so this could not be checked"*. Honest, and the reason nobody had seen
+what it says when it can read them.
+
+Over http it failed immediately, on four tokens that have nothing to do with this work:
+`--size-mark`, `--size-mark-sm`, `--size-mark-lg` and `--size-control-sm`. All four are
+spent by the app flow — the confirmation marks, the check screen's marks, the vehicle chip
+— and all four were equally unused at HEAD. Pre-existing, and invisible because the only
+way to see it was a run nobody was doing.
+
+They are now named in `SPENT_BY_THE_OTHER_FLOW` with what spends them, which is the
+mechanism that list exists for: named rather than pattern-matched, so the day one of them
+stops being used on *both* sides it comes back as a failure. The check now reads
+**10 passing, 1 warn** — the warn being the demo support number, which is long-standing.
+
+The eight new tokens do not appear in that failure, which is the confirmation that was
+wanted: every one of them is consumed.
+
+### Gate results
+
+| Gate | Result |
+|---|---|
+| `node tools/check.js` | pass — 213 tokens identical in both files |
+| `node tools/journey.js` | 71 passed, 0 failed |
+| `node tools/sweep.js` | 104 states, 0 with failures |
+| `node tools/sweep.js --large` | 104 states, 0 with failures |
+| In-page self-check (over http) | 10 passing, 1 warn, 0 failing |
+| Computed-style fingerprint | 89,850 records, 0 real differences |

@@ -63,7 +63,7 @@
 .o-auth-hero__body {
   position: relative; z-index: var(--z-content); flex: 1;
   display: flex; flex-direction: column;
-  padding: 0 var(--sp-5) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--space-page-inline) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
 }
 
@@ -120,7 +120,7 @@
    reading the sentence above them, and read either one out to their manager
    without hunting through prose for it. */
 .o-status-page__meta {
-  display: flex; gap: var(--sp-6); margin: var(--sp-3) 0 var(--sp-4);
+  display: flex; gap: var(--space-section); margin: var(--sp-3) 0 var(--sp-4);
   /* Centred as a pair. The row sat on the left edge of cards whose every
      other line is centred - the one left-handed thing on the screen. */
   justify-content: center;
@@ -236,7 +236,7 @@
   /* The action needs visible room beneath it, and the device's own safe area
      is on top of that rather than instead of it. max() gave whichever was
      larger, so on a device with an indicator the button sat on it. */
-  padding: 0 var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--space-page-inline) calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
   display: flex; flex-direction: column;
 }
 
@@ -256,7 +256,7 @@
 .o-signup-sheet__stage { display: none; flex-direction: column; }
 
 .o-signup-sheet__stage[data-state="active"] {
-  display: flex; gap: var(--sp-2);
+  display: flex; gap: var(--space-stack-related);
   animation: stageIn var(--dur-sheet) var(--ease-out) both;
 }
 
@@ -280,6 +280,30 @@
    edges the eye actually pairs, not a number a script can settle, so it wants
    a designer looking at it rather than a blind correction. */
 .o-signup-sheet__resend { align-self: flex-start; }
+
+/* One component, two states, and the weight is how you tell them apart.
+
+   Waiting: the countdown is a fact, not a control. It wears plain text and
+   weight 500 so nothing invites a press that cannot work yet.
+   Ready: "Resend" is a real action again and takes the link's own weight 600.
+
+   500 comes from `.a-link:disabled` below and 600 from `.a-link` itself, so
+   neither is restated here. This rule used to set 600 on the waiting state as
+   well - the opposite of the intent - and was inert only because a later rule
+   of equal specificity happened to be typed after it. Removing it changes no
+   pixels and removes the contradiction. */
+.o-signup-sheet__resend:disabled { text-decoration: none; }
+
+/* Except this one. Disabled, it is not a control being ignored: it is the
+   sentence telling a driver when they can try again, read one-handed on a
+   forecourt. Tertiary is 3.72:1 on the sheet and is meant for inert controls;
+   the countdown is content, so it takes the colour content takes. */
+/* On the final attempt the safest recovery leads: the resend link takes
+   the lead coat and outranks the channel button beside it. */
+.o-signup-sheet__resend[data-lead="true"] { font-weight: var(--weight-heavy); color: var(--color-primary-dark); }
+
+.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }
+
 
 /* Below here the driver has left the task and is taking another route, which
    is a decision, so it earns the same separation the primary action gets. */

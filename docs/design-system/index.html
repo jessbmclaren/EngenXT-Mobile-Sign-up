@@ -118,10 +118,12 @@
     <code>&lt;link&gt;</code> in <code>index.html</code> — because the demo tooling has to
     work in the deployed prototype. It is last in the layer order, so it cannot affect how
     a product component renders; it is the one file to drop when the prototype becomes a
-    product. And five tooling rules live in <code>templates.css</code> rather than in the
-    developer layer, three of which read <code>--d-</code> tokens. The scale states that no
-    product component may read a <code>--d-</code> token; these are tooling wearing a
-    product file's name, and they should move.
+    product. And six tooling rules used to live in <code>templates.css</code>; they are now
+    in <code>developer-layout.css</code>, which still declares
+    <code>@layer templates</code> so their cascade position is unchanged. Promoting them
+    into the developer layer would have moved them past utilities and into a source-order
+    fight with <code>developer.css</code>, which already styles the same two blocks — a
+    cascade change wearing a tidy-up's clothes. They changed address, not rank.
   </div>
 
   <h3>Why layers rather than specificity</h3>
@@ -139,11 +141,11 @@
     original file so today's rendering is preserved.
   </p>
   <p>
-    The cost of pinning is that those rules are now filed against the naming law: three
-    <code>.o-signup-sheet__resend</code> rules sit in <code>atoms.css</code>. Preserving
-    the pixels and obeying the filing law are in genuine conflict there, and resolving it
-    needs a design decision rather than a refactor — see
-    <a href="#limitations">Decisions</a>.
+    Pinning had a cost: three <code>.o-signup-sheet__resend</code> rules stayed in
+    <code>atoms.css</code>, against the filing law, because moving them might have moved
+    pixels. That has since been tested rather than assumed — they are in
+    <code>organisms.css</code> now, and the fingerprint of all 104 states is unchanged. The
+    conflict was real but it was not, in the end, a trade.
   </p>
 </section>
 
@@ -159,7 +161,7 @@
   <h3>Visual hierarchy</h3>
   <p>Rank is carried by three tokens at once — size, weight and text colour — and a colour may never outrank its role: <code>--color-text-tertiary</code> is for inert controls and placeholders only, <code>--color-text-muted</code> for decoration only. A line a driver reads never takes either.</p>
   <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:104-107 — <code>--color-text-tertiary: #6C6C70; /* disabled and placeholder, 4.69:1 on sunken. 3.72:1 on the sheet, so it is for inert controls only, never for a line being read. */</code> and <code>--color-text-muted: #b0bcd0; /* decorative only, never load-bearing text */</code>. Applied at src/css/organisms.css:371-381, where <code>.o-outcome-panel__clock</code> takes --text-title / --weight-heavy / --color-text-primary and <code>.o-outcome-panel__meta</code> takes --text-caption2 / --weight-medium / --color-text-secondary under the comment &quot;A supporting offer, not the outcome, so it sits below the clock and quieter than both the title and the number.&quot;</p>
-  <p class="ds-where"><strong>The exception:</strong> Breaking it is written up at engenxt-onboarding.html:2072-2074: <code>.o-step__label</code> in tertiary is &quot;4.19:1 on the page grey this label sits on, and at 11px it gets no large-text allowance: it is a line being read, and tertiary is for controls that are switched off.&quot; The stated exception runs the other way at src/css/atoms.css:126-134 — <code>.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }</code> with &quot;Except this one... the countdown is content, so it takes the colour content takes&quot;: a disabled control deliberately refuses the disabled ink.</p>
+  <p class="ds-where"><strong>The exception:</strong> Breaking it is written up at engenxt-onboarding.html:2072-2074: <code>.o-step__label</code> in tertiary is &quot;4.19:1 on the page grey this label sits on, and at 11px it gets no large-text allowance: it is a line being read, and tertiary is for controls that are switched off.&quot; The stated exception runs the other way in <code>src/css/organisms.css</code> — <code>.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }</code> with &quot;Except this one... the countdown is content, so it takes the colour content takes&quot;: a disabled control deliberately refuses the disabled ink.</p>
 
   <h3>Priority of content and actions</h3>
   <p>When the keyboard takes the screen, height is surrendered in one fixed order and nothing may jump the queue: 1 tooling, 2 the step counter, 3 an instruction the driver has already acted on, 4 the loose spacing steps. The base gap is never given up, at any width.</p>
@@ -204,7 +206,7 @@
   <h3>Padding, margin and gap responsibilities</h3>
   <p>The organism owns the vertical rhythm through its gap and nothing in the markup sets spacing. A parent may PLACE a child — where it sits, how much room it takes, whether it shows — but may never RESTYLE its insides; a child that must look different in a context carries a modifier for it.</p>
   <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:243 &quot;The organism owns the vertical rhythm. Nothing in the markup sets spacing.&quot; index.html:3575, RULES[&#x27;Composition&#x27;]: &quot;Colour, type, padding, radius and border stay with the component that owns them... That is why the links on a content edge take a-link--flush rather than the row cancelling their padding.&quot; The modifier that keeps the law: src/css/atoms.css:108 <code>.a-link--flush { padding-inline: 0; }</code> — &quot;The vertical padding stays, because the 48px target depends on it&quot; — declared as a modifier rather than a row rule at molecules.css:221-223.</p>
-  <p class="ds-where"><strong>The exception:</strong> The law is written from two real breaches. src/css/atoms.css:62-70: <code>.o-scan__actions .a-btn--outline</code> &quot;set the border and the ink from the organism - which is the Composition law&#x27;s own worked example of what a parent may not do&quot;, fixed by writing <code>.a-btn--outlineOnDark</code>. src/css/molecules.css:66-75: <code>.o-home .m-brand-lockup__name</code> recoloured a child and &quot;was invisible to the parity gate, which drops any rule whose classes do not all root into the manifest. So the gate went on proving the lockup identical in both files while the two files rendered it in different colours.&quot; A live crossing survives: src/css/atoms.css:104, :132 and :134 style <code>.o-signup-sheet__resend</code>, an organism element, from inside <code>@layer atoms</code>, with no comment claiming an exception.</p>
+  <p class="ds-where"><strong>The exception:</strong> The law is written from two real breaches. src/css/atoms.css:62-70: <code>.o-scan__actions .a-btn--outline</code> &quot;set the border and the ink from the organism - which is the Composition law&#x27;s own worked example of what a parent may not do&quot;, fixed by writing <code>.a-btn--outlineOnDark</code>. src/css/molecules.css:66-75: <code>.o-home .m-brand-lockup__name</code> recoloured a child and &quot;was invisible to the parity gate, which drops any rule whose classes do not all root into the manifest. So the gate went on proving the lockup identical in both files while the two files rendered it in different colours.&quot; That crossing has since been closed: three rules styling <code>.o-signup-sheet__resend</code> from inside <code>@layer atoms</code> now sit with the organism that owns them, verified computed-identical across all 104 states.</p>
 
   <h3>Accessibility</h3>
   <p>Every interactive control in the product clears 48px in its smallest dimension (<code>--size-target</code>), the target counting absolutely-positioned pseudo-element hit area; one two-tone focus ring serves the whole file; colour never carries meaning alone; any state signalled by colour re-states itself structurally under forced-colors; every animation collapses to a still frame under reduced motion.</p>
@@ -232,7 +234,7 @@
   </p>
 
   <p>
-    <b data-count="tokens">205</b> product tokens, identical in both pages and compared
+    <b data-count="tokens">213</b> product tokens, identical in both pages and compared
     property by property by the build gate.
   </p>
 
@@ -286,6 +288,27 @@
     text is what people turn this on for.
   </p>
 
+  <h3>The one token the page writes</h3>
+  <p>
+    <code>--keyboard-inset</code> is declared at <code>0px</code> and owned at runtime. When
+    the keyboard opens, the page writes the real height onto the device frame; three layers
+    size themselves against it — the sheet's height and max-height, the frame's own height,
+    and the drawn keypad.
+  </p>
+  <p>
+    It is declared for a reason worth knowing. Every one of its six consumers was written as
+    <code>var(--keyboard-inset, 0px)</code>, so the property resolved only because each of
+    them carried its own fallback — which made those fallbacks load-bearing rather than
+    defensive. Drop one and the sheet collapses silently, with nothing to fail. Declared, the
+    fallbacks become belt and braces and the property has a stated default.
+  </p>
+  <div class="ds-note">
+    <strong>Zero is the whole of the default.</strong> No other keyboard height belongs in
+    the stylesheet — the real number comes from the operating system at runtime, and a second
+    value here would be a guess competing with a measurement. The unmigrated page carries the
+    declaration for token parity and does not consume it.
+  </div>
+
   <h3>Every token</h3>
   <div id="dsTokens">
     <p class="ds-note">Token tables are drawn by <code>docs.js</code> from the linked CSS.</p>
@@ -304,6 +327,13 @@
     Only 16 take a leading token. That is the largest single gap in
     the type system: it is where two-line labels collide when large text is on. It is
     recorded, not fixed — fixing it moves pixels.
+    <br><br>
+    <strong>There is a measured proposal for it:</strong>
+    <a href="line-height-proposal.md">line-height-proposal.md</a> — all 21 grouped by
+    semantic role, with before-and-after boxes at both text sizes. Three of them already
+    change shape under large text, going from one line to two:
+    <code>.m-figure__key</code>, <code>.o-auth-hero__how</code> and
+    <code>.o-status-page__title</code>. Nothing in it has been applied.
   </div>
   <p>
     <strong>2 styles use a literal pixel size</strong>, marked
@@ -391,13 +421,33 @@
     the <a href="#foundations">Tokens</a> table under <em>Spacing</em>.
   </p>
 
+  <h4>The semantic layer</h4>
+  <p>
+    Seven names for what a gap is <em>for</em>, each pointing at a step of the reference
+    scale rather than holding a value of its own. Nothing here can move a pixel: change
+    what a job is worth and it is one edit, in one place.
+  </p>
+  <div class="ds-tablewrap">
+    <table class="ds-table">
+      <thead><tr><th>Token</th><th>Points at</th><th>Renders</th><th>Means</th><th>Consumed by</th></tr></thead>
+      <tbody>
+        <tr><td><code>--space-control-inline</code></td><td><code>--sp-4</code></td><td class="ds-num">16px</td><td>Inside a control, left and right</td><td><code>.a-field</code></td></tr>
+        <tr><td><code>--space-control-block</code></td><td><code>--sp-2</code></td><td class="ds-num">8px</td><td>Inside a control, top and bottom</td><td><code>.a-link</code></td></tr>
+        <tr><td><code>--space-stack-related</code></td><td><code>--sp-2</code></td><td class="ds-num">8px</td><td>Parts of one thing</td><td><code>.o-signup-sheet__stage</code></td></tr>
+        <tr><td><code>--space-stack-default</code></td><td><code>--sp-3</code></td><td class="ds-num">12px</td><td>A plain stack of its own children</td><td><code>.m-alert</code></td></tr>
+        <tr><td><code>--space-group</code></td><td><code>--sp-4</code></td><td class="ds-num">16px</td><td>One group to the next</td><td><code>.m-sheet-header</code></td></tr>
+        <tr><td><code>--space-section</code></td><td><code>--sp-6</code></td><td class="ds-num">24px</td><td>A decision, or a different route</td><td><code>.o-status-page__meta</code></td></tr>
+        <tr><td><code>--space-page-inline</code></td><td><code>--sp-5</code></td><td class="ds-num">20px</td><td>The screen's own left and right</td><td><code>.o-auth-hero__body</code>, <code>.o-signup-sheet__body</code></td></tr>
+      </tbody>
+    </table>
+  </div>
   <div class="ds-note">
-    <strong>Not yet done.</strong> A semantic spacing layer — <code>space-control-inline</code>,
-    <code>space-stack-related</code>, <code>space-section</code> and the rest — has been
-    specified but not built. Introducing it means re-pointing roughly 400 declarations and
-    deciding, case by case, which of two near-identical values is the intended one. That
-    is a design review, not a mechanical edit, and it changes pixels. It is listed under
-    <a href="#limitations">Decisions</a> as awaiting approval.
+    <strong>Adoption is deliberately partial.</strong> Each alias was taken from a rule that
+    already rendered that value for that reason — none is aspirational, and none renames a
+    value it does not already have. The remaining <code>--sp-*</code> uses were left alone,
+    because deciding which of two near-identical values is <em>intended</em> is a design
+    review rather than a mechanical edit. Verified: every element on all 104 states,
+    before and after, identical.
   </div>
 
   <h4>How spacing is applied</h4>
@@ -1233,6 +1283,17 @@ button { background: none; border: none; color: inherit; }</pre>
 
   <h3>Approved and done</h3>
   <ul>
+    <li>
+      <strong>The resend button is organism-owned, and now filed that way.</strong> Four
+      rules style <code>.o-signup-sheet__resend</code>; three of them sat in
+      <code>atoms.css</code>, pinned there when the stylesheet was split. They are now in
+      <code>organisms.css</code> with the fourth. The move was made on the ruling that
+      visual correctness outranks a filing taxonomy — so it was attempted, then measured:
+      every element on all 104 states is computed-identical before and after, so the move
+      stands and no cascade exception was needed. The countdown reads 500 while it is
+      waiting and 600 once Resend is live, which is now what the stylesheet says rather
+      than what source order happened to produce.
+    </li>
     <li><strong>Linked CSS, no build.</strong> Eight layer files loaded by plain <code>&lt;link&gt;</code>. Verified to render identically over <code>file://</code> and http.</li>
     <li><strong>Cascade layers.</strong> Order declared once. Every rule is filed by its owning block, not its target, so a screen's override stays with the screen.</li>
     <li><strong>Gates keep their strictness.</strong> The three CLI gates learned to find linked CSS; not one assertion was relaxed.</li>
@@ -1247,28 +1308,11 @@ button { background: none; border: none; color: inherit; }</pre>
   <h3>Inconsistencies that need a design ruling</h3>
   <ul>
     <li>
-      <strong>The resend button is filed in the wrong place, and that is the real problem.</strong>
-      Four rules style it. <em>Three of them are in <code>atoms.css</code></em> even though
-      their leftmost block is <code>.o-signup-sheet__resend</code> — an organism — which
-      breaks the filing law stated above. Only one, <code>align-self</code>, is in
-      <code>organisms.css</code>.
-      <br><br>
-      The visible symptom: the countdown's weight is decided between
-      <code>.o-signup-sheet__resend:disabled</code> (semibold) and
-      <code>.a-link:disabled</code> (medium). Both are the same specificity and
-      <em>both are inside <code>@layer atoms</code></em>, so the layer order cannot
-      separate them — source order alone decides, and medium wins. An earlier note here
-      claimed layers would have flipped them and that they were pinned; that was wrong,
-      and it was wrong because it assumed the rules were in the layers their names imply.
-      <br><br>
-      Move the three rules to <code>organisms.css</code> and two things happen at once: the
-      filing law holds again, and the layer order decides the weight instead of typing
-      order — at which point "is 500 or 600 intended?" becomes a one-line answer rather
-      than a standing question.
-    </li>
-    <li>
-      <strong>The semantic spacing layer.</strong> Specified, not built. It requires deciding,
-      case by case, which of two near-identical values is intended, and it moves pixels.
+      <strong>The semantic spacing layer.</strong> <em>Approved and built.</em> Seven aliases,
+      each mapped one-to-one onto the reference step it already rendered, so no pixel moved.
+      What is still open is <em>adoption</em>: most <code>--sp-*</code> uses were left where
+      they are, because choosing which of two near-identical values is intended is a design
+      review. See <a href="#foundations">Foundations</a>.
     </li>
     <li>
       <strong>Same-level nesting.</strong> Three components hold another of their own level —

@@ -305,6 +305,23 @@
   --size-status-bar: 78px;
   --sp-1h: 6px; --sp-2h: 10px;
 
+  /* Space, said by job rather than by size. Each points at a step above rather
+     than holding a value of its own, so nothing here can move a pixel. The
+     sign-up flow consumes these; this flow carries them because the scale is
+     one union copied whole into both files, which the build gate enforces. */
+  --space-control-inline: var(--sp-4);   /* 16 - inside a control, left and right */
+  --space-control-block:  var(--sp-2);   /*  8 - inside a control, top and bottom  */
+  --space-stack-related:  var(--sp-2);   /*  8 - parts of one thing                */
+  --space-stack-default:  var(--sp-3);   /* 12 - a plain stack of its own children */
+  --space-group:          var(--sp-4);   /* 16 - one group to the next             */
+  --space-section:        var(--sp-6);   /* 24 - a decision, or a different route  */
+  --space-page-inline:    var(--sp-5);   /* 20 - the screen's own left and right   */
+
+  /* Runtime-owned: the page writes it on the device frame when the keyboard
+     opens. Declared at zero so the consumers' fallbacks are defensive rather
+     than load-bearing. Zero is the whole of the default. */
+  --keyboard-inset: 0px;
+
   /* Size. Values that are neither spacing nor type. */
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
@@ -570,7 +587,7 @@ button { background: none; border: none; color: inherit; }
 }
 .a-btn[aria-disabled="true"]:active, .a-btn:disabled:active { transform: none; }
 .a-link {
-  min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
+  min-height: var(--size-target); padding: var(--space-control-block) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
   font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight);
@@ -1955,7 +1972,7 @@ button { background: none; border: none; color: inherit; }
   text-transform: uppercase; color: var(--color-on-dark-soft);
 }
 .o-scan__typeInput {
-  min-height: var(--size-control); padding: 0 var(--sp-4);
+  min-height: var(--size-control); padding: 0 var(--space-control-inline);
   border: 1px solid var(--color-on-dark-line); border-radius: var(--radius-card-sm);
   background: var(--color-on-dark-fill); color: var(--color-text-on-dark);
   font-size: var(--text-callout); font-weight: var(--weight-bold); letter-spacing: var(--tracking-caps);

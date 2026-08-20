@@ -22,6 +22,10 @@
 <link rel="stylesheet" href="src/css/molecules.css">
 <link rel="stylesheet" href="src/css/organisms.css">
 <link rel="stylesheet" href="src/css/templates.css">
+<!-- Tooling that answers the template layer's breakpoints. Declares
+     @layer templates so its cascade position is unchanged, and loads here so
+     that within that layer it sits exactly where it sat inside templates.css. -->
+<link rel="stylesheet" href="src/css/developer-layout.css">
 <link rel="stylesheet" href="src/css/utilities.css">
 <link rel="stylesheet" href="src/css/developer.css">
 </head>
@@ -4005,7 +4009,15 @@
         '--press-subtle': 'the app’s rows and cards, which are tapped rather than aimed at',
         '--tracking-display': 'the app’s station name and litre count',
         '--color-hover-lift': 'the app’s icon buttons, which sit on a sunken plate',
-        '--color-hover-onDark': 'the app’s scanner, the one dark screen with controls on it'
+        '--color-hover-onDark': 'the app’s scanner, the one dark screen with controls on it',
+        /* Found when this check was first run over http. Off disk it cannot read a
+           linked stylesheet and says so, which is honest but meant these four had
+           never actually been tested - they are as unused here as the nine above and
+           had simply never been reached. */
+        '--size-mark': 'the app’s confirmation marks - the linked tick and the verdict mark',
+        '--size-mark-sm': 'the app’s check screen, its small pass and skipped marks',
+        '--size-mark-lg': 'the app’s check screen, the full-size mark',
+        '--size-control-sm': 'the app’s vehicle chip and its small square controls'
       };
       var dead = Object.keys(declared).filter(function (d) {
         return !used[d] && !SPENT_BY_THE_OTHER_FLOW[d];

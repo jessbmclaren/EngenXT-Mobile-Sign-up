@@ -1,0 +1,55 @@
+/* ══════════════════════════════════════════════════════════════════════
+   DEVELOPER LAYOUT
+
+   Tooling that has to live in the template layer.
+
+   These six rules were inside templates.css, interleaved with the product's
+   own responsive rules because they answer the same two breakpoints: when the
+   demo page stacks, the state rail and the inspector stack with it. They are
+   not product template rules - nothing a driver sees is affected by any of
+   them - so they do not belong in the file that holds the device frame.
+
+   WHY THIS DECLARES @layer templates AND NOT @layer developer.
+
+   The layer order is tokens, foundations, atoms, molecules, organisms,
+   templates, utilities, developer. Moving these rules into the developer layer
+   would move them PAST utilities and past every rule that currently outranks
+   them, which is a cascade change wearing a tidy-up's clothes. developer.css
+   already styles .d-stateNav and .d-inspect, and it already wins over this
+   file's layer; that relationship is what keeps today's rendering, and
+   promoting these rules into the same layer would put them in a source-order
+   fight they do not currently have.
+
+   So the rules keep their cascade position exactly and only change address.
+   The page links this immediately after templates.css, so within the templates
+   layer they sit where they always sat: at the end.
+
+   The test is not that it looks right. It is that the computed-style
+   fingerprint of every element on all 104 states is unchanged.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@layer templates {
+
+/* One column, so the rail stops being a rail and stacks under the device.
+   The product half of this breakpoint stays in templates.css. */
+@media (max-width: 900px) {
+  .d-stateNav { position: static; width: 100%; max-width: 390px; max-height: none; }
+  .d-inspect { width: 100%; max-width: 390px; }
+}
+
+@media (max-width: 440px) {
+  .d-stateNav { max-width: none; border-radius: 0; }
+}
+
+/* Overlays inside the device. The layer-inspect switch outlines every block by
+   its level, which is why these read --d- tokens: they are tooling drawing the
+   taxonomy, not product components borrowing a tooling colour. */
+[data-layers="on"] .t-device-frame [class*="a-"],
+[data-layers="on"] .t-device-frame [class*="m-"],
+[data-layers="on"] .t-device-frame [class*="o-"] { outline: 1px solid var(--d-level-atom); }
+
+[data-layers="on"] .t-device-frame [class^="m-"], [data-layers="on"] .t-device-frame [class*=" m-"] { outline-color: var(--d-level-molecule); }
+
+[data-layers="on"] .t-device-frame [class^="o-"], [data-layers="on"] .t-device-frame [class*=" o-"] { outline-color: var(--d-level-organism); }
+
+}

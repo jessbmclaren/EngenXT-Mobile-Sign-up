@@ -155,12 +155,12 @@
   max-width: 390px; line-height: var(--leading-body);
 }
 
+/* One column, so the rail stops being a rail and stacks under the device.
+   The tooling half of this breakpoint - the state rail and the inspector -
+   is in developer-layout.css, which keeps this layer position. */
 @media (max-width: 900px) {
   .p-signup-demo { flex-direction: column; align-items: center; padding: var(--sp-4); }
-  .d-stateNav { position: static; width: 100%; max-width: 390px; max-height: none; }
-  /* One column, so the rail stops being a rail and stacks under the device. */
   .p-signup-demo__rail { position: static; max-height: none; width: 100%; align-items: center; }
-  .d-inspect { width: 100%; max-width: 390px; }
 }
 
 /* Six squares and five gaps cannot each clear 48px inside 320. The row takes
@@ -172,16 +172,6 @@
 @media (max-width: 440px) {
   .p-signup-demo { padding: 0; gap: 0; }
   .t-device-frame { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
-  .d-stateNav { max-width: none; border-radius: 0; }
 }
-
-/* Overlays inside the device */
-[data-layers="on"] .t-device-frame [class*="a-"],
-[data-layers="on"] .t-device-frame [class*="m-"],
-[data-layers="on"] .t-device-frame [class*="o-"] { outline: 1px solid var(--d-level-atom); }
-
-[data-layers="on"] .t-device-frame [class^="m-"], [data-layers="on"] .t-device-frame [class*=" m-"] { outline-color: var(--d-level-molecule); }
-
-[data-layers="on"] .t-device-frame [class^="o-"], [data-layers="on"] .t-device-frame [class*=" o-"] { outline-color: var(--d-level-organism); }
 
 }

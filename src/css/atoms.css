@@ -88,7 +88,7 @@
 
 /* a-link */
 .a-link {
-  min-height: var(--size-target); padding: var(--sp-2) var(--sp-1);
+  min-height: var(--size-target); padding: var(--space-control-block) var(--sp-1);
   font-variant-numeric: tabular-nums;
   display: inline-flex; align-items: center; justify-content: center;
   font-size: var(--text-footnote); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight);
@@ -98,19 +98,6 @@
 /* Quiet is still a live control, so it differentiates upward from disabled
    rather than sharing its grey. */
 .a-link--quiet { color: var(--color-text-secondary); font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; }
-
-/* One component, two states, and the weight is how you tell them apart.
-
-   Waiting: the countdown is a fact, not a control. It wears plain text and
-   weight 500 so nothing invites a press that cannot work yet.
-   Ready: "Resend" is a real action again and takes the link's own weight 600.
-
-   500 comes from `.a-link:disabled` below and 600 from `.a-link` itself, so
-   neither is restated here. This rule used to set 600 on the waiting state as
-   well - the opposite of the intent - and was inert only because a later rule
-   of equal specificity happened to be typed after it. Removing it changes no
-   pixels and removes the contradiction. */
-.o-signup-sheet__resend:disabled { text-decoration: none; }
 
 /* Flush drops the inline padding so the label sits on the container's content
    edge. The vertical padding stays, because the 48px target depends on it. */
@@ -132,22 +119,17 @@
   color: var(--color-text-tertiary); font-weight: var(--weight-medium); cursor: default;
 }
 
-/* Except this one. Disabled, it is not a control being ignored: it is the
-   sentence telling a driver when they can try again, read one-handed on a
-   forecourt. Tertiary is 3.72:1 on the sheet and is meant for inert controls;
-   the countdown is content, so it takes the colour content takes. */
-/* On the final attempt the safest recovery leads: the resend link takes
-   the lead coat and outranks the channel button beside it. */
-.o-signup-sheet__resend[data-lead="true"] { font-weight: var(--weight-heavy); color: var(--color-primary-dark); }
-
-.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }
+/* One link is exempt from the disabled colour above: the resend countdown,
+   which is content rather than an ignored control. That rule and the rest of
+   the resend's appearance are filed with the organism that owns it, in
+   organisms.css - see the note there. */
 
 /* a-field. Two orthogonal axes: data-state for idle, pending and error,
    :focus-within for focus. Squeezing focus and
    valid into one slot made focusing a complete field hide its own tick. */
 .a-field {
   display: flex; align-items: center; gap: var(--sp-3);
-  min-height: var(--size-control); padding: 0 var(--sp-4);
+  min-height: var(--size-control); padding: 0 var(--space-control-inline);
   background: var(--glass-card-bg);
   border: var(--size-border) solid var(--color-border-field);
   border-radius: var(--radius-card);

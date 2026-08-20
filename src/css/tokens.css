@@ -312,6 +312,37 @@
   --size-status-bar: 78px;
   --sp-1h: 6px; --sp-2h: 10px;
 
+  /* Space, said by job rather than by size.
+
+     The scale above is the reference: eight steps and two half steps, named
+     for where they sit. These are named for what they are FOR, and every one
+     of them points at a step above rather than holding a value of its own, so
+     nothing here can move a pixel. Changing what a job is worth is one edit,
+     in one place, and the reference scale stays the vocabulary underneath.
+
+     Deliberately not a full set. Each of these was taken from a rule that
+     already rendered that value for that reason - none is aspirational, and
+     none renames a value it does not already have. */
+  --space-control-inline: var(--sp-4);   /* 16 - inside a control, left and right */
+  --space-control-block:  var(--sp-2);   /*  8 - inside a control, top and bottom  */
+  --space-stack-related:  var(--sp-2);   /*  8 - parts of one thing                */
+  --space-stack-default:  var(--sp-3);   /* 12 - a plain stack of its own children */
+  --space-group:          var(--sp-4);   /* 16 - one group to the next             */
+  --space-section:        var(--sp-6);   /* 24 - a decision, or a different route  */
+  --space-page-inline:    var(--sp-5);   /* 20 - the screen's own left and right   */
+
+  /* Runtime-owned, and the only token here that is.
+
+     The page writes it on the device frame when the keyboard opens, and three
+     layers size themselves against it. It is declared at zero because every
+     consumer had been carrying its own `, 0px` fallback, which meant the
+     fallbacks were load-bearing rather than defensive: drop one and the sheet
+     would collapse silently. Declared, they are belt and braces.
+
+     Zero is the whole of the default. No other keyboard value belongs here -
+     the real height comes from the OS at runtime. */
+  --keyboard-inset: 0px;
+
   /* Size. Values that are neither spacing nor type. */
   --size-otp-cell: 52px;
   --size-control:  56px;   /* primary control height */
