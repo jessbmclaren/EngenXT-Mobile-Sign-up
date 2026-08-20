@@ -1717,7 +1717,7 @@ body.drawer-open .scrim { animation: fade-in var(--duration-base) var(--ease-sta
   font-weight: var(--font-weight-label-md);
 }
 
-.pop label:focus-within { outline: var(--size-focus-ring-width) solid var(--color-brand-ink); outline-offset: calc(var(--size-focus-ring-offset) * -1); }
+.pop label:has(:focus-visible) { outline: var(--size-focus-ring-width) solid var(--color-brand-ink); outline-offset: calc(var(--size-focus-ring-offset) * -1); }
 .pop input[type="checkbox"] { flex: none; width: var(--icon-sm); height: var(--icon-sm); }
 
 .pop label:hover { background: var(--color-surface-hover); }
@@ -2511,6 +2511,14 @@ a.stat-tile:focus-visible {
 
 body.sheet-open .focus-sheet { display: flex; }
 
+/* The document gives up its scroll while a sheet or a confirmation is up.
+   Without this, reaching the end of the sheet's own scroll carried on into
+   the page beneath and moved the list out from behind the form. */
+body.sheet-open,
+body.discard-open,
+body.detail-open,
+body.theft-open { overflow: hidden; }
+
 /* Below the breakpoint a two-column form has nothing to gain and the sheet
    would be most of the window anyway. It takes all of it, and keeps its header
    and footer, so the shape a person learned on a laptop still holds. */
@@ -3003,6 +3011,9 @@ body.theft-open .sheet-backdrop { display: block; }
   color: var(--color-icon);
   cursor: pointer;
 }
+
+.navrail button:hover { background: var(--color-surface-hover); color: var(--color-on-surface); }
+.navrail button:active { background: var(--color-surface-muted); }
 
 .navrail button[aria-current="true"] {
   background: var(--color-brand-tint);
@@ -3856,6 +3867,11 @@ body.drawer-open .drawer { display: flex; }
 
 /* A rule above the actions, so they read as the end of the panel rather than
    as the last row of its content. */
+/* Wraps rather than clipping. Two buttons with a width floor inside an
+   overflow:hidden container put the primary off the edge below about 560px,
+   where nothing could scroll to it. */
+.panel-foot, .panel-actions { flex-wrap: wrap; row-gap: var(--space-1-5); }
+
 .panel-foot {
   display: flex;
   align-items: center;
@@ -5759,15 +5775,19 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
   </nav>
 
   <div class="stage">
-    <!-- Product chrome. Vehicles, Drivers and Rules go where they say; Home and
-         Reports are sections this prototype does not cover, so they stay inert
-         rather than pretending. -->
+    <!-- Product chrome. Every icon here goes where it says.
+
+         Reports used to sit at the bottom: an ordinary-looking,
+         keyboard-reachable button with a pointer cursor that did nothing when
+         pressed and gave no reason. The comment called that "inert rather than
+         pretending", which is the opposite of what it did — somebody presses
+         it, nothing happens, and they press it again. A destination that does
+         not exist is not offered, and it comes back the day it does. -->
     <nav class="navrail" aria-label="Sections">
       <button aria-label="Home" data-goto="home" data-section="home"><svg data-lucide="house" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
       <button aria-label="Vehicles" data-goto="directory" data-section="vehicles"><svg data-lucide="truck" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></button>
       <button aria-label="Drivers" data-goto="drivers-directory" data-section="drivers"><svg data-lucide="user" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
       <button aria-label="Rules" data-goto="rules" data-section="rules"><svg data-lucide="sliders-horizontal" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg></button>
-      <button aria-label="Reports" data-section="reports"><svg data-lucide="chart-column" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></button>
     </nav>
     <div class="cols">
     <div class="topbar">
@@ -6054,7 +6074,9 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         <div class="page-head">
           <div>
             <h1>Ready to bring in</h1>
-            <p>Nothing is added until you press the button. Two rows need a decision from you first.</p>
+            <!-- Written on every render, because it was a hard-coded "Two rows"
+                 that went on saying two after both had been answered. -->
+            <p data-role="review-headline">Nothing is added until you press the button.</p>
           </div>
         </div>
         <div class="surfaces">
@@ -6803,7 +6825,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
               </ul>
 
               <div class="panel-foot">
-                <p class="panel-scope">Delivery carries on after you leave, and anything that fails waits for you under Import &rsaquo; Invitations. Nothing here holds up a vehicle.</p>
+                <!-- It used to say a failure would wait "under Import ›
+                     Invitations". There is no Import section and no
+                     Invitations page, so the instruction named somewhere that
+                     does not exist. It names the vehicle's own record, which
+                     does. -->
+                <p class="panel-scope">Delivery carries on after you leave. Anything that fails is shown on the vehicle’s own record, with a way to send it again. Nothing here holds up a vehicle.</p>
                 <div class="panel-actions">
                   <button class="btn btn-secondary" data-goto="import">Import another file</button>
                 </div>
@@ -9961,6 +9988,9 @@ function form(spec) {
   let opener = null;
 
   function trap(e) {
+    /* Stood down while a confirmation is up: the sheet is inert then, and
+       cycling focus into an inert subtree is the same as swallowing the key. */
+    if (document.body.classList.contains('trap-suspended')) return;
     if (e.key !== 'Tab') return;
     const items = [...root.querySelectorAll(FOCUSABLE)].filter(n => n.offsetParent !== null);
     if (!items.length) return;
@@ -10533,8 +10563,11 @@ function directory(spec) {
   if (searchBox) {
     searchBox.addEventListener('input', () => {
       query = searchBox.value.trim().toLowerCase();
-      // A tick on a row the search has just hidden is a tick nobody meant.
-      selected.clear();
+      /* A tick on a row the search has just hidden is a tick nobody meant — but
+         a tick on a row the search still shows is one they did mean, and
+         clearing the lot meant narrowing a list to find the rest of what you
+         wanted lost what you already had. render() prunes exactly what has
+         gone out of view and leaves the rest. */
       render();
     });
   }
@@ -11220,7 +11253,14 @@ const statusDialog = (() => {
     document.removeEventListener('keydown', keys, true);
     /* Back on the row they opened it from, so the list is exactly where they
        left it. That is why this is a dialog and not a screen. */
-    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    /* A deliberate landing place. On the route path the opener was captured
+       from document.activeElement, which is the body, so closing dropped the
+       keyboard to the top of the document. */
+    const usable = opener && document.contains(opener) && opener.offsetParent !== null;
+    const land = usable ? opener
+      : document.querySelector('#screen-directory .page-head [data-open]')
+        || document.querySelector('.page-head [data-open]');
+    if (land) land.focus({ preventScroll: true });
     opener = null;
   }
 
@@ -13953,7 +13993,7 @@ const vehicles = Records.directory({
          not to whether it happens to be a link. */
       `<a class="rec ident" href="#">${r[0]}</a>`,
       r[1] || '<span class="cell-none">Not assigned</span>',
-      `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${r[6]} L`,
+      `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${Records.groupNum(r[6])} L`,
       `<span class="status-cell">
          ${pill(status, 'status', 'Operational status')}
          ${showAccess ? '<span class="status-derived">Fuel blocked</span>' : ''}
@@ -14192,7 +14232,7 @@ function panelSpec(vehicle, tab) {
       ['Vehicle', `${esc(vehicle[F.MODEL])} · ${esc(vehicle[F.YEAR])}`],
       ['Type', `${esc(VehicleTypes.label(vehicle[F.TYPE]))}`],
       ['Fuel', esc(vehicle[F.FUEL])],
-      ['Tank capacity', `${vehicle[F.CAP]} L`],
+      ['Tank capacity', `${Records.groupNum(vehicle[F.CAP])} L`],
     ],
     /* GAP, stated rather than hidden: linking a vehicle to a driver is the
        grouping work and it is a later phase. An Overview that silently omitted
@@ -16438,8 +16478,11 @@ function makeSheet(config) {
         '</span>' +
         /* Removable only past the second, because "more than one tank" is the
            answer that put this editor on screen. */
+        /* Named for the row it removes: three buttons all saying "Remove" are
+           three identical announcements. */
         (tankCount > 2
-          ? '<button type="button" class="btn btn-tertiary tank-remove" data-remove="' + i + '">Remove</button>'
+          ? '<button type="button" class="btn btn-tertiary tank-remove" data-remove="' + i +
+            '" aria-label="Remove tank ' + (i + 1) + '">Remove</button>'
           : '') +
         '</span>';
     }
@@ -16487,6 +16530,16 @@ function makeSheet(config) {
       tankInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
     return sum;
+  }
+
+  /* Cleared when the sheet opens, with the rest of the form. The count lived
+     in the closure and outlived the record it belonged to. */
+  function resetTanks() {
+    tankCount = 2;
+    const list = part('tank-list');
+    if (list) list.innerHTML = '';
+    const out = part('tank-total');
+    if (out) out.textContent = '';
   }
 
   function syncTanks() {
@@ -16550,6 +16603,14 @@ function makeSheet(config) {
       renderTanks();
       [...list.querySelectorAll('input')].forEach((inp, j) => { inp.value = held[j] || ''; });
       total();
+      /* The node that had focus has just been replaced. Land on the row that
+         took its place, or on the last one if the removed row was the last —
+         anywhere deliberate rather than on the document. */
+      const rows = [...list.querySelectorAll('[data-remove]')];
+      const land = rows[Math.min(i, rows.length - 1)]
+        || list.querySelector('input')
+        || part('tank-add');
+      if (land) land.focus({ preventScroll: true });
     }
   });
 
@@ -16621,6 +16682,10 @@ function makeSheet(config) {
        the only way the three stay in agreement. */
     document.querySelectorAll('.app > *:not(.focus-sheet):not(.sheet-backdrop)')
       .forEach(el => el.setAttribute('inert', ''));
+    /* The tank rows are closure state and outlived the record they belonged
+       to: adding a vehicle with four tanks left the next sheet offering four
+       empty rows. */
+    resetTanks();
     syncCategory();
     syncTanks();
     /* The rail gives every state its own address. If the address names one,
@@ -16642,7 +16707,14 @@ function makeSheet(config) {
     document.body.classList.remove('sheet-open');
     sheet.classList.add('hidden');
     document.querySelectorAll('[inert]').forEach(el => el.removeAttribute('inert'));
-    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    /* A deliberate landing place. On the route path the opener was captured
+       from document.activeElement, which is the body, so closing dropped the
+       keyboard to the top of the document. */
+    const usable = opener && document.contains(opener) && opener.offsetParent !== null;
+    const land = usable ? opener
+      : document.querySelector('#screen-directory .page-head [data-open]')
+        || document.querySelector('.page-head [data-open]');
+    if (land) land.focus({ preventScroll: true });
     opener = null;
   }
 
@@ -16674,6 +16746,10 @@ function makeSheet(config) {
        thing being asked about. It goes inert so nothing behind the
        confirmation can be tabbed to or clicked. */
     sheet.setAttribute('inert', '');
+    /* The form engine keeps a document-level trap inside the sheet. With the
+       confirmation up, that trap cycles focus back into an inert subtree and
+       forward Tab does nothing at all. The confirmation runs its own. */
+    document.body.classList.add('trap-suspended');
     const keep = dlg.querySelector('[data-role="keep"]');
     if (keep) keep.focus({ preventScroll: true });
   }
@@ -16683,6 +16759,7 @@ function makeSheet(config) {
     const dlg = document.getElementById(config.dialog);
     if (dlg) dlg.classList.add('hidden');
     document.body.classList.remove('discard-open');
+    document.body.classList.remove('trap-suspended');
     sheet.removeAttribute('inert');
     if (body) body.scrollTop = sheetScroll;
     const back = (discardTrigger && sheet.contains(discardTrigger) && discardTrigger.offsetParent !== null)
@@ -16802,7 +16879,14 @@ window.__openSheet = () =>
         && !document.body.classList.contains('theft-open')) {
       document.querySelectorAll('.app > *').forEach(x => x.removeAttribute('inert'));
     }
-    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    /* A deliberate landing place. On the route path the opener was captured
+       from document.activeElement, which is the body, so closing dropped the
+       keyboard to the top of the document. */
+    const usable = opener && document.contains(opener) && opener.offsetParent !== null;
+    const land = usable ? opener
+      : document.querySelector('#screen-directory .page-head [data-open]')
+        || document.querySelector('.page-head [data-open]');
+    if (land) land.focus({ preventScroll: true });
     opener = null;
   }
 
@@ -17436,6 +17520,14 @@ function render() {
     <li class="review-all">
       <button class="btn btn-tertiary" data-review="approve-all">Import all ${untouched()} as they are</button>
     </li>` : '');
+
+  /* The one sentence that changes as decisions are made. */
+  const headline = root.querySelector('[data-role="review-headline"]');
+  if (headline) {
+    headline.textContent = left
+      ? `Nothing is added until you press the button. ${left} row${left === 1 ? '' : 's'} need${left === 1 ? 's' : ''} a decision from you first.`
+      : 'Nothing is added until you press the button. Every row has been answered.';
+  }
 
   restoreFocus(token);
 
