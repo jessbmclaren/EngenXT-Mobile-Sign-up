@@ -4064,6 +4064,18 @@ body.status-dialog-open .scrim { display: block; }
    reference somebody typed, and present enough to say the column was seen. */
 .cell-none { color: var(--color-on-surface-variant); }
 
+/* The state a record is already in, said rather than offered. It keeps the
+   row's shape so the menu does not jump, and gives up the affordances of a
+   control: no pointer, no hover, no focus ring. */
+.pick-current {
+  display: flex;
+  gap: var(--space-1-0);
+  margin: 0;
+  padding: var(--space-1-5) var(--space-2-0);
+  cursor: default;
+}
+.pick-now { color: var(--color-on-surface-variant); font-weight: 400; }
+
 .status-derived {
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
@@ -4309,6 +4321,20 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 }
 
 .record-panel.hidden { display: none; }
+
+/* The panel is documented as non-modal so the table stays reachable, and it
+   was a 520px overlay pinned to the right edge — directly over the Status
+   column, which is the one thing somebody reading a record wants to reach
+   beside it. The list gives up the width instead of being covered by it.
+
+   Below the point where the remaining table is too narrow to be worth
+   keeping, the panel takes the screen and stops pretending otherwise. */
+body.record-panel-open .page { padding-right: var(--size-drawer-width); }
+
+@media (max-width: 900px) {
+  .record-panel { width: 100vw; }
+  body.record-panel-open .page { padding-right: 0; }
+}
 
 .record-panel__head {
   display: flex;
@@ -5943,7 +5969,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
               </div>
               <div class="panel-key">
                 <div class="key-figure"><b data-role="review-figure">6</b><span data-role="review-figure-label">vehicles coming in</span></div>
-                <div class="key-reason" data-role="review-state"></div>
+                <div class="key-reason" data-role="review-state" role="status" aria-live="polite"></div>
               </div>
 
               <ul class="review-rows" data-role="review-rows"></ul>
@@ -6035,11 +6061,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="stage-scrim" aria-hidden="true"></div>
 
-        <div class="stage-modal">
+        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-1">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title">Add Goodwood to this policy?</h2>
+                  <h2 class="panel-title" id="stage-modal-title-1">Add Goodwood to this policy?</h2>
                   <p class="panel-sub">You have released this station for Thabo three times.</p>
                 </div>
               </div>
@@ -7117,12 +7143,16 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="stage-scrim" aria-hidden="true"></div>
 
-        <div class="stage-modal">
+        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-2">
           <div class="approve-card">
               <div class="approve-head">
-                <h2>Mark <span class="ident">HRV 482 GP</span> as recovered?</h2>
+                <h2 id="stage-modal-title-2">Mark <span class="ident">HRV 482 GP</span> as recovered?</h2>
               </div>
-              <p class="approve-scope">It comes back as <b>Cannot fuel</b>, with the reason set to <i>Recovered, not yet checked</i>, so somebody looks it over before it fuels again. The stolen report and everything on it stay on the record.</p>
+              <!-- What happens, not how the record is assembled. "It comes
+                   back as Cannot fuel with the reason set to Recovered, not
+                   yet checked" describes two field writes; the person taking
+                   this decision needs the consequence. -->
+              <p class="approve-scope">Fuel access stays blocked until the vehicle has been inspected and reactivated. The theft report and everything on it stay on the record.</p>
               <div class="fields">
                 <div class="form-field">
                   <span class="label">Do you have the vehicle back?</span>
@@ -7225,11 +7255,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="stage-scrim" aria-hidden="true"></div>
 
-        <div class="stage-modal">
+        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-3">
           <div class="panel">
           <div class="panel-head">
             <div>
-              <h2 class="panel-title">Thabo Mokoena wants to fill up</h2>
+              <h2 class="panel-title" id="stage-modal-title-3">Thabo Mokoena wants to fill up</h2>
               <p class="panel-sub"><span class="ident">HRV 482 GP</span> at Engen N1 City, Goodwood</p>
             </div>
             <span class="timer">Expires <b>08:52</b> · in <b>1:47</b></span>
@@ -7560,11 +7590,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="stage-scrim" aria-hidden="true"></div>
 
-        <div class="stage-modal">
+        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-4">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title">Sipho Dube approved this fill</h2>
+                  <h2 class="panel-title" id="stage-modal-title-4">Sipho Dube approved this fill</h2>
                   <p class="panel-sub">At 08:43, about twenty seconds before you pressed.</p>
                 </div>
                 <span class="badge badge-good">Approved</span>
@@ -7652,11 +7682,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
         <div class="stage-scrim" aria-hidden="true"></div>
 
-        <div class="stage-modal">
+        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-5">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title">Sibusiso Mahlangu wants to fill up</h2>
+                  <h2 class="panel-title" id="stage-modal-title-5">Sibusiso Mahlangu wants to fill up</h2>
                   <p class="panel-sub"><span class="ident">NCA 875 GP</span> at Engen Beaufort West</p>
                 </div>
                 <span class="timer">Expires <b>11:18</b> · in <b>3:02</b></span>
@@ -10737,6 +10767,20 @@ const statusMenu = (() => {
     const items = [];
     const html = (spec.groups || []).map(g => {
       const rows = g.items.map(it => {
+        /* Neither a value to set nor an action to take: this item is the state
+           the record is already in, put there so the menu says what it is
+           rather than opening on nothing. It is marked as current and is not a
+           control — a button that does nothing when pressed is worse than no
+           button, because somebody presses it twice before believing it. */
+        if (it.value === undefined && !it.act) {
+          return `<p class="pick pick-current" role="note">
+                    <span class="pick-mark" aria-hidden="true">${tick}</span>
+                    <span class="pick-body">
+                      <span class="pick-label">${it.label}<span class="pick-now"> — current</span></span>
+                      ${it.says ? `<span class="pick-says">${it.says}</span>` : ''}
+                    </span>
+                  </p>`;
+        }
         const i = items.push(it) - 1;
         const on = it.value !== undefined && it.value === spec.value;
         return `<button class="pick${it.danger ? ' pick-danger' : ''}${on ? ' is-on' : ''}"
@@ -10822,6 +10866,12 @@ const statusDialog = (() => {
 
   function close() {
     box.classList.add('hidden');
+    document.querySelectorAll('[inert]').forEach(el => {
+      /* Only what this dialog made inert. A sheet underneath may have set its
+         own, and clearing that would make a form live behind its own
+         confirmation. */
+      if (!el.closest('.focus-sheet')) el.removeAttribute('inert');
+    });
     document.body.classList.remove('status-dialog-open');
     document.removeEventListener('keydown', keys, true);
     /* Back on the row they opened it from, so the list is exactly where they
@@ -10882,6 +10932,13 @@ const statusDialog = (() => {
     opener = (from && document.contains(from)) ? from : document.activeElement;
     box.classList.remove('hidden');
     document.body.classList.add('status-dialog-open');
+    /* Everything behind it stops being reachable. The record panel sits above
+       the scrim in the layer order and was never made inert, so while a dialog
+       said aria-modal="true" the panel underneath stayed fully operable by
+       mouse and by Tab — a modal that was only modal to the eye. */
+    document.querySelectorAll('#record-panel, .app > *').forEach(el => {
+      if (el !== box && !el.contains(box)) el.setAttribute('inert', '');
+    });
     document.addEventListener('keydown', keys, true);
     box.focus({ preventScroll: true });
   }
@@ -10922,6 +10979,12 @@ const recordPanel = (() => {
 
   function close() {
     box.classList.add('hidden');
+    document.querySelectorAll('[inert]').forEach(el => {
+      /* Only what this dialog made inert. A sheet underneath may have set its
+         own, and clearing that would make a form live behind its own
+         confirmation. */
+      if (!el.closest('.focus-sheet')) el.removeAttribute('inert');
+    });
     document.body.classList.remove('record-panel-open');
     document.removeEventListener('keydown', keys, true);
     if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
@@ -15077,7 +15140,11 @@ function dLifeMenu(person, anchor) {
     label: 'Account status',
     value: person.lifecycle,
     groups: [
-      { items: ['Invited', 'Active'].map(v => ({ value: v, says: DLIFE[v].says })) },
+      /* Invited is a record of something that happened, so it is stated when
+         it is true and never offered as a value to set. Sending another
+         invitation is the action beneath, which is the real thing somebody
+         wants when they reach for it. */
+      { items: [{ value: 'Active', says: DLIFE.Active.says }] },
       ...(person.lifecycle === 'Invited'
         ? [{ title: 'Invitation', items: [{ label: 'Resend invitation', act: 'resend', says: 'Sends the WhatsApp message again. Nothing on this row changes.' }] }]
         : []),
@@ -16403,6 +16470,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => (
 
 const coming = () => CLEAN + state.filter(s => s.decision === 'fixed' || s.decision === 'approved').length;
 const outstanding = () => state.filter(s => s.decision === 'undecided' || s.decision === 'fixing').length;
+/* What the shortcut will take, which is not the same as what is unresolved: a
+   row being corrected is outstanding and is deliberately out of its reach. */
+const untouched = () => state.filter(s => s.decision === 'undecided').length;
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
@@ -16474,14 +16544,35 @@ function rowHtml(r, i) {
     </li>`;
 }
 
+/* What had the keyboard before the rewrite, so it can be given back to the
+   equivalent node afterwards. Identity rather than position: the row that was
+   answered may not be in the same place in the new list. */
+function focusToken() {
+  const el = document.activeElement;
+  if (!el || !list.contains(el)) return null;
+  const row = el.closest('[data-i]');
+  return row ? { i: row.dataset.i, role: el.dataset.review || null } : null;
+}
+
+function restoreFocus(token) {
+  if (!token) return;
+  const row = list.querySelector('[data-i="' + token.i + '"]');
+  if (!row) { (list.querySelector('button') || list).focus?.(); return; }
+  const same = token.role && row.querySelector('[data-review="' + token.role + '"]');
+  (same || row.querySelector('button') || row).focus?.({ preventScroll: true });
+}
+
 function render() {
+  const token = focusToken();
   const left = outstanding();
   const n = coming();
 
   list.innerHTML = ROWS.map(rowHtml).join('') + (left > 1 ? `
     <li class="review-all">
-      <button class="btn btn-tertiary" data-review="approve-all">Import all ${left} as they are</button>
+      <button class="btn btn-tertiary" data-review="approve-all">Import all ${untouched()} as they are</button>
     </li>` : '');
+
+  restoreFocus(token);
 
   figure.textContent = n;
   figureLabel.textContent = `${n === 1 ? 'vehicle' : 'vehicles'} coming in`;
@@ -16505,7 +16596,10 @@ list.addEventListener('click', e => {
 
   if (act === 'approve-all') {
     state.forEach(s => {
-      if (s.decision === 'undecided' || s.decision === 'fixing') s.decision = 'approved';
+      /* Only the untouched. A row with an open editor is the one row the
+         person is demonstrably dealing with, and sweeping it up discards what
+         they have typed and records the opposite of what they were doing. */
+      if (s.decision === 'undecided') s.decision = 'approved';
     });
     render();
     return;
