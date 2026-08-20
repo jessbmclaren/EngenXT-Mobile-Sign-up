@@ -10288,7 +10288,7 @@ function directory(spec) {
          ancestor chain, and the tbody carries a data-role of its own, so an
          unscoped test exempted every click in the table and the guard never
          fired at all. */
-      const own = e.target.closest('[data-role], [data-facet], [data-col], [data-pick]');
+      const own = e.target.closest('[data-role], [data-facet], [data-col], [data-pick], [data-act], [data-bulk]');
       if (!own || !inPop.contains(own)) { e.stopPropagation(); return; }
     }
 
@@ -10917,7 +10917,13 @@ const statusDialog = (() => {
     go.textContent = spec.confirmLabel;
     go.className = 'btn ' + (spec.tone || 'btn-danger');
 
-    const check = () => { go.disabled = spec.gate ? !spec.gate(slot) : false; };
+    const check = () => {
+      go.disabled = spec.gate ? !spec.gate(slot) : false;
+      /* Given the button so a branch can rename it. "Mark as recovered" over a
+         correction describes the wrong event, and the wrong event is what
+         somebody will believe they took. */
+      if (spec.react) spec.react(slot, go);
+    };
     check();
     slot.oninput = check;
     slot.onchange = check;
@@ -12037,6 +12043,101 @@ return {
  * is worse than one that questions it. Only values that cannot be true —
  * missing, non-numeric, zero, negative — block.
  */
+/* incidents.js */
+/* Theft incidents: their own records, with their own immutable timelines.
+ *
+ * Kept apart from the vehicle deliberately. The vehicle has an operational
+ * state — reported stolen, recovered, active — and the incident has a history:
+ * when it was reported, who by, what the police reference is, which fuel
+ * attempts were made against it, whether it turned out to be a mistake. Those
+ * answer different questions and change at different times, and folding them
+ * together is what produced a "reason" field carrying the words "Recovered,
+ * not yet checked".
+ *
+ * ── What this product does not do ────────────────────────────────────────
+ *
+ * Nothing here reaches SAPS or NaTIS. Recording a case number files a
+ * reference against an incident; it does not open a case, update one, or
+ * satisfy anybody's obligation to report. The regulations require the owner to
+ * report a theft to the police and, on recovery, to notify the registering
+ * authority — and this portal is not a channel for either. Every sentence the
+ * screens use says so.
+ */
+window.Incidents = (() => {
+
+let seq = 400;
+const all = [];
+
+const now = () => {
+  /* The prototype has no clock it can trust and no server to ask, so a stamp
+     is a display string rather than a time anybody should compute with. */
+  const d = new Date();
+  const p2 = n => String(n).padStart(2, '0');
+  return `${p2(d.getDate())} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]}, ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+};
+
+/* One entry, appended and never rewritten. Correcting a mistaken report adds
+   a correction; it does not erase what was recorded at the time. */
+function file(incident, event, detail) {
+  const entry = Object.assign({ event, at: now(), who: 'You' }, detail || {});
+  incident.timeline.push(entry);
+  return entry;
+}
+
+function open(vehicle, { how, reportedBy } = {}) {
+  const incident = {
+    ref: 'INC-' + (++seq),
+    reg: vehicle[0],
+    openedAt: now(),
+    how: how || '',
+    reportedBy: reportedBy || 'You',
+    caseNumber: '',
+    station: '',
+    notes: '',
+    /* Whether the block the report asked for actually took. A report that
+       could not block is not a vehicle that is protected, and the screens must
+       never show one as the other. */
+    block: 'pending',
+    state: 'open',
+    attempts: [],
+    timeline: [],
+  };
+  all.push(incident);
+  file(incident, 'Theft reported', { how: incident.how });
+  return incident;
+}
+
+/* The block is a separate operation with its own outcome, because it is the
+   part that protects the vehicle and the part that can fail. */
+function blockResult(incident, ok, reason) {
+  incident.block = ok ? 'blocked' : 'failed';
+  file(incident, ok ? 'Fuel access blocked' : 'Fuel block failed',
+    ok ? null : { reason: reason || 'The request did not reach the fuel network' });
+  return incident.block;
+}
+
+/* A refused attempt, added to the incident by a person rather than silently:
+   the event exists on its own and joining it to a report is a decision with an
+   author. Idempotent, so pressing twice does not file it twice. */
+function addAttempt(incident, attempt) {
+  if (incident.attempts.some(a => a.id === attempt.id)) return false;
+  incident.attempts.push(attempt);
+  file(incident, 'Fuel attempt added to the report', { station: attempt.station, at: attempt.at });
+  return true;
+}
+
+function forVehicle(reg) {
+  /* An incident stays findable until it is finished. Recovery is a step in it,
+     not the end of it — the inspection and the return to service belong on the
+     same timeline, and looking only for 'open' left them unrecorded. */
+  return all.filter(i => i.reg === reg && i.state !== 'closed' && i.state !== 'corrected')
+    .slice(-1)[0] || null;
+}
+
+return { open, file, blockResult, addAttempt, forVehicle, all: () => all.slice(), now };
+
+})();
+
 /* vin-rules.js */
 window.VIN = (() => {
 
@@ -12615,6 +12716,11 @@ const STATUS = {
     badge: 'badge-danger',
     fuels: false, release: false,
     says: 'Reported to the police. Fuel is blocked everywhere and nobody can release a fill, including you.',
+  },
+  'Recovered — inspection required': {
+    badge: 'badge-warning',
+    fuels: false, release: false,
+    says: 'Back in your hands and not yet on the road. Fuel stays blocked until somebody has inspected it and put it back into service.',
   },
   'Removed from fleet': {
     badge: 'badge-neutral',
@@ -13242,6 +13348,12 @@ const WHY = {
     title: r => `How did ${r[0]} go missing?`,
     list: ['Hijacked', 'Taken overnight', 'Not returned from a trip', 'Not sure'],
   },
+  'Recovered — inspection required': {
+    label: 'How it came back',
+    title: r => `How did ${r[0]} come back?`,
+    list: ['Recovered by the police', 'Found by the driver', 'Returned by the person who took it',
+      'Found abandoned', 'Something else'],
+  },
   'Removed from fleet': {
     label: 'What happened to it',
     title: r => `What happened to ${r[0]}?`,
@@ -13370,8 +13482,10 @@ const vehicles = Records.directory({
        somebody aiming at Cannot fuel can reach them. */
     ...(r[F.STATUS] === 'Removed from fleet' ? [] : [
       ...(r[F.STATUS] === 'Reported stolen'
-        ? [{ act: 'recovered', label: 'Mark recovered' }]
-        : [{ act: 'stolen', label: 'Report stolen…', danger: true }]),
+        ? [{ act: 'recovered', label: 'Mark as recovered…' }]
+        : r[F.STATUS] === 'Recovered — inspection required'
+          ? [{ act: 'inspect', label: 'Put back into service…' }]
+          : [{ act: 'stolen', label: 'Report stolen…', danger: true }]),
       { act: 'remove', label: 'Remove from fleet…', danger: true },
     ]),
   ],
@@ -13744,6 +13858,7 @@ const PUMP = {
   Active: 'Fuel flows, inside the driver’s rules.',
   'In maintenance': 'No fuel. A manager can still release one fill at the pump.',
   'Reported stolen': 'No fuel, anywhere. Nobody can release a fill. An attempt tells you the station and the time.',
+  'Recovered — inspection required': 'No fuel. It stays blocked until somebody inspects the vehicle and puts it back into service.',
   'Removed from fleet': 'No fuel. Nobody can release one, not even an administrator.',
   /* Said of the administrative block rather than of a status, because the
      vehicle is otherwise ordinary and that is the point of it. */
@@ -13907,9 +14022,21 @@ function vehicleAction(key, act, extra) {
   if (act === 'stolen-confirmed') {
     const wasAccess = vehicle[F.BLOCK];
     const wasReason = vehicle[F.REASON];
+    /* Opened before the state changes, so the incident carries what the
+       vehicle was — the only thing that can put it back if the report turns
+       out to be wrong. */
+    const incident = Incidents.open(vehicle, { how: extra || '' });
+    incident.priorState = vehicle[F.STATUS];
+    incident.priorReason = vehicle[F.REASON];
     vehicle[F.STATUS] = 'Reported stolen';
     vehicle[F.REASON] = extra || '';
     logChange(vehicle, 'Operational status', wasAccess, 'Reported stolen');
+    /* The prototype has no fuel network to ask, so this stands for the
+       request succeeding. What matters in the model is that the outcome is
+       recorded separately from the report: a report that could not block is
+       not a vehicle that is protected, and no screen may show one as the
+       other. */
+    Incidents.blockResult(incident, true);
     if (extra) logChange(vehicle, 'Reason', wasReason, extra, 'reason');
     logEvent(vehicle, 'Reported stolen. Blocked at every Engen site.');
     vehicles.render();
@@ -13937,21 +14064,169 @@ function vehicleAction(key, act, extra) {
      sold van has not been recovered, and the word only existed there because
      one field was holding both ideas. With the fields split, this is reachable
      from exactly one place. */
+  /* The three answers, asked as one question. The primary action's words
+     change with the answer, because the three do different things and a
+     button that says "Mark as recovered" while correcting a mistaken report
+     is describing the wrong event. */
   if (act === 'recovered') {
-    /* Not straight back to fuelling. Somebody looks the vehicle over first,
-       which is the promise every screen in this flow makes.
-       Stopped, with a reason that says why, keeps that promise while leaving
-       the vehicle in the fleet — which a recovered vehicle never stopped
-       being. */
-    const wasReason = vehicle[F.REASON];
-    vehicle[F.STATUS] = 'In maintenance';
-    vehicle[F.REASON] = 'Recovered, not yet checked';
-    logEvent(vehicle, 'Marked recovered.');
-    logChange(vehicle, 'Operational status', 'Reported stolen', 'In maintenance');
-    logChange(vehicle, 'Reason', wasReason, 'Recovered, not yet checked', 'reason');
+    return void Records.statusDialog.ask({
+      eyebrow: 'Reported stolen',
+      title: `Mark ${vehicle[0]} as recovered?`,
+      sub: 'Fuel access stays blocked until the vehicle has been inspected and put back into service.',
+      fields: `
+        <fieldset class="radio-group" role="radiogroup" aria-labelledby="rec-q">
+          <legend id="rec-q">What is the current situation?</legend>
+          <label class="radio"><input type="radio" name="rec-what" value="recovered"> <span>We have recovered the vehicle</span></label>
+          <label class="radio"><input type="radio" name="rec-what" value="error"> <span>The stolen report was made in error</span></label>
+          <label class="radio"><input type="radio" name="rec-what" value="unsure"> <span>I’m not sure</span></label>
+        </fieldset>
+        <div class="form-field" data-branch="recovered" hidden>
+          <label for="rec-note">Recovery notes <span class="opt">Optional</span></label>
+          <textarea class="field" id="rec-note" rows="3"
+            placeholder="e.g. Recovered by SAPS in Delft, visible damage to the driver's door"></textarea>
+          <span class="help">Include who recovered it, where it was found and any visible damage.</span>
+        </div>
+        <div class="form-field" data-branch="error" hidden>
+          <label for="rec-why">Reason for correction</label>
+          <textarea class="field" id="rec-why" rows="3"
+            placeholder="e.g. The driver had taken it to the Brackenfell yard and had not told the office"></textarea>
+          <span class="help">Required. The original report stays on the record, marked as corrected.</span>
+        </div>
+        <p class="notice" data-branch="unsure" hidden>The vehicle stays reported stolen and
+          fuel stays blocked. Nothing is changed by an uncertain answer.</p>`,
+      confirmLabel: 'Keep blocked',
+      tone: 'btn-secondary',
+      /* Nothing is answerable until the question is. A correction also needs
+         its reason, because a corrected report with no explanation is a record
+         nobody can audit. */
+      gate: slot => {
+        const on = slot.querySelector('[name="rec-what"]:checked');
+        if (!on) return false;
+        if (on.value === 'error') return !!slot.querySelector('#rec-why').value.trim();
+        return true;
+      },
+      /* Only the chosen branch's fields are on screen, and the button says
+         what that branch does. */
+      react: (slot, go) => {
+        const on = (slot.querySelector('[name="rec-what"]:checked') || {}).value || '';
+        slot.querySelectorAll('[data-branch]').forEach(el => {
+          el.hidden = el.dataset.branch !== on;
+        });
+        const WORDS = {
+          recovered: ['Mark as recovered', 'btn-primary'],
+          error: ['Correct stolen report', 'btn-primary'],
+          unsure: ['Keep blocked', 'btn-secondary'],
+          '': ['Keep blocked', 'btn-secondary'],
+        };
+        const [label, tone] = WORDS[on];
+        go.textContent = label;
+        go.className = 'btn ' + tone;
+      },
+      read: slot => ({
+        what: (slot.querySelector('[name="rec-what"]:checked') || {}).value || '',
+        note: slot.querySelector('#rec-note').value.trim(),
+        why: slot.querySelector('#rec-why').value.trim(),
+      }),
+      act: 'recovered-answer',
+    }, (a2, picked) => vehicleAction(key, a2, picked), openerFor(key));
+  }
+
+  /* What the answer means. Each branch is a different event with a different
+     resulting state, and each one is filed. */
+  if (act === 'recovered-answer') {
+    const incident = Incidents.forVehicle(vehicle[0]);
+    const answer = extra || {};
+
+    if (answer.what === 'unsure') {
+      /* Protection is never reduced by uncertainty. */
+      if (incident) Incidents.file(incident, 'Recovery uncertain, vehicle kept blocked');
+      logEvent(vehicle, 'Asked about recovery: not sure. Left reported stolen.');
+      vehicles.render();
+      return void Records.toast(`${vehicle[0]} stays reported stolen. Fuel remains blocked.`);
+    }
+
+    if (answer.what === 'error') {
+      /* Not a recovery. The vehicle returns to what it was before the report —
+         which the incident recorded, because "back to Active" is a guess and
+         a vehicle that was in maintenance before a mistaken report is still in
+         maintenance after it. */
+      const back = (incident && incident.priorState) || 'In maintenance';
+      const was = vehicle[F.STATUS];
+      vehicle[F.STATUS] = back;
+      vehicle[F.REASON] = (incident && incident.priorReason) || '';
+      if (incident) {
+        incident.state = 'corrected';
+        Incidents.file(incident, 'Report corrected', { reason: answer.why });
+      }
+      logChange(vehicle, 'Operational status', was, back);
+      logEvent(vehicle, 'Stolen report corrected: ' + answer.why);
+      vehicles.render();
+      return void Records.toast(
+        `The stolen report for ${vehicle[0]} is marked as corrected. It is ${back.toLowerCase()}.`,
+        null, { label: 'View the record', run: () => vehicleAction(key, 'notes') });
+    }
+
+    /* Recovered. Back in the fleet's hands, not back on the road. */
+    const was = vehicle[F.STATUS];
+    vehicle[F.STATUS] = 'Recovered — inspection required';
+    vehicle[F.REASON] = '';
+    if (incident) {
+      incident.state = 'recovered';
+      Incidents.file(incident, 'Vehicle recovered', { note: answer.note });
+    }
+    logChange(vehicle, 'Operational status', was, 'Recovered — inspection required');
+    if (answer.note) addNote(vehicle, answer.note);
     vehicles.render();
-    Records.toast(`${vehicle[0]} is off the stolen list and stopped. Allow fuelling once it has been looked over.`,
-      null, { label: 'Add a note', run: () => vehicleAction(key, 'notes') });
+    Records.toast(
+      `${vehicle[0]} is marked as recovered. Fuel access stays blocked until it is inspected and put back into service.`,
+      null, { label: 'Start inspection', run: () => vehicleAction(key, 'inspect') });
+  }
+
+  /* ── Inspection and reactivation ───────────────────────────────────────
+   * The only route from recovered back to the road, and it is deliberately a
+   * decision somebody takes rather than a status they pick. */
+  if (act === 'inspect') {
+    return void Records.statusDialog.ask({
+      eyebrow: 'Recovered — inspection required',
+      title: `Put ${vehicle[0]} back into service?`,
+      sub: 'Confirm the vehicle has been inspected. Fuel access is restored when you do.',
+      fields: `
+        <fieldset class="radio-group check-list" role="group" aria-labelledby="insp-q">
+          <legend id="insp-q">Confirm the inspection</legend>
+          <label class="radio"><input type="checkbox" data-insp value="identity"> <span>Registration and VIN match the record</span></label>
+          <label class="radio"><input type="checkbox" data-insp value="card"> <span>The fuel card and tag are accounted for</span></label>
+          <label class="radio"><input type="checkbox" data-insp value="damage"> <span>Damage and tampering have been recorded</span></label>
+          <label class="radio"><input type="checkbox" data-insp value="fuel"> <span>The fuel system and tanks are sound</span></label>
+        </fieldset>
+        <div class="form-field">
+          <label for="insp-note">Inspection notes <span class="opt">Optional</span></label>
+          <textarea class="field" id="insp-note" rows="2"></textarea>
+        </div>`,
+      confirmLabel: 'Put back into service',
+      tone: 'btn-primary',
+      /* Every line, because a partial inspection is not one. */
+      gate: slot => [...slot.querySelectorAll('[data-insp]')].every(c => c.checked),
+      read: slot => ({ note: slot.querySelector('#insp-note').value.trim() }),
+      act: 'reactivate',
+    }, (a2, picked) => vehicleAction(key, a2, picked), openerFor(key));
+  }
+
+  if (act === 'reactivate') {
+    const was = vehicle[F.STATUS];
+    vehicle[F.STATUS] = 'Active';
+    vehicle[F.BLOCK] = 'Allowed';
+    vehicle[F.REASON] = '';
+    const incident = Incidents.forVehicle(vehicle[0]);
+    if (incident) {
+      Incidents.file(incident, 'Inspection completed, vehicle back in service');
+      Incidents.file(incident, 'Fuel access restored');
+      incident.state = 'closed';
+    }
+    logChange(vehicle, 'Operational status', was, 'Active');
+    logEvent(vehicle, 'Inspected and put back into service. Fuel access restored.');
+    if (extra && extra.note) addNote(vehicle, extra.note);
+    vehicles.render();
+    Records.toast(`${vehicle[0]} is back in service and can fuel.`);
   }
 }
 
@@ -13997,6 +14272,25 @@ function accessMenu(vehicle, anchor) {
     }, () => {});
   }
 
+  /* Recovered has one way forward and it is not a value in a list: an
+     inspection somebody carries out and confirms. The menu says where the
+     vehicle is and offers that. */
+  if (status === 'Recovered — inspection required') {
+    return Records.statusMenu.open(anchor, {
+      label: 'Operational status',
+      value: status,
+      groups: [
+        { items: [{ label: 'Recovered — inspection required',
+                    says: STATUS['Recovered — inspection required'].says }] },
+        { title: 'Back to the road', items: [{ label: 'Put back into service…', act: 'inspect',
+            says: 'Confirm the inspection. Fuel access is restored when you do.' }] },
+        { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true,
+            says: STATUS['Removed from fleet'].says }] },
+      ],
+      help: 'states',
+    }, item => item.act && vehicleAction(vehicle[0], item.act));
+  }
+
   if (status === 'Reported stolen') {
     return Records.statusMenu.open(anchor, {
       label: 'Operational status',
@@ -14006,7 +14300,7 @@ function accessMenu(vehicle, anchor) {
         /* No ellipsis: in this product it means "asks you something first", and
            this one does not. It is the only way back from a theft report and
            it is deliberately one press. */
-        { title: 'Security', items: [{ label: 'Mark recovered', act: 'recovered', says: 'The vehicle is back. It comes back off the road, so somebody looks it over before it fuels.' }] },
+        { title: 'Security', items: [{ label: 'Mark as recovered…', act: 'recovered', says: 'Asks what has happened. A recovered vehicle stays blocked until it has been inspected.' }] },
         { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true, says: STATUS['Removed from fleet'].says }] },
       ],
       help: 'states',
