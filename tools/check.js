@@ -40,6 +40,8 @@ const FILES = [SIGNUP, ONBOARD];
 const problems = [];
 const fail = (msg) => problems.push(msg);
 let docsSummary = '';
+let docsStructure = '';
+let cssBlocks = new Map();
 
 /* ── Reading the files ───────────────────────────────────────────────── */
 
@@ -1142,7 +1144,7 @@ if (!fs.existsSync(docsPath)) {
 
   /* Every block defined by the stylesheets, by level. A block is the part
      before __element or --modifier, so one entry per component. */
-  const cssBlocks = new Map();
+  cssBlocks = new Map();
   const cssDir = path.join(ROOT, 'src', 'css');
   for (const file of fs.readdirSync(cssDir).filter((f) => f.endsWith('.css'))) {
     if (file.startsWith('developer')) { continue; }       /* tooling, never documented */
@@ -1177,9 +1179,21 @@ if (!fs.existsSync(docsPath)) {
     }
   }
 
-  /* 11c. Every block the page names is real. */
+  /* 11c. Every block the page names is real.
+
+     Read from the two places a component name can honestly appear: a <code>
+     span, which is how the prose refers to one, and a class attribute, which is
+     how a specimen renders one. Scanning the whole document instead was too
+     blunt. Heading ids are slugs, so `state-is-never-a-class` contains the
+     substring `a-class` and was reported as an undefined atom. Narrowing where
+     it looks makes it more accurate rather than less strict: a phantom named in
+     prose is still caught, which is how `a-icon-btn` was found. */
   const namedInDocs = new Set();
-  for (const m of docs.matchAll(/\b([amotpu]-[a-z][A-Za-z0-9_-]*)\b/g)) {
+  const nameSources = [
+    ...[...docs.matchAll(/<code>([\s\S]*?)<\/code>/g)].map((m) => m[1]),
+    ...[...docs.matchAll(/\sclass="([^"]*)"/g)].map((m) => m[1]),
+  ].join(' ');
+  for (const m of nameSources.matchAll(/\b([amotpu]-[a-z][A-Za-z0-9_-]*)\b/g)) {
     namedInDocs.add(blockOf(m[1]));
   }
   const unmigrated = blocksDefinedIn(ONBOARD);
@@ -1227,6 +1241,144 @@ if (!fs.existsSync(docsPath)) {
                 `${checkedCounts} counts match the code`;
 }
 
+
+/* ── 12. The documentation's own structure ───────────────────────────────
+
+   The page is now a reference manual rather than an essay, so its shape is
+   part of what it promises. These assert the shape. All additive: nothing
+   above is touched.
+
+   Headings inside a preview are skipped throughout. A preview holds real
+   product markup, and some of that markup is a heading, so m-sheet-header__title
+   is an <h2> in the product. It belongs in the preview rather than in the
+   documentation's outline.                                                    */
+
+const DOC_SECTIONS = [
+  'introduction', 'principles', 'foundations', 'primitives', 'atoms', 'molecules',
+  'organisms', 'templates', 'screens', 'quality', 'contributing', 'limitations',
+];
+
+/* Every documented item carries these, in this order. */
+const DOC_PARTS = ['preview', 'purpose', 'anatomy', 'variants', 'states', 'behaviour',
+                   'content', 'a11y', 'tokens', 'markup', 'responsive', 'related'];
+const SCREEN_PARTS = ['purpose', 'template', 'composition', 'hierarchy', 'states',
+                      'responsive', 'a11y', 'traceability'];
+
+if (fs.existsSync(docsPath)) {
+  const doc = fs.readFileSync(docsPath, 'utf8');
+
+  /* Two different reductions, for two different questions.
+
+     `live` is the document with every code block taken out. A markup contract
+     is escaped text, so `id="resendBtn"` inside one is a string a reader copies
+     rather than an attribute the browser sees. Counting those as real ids
+     reported forty duplicate ids that do not exist.
+
+     `outline` goes further and also drops previews, because a preview holds
+     product markup and some of that markup is a heading. */
+  const live = doc.replace(/<pre\b[\s\S]*?<\/pre>/g, ' ')
+                  .replace(/<code>[\s\S]*?<\/code>/g, ' ');
+  const outline = live.replace(/<div class="ds-canvas"[\s\S]*?\n    <\/div>/g, ' ')
+                      .replace(/<div class="ds-spec"[\s\S]*?\n  <\/div>/g, ' ');
+
+  /* 12a. Exactly one h1. */
+  const h1s = [...outline.matchAll(/<h1\b[^>]*>/g)];
+  if (h1s.length !== 1) {
+    fail(`${DOCS}: ${h1s.length} <h1> elements. The design system is one thing, so there is exactly one.`);
+  }
+
+  /* 12b. The required sections, in the required order. */
+  const seen = [...live.matchAll(/<section class="ds-section" id="([a-z-]+)"/g)].map((m) => m[1]);
+  if (seen.join(',') !== DOC_SECTIONS.join(',')) {
+    fail(`${DOCS}: top-level sections are\n        ${seen.join(', ')}\n      and should be\n        ${DOC_SECTIONS.join(', ')}`);
+  }
+
+  /* 12c. No heading level is skipped. */
+  const levels = [...outline.matchAll(/<(h[1-6])\b[^>]*>/g)].map((m) => +m[1][1]);
+  for (let i = 1; i < levels.length; i++) {
+    if (levels[i] - levels[i - 1] > 1) {
+      fail(`${DOCS}: heading jumps from h${levels[i - 1]} to h${levels[i]}. Levels are structure, not sizes.`);
+      break;
+    }
+  }
+
+  /* 12d. Every documentation heading has an id, and no id is used twice. */
+  const ids = [...live.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+  for (const dup of new Set(ids.filter((v, i) => ids.indexOf(v) !== i))) {
+    fail(`${DOCS}: id="${dup}" is used more than once`);
+  }
+  const bare = [...outline.matchAll(/<(h[2-5])(\s[^>]*)?>/g)].filter((m) => !(m[2] || '').includes('id='));
+  if (bare.length) {
+    fail(`${DOCS}: ${bare.length} documentation heading(s) have no id, so nothing can link to them`);
+  }
+
+  /* 12e. No dead in-page anchor. */
+  const idSet = new Set(ids);
+  for (const m of live.matchAll(/href="#([^"]+)"/g)) {
+    if (!idSet.has(m[1])) { fail(`${DOCS}: href="#${m[1]}" points at nothing`); }
+  }
+
+  /* 12f. The navigation is generated from the document.
+
+     The brief asks that navigation order and document order be identical. The
+     way to keep that true is to not have a second list at all, so this asserts
+     the generator rather than comparing two hand-written orders. */
+  const js = fs.readFileSync(path.join(ROOT, 'docs/design-system/docs.js'), 'utf8');
+  if (!/function buildNav\b/.test(js) || !/\.ds-main h2\[id\]/.test(js)) {
+    fail(`${DOCS}: the navigation is no longer generated from the document's own headings, ` +
+         `so its order can drift from the page`);
+  }
+  /* The other half of the same promise: there must be no second, hand-written
+     list of sections in the markup for the generated one to disagree with. */
+  const railBody = (doc.match(/<div class="ds-rail__nav[^"]*"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || '';
+  if (/<a\s[^>]*href="#/.test(railBody)) {
+    fail(`${DOCS}: the rail contains hand-written section links. The tree is generated, ` +
+         `so a second list can only ever go stale.`);
+  }
+
+  /* 12g. Every documented item carries its metadata and its subsections. */
+  const items = [...live.matchAll(/<div class="ds-item" data-doc-level="([a-z]+)" data-doc-component="([^"]+)">([\s\S]*?)\n  <\/div>/g)];
+  const named = items.map((m) => m[2]);
+  for (const dup of new Set(named.filter((v, i) => named.indexOf(v) !== i))) {
+    fail(`${DOCS}: '${dup}' is documented more than once`);
+  }
+  for (const [, level, name, body] of items) {
+    for (const k of ['Level', 'Ownership', 'Source', 'Status']) {
+      if (level === 'screen' && k === 'Ownership') { continue; }
+      if (!body.includes(`>${k}<`)) { fail(`${DOCS}: '${name}' has no ${k} in its metadata`); }
+    }
+    /* A utility is one declaration with one job. Requiring twelve subsections of
+       it would produce eleven paragraphs of filler, which is the opposite of what
+       the rest of this gate is for. It still needs its metadata. */
+    if (level === 'utility') { continue; }
+    const want = level === 'screen' ? SCREEN_PARTS : DOC_PARTS;
+    const got = [...body.matchAll(/<h4 id="([^"]+)"/g)].map((m) => m[1]);
+    for (const part of want) {
+      if (!got.includes(`${name}-${part}`)) {
+        fail(`${DOCS}: '${name}' is missing its ${part} subsection (expected id "${name}-${part}")`);
+      }
+    }
+  }
+
+  /* 12h. Every block in src/css is documented as an item, not merely mentioned. */
+  const documented = new Set(named);
+  for (const [block, file] of cssBlocks) {
+    if (block.startsWith('u-')) { continue; }        /* utilities are listed, not profiled */
+    if (!documented.has(block)) {
+      fail(`${DOCS}: '${block}' (src/css/${file}) has no documented item of its own`);
+    }
+  }
+
+  /* 12i. All thirteen app screens, each on its own. */
+  const screens = items.filter((m) => m[1] === 'screen').length;
+  if (screens !== 13) {
+    fail(`${DOCS}: ${screens} screens documented separately. There are 13 in ${ONBOARD}.`);
+  }
+
+  docsStructure = `one h1, ${DOC_SECTIONS.length} sections in order, ${items.length} items ` +
+                  `each with metadata and subsections, ${screens} screens, no dead anchors`;
+}
+
 if (problems.length) {
   console.error(`\n  ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n`);
   for (const p of problems) { console.error(`    - ${p}`); }
@@ -1245,4 +1397,5 @@ console.log('    every class is shaped like the system, no dead names, tokens in
 console.log('    the shared library is verbatim in both files, and both restate colour-only states');
 console.log('    the base layer agrees too: what a control inherits is the same on both sides');
 console.log('    no parent paints a child it did not make, and the layers nest the right way round');
-console.log(`    the documentation agrees with the code: ${docsSummary}\n`);
+console.log(`    the documentation agrees with the code: ${docsSummary}`);
+console.log(`    and its own structure holds: ${docsStructure}\n`);

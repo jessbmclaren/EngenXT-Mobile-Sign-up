@@ -293,3 +293,186 @@ body.ds-body {
    foundations sets. The moment the product's
    values changed, this page would have gone on demonstrating the old ones
    with nothing to show it. */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE DOCUMENTATION SHELL, PART TWO
+
+   A navigation tree, a filter, a mobile control and the component furniture:
+   metadata strips, preview canvases and per-item tables of contents.
+
+   Same law as the rest of this file. Everything is .ds- prefixed. Everything is
+   unlayered. Nothing in here may reach a product class. The preview canvas
+   draws a boundary AROUND a component. It never draws the component.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The navigation tree ──────────────────────────────────────────────── */
+
+.ds-nav__filter {
+  width: 100%; margin: 0 0 14px; padding: 7px 10px;
+  border: 1px solid var(--ds-rule); border-radius: 8px;
+  background: var(--ds-ground); color: var(--ds-ink);
+  font: inherit; font-size: 13px;
+}
+.ds-nav__filter::placeholder { color: var(--ds-ink-soft); }
+.ds-nav__filter:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 1px; }
+
+.ds-nav__count { display: block; margin: -8px 0 12px; font-size: 11.5px; color: var(--ds-ink-soft); }
+
+/* A top-level section and the items under it. <details> gives keyboard
+   operation plus an open state for free, with no script to keep in sync. */
+.ds-nav__group { border: none; margin: 0; }
+.ds-nav__group > summary {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 8px; margin-left: -8px; border-radius: 6px;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; list-style: none;
+}
+.ds-nav__group > summary::-webkit-details-marker { display: none; }
+.ds-nav__group > summary:hover { background: var(--ds-accent-bg); }
+.ds-nav__group > summary:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 1px; }
+.ds-nav__group > summary::before {
+  content: ""; width: 0; height: 0; flex: none;
+  border-left: 5px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  opacity: .45; transition: transform var(--ds-quick, .15s) ease;
+}
+.ds-nav__group[open] > summary::before { transform: rotate(90deg); }
+.ds-nav__group > summary[aria-current="true"] { color: var(--ds-accent); }
+
+.ds-nav__items { margin: 0 0 6px 12px; padding-left: 10px; border-left: 1px solid var(--ds-rule); }
+.ds-nav__items a { font-size: 13px; padding: 4px 8px; }
+.ds-nav__items code { font-family: var(--ds-mono); font-size: 11.5px; }
+
+.ds-nav a[hidden], .ds-nav__group[hidden] { display: none !important; }
+.ds-nav__empty { padding: 8px; font-size: 12.5px; color: var(--ds-ink-soft); }
+
+/* ── The mobile control ───────────────────────────────────────────────── */
+
+.ds-navToggle {
+  display: none;
+  align-items: center; gap: 8px;
+  padding: 8px 12px; min-height: 44px;
+  border: 1px solid var(--ds-rule); border-radius: 8px;
+  background: var(--ds-panel); color: var(--ds-ink);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.ds-navToggle:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 2px; }
+
+/* ── An item's own table of contents ──────────────────────────────────── */
+
+.ds-toc {
+  margin: 14px 0 24px; padding: 12px 16px;
+  border: 1px solid var(--ds-rule); border-radius: 10px; background: var(--ds-panel);
+}
+.ds-toc__title { margin: 0 0 6px; font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ds-ink-soft); }
+.ds-toc ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.ds-toc a { font-size: 13px; color: var(--ds-ink); text-decoration: none; }
+.ds-toc a:hover { color: var(--ds-accent); text-decoration: underline; }
+.ds-toc a:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 2px; }
+
+/* ── A documented item ────────────────────────────────────────────────── */
+
+.ds-item { padding-block: 8px 4px; scroll-margin-top: 16px; }
+.ds-item + .ds-item { margin-top: 36px; border-top: 1px dashed var(--ds-rule); padding-top: 28px; }
+.ds-item > h3 { margin: 0 0 2px; font-size: 19px; letter-spacing: -0.3px; }
+.ds-item > h3 code { font-size: 17px; }
+.ds-item__lede { margin: 0 0 10px; max-width: 68ch; color: var(--ds-ink-soft); }
+
+/* The metadata strip. Level, ownership, source and status on one line, in the
+   same place on every item, so it can be skimmed down the page. */
+.ds-meta { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 14px; font-size: 11.5px; }
+.ds-meta__item {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 2px 9px; border-radius: 999px;
+  background: var(--ds-ground); border: 1px solid var(--ds-rule); color: var(--ds-ink-soft);
+}
+.ds-meta__k { font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 10px; }
+.ds-meta__v { color: var(--ds-ink); font-family: var(--ds-mono); font-size: 11.5px; }
+.ds-meta__item--stable { background: #e8f5ee; border-color: #bfe3cd; color: #166832; }
+.ds-meta__item--provisional { background: var(--ds-warn-bg); border-color: #f0d6b4; color: var(--ds-warn-ink); }
+.ds-meta__item--shared { background: var(--ds-accent-bg); border-color: #cfe0ff; color: var(--ds-accent); }
+
+.ds-item > h4, .ds-part > h4 {
+  margin: 22px 0 6px; font-size: 12px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--ds-ink-soft);
+}
+
+/* ── The preview canvas ───────────────────────────────────────────────── */
+
+/* A bounded stage the component is placed on. The checkerboard says "this is a
+   canvas, not a page", the same way Storybook does. It also makes a transparent
+   or white component visible as an object. */
+.ds-canvas {
+  margin: 8px 0 4px; border: 1px solid var(--ds-rule); border-radius: 10px;
+  background: var(--ds-panel); overflow: hidden;
+}
+.ds-canvas__bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 7px 12px; border-bottom: 1px solid var(--ds-rule);
+  font-size: 11.5px; color: var(--ds-ink-soft);
+}
+.ds-canvas__label { font-weight: 600; color: var(--ds-ink); }
+
+/* The stage re-enters the product's inherited context, exactly as .ds-spec__stage
+   does, so a component is drawn in the product's face and leading rather than
+   the document's. */
+.ds-canvas__stage {
+  padding: 22px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  font-family: var(--font-sans); font-size: 16px; line-height: normal;
+  color: var(--color-text-primary);
+  background-color: var(--ds-panel);
+  background-image:
+    linear-gradient(45deg, var(--ds-ground) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--ds-ground) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--ds-ground) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--ds-ground) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+.ds-canvas__stage--stack { flex-direction: column; align-items: stretch; }
+.ds-canvas__stage--dark { background-image: none; background-color: var(--color-hero-1); color: var(--color-text-on-dark); }
+.ds-canvas__stage--plain { background-image: none; }
+
+/* A labelled cell inside a canvas, for showing variants or states side by side. */
+.ds-cell { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; min-width: 0; }
+.ds-cell__name {
+  font-family: var(--ds-mono); font-size: 11px; color: var(--ds-ink-soft);
+  background: var(--ds-panel); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--ds-rule);
+}
+.ds-canvas__stage--grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); align-items: start; }
+
+/* ── Narrow ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .ds-navToggle { display: inline-flex; }
+  .ds-rail { padding-bottom: 8px; }
+  .ds-rail__nav[hidden] { display: none; }
+  .ds-nav__items { margin-left: 8px; }
+  .ds-toc ul { flex-direction: column; gap: 2px; }
+}
+
+/* A group's item count, so the size of a section is visible before opening it. */
+.ds-nav__n {
+  margin-left: auto; padding: 0 6px; border-radius: 999px;
+  background: var(--ds-ground); border: 1px solid var(--ds-rule);
+  font-size: 10px; font-weight: 700; color: var(--ds-ink-soft);
+}
+.ds-nav__group > summary[aria-current="true"] .ds-nav__n {
+  background: var(--ds-accent-bg); border-color: #cfe0ff; color: var(--ds-accent);
+}
+.ds-nav__all { color: var(--ds-ink-soft) !important; font-style: italic; }
+.ds-nav__items a[aria-current="true"] {
+  background: var(--ds-accent-bg); color: var(--ds-accent); font-weight: 600;
+}
+.ds-nav__items code { background: none; padding: 0; }
+
+/* The filter stays put while the tree scrolls under it. */
+.ds-rail { scroll-behavior: smooth; }
+#dsNavTools {
+  position: sticky; top: -28px; z-index: 2;
+  padding-top: 4px; margin-bottom: 4px; background: var(--ds-panel);
+}
+
+/* A sub-entry sits one step in from its category, so the tree reads as two
+   levels rather than one long list. */
+.ds-nav__sub { padding-left: 20px !important; font-size: 12.5px; color: var(--ds-ink-soft); }
+.ds-nav__sub::before { content: "\\2013\\00a0"; opacity: .5; }

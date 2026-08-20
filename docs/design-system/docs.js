@@ -127,31 +127,63 @@
     return (!isNaN(px) && /px$/.test(v)) ? (px / 16).toFixed(px % 16 === 0 ? 0 : 4).replace(/\.?0+$/, '') + 'rem' : '';
   }
 
-  function tokenTable(host) {
-    var groups = {};
-    TOKENS.forEach(function (t) {
-      var f = familyOf(t.name);
-      (groups[f] = groups[f] || []).push(t);
+  /* One table per category, written into the category's own host.
+
+     It used to be one table of every token, under one heading. That reads as a
+     data dump and, worse, it cannot be navigated: a person looking for the
+     colour scale had nothing to click. Each family now has a heading of its own
+     and the tree lists it. */
+  var TOKEN_HOSTS = {
+    dsColorRef:   ['--color-'],
+    dsGradient:   ['--gradient-', '--glass-'],
+    dsTypeTokens: ['--font-', '--text-', '--weight-', '--leading-', '--tracking-'],
+    dsSpaceTokens:['--sp-', '--space-'],
+    dsSizeTokens: ['--size-', '--keyboard-'],
+    dsRadius:     ['--radius-'],
+    dsShadow:     ['--shadow-'],
+    dsMotionTok:  ['--dur-', '--ease-', '--press-'],
+    dsZ:          ['--z-'],
+    dsKb:         ['--kb-'],
+  };
+
+  function tokenTable(hostId, prefixes) {
+    var host = document.getElementById(hostId);
+    if (!host) { return 0; }
+    var rows = TOKENS.filter(function (t) {
+      return prefixes.some(function (p) { return t.name.indexOf(p) === 0; });
     });
-    var html = '';
-    FAMILIES.map(function (f) { return f[1]; }).concat(['Other']).forEach(function (fam) {
-      var rows = groups[fam];
-      if (!rows || !rows.length) { return; }
-      html += '<h3>' + esc(fam) + ' <span class="ds-pill">' + rows.length + '</span></h3>';
-      html += '<div class="ds-tablewrap"><table class="ds-table"><thead><tr>' +
-        '<th>Custom property</th><th>Resolved value</th>' +
-        (READABLE ? '<th>As written</th>' : '') +
-        '<th>rem</th><th></th></tr></thead><tbody>';
-      rows.forEach(function (t) {
-        html += '<tr><td><code>' + esc(t.name) + '</code></td>' +
-          '<td class="ds-mono ds-num">' + esc(t.value) + '</td>' +
-          (READABLE ? '<td class="ds-mono">' + esc(t.authored) + '</td>' : '') +
-          '<td class="ds-mono ds-num">' + esc(rem(t.value)) + '</td>' +
-          '<td>' + sampleFor(t) + '</td></tr>';
-      });
-      html += '</tbody></table></div>';
+    if (!rows.length) {
+      host.innerHTML = '<p class="ds-note">No tokens could be read here. Serve the folder ' +
+                       'over http: a browser will not let a page read a linked stylesheet off disk.</p>';
+      return 0;
+    }
+    var html = '<div class="ds-tablewrap"><table class="ds-table"><thead><tr>' +
+      '<th>Token</th><th>Resolved</th>' + (READABLE ? '<th>Source</th>' : '') +
+      '<th>rem</th><th>Specimen</th></tr></thead><tbody>';
+    rows.forEach(function (t) {
+      var alias = READABLE && t.authored.indexOf('var(') !== -1;
+      html += '<tr><td><code>' + esc(t.name) + '</code>' +
+        (alias ? ' <span class="ds-pill">alias</span>' : '') + '</td>' +
+        '<td class="ds-mono ds-num">' + esc(t.value) + '</td>' +
+        (READABLE ? '<td class="ds-mono">' + esc(t.authored) + '</td>' : '') +
+        '<td class="ds-mono ds-num">' + esc(rem(t.value)) + '</td>' +
+        '<td>' + sampleFor(t) + '</td></tr>';
     });
-    host.innerHTML = html;
+    host.innerHTML = html + '</tbody></table></div>';
+    return rows.length;
+  }
+
+  function allTokenTables() {
+    var total = 0, hosts = 0;
+    Object.keys(TOKEN_HOSTS).forEach(function (id) {
+      var n = tokenTable(id, TOKEN_HOSTS[id]);
+      if (n) { hosts++; total += n; }
+    });
+    var stamp = document.getElementById('dsTokenTotal');
+    if (stamp) {
+      stamp.textContent = total + ' tokens across ' + hosts + ' categories, read from the ' +
+        'stylesheet when this page opened.';
+    }
   }
 
   /* ── How many tiers the scale has ─────────────────────────────────── */
@@ -341,6 +373,166 @@
     });
   }
 
+
+  /* ── The navigation tree ──────────────────────────────────────────────
+
+     Built from the document rather than written beside it. The brief asks that
+     navigation order and document order be identical, which is a promise no
+     hand-written list can keep for long. Reading the headings makes it true by
+     construction. The tree cannot list a section the page does not have, cannot
+     miss one it does have, or put them in a different order.
+
+     Headings inside a preview canvas are skipped. A canvas holds real product
+     markup. Some of that markup is a heading: .m-sheet-header__title is an
+     <h2> in the product. It belongs in the preview, not in the documentation's
+     outline. */
+
+  function navSkip(h) {
+    return !!(h.closest('[data-doc-part="preview"]') || h.closest('.ds-canvas') || h.closest('.ds-spec'));
+  }
+
+  function buildNav() {
+    var host = document.querySelector('.ds-rail__nav');
+    if (!host) { return; }
+    /* h2 and h3 always. h4 only where it is real content rather than one of the
+       twelve subsections every component repeats: listing those would add five
+       hundred entries that all say the same twelve things. A component's own
+       subsections are covered by the table of contents inside it. */
+    var heads = [].slice.call(document.querySelectorAll('.ds-main h2[id], .ds-main h3[id], .ds-main h4[id]'))
+      .filter(function (h) {
+        if (navSkip(h)) { return false; }
+        return h.tagName !== 'H4' || !h.closest('[data-doc-component]');
+      });
+
+    /* Gather first, render second, so a group can print how many things are in
+       it before its children are written. */
+    var groups = [], cur = null;
+    heads.forEach(function (h) {
+      var sec = h.closest('.ds-section');
+      var target = (h.tagName === 'H2' && sec && sec.id) ? sec.id : h.id;
+      var text = (h.textContent || '').trim();
+      if (h.tagName === 'H2') {
+        cur = { id: target, text: text, items: [] };
+        groups.push(cur);
+      } else if (cur) {
+        var sub = h.tagName === 'H4';
+        /* A component heading is its class name inside a <code>. Keep that shape
+           in the tree so a name reads as a name rather than as a sentence. */
+        var isCode = h.firstElementChild && h.firstElementChild.tagName === 'CODE'
+                     && h.firstElementChild.textContent.trim() === text;
+        cur.items.push({ id: target, text: text, code: isCode, sub: sub });
+      }
+    });
+
+    var html = '', items = 0;
+    groups.forEach(function (g) {
+      items += g.items.length;
+      html += '<details class="ds-nav__group" id="nav-' + esc(g.id) + '">' +
+              '<summary data-for="' + esc(g.id) + '">' + esc(g.text) +
+              (g.items.length ? '<span class="ds-nav__n">' + g.items.length + '</span>' : '') +
+              '</summary><div class="ds-nav__items">' +
+              '<a href="#' + esc(g.id) + '" class="ds-nav__all">' + esc(g.text) + ' overview</a>';
+      g.items.forEach(function (it) {
+        html += '<a href="#' + esc(it.id) + '"' + (it.sub ? ' class="ds-nav__sub"' : '') + '>' +
+                (it.code ? '<code>' + esc(it.text) + '</code>' : esc(it.text)) + '</a>';
+      });
+      html += '</div></details>';
+    });
+    host.innerHTML = html;
+
+    var count = document.getElementById('dsNavCount');
+    if (count) { count.textContent = groups.length + ' sections · ' + items + ' entries'; }
+  }
+
+  /* ── Filtering ────────────────────────────────────────────────────────
+     Matches on the visible text, so typing "otp" finds the OTP group and
+     typing "colour" finds the colour foundations. A group whose own name
+     matches keeps all of its children, because that is what you meant. */
+
+  function wireFilter() {
+    var box = document.getElementById('dsFilter');
+    var host = document.querySelector('.ds-rail__nav');
+    if (!box || !host) { return; }
+    /* A few words this system spells one way and a reader might type the other.
+       Both spellings should find the same section rather than one of them
+       finding nothing. */
+    var SAME = { color: 'colour', colour: 'colour', gray: 'grey', grey: 'grey',
+                 z: 'z-index', index: 'z-index' };
+    function norm(t) {
+      return t.toLowerCase().replace(/[a-z-]+/g, function (w) { return SAME[w] || w; });
+    }
+    box.addEventListener('input', function () {
+      var q = norm(box.value.trim());
+      var groups = host.querySelectorAll('.ds-nav__group');
+      var anyGroup = false;
+      [].forEach.call(groups, function (g) {
+        var sum = g.querySelector('summary');
+        var groupHit = !q || norm(sum.textContent || '').indexOf(q) !== -1;
+        var links = g.querySelectorAll('.ds-nav__items a');
+        var hits = 0;
+        [].forEach.call(links, function (a) {
+          var hit = !q || groupHit || norm(a.textContent || '').indexOf(q) !== -1;
+          a.hidden = !hit;
+          if (hit) { hits++; }
+        });
+        var show = !q || groupHit || hits > 0;
+        g.hidden = !show;
+        if (show) { anyGroup = true; }
+        if (q && show) { g.open = true; }
+      });
+      var empty = document.getElementById('dsNavEmpty');
+      if (empty) { empty.hidden = anyGroup; }
+    });
+  }
+
+  /* ── The mobile control ───────────────────────────────────────────── */
+
+  function wireNavToggle() {
+    var btn = document.getElementById('dsNavToggle');
+    var nav = document.querySelector('.ds-rail__nav');
+    var tools = document.getElementById('dsNavTools');
+    if (!btn || !nav) { return; }
+    var narrow = window.matchMedia('(max-width: 900px)');
+    function apply() {
+      var hide = narrow.matches && btn.getAttribute('aria-expanded') !== 'true';
+      nav.hidden = hide;
+      if (tools) { tools.hidden = hide; }
+    }
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', function () {
+      btn.setAttribute('aria-expanded', btn.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+      apply();
+    });
+    narrow.addEventListener('change', apply);
+    /* Following a link on a phone should close the tray behind you. */
+    nav.addEventListener('click', function (e) {
+      if (narrow.matches && e.target.closest && e.target.closest('a')) {
+        btn.setAttribute('aria-expanded', 'false');
+        apply();
+      }
+    });
+    apply();
+  }
+
+  /* ── Per-item tables of contents ──────────────────────────────────────
+     A documented component has the same eleven subsections every time, so a
+     long one is worth a local index. It is generated, so it cannot list a
+     subsection the item does not have. */
+
+  function buildItemTocs() {
+    [].forEach.call(document.querySelectorAll('[data-doc-component]'), function (item) {
+      var host = item.querySelector('[data-doc-toc]');
+      if (!host) { return; }
+      var subs = item.querySelectorAll(':scope > h4[id]');
+      if (subs.length < 4) { host.remove(); return; }
+      var html = '<p class="ds-toc__title">On this component</p><ul>';
+      [].forEach.call(subs, function (h) {
+        html += '<li><a href="#' + esc(h.id) + '">' + esc((h.textContent || '').trim()) + '</a></li>';
+      });
+      host.innerHTML = html + '</ul>';
+    });
+  }
+
   /* ── Specimens ────────────────────────────────────────────────────── */
 
   function esc(s) {
@@ -410,19 +602,62 @@
   /* ── The rail follows the reading position ────────────────────────── */
 
   function wireRail() {
-    var links = Array.prototype.slice.call(document.querySelectorAll('.ds-rail a[href^="#"]'));
-    var sections = links.map(function (a) { return document.getElementById(a.hash.slice(1)); });
-    if (!('IntersectionObserver' in window)) { return; }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) { return; }
-        var i = sections.indexOf(e.target);
-        if (i === -1) { return; }
-        links.forEach(function (a) { a.removeAttribute('aria-current'); });
-        links[i].setAttribute('aria-current', 'true');
+    var links = [].slice.call(document.querySelectorAll('.ds-nav a[href^="#"]'));
+    if (!links.length || !('IntersectionObserver' in window)) { return; }
+
+    var byId = {};
+    links.forEach(function (a) { byId[a.hash.slice(1)] = a; });
+
+    var targets = Object.keys(byId)
+      .map(function (id) { return document.getElementById(id); })
+      .filter(Boolean);
+
+    function mark(id) {
+      links.forEach(function (a) { a.removeAttribute('aria-current'); });
+      [].forEach.call(document.querySelectorAll('.ds-nav__group > summary'), function (sm) {
+        sm.removeAttribute('aria-current');
       });
-    }, { rootMargin: '-8% 0px -80% 0px' });
-    sections.forEach(function (s) { if (s) { io.observe(s); } });
+      var a = byId[id];
+      if (!a) { return; }
+      a.setAttribute('aria-current', 'true');
+      var group = a.closest('.ds-nav__group');
+      if (!group) { return; }
+      /* Open the section being read and close the others, so the tree stays the
+         length of one section rather than the length of the whole page. */
+      [].forEach.call(document.querySelectorAll('.ds-nav__group'), function (g) {
+        if (g !== group) { g.open = false; }
+      });
+      group.open = true;
+      var sm = group.querySelector('summary');
+      if (sm) { sm.setAttribute('aria-current', 'true'); }
+      /* Keep the current entry in view inside a long tree. */
+      var rail = document.querySelector('.ds-rail');
+      if (rail && a.offsetTop < rail.scrollTop || (rail && a.offsetTop > rail.scrollTop + rail.clientHeight - 40)) {
+        rail.scrollTop = Math.max(0, a.offsetTop - rail.clientHeight / 2);
+      }
+    }
+
+    var seen = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { seen[e.target.id] = e.isIntersecting ? e : null; });
+      /* The topmost thing currently on screen wins. Taking whichever entry the
+         browser reported last picks an arbitrary one when two overlap. */
+      var best = null;
+      targets.forEach(function (t) {
+        var e = seen[t.id];
+        if (!e) { return; }
+        if (!best || e.boundingClientRect.top < best.boundingClientRect.top) { best = e; }
+      });
+      if (best) { mark(best.target.id); }
+    }, { rootMargin: '-6% 0px -70% 0px' });
+
+    targets.forEach(function (t) { io.observe(t); });
+
+    /* Clicking is an answer too. It should not wait for a scroll event. */
+    document.querySelector('.ds-nav').addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (a) { mark(a.hash.slice(1)); }
+    });
   }
 
   /* ── How the page was read ────────────────────────────────────────── */
@@ -446,13 +681,16 @@
   }
 
   ready(function () {
-    var host = document.getElementById('dsTokens');
-    if (host) { tokenTable(host); }
+    allTokenTables();
     tierTable(document.getElementById('dsTiers'));
     largeTable(document.getElementById('dsLarge'));
     motionCatalogue(document.getElementById('dsMotion'));
     stampSource();
     wireSpecimens();
+    buildItemTocs();
+    buildNav();
+    wireFilter();
+    wireNavToggle();
     wireRail();
   });
 })();
