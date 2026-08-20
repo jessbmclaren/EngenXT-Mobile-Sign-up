@@ -1,13 +1,13 @@
 /* ══════════════════════════════════════════════════════════════════════════
    THE DOCUMENTATION'S BEHAVIOUR
 
-   Three jobs, and none of them is styling:
+   Three jobs. None of them is styling:
 
      1. Read the real tokens out of the real stylesheet and draw the tables.
         Nothing here holds a copy of a value. A token table that is typed by
-        hand is a second source of truth, and the second one is always the one
-        that goes stale - so every number on this page is asked for at the
-        moment it is shown.
+        hand is a second source of truth. The second one is always the one that
+        goes stale, so every number on this page is asked for at the moment it
+        is shown.
 
      2. Escape the markup of each specimen and offer it to be copied, so what
         a developer pastes is the thing they are looking at.
@@ -35,8 +35,8 @@
       if (!rules) { return; }
       for (var i = 0; i < rules.length; i++) {
         var r = rules[i];
-        /* @layer, @media and @supports all hold rules of their own, and the
-           scale lives inside @layer tokens. */
+        /* @layer, @media and @supports all hold rules of their own. The scale
+           lives inside @layer tokens. */
         if (r.cssRules && r.cssRules.length) { scan(r.cssRules); }
         if (!r.style || r.selectorText !== ':root') { continue; }
         for (var k = 0; k < r.style.length; k++) {
@@ -159,8 +159,8 @@
   /* A name whose tail is a position on a scale - a number, a t-shirt size, a
      light/dark modifier - describes what the value IS. Any other tail
      describes what it is FOR. That distinction is the whole difference
-     between a palette and a semantic layer, and it can be read off the name
-     alone, which is why this half of the count works even off disk. */
+     between a palette and a semantic layer. It can be read off the name alone,
+     which is why this half of the count works even off disk. */
   var SCALE_TAIL = /-(\d+|xs|sm|md|lg|xl|xxl|light|dark|darker|lighter)$/;
 
   function tierTable(host) {
@@ -188,16 +188,16 @@
     if (!READABLE) {
       html += '<p class="ds-note">The second column cannot be counted here. ' +
         'Opened off disk a browser will not let this page read the stylesheet ' +
-        'text, and a computed value has already resolved its <code>var()</code> ' +
-        'references — so every token would appear to hold a literal. Serve the ' +
+        'text. A computed value has already resolved its <code>var()</code> ' +
+        'references, so every token would appear to hold a literal. Serve the ' +
         'folder over http for the real split.</p>';
     } else {
       var semantic = Math.round((n.roleLit + n.roleVar) / TOKENS.length * 100);
       html += '<p><strong>' + semantic + '% of the scale is named for its job.</strong> ' +
         'The naming is semantic almost throughout; the structure underneath it is ' +
         'flat. Only <strong>' + (n.roleVar + n.scaleVar) + '</strong> tokens are ' +
-        'built from another token — the gradients, a handful of hover and focus ' +
-        'aliases, and the <code>color-mix()</code> steps that tint the primary and ' +
+        'built from another token: the gradients, a handful of hover and focus ' +
+        'aliases and the <code>color-mix()</code> steps that tint the primary and ' +
         'secondary. Everything else stands alone.</p>';
     }
     host.innerHTML = html;
@@ -206,7 +206,7 @@
   function row(label, eg, lit, ind) {
     return '<tr><td>' + label + '<br><code class="ds-eg">' + esc(eg) + '</code></td>' +
       '<td class="ds-num ds-big">' + lit + '</td>' +
-      '<td class="ds-num ds-big">' + (READABLE ? ind : '<span class="ds-unknown">—</span>') + '</td></tr>';
+      '<td class="ds-num ds-big">' + (READABLE ? ind : '<span class="ds-unknown">not counted</span>') + '</td></tr>';
   }
 
   /* ── The second type scale ────────────────────────────────────────── */
@@ -241,7 +241,7 @@
     if (!names.length) {
       host.innerHTML = '<p class="ds-note">The large-text scale cannot be listed ' +
         'here. Opened off disk a browser will not let this page read the rules of ' +
-        'a linked stylesheet, and the override only exists as a rule — nothing on ' +
+        'a linked stylesheet. The override only exists as a rule. Nothing on ' +
         'this page is in that mode, so there is no computed value to fall back to. ' +
         'Serve the folder over http to see it.</p>';
       return;

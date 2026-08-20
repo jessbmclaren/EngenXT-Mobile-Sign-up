@@ -1,11 +1,10 @@
 # Line-height proposal
 
 21 of the 37 text styles set no `line-height` and inherit the user agent's
-`normal`. That is not a step on the `--leading-*` scale, and it is not even a
-constant: measured across the flow it lands anywhere between **1.18 and 1.28** depending
-on the size. So the system has a four-value leading scale that most of its text does not
-use, and what those styles actually render is decided by the font rather than by the
-design.
+`normal`. That is not a step on the `--leading-*` scale. It is not even a constant.
+Measured across the flow it lands anywhere between **1.18 and 1.28** depending on the size.
+So the system has a four-value leading scale that most of its text ignores. What those
+styles actually render is decided by the font, not by the design.
 
 **Nothing here has been applied.** Every row is a proposal with its measurement, because
 several of them move pixels and that is a design decision.
@@ -14,7 +13,7 @@ several of them move pixels and that is a design decision.
 
 Every state of the sign-up flow was walked twice - once at `data-text="default"`, once
 at `[data-text="large"]` - and for each selector the largest rendering found was
-recorded: font size, box height, and how many lines it actually wrapped to. A style that
+recorded: font size, box height and how many lines it actually wrapped to. A style that
 never wraps is a style whose leading nobody can see; a style that wraps only under large
 text is where an explicit leading either prevents a collision or causes one.
 
@@ -61,7 +60,7 @@ Short uppercase text naming something else. `.m-figure__key` is the one that alr
 
 ## Supporting text that wraps - P1
 
-Sentences rather than labels. These are where leading is actually read, and where `normal` is tightest relative to what prose needs.
+Sentences rather than labels. This is where leading is actually read. It is also where `normal` sits tightest against what prose needs.
 
 | Style | Proposed | Size | Before box | After line | After box | Note |
 |---|---|---|---|---|---|---|
@@ -71,7 +70,7 @@ Sentences rather than labels. These are where leading is actually read, and wher
 
 ## Headings - P2
 
-Named surfaces. `.o-status-page__title` is the third style that wraps only under large text, and it is the largest jump of the three.
+Named surfaces. `.o-status-page__title` is the third style that wraps only under large text. It is the largest jump of the three.
 
 | Style | Proposed | Size | Before box | After line | After box | Note |
 |---|---|---|---|---|---|---|
@@ -94,13 +93,14 @@ Numbers read at a glance. Tight leading keeps a figure and its key visually pair
 |---|---|
 | `.m-status-bar__time` | the drawn handset clock - OS chrome, not app text |
 | `.m-status-bar__net` | the No-service label - OS chrome |
-| `.m-keyboard__digit` | the drawn Android keypad - OS chrome, and already off the type ramp on purpose |
+| `.m-keyboard__digit` | the drawn Android keypad. OS chrome, already off the type ramp on purpose |
 | `.m-keyboard__sub` | the keypad sub-labels - same reason |
 
 ## What this would cost
 
-Every row changes a rendered box, so **this proposal moves pixels** - that is the point
-of it, and why it is a proposal. Two consequences to weigh before approving:
+Every row changes a rendered box, so **this proposal moves pixels**. That is the point of
+it. It is also why it is a proposal rather than a change. Two things to weigh before
+approving:
 
 - **The supporting-text group loosens.** `--leading-body` (1.5) is larger than
   `normal` at every size, so those three get taller and push the content below them down.
@@ -119,6 +119,7 @@ of it, and why it is a proposal. Two consequences to weigh before approving:
 4. The supporting text last, because it is the group that grows and therefore the one that
    moves everything beneath it.
 
-Each step wants the verification the architectural work got: a computed-style fingerprint
-before and after, and all four gates. Unlike that work, these will show real differences -
-the fingerprint's job here is to prove the differences are *only* the intended ones.
+Each step wants the same verification the architectural work got. A computed-style
+fingerprint before and after, plus all four gates. Unlike that work, these will show real
+differences. The fingerprint's job here is to prove the differences are *only* the
+intended ones.

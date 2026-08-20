@@ -12,10 +12,10 @@
      thing it documents: if one changes, both change, because there is only
      one of them.
 
-     The product's CSS is entirely inside @layer. docs.css is not, and an
-     unlayered rule beats every layer - so the page around the components can
-     be styled without raising specificity, reaching for !important, or ever
-     touching a component. -->
+     The product's CSS is entirely inside @layer. docs.css is not. An unlayered
+     rule beats every layer, so the page around the components can be styled
+     without raising specificity, reaching for !important, or ever touching a
+     component. -->
 <link rel="stylesheet" href="../../src/css/tokens.css">
 <link rel="stylesheet" href="../../src/css/foundations.css">
 <link rel="stylesheet" href="../../src/css/atoms.css">
@@ -73,25 +73,25 @@
   <h3>What it is for</h3>
   <p>
     Drivers use this app one-handed, outdoors, in daylight, with someone waiting behind
-    them. That constraint decides most of the system: high contrast, large targets, plain
-    words, and motion only where it costs nobody time.
+    them. That decides most of the system: high contrast, large targets, plain words,
+    motion only where it costs nobody time.
   </p>
 
   <h3>Scope</h3>
   <p>
-    Two pages share this system. <code>index.html</code> is sign-up and the home screen;
-    <code>engenxt-onboarding.html</code> is what a driver arrives in afterwards. Only
-    <code>index.html</code> has been migrated to linked CSS so far, so the components
-    documented here are the ones that page renders.
+    Two pages share this system. <code>index.html</code> is sign-up plus the home screen.
+    <code>engenxt-onboarding.html</code> is where a driver lands afterwards. Only
+    <code>index.html</code> has moved to linked CSS so far, so the components documented
+    here are the ones that page renders.
   </p>
 
-  <h3>No build, and why that is a requirement rather than a shortcut</h3>
+  <h3>No build step, a requirement rather than a shortcut</h3>
   <p>
-    There is no package manager, no bundler and no build step. Both pages open by
-    double-clicking them, and the deployed site is those same files served statically.
-    A reviewer with no toolchain, on a plane, can open the product. That property is
-    load-bearing, so the system is expressed in plain <code>&lt;link&gt;</code> tags,
-    CSS custom properties and cascade layers — never in a compiler.
+    No package manager, no bundler, no build step. Both pages open by double-clicking
+    them. The deployed site is those same files served statically. A reviewer with no
+    toolchain, on a plane, can open the product. That property is load-bearing, so the
+    system lives in plain <code>&lt;link&gt;</code> tags, CSS custom properties and
+    cascade layers. Never in a compiler.
   </p>
 
   <h3>Dependency direction</h3>
@@ -100,51 +100,51 @@
     <table class="ds-table">
       <thead><tr><th>Layer</th><th>File</th><th>Holds</th><th>May use</th></tr></thead>
       <tbody>
-        <tr><td><code>tokens</code></td><td><code>src/css/tokens.css</code></td><td>Every value the product may use, and nothing that uses them</td><td>—</td></tr>
+        <tr><td><code>tokens</code></td><td><code>src/css/tokens.css</code></td><td>Every value the product may use. Nothing that uses them</td><td>nothing</td></tr>
         <tr><td><code>foundations</code></td><td><code>src/css/foundations.css</code></td><td>Reset, focus ring, motion laws, keyframes</td><td>tokens</td></tr>
         <tr><td><code>atoms</code></td><td><code>src/css/atoms.css</code></td><td>Parts that cannot be divided further and still mean anything</td><td>tokens, foundations</td></tr>
         <tr><td><code>molecules</code></td><td><code>src/css/molecules.css</code></td><td>Small groups of atoms doing one job</td><td>above</td></tr>
-        <tr><td><code>organisms</code></td><td><code>src/css/organisms.css</code></td><td>Distinct sections, and the screens</td><td>above</td></tr>
+        <tr><td><code>organisms</code></td><td><code>src/css/organisms.css</code></td><td>Distinct sections and the screens</td><td>above</td></tr>
         <tr><td><code>templates</code></td><td><code>src/css/templates.css</code></td><td>The device frame and the page it sits on</td><td>above</td></tr>
         <tr><td><code>utilities</code></td><td><code>src/css/utilities.css</code></td><td>One job, no opinion</td><td>above</td></tr>
-        <tr><td><code>developer</code></td><td><code>src/css/developer.css</code></td><td>Tooling. Last in the order, so it can never affect product rendering. The prototype does load it — see the note below — and this documentation page does not</td><td>above</td></tr>
+        <tr><td><code>developer</code></td><td><code>src/css/developer.css</code></td><td>Tooling. Last in the order, so it can never affect product rendering. The prototype does load it (see the note below). This documentation page does not</td><td>above</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="ds-note">
     <strong>Two honest exceptions to the table above.</strong> The prototype
-    <em>does</em> load <code>developer.css</code> — it is the eighth
-    <code>&lt;link&gt;</code> in <code>index.html</code> — because the demo tooling has to
-    work in the deployed prototype. It is last in the layer order, so it cannot affect how
-    a product component renders; it is the one file to drop when the prototype becomes a
-    product. And six tooling rules used to live in <code>templates.css</code>; they are now
-    in <code>developer-layout.css</code>, which still declares
-    <code>@layer templates</code> so their cascade position is unchanged. Promoting them
-    into the developer layer would have moved them past utilities and into a source-order
-    fight with <code>developer.css</code>, which already styles the same two blocks — a
-    cascade change wearing a tidy-up's clothes. They changed address, not rank.
+    <em>does</em> load <code>developer.css</code>, the eighth <code>&lt;link&gt;</code>
+    in <code>index.html</code>, because the demo tooling has to work in the deployed
+    prototype. It sits last in the layer order, so it cannot change how a product
+    component renders. Drop it the day the prototype becomes a product. The other
+    exception is filing. Six tooling rules used to live in <code>templates.css</code>.
+    They are in <code>developer-layout.css</code> now, which still declares
+    <code>@layer templates</code>, so their cascade position is unchanged. Promoting them
+    into the developer layer would have pushed them past utilities into a source-order
+    fight with <code>developer.css</code>, which already styles the same two blocks. That
+    is a cascade change wearing a tidy-up's clothes. They changed address, not rank.
   </div>
 
   <h3>Why layers rather than specificity</h3>
   <p>
     The order is declared once, at the top of <code>tokens.css</code>. A later layer beats
-    an earlier one whatever the specificity — so a screen's override no longer has to
-    out-specify an atom, it simply lives further down the list. That is what keeps
-    selectors flat and removes the reason people reach for <code>!important</code>.
+    an earlier one whatever the specificity. A screen's override no longer has to
+    out-specify an atom. It lives further down the list instead. That keeps selectors flat
+    and removes the reason people reach for <code>!important</code>.
   </p>
   <p>
-    It has one consequence worth knowing. Two rules of equal specificity that relied on
-    which was typed first will flip when they land in different layers. Splitting the
-    stylesheet did exactly that, and the flips were caught by comparing every computed
-    property on every element before and after. The rules involved were pinned into their
-    original file so today's rendering is preserved.
+    There is one consequence. Two rules of equal specificity that relied on which was
+    typed first will flip when they land in different layers. Splitting the stylesheet did
+    that. The flips were caught by comparing every computed property on every element
+    before and after. The rules involved were pinned into their original file, so today's
+    rendering is preserved.
   </p>
   <p>
-    Pinning had a cost: three <code>.o-signup-sheet__resend</code> rules stayed in
+    Pinning had a cost. Three <code>.o-signup-sheet__resend</code> rules stayed in
     <code>atoms.css</code>, against the filing law, because moving them might have moved
-    pixels. That has since been tested rather than assumed — they are in
-    <code>organisms.css</code> now, and the fingerprint of all 104 states is unchanged. The
+    pixels. That has since been tested rather than assumed. They are in
+    <code>organisms.css</code> now. The fingerprint of all 104 states is unchanged. The
     conflict was real but it was not, in the end, a trade.
   </p>
 </section>
@@ -153,70 +153,70 @@
 <section class="ds-section" id="principles">
   <h2>UI principles</h2>
   <p class="ds-lede">
-    Twelve rules the system already follows. Each is stated so it can be checked, each says
-    where it is enforced, and each carries the exception the code actually takes — because a
-    principle with no stated exception is a principle somebody is quietly breaking.
+    Twelve rules the system already follows. Each one is stated so it can be checked, says
+    where it is enforced and carries the exception the code actually takes. A principle with
+    no stated exception is a principle somebody is quietly breaking.
   </p>
 
   <h3>Visual hierarchy</h3>
-  <p>Rank is carried by three tokens at once — size, weight and text colour — and a colour may never outrank its role: <code>--color-text-tertiary</code> is for inert controls and placeholders only, <code>--color-text-muted</code> for decoration only. A line a driver reads never takes either.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:104-107 — <code>--color-text-tertiary: #6C6C70; /* disabled and placeholder, 4.69:1 on sunken. 3.72:1 on the sheet, so it is for inert controls only, never for a line being read. */</code> and <code>--color-text-muted: #b0bcd0; /* decorative only, never load-bearing text */</code>. Applied at src/css/organisms.css:371-381, where <code>.o-outcome-panel__clock</code> takes --text-title / --weight-heavy / --color-text-primary and <code>.o-outcome-panel__meta</code> takes --text-caption2 / --weight-medium / --color-text-secondary under the comment &quot;A supporting offer, not the outcome, so it sits below the clock and quieter than both the title and the number.&quot;</p>
-  <p class="ds-where"><strong>The exception:</strong> Breaking it is written up at engenxt-onboarding.html:2072-2074: <code>.o-step__label</code> in tertiary is &quot;4.19:1 on the page grey this label sits on, and at 11px it gets no large-text allowance: it is a line being read, and tertiary is for controls that are switched off.&quot; The stated exception runs the other way in <code>src/css/organisms.css</code> — <code>.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }</code> with &quot;Except this one... the countdown is content, so it takes the colour content takes&quot;: a disabled control deliberately refuses the disabled ink.</p>
+  <p>Rank is carried by three tokens at once: size, weight and text colour. A colour may never outrank its role. <code>--color-text-tertiary</code> is for inert controls and placeholders, <code>--color-text-muted</code> for decoration. A line a driver reads takes neither.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:104-107. <code>--color-text-tertiary: #6C6C70; /* disabled and placeholder, 4.69:1 on sunken. 3.72:1 on the sheet, so it is for inert controls only, never for a line being read. */</code> and <code>--color-text-muted: #b0bcd0; /* decorative only, never load-bearing text */</code>. Applied at src/css/organisms.css:371-381, where <code>.o-outcome-panel__clock</code> takes --text-title / --weight-heavy / --color-text-primary while <code>.o-outcome-panel__meta</code> takes --text-caption2 / --weight-medium / --color-text-secondary, under the comment &quot;A supporting offer, not the outcome, so it sits below the clock and quieter than both the title and the number.&quot;</p>
+  <p class="ds-where"><strong>The exception:</strong> The break is written up at engenxt-onboarding.html:2072-2074. <code>.o-step__label</code> in tertiary measures 4.19:1 on the page grey it sits on. At 11px it gets no large-text allowance. It is &quot;a line being read&quot;, while tertiary is &quot;for controls that are switched off&quot;. In <code>src/css/organisms.css</code> the stated exception runs the other way: <code>.o-signup-sheet__resend:disabled { color: var(--color-text-secondary); }</code> with &quot;Except this one... the countdown is content, so it takes the colour content takes&quot;. A disabled control refuses the disabled ink on purpose.</p>
 
   <h3>Priority of content and actions</h3>
-  <p>When the keyboard takes the screen, height is surrendered in one fixed order and nothing may jump the queue: 1 tooling, 2 the step counter, 3 an instruction the driver has already acted on, 4 the loose spacing steps. The base gap is never given up, at any width.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/templates.css:47-59 — &quot;THE COMPRESSION ORDER... It must not be the base gap: the base gap is what says which things belong together, and that matters most when there is least room to read it.&quot; Enforced in that order at templates.css:60 (<code>[data-keyboard=&quot;open&quot;] .a-progress { display: none }</code>), :66, :69-70. Restated as law at index.html:3580, RULES[&#x27;Keyboard&#x27;].</p>
-  <p class="ds-where"><strong>The exception:</strong> The exception is inside step 3 itself, src/css/templates.css:63-66: the selector is <code>.o-signup-sheet[data-stage=&quot;number&quot;] .m-sheet-header__sub</code>, not all stages — &quot;On the code stage it names the channel and the masked number, which is exactly what a driver checks against their handset mid-code, so it stays.&quot; Widening that selector to every stage would break the rule. A second worked failure sits at templates.css:72-77: giving the sheet the full height without giving the stage a way to spend it parked the CTA &quot;at the furthest point from the thumb that is still on the sheet&quot; over 97px of empty sheet.</p>
+  <p>When the keyboard takes the screen, height is given up in one fixed order. Nothing jumps the queue: 1 tooling, 2 the step counter, 3 an instruction the driver has already acted on, 4 the loose spacing steps. The base gap is never given up, at any width.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/templates.css:47-59. &quot;THE COMPRESSION ORDER... It must not be the base gap: the base gap is what says which things belong together&quot;. That matters most when there is least room to read it. Enforced in that order at templates.css:60 (<code>[data-keyboard=&quot;open&quot;] .a-progress { display: none }</code>), :66, :69-70. Restated as law at index.html:3580, RULES[&#x27;Keyboard&#x27;].</p>
+  <p class="ds-where"><strong>The exception:</strong> The exception sits inside step 3. src/css/templates.css:63-66 scopes the selector to <code>.o-signup-sheet[data-stage=&quot;number&quot;] .m-sheet-header__sub</code> rather than all stages: &quot;On the code stage it names the channel and the masked number, which is exactly what a driver checks against their handset mid-code, so it stays.&quot; Widen that selector to every stage and the rule breaks. A second worked failure sits at templates.css:72-77. Giving the sheet the full height without giving the stage a way to spend it parked the CTA &quot;at the furthest point from the thumb that is still on the sheet&quot;, over 97px of empty sheet.</p>
 
   <h3>Proximity and grouping</h3>
-  <p>Every rendered gap inside a stage is 8, 16 or 24 (32 only to close a centred group), and each number means exactly one thing. Looser steps are the base gap plus a margin on the element that starts them — never a base plus a nudge.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:243-255: &quot;The organism owns the vertical rhythm. Nothing in the markup sets spacing. / ONE SCALE, THREE MEANINGS... every rendered gap is 8, 16 or 24 and each number means one thing: / 8 parts of one thing — label to its field, field to its helper, the cells to the line that reports on them / 16 one group to the next — the control block to the card about it / 24 a decision, or a different route / Gaps used to be composed as 16 plus a 4px nudge, which rendered 18 and 20: values close enough to the group step to read as noise rather than meaning.&quot; The arithmetic is written on each rule: organisms.css:263 &quot;8 + 8 = 16&quot;, :267 &quot;8 + 16 = 24&quot;, :330 &quot;8 + 24 = 32&quot;. Machine-checked at index.html:3854, <code>[&#x27;Spacing&#x27;, &#x27;every rendered gap is on the scale&#x27;, ... var ok = [4, 8, 16, 24, 32]]</code>.</p>
-  <p class="ds-where"><strong>The exception:</strong> Admitted and left unfixed at src/css/organisms.css:273-281: because gaps are authored between boxes and &quot;a 48px target holds about 18px of line, so it carries ~15px of nothing above and below it. The eye is therefore shown roughly 23, 39 and 31 where the scale says 8, 24 and 16.&quot; The negative-margin correction was tried and &quot;overshot: it tightened the button gap to 17 and closed the row to 1&quot;, so it &quot;wants a designer looking at it rather than a blind correction&quot;. The measured gate passes; the eye does not.</p>
+  <p>Every rendered gap inside a stage is 8, 16 or 24, with 32 only to close a centred group. Each number means exactly one thing. Looser steps are the base gap plus a margin on the element that starts them, never a base plus a nudge.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:243-255: &quot;The organism owns the vertical rhythm. Nothing in the markup sets spacing.&quot; Under ONE SCALE, THREE MEANINGS, &quot;every rendered gap is 8, 16 or 24 and each number means one thing&quot;. 8 is parts of one thing (label to its field, field to its helper, the cells to the line that reports on them), 16 is one group to the next (the control block to the card about it), 24 is a decision or a different route. The reason follows: &quot;Gaps used to be composed as 16 plus a 4px nudge, which rendered 18 and 20: values close enough to the group step to read as noise rather than meaning.&quot; The arithmetic is written on each rule: organisms.css:263 &quot;8 + 8 = 16&quot;, :267 &quot;8 + 16 = 24&quot;, :330 &quot;8 + 24 = 32&quot;. Machine-checked at index.html:3854, <code>[&#x27;Spacing&#x27;, &#x27;every rendered gap is on the scale&#x27;, ... var ok = [4, 8, 16, 24, 32]]</code>.</p>
+  <p class="ds-where"><strong>The exception:</strong> Admitted and left unfixed at src/css/organisms.css:273-281. Gaps are authored between boxes: &quot;a 48px target holds about 18px of line, so it carries ~15px of nothing above and below it. The eye is therefore shown roughly 23, 39 and 31 where the scale says 8, 24 and 16.&quot; The negative-margin correction was tried and &quot;overshot: it tightened the button gap to 17 and closed the row to 1&quot;, so it &quot;wants a designer looking at it rather than a blind correction&quot;. The measured gate passes. The eye does not.</p>
 
   <h3>Alignment</h3>
-  <p>Alignment is decided by whether the thing has a neighbour to line up with, not by house style. A key-over-value stack is left-aligned only when it sits in a column that shares one reading edge; standing alone on a centred panel it centres. Any such override is scoped to the context, never written onto the atom.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:128-140 — <code>.o-status-page__meta .m-figure { align-items: center; text-align: center; }</code> under &quot;A key-over-value stack is left-aligned so that a COLUMN of them shares one edge to read down. There is no column here... the left edge buys nothing, and it costs the obvious thing - DOWNLOAD SIZE is twice the width of 42 MB, so the number sits off under one end of its own label. Scoped to this row on purpose. The same atom sits in the home notice on the dark hero, in a block whose every line is left-aligned, and it is right to stay left-aligned there.&quot; The atom&#x27;s own default stays left at src/css/molecules.css:228, <code>.m-figure { ... text-align: left; }</code>.</p>
-  <p class="ds-where"><strong>The exception:</strong> The nearby failure is quoted at organisms.css:124-126 — the row itself &quot;sat on the left edge of cards whose every other line is centred - the one left-handed thing on the screen&quot;, fixed with <code>justify-content: center</code> at :126. The stated exception to centring is <code>.m-resend-row[data-single=&quot;true&quot;] { justify-content: center; }</code> (molecules.css:226): the row is only centred when a state has withdrawn one of the two links, &quot;so the survivor centres rather than sitting hard left where its partner used to balance it.&quot;</p>
+  <p>Alignment is decided by whether the thing has a neighbour to line up with, not by house style. A key-over-value stack is left-aligned only when it sits in a column that shares one reading edge. Standing alone on a centred panel, it centres. Any such override is scoped to the context, never written onto the atom.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:128-140, <code>.o-status-page__meta .m-figure { align-items: center; text-align: center; }</code>. A key-over-value stack is left-aligned so that a COLUMN of them shares one edge to read down. There is no column here. The left edge buys nothing and it costs the obvious thing: DOWNLOAD SIZE is twice the width of 42 MB, so the number sits off under one end of its own label. The comment says it is scoped to this row on purpose. The same atom sits in the home notice on the dark hero, in a block whose every line is left-aligned, where staying left-aligned is right. The atom&#x27;s own default stays left at src/css/molecules.css:228, <code>.m-figure { ... text-align: left; }</code>.</p>
+  <p class="ds-where"><strong>The exception:</strong> The nearby failure is quoted at organisms.css:124-126. The row itself &quot;sat on the left edge of cards whose every other line is centred - the one left-handed thing on the screen&quot;, fixed with <code>justify-content: center</code> at :126. The stated exception to centring is <code>.m-resend-row[data-single=&quot;true&quot;] { justify-content: center; }</code> (molecules.css:226). The row centres only when a state has withdrawn one of the two links, &quot;so the survivor centres rather than sitting hard left where its partner used to balance it.&quot;</p>
 
   <h3>Consistency</h3>
-  <p>A component reads tokens and never raw values; if a value has no token, the token is added first. Two gates hold it: nothing painted may resolve to a value with no token, and no token may be declared and never used — the only permitted unused tokens are on a named list saying which sibling flow spends each one.</p>
+  <p>A component reads tokens and never raw values. If a value has no token, the token is added first. Two gates hold it. Nothing painted may resolve to a value with no token. No token may be declared and never used. The only permitted unused tokens are on a named list saying which sibling flow spends each one.</p>
   <p class="ds-where"><strong>Enforced at:</strong> index.html:3572, RULES[&#x27;Tokens&#x27;]: &quot;A component reads tokens, never raw values. If you need a value that has no token, add the token first.&quot; Gates at index.html:3871 (<code>[&#x27;Tokens&#x27;, &#x27;no component paints a value that has no token&#x27;]</code>) and index.html:3945 (<code>[&#x27;Tokens&#x27;, &#x27;no token is declared and never used&#x27;]</code>). The naming rationale is at src/css/tokens.css:238-245: the file already used 0.97 and 0.985, &quot;plus one 0.99 on a station row that was doing the subtle job at a value of its own. Naming them is what stops a third appearing.&quot;</p>
-  <p class="ds-where"><strong>The exception:</strong> <code>--press-subtle</code> (src/css/tokens.css:247) is declared in the sign-up bundle and consumed by nothing in src/css — grep finds its only users in the other file: engenxt-onboarding.html:1502, 1696, 2429, 2524, 3442. It survives the dead-token gate only because index.html:3993 lists it by hand: <code>&#x27;--press-subtle&#x27;: &#x27;the app&#x27;s rows and cards, which are tapped rather than aimed at&#x27;</code>, under the comment at index.html:3985 that anything not on the list &quot;is still dead the moment it is unused&quot;.</p>
+  <p class="ds-where"><strong>The exception:</strong> <code>--press-subtle</code> (src/css/tokens.css:247) is declared in the sign-up bundle and nothing in src/css uses it. Grep finds its only users in the other file: engenxt-onboarding.html:1502, 1696, 2429, 2524, 3442. It survives the dead-token gate only because index.html:3993 lists it by hand: <code>&#x27;--press-subtle&#x27;: &#x27;the app&#x27;s rows and cards, which are tapped rather than aimed at&#x27;</code>. The comment at index.html:3985 is blunt about the rest. Anything not on the list &quot;is still dead the moment it is unused&quot;.</p>
 
   <h3>Responsive and mobile-first behaviour</h3>
-  <p>The component decides, not the window: four real device widths in points (390x844, 375x812, 360x800, 320x720), plus page reflow at 900px and full bleed at 440px. Text size belongs to the user — <code>[data-text=&quot;large&quot;]</code> repoints the whole --text-* ramp on the root so every component grows without knowing it did. 320 and large text must be tested together.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/templates.css:113-125 — &quot;360 x 800 is not an iPhone at all: it is the single most common Android viewport, which for a South African fleet is the one that matters most. 320 is not a current phone, it is the floor, kept as a stress test.&quot; Ramp repointing at src/css/tokens.css:430-446. Breakpoints at templates.css:158-164 and :172-176. Stated at index.html:3579, RULES[&#x27;Responsive&#x27;]: &quot;Test at 320 and at large text together, because that is the pair that breaks things.&quot;</p>
-  <p class="ds-where"><strong>The exception:</strong> The drawn Android keyboard is exempt on purpose — src/css/molecules.css:254-260: &quot;These sizes deliberately sit outside the type ramp. The ramp exists so app text answers the driver&#x27;s text-size setting, and a drawing of Android&#x27;s own keyboard must not: a real keyboard does not grow when app text does&quot; (<code>font-size: 21px</code>, <code>font-size: 9px</code>). The opposite exception is tokens.css:445, <code>--size-otp-cell: 60px; /* the square has to keep containing its glyph */</code> — one non-type size that has to follow the ramp anyway.</p>
+  <p>The component decides, not the window: four real device widths in points (390x844, 375x812, 360x800, 320x720), plus page reflow at 900px and full bleed at 440px. Text size belongs to the user. <code>[data-text=&quot;large&quot;]</code> repoints the whole --text-* ramp on the root, so every component grows without knowing it did. 320 and large text must be tested together.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/templates.css:113-125: &quot;360 x 800 is not an iPhone at all: it is the single most common Android viewport, which for a South African fleet is the one that matters most. 320 is not a current phone, it is the floor, kept as a stress test.&quot; Ramp repointing at src/css/tokens.css:430-446. Breakpoints at templates.css:158-164 and :172-176. Stated at index.html:3579, RULES[&#x27;Responsive&#x27;]: &quot;Test at 320 and at large text together, because that is the pair that breaks things.&quot;</p>
+  <p class="ds-where"><strong>The exception:</strong> The drawn Android keyboard is exempt on purpose. src/css/molecules.css:254-260: &quot;These sizes deliberately sit outside the type ramp.&quot; The ramp exists so app text answers the driver&#x27;s text-size setting. A drawing of Android&#x27;s own keyboard must not follow it, because &quot;a real keyboard does not grow when app text does&quot; (<code>font-size: 21px</code>, <code>font-size: 9px</code>). The opposite exception is tokens.css:445, <code>--size-otp-cell: 60px; /* the square has to keep containing its glyph */</code>: one non-type size that has to follow the ramp anyway.</p>
 
   <h3>One clear primary action per context</h3>
-  <p>Exactly one visible <code>.a-btn--primary</code> per active context; every other action is <code>.a-btn--outline</code>. When priority moves, the primary coat moves with it via <code>data-lead</code> rather than a second primary appearing. A blocked screen replaces its action with the recovery instead of showing both.</p>
+  <p>Exactly one visible <code>.a-btn--primary</code> per active context. Every other action is <code>.a-btn--outline</code>. When priority moves, the primary coat moves with it via <code>data-lead</code> rather than a second primary appearing. A blocked screen replaces its action with the recovery instead of showing both.</p>
   <p class="ds-where"><strong>Enforced at:</strong> src/css/atoms.css:34-37 <code>.a-btn--primary { background: var(--gradient-primary); color: var(--color-text-on-dark); box-shadow: var(--shadow-btn); }</code> against atoms.css:44-50 <code>.a-btn--outline { min-height: var(--size-target); background: transparent; color: var(--color-text-secondary); border: 1px solid var(--color-border-field); font-weight: var(--weight-semibold); }</code>. index.html:2130: &quot;The home screen has exactly one action. When something blocks entry the action is replaced by the recovery, never left on screen looking dead.&quot; src/css/organisms.css:147-148: &quot;o-status-page. A blocking status with one recovery action... because an account choice is not the answer.&quot; src/css/templates.css:31-37 fades <code>.o-auth-hero__actions</code> to opacity 0 once the sheet is up, because &quot;a driver who taps it is tapping the thing they have already done&quot;.</p>
-  <p class="ds-where"><strong>The exception:</strong> The sanctioned override is src/css/atoms.css:55-60, <code>.a-btn--outline[data-lead=&quot;true&quot;]</code> taking <code>var(--gradient-primary)</code>, <code>--weight-bold</code> and <code>--shadow-btn</code>: &quot;when a person becomes the last resort the scan sheet says so with data-lead, and the fact wears the primary coat&quot; — the coat moves, it is not duplicated (same move for the link at atoms.css:132). The rule is one <code>hidden</code> attribute away from being broken at index.html:296-298, where the biometrics panel holds two <code>.a-btn--primary</code> in the DOM (<code>bioEnable</code>, <code>bioContinue</code>) and stays legal only because <code>bioContinue</code> carries <code>hidden</code>, which foundations.css:38 forces to <code>display: none !important</code>.</p>
+  <p class="ds-where"><strong>The exception:</strong> The sanctioned override is src/css/atoms.css:55-60. <code>.a-btn--outline[data-lead=&quot;true&quot;]</code> takes <code>var(--gradient-primary)</code>, <code>--weight-bold</code> and <code>--shadow-btn</code>: &quot;when a person becomes the last resort the scan sheet says so with data-lead&quot;, so the fact wears the primary coat. The coat moves. It is not duplicated. Same move for the link at atoms.css:132. The rule is one <code>hidden</code> attribute away from being broken at index.html:296-298, where the biometrics panel holds two <code>.a-btn--primary</code> in the DOM (<code>bioEnable</code>, <code>bioContinue</code>). It stays legal only because <code>bioContinue</code> carries <code>hidden</code>, which foundations.css:38 forces to <code>display: none !important</code>.</p>
 
   <h3>Interaction feedback</h3>
-  <p>Every pressable thing reports the press with a scale token chosen by what it is: <code>--press-firm</code> (0.97) for a control you aim at, <code>--press-subtle</code> (0.985) for a surface you tap. A third value is drift unless the rule states its reason in place. Disabled controls suppress the press entirely rather than animating a dead action.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:238-247 — &quot;Two depths, because there are two kinds of thing to press: a control you aim at, and a surface you tap... Naming them is what stops a third appearing.&quot; Consumed at src/css/atoms.css:32 <code>.a-btn:active { transform: scale(var(--press-firm)); transition-duration: .1s; }</code>, suppressed at atoms.css:87 <code>.a-btn[aria-disabled=&quot;true&quot;]:active, .a-btn:disabled:active { transform: none; }</code>. Documented in the panel at docs/design-system/index.html:745: &quot;<code>--press-firm</code> on controls, <code>--press-subtle</code> on rows&quot;.</p>
-  <p class="ds-where"><strong>The exception:</strong> The one legal third value names itself at engenxt-onboarding.html:2061-2063: <code>/* Not --press-firm. This is imitating a physical shutter rather than a button, and the travel is the point of it. */ .a-shutter:active .a-shutter__ring { transform: scale(0.92); }</code> — pre-declared as legal by tokens.css:244-245. The illegal third value is the one the token was written to kill: &quot;one 0.99 on a station row that was doing the subtle job at a value of its own&quot; (tokens.css:242-243).</p>
+  <p>Every pressable thing reports the press with a scale token chosen by what it is: <code>--press-firm</code> (0.97) for a control you aim at, <code>--press-subtle</code> (0.985) for a surface you tap. A third value is drift unless the rule states its reason in place. Disabled controls suppress the press rather than animating a dead action.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:238-247: two depths, &quot;because there are two kinds of thing to press&quot;, a control you aim at and a surface you tap. &quot;Naming them is what stops a third appearing.&quot; Consumed at src/css/atoms.css:32 <code>.a-btn:active { transform: scale(var(--press-firm)); transition-duration: .1s; }</code>, suppressed at atoms.css:87 <code>.a-btn[aria-disabled=&quot;true&quot;]:active, .a-btn:disabled:active { transform: none; }</code>. Documented in the panel at docs/design-system/index.html:745: &quot;<code>--press-firm</code> on controls, <code>--press-subtle</code> on rows&quot;.</p>
+  <p class="ds-where"><strong>The exception:</strong> The one legal third value names itself at engenxt-onboarding.html:2061-2063: <code>/* Not --press-firm. This is imitating a physical shutter rather than a button, and the travel is the point of it. */ .a-shutter:active .a-shutter__ring { transform: scale(0.92); }</code>, pre-declared as legal by tokens.css:244-245. The illegal third value is the one the token was written to kill: &quot;one 0.99 on a station row that was doing the subtle job at a value of its own&quot; (tokens.css:242-243).</p>
 
   <h3>Typography and readability</h3>
-  <p>Every size comes from the --text-* ramp, every weight from the seven named --weight-* values, every line-height from one of four leading jobs, and repeating tracking from the five --tracking-* steps. An off-scale value is legal only as a single-instance optic and must say so on the rule that uses it.</p>
+  <p>Every size comes from the --text-* ramp, every weight from the seven named --weight-* values, every line-height from one of four leading jobs, repeating tracking from the five --tracking-* steps. An off-scale value is legal only as a single-instance optic. It must say so on the rule that uses it.</p>
   <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:200-219 (the 13-step ramp), :222-236 (&quot;four values carry ninety-six per cent of the uses - it simply had no names, so nothing could tell a considered 800 from a typo... a stray 750 is now visibly not one of these&quot;), :250-259 (&quot;1.45, 1.5, 1.55 and 1.6 were four ways of saying &#x27;body&#x27;; 1.05, 1.08, 1.1, 1.18 and 1.2 were five ways of saying &#x27;headline&#x27;&quot;), :261-269 (&quot;a handful of headline optics keep their own value and say so where they are written&quot;).</p>
-  <p class="ds-where"><strong>The exception:</strong> Two rules take that exemption and both declare it. src/css/organisms.css:79-82: <code>.o-auth-hero__title { ... letter-spacing: -1.6px; }</code> — &quot;Off the scale: one headline optic. At 42px the display step is too loose and the hero step too tight, and this is the only 42px line.&quot; And src/css/molecules.css:86-89: <code>.m-brand-lockup__tag { ... letter-spacing: 1.5px; }</code> — &quot;Off the tracking scale on purpose: this is a 10px uppercase strapline under a wordmark.&quot; Breaking it is a second component adopting -1.6px, which converts a stated one-off into an unnamed sixth tracking step that no gate catches — index.html:3871 measures only shadows and backgrounds.</p>
+  <p class="ds-where"><strong>The exception:</strong> Two rules take that exemption and both declare it. src/css/organisms.css:79-82: <code>.o-auth-hero__title { ... letter-spacing: -1.6px; }</code>, &quot;Off the scale: one headline optic.&quot; At 42px the display step is too loose and the hero step too tight. It is the only 42px line. And src/css/molecules.css:86-89: <code>.m-brand-lockup__tag { ... letter-spacing: 1.5px; }</code>, &quot;Off the tracking scale on purpose: this is a 10px uppercase strapline under a wordmark.&quot; Breaking it is a second component adopting -1.6px, which turns a stated one-off into an unnamed sixth tracking step that no gate catches. index.html:3871 measures only shadows and backgrounds.</p>
 
   <h3>Padding, margin and gap responsibilities</h3>
-  <p>The organism owns the vertical rhythm through its gap and nothing in the markup sets spacing. A parent may PLACE a child — where it sits, how much room it takes, whether it shows — but may never RESTYLE its insides; a child that must look different in a context carries a modifier for it.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:243 &quot;The organism owns the vertical rhythm. Nothing in the markup sets spacing.&quot; index.html:3575, RULES[&#x27;Composition&#x27;]: &quot;Colour, type, padding, radius and border stay with the component that owns them... That is why the links on a content edge take a-link--flush rather than the row cancelling their padding.&quot; The modifier that keeps the law: src/css/atoms.css:108 <code>.a-link--flush { padding-inline: 0; }</code> — &quot;The vertical padding stays, because the 48px target depends on it&quot; — declared as a modifier rather than a row rule at molecules.css:221-223.</p>
-  <p class="ds-where"><strong>The exception:</strong> The law is written from two real breaches. src/css/atoms.css:62-70: <code>.o-scan__actions .a-btn--outline</code> &quot;set the border and the ink from the organism - which is the Composition law&#x27;s own worked example of what a parent may not do&quot;, fixed by writing <code>.a-btn--outlineOnDark</code>. src/css/molecules.css:66-75: <code>.o-home .m-brand-lockup__name</code> recoloured a child and &quot;was invisible to the parity gate, which drops any rule whose classes do not all root into the manifest. So the gate went on proving the lockup identical in both files while the two files rendered it in different colours.&quot; That crossing has since been closed: three rules styling <code>.o-signup-sheet__resend</code> from inside <code>@layer atoms</code> now sit with the organism that owns them, verified computed-identical across all 104 states.</p>
+  <p>The organism owns the vertical rhythm through its gap. Nothing in the markup sets spacing. A parent may PLACE a child (where it sits, how much room it takes, whether it shows) but may never RESTYLE its insides. A child that must look different in a context carries a modifier for it.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/organisms.css:243 &quot;The organism owns the vertical rhythm. Nothing in the markup sets spacing.&quot; index.html:3575, RULES[&#x27;Composition&#x27;]: &quot;Colour, type, padding, radius and border stay with the component that owns them... That is why the links on a content edge take a-link--flush rather than the row cancelling their padding.&quot; The modifier that keeps the law: src/css/atoms.css:108 <code>.a-link--flush { padding-inline: 0; }</code>, where &quot;The vertical padding stays, because the 48px target depends on it&quot;. It is declared as a modifier rather than a row rule at molecules.css:221-223.</p>
+  <p class="ds-where"><strong>The exception:</strong> The law is written from two real breaches. At src/css/atoms.css:62-70, <code>.o-scan__actions .a-btn--outline</code> &quot;set the border and the ink from the organism - which is the Composition law&#x27;s own worked example of what a parent may not do&quot;, fixed by writing <code>.a-btn--outlineOnDark</code>. At src/css/molecules.css:66-75, <code>.o-home .m-brand-lockup__name</code> recoloured a child and &quot;was invisible to the parity gate, which drops any rule whose classes do not all root into the manifest. So the gate went on proving the lockup identical in both files while the two files rendered it in different colours.&quot; That crossing has since been closed. Three rules styling <code>.o-signup-sheet__resend</code> from inside <code>@layer atoms</code> now sit with the organism that owns them, verified computed-identical across all 104 states.</p>
 
   <h3>Accessibility</h3>
-  <p>Every interactive control in the product clears 48px in its smallest dimension (<code>--size-target</code>), the target counting absolutely-positioned pseudo-element hit area; one two-tone focus ring serves the whole file; colour never carries meaning alone; any state signalled by colour re-states itself structurally under forced-colors; every animation collapses to a still frame under reduced motion.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:318 <code>--size-target: 48px; /* minimum tap target */</code>, consumed at atoms.css:45, :72, :78, :91 and organisms.css:216, and reached by pseudo-element where the visible box is smaller (molecules.css:187-189 <code>.m-sheet-header__close::after { inset: 0 -6px -12px -6px; }</code> — &quot;36 + 12 = the 48 the tap floor asks for&quot;; organisms.css:309-311 <code>.o-signup-sheet__noteMore::before { inset: -17px -10px; } /* 15px of text to the 48px floor */</code>). One ring at foundations.css:30-34. &quot;Tone is never carried by colour alone&quot; at atoms.css:239. forced-colors block at atoms.css:390-397. Reduced motion at foundations.css:71-83. Measured, not asserted: tools/sweep.js:110-111 reads the token off the root — &quot;One law, one writer: the floor is the token the spec panel reads, not a number this file made up.&quot;</p>
-  <p class="ds-where"><strong>The exception:</strong> index.html:3577 names two documented exceptions to the 48px floor: the six OTP cells, because &quot;six squares and five gaps cannot each clear 48 inside 320 minus the gutters, so the row takes the largest size that fits rather than pretending the rule holds&quot; (templates.css:166-170 tightens <code>.m-otp-group</code> to <code>gap: var(--sp-1)</code>; the gate skips them at index.html:3895, <code>if (/a-otp-cell/.test(cls)) { return; }</code>), and the whole d- layer, &quot;a desktop review surface driven with a mouse&quot;. A third exception runs against the focus ring: organisms.css:356-365 removes it from <code>.o-outcome-panel__title</code> and <code>.o-status-page__title</code> because they are focused by script to announce a screen — &quot;a ring drawn round a heading nobody moved to reads as a control.&quot;</p>
+  <p>Every interactive control in the product clears 48px in its smallest dimension (<code>--size-target</code>), counting hit area from an absolutely-positioned pseudo-element. One two-tone focus ring serves the whole file. Colour never carries meaning alone. Any state signalled by colour re-states itself structurally under forced-colors. Every animation collapses to a still frame under reduced motion.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> src/css/tokens.css:318 <code>--size-target: 48px; /* minimum tap target */</code>, consumed at atoms.css:45, :72, :78, :91 and organisms.css:216. Where the visible box is smaller, a pseudo-element reaches the floor (molecules.css:187-189 <code>.m-sheet-header__close::after { inset: 0 -6px -12px -6px; }</code>, &quot;36 + 12 = the 48 the tap floor asks for&quot;; organisms.css:309-311 <code>.o-signup-sheet__noteMore::before { inset: -17px -10px; } /* 15px of text to the 48px floor */</code>). One ring at foundations.css:30-34. &quot;Tone is never carried by colour alone&quot; at atoms.css:239. forced-colors block at atoms.css:390-397. Reduced motion at foundations.css:71-83. Measured, not asserted: tools/sweep.js:110-111 reads the token off the root: &quot;One law, one writer: the floor is the token the spec panel reads, not a number this file made up.&quot;</p>
+  <p class="ds-where"><strong>The exception:</strong> index.html:3577 names two documented exceptions to the 48px floor. First, the six OTP cells, because &quot;six squares and five gaps cannot each clear 48 inside 320 minus the gutters, so the row takes the largest size that fits rather than pretending the rule holds&quot; (templates.css:166-170 tightens <code>.m-otp-group</code> to <code>gap: var(--sp-1)</code>; the gate skips them at index.html:3895, <code>if (/a-otp-cell/.test(cls)) { return; }</code>). Second, the whole d- layer, &quot;a desktop review surface driven with a mouse&quot;. A third exception runs against the focus ring: organisms.css:356-365 removes it from <code>.o-outcome-panel__title</code> and <code>.o-status-page__title</code>, because script focuses them to announce a screen: &quot;a ring drawn round a heading nobody moved to reads as a control.&quot;</p>
 
   <h3>Documented exceptions</h3>
-  <p>An exception is legal only where it is written beside the code that breaks the rule and says what the break bought. The shape is always the same three parts: name the rule, name the exception, name the reason — and a rule that cannot be exempted says so in the same breath.</p>
-  <p class="ds-where"><strong>Enforced at:</strong> The pattern repeats verbatim across the files: index.html:3577 &quot;Two documented exceptions&quot;; src/css/atoms.css:126-131 &quot;Except this one.&quot;; src/css/atoms.css:321 &quot;5px is a deliberate hairline bar thickness, not a grid value&quot;; src/css/tokens.css:244-245 pre-authorises the shutter&#x27;s 0.92; src/css/molecules.css:254-256 exempts the drawn keyboard from the ramp; src/css/organisms.css:80-82 exempts one 42px line from the tracking scale. The rule that refuses exemption is src/css/tokens.css:97-99: &quot;Error TEXT is darker than the brand red. --color-secondary is the Engen red in the logo, so it must not be darkened to satisfy a text contrast rule&quot; — hence a second red, <code>--color-error-text: #B81510</code>, rather than a bent brand colour.</p>
-  <p class="ds-where"><strong>The exception:</strong> Two exception comments in the repo have gone stale, which is the real failure mode of this pattern. src/css/molecules.css:203 still reads &quot;6px between cells is optical&quot; while the rule it heads, molecules.css:211, declares <code>gap: var(--sp-2)</code> — 8px — corrected by a later comment at :206-210 that the first was never updated to match. src/css/molecules.css:214-215 claims &quot;the negative inline margin pulls the links back onto the content edge&quot; while <code>.m-resend-row</code> at :216-219 contains no negative margin at all; the job moved to <code>.a-link--flush</code> and the comment stayed. The system&#x27;s own defence against this is tokens.css:44-47: &quot;a manifest in a comment goes stale silently, and this one had, naming a template that no longer exists and an attribute that never did.&quot;</p>
+  <p>An exception is legal only where it is written beside the code that breaks the rule and says what the break bought. The shape is always the same three parts: name the rule, name the exception, name the reason. A rule that cannot be exempted says so in the same breath.</p>
+  <p class="ds-where"><strong>Enforced at:</strong> The pattern repeats verbatim across the files: index.html:3577 &quot;Two documented exceptions&quot;; src/css/atoms.css:126-131 &quot;Except this one.&quot;; src/css/atoms.css:321 &quot;5px is a deliberate hairline bar thickness, not a grid value&quot;; src/css/tokens.css:244-245 pre-authorises the shutter&#x27;s 0.92; src/css/molecules.css:254-256 exempts the drawn keyboard from the ramp; src/css/organisms.css:80-82 exempts one 42px line from the tracking scale. The rule that refuses exemption is src/css/tokens.css:97-99: &quot;Error TEXT is darker than the brand red. --color-secondary is the Engen red in the logo, so it must not be darkened to satisfy a text contrast rule&quot;. Hence a second red, <code>--color-error-text: #B81510</code>, rather than a bent brand colour.</p>
+  <p class="ds-where"><strong>The exception:</strong> Two exception comments in the repo have gone stale, which is the real failure mode of this pattern. src/css/molecules.css:203 still reads &quot;6px between cells is optical&quot; while the rule it heads, molecules.css:211, declares <code>gap: var(--sp-2)</code>, which is 8px. A later comment at :206-210 corrects it. The first was never updated to match. src/css/molecules.css:214-215 claims &quot;the negative inline margin pulls the links back onto the content edge&quot; while <code>.m-resend-row</code> at :216-219 contains no negative margin at all. The job moved to <code>.a-link--flush</code> and the comment stayed. The system&#x27;s own defence against this is tokens.css:44-47, where a manifest in a comment &quot;goes stale silently&quot;. That one had gone stale, naming a template that no longer exists and an attribute that never did.</p>
 </section>
 
 <!-- ════════════════════════════════════════════ FOUNDATIONS AND TOKENS -->
@@ -227,9 +227,9 @@
     hand, so a token cannot be documented at a value it no longer has.
   </p>
   <p>
-    The scale is copied verbatim into both pages, and the build gate compares them
-    property by property — a token that exists in one file and not the other fails the
-    build. Names must belong to a sanctioned family; a stray
+    The scale is copied verbatim into both pages. The build gate then compares them
+    property by property. A token that exists in one file and not the other fails the
+    build. Names must belong to a sanctioned family, so a stray
     <code>--brand-blue-2</code> is refused.
   </p>
 
@@ -242,25 +242,25 @@
   <p>
     A mature scale usually has two or three: a palette of raw values
     (<code>--blue-60</code>), a semantic layer that gives each one a job
-    (<code>--color-text-primary: var(--blue-60)</code>), and sometimes a third
-    per component. This one has <strong>a single tier</strong>, and it is named as
+    (<code>--color-text-primary: var(--blue-60)</code>) and sometimes a third
+    per component. This one has <strong>a single tier</strong> named as
     though it had two.
   </p>
   <p>
-    That is worth understanding before you change anything. The names already say
-    what a value is <em>for</em> rather than what it <em>is</em> — which is the
-    hard half of the work, and it is done. What is missing is the indirection
-    underneath: <code>--color-text-primary</code> holds <code>#0d1e2a</code>
-    directly, so two roles that happen to share a colour today have no way of
+    Understand that before you change anything. The names already say
+    what a value is <em>for</em> rather than what it <em>is</em>. That is the
+    hard half of the work and it's done. What's missing is the indirection
+    underneath. <code>--color-text-primary</code> holds <code>#0d1e2a</code>
+    directly, so two roles that share a colour today have no way of
     saying they are the same colour. The counts below are measured from the live
     stylesheet, not asserted.
   </p>
   <div id="dsTiers"></div>
   <p class="ds-note">
     <strong>Do not "fix" this by adding a palette tier on a quiet afternoon.</strong>
-    It is a safe change only if every value is preserved exactly, and the way to
-    prove that is the fingerprint instrument described under
-    <a href="#traceability">Traceability</a> — not by eye. A half-done palette,
+    It is safe only if every value is preserved exactly. Prove that with the
+    fingerprint instrument described under
+    <a href="#traceability">Traceability</a>, not by eye. A half-done palette,
     where some roles point at it and some still hold literals, is worse than the
     single tier you started with.
   </p>
@@ -269,42 +269,42 @@
   <p>
     Fifteen tokens are declared twice. The second set lives under
     <code>[data-text="large"]</code> and takes over when the driver turns
-    large text on — one attribute on the root, and the whole flow resizes,
+    large text on. One attribute on the root resizes the whole flow,
     because no component holds a font size of its own.
   </p>
   <p>
-    This is the payoff for having a type scale at all, and it is easy to break
-    without noticing: a hard-coded <code>font-size: 15px</code> looks identical
-    to <code>var(--text-body)</code> until somebody switches this on, and then
-    it is the one line of text on the screen that did not grow.
+    This is the payoff for having a type scale at all. It's easy to break
+    without noticing. A hard-coded <code>font-size: 15px</code> looks identical
+    to <code>var(--text-body)</code> until somebody switches this on. Then
+    it's the one line of text on the screen that didn't grow.
   </p>
   <div id="dsLarge"></div>
   <p>
-    The steps are not uniform, and that is deliberate. Body sizes gain 2px,
-    the three display sizes gain 4px, and the OTP cell gains 8px so the digits
-    keep their room. In proportion that means the smallest text grows most —
+    The steps are not uniform. That is deliberate. Body sizes gain 2px,
+    the three display sizes gain 4px and the OTP cell gains 8px so the digits
+    keep their room. In proportion the smallest text grows most:
     around a fifth at <code>--text-nano</code> against a sixteenth at
-    <code>--text-figure</code> — which is the right way round, since the small
+    <code>--text-figure</code>. That is the right way round, since the small
     text is what people turn this on for.
   </p>
 
   <h3>The one token the page writes</h3>
   <p>
     <code>--keyboard-inset</code> is declared at <code>0px</code> and owned at runtime. When
-    the keyboard opens, the page writes the real height onto the device frame; three layers
-    size themselves against it — the sheet's height and max-height, the frame's own height,
-    and the drawn keypad.
+    the keyboard opens, the page writes the real height onto the device frame. Three layers
+    size themselves against it: the sheet's height and max-height, the frame's own height,
+    the drawn keypad.
   </p>
   <p>
-    It is declared for a reason worth knowing. Every one of its six consumers was written as
+    The declaration earns its place. Every one of its six consumers was written as
     <code>var(--keyboard-inset, 0px)</code>, so the property resolved only because each of
-    them carried its own fallback — which made those fallbacks load-bearing rather than
+    them carried its own fallback. That made those fallbacks load-bearing rather than
     defensive. Drop one and the sheet collapses silently, with nothing to fail. Declared, the
     fallbacks become belt and braces and the property has a stated default.
   </p>
   <div class="ds-note">
     <strong>Zero is the whole of the default.</strong> No other keyboard height belongs in
-    the stylesheet — the real number comes from the operating system at runtime, and a second
+    the stylesheet. The real number comes from the operating system at runtime, so a second
     value here would be a guess competing with a measurement. The unmigrated page carries the
     declaration for token parity and does not consume it.
   </div>
@@ -316,20 +316,20 @@
   <h3>Typography</h3>
   <p>
     The ramp is in the token table above. This is every place the product actually sets a
-    size — <strong>37 text styles</strong> across the five production
-    stylesheets, each with its role, its tokens, the element it is used on, and when not to
+    size: <strong>37 text styles</strong> across the five production
+    stylesheets. Each one lists its role, its tokens, the element it is used on and when not to
     reach for it.
   </p>
   <div class="ds-note">
     <strong>21 of the 37 set no
-    <code>line-height</code></strong> and inherit the user agent's <code>normal</code>,
-    which is roughly 1.2 and is not a step on the four-value <code>--leading-*</code> scale.
+    <code>line-height</code></strong> and inherit the user agent's <code>normal</code>.
+    That is roughly 1.2 and is not a step on the four-value <code>--leading-*</code> scale.
     Only 16 take a leading token. That is the largest single gap in
-    the type system: it is where two-line labels collide when large text is on. It is
-    recorded, not fixed — fixing it moves pixels.
+    the type system. Two-line labels collide there when large text is on. It is
+    recorded, not fixed, because fixing it moves pixels.
     <br><br>
     <strong>There is a measured proposal for it:</strong>
-    <a href="line-height-proposal.md">line-height-proposal.md</a> — all 21 grouped by
+    <a href="line-height-proposal.md">line-height-proposal.md</a>. It groups all 21 by
     semantic role, with before-and-after boxes at both text sizes. Three of them already
     change shape under large text, going from one line to two:
     <code>.m-figure__key</code>, <code>.o-auth-hero__how</code> and
@@ -337,9 +337,9 @@
   </div>
   <p>
     <strong>2 styles use a literal pixel size</strong>, marked
-    <span class="ds-pill ds-pill--warn">px</span> below. Both are inside the drawn Android
-    keyboard, which is operating-system chrome and must not grow when app text does. That is
-    the one sanctioned exemption; anywhere else a literal size is a bug, because it will not
+    <span class="ds-pill ds-pill--warn">px</span> below. Both sit inside the drawn Android
+    keyboard. That is operating-system chrome and must not grow when app text does. It is
+    the one sanctioned exemption. Anywhere else a literal size is a bug, because it will not
     answer <code>[data-text="large"]</code>.
   </p>
   <div class="ds-tablewrap">
@@ -351,13 +351,13 @@
         <tr><td><code>.a-link</code><br><span class="ds-more">atoms.css:90 · &lt;a&gt;</span></td><td>A text control - resend, change number, help, the ways out of a stage</td><td><code>--text-footnote</code> <span class="ds-more">14px; 16px large</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td>inherited: normal</td><td><code>--tracking-tight</code> <span class="ds-more">-0.3px</span></td><td><code>--color-primary-dark</code> <span class="ds-more">#0D3A8A</span></td><td>A text-only action that reaches the 48px target through its own min-height: var(--size-target).<br><span class="ds-more"><strong>Not for:</strong> As a word inside a running paragraph - that job belongs to __noteMore, sized to the sentence it sits in.</span></td></tr>
         <tr><td><code>.a-label</code><br><span class="ds-more">atoms.css:116 · &lt;label&gt;</span></td><td>The field label sitting above an input</td><td><code>--text-caption</code> <span class="ds-more">13px; 15px large</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td>inherited: normal</td><td>none</td><td>--color-text-secondary</td><td>Naming an input; the field is itself a label, so the whole 56px forwards focus to the input.<br><span class="ds-more"><strong>Not for:</strong> As a section heading - it is quiet secondary ink, not a heading register.</span></td></tr>
         <tr><td><code>.a-field__input</code><br><span class="ds-more">atoms.css:163 · &lt;input&gt;</span></td><td>The value the driver types - the phone number they are checking against their own handset</td><td><code>--text-subhead</code> <span class="ds-more">17px; 19px large</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td>inherited: normal</td><td>none</td><td>--color-text-primary</td><td>A single-line typed value inside .a-field; it stays full-strength even in data-state=&#x27;pending&#x27; because a faded form reads as a frozen one.<br><span class="ds-more"><strong>Not for:</strong> The one-time code - that is the six .a-otp-cell squares at --text-title.</span></td></tr>
-        <tr><td><code>.a-otp-cell</code><br><span class="ds-more">atoms.css:181 · &lt;input,&gt;</span></td><td>One digit of the six-box one-time code</td><td><code>--text-title</code> <span class="ds-more">22px; 24px large</span></td><td><code>--weight-bold</code> <span class="ds-more">700</span></td><td>inherited: normal</td><td>none</td><td>--color-text-primary</td><td>A single-character code box; the square is capped by --size-otp-cell, which data-text=&#x27;large&#x27; re-points to 60px so it keeps containing its glyph (tokens.css:444).<br><span class="ds-more"><strong>Not for:</strong> Free text - each cell is centred, square, and carries no maxLength because the OS fills the whole code into the first box.</span></td></tr>
+        <tr><td><code>.a-otp-cell</code><br><span class="ds-more">atoms.css:181 · &lt;input,&gt;</span></td><td>One digit of the six-box one-time code</td><td><code>--text-title</code> <span class="ds-more">22px; 24px large</span></td><td><code>--weight-bold</code> <span class="ds-more">700</span></td><td>inherited: normal</td><td>none</td><td>--color-text-primary</td><td>A single-character code box; the square is capped by --size-otp-cell, which data-text=&#x27;large&#x27; re-points to 60px so it keeps containing its glyph (tokens.css:444).<br><span class="ds-more"><strong>Not for:</strong> Free text - each cell is centred, square and carries no maxLength because the OS fills the whole code into the first box.</span></td></tr>
         <tr><td><code>.a-helper</code><br><span class="ds-more">atoms.css:227 · &lt;span,&gt;</span></td><td>The per-attempt feedback line under a field, with error, success and warning tones</td><td><code>--text-caption2</code> <span class="ds-more">12px; 14px large</span></td><td>inherited (400) - the tone variants at atoms.css:233-237 each set --weight-semibold</td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td><code>--color-text-secondary</code> <span class="ds-more">tones repaint: --color-error-text, --col…</span></td><td>Telling the driver what just happened in this field; tone is never colour alone - an icon is injected by setHelper.<br><span class="ds-more"><strong>Not for:</strong> A standing rule the driver keeps - that is .o-signup-sheet__note.</span></td></tr>
         <tr><td><code>.a-toast</code><br><span class="ds-more">atoms.css:336 · &lt;div&gt;</span></td><td>The transient confirmation strip floating over the screen</td><td><code>--text-caption</code> <span class="ds-more">13px; 15px large</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td>--color-text-on-dark, on a --color-text-primary ground</td><td>A short transient confirmation that needs no action from the driver.<br><span class="ds-more"><strong>Not for:</strong> Anything the driver must read at leisure or act on - it is pointer-events: none and fades on an opacity transition.</span></td></tr>
         <tr><td><code>.a-progress</code><br><span class="ds-more">atoms.css:356 · &lt;p&gt;</span></td><td>The uppercase step counter above the sheet&#x27;s content - one line of text with a span inside it as a textContent hook</td><td><code>--text-micro</code> <span class="ds-more">11px; 13px large</span></td><td><code>--weight-bold</code> <span class="ds-more">700</span></td><td>inherited: normal</td><td><code>--tracking-caps</code> <span class="ds-more">0.08em</span></td><td>--color-text-secondary</td><td>An uppercase micro-label counting position in a flow; its display lives in CSS, not inline style, so [hidden] can win.<br><span class="ds-more"><strong>Not for:</strong> While the keyboard is open - templates.css:60 hides it there to buy back vertical room.</span></td></tr>
         <tr><td><code>.m-status-bar__time</code><br><span class="ds-more">molecules.css:23 · &lt;span&gt;</span></td><td>The simulated handset clock in the drawn device status bar</td><td><code>--text-body</code> <span class="ds-more">15px; 17px large</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td>inherited: normal</td><td><code>--tracking-tight</code> <span class="ds-more">-0.3px</span></td><td>none in rule - dark ink by inheritance; the onDark tone at molecules.css:27 sets --color-on-dark-strong</td><td>The clock in the device chrome, following the bar&#x27;s tone the way every other thing in the bar does.<br><span class="ds-more"><strong>Not for:</strong> App content - it is a drawing of OS chrome, though unlike the keyboard it still answers Large text.</span></td></tr>
         <tr><td><code>.m-status-bar__net</code><br><span class="ds-more">molecules.css:39 · &lt;span&gt;</span></td><td>The &#x27;No service&#x27; word beside the clock when data-net=&#x27;offline&#x27; - without it data-net was a flag with no rendering, so Offline looked broken until you tried to send</td><td><code>--text-caption2</code> <span class="ds-more">12px; 14px large</span></td><td><code>--weight-bold</code> <span class="ds-more">700</span></td><td>inherited: normal</td><td><code>--tracking-tight</code> <span class="ds-more">-0.3px</span></td><td>--color-text-secondary; the onDark tone at molecules.css:44 flips to --color-on-dark-soft</td><td>Showing connection state where a phone shows it; dark ink is the default and the on-dark ramp is the exception.<br><span class="ds-more"><strong>Not for:</strong> App-level offline messaging - and never revert it to unconditional on-dark white, which measured 2.30:1 on home and was worst in Large text, &#x27;the mode a driver reading a phone in the sun turns on&#x27;.</span></td></tr>
-        <tr><td><code>.m-brand-lockup__name</code><br><span class="ds-more">molecules.css:76 · &lt;p&gt;</span></td><td>The EngenXT wordmark itself</td><td><code>--text-title</code> <span class="ds-more">22px; 24px large</span></td><td>--weight-black (900) - the only 900 in the product</td><td><code>--leading-flush</code> <span class="ds-more">1</span></td><td><code>--tracking-snug</code> <span class="ds-more">-0.5px</span></td><td>--color-text-primary; the --onDark modifier at molecules.css:81 flips to --color-text-on-dark; the em child takes --color-secondary</td><td>The wordmark inside a brand lockup, on either ground - the on-dark case is a modifier, the way a-btn, a-link and a-icon-wrap already do it.<br><span class="ds-more"><strong>Not for:</strong> As a heading - it is a mark, and --leading-flush assumes it never wraps.</span></td></tr>
+        <tr><td><code>.m-brand-lockup__name</code><br><span class="ds-more">molecules.css:76 · &lt;p&gt;</span></td><td>The EngenXT wordmark itself</td><td><code>--text-title</code> <span class="ds-more">22px; 24px large</span></td><td>--weight-black (900) - the only 900 in the product</td><td><code>--leading-flush</code> <span class="ds-more">1</span></td><td><code>--tracking-snug</code> <span class="ds-more">-0.5px</span></td><td>--color-text-primary; the --onDark modifier at molecules.css:81 flips to --color-text-on-dark; the em child takes --color-secondary</td><td>The wordmark inside a brand lockup, on either ground - the on-dark case is a modifier, the way a-btn, a-link and a-icon-wrap already do it.<br><span class="ds-more"><strong>Not for:</strong> As a heading - it is a mark. --leading-flush assumes it never wraps.</span></td></tr>
         <tr><td><code>.m-brand-lockup__tag</code><br><span class="ds-more">molecules.css:85 · &lt;p&gt;</span></td><td>The uppercase strapline under the wordmark (&#x27;DRIVER REWARDS&#x27;)</td><td><code>--text-micro</code> <span class="ds-more">11px; 13px large</span></td><td><code>--weight-medium</code> <span class="ds-more">500</span></td><td>inherited: normal</td><td><code>1.5px</code> <span class="ds-more">LITERAL, off the tracking scale on…</span></td><td>--color-on-dark-faint</td><td>The strapline directly under the wordmark, where an em-based tracking would collapse it into a word.<br><span class="ds-more"><strong>Not for:</strong> Any other uppercase micro-label - --tracking-caps is the scale answer there. Note the comment says &#x27;10px&#x27; but the rule reads --text-micro, which is 11px (tokens.css:218), so the optic was tuned for a size this rule no longer sets.</span></td></tr>
         <tr><td><code>.m-alert__title</code><br><span class="ds-more">molecules.css:115 · &lt;p&gt;</span></td><td>The few-word headline of an inline alert</td><td><code>--text-footnote</code> <span class="ds-more">14px; 16px large</span></td><td><code>--weight-bold</code> <span class="ds-more">700</span></td><td><code>--leading-snug</code> <span class="ds-more">1.35</span></td><td>none</td><td>--color-text-primary; --onDark at molecules.css:131 flips to --color-text-on-dark</td><td>The headline of an inline alert box, above one plain line of body.<br><span class="ds-more"><strong>Not for:</strong> As a screen or sheet heading - it is a component&#x27;s internal title, not a page&#x27;s.</span></td></tr>
         <tr><td><code>.m-alert__body</code><br><span class="ds-more">molecules.css:120 · &lt;p&gt;</span></td><td>The one plain line under an alert headline</td><td><code>--text-caption2</code> <span class="ds-more">12px; 14px large</span></td><td>inherited (400); the b child takes --weight-bold and tabular-nums</td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td>--color-text-secondary; --onDark at molecules.css:133 flips to --color-on-dark-mid</td><td>One plain sentence explaining the alert&#x27;s headline.<br><span class="ds-more"><strong>Not for:</strong> Long explanations - the alert is built for one glance.</span></td></tr>
@@ -369,7 +369,7 @@
         <tr><td><code>.m-figure__val</code><br><span class="ds-more">molecules.css:235 · &lt;span&gt;</span></td><td>The figure itself in a key/value read-out</td><td><code>--text-lead</code> <span class="ds-more">20px; 22px large</span></td><td><code>--weight-heavy</code> <span class="ds-more">800</span></td><td>inherited: normal</td><td>none</td><td>--color-text-primary</td><td>A numeric value paired with an __key above it; it sets font-variant-numeric: tabular-nums.<br><span class="ds-more"><strong>Not for:</strong> The live counting litre figure - the ramp keeps --text-figure (64px) for the one number a driver watches while fuel goes in.</span></td></tr>
         <tr><td><code>.m-keyboard__digit</code> <span class="ds-pill ds-pill--warn">px</span><br><span class="ds-more">molecules.css:257 · &lt;SVG&gt;</span></td><td>The digits drawn on the simulated Android numeric keypad - OS chrome, not app text</td><td><code>21px</code> <span class="ds-more">LITERAL - sanctioned exception; comment: &#x27;These size…</span></td><td><code>--weight-regular</code> <span class="ds-more">400</span></td><td>inherited: normal</td><td>none</td><td><code>fill: var</code> <span class="ds-more">--kb-text) (#1B1E23</span></td><td>Only inside the drawn OS keyboard SVG, where the literal is the point - it must NOT respond to data-text=&#x27;large&#x27;.<br><span class="ds-more"><strong>Not for:</strong> Any app text - this and __sub are the only two places in production CSS where a literal font-size is correct.</span></td></tr>
         <tr><td><code>.m-keyboard__sub</code> <span class="ds-pill ds-pill--warn">px</span><br><span class="ds-more">molecules.css:262 · &lt;SVG&gt;</span></td><td>The letter sub-labels under the keypad digits (ABC, DEF) - OS chrome, not app text</td><td><code>9px</code> <span class="ds-more">LITERAL - sanctioned exception, same comment at mole…</span></td><td><code>--weight-semibold</code> <span class="ds-more">600</span></td><td>inherited: normal</td><td><code>--tracking-caps</code> <span class="ds-more">0.08em</span></td><td><code>fill: var</code> <span class="ds-more">--kb-sub) (#6B7280</span></td><td>Only the sub-labels on the drawn Android keypad, which must stay fixed while app text scales.<br><span class="ds-more"><strong>Not for:</strong> Any app text - 9px sits below --text-nano and would fail legibility as product copy.</span></td></tr>
-        <tr><td><code>.m-privacy__row</code><br><span class="ds-more">molecules.css:272 · &lt;div&gt;</span></td><td>One fact row in the privacy disclosure - comment: &#x27;Facts as rows: an icon naming the subject, a bold headline of a few words, one plain line after it. A paragraph made a reader hold five sentences; a row asks for one glance each.&#x27;</td><td><code>--text-caption2</code> <span class="ds-more">12px; 14px large</span></td><td>inherited (400); the b child takes --weight-bold and --color-text-primary</td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td>--color-text-secondary</td><td>A list of short disclosure facts, each read in one glance, each led by its own icon.<br><span class="ds-more"><strong>Not for:</strong> Prose paragraphs - the row is a flex container, and the format exists specifically to replace a paragraph.</span></td></tr>
+        <tr><td><code>.m-privacy__row</code><br><span class="ds-more">molecules.css:272 · &lt;div&gt;</span></td><td>One fact row in the privacy disclosure - comment: &#x27;Facts as rows: an icon naming the subject, a bold headline of a few words, one plain line after it. A paragraph made a reader hold five sentences; a row asks for one glance each.&#x27;</td><td><code>--text-caption2</code> <span class="ds-more">12px; 14px large</span></td><td>inherited (400); the b child takes --weight-bold and --color-text-primary</td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td>--color-text-secondary</td><td>A list of short disclosure facts, each read in one glance, each led by its own icon.<br><span class="ds-more"><strong>Not for:</strong> Prose paragraphs - the row is a flex container. The format exists specifically to replace a paragraph.</span></td></tr>
         <tr><td><code>.o-auth-hero__title</code><br><span class="ds-more">organisms.css:73 · &lt;h1&gt;</span></td><td>The product promise headline on the dark home screen - the single largest line of copy in the app</td><td><code>--text-hero</code> <span class="ds-more">42px; 46px at data-text=large</span></td><td><code>--weight-heavy</code> <span class="ds-more">800</span></td><td><code>--leading-tight</code> <span class="ds-more">1.1</span></td><td><code>-1.6px</code> <span class="ds-more">LITERAL, off-scale by design - com…</span></td><td>--color-text-on-dark</td><td>The one promise headline on a dark full-bleed auth screen, anchored to the bottom where the thumb rests.<br><span class="ds-more"><strong>Not for:</strong> Any second headline - the -1.6px optic is tuned for this one 42px line and nothing else.</span></td></tr>
         <tr><td><code>.o-auth-hero__lede</code><br><span class="ds-more">organisms.css:85 · &lt;p&gt;</span></td><td>The one-sentence explanation sitting under the hero promise</td><td><code>--text-body</code> <span class="ds-more">15px; 17px large</span></td><td><code>--weight-regular</code> <span class="ds-more">400</span></td><td><code>--leading-body</code> <span class="ds-more">1.5</span></td><td>none</td><td>--color-on-dark-soft</td><td>A supporting sentence directly under a dark hero headline.<br><span class="ds-more"><strong>Not for:</strong> On any light surface - the colour is 60% white, built for dark ground only.</span></td></tr>
         <tr><td><code>.o-auth-hero__how</code><br><span class="ds-more">organisms.css:92 · &lt;p&gt;</span></td><td>How the door works in one breath, centred under the CTA so the button reads as an answer rather than a question (per the CSS comment above it)</td><td><code>--text-caption</code> <span class="ds-more">13px; 15px large</span></td><td><code>inherited</code> <span class="ds-more">400 from body</span></td><td>inherited: normal</td><td>none</td><td>--color-on-dark-soft</td><td>A centred one-line reassurance immediately under a primary action on dark.<br><span class="ds-more"><strong>Not for:</strong> Copy that will wrap - it sets no line-height, so wrapped lines run at UA normal.</span></td></tr>
@@ -387,25 +387,25 @@
     </table>
   </div>
 
-  <h4>Possible consolidations — proposals only, nothing changed</h4>
+  <h4>Possible consolidations: proposals only, nothing changed</h4>
   <p>
     Near-duplicate styles found while cataloguing the 37. <strong>None
     of these has been applied.</strong> Production typography does not change without a
-    design ruling, and several of these would move pixels. They are listed so the decision
+    design ruling. Several of these would move pixels. They are listed so the decision
     can be made deliberately rather than discovered.
   </p>
   <div class="ds-tablewrap">
     <table class="ds-table">
       <thead><tr><th>Styles</th><th>What they share</th><th>Proposal</th><th>Risk if applied</th></tr></thead>
       <tbody>
-        <tr><td><code>.o-status-page__title</code>, <code>.o-outcome-panel__title</code></td><td>Byte-identical typography: --text-heading / --weight-heavy / --tracking-tight, no line-height, no colour. organisms.css:174-177 and organisms.css:367. Both are &#x27;the name of an outcome&#x27;, differing only in whether the outcome fills the screen or sits in the sheet.</td><td>Group the two selectors into one typography rule (an :is() list) and leave the level-specific bits - margins and focus resets - in their own rules.</td><td>Each already carries a separate :focus-visible reset (organisms.css:359 and :365) written for a different reason, and .o-outcome-panel__title has a second margin-only rule at :323. Merging the type rule leaves three near-neighbour rules with the same name, which is how the :365 comment says the sibling reset got missed in the first place. They also sit on different elements (h2 vs h3), so a future colour or size change would silently apply across two document levels.</td></tr>
+        <tr><td><code>.o-status-page__title</code>, <code>.o-outcome-panel__title</code></td><td>Byte-identical typography: --text-heading / --weight-heavy / --tracking-tight, no line-height, no colour. organisms.css:174-177 and organisms.css:367. Both are &#x27;the name of an outcome&#x27;, differing only in whether the outcome fills the screen or sits in the sheet.</td><td>Group the two selectors into one typography rule (an :is() list) and leave the level-specific bits - margins and focus resets - in their own rules.</td><td>Each already carries a separate :focus-visible reset (organisms.css:359 and :365) written for a different reason. .o-outcome-panel__title also has a second margin-only rule at :323. Merging the type rule leaves three near-neighbour rules with the same name, which is how the :365 comment says the sibling reset got missed in the first place. They also sit on different elements (h2 vs h3), so a future colour or size change would silently apply across two document levels.</td></tr>
         <tr><td><code>.o-status-page__body</code>, <code>.o-outcome-panel__body</code>, <code>.m-sheet-header__sub</code></td><td>Three identical declarations of --text-caption / --leading-body / --color-text-secondary with no weight, spread across organisms.css:179, organisms.css:369 and molecules.css:150. All three are &#x27;one supporting sentence under a heading&#x27;.</td><td>Name the role once - a supporting-sentence recipe - and have the three reference it.</td><td>It crosses the molecule/organism boundary, which the codebase treats as load-bearing (see the Composition-law comment at molecules.css:70-76 about a rule reaching into a child&#x27;s insides going invisible to the parity gate). .m-sheet-header__sub also carries a b child rule (molecules.css:156, white-space: nowrap on the masked number) and a template-level hide (templates.css:66) that would have to travel with it or be orphaned.</td></tr>
-        <tr><td><code>.a-helper</code>, <code>.o-signup-sheet__note</code>, <code>.m-alert__body</code>, <code>.m-privacy__row</code></td><td>Four styles, one recipe: --text-caption2 / --leading-body / --color-text-secondary, no weight. atoms.css:227, organisms.css:294, molecules.css:120, molecules.css:272. This is the single largest duplicate cluster in the system.</td><td>Extract one caption2-secondary role and let the four reference it, keeping only what actually differs (display, margins, flex).</td><td>The four mean different things and three of them override the shared colour under state. .a-helper has three tone variants (atoms.css:233-237) that repaint colour AND weight; .m-alert__body has an --onDark repaint to --color-on-dark-mid (molecules.css:133); .m-privacy__row is a flex container, not a text block, and its 12px is on a row whose icon alignment depends on the line box. Collapsing the colour into a shared role would put the tone and onDark overrides at a different specificity than the base they are meant to beat - the exact failure the m-alert :not() comment (molecules.css:110-114) documents.</td></tr>
+        <tr><td><code>.a-helper</code>, <code>.o-signup-sheet__note</code>, <code>.m-alert__body</code>, <code>.m-privacy__row</code></td><td>Four styles, one recipe: --text-caption2 / --leading-body / --color-text-secondary, no weight. atoms.css:227, organisms.css:294, molecules.css:120, molecules.css:272. This is the single largest duplicate cluster in the system.</td><td>Extract one caption2-secondary role and let the four reference it, keeping only what actually differs (display, margins, flex).</td><td>The four mean different things and three of them override the shared colour under state. .a-helper has three tone variants (atoms.css:233-237) that repaint colour AND weight; .m-alert__body has an --onDark repaint to --color-on-dark-mid (molecules.css:133); .m-privacy__row is a flex container, not a text block, so its 12px is on a row whose icon alignment depends on the line box. Collapsing the colour into a shared role would put the tone and onDark overrides at a different specificity than the base they are meant to beat - the exact failure the m-alert :not() comment (molecules.css:110-114) documents.</td></tr>
         <tr><td><code>.m-sheet-header__title</code>, <code>.o-outcome-panel__clock</code>, <code>.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title</code></td><td>Three uses of --text-title at --weight-heavy / --tracking-snug, but only two set a line-height: the clock and the template override take --leading-tight, while .m-sheet-header__title (molecules.css:145) sets none and runs at UA normal.</td><td>Give all three --leading-tight so one 22px size has one leading, rather than two behaviours depending on which rule you land in.</td><td>This one changes rendering, not just structure. .m-sheet-header__title is a live production heading on every sheet stage; it currently wraps at roughly 1.2 and forcing 1.1 tightens every two-line stage heading, which is most visible at data-text=&#x27;large&#x27; where --text-title becomes 24px (tokens.css:434). Needs a look at every stage in both text modes before it is approved.</td></tr>
         <tr><td><code>.o-auth-hero__title</code>, <code>.m-brand-lockup__tag</code></td><td>The only two literal letter-spacing values in production CSS - -1.6px (organisms.css:79) and 1.5px (molecules.css:89) - and both carry a comment defending the exception. They are not near-duplicates of each other; they are the two holes in the tracking scale.</td><td>Rather than collapse them, name them (--tracking-hero, --tracking-lockup) so the scale accounts for its own exceptions and a stray literal remains visibly not one of these - the same argument the weight tokens make at tokens.css:227-229.</td><td>No rendering change, but the brand tag&#x27;s comment justifies 1.5px for &#x27;a 10px uppercase strapline&#x27; while the rule actually sets --text-micro, which is 11px (tokens.css:218) and 13px under Large text. Tokenising the value as-is would freeze an optic that was tuned for a size this rule no longer sets. Re-measure before naming it.</td></tr>
-        <tr><td><code>.a-progress</code>, <code>.m-figure__key</code>, <code>.m-brand-lockup__tag</code></td><td>Three uppercase micro-labels, three different size/weight/tracking triplets: --text-micro/bold/--tracking-caps (atoms.css:356), --text-nano/bold/--tracking-caps-wide (molecules.css:230), --text-micro/medium/1.5px (molecules.css:85). Nothing in the CSS explains why uppercase needs three recipes.</td><td>One uppercase-label recipe with a size modifier, so the tracking follows the size by rule rather than by hand.</td><td>They sit on three different grounds (--color-text-secondary, --color-text-tertiary, --color-on-dark-faint) and the lockup tag is a brand asset rather than a UI label - folding a wordmark&#x27;s strapline into a UI label recipe subordinates the mark to the interface, and its own comment says the em scale is wrong at that size. A shared recipe would also have to reconcile --tracking-caps (0.08em) against --tracking-caps-wide (0.16em), which currently track with size in the right direction.</td></tr>
+        <tr><td><code>.a-progress</code>, <code>.m-figure__key</code>, <code>.m-brand-lockup__tag</code></td><td>Three uppercase micro-labels, three different size/weight/tracking triplets: --text-micro/bold/--tracking-caps (atoms.css:356), --text-nano/bold/--tracking-caps-wide (molecules.css:230), --text-micro/medium/1.5px (molecules.css:85). Nothing in the CSS explains why uppercase needs three recipes.</td><td>One uppercase-label recipe with a size modifier, so the tracking follows the size by rule rather than by hand.</td><td>They sit on three different grounds (--color-text-secondary, --color-text-tertiary, --color-on-dark-faint) and the lockup tag is a brand asset rather than a UI label. Folding a wordmark&#x27;s strapline into a UI label recipe subordinates the mark to the interface. Its own comment says the em scale is wrong at that size. A shared recipe would also have to reconcile --tracking-caps (0.08em) against --tracking-caps-wide (0.16em), which currently track with size in the right direction.</td></tr>
         <tr><td><code>.t-device-frame:has(.o-signup-sheet[data-stage]) .o-auth-hero__title</code>, <code>.m-sheet-header__title</code></td><td>templates.css:24-29 restates --text-title / --leading-tight / --tracking-snug, which is .m-sheet-header__title&#x27;s recipe plus a leading. The template is hand-copying the size of the thing that is replacing the headline.</td><td>Have the override name the shared sheet-title role instead of restating three properties, so the demoted headline and the sheet heading cannot drift apart.</td><td>templates.css:24 is already a :has() state rule reaching from a template into an organism&#x27;s element. Making it depend on a molecule&#x27;s class deepens a cross-layer coupling the codebase explicitly polices - molecules.css:70-76 describes a rule of exactly this shape going invisible to the parity gate because the gate drops any rule whose classes do not all root into the manifest.</td></tr>
-        <tr><td><code>--text-display</code>, <code>--text-figure</code>, <code>--text-callout</code></td><td>Three ramp steps carry no font-size rule anywhere in the five production files. --text-callout appears once, in developer.css:194, which tokens.css marks &#x27;Not part of the product ... kept out of the atomic layers on purpose, so nobody ships it by accident&#x27;. --text-display and --text-figure appear only as label strings in the developer token reference (index.html:3988 and :3990).</td><td>Confirm whether the greeting/balance and filling screens ship from this CSS or only from engenxt-onboarding.html, then either wire the steps into real rules or retire them from the ramp.</td><td>--text-figure carries the longest justification in the tokens file (tokens.css:203-208): it was a raw 64px, and tokenising it was the fix that made the live litre count answer Large text. Retiring it would undo a deliberate accessibility decision, and both it and --text-display may be consumed by the other prototype file, which is outside this audit&#x27;s scope. Verify before touching.</td></tr>
+        <tr><td><code>--text-display</code>, <code>--text-figure</code>, <code>--text-callout</code></td><td>Three ramp steps carry no font-size rule anywhere in the five production files. --text-callout appears once, in developer.css:194, which tokens.css marks &#x27;Not part of the product ... kept out of the atomic layers on purpose, so nobody ships it by accident&#x27;. --text-display and --text-figure appear only as label strings in the developer token reference (index.html:3988 and :3990).</td><td>Confirm whether the greeting/balance and filling screens ship from this CSS or only from engenxt-onboarding.html, then either wire the steps into real rules or retire them from the ramp.</td><td>--text-figure carries the longest justification in the tokens file (tokens.css:203-208): it was a raw 64px. Tokenising it was the fix that made the live litre count answer Large text. Retiring it would undo a deliberate accessibility decision. Both it and --text-display may be consumed by the other prototype file, which is outside this audit&#x27;s scope. Verify before touching.</td></tr>
         <tr><td><code>.m-keyboard__digit</code>, <code>.m-keyboard__sub</code>, <code>.m-status-bar__time</code>, <code>.m-status-bar__net</code></td><td>Two policies for drawn OS chrome. The keyboard uses literals (21px, 9px) so it does not grow with app text, with a comment saying exactly that. The status bar is the same kind of drawn chrome but reads --text-body and --text-caption2, so its clock and &#x27;No service&#x27; word DO grow under data-text=&#x27;large&#x27;.</td><td>State one policy for simulated device chrome and apply it to both molecules, or write the divergence down so the next reader does not treat the status bar as a bug.</td><td>Do not resolve this by de-tokenising the status bar. .m-status-bar__net carries an explicit contrast fix (molecules.css:29-38) whose comment names Large text as &#x27;the mode a driver reading a phone in the sun turns on&#x27; and calls this &#x27;the one word telling them the phone has no signal&#x27;. Freezing it at 12px would reverse a deliberate legibility decision. If anything the keyboard is the correct exception and the status bar&#x27;s responsiveness is the correct behaviour, which means the right outcome here is documentation, not code.</td></tr>
       </tbody>
     </table>
@@ -413,18 +413,18 @@
 
   <h3>Spacing</h3>
   <p>
-    A 4px base — <code>--sp-1</code> through <code>--sp-8</code>, 4px to 32px — with
-    <strong>two</strong> half-steps, <code>--sp-1h</code> (6px) and <code>--sp-2h</code>
-    (10px), because both are structural here rather than exceptional. There is no 18:
-    gaps that composed to 18 and 20 sat close enough to the group step to read as noise
-    rather than meaning, and were removed. The tokens and their resolved values are in
+    A 4px base: <code>--sp-1</code> through <code>--sp-8</code>, 4px to 32px. <strong>Two</strong>
+    half-steps join it, <code>--sp-1h</code> (6px) and <code>--sp-2h</code>
+    (10px), because both are structural here rather than exceptional. There is no 18.
+    Gaps that composed to 18 and 20 sat close enough to the group step to read as noise
+    rather than meaning, so they were removed. The tokens and their resolved values are in
     the <a href="#foundations">Tokens</a> table under <em>Spacing</em>.
   </p>
 
   <h4>The semantic layer</h4>
   <p>
     Seven names for what a gap is <em>for</em>, each pointing at a step of the reference
-    scale rather than holding a value of its own. Nothing here can move a pixel: change
+    scale rather than holding a value of its own. Nothing here can move a pixel. Change
     what a job is worth and it is one edit, in one place.
   </p>
   <div class="ds-tablewrap">
@@ -443,7 +443,7 @@
   </div>
   <div class="ds-note">
     <strong>Adoption is deliberately partial.</strong> Each alias was taken from a rule that
-    already rendered that value for that reason — none is aspirational, and none renames a
+    already rendered that value for that reason. None is aspirational or renames a
     value it does not already have. The remaining <code>--sp-*</code> uses were left alone,
     because deciding which of two near-identical values is <em>intended</em> is a design
     review rather than a mechanical edit. Verified: every element on all 104 states,
@@ -455,7 +455,7 @@
     <li><strong>Gap, not margin,</strong> between children of a flex or grid container.</li>
     <li><strong>Container padding</strong> for internal boundaries.</li>
     <li>A component does not impose its own external margins; the parent layout owns the space between components.</li>
-    <li>Inner spacing is smaller than the spacing that groups things — proximity is what says what belongs together.</li>
+    <li>Inner spacing is smaller than the spacing that groups things. Proximity is what says what belongs together.</li>
   </ul>
 </section>
 
@@ -464,31 +464,31 @@
   <h2>Code primitives</h2>
   <p class="ds-lede">
     The rules that apply to bare elements, before any class exists. A primitive
-    has no name you can call — you get it by using the element. That makes this
-    the one layer a developer inherits without knowing it is there, so it is the
-    one most worth reading before you write anything.
+    has no name you can call. You get it by using the element. It's the one layer
+    a developer inherits without knowing it is there, so read it before you write
+    anything.
   </p>
   <p>
     All of it lives in <code>src/css/foundations.css</code>, inside
-    <code>@layer&nbsp;foundations</code> — second of eight, so every one of these
-    rules is beaten by any atom, molecule or screen that has an opinion, whatever
-    the specificity. A primitive sets the default. It never wins an argument.
+    <code>@layer&nbsp;foundations</code>. That's second of eight, so any atom,
+    molecule or screen with an opinion beats these rules whatever the specificity.
+    A primitive sets the default. It never wins an argument.
   </p>
 
   <h3>The reset</h3>
   <p>
     Three declarations, applied to everything including generated boxes. Border-box
-    means a width is the width you see, so a padded field still fits its column.
-    Zeroing margin and padding means every gap on the page was asked for by
-    somebody — there is no browser default quietly contributing.
+    makes a width the width you see, so a padded field still fits its column.
+    Zeroing margin and padding means somebody asked for every gap on the page. No
+    browser default is quietly contributing.
   </p>
   <pre class="ds-code">*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }</pre>
 
   <h3>The ground</h3>
   <p>
     <code>body</code> paints the page colour and sets the family and ink that
-    everything else inherits. It is the only place in the system that names a
-    font family; every other rule inherits it or is a bug.
+    everything else inherits. It's the only place in the system that names a font
+    family. Every other rule inherits it or is a bug.
   </p>
   <pre class="ds-code">body {
   min-height: 100vh;
@@ -498,20 +498,20 @@
   color: var(--color-text-primary);
 }</pre>
   <p>
-    Form controls do not inherit type from their parent — browsers give them a
-    system face instead — so the inheritance is repaired explicitly, and
-    <code>button</code> is stripped back to a plain box so that every button on
-    the page gets its appearance from a class rather than from the user agent.
+    Form controls don't inherit type from their parent. Browsers hand them a system
+    face instead, so the inheritance is repaired here by hand. <code>button</code>
+    is stripped back to a plain box as well. Every button on the page then takes
+    its appearance from a class rather than from the user agent.
   </p>
   <pre class="ds-code">input, button, a { font-family: inherit; }
 button { background: none; border: none; color: inherit; }</pre>
 
   <h3>The focus ring</h3>
   <p>
-    One ring for the entire system, and it is two-tone on purpose. The dark core
-    reads against the white sheet; the light halo around it reads against the
-    near-black hero. A single-colour ring would disappear on one of the two, and
-    the sign-up flow uses both.
+    One ring for the entire system, two-tone on purpose. The dark core reads
+    against the white sheet. The light halo around it reads against the near-black
+    hero. A single-colour ring would disappear on one of the two. The sign-up flow
+    uses both.
   </p>
   <pre class="ds-code">:focus-visible {
   outline: 3px solid var(--color-focus);
@@ -521,13 +521,13 @@ button { background: none; border: none; color: inherit; }</pre>
   <p>
     <code>:focus-visible</code> rather than <code>:focus</code>, so the ring
     appears for a keyboard and not for a tap. Never remove it from a component.
-    If it looks wrong on something you are building, the something is too tight
-    against its neighbour — give it room rather than taking the ring away.
+    If it looks wrong on something you're building, that thing sits too tight
+    against its neighbour. Give it room instead of taking the ring away.
   </p>
   <div class="ds-spec">
     <div class="ds-spec__head">
       <span class="ds-spec__name">:focus-visible</span>
-      <span>Press Tab to move through these — the ring is the real one, from the production CSS</span>
+      <span>Press Tab through these. The ring is the real one, from the production CSS</span>
     </div>
     <div class="ds-spec__stage">
       <button type="button" class="a-btn a-btn--primary">Continue</button>
@@ -543,76 +543,75 @@ button { background: none; border: none; color: inherit; }</pre>
 
   <h3>Hiding</h3>
   <p>
-    <code>[hidden]</code> is forced to <code>display: none</code>. This is the one
-    <code>!important</code> in the foundations layer and it earns its place: a
+    <code>[hidden]</code> is forced to <code>display: none</code>. It's the one
+    <code>!important</code> in the foundations layer and it earns the place. A
     hidden child of a flex row still takes its share of the <code>gap</code> if
-    something else set it to <code>display: flex</code>, which leaves a hole
-    nobody can see the cause of.
+    something else set it to <code>display: flex</code>. That leaves a hole with
+    no visible cause.
   </p>
   <pre class="ds-code">[hidden] { display: none !important; }</pre>
   <p>
-    Use the attribute, not a class. Hiding is state, and
-    <a href="#contributing">state is never a class</a> here.
+    Use the attribute, not a class. Hiding is state. Here,
+    <a href="#contributing">state is never a class</a>.
   </p>
 
   <h3>The nudge</h3>
   <p>
-    A wrong entry shakes the control the driver can actually correct — the field,
-    not the screen. Moving the whole column moves the parts that are fine too,
-    which reads as "everything is wrong" when one thing is.
+    A wrong entry shakes the control the driver can actually correct: the field,
+    not the screen. Moving the whole column moves the parts that are fine too.
+    That reads as "everything is wrong" when one thing is.
   </p>
   <pre class="ds-code">[data-shake="true"] { animation: shakeX var(--dur-slow) ease; }</pre>
   <div class="ds-note">
     <strong>Why it is on the field and not the card.</strong> Two animations on
     one element share one <code>animation</code> shorthand. When the shake
     finished, the shorthand fell back to the card's <code>stageIn</code> and
-    replayed the entrance — field, helper, card and button faded out and floated
-    back up half a second after the error appeared. Different elements, no shared
-    property, no replay. If you ever add a second animation to an element that
-    already has one, this is the trap.
+    replayed the entrance. Field, helper, card and button faded out then floated
+    back up, half a second after the error appeared. Different elements, no shared
+    property, no replay. Adding a second animation to an element that already has
+    one is the trap.
   </div>
 
   <h3>Motion</h3>
   <p>
     Every keyframe in the system is declared here, so a component can reach for
-    an existing movement instead of inventing a near-copy. Read out of the live
-    stylesheet below, at a fixed demo duration — in the product each one plays at
-    its own duration token.
+    an existing movement instead of inventing a near-copy. The list below is read
+    out of the live stylesheet at a fixed demo duration. In the product each one
+    plays at its own duration token.
   </p>
   <div id="dsMotion"></div>
   <p>
     Durations and easings are tokens, not numbers:
-    <code>--dur-fast</code> through <code>--dur-slow</code>, and four easings.
+    <code>--dur-fast</code> through <code>--dur-slow</code>, plus four easings.
     <code>--ease-out</code> is the default for anything arriving,
-    <code>--ease-emphasis</code> for the sheet, <code>--ease-spring</code> only
-    where an overshoot is wanted. Full values are in
+    <code>--ease-emphasis</code> is for the sheet and <code>--ease-spring</code>
+    is only for where an overshoot is wanted. Full values are in
     <a href="#foundations">Tokens</a> under Duration and Easing.
   </p>
 
   <h4>Reduced motion is honoured twice</h4>
   <p>
-    Once for the operating system setting, and once for the demo toggle in the
-    developer panel — because a stakeholder watching on a borrowed laptop cannot
-    change the OS preference, and the flow still has to be reviewable with the
-    movement off.
+    Once for the operating system setting. Once for the demo toggle in the
+    developer panel. A stakeholder watching on a borrowed laptop can't change the
+    OS preference, but the flow still has to be reviewable with the movement off.
   </p>
   <pre class="ds-code">@media (prefers-reduced-motion: reduce) { /* … */ }
 [data-motion="reduced"] *, [data-motion="reduced"] *::before, … { /* … */ }</pre>
   <p>
     Both collapse animation and transition to <code>0.001ms</code> rather than
-    <code>0</code>, so anything waiting on a <code>transitionend</code> or
-    <code>animationend</code> event still receives it and the flow does not stall.
+    <code>0</code>. Anything waiting on a <code>transitionend</code> or
+    <code>animationend</code> event still receives it, so the flow doesn't stall.
     Both reset <code>animation-delay</code> and
-    <code>animation-iteration-count</code> too, so a staggered entrance does not
-    leave the last element invisible for half a second and a loop does not run
-    forever at a millisecond a turn.
+    <code>animation-iteration-count</code> too. A staggered entrance won't leave
+    the last element invisible for half a second. A loop won't run forever at a
+    millisecond a turn.
   </p>
   <div class="ds-note">
-    Because they are <code>!important</code> and apply to every element, a new
-    component gets reduced-motion support for free. You do not need to write
-    anything. You <em>do</em> need to make sure the end state is the readable one:
-    if an element animates <em>in</em> from <code>opacity: 0</code>, it must not
-    be left at zero when the animation is skipped.
+    They are <code>!important</code> and apply to every element, so a new
+    component gets reduced-motion support for free. You write nothing. You
+    <em>do</em> need the end state to be the readable one: if an element animates
+    <em>in</em> from <code>opacity: 0</code>, it must not be left at zero when the
+    animation is skipped.
   </div>
 </section>
 
@@ -621,8 +620,8 @@ button { background: none; border: none; color: inherit; }</pre>
   <h2>Atoms</h2>
   <p>
     <strong><b data-count="atoms">13</b> atom blocks exist in <code>src/css/atoms.css</code>; ten are rendered
-    below.</strong> Twelve appear in the sign-up page's markup and the thirteenth,
-    <code>a-otp-cell</code>, is created by script — it is shown here inside the
+    below.</strong> Twelve appear in the sign-up page's markup. The thirteenth,
+    <code>a-otp-cell</code>, is created by script, so it is shown here inside the
     <code>m-otp-group</code> specimen. Four have no specimen yet:
     <code>a-spinner</code>, <code>a-scrim</code>, <code>a-notch</code> and
     <code>a-toast</code>. Every specimen below is the real element with the real
@@ -641,9 +640,9 @@ button { background: none; border: none; color: inherit; }</pre>
   </div>
   <p>
     <strong>Internal padding</strong> comes from <code>--size-control</code> as a minimum
-    height, not from vertical padding, so a wrapped label cannot shrink the target.
+    height, not from vertical padding. A wrapped label therefore can't shrink the target.
     <strong>Press</strong> is <code>--press-firm</code>. <strong>Accessibility:</strong>
-    disabled uses <code>aria-disabled</code> rather than the attribute, so the control keeps
+    disabled uses <code>aria-disabled</code> instead of the attribute, so the control keeps
     its place in the focus order and can still explain itself.
   </p>
 
@@ -674,22 +673,22 @@ button { background: none; border: none; color: inherit; }</pre>
     <strong>The field is a <code>&lt;label&gt;</code>, not a <code>&lt;span&gt;</code>.</strong>
     That is what makes the whole 56px box focus the input when a thumb lands anywhere on
     it. Geometry was tried first and was the wrong tool. In the sign-up flow the same
-    element also carries <code>m-phone-field</code> — both classes on one element, because
-    the field supplies the box and the molecule supplies the country prefix inside it.
+    element also carries <code>m-phone-field</code>. Both classes sit on one element: the
+    field supplies the box, the molecule supplies the country prefix inside it.
   </p>
   <p>
     The label is persistent, never a placeholder. The error message sits directly under the
-    control it belongs to, and the field carries <code>data-state="error"</code>.
+    control it belongs to. The field itself carries <code>data-state="error"</code>.
   </p>
   <div class="ds-note">
     <strong>What the error state actually changes: border colour and background, both
-    colour.</strong> The non-colour cue is not the border width — the border is
-    <code>--size-border</code> in every state. It is the glyph the helper gains beneath
-    the field, and the shake on the control itself. Under
+    colour.</strong> The non-colour cue isn't the border width. The border is
+    <code>--size-border</code> in every state. The cue is the glyph the helper gains beneath
+    the field plus the shake on the control itself. Under
     <code>@media (forced-colors: active)</code>, where every colour is discarded, the field
     restates itself structurally with <code>outline: 2px dashed</code>
-    (<code>atoms.css</code>) — solid for valid, dashed for error. That branch is what keeps
-    the state readable when colour is gone, and it is required by the build gate.
+    (<code>atoms.css</code>): solid for valid, dashed for error. That branch keeps the state
+    readable when colour is gone. The build gate requires it.
   </div>
 
   <h3>a-icon-wrap</h3>
@@ -705,9 +704,9 @@ button { background: none; border: none; color: inherit; }</pre>
     <div class="ds-spec__foot"></div>
   </div>
   <p>
-    A fill, not an outline. The atom declares no <code>color</code>, deliberately: the glyph
-    takes the ink of whatever row it is placed in, which is why a parent setting its colour
-    is composition rather than an override.
+    A fill, not an outline. The atom sets no <code>color</code>, deliberately. The glyph
+    takes the ink of whatever row it sits in, so a parent setting its colour is composition
+    rather than an override.
   </p>
 
   <h3>a-spinner, a-handle, a-progress</h3>
@@ -755,8 +754,8 @@ button { background: none; border: none; color: inherit; }</pre>
   </div>
   <p>
     The close control is a 36px circle with the glyph centred in it and its own edge on the
-    gutter. Its 48px target is drawn out from a pseudo-element downward and sideways only,
-    because the sheet's scroller clips above it and a clipped region is not pressable.
+    gutter. A pseudo-element draws its 48px target outward, downward and sideways only. The
+    sheet's scroller clips above it. A clipped region isn't pressable.
   </p>
 
   <h3>m-alert</h3>
@@ -829,7 +828,7 @@ button { background: none; border: none; color: inherit; }</pre>
     </div>
     <div class="ds-spec__foot"></div>
   </div>
-  <p>A paragraph made a reader hold five sentences at once; a row asks for one glance each. The icons are decorative and hidden from assistive technology — each repeats a word already in its row.</p>
+  <p>A paragraph made a reader hold five sentences at once; a row asks for one glance each. The icons are decorative and hidden from assistive technology. Each one repeats a word already in its row.</p>
 </section>
 
 <!-- ═════════════════════════════════════════════════════════ ORGANISMS -->
@@ -838,19 +837,18 @@ button { background: none; border: none; color: inherit; }</pre>
   <p>
     <b data-count="organisms">4</b> on this page: <code>o-auth-hero</code>, <code>o-signup-sheet</code>,
     <code>o-status-page</code> and <code>o-outcome-panel</code>. They are full screens
-    rather than sections, which is discussed under <a href="#limitations">Decisions</a>.
+    rather than sections. <a href="#limitations">Decisions</a> covers why.
   </p>
   <p>
-    They are not reproduced as specimens here. An organism in this product is a whole
-    screen that positions itself absolutely inside the device frame and shows or hides on
-    <code>data-state</code> — rendering one inside a documentation page would either
-    require faking the frame or would cover the page. The honest way to see them is the
-    real thing: open <code>index.html</code> and use the state rail, which lists all 43
-    states and deep-links to each.
+    There are no specimens here. An organism in this product is a whole screen. It positions
+    itself absolutely inside the device frame and shows or hides on <code>data-state</code>,
+    so rendering one inside a documentation page would mean faking the frame or covering the
+    page. Open <code>index.html</code> instead. The state rail lists all 43 states and
+    deep-links to each.
   </p>
   <div class="ds-note">
     <strong>Ownership.</strong> All four are product-specific. Nothing in the organism layer
-    is shared between the two pages today — the shared core is tokens, foundations and the
+    is shared between the two pages today. The shared core is tokens, foundations and the
     atom library.
   </div>
 </section>
@@ -859,28 +857,27 @@ button { background: none; border: none; color: inherit; }</pre>
 <section class="ds-section" id="templates">
   <h2>Templates</h2>
   <p>
-    <b data-count="templates">2</b> blocks: <code>t-device-frame</code>, the phone, and
-    <code>p-signup-demo</code>, the page it stands on. A template owns structure and
-    arrangement; it never owns content, routing or application state.
+    <b data-count="templates">2</b> blocks: <code>t-device-frame</code> (the phone) and
+    <code>p-signup-demo</code> (the page it stands on). A template owns structure and
+    arrangement. It never owns content, routing or application state.
   </p>
   <h3>t-device-frame</h3>
   <p>
-    The phone. It owns the viewport the product is designed against — 390×844 by default,
-    with 375, 360 and 320 available as a stress test — and it is the containing block every
+    The phone. It owns the viewport the product is designed against (390×844 by default,
+    with 375, 360 and 320 available as a stress test) and it is the containing block every
     screen positions itself against.
   </p>
   <p>
     It is also the one parent allowed to change what its children are, because it is the
-    hardware: at the Android width the notch becomes a pill, and when the keyboard is up
-    the sheet squares its corners and the hero's title steps down a size. A component
-    cannot carry a modifier for that, because it is not the component's fact.
+    hardware. At the Android width the notch becomes a pill. When the keyboard is up the
+    sheet squares its corners and the hero's title steps down a size. A component can't carry
+    a modifier for that. It isn't the component's fact.
   </p>
   <div class="ds-note">
     <strong>Honest limit.</strong> <code>t-device-frame</code> is content-agnostic, which is
-    half of Frost's definition of a template, but it does not articulate a screen's content
-    structure. The second page has a real <code>t-screen</code> template; this page does not
-    yet need one, because it has a single sheet over a hero rather than twelve screens
-    repeating a skeleton.
+    half of Frost's definition of a template, but it doesn't articulate a screen's content
+    structure. The second page has a real <code>t-screen</code> template. This page doesn't
+    need one yet: it has a single sheet over a hero, not twelve screens repeating a skeleton.
   </div>
 </section>
 
@@ -888,9 +885,9 @@ button { background: none; border: none; color: inherit; }</pre>
 <section class="ds-section" id="screens">
   <h2>Pages and screens</h2>
   <p class="ds-lede">
-    A screen is a template with real content in it. Page and screen are the same level here,
-    not two — the <code>p-</code> class is the demo harness the phone stands on, not a
-    product surface.
+    A screen is a template with real content in it. Page and screen are one level here, not
+    two. The <code>p-</code> class is the demo harness the phone stands on, not a product
+    surface.
   </p>
   <p>
     <b data-count="states-signup">43</b> states in the sign-up flow and
@@ -899,9 +896,9 @@ button { background: none; border: none; color: inherit; }</pre>
 
   <h3>How the sign-up surfaces stack</h3>
   <p>
-    They are not a partition — they sit on top of one another, so counting how many states
-    each <em>appears</em> in gives a total far above 43. Measured by walking all 43 states
-    in a browser and recording which organisms are actually visible:
+    They are not a partition. They stack, so counting the states each one <em>appears</em>
+    in gives a total well above 43. Measured by walking all 43 states in a browser and
+    recording which organisms are visible:
   </p>
   <div class="ds-tablewrap">
     <table class="ds-table">
@@ -914,80 +911,80 @@ button { background: none; border: none; color: inherit; }</pre>
     </table>
   </div>
   <p>
-    <strong>2 + 3 + 38 = 43.</strong> The hero is behind every state and is the screen in
-    only two of them — <code>#home/default</code> and <code>#home/offline</code>. The status
+    <strong>2 + 3 + 38 = 43.</strong> The hero sits behind every state. It is the screen in
+    only two of them: <code>#home/default</code> and <code>#home/offline</code>. The status
     page covers it in three. The sheet covers it in the other thirty-eight.
   </p>
   <div class="ds-note">
     <strong><code>o-outcome-panel</code> is not a screen.</strong> It has no base rule in
-    <code>organisms.css</code> and never sets <code>position</code>; it is a stage
+    <code>organisms.css</code> and never sets <code>position</code>. It's a stage
     <em>inside</em> the sheet's scroll area, laid out by
     <code>.o-signup-sheet__stage</code>. Across all 43 states it never once appears without
-    <code>o-signup-sheet</code>. It carries 11 of the sheet's 38 — the three
+    <code>o-signup-sheet</code>. It carries 11 of the sheet's 38: the three
     <code>blocked/</code>, two <code>success/</code> and six <code>biometrics/</code>
-    states. It was listed here as a fourth screen on <code>t-device-frame</code>, which
-    stated a containment that does not exist.
+    states. It was listed here as a fourth screen on <code>t-device-frame</code>, a
+    containment that does not exist.
   </div>
 
   <h3>The app</h3>
   <p>
     Thirteen screens, all in <code>engenxt-onboarding.html</code>, all still styled by that
     page's inline CSS rather than by <code>src/css</code>. Not migrated is a status, not a
-    reason to leave a screen unnamed — the ids and the states are readable from the file as
-    it stands, so they are named here.
+    reason to leave a screen unnamed. The ids and the states read straight out of the file
+    as it stands, so they are named here.
   </p>
   <div class="ds-tablewrap">
     <table class="ds-table">
       <thead><tr><th>Screen</th><th>Organism</th><th>States</th><th>Molecules</th><th>Atoms</th><th>Content and action hierarchy</th></tr></thead>
       <tbody>
-        <tr><td><strong>Scan the disc or plate</strong><br><code>scanScreen</code></td><td><code>o-scan</code></td><td class="ds-num">17</td><td><code>m-scan-note</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outlineOnDark</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>A full-bleed o-scan__view camera stage carrying the a-scan-frame and its sweeping line with the a-shutter beneath, an m-scan-note that names what went wrong, an o-scan__typePanel for entering the plate by hand, and an o-scan__actions stack of primary retry/settings/use-this-vehicle over the on-dark alternates and &quot;Ask your manager&quot;.</td></tr>
-        <tr><td><strong>Home</strong><br><code>homeScreen</code></td><td><code>o-home</code></td><td class="ds-num">12</td><td><code>m-app-bar</code>, <code>m-brand-lockup</code>, <code>m-stat-pill</code>, <code>m-linked</code> <span class="ds-more">+5</span></td><td><code>a-avatar</code>, <code>a-badge</code>, <code>a-btn</code>, <code>a-btn--primary</code> <span class="ds-more">+4</span></td><td>m-app-bar with the m-brand-lockup, bell and avatar over the o-home__greeting and the driver&#x27;s name, then the o-home__panel balance (points and worth) with m-stat-pill figures, the m-vehicle-card or m-vehicle-picker or the m-empty-note &quot;No vehicle assigned&quot;, an m-live-bar when a fill is open, and the primary &quot;I want to fuel&quot; pinned in o-home__action at the thumb; the o-tab-bar stays via paintTabs(&#x27;home&#x27;) at line 5917.</td></tr>
-        <tr><td><strong>Step (account, vehicle, location, odometer)</strong><br><code>stepScreen</code></td><td><code>o-step</code></td><td class="ds-num">10</td><td><code>m-vehicle-picker</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+1</span></td><td>A back chevron in o-step__bar above the o-step__mark, a JS-set title and body, an o-step__group the step builds itself (an o-step__field with its o-step__err for odometer, the m-vehicle-picker for vehicle), and an o-step__actions block of primary, outline, quiet-Back and tertiary buttons whose labels each step supplies.</td></tr>
-        <tr><td><strong>Filling (live pump)</strong><br><code>fillingScreen</code></td><td><code>o-filling</code></td><td class="ds-num">4</td><td>—</td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>An o-filling__stage vessel whose liquid and wave rise on --fill-level with the litres counting inside it, the o-filling__facts line beneath (plate, station, cap), an o-filling__note that changes with the fault, and an action block that swaps between outline &quot;Show fuel code again&quot;, outline &quot;Message Engen support&quot;, quiet &quot;Close live view&quot; and the primary &quot;See your points&quot;.</td></tr>
-        <tr><td><strong>Stations map and sheet</strong><br><code>stationsScreen</code></td><td><code>o-stations</code></td><td class="ds-num">4</td><td><code>m-search</code>, <code>m-station-head</code>, <code>m-deals</code>, <code>m-station</code> <span class="ds-more">+1</span></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-btn--sm</code> <span class="ds-more">+7</span></td><td>An o-stations__map plane with its o-stations__plan, runtime a-pin markers and an o-stations__locate a-here control under the bar, and a draggable o-stations__sheet (a-handle) that carries either o-stations__browse — m-search, sort a-filter-chip, the m-station radiogroup, and the o-stations__empty fallback with &quot;Search another area&quot; and &quot;Message my manager&quot; — or one station&#x27;s m-station-head detail with m-deals, primary &quot;Choose this station&quot; and outline &quot;Get directions&quot;.</td></tr>
-        <tr><td><strong>Check before the code</strong><br><code>checkScreen</code></td><td><code>o-check</code></td><td class="ds-num">4</td><td><code>m-verdict</code>, <code>m-fact</code>, <code>m-check</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code></td><td>A back bar over the m-verdict mark, the station name h1 and its o-check__km distance, the lead &quot;Checked before every fill&quot;, the vehicle plate and model, the m-fact rows and the runtime o-check__checks list of m-check lines with the o-check__why note, then primary &quot;Show fuel code&quot; when clear or outline &quot;Choose another station&quot; with o-check__alt alternates when not.</td></tr>
-        <tr><td><strong>Rewards</strong><br><code>rewardsScreen</code></td><td><code>o-rewards</code></td><td class="ds-num">3</td><td><code>m-screen-bar</code>, <code>m-confirm</code>, <code>m-bundle</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-icon-btn</code>, <code>a-quiet-link</code> <span class="ds-more">+2</span></td><td>m-screen-bar and a-screen-title &quot;Rewards&quot; over the o-rewards__balanceCard (points and their worth in mobile data), then the lead &quot;Use your points&quot; and a runtime list of m-bundle rows each with a Get-it action, with the m-confirm dialog (#spendConfirm) laid over for the spend and the o-rewards__earnNote naming the destination number.</td></tr>
-        <tr><td><strong>Fuel code (QR)</strong><br><code>fuelScreen</code></td><td><code>o-fuel</code></td><td class="ds-num">2</td><td><code>m-place</code>, <code>m-fuel-figures</code>, <code>m-fallback</code>, <code>m-confirm</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>An o-fuel__bar over the o-fuel__title with its success o-fuel__tick, the lead &quot;Show this code to the attendant&quot;, the m-place station pin, the a-qr with its m-fallback typed digits and the m-fuel-figures cells, then outline &quot;Hide code&quot; and a quiet &quot;Cancel this request&quot; guarded by the m-confirm dialog (#fuelConfirm) with &quot;Keep it&quot; / &quot;Cancel it&quot;.</td></tr>
-        <tr><td><strong>Sign-up reward</strong><br><code>rewardScreen</code></td><td><code>o-onboard o-onboard--reward</code></td><td class="ds-num">1</td><td><code>m-earn-row</code>, <code>m-reward-goal</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-confetti</code>, <code>a-icon-wrap</code> <span class="ds-more">+3</span></td><td>Eyebrow &quot;Sign-up complete&quot; over the h1 &quot;You&#x27;re signed up&quot;, then the counting a-medal with its m-earn-row points pill and the m-reward-goal meter below it, resolving to one primary Continue in o-onboard__actions.</td></tr>
-        <tr><td><strong>Points earned</strong><br><code>earnedScreen</code></td><td><code>o-onboard o-onboard--reward</code></td><td class="ds-num">1</td><td><code>m-earn-row</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-confetti</code>, <code>a-icon-wrap</code> <span class="ds-more">+3</span></td><td>Eyebrow &quot;Fill complete&quot; over the h1 &quot;524 points earned&quot;, the same a-medal and m-earn-row pay-off, then primary &quot;See receipt&quot; with a quiet &quot;Done&quot; beneath it.</td></tr>
-        <tr><td><strong>Receipt</strong><br><code>receiptScreen</code></td><td><code>o-receipt</code></td><td class="ds-num">1</td><td><code>m-slip-row</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-screen-title</code></td><td>a-screen-title &quot;Receipt&quot; and the o-receipt__when timestamp above a single o-receipt__card of m-slip-row facts, closing on primary &quot;Done&quot;, outline &quot;Send to my manager&quot; and the o-receipt__filed note &quot;Saved in History.&quot;</td></tr>
-        <tr><td><strong>Fuel history</strong><br><code>historyScreen</code></td><td><code>o-history</code></td><td class="ds-num">1</td><td><code>m-screen-bar</code>, <code>m-empty-note</code>, <code>m-empty-note--history</code>, <code>m-slip-row</code></td><td><code>a-icon-btn</code>, <code>a-screen-title</code></td><td>m-screen-bar and a-screen-title &quot;Fuel history&quot; over an o-history__list filled at runtime with m-slip-row receipt cards, falling back to the m-empty-note &quot;No fills yet&quot;; the o-tab-bar stays and marks itself via paintTabs(&#x27;history&#x27;) at line 7932.</td></tr>
-        <tr><td><strong>Account</strong><br><code>accountScreen</code></td><td><code>o-account</code></td><td class="ds-num">1</td><td><code>m-screen-bar</code></td><td><code>a-btn</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code>, <code>a-screen-title</code> <span class="ds-more">+1</span></td><td>m-screen-bar and a-screen-title &quot;Account&quot; over o-account__row entries (vehicle count, the Face ID a-switch with its explanatory sub-line), ending in the outline &quot;Sign out&quot; in o-account__out; the o-tab-bar stays via paintTabs(&#x27;account&#x27;) at line 7909.</td></tr>
+        <tr><td><strong>Scan the disc or plate</strong><br><code>scanScreen</code></td><td><code>o-scan</code></td><td class="ds-num">17</td><td><code>m-scan-note</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outlineOnDark</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>A full-bleed o-scan__view camera stage carries the a-scan-frame and its sweeping line, with the a-shutter beneath. An m-scan-note names what went wrong. An o-scan__typePanel takes the plate by hand. The o-scan__actions stack puts primary retry/settings/use-this-vehicle over the on-dark alternates and &quot;Ask your manager&quot;.</td></tr>
+        <tr><td><strong>Home</strong><br><code>homeScreen</code></td><td><code>o-home</code></td><td class="ds-num">12</td><td><code>m-app-bar</code>, <code>m-brand-lockup</code>, <code>m-stat-pill</code>, <code>m-linked</code> <span class="ds-more">+5</span></td><td><code>a-avatar</code>, <code>a-badge</code>, <code>a-btn</code>, <code>a-btn--primary</code> <span class="ds-more">+4</span></td><td>m-app-bar with the m-brand-lockup, bell and avatar sits over the o-home__greeting and the driver&#x27;s name. Below it the o-home__panel balance (points and worth) shows m-stat-pill figures, then the m-vehicle-card or m-vehicle-picker or the m-empty-note &quot;No vehicle assigned&quot;, plus an m-live-bar when a fill is open. The primary &quot;I want to fuel&quot; is pinned in o-home__action at the thumb. The o-tab-bar stays via paintTabs(&#x27;home&#x27;) at line 5917.</td></tr>
+        <tr><td><strong>Step (account, vehicle, location, odometer)</strong><br><code>stepScreen</code></td><td><code>o-step</code></td><td class="ds-num">10</td><td><code>m-vehicle-picker</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+1</span></td><td>A back chevron in o-step__bar above the o-step__mark, then a JS-set title and body. The step builds its own o-step__group (an o-step__field with its o-step__err for odometer, the m-vehicle-picker for vehicle). The o-step__actions block holds primary, outline, quiet-Back and tertiary buttons whose labels each step supplies.</td></tr>
+        <tr><td><strong>Filling (live pump)</strong><br><code>fillingScreen</code></td><td><code>o-filling</code></td><td class="ds-num">4</td><td>none</td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>An o-filling__stage vessel whose liquid and wave rise on --fill-level, with the litres counting inside it. The o-filling__facts line beneath carries plate, station and cap. An o-filling__note changes with the fault. The action block swaps between outline &quot;Show fuel code again&quot;, outline &quot;Message Engen support&quot;, quiet &quot;Close live view&quot; and the primary &quot;See your points&quot;.</td></tr>
+        <tr><td><strong>Stations map and sheet</strong><br><code>stationsScreen</code></td><td><code>o-stations</code></td><td class="ds-num">4</td><td><code>m-search</code>, <code>m-station-head</code>, <code>m-deals</code>, <code>m-station</code> <span class="ds-more">+1</span></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-btn--sm</code> <span class="ds-more">+7</span></td><td>An o-stations__map plane with its o-stations__plan, runtime a-pin markers and an o-stations__locate a-here control under the bar. Beneath it a draggable o-stations__sheet (a-handle) carries either o-stations__browse (m-search, sort a-filter-chip, the m-station radiogroup, plus the o-stations__empty fallback with &quot;Search another area&quot; and &quot;Message my manager&quot;) or one station&#x27;s m-station-head detail with m-deals, primary &quot;Choose this station&quot; and outline &quot;Get directions&quot;.</td></tr>
+        <tr><td><strong>Check before the code</strong><br><code>checkScreen</code></td><td><code>o-check</code></td><td class="ds-num">4</td><td><code>m-verdict</code>, <code>m-fact</code>, <code>m-check</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code></td><td>A back bar over the m-verdict mark, the station name h1 and its o-check__km distance. Then the lead &quot;Checked before every fill&quot;, the vehicle plate and model, the m-fact rows and the runtime o-check__checks list of m-check lines with the o-check__why note. It ends on primary &quot;Show fuel code&quot; when clear, or outline &quot;Choose another station&quot; with o-check__alt alternates when not.</td></tr>
+        <tr><td><strong>Rewards</strong><br><code>rewardsScreen</code></td><td><code>o-rewards</code></td><td class="ds-num">3</td><td><code>m-screen-bar</code>, <code>m-confirm</code>, <code>m-bundle</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-icon-btn</code>, <code>a-quiet-link</code> <span class="ds-more">+2</span></td><td>m-screen-bar and a-screen-title &quot;Rewards&quot; over the o-rewards__balanceCard (points and their worth in mobile data). Then the lead &quot;Use your points&quot; and a runtime list of m-bundle rows, each with a Get-it action. The m-confirm dialog (#spendConfirm) lays over the top for the spend. The o-rewards__earnNote names the destination number.</td></tr>
+        <tr><td><strong>Fuel code (QR)</strong><br><code>fuelScreen</code></td><td><code>o-fuel</code></td><td class="ds-num">2</td><td><code>m-place</code>, <code>m-fuel-figures</code>, <code>m-fallback</code>, <code>m-confirm</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code> <span class="ds-more">+2</span></td><td>An o-fuel__bar over the o-fuel__title with its success o-fuel__tick, then the lead &quot;Show this code to the attendant&quot; and the m-place station pin. Below them the a-qr with its m-fallback typed digits and the m-fuel-figures cells. It closes on outline &quot;Hide code&quot; and a quiet &quot;Cancel this request&quot;, guarded by the m-confirm dialog (#fuelConfirm) with &quot;Keep it&quot; / &quot;Cancel it&quot;.</td></tr>
+        <tr><td><strong>Sign-up reward</strong><br><code>rewardScreen</code></td><td><code>o-onboard o-onboard--reward</code></td><td class="ds-num">1</td><td><code>m-earn-row</code>, <code>m-reward-goal</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-confetti</code>, <code>a-icon-wrap</code> <span class="ds-more">+3</span></td><td>Eyebrow &quot;Sign-up complete&quot; over the h1 &quot;You&#x27;re signed up&quot;. Then the counting a-medal with its m-earn-row points pill, the m-reward-goal meter below it. It resolves to one primary Continue in o-onboard__actions.</td></tr>
+        <tr><td><strong>Points earned</strong><br><code>earnedScreen</code></td><td><code>o-onboard o-onboard--reward</code></td><td class="ds-num">1</td><td><code>m-earn-row</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-confetti</code>, <code>a-icon-wrap</code> <span class="ds-more">+3</span></td><td>Eyebrow &quot;Fill complete&quot; over the h1 &quot;524 points earned&quot;, with the same a-medal and m-earn-row pay-off. Then primary &quot;See receipt&quot; and a quiet &quot;Done&quot; beneath it.</td></tr>
+        <tr><td><strong>Receipt</strong><br><code>receiptScreen</code></td><td><code>o-receipt</code></td><td class="ds-num">1</td><td><code>m-slip-row</code></td><td><code>a-btn</code>, <code>a-btn--primary</code>, <code>a-btn--outline</code>, <code>a-screen-title</code></td><td>a-screen-title &quot;Receipt&quot; and the o-receipt__when timestamp above a single o-receipt__card of m-slip-row facts. It closes on primary &quot;Done&quot;, outline &quot;Send to my manager&quot; and the o-receipt__filed note &quot;Saved in History.&quot;</td></tr>
+        <tr><td><strong>Fuel history</strong><br><code>historyScreen</code></td><td><code>o-history</code></td><td class="ds-num">1</td><td><code>m-screen-bar</code>, <code>m-empty-note</code>, <code>m-empty-note--history</code>, <code>m-slip-row</code></td><td><code>a-icon-btn</code>, <code>a-screen-title</code></td><td>m-screen-bar and a-screen-title &quot;Fuel history&quot; over an o-history__list filled at runtime with m-slip-row receipt cards. Empty, it falls back to the m-empty-note &quot;No fills yet&quot;. The o-tab-bar stays and marks itself via paintTabs(&#x27;history&#x27;) at line 7932.</td></tr>
+        <tr><td><strong>Account</strong><br><code>accountScreen</code></td><td><code>o-account</code></td><td class="ds-num">1</td><td><code>m-screen-bar</code></td><td><code>a-btn</code>, <code>a-btn--outline</code>, <code>a-icon-btn</code>, <code>a-screen-title</code> <span class="ds-more">+1</span></td><td>m-screen-bar and a-screen-title &quot;Account&quot; over o-account__row entries (vehicle count, the Face ID a-switch with its explanatory sub-line). It ends in the outline &quot;Sign out&quot; in o-account__out. The o-tab-bar stays via paintTabs(&#x27;account&#x27;) at line 7909.</td></tr>
       </tbody>
     </table>
   </div>
   <p>
-    <strong>Sums to 61</strong>, which is the app's own state count. Every screen is
-    reachable from the state rail in either page, and every state id is checked against the
-    real registry by the build gate.
+    <strong>Sums to 61</strong>, the app's own state count. Every screen is reachable from
+    the state rail in either page. The build gate checks every state id against the real
+    registry.
   </p>
 
   <h4>Chrome that is not a screen</h4>
   <p>
-    These sit around or across the screens and are deliberately not <code>t-screen</code>
+    These sit around or across the screens. They are deliberately not <code>t-screen</code>
     elements, so they survive the app changing screens underneath them.
   </p>
   <ul>
-    <li>d-stateNav#stateNav (line 4038) — the prototype&#x27;s own left rail listing the 61 states; not part of the app. Its d-stateNav__switcher tabs (4040) flip between #viewStates (4047) and #viewNotes (4051); #navRight (4067) is the right-hand column.</li>
-    <li>p-onboard-demo__stage (line 4071) — page wrapper holding the phone.</li>
-    <li>t-device-frame#deviceFrame (line 4072) — the phone shell itself; a template, not a screen. Sizes 390x844 default, with data-width 375, 360 and 320 variants (CSS at lines 785-802).</li>
-    <li>a-seam#seam (line 4077) — the frame&#x27;s edge highlight.</li>
-    <li>m-notch (line 4079), containing a-notch — the hardware notch.</li>
-    <li>m-status-bar#statusBar (line 4080) — time, No-service label, signal/battery icons; tone flipped per screen by setStatusTone, never hidden by hideAll.</li>
-    <li>m-push#pushNote (line 4102) — the OS notification, with m-push__icon, __app, __title, __sub. Deliberately NOT a t-screen and deliberately NOT cleared by hideAll (comment at lines 5387-5390): it is the phone&#x27;s chrome, so it survives the app chang</li>
-    <li>o-tab-bar#tabBar (line 4605) — four tabs (home, fuel, history, account) with an a-badge on history. A sibling of the screens, not inside any of them. Made visible only by paintTabs (line 5364), which is called from showHome (5917), showAccount (7909) </li>
-    <li>a-toast#toast (line 4989) — transient message layer inside the frame.</li>
-    <li>u-visually-hidden#announcer (line 4990) — the aria-live=polite region every show* function writes to via announce().</li>
-    <li>d-gridOverlay (line 4991) — developer grid, aria-hidden.</li>
-    <li>p-onboard-demo__caption#caption (line 4994) — the caption under the phone, outside the frame.</li>
-    <li>p-onboard-demo__rail#demoRail (line 4997) holding d-panel#specPanel (line 4998) — the right-hand design-spec panel; prototype furniture, not app chrome.</li>
+    <li>d-stateNav#stateNav (line 4038) is the prototype&#x27;s own left rail, listing the 61 states. Not part of the app. Its d-stateNav__switcher tabs (4040) flip between #viewStates (4047) and #viewNotes (4051). #navRight (4067) is the right-hand column.</li>
+    <li>p-onboard-demo__stage (line 4071) is the page wrapper holding the phone.</li>
+    <li>t-device-frame#deviceFrame (line 4072) is the phone shell itself, a template not a screen. Sizes 390x844 default, with data-width 375, 360 and 320 variants (CSS at lines 785-802).</li>
+    <li>a-seam#seam (line 4077) is the frame&#x27;s edge highlight.</li>
+    <li>m-notch (line 4079), containing a-notch, is the hardware notch.</li>
+    <li>m-status-bar#statusBar (line 4080) holds time, the No-service label and signal/battery icons. setStatusTone flips its tone per screen. hideAll never hides it.</li>
+    <li>m-push#pushNote (line 4102) is the OS notification, with m-push__icon, __app, __title, __sub. Deliberately NOT a t-screen and deliberately NOT cleared by hideAll (comment at lines 5387-5390). It is the phone&#x27;s chrome, so it survives the app chang</li>
+    <li>o-tab-bar#tabBar (line 4605) is four tabs (home, fuel, history, account) with an a-badge on history. It is a sibling of the screens, not inside any of them. Only paintTabs (line 5364) makes it visible, called from showHome (5917), showAccount (7909) </li>
+    <li>a-toast#toast (line 4989) is the transient message layer inside the frame.</li>
+    <li>u-visually-hidden#announcer (line 4990) is the aria-live=polite region every show* function writes to via announce().</li>
+    <li>d-gridOverlay (line 4991) is the developer grid, aria-hidden.</li>
+    <li>p-onboard-demo__caption#caption (line 4994) is the caption under the phone, outside the frame.</li>
+    <li>p-onboard-demo__rail#demoRail (line 4997) holds d-panel#specPanel (line 4998), the right-hand design-spec panel. Prototype furniture, not app chrome.</li>
   </ul>
 
   <div class="ds-note">
     <strong>No reference screenshots.</strong> There are none in this repository, so no
-    screenshot comparison was performed and none is claimed. Verification was done by
-    computed-style fingerprint instead: every element on every state, before and after,
-    compared property by property.
+    screenshot comparison was run and none is claimed. Verification used a computed-style
+    fingerprint instead: every element on every state, before and after, compared property
+    by property.
   </div>
 </section>
 
@@ -995,53 +992,53 @@ button { background: none; border: none; color: inherit; }</pre>
 <section class="ds-section" id="responsive">
   <h2>Responsive behaviour</h2>
   <p>
-    The product is a phone app, so the design target is a phone and there is no desktop
-    layout to shrink from. What varies is the device width — 390, 375, 360 and 320 — and
-    whether the keyboard is up.
+    The product is a phone app. The design target is a phone, so there is no desktop layout
+    to shrink from. What varies is the device width (390, 375, 360 and 320) and whether the
+    keyboard is up.
   </p>
   <h3>The compression order</h3>
   <p>
-    When the keyboard takes half the screen, space is given up in a stated order, from what
-    the driver has already finished with: the tooling first, then the step counter, then
-    instruction that has already been acted on, then the loose gaps. The base gap between
-    related things is given up last, because it is what says which things belong together —
-    and that matters most when there is least room.
+    When the keyboard takes half the screen, space is given up in a stated order, starting
+    with what the driver has already finished with: the tooling first, then the step counter,
+    then instruction that has already been acted on, then the loose gaps. The base gap between
+    related things goes last. It is what says which things belong together. That matters most
+    when there is least room.
   </p>
-  <p>Content reflows by priority. Nothing is hidden merely to make it fit, and no page scrolls sideways.</p>
+  <p>Content reflows by priority. Nothing is hidden merely to make it fit. No page scrolls sideways.</p>
 </section>
 
 <!-- ═════════════════════════════════════════════════════ ACCESSIBILITY -->
 <section class="ds-section" id="accessibility">
   <h2>Accessibility</h2>
   <ul>
-    <li><strong>Keyboard.</strong> Every control is a real <code>&lt;button&gt;</code> or input. Disabled primary actions use <code>aria-disabled</code> so they keep their place in the focus order and can still explain why they are not available.</li>
-    <li><strong>Visible focus.</strong> One ring for the whole product, two-tone so it reads on the near-black hero and the light sheet alike.</li>
+    <li><strong>Keyboard.</strong> Every control is a real <code>&lt;button&gt;</code> or input. Disabled primary actions use <code>aria-disabled</code>, so they hold their place in the focus order and can still say why they are unavailable.</li>
+    <li><strong>Visible focus.</strong> One ring for the whole product. It is two-tone, so it reads on the near-black hero and on the light sheet.</li>
     <li><strong>Labels.</strong> Persistent and visible. No placeholder-as-label anywhere.</li>
-    <li><strong>Errors.</strong> Placed against the control they belong to, and never carried by colour alone — a field in error gains a glyph in its helper and shakes once.</li>
-    <li><strong>Forced colours.</strong> <code>@media (forced-colors: active)</code> discards every background and border colour, which is every cue the OTP group and the field have. Both re-express their state structurally instead: a solid outline for valid, a dashed one for error. The build gate fails any page without that block, so this is enforced rather than remembered.</li>
+    <li><strong>Errors.</strong> Placed against the control they belong to. Colour never carries an error on its own: a field in error gains a glyph in its helper and shakes once.</li>
+    <li><strong>Forced colours.</strong> <code>@media (forced-colors: active)</code> throws away every background and border colour. That is every cue the OTP group and the field have, so both re-express their state structurally: a solid outline for valid, a dashed one for error. The build gate fails any page missing that block, so nobody has to remember it.</li>
     <li><strong>Landmarks.</strong> Each screen is a <code>&lt;section&gt;</code> labelled by its own heading; the device chrome is <code>aria-hidden</code>.</li>
-    <li><strong>Reduced motion.</strong> Honoured through the media query and an explicit switch, so it can be demonstrated without changing an OS setting.</li>
-    <li><strong>Contrast.</strong> Sampled from rendered pixels on all 43 states, not reasoned about from tokens — gradients and glass make the arithmetic unreliable.</li>
-    <li><strong>Targets.</strong> A 48px floor, measured including pseudo-element extensions, because the drawn size and the pressable size are allowed to differ and only the pressable one counts.</li>
+    <li><strong>Reduced motion.</strong> Honoured through the media query and through an explicit switch, so you can demo it without touching an OS setting.</li>
+    <li><strong>Contrast.</strong> Sampled from rendered pixels on all 43 states, not reasoned about from tokens. Gradients and glass make the arithmetic unreliable.</li>
+    <li><strong>Targets.</strong> A 48px floor, measured with pseudo-element extensions included. The drawn size and the pressable size are allowed to differ, so only the pressable one counts.</li>
   </ul>
   <h3>Known limitations</h3>
   <ul>
-    <li>Screen-reader testing has been reasoned about and coded for, but not performed with an actual screen reader.</li>
-    <li>The status-bar contrast check samples one point per state; it would miss a failure elsewhere in the bar.</li>
+    <li>Screen-reader behaviour is reasoned about and coded for, but nothing has been run against a real screen reader.</li>
+    <li>The status-bar contrast check samples one point per state. It would miss a failure elsewhere in the bar.</li>
   </ul>
 </section>
 
 <!-- ═════════════════════════════════════ CONTENT RESILIENCE AND STATES -->
 <section class="ds-section" id="resilience">
   <h2>Content resilience and states</h2>
-  <p>Only states that actually exist in the screens are listed. Nothing here is invented.</p>
+  <p>Only states that exist in the screens are listed. Nothing here is invented.</p>
   <div class="ds-tablewrap">
     <table class="ds-table">
       <thead><tr><th>State</th><th>How it is expressed</th><th>Where to see it</th></tr></thead>
       <tbody>
-        <tr><td>Default</td><td>—</td><td><code>#number/empty</code></td></tr>
-        <tr><td>Focus</td><td><code>:focus-visible</code> — 3px ring plus a white halo, two-tone so one ring works on the dark hero and the light sheet</td><td>Tab through any screen</td></tr>
-        <tr><td>Hover</td><td><code>--color-hover-wash</code> or <code>--color-hover-lift</code> by what the control stands on</td><td>Pointer devices only</td></tr>
+        <tr><td>Default</td><td>none</td><td><code>#number/empty</code></td></tr>
+        <tr><td>Focus</td><td><code>:focus-visible</code>. A 3px ring plus a white halo, two-tone so one ring works on the dark hero and on the light sheet</td><td>Tab through any screen</td></tr>
+        <tr><td>Hover</td><td><code>--color-hover-wash</code> or <code>--color-hover-lift</code>, by what the control stands on</td><td>Pointer devices only</td></tr>
         <tr><td>Active</td><td><code>--press-firm</code> on controls, <code>--press-subtle</code> on rows</td><td>Any button</td></tr>
         <tr><td>Disabled</td><td><code>aria-disabled</code> plus a flattened coat; stays focusable</td><td><code>#number/empty</code></td></tr>
         <tr><td>Loading</td><td><code>a-spinner</code> inside the control that caused the wait</td><td><code>#number/sending</code></td></tr>
@@ -1059,7 +1056,7 @@ button { background: none; border: none; color: inherit; }</pre>
 <!-- ══════════════════════════════════════════════════════ TRACEABILITY -->
 <section class="ds-section" id="traceability">
   <h2>Traceability</h2>
-  <p>Screen → template → organism → molecule → atom → tokens, for the sections of each screen.</p>
+  <p>Screen → template → organism → molecule → atom → tokens, section by section.</p>
   <div class="ds-tablewrap">
     <table class="ds-table">
       <thead><tr><th>Screen section</th><th>Organism</th><th>Molecule</th><th>Atoms</th><th>Key tokens</th></tr></thead>
@@ -1081,7 +1078,7 @@ button { background: none; border: none; color: inherit; }</pre>
         </tr>
         <tr>
           <td>Privacy card</td><td><code>o-signup-sheet</code></td><td><code>m-privacy</code></td>
-          <td>—</td><td><code>--text-caption2</code>, <code>--leading-body</code>, <code>--sp-2h</code></td>
+          <td>none</td><td><code>--text-caption2</code>, <code>--leading-body</code>, <code>--sp-2h</code></td>
         </tr>
         <tr>
           <td>Refusal</td><td><code>o-outcome-panel</code></td><td><code>m-alert</code></td>
@@ -1094,7 +1091,7 @@ button { background: none; border: none; color: inherit; }</pre>
           <td><code>--color-warning-*</code>, <code>--text-nano</code>, <code>--tracking-caps-wide</code></td>
         </tr>
         <tr>
-          <td>Device chrome</td><td>—</td><td><code>m-notch</code>, <code>m-status-bar</code></td>
+          <td>Device chrome</td><td>none</td><td><code>m-notch</code>, <code>m-status-bar</code></td>
           <td><code>a-notch</code></td><td><code>--color-hardware</code>, <code>--size-status-bar</code>, <code>--radius-phone</code></td>
         </tr>
       </tbody>
@@ -1106,7 +1103,7 @@ button { background: none; border: none; color: inherit; }</pre>
 <section class="ds-section" id="contributing">
   <h2>Contribution and governance</h2>
   <p class="ds-lede">
-    How to add something without breaking what is here, and what will stop you if you do.
+    How to add something without breaking what is here. And what stops you if you do.
   </p>
 
   <h3>Decide the level first</h3>
@@ -1132,15 +1129,15 @@ button { background: none; border: none; color: inherit; }</pre>
 
   <h3>The filing law</h3>
   <p>
-    <strong>A rule is filed by the block that owns it — the leftmost in its selector — not
-    by what it targets.</strong> <code>.o-auth-hero__actions .a-btn</code> is the hero's
+    <strong>A rule is filed by the block that owns it (the leftmost in its selector), not by
+    what it targets.</strong> <code>.o-auth-hero__actions .a-btn</code> is the hero's
     rule about a button it contains, so it belongs with the hero. Filing it under atoms
     would put a screen's override in front of the screen.
   </p>
   <p>
-    One live exception, and it is not a good one: three
+    There is one live exception. It is not a good one: three
     <code>.o-signup-sheet__resend</code> rules sit in <code>atoms.css</code>, pinned there
-    when the stylesheet was split so that the rendering would not change. See
+    when the stylesheet was split so the rendering would not change. See
     <a href="#limitations">Known limitations</a>.
   </p>
 
@@ -1153,7 +1150,7 @@ button { background: none; border: none; color: inherit; }</pre>
       --z- --ease- --dur- --d-</code>.</li>
     <li>Name it for what it is <em>for</em>, not for what it is.</li>
     <li><strong>Add it to <code>engenxt-onboarding.html</code> as well.</strong> That page
-      still carries an inline copy of the scale and the gate compares the two property by
+      still carries an inline copy of the scale. The gate compares the two property by
       property, so a token in one file and not the other fails the build.</li>
     <li>If it is a type size, decide whether it also needs a value under
       <code>[data-text="large"]</code>. Fifteen tokens do.</li>
@@ -1174,7 +1171,7 @@ button { background: none; border: none; color: inherit; }</pre>
   </ol>
 
   <h3>Naming</h3>
-  <p>Every class states its level in its first two characters. This is enforced by the build gate, not by convention.</p>
+  <p>Every class states its level in its first two characters. The build gate enforces that, not convention.</p>
   <div class="ds-tablewrap">
     <table class="ds-table">
       <thead><tr><th>Prefix</th><th>Level</th><th>Example</th></tr></thead>
@@ -1185,7 +1182,7 @@ button { background: none; border: none; color: inherit; }</pre>
         <tr><td><code>t-</code></td><td>Template</td><td><code>t-device-frame</code></td></tr>
         <tr><td><code>p-</code></td><td>Page</td><td><code>p-signup-demo</code></td></tr>
         <tr><td><code>u-</code></td><td>Utility</td><td><code>u-visually-hidden</code></td></tr>
-        <tr><td><code>d-</code></td><td>Developer tooling — never ships</td><td><code>d-panel</code></td></tr>
+        <tr><td><code>d-</code></td><td>Developer tooling, never ships</td><td><code>d-panel</code></td></tr>
       </tbody>
     </table>
   </div>
@@ -1196,38 +1193,38 @@ button { background: none; border: none; color: inherit; }</pre>
   </p>
   <h3>How a token is named</h3>
   <p>
-    A token opens with the family it belongs to — <code>--color-</code>,
+    A token opens with the family it belongs to: <code>--color-</code>,
     <code>--text-</code>, <code>--sp-</code>, <code>--radius-</code>,
-    <code>--dur-</code> and the rest. The family is enforced: the gate keeps a
-    list, and a name outside it fails the build, so nobody can quietly start a
+    <code>--dur-</code> and the rest. The family is enforced. The gate keeps a
+    list and a name outside it fails the build, so nobody can quietly start a
     <code>--brand-blue-2</code> alongside the scale.
   </p>
   <p>
     After the family, the name says what the value is <strong>for</strong>, not
     what it <strong>is</strong>. <code>--color-text-secondary</code>, not
-    <code>--color-grey-60</code>. This is the rule that lets a value change
-    without a rename, and it is followed almost everywhere — see
+    <code>--color-grey-60</code>. That is the rule that lets a value change
+    without a rename. It is followed almost everywhere; see
     <a href="#foundations">how many tiers there are</a> for the count.
     <code>--d-</code> marks the developer panel, which never ships.
   </p>
   <p>
     Token names are kebab-case, with <strong>one exception</strong>:
     <code>--color-hover-onDark</code>. That is not a slip. <em>onDark</em> is a
-    single concept throughout this codebase — <code>data-tone="onDark"</code>,
-    <code>.a-btn--outlineOnDark</code> — and it is spelled the same way in all
+    single concept throughout this codebase (<code>data-tone="onDark"</code>,
+    <code>.a-btn--outlineOnDark</code>) and it is spelled the same way in all
     three places. The cost is that you cannot assume a token is kebab-case and
     autocomplete your way to it. It is the only one.
   </p>
 
   <h3>State is never a class</h3>
   <p>
-    Runtime state rides a <code>data-*</code> attribute — <code>data-state</code>,
+    Runtime state rides a <code>data-*</code> attribute: <code>data-state</code>,
     <code>data-tone</code>, <code>data-verdict</code>. There is no <code>is-open</code>
-    anywhere, and the gate fails the build if one appears. A class says what a thing
+    anywhere. The gate fails the build if one appears. A class says what a thing
     <em>is</em>; an attribute says what it is <em>doing</em>.
   </p>
 
-  <h3>The gates, and which ones stop a merge</h3>
+  <h3>The gates and which ones stop a merge</h3>
   <p>
     Four checks, cheapest first. Set <code>CHROME=/path/to/chrome</code> if Chrome is not at
     the macOS default.
@@ -1238,7 +1235,7 @@ button { background: none; border: none; color: inherit; }</pre>
       <tbody>
         <tr><td><code>node tools/check.js</code></td><td>Under a second</td>
           <td>Scripts parse, ids exist, state rails agree, tokens identical across both files,
-              class shapes, layer nesting, and that this page agrees with the code</td>
+              class shapes, layer nesting and that this page agrees with the code</td>
           <td><strong>Yes</strong></td></tr>
         <tr><td><code>node tools/journey.js</code></td><td>≈2 minutes</td>
           <td>Walks the flows with real events and the real clock</td>
@@ -1249,22 +1246,22 @@ button { background: none; border: none; color: inherit; }</pre>
           <td><strong>Yes</strong></td></tr>
         <tr><td><code>node tools/sweep.js --large</code></td><td>A few minutes</td>
           <td>The same 104 states with large text on</td>
-          <td>No — run it yourself before merging anything that touches type or spacing</td></tr>
+          <td>No. Run it yourself before merging anything that touches type or spacing</td></tr>
       </tbody>
     </table>
   </div>
   <p>
     <code>.github/workflows/check.yml</code> runs the first three on every push to
-    <code>main</code> and on every pull request, in two jobs so that a parse failure reads as
-    itself rather than as a dead browser. <strong>Those three block a merge.</strong> The
-    large-text sweep is discipline, not enforcement.
+    <code>main</code> and on every pull request. They run in two jobs, so a parse failure
+    reads as itself rather than as a dead browser. <strong>Those three block a merge.</strong>
+    The large-text sweep is discipline, not enforcement.
   </p>
   <p>
     The repo deploys straight from <code>main</code> to GitHub Pages, so <code>main</code>
     being green is the only gate that means anything. There is no install step and no
-    <code>package.json</code> — the checks have no dependencies, and adding one so the
-    workflow looked conventional would be the toolchain this prototype has done without for
-    its whole life.
+    <code>package.json</code>. The checks have no dependencies. Adding one so the workflow
+    looked conventional would hand this prototype the toolchain it has done without for its
+    whole life.
   </p>
 
   <h3>Who decides</h3>
@@ -1284,19 +1281,18 @@ button { background: none; border: none; color: inherit; }</pre>
   <h3>Approved and done</h3>
   <ul>
     <li>
-      <strong>The resend button is organism-owned, and now filed that way.</strong> Four
-      rules style <code>.o-signup-sheet__resend</code>; three of them sat in
-      <code>atoms.css</code>, pinned there when the stylesheet was split. They are now in
-      <code>organisms.css</code> with the fourth. The move was made on the ruling that
-      visual correctness outranks a filing taxonomy — so it was attempted, then measured:
-      every element on all 104 states is computed-identical before and after, so the move
-      stands and no cascade exception was needed. The countdown reads 500 while it is
-      waiting and 600 once Resend is live, which is now what the stylesheet says rather
-      than what source order happened to produce.
+      <strong>The resend button is organism-owned. It is now filed that way.</strong> Four
+      rules style <code>.o-signup-sheet__resend</code>. Three of them sat in
+      <code>atoms.css</code>, pinned there when the stylesheet was split. They now sit in
+      <code>organisms.css</code> with the fourth. Visual correctness outranks a filing
+      taxonomy, so the move was made and then measured. Every element on all 104 states is
+      computed-identical before and after. The move stands. No cascade exception was needed.
+      The countdown reads 500 while it waits and 600 once Resend is live. That is what the
+      stylesheet says now, not what source order happened to produce.
     </li>
     <li><strong>Linked CSS, no build.</strong> Eight layer files loaded by plain <code>&lt;link&gt;</code>. Verified to render identically over <code>file://</code> and http.</li>
     <li><strong>Cascade layers.</strong> Order declared once. Every rule is filed by its owning block, not its target, so a screen's override stays with the screen.</li>
-    <li><strong>Gates keep their strictness.</strong> The three CLI gates learned to find linked CSS; not one assertion was relaxed.</li>
+    <li><strong>Gates keep their strictness.</strong> The three CLI gates learned to find linked CSS. Not one assertion was relaxed.</li>
   </ul>
 
   <h3>Implementation assumptions</h3>
@@ -1310,29 +1306,29 @@ button { background: none; border: none; color: inherit; }</pre>
     <li>
       <strong>The semantic spacing layer.</strong> <em>Approved and built.</em> Seven aliases,
       each mapped one-to-one onto the reference step it already rendered, so no pixel moved.
-      What is still open is <em>adoption</em>: most <code>--sp-*</code> uses were left where
-      they are, because choosing which of two near-identical values is intended is a design
+      <em>Adoption</em> is the open part. Most <code>--sp-*</code> uses were left where they
+      are, because picking which of two near-identical values is intended takes a design
       review. See <a href="#foundations">Foundations</a>.
     </li>
     <li>
-      <strong>Same-level nesting.</strong> Three components hold another of their own level —
+      <strong>Same-level nesting.</strong> Three components hold another of their own level:
       <code>a-icon-btn</code> holds <code>a-badge</code>, <code>m-app-bar</code> holds
-      <code>m-brand-lockup</code>, <code>m-alert</code> holds <code>m-privacy</code>. Strictly
-      each pair is one level up. The build deliberately does not fail on these, because a gate
-      that fails on judgement calls teaches people to reach for the exception list.
+      <code>m-brand-lockup</code>, <code>m-alert</code> holds <code>m-privacy</code>. Strictly,
+      each pair is one level up. The build deliberately doesn't fail on these. A gate that
+      fails on judgement calls teaches people to reach for the exception list.
     </li>
   </ul>
 
   <h3>Known limits of this page</h3>
   <ul>
-    <li>Opened straight off disk, a browser will not let this page read the <em>authored</em> form of a token — only its resolved value. Serve the folder over http for the full table.</li>
-    <li>Organisms are described rather than rendered here; they are full screens and need the device frame to make sense.</li>
-    <li>Only <code>index.html</code> is migrated. The app's components are documented in its own in-page spec panel until it is.</li>
+    <li>Opened straight off disk, a browser won't let this page read the <em>authored</em> form of a token. It sees only the resolved value. Serve the folder over http for the full table.</li>
+    <li>Organisms are described here rather than rendered. They are full screens and need the device frame to make sense.</li>
+    <li>Only <code>index.html</code> is migrated. Until the app follows, its components stay documented in its own in-page spec panel.</li>
   </ul>
 
   <p class="ds-foot">
     Source: <code>src/css/*.css</code> · Screens: <code>index.html</code> ·
-    Gates: <code>tools/check.js</code>, <code>tools/sweep.js</code>, <code>tools/journey.js</code>,
+    Gates: <code>tools/check.js</code>, <code>tools/sweep.js</code>, <code>tools/journey.js</code>
     and the in-page Self-check on the rail's Design notes tab.
   </p>
 </section>
