@@ -368,19 +368,33 @@
      --focus-sheet-backdrop, which is lighter again and says why where it is
      defined. Anything else dimming anything is one of these three. */
 
-  /* Blur belongs to a scrim, and only to a scrim.
-   *
-   * Translucent blurred chrome was tried and removed — the reasons are
-   * recorded where the top bar is defined, and they stand. This is the other
-   * case: a layer whose whole purpose is to say the page beneath it is not
-   * available. Softening what it covers says that with the page still in
-   * view, which is what a scrim over a list is for. Three pixels is enough to
-   * read as behind-glass and little enough to leave a row recognisable. */
-  --overlay-scrim-blur: blur(3px);
+  /* There is no blur token, and there was one. Three pixels of
+     backdrop-filter sat on all four scrims on the argument that softening a
+     page says "not available" while leaving it in view. It says something
+     else as well: that the product went out of focus, which is a state a
+     product can be in for other reasons. Dimming already carries the whole
+     message, and it carries it without touching legibility, without a
+     compositing cost on eleven figures at once, and without the halo a blur
+     leaves along the edge of the thing it stops at. The page behind a scrim
+     stays sharp. */
   --size-input-focused-border-width: 1.6px;
   --size-marker-border-width: 1.5px;
   --size-marker-diameter: 18px;
   --size-nav-rail-width: 56px;
+  /* The product viewport a screen-pack figure is drawn at, and the width a
+     decision is allowed to take inside one. A dialog that grows past the width
+     is a dialog with too much in it: the answer is to take content out, not to
+     mint a second width.
+
+     The height was 560px, which is not a screen anybody works on. The Goodwood
+     decision is 552px tall, so it filled its own viewport to within 24px and
+     stopped reading as something over a product and read as the product. A
+     figure of a modal has to leave enough page showing that a person can see
+     what the modal is interrupting. 800px is a browser viewport at the height
+     this portal is used at, and it still lets a whole figure sit on screen at
+     1440x900 with the documentation page's own bar above it. */
+  --size-preview-height: 800px;
+  --size-dialog-width: 600px;
   --size-rail-max-width: 360px;
   --size-rail-min-width: 300px;
   --size-search-field-max-width: 440px;
@@ -425,7 +439,6 @@
   --size-drawer-width: 520px;
   /* How much of the list an overlay screen shows behind itself. Enough to say
      which screen you are on, not so much that the decision is pushed down. */
-  --size-stage-crop: 520px;
   /* Wide enough for the longest filter value on one line ("Removed from
      fleet") and no wider: a filter panel is a list of short phrases, and the
      extra width only buys covered table. */
@@ -1940,6 +1953,34 @@ body.drawer-open .drawer { animation: slide-in var(--duration-base) var(--ease-d
 .seg.is-stacked { flex-direction: column; }
 .seg.is-stacked label { justify-content: flex-start; text-align: left; }
 
+/* Stacked, these stop being segments. Side by side the shared frame says
+   "pick one of these" by itself; in a column the same rows read as three
+   buttons, and nothing on screen says that choosing one un-chooses the
+   others. So the marker gets drawn. It is the radio the markup always was. */
+.seg.is-stacked label {
+  gap: var(--space-1-5);
+  padding-left: var(--space-1-5);
+}
+.seg.is-stacked label::before {
+  content: "";
+  flex: none;
+  width: var(--size-marker-diameter);
+  height: var(--size-marker-diameter);
+  border: var(--size-marker-border-width) solid var(--color-outline-control);
+  border-radius: 50%;
+  background: var(--color-surface);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+.seg.is-stacked label:hover::before { border-color: var(--color-on-surface-variant); }
+.seg.is-stacked label:has(:checked)::before {
+  border-color: var(--color-brand-ink);
+  /* The dot is drawn with a ring rather than a child element, because the
+     marker is a pseudo-element and cannot have one. */
+  box-shadow: inset 0 0 0 4px var(--color-surface),
+              inset 0 0 0 var(--size-marker-diameter) var(--color-brand-ink);
+}
+
 .seg label {
   flex: 1;
   display: flex;
@@ -2661,11 +2702,9 @@ body.theft-open { overflow: hidden; }
   position: fixed;
   inset: 0;
   background: var(--focus-sheet-backdrop);
-  /* Lighter ink than the page modal, and the same blur: together they say
-     "behind" without taking the directory away, which is the reason a vehicle
-     is added from a sheet rather than from a page. */
-  -webkit-backdrop-filter: var(--overlay-scrim-blur);
-  backdrop-filter: var(--overlay-scrim-blur);
+  /* Lighter ink than the page modal: it says "behind" without taking the
+     directory away, which is the reason a vehicle is added from a sheet
+     rather than from a page. */
   z-index: var(--z-scrim);
   display: none;
 }
@@ -2695,14 +2734,24 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
   font-weight: var(--font-weight-label-md);
   color: var(--color-on-surface);
 }
-.radio {
+/* Named through .form-field as well, because a radio option lives inside one
+   and `.form-field label` is a more specific selector than `.radio`. It was
+   winning: the option got display:block, which made the gap below inert so the
+   dot sat against its own text, plus a field label's weight and bottom margin,
+   so three answers were drawn like three headings. */
+.radio,
+.form-field label.radio {
   display: flex;
   align-items: center;
   gap: var(--space-1-0);
   min-height: var(--size-control-height);
+  margin-bottom: 0;
   cursor: pointer;
   font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-body-md);
 }
+/* The dot keeps its size while the answer beside it wraps. */
+.radio input { flex: none; }
 .radio input { width: 16px; height: 16px; accent-color: var(--color-brand-ink); margin: 0; }
 
 /* ── MultiTankEditor ────────────────────────────────────────────────────
@@ -2712,12 +2761,6 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 .tank-list { display: flex; flex-direction: column; gap: var(--space-1-5); }
 .tank-row { display: flex; align-items: flex-end; gap: var(--space-1-5); }
 .tank-row .form-field { flex: 1; min-width: 0; }
-.tank-row .tank-remove {
-  flex: none;
-  height: var(--size-control-height);
-  padding-inline: var(--space-1-5);
-}
-.tank-add { margin-top: var(--space-1-5); padding-inline: 0; }
 .tank-total {
   margin: var(--space-2-0) 0 0;
   padding-top: var(--space-1-5);
@@ -2818,8 +2861,6 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
      leaves the half-finished form legible underneath the question about it. */
   z-index: var(--z-dialog-scrim);
   background: var(--overlay-scrim-nested);
-  -webkit-backdrop-filter: var(--overlay-scrim-blur);
-  backdrop-filter: var(--overlay-scrim-blur);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2962,9 +3003,13 @@ body.theft-open .sheet-backdrop { display: block; }
 .select-value.is-placeholder { color: var(--color-form-placeholder-text); }
 .select-caret { flex: none; color: var(--color-on-surface-variant); }
 
+/* No percentage width here. The list is placed with position:fixed, so a
+   `min-width: 100%` resolves against the viewport rather than against the
+   field, and every menu opened at the full width of the window. The width is
+   the trigger's, measured and written when it opens. */
 .select-list {
-  min-width: 100%;
   padding: var(--space-0-5);
+  box-sizing: border-box;
 }
 
 .select-option {
@@ -3003,13 +3048,6 @@ body.theft-open .sheet-backdrop { display: block; }
 /* Only on a list long enough to need it, and held at the top of the panel it
    filters: scrolled away, it leaves a short list with no visible reason for
    being short. */
-.select-search {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  margin-bottom: var(--space-1-0);
-  background: var(--color-surface);
-}
 .select-none {
   margin: 0;
   padding: var(--space-1-5);
@@ -3402,8 +3440,6 @@ tbody td.truncate-wide { max-width: 26ch; }
   inset: 0;
   z-index: var(--z-scrim);
   background: var(--overlay-scrim-background);
-  -webkit-backdrop-filter: var(--overlay-scrim-blur);
-  backdrop-filter: var(--overlay-scrim-blur);
   display: none;
 }
 
@@ -3651,6 +3687,12 @@ body.drawer-open .drawer { display: flex; }
    not, rather than staggering to the right edge like an accident. */
 .approve-actions .btn { flex: 1 1 11rem; }
 
+/* A field group ends at its last control, with no margin of its own, so
+   the buttons sat against the last answer. On the recovery decision that
+   put a disabled primary action one gap away from the radio it is
+   waiting on, which reads as part of the group. */
+.approve-card .fields + .approve-actions { margin-top: var(--space-3-0); }
+
 /* ── Where a live request lands ───────────────────────────────────────────
  * The banner sits above the page, and is the only thing allowed to. It is
  * there because the request is *expiring*. A badge you have to notice is the
@@ -3875,6 +3917,16 @@ body.drawer-open .drawer { display: flex; }
   padding: var(--space-3-0);
 }
 
+/* A badge names a status, and the layout is not allowed to abbreviate it.
+   Flex items default to 0 1 auto, so the badge shrank to whatever was left
+   after the title: 91px of box for 99px of text, and "Reported stolen" lost
+   its last two letters. It was invisible while the word was "Stolen lock",
+   which fitted. The badge takes its own width and the title wraps instead. */
+.panel-head > .badge,
+.approve-head > .badge,
+.panel-head > .expiry,
+.approve-head > .expiry { flex: none; }
+
 .panel-eyebrow {
   margin: 0 0 var(--space-1-0);
   font-size: var(--font-size-label-sm);
@@ -3961,6 +4013,18 @@ body.drawer-open .drawer { display: flex; }
   margin: 0;
   padding: var(--space-3-0);
   font-size: var(--font-size-body-sm);
+}
+
+/* Two columns need room for the longest label plus a value. Narrower than
+   that the label column wins on max-content and pushes the record wider than
+   the surface holding it, so the record is clipped rather than wrapped. Below
+   the breakpoint the pairs stack, which is what a phone-width drawer does. */
+@media (max-width: 900px) {
+  .panel-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-0-5);
+  }
+  .panel-facts dd { margin-bottom: var(--space-1-0); }
 }
 
 .panel-facts dt { color: var(--color-on-surface-variant); }
@@ -5503,116 +5567,140 @@ tbody td .is-past { color: var(--color-on-danger-container); }
   max-width: var(--size-measure-wide);
 }
 
-/* ── The stage: an overlay over the list it happens on ────────────────────
+/* ── The screen pack: a decision over the product, at full page ───────────
  *
- * Eleven screens used to be standalone pages — a fuel request, a theft
- * receipt, a policy change — each with its own page heading. None of them is a
- * page. They are things that happen to a vehicle while somebody is looking at
- * the vehicle list, and drawing them alone was an instruction to build eleven
- * routes that should not exist.
+ * Eleven of these are not pages. They are things that happen to a vehicle
+ * while somebody is looking at the vehicle list, so each one draws the list
+ * with a decision over it.
  *
- * The list underneath is the real one: same header, same toolbar, same table,
- * at full width. It is cropped rather than complete, because the top of the
- * list is enough to say where you are and a full one would push the decision
- * off the screen. Inert and hidden from assistive technology: it is context,
- * not content.
+ * Two earlier versions got the covering wrong. The first inset the dim into
+ * the table, which left the product's navigation and top bar lit one level
+ * above it. The second drew the figure its own navigation and top bar inside
+ * a frame, which put a second copy of chrome an inch from the real one.
+ *
+ * The page this renders on is the product, so the overlay covers the product:
+ * fixed to the viewport, over the top bar, the page heading, the toolbar, the
+ * table and the empty page below it. The list under it is the real page
+ * content rather than a copy of one.
+ *
+ * Two things stay out of it. The review rail, which is not the product. The
+ * product's navigation, which is how somebody leaves the screen.
  */
-/* The list and the scrim over it, in one box. The scrim fills this rather
-   than repeating the crop height, so the dim cannot outrun the content. */
-.stage-crop {
-  position: relative;
-  /* The illustration's layers are the illustration's. Without this they sort
-     against the live top bar in the root context and an illustrated dialog
-     paints over the real one. */
-  isolation: isolate;
-}
 
-.stage-under {
-  max-height: var(--size-stage-crop);
-  overflow: hidden;
-  pointer-events: none;
-  user-select: none;
-  /* Its own stacking context at the floor, so the scrim above it covers every
-     child. Without this the page-head buttons painted over the scrim and the
-     screen read as half dimmed. */
-  position: relative;
-  z-index: 0;
-  /* The cap is a guard, not a crop: every stage renders shorter than it, so
-     nothing is ever cut here. There is no fade, because a fade would be
-     dissolving an edge that does not exist and taking two rows of a complete
-     table with it. */
-}
+/* The state's own page content, with no frame, crop or inset around it. These
+   wrappers stay in the markup for the overlay to sit beside, and lay out
+   nothing themselves. */
+.preview,
+.preview-product,
+.preview-cols,
+.preview-page { display: contents; }
 
-/* Covers the list and stops at it, so the commentary below stays readable. */
-.stage-scrim {
+/* ── The overlay layer ────────────────────────────────────────────────────
+ * One per open decision, fixed to the product viewport. Its bounds are the
+ * window, less the review rail when the review rail is showing.
+ */
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  /* The review rail and the product's navigation both sit outside the cover.
+     The rail is not the product. The navigation is the way out of a screen
+     you have been stopped on, and dimming it while it still takes clicks is
+     the one thing a scrim must not do. Everything the decision is about is
+     under it: the top bar, the page heading, the actions, the search, the
+     table and the empty page. */
+  left: calc(var(--size-rail-width) + var(--size-nav-rail-width));
+  z-index: var(--z-scrim);
+}
+/* Review rail gone, so the cover starts at the product's navigation. */
+body.demo .preview-overlay,
+body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
+
+/* Flat and uniform. A gradient, a mask and a blur have each been on this
+   element at some point, and none of them said what the product meant. */
+.preview-scrim {
   position: absolute;
   inset: 0;
   background: var(--overlay-scrim-background);
-  -webkit-backdrop-filter: var(--overlay-scrim-blur);
-  backdrop-filter: var(--overlay-scrim-blur);
-  z-index: var(--z-scrim);
+  /* A scrim takes the clicks aimed at what is behind it. */
+  pointer-events: auto;
+}
+
+.preview-positioner {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  padding: var(--space-3-0);
   pointer-events: none;
 }
-
-/* Both overlays sit in normal flow and are pulled back up over the cropped
-   list, so the section grows with whatever they contain and the notes below
-   are never covered. Absolute positioning would have needed a height nobody
-   can know in advance. */
-.stage-modal,
-.stage-panel {
-  position: relative;
-  z-index: var(--z-dialog);
-  /* Pulled back over the cropped list. Measured from the crop box, which is
-     as tall as the list actually is, rather than from the cap it never
-     reaches. */
-  margin-top: calc(var(--size-stage-crop) * -0.62);
+.preview-positioner > * {
+  pointer-events: auto;
+  user-select: text;
 }
 
-/* A decision takes the middle. */
-.stage-modal {
-  margin-left: auto;
-  margin-right: auto;
-  width: min(var(--size-panel-max), calc(100% - var(--space-6-0)));
+/* A record arrives at the edge the live drawer arrives at, and takes the
+   viewport's full height, so the two patterns cannot drift. */
+.preview-positioner--edge {
+  padding: 0;
+  align-items: stretch;
+  justify-items: end;
 }
 
-/* A record sits beside the list, at the drawer's width, so the two patterns
-   cannot drift apart. */
-.stage-panel {
-  margin-left: auto;
-  width: min(var(--size-drawer-width), calc(100% - var(--space-4-0)));
-  /* One surface, not a stack of cards with the dimmed table showing between
-     them. A record read from the side is a single column. */
+/* A decision takes the middle, at one width. */
+.preview-dialog {
+  width: min(var(--size-dialog-width), 100%);
+  min-width: 0;
+  max-height: 100%;
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--elevation-high, var(--elevation-medium));
+}
+
+/* A record sits at the drawer's width, as one surface rather than a stack of
+   cards with the dimmed table showing between them. */
+.preview-record {
+  width: min(var(--size-drawer-width), 100%);
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow: auto;
   background: var(--color-surface);
-  border: var(--size-border-hairline) solid var(--color-outline-variant);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  border-left: var(--size-border-hairline) solid var(--color-outline-variant);
   box-shadow: var(--elevation-medium);
 }
 
-.stage-panel > * + * { border-top: var(--size-border-hairline) solid var(--color-outline-variant); }
-.stage-panel > * { border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
+/* A flex item will not shrink below its own content unless it is told it may.
+   The record's head is a title beside a badge, and at a narrow viewport those
+   two set a floor of 369px on a 284px surface. Nothing here has a width; they
+   have a refusal to shrink, and this is where it is lifted. */
+.preview-positioner .panel,
+.preview-positioner .approve-card,
+.preview-positioner .panel-head > *,
+.preview-positioner .approve-head > * { min-width: 0; }
+.preview-positioner .panel-title,
+.preview-positioner .approve-head h2 { overflow-wrap: anywhere; }
 
-.stage-modal > *, .stage-panel > * { max-width: none; width: 100%; }
+.preview-record > * + * { border-top: var(--size-border-hairline) solid var(--color-outline-variant); }
+.preview-record > * { border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
+.preview-dialog > * { border-radius: 0; box-shadow: none; }
+.preview-dialog > *, .preview-record > * { max-width: none; width: 100%; }
 
-/* Under the whole stage and clear of the scrim: this is the prototype talking
-   about itself, not part of the screen. */
-.stage-notes {
+/* Over the scrim, not under it. This is the prototype talking about itself,
+   and a decision taken over the product is no reason to stop being able to
+   read the note explaining why. */
+.figure-notes {
   position: relative;
   z-index: calc(var(--z-dialog) + 1);
-  margin-top: var(--space-6-0);
+  margin-top: var(--space-3-0);
   display: flex;
   flex-direction: column;
   gap: var(--space-2-0);
   max-width: var(--size-measure-wide);
-}
-
-/* The crop box is the positioning parent now, so the scrim is measured
-   against the list rather than against everything above it on the page. */
-
-@media (max-width: 900px) {
-  .stage-modal, .stage-panel { width: 100%; margin-top: calc(var(--size-stage-crop) * -0.72); }
 }
 
 /* ── Component documentation ──────────────────────────────────────────────
@@ -5706,6 +5794,12 @@ body.clean #clean { display: inline-flex !important; }
 body.demo .rail { display: none !important; }
 body.demo #clean { display: none !important; }
 
+/* Closed by the switch in the top bar. !important for the same reason the
+   line above it needs one: .rail sets display in its own rule. */
+body.rail-closed .rail { display: none !important; }
+/* No list to close, so no switch. */
+body.demo #rail-toggle { display: none !important; }
+
 
 /* Under the toggle, the panel takes the whole column back rather than leaving
    a hole where the commentary was. */
@@ -5762,11 +5856,11 @@ body.clean .surfaces:has(.panel) { grid-template-columns: minmax(0, 1fr); }
 /* These two carry a column of notes beside them while the notes are on, and
    that column is what fills the width. Under the toggle it goes, and the card
    is left on its own in the middle of nowhere. */
-body.clean .page > section:has(.approve-card) > :not(.page-head):not(.stage-crop):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
+body.clean .page > section:has(.approve-card) > :not(.page-head):not(.preview):not(.figure-notes) {
   max-width: var(--size-measure-narrow);
 }
 
-body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
+body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.figure-notes) {
   max-width: var(--size-panel-max);
 }
 </style>
@@ -5780,7 +5874,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
 
   <!-- The screen rail. A review affordance, the same one the Flutter builder
        carries, so the two prototypes are navigated the same way. -->
-  <nav class="rail">
+  <nav class="rail" id="review-rail">
     <!-- Two things were sharing one list: the product, and the pages that
          explain it. A reviewer walking the flow kept landing on a specimen
          table, and somebody looking for the token spec had to know it lived
@@ -5935,6 +6029,15 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
     </nav>
     <div class="cols">
     <div class="topbar">
+      <!-- The screen list is a review affordance and it takes 232px of a
+           1440px window. Until now the only way to be rid of it was ?demo,
+           which also removes the review switch and the keystroke. All or
+           nothing, and reached by editing the URL. This closes it and opens
+           it again. -->
+      <button class="icon-btn" id="rail-toggle" aria-pressed="false" aria-controls="review-rail"
+              title="Hide the screen list" aria-label="Hide the screen list">
+        <svg data-lucide="panel-left" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+      </button>
       <input class="field search" type="search" placeholder="Search" aria-label="Search">
       <div class="topbar-actions">
         <div class="bell-anchor">
@@ -6285,8 +6388,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            it; this is the thing it offers. -->
             <section id="screen-rules" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -6325,14 +6430,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-1">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner">
+        <div class="preview-dialog" role="group" aria-labelledby="preview-dialog-title-1">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title" id="stage-modal-title-1">Add Goodwood to this policy?</h2>
+                  <h2 class="panel-title" id="preview-dialog-title-1">Add Goodwood to this policy?</h2>
                   <p class="panel-sub">You have released this station for Thabo three times.</p>
                 </div>
               </div>
@@ -6384,10 +6492,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </div>
             </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The last line is the whole screen.</b>
             The offer came from one driver being refused three times, and
             accepting it changes the rules for twelve vehicles and nine
@@ -6678,7 +6788,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
         <h2 class="spec-h">Fuel access &mdash; may it buy fuel today?</h2>
         <table class="states-table">
           <thead>
-            <tr><th>State</th><th>At the pump</th><th>Set by</th><th>Way back</th></tr>
+            <tr><th>State</th><th>What station staff see</th><th>Set by</th><th>Way back</th></tr>
           </thead>
           <tbody>
             <tr>
@@ -6694,7 +6804,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               <td>Set it back to Can fuel</td>
             </tr>
             <tr>
-              <td><span class="badge badge-danger">Stolen lock</span> <span class="status-reason">+ a reason</span></td>
+              <td><span class="badge badge-danger">Reported stolen</span> <span class="status-reason">+ a reason</span></td>
               <td>No fuel, immediately, and nobody can release one, including the manager who set it. An attempt tells you the station and the time.</td>
               <td>Manager, in a confirmation</td>
               <td>Mark recovered, which sets it to Cannot fuel so somebody looks it over</td>
@@ -6748,7 +6858,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </tr>
               <tr>
                 <td>PBK 550 GP</td><td class="ident">FL-007</td><td>Toyota Land Cruiser 79 · 2022</td><td>Bakkie</td><td class="num">130 L</td>
-                <td class="status-col"><span class="status-cell"><span class="status-pill badge-danger">Stolen lock</span><span class="status-why">Hijacked</span></span></td>
+                <td class="status-col"><span class="status-cell"><span class="status-pill badge-danger">Reported stolen</span><span class="status-why">Hijacking</span></span></td>
               </tr>
               <tr>
                 <td>VBN 442 GP</td><td class="ident">FL-019</td><td>Mercedes-Benz Sprinter 519 · 2023</td><td>Van</td><td class="num">93 L</td>
@@ -6763,7 +6873,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           <tbody>
             <tr><td>Can fuel</td><td>In fleet, and allowed to fuel. The ordinary vehicle, and where a new one starts. Drawn plain, so the three below it carry.</td></tr>
             <tr><td><span class="badge badge-warning">Cannot fuel</span> <span class="status-reason">In for a service</span></td><td>In fleet, off the road this week. The combination the old single Status column could not express, because Sold and In for a service were competing for the same word.</td></tr>
-            <tr><td><span class="badge badge-danger">Stolen lock</span> <span class="status-reason">Hijacked</span></td><td>In fleet and still counted; blocked at every forecourt.</td></tr>
+            <tr><td><span class="badge badge-danger">Reported stolen</span> <span class="status-reason">Hijacking</span></td><td>In fleet and still counted; blocked at every forecourt.</td></tr>
             <tr><td><span class="badge badge-neutral">Removed from fleet</span> <span class="status-reason">Sold</span></td><td>Gone. Only an administrator can bring it back. The one row where the pill is the lifecycle rather than fuel access.</td></tr>
           </tbody>
         </table>
@@ -7042,8 +7152,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            manager most needs to be told it worked said nothing at all. -->
             <section id="screen-stolen-filed" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7082,57 +7194,63 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title"><span class="ident">HRV 482 GP</span> is blocked</h2>
-                  <p class="panel-sub">No card can fuel it, at any station, from 14:32 today.</p>
+                  <h2 class="panel-title"><span class="ident">HRV 482 GP</span> is reported stolen</h2>
+                  <p class="panel-sub">Fuel purchases for this vehicle have been blocked since 14:32 today.</p>
                 </div>
-                <span class="badge badge-danger">Stolen lock</span>
+                <span class="badge badge-danger">Reported stolen</span>
               </div>
 
-              <dl class="panel-facts"><dt>Reference</dt><dd><span class="ident">SR-4821</span></dd><dt>Blocked at</dt><dd>14:32, today</dd><dt>Reported by</dt><dd>You</dd><dt>Vehicle</dt><dd>Toyota Hilux 2.4 GD-6, 2021</dd><dt>Driver on record</dt><dd>Thabo Mokoena</dd><dt>Last fill</dt><dd>Engen Sandton, yesterday 17:04</dd></dl>
+              <!-- Two facts, not one. What the vehicle is (reported stolen) and what
+                   its card can do (blocked) are different things that happen to
+                   move together here; a single "blocked" collapsed them and left
+                   nowhere to say that a recovered vehicle is still blocked. -->
+              <dl class="panel-facts"><dt>Vehicle state</dt><dd>Reported stolen</dd><dt>Fuel access</dt><dd>Blocked</dd><dt>Reference</dt><dd><span class="ident">SR-4821</span></dd><dt>Blocked at</dt><dd>14:32, today</dd><dt>Reported by</dt><dd>You</dd><dt>Vehicle</dt><dd>Toyota Hilux 2.4 GD-6, 2021</dd><dt>Assigned driver</dt><dd>Thabo Mokoena</dd><dt>Last fill</dt><dd>Engen Sandton, yesterday 17:04</dd></dl>
 
               <div class="panel-key">
-                <p class="key-outside"><span class="badge badge-danger">At the pump</span> An attendant who scans it sees <b>Do not fuel. This vehicle is reported stolen.</b> They are told to refuse the fill and report it, not to stop anyone.</p>
+                <p class="key-outside"><span class="badge badge-danger">What station staff see</span> An attendant who scans it sees <b>Do not fuel. This vehicle is reported stolen.</b> They are told to refuse the fill and report it, not to stop anyone.</p>
               </div>
 
               <div class="panel-foot">
-                <p class="panel-scope"><b>If anyone tries to fuel it, you get the station and the time.</b> You do not have to watch for it. No attempts since 14:32.</p>
+                <p class="panel-scope"><b>If a fuel attempt is recorded, it will appear in this report with the station and the time.</b> No attempts since 14:32.</p>
               </div>
             </div>
 
             <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title">Anything you know</h2>
-                  <p class="panel-sub">None of this holds up the block. It is already done.</p>
+                  <h2 class="panel-title">Report details</h2>
+                  <p class="panel-sub">These details are optional and can be added later.</p>
                 </div>
               </div>
               <div class="fields">
                 <div class="form-field">
-                  <span class="label">How did it go missing? <span class="opt">Optional</span></span>
-                  <div class="seg" role="radiogroup" aria-label="How did it go missing">
-                    <label><input type="radio" name="stolen-how">Hijacked</label>
-                    <label><input type="radio" name="stolen-how">Taken overnight</label>
-                    <label><input type="radio" name="stolen-how">Not returned</label>
+                  <span class="label">What happened? <span class="opt">Optional</span></span>
+                  <!-- The four answers are written here and generated from WHY
+                       in the live sheet, which is two places for one list. The
+                       figure is filled from WHY at load; this markup is the
+                       fallback and is kept in step by tools/copy-check. -->
+                  <div class="seg is-stacked" role="radiogroup" aria-label="What happened" data-role="why-stolen">
+                    <label><input type="radio" name="stolen-how">Hijacking</label>
+                    <label><input type="radio" name="stolen-how">Stolen while parked</label>
+                    <label><input type="radio" name="stolen-how">Vehicle not returned</label>
                     <label><input type="radio" name="stolen-how">Not sure</label>
                   </div>
-                  <span class="help">Not sure is a real answer. Nobody has to guess to get past this.</span>
+                  <span class="help">Choose Not sure if the circumstances are unknown.</span>
                 </div>
                 <div class="form-field">
                   <label for="stolen-note">Anything else <span class="opt">Optional</span></label>
                   <textarea id="stolen-note" class="field" rows="3" placeholder="Where it was last seen, who was driving, anything else you know."></textarea>
-                  <span class="help">This is what somebody reads back to the police, so write it the way you would say it.</span>
-                </div>
-                <div class="form-field">
-                  <label for="stolen-case">SAPS case number <span class="opt">Optional</span></label>
-                  <input id="stolen-case" class="field field-sm" placeholder="CAS 123/08/2026">
-                  <span class="help">You will not have this yet. SAPS sends it once the case is registered, and the law gives you 24 hours to report the theft.</span>
+                  <span class="help">Write it the way you would say it out loud.</span>
                 </div>
               </div>
               <div class="panel-foot">
@@ -7141,10 +7259,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </div>
             </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The first line is the whole screen.</b>
             A person who has just pressed a red button wants one thing, which
             is to know it took. A time is what makes that believable; a tick
@@ -7167,7 +7287,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
             make a theft into a form. Asking after costs nothing, and this is
             the only moment somebody has the details in their head.</p>
           <p class="surface-note"><b>Optional, all of them.</b> The case
-            number does not exist yet at 14:32. SAPS issues it once the
+            number does not exist yet at 14:32. It is issued once the
             case is registered, and the law allows twenty-four hours,
             so the field says that rather than sitting there looking unfilled.
             A required field here would be guessed at or would send somebody
@@ -7191,8 +7311,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            product will ever know. -->
             <section id="screen-stolen-sighting" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7231,24 +7353,27 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
           <div class="panel">
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Someone tried to fuel <span class="ident">HRV 482 GP</span></h2>
               <p class="panel-sub">Engen N1 City, Goodwood. Nine minutes ago.</p>
             </div>
-            <span class="badge badge-danger">Stolen lock</span>
+            <span class="badge badge-danger">Reported stolen</span>
           </div>
           <div class="panel-key">
             <div class="key-figure"><b>9 min ago</b><span>Engen N1 City, Goodwood</span></div>
             <div class="key-reason"><span class="badge badge-danger">Refused</span><span>Reported stolen at 06:10</span></div>
           </div>
-          <dl class="panel-facts"><dt>Card used</dt><dd><span class="ident">4821</span></dd><dt>Driver on record</dt><dd>Thabo Mokoena</dd><dt>Station</dt><dd>Engen N1 City, Goodwood</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd></dl>
-          <div class="panel-links"><a href="#stolen-sighting"><svg data-lucide="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>See on map</a><a href="#stolen-sighting"><svg data-lucide="share-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>Copy details for SAPS</a></div>
+          <dl class="panel-facts"><dt>Card used</dt><dd><span class="ident">4821</span></dd><dt>Assigned driver</dt><dd>Thabo Mokoena</dd><dt>Station</dt><dd>Engen N1 City, Goodwood</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd></dl>
+          <div class="panel-links"><a href="#stolen-sighting"><svg data-lucide="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>See on map</a><a href="#stolen-sighting"><svg data-lucide="share-2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>Copy details</a></div>
           <div class="panel-foot">
             <p class="panel-scope">The fill was refused. The vehicle is still reported stolen. <a href="#stolen-filed">Add this to the report</a>, so the case number and the sighting sit in one place.</p>
             <!-- Mark recovered does not belong on a fuel-attempt alert: an
@@ -7260,15 +7385,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </div>
         </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>This is the reason the state is worth
             having.</b> Blocking the card silently is correct and useless. The
             same event, reported, is a station, a time and a card number, which
             is more than most people get in the first day.</p>
-          <p class="surface-note"><b>Copy details for SAPS</b> copies the details as
+          <p class="surface-note"><b>Copy details</b> copies the details as
             text somebody can read down a phone. It does not pretend to file a
             case.</p>
           <p class="surface-note"><b>Mark recovered sits here and stays
@@ -7284,8 +7411,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            holding. Certainty has to survive closing the laptop. -->
             <section id="screen-stolen-record" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7324,19 +7453,13 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
-          <div class="banner banner-danger">
-              <div class="banner-body">
-                <p><b>Reported stolen by Thandi Mokoena, 19 August at 14:32.</b></p>
-                <p>No Engen site can release a fill for this vehicle. That includes you.</p>
-                <p class="banner-meta">Reference <span class="ident">SR-4821</span> &middot; still blocked &middot; 12 days</p>
-              </div>
-              <button class="btn btn-secondary" data-goto="stolen-recovered">Mark recovered</button>
-            </div>
-
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -7345,7 +7468,6 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
                 </div>
               </div>
               <ol class="trail">
-                <li><time>20 Aug 07:15</time><div><p>Case number added by Thandi Mokoena</p><p class="trail-detail"><span class="ident">CAS 214/08/2026</span></p></div></li>
                 <li><time>19 Aug 19:04</time><div><p>A fill was refused at Engen Rivonia <span class="badge badge-danger">Refused</span></p><p class="trail-detail">The attendant scanned this vehicle and got no fuel. Card 4821.</p></div></li>
                 <li><time>19 Aug 16:40</time><div><p>Note by Thandi Mokoena</p><p class="trail-detail">Recovery company has the plate. They will call me if the tracker pings.</p></div></li>
                 <li><time>19 Aug 14:32</time><div><p>Fuelling blocked at every Engen site</p></div></li>
@@ -7353,14 +7475,25 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </ol>
               <div class="panel-foot">
                 <p class="panel-scope">Nothing here can be edited, only added to. That is what makes it worth handing to an insurer.</p>
-                <div class="panel-actions"><button class="btn btn-secondary">Download for SAPS</button></div>
+                <div class="panel-actions"><button class="btn btn-secondary">Download report</button></div>
               </div>
             </div>
+
+          <div class="banner banner-danger">
+              <div class="banner-body">
+                <p><b>Reported stolen by Thandi Mokoena, 19 August at 14:32.</b></p>
+                <p>No Engen site can release a fill for this vehicle. That includes you.</p>
+                <p class="banner-meta">Reference <span class="ident">SR-4821</span> &middot; still blocked &middot; 12 days</p>
+              </div>
+              <button class="btn btn-secondary" data-goto="stolen-recovered">Mark recovered</button>
+            </div>
+        </div>
+          </div>
         </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The banner is the answer to a question
             nobody asks out loud.</b> Twelve days after reporting a vehicle a
             person wants to know the block is still on, and without a durable
@@ -7370,17 +7503,20 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           <p class="surface-note"><b>Still blocked, twelve days.</b> A count
             of nothing is still news. Silence after a block reads as working
             or as broken, and only one of those is true.</p>
-          <p class="surface-note"><b>Mark recovered lives in the banner.</b>
-            The way out belongs in the same place as the state it undoes,
-            found by memory rather than hunted for under stress. A toast that
-            vanishes cannot be the only exit.</p>
+          <p class="surface-note"><b>The block sits at the foot of the record.</b>
+            It was at the head, above the history, which put the loudest thing
+            on the screen in front of the thing somebody opened the record to
+            read. The state and the way out of it now close the record instead
+            of opening it, and Mark recovered stays inside the block, so the
+            exit is in the same place as the state it undoes rather than
+            hunted for under stress.</p>
           <p class="surface-note"><b>One column, not two.</b> A refused fill
             is machine news and the note above it is human, and splitting
             them into separate feeds means reading the story twice. This is
             also where the note from the receipt ends up, which is why the
             form did not need to be a place of its own.</p>
           <p class="surface-note"><b>Add to, never edit.</b> A record somebody
-            can quietly rewrite is worth nothing to SAPS, and the append-only
+            can quietly rewrite is worth nothing to an investigation, and the append-only
             rule is cheaper to build than a permissions argument.</p>
         </div>
       </section>
@@ -7390,8 +7526,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            road, and is the transition somebody will be asked to justify. -->
             <section id="screen-stolen-recovered" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7430,44 +7568,69 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-2">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner">
+        <div class="preview-dialog" role="group" aria-labelledby="preview-dialog-title-2">
           <div class="approve-card">
               <div class="approve-head">
-                <h2 id="stage-modal-title-2">Mark <span class="ident">HRV 482 GP</span> as recovered?</h2>
+                <h2 id="preview-dialog-title-2">Mark <span class="ident">HRV 482 GP</span> as recovered?</h2>
               </div>
               <!-- What happens, not how the record is assembled. "It comes
                    back as Cannot fuel with the reason set to Recovered, not
                    yet checked" describes two field writes; the person taking
                    this decision needs the consequence. -->
               <p class="approve-scope">Fuel access stays blocked until the vehicle has been inspected and reactivated. The theft report and everything on it stay on the record.</p>
-              <div class="fields">
+              <div class="fields" data-role="recovered-form">
                 <div class="form-field">
-                  <span class="label">Do you have the vehicle back?</span>
-                  <div class="seg is-stacked" role="radiogroup" aria-label="Do you have the vehicle back">
-                    <label><input type="radio" name="recovered-have">Yes, we have it back</label>
-                    <label><input type="radio" name="recovered-have">No, but it was never stolen</label>
-                    <label><input type="radio" name="recovered-have">Not sure</label>
+                  <span class="label" id="recovered-q">Do you have the vehicle back?</span>
+                  <div class="seg is-stacked" role="radiogroup" aria-labelledby="recovered-q">
+                    <label><input type="radio" name="recovered-have" value="back">Yes, we have it back</label>
+                    <label><input type="radio" name="recovered-have" value="error">No, but it was never stolen</label>
+                    <label><input type="radio" name="recovered-have" value="unsure">Not sure</label>
                   </div>
                 </div>
-                <div class="form-field">
-                  <label for="recovered-why">What happened?</label>
-                  <textarea id="recovered-why" class="field" rows="3" placeholder="SAPS brought it back on 22 August. Case CAS 214/08/2026 is still open."></textarea>
-                  <span class="help">The next person to open this record reads this.</span>
+
+                <!-- Nothing below appears until the question above is answered,
+                     because which of these two fields belongs on the screen is
+                     the answer to it. Asking "what happened" before knowing
+                     whether it is a recovery or a correction asks one question
+                     for two different records. -->
+                <div class="form-field hidden" data-branch="back">
+                  <label for="recovered-notes">Recovery notes <span class="opt">Optional</span></label>
+                  <!-- The placeholder was a finished sentence with a date and a
+                       case number in it. A grey sentence that reads like a
+                       filled-in answer is one somebody copies, or worse, one
+                       somebody believes is already saved. -->
+                  <textarea id="recovered-notes" class="field" rows="3" placeholder="Add recovery details"></textarea>
+                  <span class="help">Who recovered it, where it was found, and whether anything on it looks damaged. The next person to open this record reads this.</span>
+                </div>
+
+                <div class="form-field hidden" data-branch="error">
+                  <label for="recovered-correction">Reason for correction</label>
+                  <textarea id="recovered-correction" class="field" rows="3" placeholder="Add the reason"></textarea>
+                  <span class="help">This is a correction, not a recovery, and it is recorded as one. The theft report and everything already on it stay exactly as they are.</span>
                 </div>
               </div>
               <div class="approve-actions">
                 <button class="btn btn-secondary" data-goto="stolen-record">Cancel, keep it blocked</button>
-                <button class="btn btn-primary" data-goto="directory">Mark recovered</button>
+                <!-- Starts disabled, and says so to a screen reader as well as
+                     to an eye. The screen used to offer Mark recovered before
+                     anybody had said whether the vehicle was back: a
+                     consequential action, live, on an unanswered question. -->
+                <button class="btn btn-primary" data-role="recovered-submit" data-goto="directory" disabled>Mark recovered</button>
               </div>
             </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>This is the only place in the flow that
             asks for anything, and it is the right place.</b> Reporting a
             theft is done in a hurry by somebody who has just lost a vehicle.
@@ -7505,8 +7668,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
         </div>
 
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7545,14 +7710,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-3">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner">
+        <div class="preview-dialog" role="group" aria-labelledby="preview-dialog-title-3">
           <div class="panel">
           <div class="panel-head">
             <div>
-              <h2 class="panel-title" id="stage-modal-title-3">Thabo Mokoena wants to fill up</h2>
+              <h2 class="panel-title" id="preview-dialog-title-3">Thabo Mokoena wants to fill up</h2>
               <p class="panel-sub"><span class="ident">HRV 482 GP</span> at Engen N1 City, Goodwood</p>
             </div>
             <span class="timer">Expires <b>08:52</b> · in <b>1:47</b></span>
@@ -7580,10 +7748,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </div>
         </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The distance is the answer.</b> Forty two
             kilometres out is a delivery that ran long or somebody filling a
             friend's car, and a manager can usually tell which from the number
@@ -7612,8 +7782,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
 
             <section id="screen-override-approved" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7652,10 +7824,13 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
           <div class="panel">
           <div class="panel-head">
             <div>
@@ -7673,10 +7848,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </div>
         </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The second button is the point.</b> Three
             approvals for the same station is not an emergency, it is a rule
             that needs changing, and this is the moment somebody notices.
@@ -7696,8 +7873,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
 
             <section id="screen-override-declined" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7736,10 +7915,13 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
           <div class="panel">
           <div class="panel-head">
             <div>
@@ -7757,10 +7939,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </div>
         </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>Declining leaves somebody stranded, so the
             driver's number stays one click away.</b> A driver who cannot fuel
             and cannot reach anyone is the version of this that ends in a tow
@@ -7772,8 +7956,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
 
             <section id="screen-override-lapsed" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7812,10 +7998,13 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-panel">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner preview-positioner--edge">
+        <div class="preview-record">
           <div class="panel">
           <div class="panel-head">
             <div>
@@ -7833,10 +8022,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </div>
         </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>It says what happened to Thabo, not to the
             request.</b> "Expired" describes a row in a database. He is the one
             standing at a pump that will not pay.</p>
@@ -7852,8 +8043,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
            who pressed still has to be told what happened to their press. -->
             <section id="screen-override-taken" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7892,14 +8085,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-4">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner">
+        <div class="preview-dialog" role="group" aria-labelledby="preview-dialog-title-4">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title" id="stage-modal-title-4">Sipho Dube approved this fill</h2>
+                  <h2 class="panel-title" id="preview-dialog-title-4">Sipho Dube approved this fill</h2>
                   <p class="panel-sub">At 08:43, about twenty seconds before you pressed.</p>
                 </div>
                 <span class="badge badge-good">Approved</span>
@@ -7915,10 +8111,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </div>
             </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>Two managers, one notification, one
             pump.</b> Break-glass goes to everybody who can answer it, which
             is the point &mdash; somebody is standing at a forecourt. It also
@@ -7947,8 +8145,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
         </div>
 
         <!-- The list this happens on, not a page of its own. -->
-        <div class="stage-crop">
-        <div class="stage-under" aria-hidden="true">
+        <div class="preview">
+        <div class="preview-product" aria-hidden="true">
+        <div class="preview-cols">
+        <div class="preview-page">
         <div class="page-head">
           <div>
             <h1>Vehicles</h1>
@@ -7987,14 +8187,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
           </table>
         </div>
         </div>
+        </div>
+        </div>
 
-        <div class="stage-scrim" aria-hidden="true"></div>
-
-        <div class="stage-modal" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="stage-modal-title-5">
+        <div class="preview-overlay">
+          <div class="preview-scrim" aria-hidden="true"></div>
+          <div class="preview-positioner">
+        <div class="preview-dialog" role="group" aria-labelledby="preview-dialog-title-5">
           <div class="panel">
               <div class="panel-head">
                 <div>
-                  <h2 class="panel-title" id="stage-modal-title-5">Sibusiso Mahlangu wants to fill up</h2>
+                  <h2 class="panel-title" id="preview-dialog-title-5">Sibusiso Mahlangu wants to fill up</h2>
                   <p class="panel-sub"><span class="ident">NCA 875 GP</span> at Engen Beaufort West</p>
                 </div>
                 <span class="timer">Expires <b>11:18</b> · in <b>3:02</b></span>
@@ -8010,10 +8213,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.
               </div>
             </div>
         </div>
+          </div>
+        </div>
 
         </div>
 
-        <div class="stage-notes">
+        <div class="figure-notes">
           <p class="surface-note"><b>The cap is a fact about the policy, not a
             refusal.</b> So the screen offers the largest thing it is allowed
             to offer and says plainly that it is a part tank. Hiding the
@@ -8626,7 +8831,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 
         <table class="states-table">
           <thead>
-            <tr><th>Status</th><th>Which field</th><th>At the pump</th><th>Set by</th><th>Way back</th></tr>
+            <tr><th>Status</th><th>Which field</th><th>What station staff see</th><th>Set by</th><th>Way back</th></tr>
           </thead>
           <tbody data-role="status-rows"><!-- built from STATUS_MEANING in drivers.js --></tbody>
         </table>
@@ -8927,24 +9132,18 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
     </div>
 
-    <h3 class="sheet-section__title">Police reference</h3>
-    <!-- Said plainly, because the opposite belief is the dangerous one: typing
-         a case number here does not open a case, update one, or discharge
-         anybody's duty to report. -->
-    <p class="group-note">Recording a reference here files it against this
-      incident. It does not open or update a case with SAPS, and it does not
-      replace reporting the theft to them.</p>
-    <div class="fields">
-      <div class="form-field">
-        <label for="theft-cas">SAPS CAS number <span class="opt">Optional</span></label>
-        <input class="field ident" id="theft-cas" autocomplete="off" placeholder="e.g. 411/8/2026">
-        <span class="help">Add this after SAPS has registered the case.</span>
-      </div>
-      <div class="form-field">
-        <label for="theft-station">Police station <span class="opt">Optional</span></label>
-        <input class="field" id="theft-station" autocomplete="off" placeholder="e.g. Sandton">
-      </div>
-    </div>
+    <!-- Police reference was a section here: a case number, a police station,
+         and a paragraph explaining that filling them in does not open a case,
+         update one, or discharge anybody's duty to report the theft.
+
+         All of that was true, which was the problem. The product does not
+         reach the police, so every word of the section was spent telling
+         somebody what the two fields under it would not do. A question whose
+         own help text has to talk you out of expecting anything is a question
+         to remove, not to word better.
+
+         Anything worth keeping about a case goes in the report notes above,
+         which are free text and already stamped with who wrote them. -->
 
     <h3 class="sheet-section__title">Fuel attempts</h3>
     <p class="group-note">Attempts recorded against this vehicle since it was reported.</p>
@@ -9185,20 +9384,22 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
           <option>Diesel</option><option>Petrol</option>
         </select>
       </div>
-      <!-- Engine size, above tank capacity and clearly a different quantity.
-           The commonest fault in a fleet import is one being typed into the
-           other — 125 in the tank field on a motorcycle, 2 000 in the engine
-           field meaning cc. Two labelled fields with two units is the cheapest
-           guard there is, and the service checks for the swap by name as
-           well. -->
-      <div class="form-field" data-field="engineCc">
-        <label for="f-engine" data-role="engine-label">Engine capacity <span class="opt">Optional</span></label>
-        <span class="suffix-wrap">
-          <input class="field" id="f-engine" inputmode="decimal" placeholder="e.g. 2393">
-          <span class="suffix">cc</span>
-        </span>
-        <span class="help" data-role="engine-help">In cc, not litres.</span>
-      </div>
+      <!-- Engine capacity was here, inside Fuel specification, which is the
+           wrong section: engine displacement is not a fuel quantity and being
+           beside tank capacity is what invited the two to be confused.
+
+           It is out of the manual form entirely, not moved. The only stated
+           use for it is checking an A1 against an A motorcycle licence, and
+           that check is not built: licence codes live on the driver record and
+           nothing anywhere compares one to a displacement. Asking every person
+           adding a bakkie for a number no code reads is a question with no
+           outcome behind it.
+
+           It stays an optional CSV import column, so an existing fleet export
+           still loads without edits, and it comes back to this form the day
+           the licence check exists, under Vehicle details, shown for
+           motorcycles only, labelled "Engine capacity, Optional" in cc, saying
+           what it is for. -->
 
       <!-- Three named answers, not a dropdown showing "Not sure".
            The old control was a select whose resting label was the least
@@ -9219,7 +9420,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
              through one element. Kept in step by the sheet controller. -->
         <input type="hidden" id="f-tank-mode">
         <label class="radio"><input type="radio" name="tankMode" value="one"> <span>One tank</span></label>
-        <label class="radio"><input type="radio" name="tankMode" value="many"> <span>More than one tank</span></label>
+        <label class="radio"><input type="radio" name="tankMode" value="many"> <span>Two tanks</span></label>
         <label class="radio"><input type="radio" name="tankMode" value="unsure"> <span>Not sure</span></label>
       </fieldset>
 
@@ -9233,12 +9434,17 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <span class="help" data-role="tank-help">Do not include the AdBlue tank.</span>
       </div>
 
-      <!-- More than one: each tank on its own, and the total worked out here.
-           Asking somebody to add up their own tanks is asking them to do
-           arithmetic the product is about to validate. -->
+      <!-- Two tanks, each on its own, and the total worked out here. Asking
+           somebody to add up their own tanks is asking them to do arithmetic
+           the product is about to validate.
+
+           Two is the limit. The editor used to grow a row on every press of
+           "Add another tank" with nothing stopping it, while the answer above
+           said "More than one tank" and left how many open. Both now say the
+           same thing, so nobody is offered a third row and then asked why the
+           total looks wrong. -->
       <div class="form-field field-wide" data-field="tanks" hidden>
         <span class="tank-list" data-role="tank-list"></span>
-        <button type="button" class="btn btn-tertiary tank-add" data-role="tank-add">Add another tank</button>
         <p class="tank-total" data-role="tank-total"></p>
       </div>
       </div>
@@ -9361,7 +9567,6 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
            there is a purpose for it. It returns as an optional field the day a
            documented operational requirement exists, with its retention and
            who-may-view-it settled first. -->
-      </div>
     </div>
 
     <h3 class="sheet-section__title">Identification</h3>
@@ -12226,32 +12431,38 @@ if (typeof module !== 'undefined' && module.exports) module.exports = DriverRule
 window.VehicleTypes = (() => {
 
 /* `band` is the key the capacity service bands against, so adding a category
-   here is enough to give it a plausibility range. `engine` says whether
-   engine displacement is required: on anything with two or three wheels the
-   tank is small enough that cc and litres get confused, and having the engine
-   size is what lets the service catch the swap.
+   here is enough to give it a plausibility range.
+
+   `engine` records which categories would want a displacement if anything
+   asked for one. Nothing does: the field is off the manual form until there
+   is a licence check to consume it, and this key is kept because it is the
+   fact, not the wiring. Do not read it to decide whether to show a field.
 
    `group` drives the optgroups. A flat list of thirteen is a wall; grouped,
    a manager finds their vehicle in one glance without the list hiding
    anything from them. */
+/* Seven, in the three groups this fleet actually runs: light commercial,
+   heavy commercial, and two and three wheels.
+
+   Thirteen were offered before, which meant offering passenger cars, minibuses,
+   buses, a special-purpose free-text branch and an "Other" escape hatch to a
+   product for bakkies, vans, trucks and bikes. A list is a claim about what
+   you support, and five of those were not claims anybody meant to make.
+
+   An import naming one of the removed kinds no longer resolves silently. It
+   arrives unrecognised and is surfaced at review, which is the honest answer:
+   the product does not carry that vehicle. */
 const TYPES = [
   { code: 'motorcycle',         label: 'Motorcycle',              group: 'Two and three wheels', band: 'motorcycle.street',    engine: 'required' },
   { code: 'scooter',            label: 'Scooter',                 group: 'Two and three wheels', band: 'motorcycle.scooter',   engine: 'required' },
   { code: 'courier_motorcycle', label: 'Courier motorcycle',      group: 'Two and three wheels', band: 'motorcycle.underbone', engine: 'required' },
   { code: 'three_wheeler',      label: 'Three-wheeler',           group: 'Two and three wheels', band: 'motorcycle.tricycle',  engine: 'required' },
 
-  { code: 'passenger_car',      label: 'Passenger car',           group: 'Cars and light commercial', band: 'passenger', engine: 'optional' },
-  { code: 'bakkie',             label: 'Bakkie',                  group: 'Cars and light commercial', band: 'bakkie',    engine: 'optional' },
-  { code: 'van',                label: 'Van',                     group: 'Cars and light commercial', band: 'van',       engine: 'optional' },
+  { code: 'bakkie',             label: 'Bakkie',                  group: 'Light commercial', band: 'bakkie',    engine: 'optional' },
+  { code: 'van',                label: 'Van',                     group: 'Light commercial', band: 'van',       engine: 'optional' },
 
-  { code: 'minibus',            label: 'Minibus',                 group: 'Carrying people', band: 'minibus', engine: 'optional' },
-  { code: 'bus',                label: 'Bus',                     group: 'Carrying people', band: 'bus',     engine: 'optional' },
-
-  { code: 'rigid_truck',        label: 'Rigid truck',             group: 'Trucks', band: 'truck.medium', engine: 'optional' },
-  { code: 'tractor_unit',       label: 'Tractor unit',            group: 'Trucks', band: 'truck.heavy',  engine: 'optional' },
-
-  { code: 'special_purpose',    label: 'Special-purpose vehicle', group: 'Anything else', band: 'special', engine: 'optional' },
-  { code: 'other',              label: 'Other',                   group: 'Anything else', band: null,      engine: 'optional' },
+  { code: 'rigid_truck',        label: 'Rigid truck',             group: 'Heavy commercial', band: 'truck.medium', engine: 'optional' },
+  { code: 'tractor_unit',       label: 'Tractor unit',            group: 'Heavy commercial', band: 'truck.heavy',  engine: 'optional' },
 ];
 
 const BY_CODE = Object.fromEntries(TYPES.map(t => [t.code, t]));
@@ -12276,30 +12487,19 @@ const CONFIGS = {
     { code: 'medium', label: 'Medium, 8 to 16 tons',  band: 'truck.medium' },
     { code: 'heavy',  label: 'Heavy, over 16 tons',   band: 'truck.heavy' },
   ],
-  passenger_car: [
-    { code: 'hatchback', label: 'Hatchback', band: 'passenger' },
-    { code: 'sedan',     label: 'Sedan',     band: 'passenger' },
-    { code: 'suv',       label: 'SUV',       band: 'passenger.suv' },
-  ],
   bakkie: [
     { code: 'single', label: 'Single cab', band: 'bakkie' },
     { code: 'double', label: 'Double cab', band: 'bakkie' },
   ],
-  bus: [
-    { code: 'midibus', label: 'Midibus',        band: 'bus.midi' },
-    { code: 'coach',   label: 'Coach',          band: 'bus.coach' },
-    { code: 'double',  label: 'Double-decker',  band: 'bus.coach' },
-  ],
 };
 
-/* Primary use. Asked on three categories and no others.
+/* Primary use. Asked on one category and no others.
  *
- * On `other` and `special_purpose` the category has deliberately told the
- * product nothing, so this is the only field that says what the vehicle is —
- * which is why it is free text and why it is required. On a three-wheeler it
- * is the difference between a delivery box and a passenger cab, and those do
- * not carry the same tank. Everywhere else the answer would change nothing,
- * and the brief's own rule applies: do not ask. */
+ * On a three-wheeler it is the difference between a delivery box and a
+ * passenger cab, and those do not carry the same tank. It was also asked on
+ * `other` and `special_purpose`, where it was the only field saying what the
+ * vehicle was; both categories are gone. Everywhere else the answer would
+ * change nothing, and the brief's own rule applies: do not ask. */
 const USES = {
   three_wheeler: {
     required: true,
@@ -12308,16 +12508,6 @@ const USES = {
       { code: 'cargo',     label: 'Cargo or delivery', band: 'motorcycle.tricycle' },
       { code: 'passenger', label: 'Carrying passengers', band: 'motorcycle.tricycle' },
     ],
-  },
-  special_purpose: {
-    required: true, free: true,
-    label: 'What this vehicle is used for',
-    help: 'For example: tipper, crane truck, refrigerated body, water tanker.',
-  },
-  other: {
-    required: true, free: true,
-    label: 'Describe this vehicle',
-    help: 'Tell us what it is, so we can check its tank capacity sensibly.',
   },
 };
 
@@ -12331,14 +12521,12 @@ const ALIASES = {
   lcv: 'bakkie', 'light commercial vehicle': 'bakkie',
   hcv: 'rigid_truck', 'heavy commercial vehicle': 'rigid_truck',
   'heavy commercial vehicle (≤8 ton)': 'rigid_truck',
-  'other (>8 ton)': 'other',
   bike: 'motorcycle', motorbike: 'motorcycle', moto: 'motorcycle',
   ute: 'bakkie', pickup: 'bakkie', 'pick-up': 'bakkie', 'pick up': 'bakkie',
-  car: 'passenger_car', sedan: 'passenger_car', hatchback: 'passenger_car',
-  suv: 'passenger_car',
+  /* car, sedan, hatchback, suv, taxi, combi, kombi and coach used to resolve
+     here. The product does not carry those vehicles, so a file naming one is
+     not quietly turned into something else; it is flagged at review. */
   panelvan: 'van', 'panel van': 'van',
-  taxi: 'minibus', combi: 'minibus', kombi: 'minibus',
-  coach: 'bus',
   truck: 'rigid_truck', 'rigid': 'rigid_truck',
   'horse': 'tractor_unit', 'truck tractor': 'tractor_unit', 'tractor': 'tractor_unit',
   trike: 'three_wheeler', tuktuk: 'three_wheeler', 'tuk-tuk': 'three_wheeler',
@@ -12393,7 +12581,6 @@ return {
   configsFor: c => (CONFIGS[c] || []).slice(),
   hasConfigs: c => !!CONFIGS[c],
   useFor: c => USES[c] || null,
-  engineRequired: c => !!BY_CODE[c] && BY_CODE[c].engine === 'required',
   /* The exact strings the CSV specification publishes, so the document and the
      parser cannot disagree about what is accepted. */
   csvValues: () => TYPES.map(t => t.code),
@@ -12592,6 +12779,23 @@ return {
     }
     make.addEventListener('input', sync);
     make.addEventListener('change', sync);
+
+    /* Opening a saved vehicle writes the make in script, and assigning to
+       .value fires neither input nor change. So an edited vehicle arrived with
+       its make filled in, its model filled in, and the model field disabled
+       and still saying "Select a make first" over the answer it was holding.
+       Same fault as the selects had, same repair: the instance's value
+       property wraps the prototype's and tells the field it changed. */
+    const makeProto = Object.getOwnPropertyDescriptor(
+      Object.getPrototypeOf(make), 'value');
+    if (makeProto && makeProto.set) {
+      Object.defineProperty(make, 'value', {
+        configurable: true,
+        get() { return makeProto.get.call(this); },
+        set(v) { makeProto.set.call(this, v); sync(); },
+      });
+    }
+    make.addEventListener('change', sync);
     sync();
   }
 })();
@@ -12688,14 +12892,10 @@ return {
 
     let active = -1;
     let rows = [];
-    let filter = null;
 
     /* Twelve is where scanning stops being faster than typing. Below it a
        search box is one more thing to look past; above it, hunting a year in a
        column of twenty-seven is worse than typing two digits. */
-    const LONG = 12;
-    const isLong = () => sel.querySelectorAll('option').length > LONG;
-
     /* Built from the select, so a field whose options are filled later — the
        taxonomy, the licence codes, the makes — is right the moment it is. */
     function draw(query) {
@@ -12703,25 +12903,15 @@ return {
       list.textContent = '';
       const q = String(query || '').trim().toLowerCase();
 
-      /* The search box belongs to the list, so it appears and disappears with
-         the list's length rather than with anybody's decision about it. */
-      if (isLong()) {
-        const box = document.createElement('input');
-        box.type = 'search';
-        box.className = 'field select-search';
-        box.placeholder = 'Search';
-        box.setAttribute('aria-label', 'Search the list');
-        box.value = query || '';
-        box.addEventListener('input', () => { draw(box.value); box.focus(); move(0); });
-        box.addEventListener('keydown', e => {
-          if (e.key === 'ArrowDown') { e.preventDefault(); move(active + 1); return; }
-          if (e.key === 'ArrowUp') { e.preventDefault(); move(active - 1); return; }
-          if (e.key === 'Enter') { e.preventDefault(); pick(active); return; }
-          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
-        });
-        list.append(box);
-        filter = box;
-      } else { filter = null; }
+      /* No search box. A long list used to grow one, which made two controls
+         out of one: the caret landed in the box on open, so Home, End and
+         type-ahead were all swallowed by an input that was filtering instead.
+         Year has twenty-seven options and could not be reached with End.
+
+         Searching belongs to Make and Model, which are comboboxes over lists
+         nobody can hold in their head. Year, Vehicle category and Fuel type
+         are closed sets that a person picks from, and type-ahead on the
+         trigger is what a native select gives them. */
 
       const keep = o => !q || o.textContent.toLowerCase().includes(q);
       [...sel.children].forEach(node => {
@@ -12793,26 +12983,98 @@ return {
       return empty ? empty.textContent : 'Select';
     };
 
+    let repos = null;
+
     function open() {
       if (!list.classList.contains('hidden')) return;
       draw(); paint();
       closeAll(api);
       list.classList.remove('hidden');
       trigger.setAttribute('aria-expanded', 'true');
-      /* Records is a top-level const, not a property of window: guarding on
-         window.Records was false every time and the list was never placed. */
-      if (typeof Records !== 'undefined' && Records.pinPop) Records.pinPop(trigger, list);
+      /* A listbox is as wide as the control it belongs to. Written here rather
+         than in pinPop, which places every popover in the product and has no
+         business deciding that a filter panel is the width of its button. */
+      const box = trigger.getBoundingClientRect();
+      list.style.width = box.width + 'px';
+
+      /* And no taller than a menu should be. pinPop hands every popover all
+         the room there is, which is right for a filter panel and wrong for a
+         list of years: twenty-seven of them came to 746px, a menu the height
+         of the window that scrolled anyway. Capped at the same token the Make
+         list uses, so the two menus in one form are the same object.
+
+         Placed twice on purpose: pinPop decides above-or-below from the
+         height it measures, so it has to see the capped box, and it writes
+         max-height itself, so the cap has to be applied between the two. */
+      const cap = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--size-menu-max-height')) || 288;
+      const place = () => {
+        if (typeof Records === 'undefined' || !Records.pinPop) return;
+        Records.pinPop(trigger, list);
+        if (parseFloat(list.style.maxHeight) > cap) {
+          list.style.maxHeight = cap + 'px';
+          Records.pinPop(trigger, list);
+          if (parseFloat(list.style.maxHeight) > cap) list.style.maxHeight = cap + 'px';
+        }
+        /* pinPop clamps horizontally against the width it measures, and .pop
+           animates in, so it can measure the box mid-animation: 651px of a
+           656px menu, which pushed the left edge 15px off the trigger at 200%
+           zoom. The width here is the one written above, not one sampled from
+           a moving element. */
+        const w = parseFloat(list.style.width);
+        if (w) {
+          const a = trigger.getBoundingClientRect();
+          const gap = 8;
+          let left = a.left;
+          if (left + w > window.innerWidth - gap) left = a.right - w;
+          left = Math.max(gap, Math.min(left, window.innerWidth - w - gap));
+          list.style.left = left + 'px';
+
+          /* And then check where it actually landed.
+             position: fixed is relative to the viewport only while no ancestor
+             is transformed. The sheet animates in with translateX(2%), and for
+             those 200ms it is the containing block for everything fixed inside
+             it, so a menu opened in that window was placed against the sheet
+             and sat 14px off the trigger on a 720px viewport. Rather than
+             special-case the animation, the offset is measured and taken out:
+             this is correct under any transformed ancestor, present or future. */
+          const landed = list.getBoundingClientRect();
+          const dx = left - landed.left;
+          if (Math.abs(dx) > 0.5) { list.style.left = (left + dx) + 'px'; }
+          const wantTop = parseFloat(list.style.top);
+          const dy = wantTop - list.getBoundingClientRect().top;
+          if (Math.abs(dy) > 0.5) { list.style.top = (wantTop + dy) + 'px'; }
+        }
+      };
+      place();
+      /* And again once layout has settled. Showing the list can move the thing
+         it is anchored to: a sheet that gains or loses a scrollbar shifts its
+         contents sideways, and the menu was left placed against where the
+         trigger used to be. Fifteen pixels adrift at 200% zoom, which is the
+         width of a scrollbar and not a coincidence. */
+      requestAnimationFrame(() => {
+        if (!list.classList.contains('hidden')) place();
+      });
+      /* And it keeps following while it is open. Anything that moves the
+         trigger under it, a scroll inside the sheet or a resize, would
+         otherwise leave the menu behind at the last place the trigger was.
+         Capture phase, because the scroll happens on the sheet body rather
+         than on the window. */
+      repos = () => { if (!list.classList.contains('hidden')) place(); };
+      window.addEventListener('scroll', repos, true);
+      window.addEventListener('resize', repos);
       const at = rows.findIndex(r => r.dataset.value === sel.value);
       move(at < 0 ? 0 : at);
-      /* Typing is the point of a long list, so the caret starts where typing
-         goes. On a short one the trigger keeps focus and type-ahead does the
-         same job without a box to look past. */
-      if (filter) filter.focus({ preventScroll: true });
       OPEN.add(api);
     }
 
     function close(focusBack) {
       if (list.classList.contains('hidden')) return;
+      if (repos) {
+        window.removeEventListener('scroll', repos, true);
+        window.removeEventListener('resize', repos);
+        repos = null;
+      }
       list.classList.add('hidden');
       trigger.setAttribute('aria-expanded', 'false');
       trigger.removeAttribute('aria-activedescendant');
@@ -12855,9 +13117,6 @@ return {
         e.preventDefault(); e.stopPropagation(); close(true); return;
       }
       if (e.key === 'Tab') { close(false); return; }
-      /* Everything else belongs to the search box while it has the caret:
-         arrows move its cursor, letters filter rather than type-ahead. */
-      if (filter && document.activeElement === filter) return;
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (list.classList.contains('hidden')) { open(); return; }
@@ -12896,8 +13155,45 @@ return {
        or writes the value in script. */
     const api = { close, refresh: () => { draw(); paint(); }, trigger, sel };
     sel.addEventListener('change', paint);
-    new MutationObserver(() => { if (!list.classList.contains('hidden')) draw(); paint(); })
-      .observe(sel, { childList: true });
+
+    /* Opening a saved record writes the value in script, and assigning to
+       .value fires no event, so the trigger kept showing "Select year" over a
+       select that already held 2021. Every field the form restores had the
+       same fault and it was invisible from the markup.
+
+       The instance's own value property wraps the prototype's: the native
+       element still stores the value, and the button is repainted the moment
+       anything writes it. selectedIndex is wrapped for the same reason, since
+       some code sets that instead. */
+    const proto = Object.getPrototypeOf(sel);
+    ['value', 'selectedIndex'].forEach(prop => {
+      const desc = Object.getOwnPropertyDescriptor(proto, prop);
+      if (!desc || !desc.set) return;
+      Object.defineProperty(sel, prop, {
+        configurable: true,
+        enumerable: desc.enumerable,
+        get() { return desc.get.call(this); },
+        set(v) { desc.set.call(this, v); paint(); },
+      });
+    });
+    /* Disabled and required live on the native element, and the control a
+       person actually reaches is the button. Without this a disabled select
+       still opened its menu, because nothing had told the button. */
+    function mirror() {
+      trigger.disabled = sel.disabled;
+      trigger.setAttribute('aria-disabled', String(sel.disabled));
+      if (sel.required) { trigger.setAttribute('aria-required', 'true'); }
+      else { trigger.removeAttribute('aria-required'); }
+      if (sel.disabled) { close(false); }
+    }
+    mirror();
+
+    new MutationObserver(() => {
+      if (!list.classList.contains('hidden')) draw();
+      paint();
+      mirror();
+    }).observe(sel, { childList: true, attributes: true,
+      attributeFilter: ['disabled', 'required'] });
 
     draw(); paint();
     return api;
@@ -12905,6 +13201,16 @@ return {
 
   document.addEventListener('click', e => {
     if (!e.target.closest('.select-field')) closeAll(null);
+  });
+
+  /* Coming back to the page from the back-forward cache, or an autofill, both
+     write the native value without going through the instance setter above and
+     without firing an event. The triggers would keep showing whatever they
+     showed when the page was put away. */
+  window.addEventListener('pageshow', () => {
+    document.querySelectorAll('select[data-enhanced]').forEach(sel => {
+      sel.dispatchEvent(new Event('change', { bubbles: false }));
+    });
   });
 
   /* Everything present at start-up, and anything added later. */
@@ -12932,32 +13238,6 @@ return {
       g.types.map(t => `<option value="${t.code}">${t.label}</option>`).join('') +
       '</optgroup>').join('');
 
-  const engine = document.querySelector('[data-field="engineCc"]');
-  const label = engine && engine.querySelector('label');
-  const help = engine && engine.querySelector('.help');
-
-  function sync() {
-    if (!engine) return;
-    const code = sel.value;
-    const required = VehicleTypes.engineRequired(code);
-    /* No type chosen yet: the field stays, optional, because somebody filling
-       the form top to bottom should not watch a field appear and disappear
-       under their hands. Once a type is chosen it either matters or it goes. */
-    engine.hidden = !!code && !required;
-    if (label) {
-      label.innerHTML = required
-        ? 'Engine capacity'
-        : 'Engine capacity <span class="opt">Optional</span>';
-    }
-    if (help) {
-      help.textContent = required
-        ? 'In cc, not litres. A 125 here and a 125 in the tank field are very different vehicles.'
-        : 'Stored in cc. Optional for this vehicle type.';
-    }
-  }
-
-  sel.addEventListener('change', sync);
-  sync();
 })();
 
 /* import-schema.js */
@@ -12988,7 +13268,7 @@ const COLUMNS = [
     example: '2021' },
   { key: 'vehicle_category', label: 'Vehicle category', required: true,
     aliases: ['vehicle_type'],
-    says: 'One of thirteen values.',
+    says: 'One of seven values.',
     example: 'bakkie' },
   { key: 'fuel_type', label: 'Fuel type', required: true,
     says: 'Diesel or Petrol.',
@@ -12997,8 +13277,8 @@ const COLUMNS = [
     aliases: ['tank_capacity_l'],
     says: 'The combined capacity of all fitted fuel tanks, in litres. Not the AdBlue tank.',
     example: '80' },
-  { key: 'engine_capacity_cc', label: 'Engine capacity', required: false, conditional: true,
-    says: 'In cc. Required for motorcycles, scooters, courier motorcycles and three-wheelers, where it is the only way to tell a small engine from a small tank. Leave it empty for anything else.',
+  { key: 'engine_capacity_cc', label: 'Engine capacity', required: false,
+    says: 'In cc, if your export has it. Nothing in the product reads it yet, so leave it empty rather than look it up. It is accepted so an existing fleet export loads without being edited first.',
     example: '' },
   { key: 'fleet_number', label: 'Fleet number', required: false,
     says: 'Your own reference. You can add it later.',
@@ -13127,21 +13407,20 @@ return {
 /* Theft incidents: their own records, with their own immutable timelines.
  *
  * Kept apart from the vehicle deliberately. The vehicle has an operational
- * state — reported stolen, recovered, active — and the incident has a history:
- * when it was reported, who by, what the police reference is, which fuel
- * attempts were made against it, whether it turned out to be a mistake. Those
- * answer different questions and change at different times, and folding them
- * together is what produced a "reason" field carrying the words "Recovered,
- * not yet checked".
+ * state, reported stolen or recovered or active, and the incident has a
+ * history: when it was reported, who by, which fuel attempts were made against
+ * it, whether it turned out to be a mistake. Those answer different questions
+ * and change at different times, and folding them together is what produced a
+ * "reason" field carrying the words "Recovered, not yet checked".
  *
  * ── What this product does not do ────────────────────────────────────────
  *
- * Nothing here reaches SAPS or NaTIS. Recording a case number files a
- * reference against an incident; it does not open a case, update one, or
- * satisfy anybody's obligation to report. The regulations require the owner to
- * report a theft to the police and, on recovery, to notify the registering
- * authority — and this portal is not a channel for either. Every sentence the
- * screens use says so.
+ * Nothing here reaches the police or NaTIS, and nothing here asks for a case
+ * number any more. It used to: a case number and a police station, under a
+ * paragraph explaining that filling them in opened no case and discharged no
+ * duty. That paragraph was correct, which is what made the fields wrong to
+ * ask for. Whatever is worth saying about a case goes in the report notes,
+ * which are free text and stamped with who wrote them.
  */
 window.Incidents = (() => {
 
@@ -13179,7 +13458,6 @@ function open(vehicle, { how, reportedBy } = {}) {
     openedAt: now(),
     how: how || '',
     reportedBy: reportedBy || 'You',
-    caseNumber: '',
     station: '',
     notes: '',
     /* Whether the block the report asked for actually took. A report that
@@ -13338,8 +13616,9 @@ const BANDS = {
      across two tanks is ordinary, and configured combinations reach ~1 510L. */
   'truck.heavy':  { review: [150, 1510], warn: [100, 1600], label: 'heavy truck' },
 
-  /* No band. Buses, minibuses and special-purpose bodies vary too much to
-     guess at, and a wrong confident warning is worse than none. */
+  /* Kept without a band. Nothing selectable maps here any more, but a record
+     imported before the taxonomy narrowed can still carry one of these, and a
+     band of null is what stops a stored bus being given a bakkie's warning. */
   'bus': null,
   'minibus': null,
   'special': null,
@@ -13656,7 +13935,7 @@ return { tank, engine, showEngine, BANDS, LEGACY, MODELS, resolveModel, bandFor 
  * week" without losing one of the two halves.
  *
  *   [9]  lifecycle    In fleet · Removed from fleet
- *   [7]  fuel access  Can fuel · Cannot fuel · Stolen lock
+ *   [7]  fuel access  Can fuel · Cannot fuel · Reported stolen
  *   [8]  reason       a preset, so it can be filtered and counted
  *   [10] notes        free writing, with who and when, kept separately
  *
@@ -13741,7 +14020,7 @@ const VEHICLES = [
   ['PBK 550 GP', 'FL-007', 'Toyota Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Allowed', 'Hijacked', 'Reported stolen',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Operational status', from: 'Active', to: 'Reported stolen' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Reason', from: '', to: 'Hijacked' },
-     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. SAPS case 411/8/2026 opened.' }], 'AHTFB71J40A234567', 'single'],
+     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. Case 411/8/2026 opened.' }], 'AHTFB71J40A234567', 'single'],
   ['RTS 018 GP', '', 'Hino 300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Allowed', '', 'In maintenance',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Operational status', from: 'Active', to: 'In maintenance' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Reason', from: '', to: 'Booked in for a service' },
@@ -13915,7 +14194,7 @@ const FILLED = {
 const ID = {
   registration: 'f-reg', make: 'f-make', model: 'f-model', year: 'f-year',
   vehicleType: 'f-type', fuelType: 'f-fuel', tankCapacity: 'f-tank',
-  engineCc: 'f-engine', vehicleConfiguration: 'f-config', primaryUse: 'f-use',
+  vehicleConfiguration: 'f-config', primaryUse: 'f-use',
   fleetNumber: 'f-fleet', vin: 'f-vin',
   /* The radio group reports through its checked input; the multi-tank editor
      through its first tank, which is the control a summary link should land
@@ -14204,19 +14483,6 @@ function check(field, v, get, state) {
     }
   }
 
-  if (field === 'engineCc') {
-    const r = Capacity.engine({
-      engineDisplacementCc: v,
-      vehicleCategory: get('vehicleType'),
-      make: get('make'),
-      model: get('model'),
-    });
-    if (r.level === 'error') return { error: r.message };
-    if (r.level === 'warning' || r.level === 'info') {
-      return { advice: [r.message, r.verify].filter(Boolean).join(' ') };
-    }
-  }
-
   return {};
 }
 
@@ -14237,10 +14503,10 @@ const form = Records.form({
      warning. */
   recheck: {
     year: ['vin'],
-    vehicleType: ['tankCapacity', 'engineCc'],
-    vehicleConfiguration: ['tankCapacity', 'engineCc'],
-    make: ['tankCapacity', 'engineCc'],
-    model: ['tankCapacity', 'engineCc'],
+    vehicleType: ['tankCapacity'],
+    vehicleConfiguration: ['tankCapacity'],
+    make: ['tankCapacity'],
+    model: ['tankCapacity'],
   },
 
   /* Which questions this form is actually asking, given what has been chosen.
@@ -14434,9 +14700,13 @@ const WHY = {
       'Recovered, not yet checked', 'Driver suspended', 'Not in use'],
   },
   'Reported stolen': {
-    label: 'How it went missing',
-    title: r => `How did ${r[0]} go missing?`,
-    list: ['Hijacked', 'Taken overnight', 'Not returned from a trip', 'Not sure'],
+    label: 'What happened',
+    title: r => `What happened to ${r[0]}?`,
+    /* "Taken overnight" is gone. It described one shift pattern rather than a
+       circumstance, and a driver who kept the bakkie over a weekend fitted
+       none of the four. The replacements are the categories a report is
+       actually filed under. */
+    list: ['Hijacking', 'Stolen while parked', 'Vehicle not returned', 'Not sure'],
   },
   'Recovered — inspection required': {
     label: 'How it came back',
@@ -14533,7 +14803,7 @@ const vehicles = Records.directory({
      list. Collapsing them was convenient for the cell — a row shows whichever
      is deciding — and wrong for the filter, where "show me everything I still
      own that cannot fuel" needs both dimensions at once. A single Status
-     heading over Can fuel, Stolen lock and Removed from fleet also asks a
+     heading over Can fuel, Reported stolen and Removed from fleet also asks a
      reader to work out which kind of thing each value is before using any of
      them, which is the complaint the record model already answered. */
   facets: [
@@ -15073,8 +15343,8 @@ function vehicleAction(key, act, extra) {
       sub: `${vehicle[2]} · ${vehicle[3]}`,
       body: '<b>This blocks the vehicle everywhere, right now.</b> No manager can release a fill for it, including you. If anyone tries, you get the station and the time.',
       calm: 'It stays in your fleet and nothing is deleted. Mark recovered undoes it, and the vehicle comes back stopped so somebody can look it over.',
-      fields: `<div class="form-field"><span class="label">How did it go missing? <span class="opt">Optional</span></span>
-          <div class="seg is-stacked" role="radiogroup" aria-label="How it went missing">
+      fields: `<div class="form-field"><span class="label">What happened? <span class="opt">Optional</span></span>
+          <div class="seg is-stacked" role="radiogroup" aria-label="What happened">
             ${WHY['Reported stolen'].list.map(w => `<label><input type="radio" name="cf-took">${w}</label>`).join('')}
           </div></div>`,
       read: slot => {
@@ -15182,7 +15452,7 @@ function vehicleAction(key, act, extra) {
         <div class="form-field" data-branch="recovered" hidden>
           <label for="rec-note">Recovery notes <span class="opt">Optional</span></label>
           <textarea class="field" id="rec-note" rows="3"
-            placeholder="e.g. Recovered by SAPS in Delft, visible damage to the driver's door"></textarea>
+            placeholder="Add recovery details"></textarea>
           <span class="help">Include who recovered it, where it was found and any visible damage.</span>
         </div>
         <div class="form-field" data-branch="error" hidden>
@@ -15284,7 +15554,7 @@ function vehicleAction(key, act, extra) {
   /* ── Inspection and reactivation ───────────────────────────────────────
    * The only route from recovered back to the road, and it is deliberately a
    * decision somebody takes rather than a status they pick. */
-  /* The report, reopened. A SAPS reference arrives hours after the theft, so
+  /* The report, reopened. A case reference arrives hours after the theft, so
      the sheet has to be reachable long after the moment it was first offered. */
   if (act === 'report') {
     const incident = Incidents.forVehicle(vehicle[0]);
@@ -17077,7 +17347,6 @@ function makeSheet(config) {
   const useWrap = field('primaryUse');
   const useSel = document.getElementById('f-use');
   const useText = document.getElementById('f-use-text');
-  const engineWrap = field('engineCc');
   const tankWrap = field('tankCapacity');
   const tanksWrap = field('tanks');
   const tankInput = document.getElementById('f-tank');
@@ -17127,24 +17396,10 @@ function makeSheet(config) {
       }
     }
 
-    /* Engine capacity: required where a small number is ambiguous between cc
-       and litres, and not asked for where it is not. */
-    if (engineWrap) {
-      const required = T.engineRequired(code);
-      const label = engineWrap.querySelector('[data-role="engine-label"]');
-      const help = engineWrap.querySelector('[data-role="engine-help"]');
-      engineWrap.hidden = !!code && !required && false;
-      if (label) {
-        label.innerHTML = required
-          ? 'Engine capacity'
-          : 'Engine capacity <span class="opt">Optional</span>';
-      }
-      if (help) {
-        help.textContent = required
-          ? 'A 125 here and a 125 in the tank field are very different vehicles.'
-          : 'In cc, not litres.';
-      }
-    }
+    /* Engine capacity had a second show-and-hide here, and the two writers
+       disagreed. This one ended `!!code && !required && false`, which is never
+       true, so whatever the other decided, the field stayed on screen for
+       every vehicle type. Both are gone with the field. */
   }
 
   /* ── Tanks ────────────────────────────────────────────────────────────
@@ -17153,7 +17408,8 @@ function makeSheet(config) {
    * add up their own tanks and then checking their arithmetic would be an
    * odd way to spend their attention.
    */
-  let tankCount = 2;
+  /* Two, and not a variable. */
+  const TANK_COUNT = 2;
 
   function tankMode() {
     const on = sheet.querySelector('[name="tankMode"]:checked');
@@ -17165,7 +17421,7 @@ function makeSheet(config) {
     if (!list) return;
     const held = [...list.querySelectorAll('input')].map(i => i.value);
     let html = '';
-    for (let i = 0; i < tankCount; i++) {
+    for (let i = 0; i < TANK_COUNT; i++) {
       html += '<span class="tank-row">' +
         '<span class="form-field">' +
           '<label for="f-tank-' + i + '">Tank ' + (i + 1) + ' capacity</label>' +
@@ -17175,14 +17431,6 @@ function makeSheet(config) {
             '<span class="suffix">litres</span>' +
           '</span>' +
         '</span>' +
-        /* Removable only past the second, because "more than one tank" is the
-           answer that put this editor on screen. */
-        /* Named for the row it removes: three buttons all saying "Remove" are
-           three identical announcements. */
-        (tankCount > 2
-          ? '<button type="button" class="btn btn-tertiary tank-remove" data-remove="' + i +
-            '" aria-label="Remove tank ' + (i + 1) + '">Remove</button>'
-          : '') +
         '</span>';
     }
     list.innerHTML = html;
@@ -17234,7 +17482,6 @@ function makeSheet(config) {
   /* Cleared when the sheet opens, with the rest of the form. The count lived
      in the closure and outlived the record it belonged to. */
   function resetTanks() {
-    tankCount = 2;
     const list = part('tank-list');
     if (list) list.innerHTML = '';
     const out = part('tank-total');
@@ -17289,30 +17536,6 @@ function makeSheet(config) {
   sheet.addEventListener('input', e => {
     if (e.target.dataset && e.target.dataset.tank !== undefined) total();
   });
-  sheet.addEventListener('click', e => {
-    const add = e.target.closest('[data-role="tank-add"]');
-    if (add) { tankCount++; renderTanks(); return; }
-    const rm = e.target.closest('[data-remove]');
-    if (rm) {
-      const i = Number(rm.dataset.remove);
-      const list = part('tank-list');
-      const held = [...list.querySelectorAll('input')].map(x => x.value);
-      held.splice(i, 1);
-      tankCount = Math.max(2, tankCount - 1);
-      renderTanks();
-      [...list.querySelectorAll('input')].forEach((inp, j) => { inp.value = held[j] || ''; });
-      total();
-      /* The node that had focus has just been replaced. Land on the row that
-         took its place, or on the last one if the removed row was the last —
-         anywhere deliberate rather than on the document. */
-      const rows = [...list.querySelectorAll('[data-remove]')];
-      const land = rows[Math.min(i, rows.length - 1)]
-        || list.querySelector('input')
-        || part('tank-add');
-      if (land) land.focus({ preventScroll: true });
-    }
-  });
-
   /* ── The error summary ────────────────────────────────────────────────
    * Links, so a keyboard reaches the field in one step, and focus moves to
    * the summary itself so a screen reader reads the heading before the list.
@@ -17692,7 +17915,6 @@ window.__openSheet = () =>
 
     theft.querySelectorAll('[name="theft-how"]').forEach(r => { r.checked = r.value === incident.how; });
     theft.querySelector('#theft-notes').value = incident.notes || '';
-    theft.querySelector('#theft-cas').value = incident.caseNumber || '';
     theft.querySelector('#theft-station').value = incident.station || '';
 
     const list = part(theft, 'theft-attempts');
@@ -17720,16 +17942,9 @@ window.__openSheet = () =>
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       const how = theft.querySelector('[name="theft-how"]:checked');
-      const before = { how: report.how, caseNumber: report.caseNumber };
+      const before = { how: report.how };
       report.how = how ? how.value : '';
       report.notes = theft.querySelector('#theft-notes').value.trim();
-      /* Surrounding whitespace absorbed; the reference itself left exactly as
-         it was given, because a case number is somebody else's identifier. */
-      report.caseNumber = theft.querySelector('#theft-cas').value.trim();
-      report.station = theft.querySelector('#theft-station').value.trim();
-      if (before.caseNumber !== report.caseNumber && report.caseNumber) {
-        Incidents.file(report, 'SAPS reference recorded', { ref: report.caseNumber });
-      }
       if (before.how !== report.how && report.how) {
         Incidents.file(report, 'Report details updated', { how: report.how });
       }
@@ -17827,6 +18042,67 @@ function wireDiscard(dialogId, sheetKey) {
 /* Both dialogs, one implementation. */
 wireDiscard('discard-vehicle', '__vehicleSheet');
 wireDiscard('discard-driver', '__driverSheet');
+
+/* The screen-pack figures used to clone a drawn navigation and top bar into
+   each one, so the figure would be a complete product viewport of its own.
+   That is gone: the overlay covers the real chrome now, and a second copy of
+   it an inch from the first was the reason the last version had a seam. The
+   preview-chrome template went with it. */
+
+/* ── The recovery decision ────────────────────────────────────────────────
+ *
+ * Three answers, three different records, and the button says which one it is
+ * about to write. It used to say "Mark recovered" and be pressable before the
+ * question above it had been answered at all, which offered a consequential
+ * write on an unanswered question. It offered the same write for "it was
+ * never stolen", which is a correction to a report and not a recovery of a
+ * vehicle.
+ *
+ * Not sure is a real answer and keeps its own outcome: the vehicle stays
+ * reported stolen, fuel stays blocked, and the button says so rather than
+ * going grey and leaving somebody stuck on a screen with no way forward.
+ */
+/* The four circumstances are generated, not typed. They exist once in WHY,
+   which the live report sheet already builds its radio list from; the figure
+   used to carry a second hand-written copy and the two had already drifted:
+   "Not returned" against "Not returned from a trip", and a "Taken overnight"
+   that only the figure still offered. */
+(function fillWhyStolen() {
+  const group = document.querySelector('[data-role="why-stolen"]');
+  const source = typeof WHY !== 'undefined' && WHY['Reported stolen'];
+  if (!group || !source) { return; }
+  group.innerHTML = source.list
+    .map(w => `<label><input type="radio" name="stolen-how">${w}</label>`).join('');
+})();
+
+(function wireRecovery() {
+  const form = document.querySelector('[data-role="recovered-form"]');
+  const submit = document.querySelector('[data-role="recovered-submit"]');
+  if (!form || !submit) { return; }
+
+  /* One row per answer: what it reveals, what the button then says, and where
+     the decision lands. The table is the whole rule. */
+  const BRANCH = {
+    back:   { reveal: 'back',  label: 'Mark as recovered',    goto: 'directory' },
+    error:  { reveal: 'error', label: 'Correct stolen report', goto: 'directory' },
+    unsure: { reveal: null,    label: 'Keep blocked',          goto: 'stolen-record' }
+  };
+
+  function choose(value) {
+    const rule = BRANCH[value];
+    form.querySelectorAll('[data-branch]').forEach(f => {
+      f.classList.toggle('hidden', !rule || f.dataset.branch !== rule.reveal);
+    });
+    if (!rule) { return; }
+    submit.textContent = rule.label;
+    submit.dataset.goto = rule.goto;
+    submit.disabled = false;
+  }
+
+  form.querySelectorAll('input[name="recovered-have"]').forEach(radio => {
+    radio.addEventListener('change', () => { if (radio.checked) { choose(radio.value); } });
+  });
+})();
 
 /* `data-goto-search` carries a search term across with the screen change, which
  * is how "Try again" on a failed list is a resume rather than a reset. The
@@ -17947,6 +18223,21 @@ document.querySelectorAll('.btn[data-beat]').forEach(b => {
  * design rather than of the design plus my remarks about it.
  */
 const cleanBtn = document.getElementById('clean');
+
+/* The screen list, closed and opened. Nothing is remembered between loads on
+   purpose: the list is how somebody arrives, and a file that opens with its
+   navigation hidden because of something they did last week is a file that
+   looks broken. */
+const railBtn = document.getElementById('rail-toggle');
+function setRail(closed) {
+  document.body.classList.toggle('rail-closed', closed);
+  railBtn.setAttribute('aria-pressed', String(closed));
+  railBtn.title = closed ? 'Show the screen list' : 'Hide the screen list';
+  railBtn.setAttribute('aria-label', railBtn.title);
+}
+railBtn.addEventListener('click', () => {
+  setRail(!document.body.classList.contains('rail-closed'));
+});
 
 function setClean(on) {
   document.body.classList.toggle('clean', on);
