@@ -144,8 +144,10 @@
   --color-outline-control: #8A93A8;
   --color-page-background: #FAFBFD;
   --color-primary: #15259B;
-  --color-scrim-backdrop: #EFF1F659;
-  --color-scrim-dialog: #10182866;
+  /* Not a scrim: the colour a menu's shadow is drawn in. It was called
+     --color-scrim-dialog and sat beside the scrim tokens, which is how a
+     shadow colour came to be read as a fourth scrim. */
+  --color-menu-shadow-ink: #10182866;
   --color-shadow-ink: #101828;
   --color-signal-fair: #D9870B;
   --color-signal-good: #1F9D57;
@@ -360,6 +362,21 @@
    * page only. */
   --overlay-scrim-background: rgba(16, 24, 40, 0.42);
   --overlay-scrim-nested: rgba(16, 24, 40, 0.32);
+  /* Three values, three jobs, and no fourth. A modal over the page takes the
+     first. A dialog raised over a sheet takes the second, because the sheet
+     underneath it has to stay readable. A focus sheet takes
+     --focus-sheet-backdrop, which is lighter again and says why where it is
+     defined. Anything else dimming anything is one of these three. */
+
+  /* Blur belongs to a scrim, and only to a scrim.
+   *
+   * Translucent blurred chrome was tried and removed — the reasons are
+   * recorded where the top bar is defined, and they stand. This is the other
+   * case: a layer whose whole purpose is to say the page beneath it is not
+   * available. Softening what it covers says that with the page still in
+   * view, which is what a scrim over a list is for. Three pixels is enough to
+   * read as behind-glass and little enough to leave a row recognisable. */
+  --overlay-scrim-blur: blur(3px);
   --size-input-focused-border-width: 1.6px;
   --size-marker-border-width: 1.5px;
   --size-marker-diameter: 18px;
@@ -1561,7 +1578,7 @@ select.field { appearance: none; background-image: none; }
   background: var(--color-surface);
   border: var(--size-border-hairline) solid var(--color-outline-variant);
   border-radius: var(--radius-xs);
-  box-shadow: 0 8px 24px var(--color-scrim-dialog);
+  box-shadow: 0 8px 24px var(--color-menu-shadow-ink);
 }
 
 .combo-list li {
@@ -1647,7 +1664,6 @@ select.field { appearance: none; background-image: none; }
 }
 
 body.drawer-open .drawer { animation: slide-in var(--duration-base) var(--ease-decelerate); }
-body.drawer-open .scrim { animation: fade-in var(--duration-base) var(--ease-standard); }
 
 /* ── Popovers ─────────────────────────────────────────────────────────────
  * Filter and Columns, anchored to their own triggers. Same shape as the bell:
@@ -2645,6 +2661,11 @@ body.theft-open { overflow: hidden; }
   position: fixed;
   inset: 0;
   background: var(--focus-sheet-backdrop);
+  /* Lighter ink than the page modal, and the same blur: together they say
+     "behind" without taking the directory away, which is the reason a vehicle
+     is added from a sheet rather than from a page. */
+  -webkit-backdrop-filter: var(--overlay-scrim-blur);
+  backdrop-filter: var(--overlay-scrim-blur);
   z-index: var(--z-scrim);
   display: none;
 }
@@ -2792,8 +2813,13 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 .discard-scrim {
   position: fixed;
   inset: 0;
-  z-index: var(--z-dialog);
-  background: var(--color-scrim-dialog);
+  /* A scrim, so it takes the scrim rung, not the dialog's. It is raised over a
+     sheet rather than over the page, so it takes the lighter nested ink and
+     leaves the half-finished form legible underneath the question about it. */
+  z-index: var(--z-dialog-scrim);
+  background: var(--overlay-scrim-nested);
+  -webkit-backdrop-filter: var(--overlay-scrim-blur);
+  backdrop-filter: var(--overlay-scrim-blur);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3369,11 +3395,15 @@ tbody td.truncate-wide { max-width: 26ch; }
  * element with a z-index makes a stacking context and its children sort inside
  * that rather than against the page.
  */
+/* The one scrim element in the running product. It serves the status dialog
+   and the confirm dialog; the focus sheets have their own, lighter one. */
 .scrim {
   position: fixed;
   inset: 0;
   z-index: var(--z-scrim);
-  background: var(--color-scrim-backdrop);
+  background: var(--overlay-scrim-background);
+  -webkit-backdrop-filter: var(--overlay-scrim-blur);
+  backdrop-filter: var(--overlay-scrim-blur);
   display: none;
 }
 
@@ -3391,7 +3421,6 @@ tbody td.truncate-wide { max-width: 26ch; }
   flex-direction: column;
 }
 
-body.drawer-open .scrim,
 body.drawer-open .drawer { display: flex; }
 
 /* The panel takes focus when it opens, so a screen reader says which dialog
@@ -4126,7 +4155,10 @@ body.drawer-open .drawer { display: flex; }
 }
 
 .status-dialog.hidden { display: none; }
-body.status-dialog-open .scrim { display: block; }
+/* Above the record panel at 31 and below the dialog at 33, which is the rung
+   --z-dialog-scrim was minted for. Without it the panel the dialog is about
+   was the one thing on screen not dimmed. */
+body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim); }
 
 .status-dialog__head { padding: var(--space-3-0) var(--space-3-0) var(--space-2-0); }
 .status-dialog__title { margin: var(--space-0-5) 0 0; font-size: var(--font-size-heading-md); }
@@ -4528,9 +4560,19 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
    keeping, the panel takes the screen and stops pretending otherwise. */
 body.record-panel-open .page { padding-right: var(--size-drawer-width); }
 
+/* The bar gives up the same width. Its own horizontal padding is preserved
+   rather than replaced, or the account menu would sit against the panel's
+   edge. The search field is flex:1 and absorbs the difference. */
+body.record-panel-open .topbar {
+  padding-right: calc(var(--size-drawer-width) + var(--space-3-0));
+}
+
 @media (max-width: 900px) {
   .record-panel { width: 100vw; }
   body.record-panel-open .page { padding-right: 0; }
+  /* The panel takes the screen here, so there is nothing left to make room
+     for and the bar returns to its own padding. */
+  body.record-panel-open .topbar { padding-right: var(--space-3-0); }
 }
 
 .record-panel__head {
@@ -5475,6 +5517,16 @@ tbody td .is-past { color: var(--color-on-danger-container); }
  * off the screen. Inert and hidden from assistive technology: it is context,
  * not content.
  */
+/* The list and the scrim over it, in one box. The scrim fills this rather
+   than repeating the crop height, so the dim cannot outrun the content. */
+.stage-crop {
+  position: relative;
+  /* The illustration's layers are the illustration's. Without this they sort
+     against the live top bar in the root context and an illustrated dialog
+     paints over the real one. */
+  isolation: isolate;
+}
+
 .stage-under {
   max-height: var(--size-stage-crop);
   overflow: hidden;
@@ -5485,25 +5537,21 @@ tbody td .is-past { color: var(--color-on-danger-container); }
      screen read as half dimmed. */
   position: relative;
   z-index: 0;
-  /* Dissolves rather than stops. A hard cut at a fixed height reads as a
-     rendering fault; a fade reads as a list continuing under the dialog. */
-  /* The list behind fades out, because it is cropped and a hard cut reads as
-     a rendering fault. The scrim over it does not — see below. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+  /* The cap is a guard, not a crop: every stage renders shorter than it, so
+     nothing is ever cut here. There is no fade, because a fade would be
+     dissolving an edge that does not exist and taking two rows of a complete
+     table with it. */
 }
 
 /* Covers the list and stops at it, so the commentary below stays readable. */
 .stage-scrim {
   position: absolute;
-  inset: 0 0 auto 0;
-  height: var(--size-stage-crop);
-  background: var(--color-scrim-dialog);
+  inset: 0;
+  background: var(--overlay-scrim-background);
+  -webkit-backdrop-filter: var(--overlay-scrim-blur);
+  backdrop-filter: var(--overlay-scrim-blur);
   z-index: var(--z-scrim);
-  /* The list behind fades out, because it is cropped and a hard cut reads as
-     a rendering fault. The scrim over it does not — see below. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 68%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Both overlays sit in normal flow and are pulled back up over the cropped
@@ -5514,7 +5562,10 @@ tbody td .is-past { color: var(--color-on-danger-container); }
 .stage-panel {
   position: relative;
   z-index: var(--z-dialog);
-  margin-top: calc(var(--size-stage-crop) * -0.72);
+  /* Pulled back over the cropped list. Measured from the crop box, which is
+     as tall as the list actually is, rather than from the cap it never
+     reaches. */
+  margin-top: calc(var(--size-stage-crop) * -0.62);
 }
 
 /* A decision takes the middle. */
@@ -5557,10 +5608,11 @@ tbody td .is-past { color: var(--color-on-danger-container); }
   max-width: var(--size-measure-wide);
 }
 
-.page > section:has(.stage-scrim) { position: relative; }
+/* The crop box is the positioning parent now, so the scrim is measured
+   against the list rather than against everything above it on the page. */
 
 @media (max-width: 900px) {
-  .stage-modal, .stage-panel { width: 100%; margin-top: calc(var(--size-stage-crop) * -0.82); }
+  .stage-modal, .stage-panel { width: 100%; margin-top: calc(var(--size-stage-crop) * -0.72); }
 }
 
 /* ── Component documentation ──────────────────────────────────────────────
@@ -5710,11 +5762,11 @@ body.clean .surfaces:has(.panel) { grid-template-columns: minmax(0, 1fr); }
 /* These two carry a column of notes beside them while the notes are on, and
    that column is what fills the width. Under the toggle it goes, and the card
    is left on its own in the middle of nowhere. */
-body.clean .page > section:has(.approve-card) > :not(.page-head):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
+body.clean .page > section:has(.approve-card) > :not(.page-head):not(.stage-crop):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
   max-width: var(--size-measure-narrow);
 }
 
-body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
+body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-crop):not(.stage-under):not(.stage-scrim):not(.stage-modal):not(.stage-panel):not(.stage-notes) {
   max-width: var(--size-panel-max);
 }
 </style>
@@ -6233,6 +6285,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            it; this is the thing it offers. -->
             <section id="screen-rules" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -6330,6 +6383,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                 </div>
               </div>
             </div>
+        </div>
+
         </div>
 
         <div class="stage-notes">
@@ -6987,6 +7042,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            manager most needs to be told it worked said nothing at all. -->
             <section id="screen-stolen-filed" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7086,6 +7142,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
             </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>The first line is the whole screen.</b>
             A person who has just pressed a red button wants one thing, which
@@ -7133,6 +7191,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            product will ever know. -->
             <section id="screen-stolen-sighting" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7202,6 +7261,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>This is the reason the state is worth
             having.</b> Blocking the card silently is correct and useless. The
@@ -7223,6 +7284,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            holding. Certainty has to survive closing the laptop. -->
             <section id="screen-stolen-record" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7296,6 +7358,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
             </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>The banner is the answer to a question
             nobody asks out loud.</b> Twelve days after reporting a vehicle a
@@ -7326,6 +7390,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            road, and is the transition somebody will be asked to justify. -->
             <section id="screen-stolen-recovered" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7400,6 +7465,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
             </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>This is the only place in the flow that
             asks for anything, and it is the right place.</b> Reporting a
@@ -7438,6 +7505,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
 
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7513,6 +7581,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>The distance is the answer.</b> Forty two
             kilometres out is a delivery that ran long or somebody filling a
@@ -7542,6 +7612,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
             <section id="screen-override-approved" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7603,6 +7674,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>The second button is the point.</b> Three
             approvals for the same station is not an emergency, it is a rule
@@ -7623,6 +7696,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
             <section id="screen-override-declined" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7684,6 +7758,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>Declining leaves somebody stranded, so the
             driver's number stays one click away.</b> A driver who cannot fuel
@@ -7696,6 +7772,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
 
             <section id="screen-override-lapsed" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7757,6 +7834,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>It says what happened to Thabo, not to the
             request.</b> "Expired" describes a row in a database. He is the one
@@ -7773,6 +7852,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
            who pressed still has to be told what happened to their press. -->
             <section id="screen-override-taken" class="hidden">
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7836,6 +7916,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
             </div>
         </div>
 
+        </div>
+
         <div class="stage-notes">
           <p class="surface-note"><b>Two managers, one notification, one
             pump.</b> Break-glass goes to everybody who can answer it, which
@@ -7865,6 +7947,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
         </div>
 
         <!-- The list this happens on, not a page of its own. -->
+        <div class="stage-crop">
         <div class="stage-under" aria-hidden="true">
         <div class="page-head">
           <div>
@@ -7926,6 +8009,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.stage-under):not(
                 <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve 93 litres</button></div>
               </div>
             </div>
+        </div>
+
         </div>
 
         <div class="stage-notes">
@@ -8762,7 +8847,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 </div>
 
 <!-- ── The add / edit vehicle drawer ──────────────────────────────────────── -->
-<div class="scrim" data-close-form aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
 <div class="sheet-backdrop" data-role="sheet-backdrop"></div>
 
 <!-- ── A refused fuel attempt ────────────────────────────────────────────
