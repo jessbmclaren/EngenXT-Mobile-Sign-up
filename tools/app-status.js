@@ -21,7 +21,9 @@
       writes both while nothing writes app status on its own;
     the reason beside a status is typed rather than picked, survives being
       typed with a bracket in it, and still gates the confirmation;
-    no dropdown in a form field opens across the line of text beneath it.
+    no dropdown in a form field opens across the line of text beneath it;
+    a record you only looked at closes without being asked to discard it,
+      and the confirmation that does appear knows an add from an edit.
 
   The second one is the point. It is checked by opening every menu on every
   status and reading what is offered, rather than by grepping for a string,
@@ -633,6 +635,61 @@ const READ_MENU = `(function(){
   check('the popover', 'no dropdown cuts a line of its own field in half',
     sliced.length === 0,
     sliced.length ? sliced.join(', ') : `${fields.length} selects, none slicing a label or help line`);
+
+  /* ── Closing a record you only looked at ─────────────────────────────── */
+
+  /* The sheet's dirty check used to mean "any field has something in it",
+     which is only the same as "somebody changed something" on a blank Add
+     form — the one form it was written against. Opening an existing driver
+     fills every field from the record, so the sheet was dirty the moment it
+     appeared, and closing it asked "Discard entered details?" about details
+     nobody had entered. That is precisely the confirmation-you-learn-to-
+     click-through that the code comment there exists to prevent. */
+  await load();
+  await run(`document.querySelector('#screen-drivers-directory tbody tr[data-row] .rec').click()`);
+  await sleep(1000);
+  const opened = await run(`window.__openSheet && window.__openSheet().isDirty()`);
+  check('closing a record', 'an untouched record is not dirty',
+    opened === false, `isDirty() = ${opened}`);
+
+  await run(`(function(){ var f = document.getElementById('d-first');
+    f.value = f.value + 'x'; f.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  await sleep(300);
+  const touchedIt = await run(`window.__openSheet().isDirty()`);
+  await run(`(function(){ var f = document.getElementById('d-first');
+    f.value = f.value.slice(0, -1); f.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  await sleep(300);
+  const reverted = await run(`window.__openSheet().isDirty()`);
+  check('closing a record', 'a change makes it dirty, undoing the change clears it',
+    touchedIt === true && reverted === false,
+    `typed: ${touchedIt}, reverted: ${reverted}`);
+
+  /* And the confirmation, when it does appear, has to describe the thing it
+     is about. "The driver will not be added" over an edit is a sentence about
+     a driver who has been on the fleet for a year. */
+  const copy = {};
+  for (const [kind, opener, seed] of [
+      ['add', '[data-open="driver:blank"]', 'Zz'],
+      ['edit', 'tbody tr[data-row] .rec', 'x']]) {
+    await load();
+    await run(`document.querySelector('#screen-drivers-directory ${opener}').click()`);
+    await sleep(1000);
+    await run(`(function(){ var f = document.getElementById('d-first');
+      f.value = (f.value || '') + ${JSON.stringify(seed)};
+      f.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    await sleep(300);
+    await run(`(function(){ var s = window.__openSheet(); if (s.isDirty()) s.tryClose(); })()`);
+    await sleep(500);
+    copy[kind] = await run(`(function(){ var d = document.getElementById('discard-driver');
+      return d.classList.contains('hidden') ? null : (d.innerText || '').split(String.fromCharCode(10)).join(' ').trim();
+    })()`);
+  }
+  check('closing a record', 'the confirmation knows an add from an edit',
+    !!copy.add && !!copy.edit && /will not be added/.test(copy.add)
+      && /stays as they were/.test(copy.edit) && copy.add !== copy.edit,
+    copy.add && copy.edit
+      ? `add: "${copy.add.slice(0, 34)}…" edit: "${copy.edit.slice(0, 34)}…"`
+      : `add: ${copy.add} / edit: ${copy.edit}`);
 
   const errs = await run(`JSON.stringify(window.__pageErrors || [])`);
   check('nobody sets it', 'the page ran clean',

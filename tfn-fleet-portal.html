@@ -9516,8 +9516,15 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 <div class="discard-scrim hidden" id="discard-driver" role="dialog" aria-modal="true"
      aria-labelledby="discard-driver-title">
   <div class="discard">
-    <h2 id="discard-driver-title">Discard entered details?</h2>
-    <p>The driver will not be added, and the details you entered will be lost.</p>
+    <!-- Both sentences are here, and tryClose picks. Until the dirty check
+         learned the difference this dialog only ever appeared over an add, so
+         one sentence was right by accident; it now also appears over an edit,
+         where "will not be added" describes a driver who has been on the
+         fleet for a year. -->
+    <h2 id="discard-driver-title" data-add="Discard entered details?"
+        data-edit="Discard your changes?">Discard entered details?</h2>
+    <p data-add="The driver will not be added, and the details you entered will be lost."
+       data-edit="This driver stays as they were. What you changed will be lost.">The driver will not be added, and the details you entered will be lost.</p>
     <div class="discard-actions">
       <button class="btn btn-secondary" data-role="keep">Keep editing</button>
       <button class="btn btn-danger" data-role="discard">Discard details</button>
@@ -9531,8 +9538,10 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     <!-- "Discard this vehicle?" reads as though a vehicle already exists and
          is about to be removed from the fleet. Nothing has been added yet;
          what is at stake is what was typed. -->
-    <h2 id="discard-title">Discard entered details?</h2>
-    <p>The vehicle will not be added, and the details you entered will be lost.</p>
+    <h2 id="discard-title" data-add="Discard entered details?"
+        data-edit="Discard your changes?">Discard entered details?</h2>
+    <p data-add="The vehicle will not be added, and the details you entered will be lost."
+       data-edit="This vehicle stays as it was. What you changed will be lost.">The vehicle will not be added, and the details you entered will be lost.</p>
     <div class="discard-actions">
       <button class="btn btn-secondary" data-role="keep">Keep editing</button>
       <button class="btn btn-danger" data-role="discard">Discard details</button>
@@ -10829,6 +10838,14 @@ function form(spec) {
       }
       Object.values(forms).forEach(f => { if (f !== api) f.hide(); });
       applyState(state);
+      /* Now, not before: this is the moment the form is in the condition the
+         person was handed it in, and every later comparison is against this.
+         Filled by applyState above, which runs after the sheet is shown. */
+      if (root.classList.contains('focus-sheet')) {
+        const sh = root.id === 'driver-drawer' ? window.__driverSheet : window.__vehicleSheet;
+        const spec = (state && typeof state === 'object') ? state : (STATES[state] || STATES.blank || {});
+        if (sh && sh.markClean) sh.markClean(!!spec.editing);
+      }
       document.addEventListener('keydown', trap, true);
       // The panel itself, not its first field: a state that scrolled to the
       // question it is about should not be dragged back to the top, and
@@ -18834,6 +18851,11 @@ function makeSheet(config) {
 
   function shut() {
     ownsRoute = false;
+    /* The next open takes its own. Left behind, a baseline from the driver
+       who was on screen last would make a freshly opened record read as
+       changed. */
+    baseline = null;
+    editing = false;
     /* Only a sheet that was open has page-global state to give back. Calling
        shut() on the sheet that is not on screen used to strip the class the
        other one is displayed by. */
@@ -18853,14 +18875,56 @@ function makeSheet(config) {
     opener = null;
   }
 
-  /* Dirty means somebody typed something. A pristine sheet closes without a
-     question, because asking "are you sure" about nothing teaches people to
-     dismiss the dialog that matters. */
+  /* Dirty means somebody changed something, which is not the same as the form
+     holding values.
+     
+     It used to be: any field with anything in it. On a blank Add form those
+     two are the same sentence, and that is the only form this was ever tested
+     against. Open an existing driver to look at them and every field is
+     prefilled from the record, so the sheet was dirty the instant it appeared
+     — and closing it, having typed nothing, asked "Discard entered details?"
+     about details nobody entered. Which is exactly the confirmation this
+     comment says must not become one people click through.
+     
+     So the sheet remembers how it opened and compares. Blank forms behave as
+     they always did: the baseline is empty, and the first keystroke is a
+     change. */
+  let baseline = null;
+
+  function snapshot() {
+    return [...sheet.querySelectorAll('input, select, textarea')]
+      .map(el => (el.type === 'radio' || el.type === 'checkbox')
+        ? (el.checked ? '1' : '0')
+        : String(el.value || '').trim())
+      .join('\u0000');
+  }
+
+  /* Called by the form engine once the fields are filled, because the values
+     arrive after this sheet opens: the panel is shown first so that anything
+     measuring inside it has a layout to measure. Taken here, the baseline
+     would be of an empty form every time.
+     
+     `editing` comes with it rather than being inferred from the snapshot. A
+     blank Add form is not empty — it carries a year, a category default, a
+     couple of hidden fields — so "the baseline has something in it" reads as
+     an edit on a form nobody has touched, and the confirmation tells somebody
+     adding their first vehicle that it "stays as it was". The state object
+     already says which this is; asking it is free. */
+  let editing = false;
+  function markClean(isEdit) { baseline = snapshot(); editing = !!isEdit; }
+  function isEditing() { return editing; }
+
   function dirty() {
-    return [...sheet.querySelectorAll('input, select, textarea')].some(el => {
-      if (el.type === 'radio' || el.type === 'checkbox') return el.checked;
-      return String(el.value || '').trim() !== '';
-    });
+    /* No baseline means nobody has told us what "as opened" looked like. The
+       old rule is the safe answer there: a form with something in it asks
+       before throwing it away. */
+    if (baseline === null) {
+      return [...sheet.querySelectorAll('input, select, textarea')].some(el => {
+        if (el.type === 'radio' || el.type === 'checkbox') return el.checked;
+        return String(el.value || '').trim() !== '';
+      });
+    }
+    return snapshot() !== baseline;
   }
 
   function tryClose() {
@@ -18870,6 +18934,13 @@ function makeSheet(config) {
     if (!dirty()) { back(); return; }
     const dlg = document.getElementById(config.dialog);
     if (!dlg) { back(); return; }
+
+    /* Which of the two sentences this is, from the state that opened it. */
+    dlg.querySelectorAll('[data-add][data-edit]').forEach(el => {
+      el.textContent = editing ? el.dataset.edit : el.dataset.add;
+    });
+    const act = dlg.querySelector('[data-role="discard"]');
+    if (act) act.textContent = editing ? 'Discard changes' : 'Discard details';
 
     /* Remembered before the confirmation takes focus, not after. */
     sheetScroll = body ? body.scrollTop : 0;
@@ -18959,7 +19030,7 @@ function makeSheet(config) {
     }, true);
   }
 
-  return { open, shut, tryClose, back, resume, isOpen, isDirty: dirty,
+  return { open, shut, tryClose, back, resume, isOpen, isDirty: dirty, markClean, isEditing,
            syncCategory, sheet };
 }
 
