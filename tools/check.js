@@ -19,7 +19,7 @@
 
     3. The state rail falling behind. Each file lists the OTHER file's states
        from a hand-written copy, nothing enforces it, and when it drifts the
-       page still works perfectly — the state is just quietly unreachable
+       page still works perfectly. The state is just quietly unreachable
        unless you know to type its hash. That is how number/err-server-2 hid.
 
   Run it: node tools/check.js
@@ -160,7 +160,7 @@ for (const name of FILES) {
          DOM and would tell us nothing about the syntax. */
       new Function(code);
     } catch (e) {
-      fail(`${name}: script block ${i + 1} does not parse — ${e.message}`);
+      fail(`${name}: script block ${i + 1} does not parse, ${e.message}`);
     }
   });
 }
@@ -174,7 +174,7 @@ for (const name of FILES) {
     declared.set(m[1], (declared.get(m[1]) || 0) + 1);
   }
   for (const [id, n] of declared) {
-    if (n > 1) { fail(`${name}: id="${id}" is declared ${n} times — getElementById returns the first`); }
+    if (n > 1) { fail(`${name}: id="${id}" is declared ${n} times, getElementById returns the first`); }
   }
 
   const looked = new Set();
@@ -215,12 +215,12 @@ function crossCheck(menuFile, subjectFile) {
 
   for (const s of real) {
     if (!rowById.has(s.id)) {
-      fail(`${menuFile} is missing ${subjectFile} state '${s.id}' (${s.label}) — unreachable from that rail`);
+      fail(`${menuFile} is missing ${subjectFile} state '${s.id}' (${s.label}), unreachable from that rail`);
     }
   }
   for (const r of rows) {
     if (!realById.has(r.id)) {
-      fail(`${menuFile} lists '${r.id}' under ${r.section}, which is not a state in ${subjectFile} — dead link`);
+      fail(`${menuFile} lists '${r.id}' under ${r.section}, which is not a state in ${subjectFile}, dead link`);
     } else if (realById.get(r.id).label !== r.label) {
       fail(`${menuFile} label drift for '${r.id}'\n        state: ${JSON.stringify(realById.get(r.id).label)}` +
            `\n        menu : ${JSON.stringify(r.label)}`);
@@ -316,13 +316,13 @@ function productTokens(s) {
   const a = productTokens(cssOf(SIGNUP));
   const b = productTokens(cssOf(ONBOARD));
   for (const [k, v] of a) {
-    if (!b.has(k)) { fail(`${ONBOARD} is missing \`${k}\`, which ${SIGNUP} declares — the scale is meant to be a verbatim copy`); }
+    if (!b.has(k)) { fail(`${ONBOARD} is missing \`${k}\`, which ${SIGNUP} declares. The scale is meant to be a verbatim copy`); }
     else if (b.get(k) !== v) {
       fail(`token drift for \`${k}\`\n        ${SIGNUP} : ${v}\n        ${ONBOARD}: ${b.get(k)}`);
     }
   }
   for (const k of b.keys()) {
-    if (!a.has(k)) { fail(`${ONBOARD} declares \`${k}\`, which ${SIGNUP} does not — the scale is meant to be a verbatim copy`); }
+    if (!a.has(k)) { fail(`${ONBOARD} declares \`${k}\`, which ${SIGNUP} does not. The scale is meant to be a verbatim copy`); }
   }
   counts.tokens = a.size;
 
@@ -1122,7 +1122,7 @@ const DOCS = 'docs/design-system/index.html';
 const docsPath = path.join(ROOT, DOCS);
 
 /* The page may also name a component from the file that has not been migrated
-   yet — it documents both, and the app's screens are real even though their
+   yet. It documents both, and the app's screens are real even though their
    CSS is still inline. Rather than keep a hand-written allowlist, which would
    be one more thing to forget, that page's own stylesheet is the allowlist.
    A name in neither place is a component that does not exist anywhere. */
@@ -1138,7 +1138,7 @@ function blocksDefinedIn(name) {
 }
 
 if (!fs.existsSync(docsPath)) {
-  fail(`${DOCS} is missing — the design system has no documentation to check`);
+  fail(`${DOCS} is missing. The design system has no documentation to check`);
 } else {
   const docs = fs.readFileSync(docsPath, 'utf8');
 
@@ -1167,14 +1167,14 @@ if (!fs.existsSync(docsPath)) {
   for (const m of docs.matchAll(/#([a-z0-9]+\/[a-z0-9-]+)/g)) { linked.add(m[1]); }
   for (const id of linked) {
     if (!realStates.has(id)) {
-      fail(`${DOCS} links to '#${id}', which is not a state in either file — dead deep link`);
+      fail(`${DOCS} links to '#${id}', which is not a state in either file, dead deep link`);
     }
   }
 
   /* 11b. Every block the stylesheets define is named on the page. */
   for (const [block, file] of cssBlocks) {
     if (!docs.includes(block)) {
-      fail(`${DOCS} never mentions '${block}' (defined in src/css/${file}) — ` +
+      fail(`${DOCS} never mentions '${block}' (defined in src/css/${file}), ` +
            `a component that ships undocumented`);
     }
   }
@@ -1199,7 +1199,7 @@ if (!fs.existsSync(docsPath)) {
   const unmigrated = blocksDefinedIn(ONBOARD);
   for (const block of namedInDocs) {
     if (cssBlocks.has(block) || unmigrated.has(block)) { continue; }
-    fail(`${DOCS} documents '${block}', which neither src/css nor ${ONBOARD} defines — ` +
+    fail(`${DOCS} documents '${block}', which neither src/css nor ${ONBOARD} defines, ` +
          `a component that exists nowhere`);
   }
 
@@ -1232,7 +1232,7 @@ if (!fs.existsSync(docsPath)) {
   }
   for (const key of Object.keys(computed)) {
     if (!docs.includes(`data-count="${key}"`)) {
-      fail(`${DOCS} states no count for '${key}' — every level must carry one so it ` +
+      fail(`${DOCS} states no count for '${key}'. Every level must carry one so it ` +
            `cannot drift (expected ${computed[key]})`);
     }
   }

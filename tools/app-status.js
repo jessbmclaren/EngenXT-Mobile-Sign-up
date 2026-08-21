@@ -16,7 +16,7 @@
     the six statuses exist, and the column shows them;
     no route anywhere sets Invite sent or Active by hand;
     each status opens the actions that belong to it and no others;
-    the menu is a menu, not a picker — no ticks, no values to choose;
+    the menu is a menu, not a picker: no ticks, no values to choose;
     app status and driver access are two fields, and leaving the company
       writes both while nothing writes app status on its own;
     the reason beside a status is typed rather than picked, survives being
@@ -295,7 +295,7 @@ const READ_MENU = `(function(){
   check('the menu', 'nothing in it is drawn as a chosen value',
     ticked.length === 0,
     ticked.length ? `ticks on: ${ticked.join(', ')}`
-      : 'no tick marks anywhere — it offers actions, not values');
+      : 'no tick marks anywhere: it offers actions, not values');
 
   const offerWrong = [];
   for (const s of STATUSES) {
@@ -380,7 +380,7 @@ const READ_MENU = `(function(){
       : 'driver access and app status name different things differently');
   check('two fields', 'a driver can be on the fleet without the app',
     split.onFleetNoApp > 0,
-    `${split.onFleetNoApp} such driver(s) — the combination one field could not hold`);
+    `${split.onFleetNoApp} such driver(s). The combination one field could not hold`);
 
   /* Reactivating goes back to what the app was, not to a fresh invitation. */
   await load();
@@ -469,7 +469,7 @@ const READ_MENU = `(function(){
   })())`));
   check('sending', 'a message that cannot arrive says so',
     bounced.app === 'Invite failed' && !!bounced.why,
-    `${bounced.app} — ${bounced.why || 'no reason given'}`);
+    `${bounced.app}, ${bounced.why || 'no reason given'}`);
 
   /* ── The tab that hides its own evidence ─────────────────────────────── */
 
@@ -536,7 +536,7 @@ const READ_MENU = `(function(){
   })())`));
   check('the reason', 'it is a box somebody types in, not a list',
     box.open && box.typed && box.choices === 0 && box.focused,
-    box.open ? `"${box.head}" — ${box.choices} choice(s), focused ${box.focused}`
+    box.open ? `"${box.head}": ${box.choices} choice(s), focused ${box.focused}`
       : 'the popover did not open');
   check('the reason', 'it opens holding what is already there',
     box.prefilled !== '' && !!box.placeholder,
@@ -602,7 +602,7 @@ const READ_MENU = `(function(){
   /* ── A popup may not slice the text under it ─────────────────────────── */
 
   /* A select in a form field opened eight pixels below its own button, which
-     put its top edge halfway down the help line — the top half of the
+     put its top edge halfway down the help line, the top half of the
      sentence readable and the bottom half behind a panel. Half-covered text
      does not read as a panel over a sentence, it reads as a fault. */
   await load();
@@ -640,7 +640,7 @@ const READ_MENU = `(function(){
 
   /* The sheet's dirty check used to mean "any field has something in it",
      which is only the same as "somebody changed something" on a blank Add
-     form — the one form it was written against. Opening an existing driver
+     form. The one form it was written against. Opening an existing driver
      fills every field from the record, so the sheet was dirty the moment it
      appeared, and closing it asked "Discard entered details?" about details
      nobody had entered. That is precisely the confirmation-you-learn-to-

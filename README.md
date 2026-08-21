@@ -6,7 +6,7 @@ for a South African fleet-fuel app used by drivers at the pump.
 **Live:** https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up/
 
 **Design system:** https://jessbmclaren.github.io/EngenXT-Mobile-Sign-up/docs/design-system/
-— the tokens, primitives and components, drawn by the same CSS the product
+, the tokens, primitives and components, drawn by the same CSS the product
 loads. Serve it over http rather than opening it off disk: a browser will not
 let a page read a linked stylesheet's rules from `file://`, and three of its
 tables are generated from exactly that.
@@ -14,8 +14,8 @@ tables are generated from exactly that.
 Two self-contained HTML files. No build, no dependencies, no network calls.
 Open either directly if you prefer.
 
-- `index.html` — the home screen and sign-up.
-- `engenxt-onboarding.html` — what a driver arrives in afterwards: linking
+- `index.html`, the home screen and sign-up.
+- `engenxt-onboarding.html`, what a driver arrives in afterwards: linking
   today's vehicle by scanning it, and getting a fuel authorisation at a pump.
 
 The rail in each one links to the states of the other, so you can start
@@ -62,7 +62,7 @@ node tools/check.js
 ```
 
 Runs on every push and pull request, and it is the only script in the repo. No
-dependencies and no build — there is nothing to install.
+dependencies and no build. There is nothing to install.
 
 It covers the three ways these files have actually broken:
 
@@ -70,7 +70,7 @@ It covers the three ways these files have actually broken:
   brace is not a degraded feature, it is a blank phone.
 - **An id is looked up that the markup no longer has.** The element registry
   dereferences everything at load, so a rename that misses one lookup is a
-  TypeError on line one — blank phone again.
+  TypeError on line one, blank phone again.
 - **The state rail falls behind.** Each file lists the other file's states from
   a hand-written copy. When it drifts nothing looks wrong; the state is just
   unreachable unless you know to type its hash. It also catches a rail pointing
@@ -86,17 +86,17 @@ support and manager links point at a placeholder number.
 
 Three tools, no dependencies beyond Node and Chrome:
 
-- `node tools/check.js` — the fast gates, run by CI on every push: scripts
+- `node tools/check.js`: the fast gates, run by CI on every push: scripts
   parse, every looked-up id exists, the two files' state rails and product
   tokens agree, and the driver-facing words stay plain (no idiom, no
-  authorise/verify/biometric — the copy standard for second-language
+  authorise/verify/biometric, the copy standard for second-language
   readers, held by a tool instead of a reviewer's memory).
-- `node tools/sweep.js [--large]` — renders every state headless and
+- `node tools/sweep.js [--large]`, renders every state headless and
   measures what a driver would meet: status-bar contrast sampled off real
   pixels, tap targets against `--size-target` (48px) counting pseudo-element hit areas, nothing
   stranded past a scroller, nothing thrown. A few minutes; run before a
   merge.
-- `node tools/journey.js` — walks the flows with real events and the real
+- `node tools/journey.js`, walks the flows with real events and the real
   clock: the typed code into the face-or-fingerprint offer, the till reading
   the QR, litres counting, the notification, the receipt keeping its promise
   on home, History, and the pump that stops early. About two minutes.

@@ -203,7 +203,7 @@ const ratio = (a, b) => {
     const states = JSON.parse((await send('Runtime.evaluate', {
       expression: 'JSON.stringify(Object.keys(window.Demo ? Demo.states() : {}))',
       returnByValue: true })).result.value);
-    console.log(`\n${name}${LARGE ? ' (large text)' : ''} — ${states.length} states`);
+    console.log(`\n${name}${LARGE ? ' (large text)' : ''}, ${states.length} states`);
     for (let i = 0; i < states.length; i++) {
       pageProblems = [];
       await send('Page.navigate', { url: 'file://' + file + '?n=' + i + '#' + states[i] });
@@ -267,7 +267,7 @@ const ratio = (a, b) => {
       if (audit.stranded.length) { notes.push('stranded: ' + audit.stranded.join(', ')); }
       if (pageProblems.length) { notes.push(pageProblems.join(' | ')); }
 
-      if (notes.length) { failures++; console.log('  FAIL ' + states[i] + ' — ' + notes.join(' · ')); }
+      if (notes.length) { failures++; console.log('  FAIL ' + states[i] + ', ' + notes.join(' · ')); }
     }
   }
   console.log(`\n${checked} states swept, ${failures} with failures`);

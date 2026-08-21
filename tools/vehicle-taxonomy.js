@@ -8,7 +8,7 @@
   Vehicle category was thirteen values, then eight, and is now lcv, hcv and
   motorcycle. Fuel-tank count is gone: the product needs the total a vehicle
   holds, not how many tanks add up to it. Vehicle configuration is gone
-  outright — motorcycle sub-types were the last three it offered — so a band
+  outright, motorcycle sub-types were the last three it offered, so a band
   is resolved from a category and from nothing else.
 
   Nothing rewrites a stored value. A record saved as `bakkie` stays `bakkie`
@@ -191,8 +191,8 @@ const NO_TANK_COUNT = `(function(){
     three.err || `stored values ${three.codes.join(', ')}`);
   check('taxonomy', 'the menu shows the expanded reading',
     JSON.stringify(three.longs) === JSON.stringify(
-      ['LCV — Light commercial vehicle', 'HCV — Heavy commercial vehicle',
-       'Motorcycle', 'Other — not one of the above']),
+      ['LCV: Light commercial vehicle', 'HCV: Heavy commercial vehicle',
+       'Motorcycle', 'Other: not one of the above']),
     (three.longs || []).join(' / '));
   check('taxonomy', 'compact places get the short label',
     JSON.stringify(three.labels) === JSON.stringify(['LCV', 'HCV', 'Motorcycle', 'Other']),
@@ -460,8 +460,8 @@ const NO_TANK_COUNT = `(function(){
   check('one taxonomy', 'the directory shows only the three',
     strays.length === 0, strays.length ? 'also showing: ' + strays.join(', ')
       : shared.cells.join(', '));
-  /* The example is shown the way the product displays a category — LCV, not
-     lcv — so the test is not "is it one of the stored codes" but "does the
+  /* The example is shown the way the product displays a category: LCV, not
+     lcv. So the test is not "is it one of the stored codes" but "does the
      parser accept what the page prints". A published example that the importer
      would refuse is the one failure this check exists to catch, and comparing
      against the codes missed it in the other direction. */

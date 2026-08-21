@@ -246,8 +246,8 @@
 
   /* ── Painted light ─────────────────────────────────────────────
      Removed. These were the only tokens in the system named for how they look
-     rather than what they are for — bloom-coral, bloom-sky, gradient-headline
-     — and the last thing using them was the dashboard hero wash, which is now
+     rather than what they are for: bloom-coral, bloom-sky, gradient-headline
+, and the last thing using them was the dashboard hero wash, which is now
      a flat bordered surface. A decorative token nothing references is a colour
      waiting to be reached for by name. */
 
@@ -333,7 +333,7 @@
   /* The coloured rail down the left of a block that is saying something: an
      error summary, a failed attempt, a quoted aside. Named for the accent and
      not just "the rail", because --size-rail-width was already taken by the
-     navigation rail — 232px of sidebar. Declared second, it won, and three
+     navigation rail: 232px of sidebar. Declared second, it won, and three
      components spent a version drawing a 232px border. */
   --size-accent-rail-width: 3px;
   /* How far a button moves when it is pressed. */
@@ -343,7 +343,7 @@
      opacity in the file used more than once. */
   --opacity-muted: 0.85;
   /* A radio's dot. Deliberately not --icon-xs, which is 14px and is for
-     icons — one site was already reaching for it with a 16px fallback that
+     icons. One site was already reaching for it with a 16px fallback that
      never applied, so the mark it draws is 14px and reads as 16. */
   --size-radio-diameter: 16px;
   /* Underlines sit off their text by one of two amounts: tight for a link
@@ -372,8 +372,8 @@
   --focus-sheet-width-min: 720px;
   --focus-sheet-width-preferred: 58vw;
   --focus-sheet-width-max: 840px;
-  /* Barely there. The directory has to stay legible behind the sheet — that is
-     the whole reason for not using a page — so this dims rather than hides. */
+  /* Barely there. The directory has to stay legible behind the sheet. That is
+     the whole reason for not using a page, so this dims rather than hides. */
   --focus-sheet-backdrop: rgba(16, 19, 35, 0.28);
   --focus-sheet-elevation: -1px 0 0 0 rgba(16, 19, 35, 0.08), -24px 0 48px -24px rgba(16, 19, 35, 0.18);
   --focus-sheet-header-height: 76px;
@@ -383,14 +383,14 @@
   /* The three overlay widths. Expressed against the viewport rather than as
      fixed numbers so none of them can reach an edge on a small laptop. */
   /* The wide overlay's width lives here, once, and the focus sheet reads it
-     rather than carrying its own clamp — that is what lets Add vehicle, Add
+     rather than carrying its own clamp. That is what lets Add vehicle, Add
      driver and the theft report be the same surface rather than three that
      happen to look alike.
 
      840 is the maximum, decided: it gives two usable form columns while
      leaving enough of the page behind visible to say where the sheet came
      from, and at 960 it takes too much of an ordinary 1440 desktop. One
-     token, three wide sheets — Add vehicle, Add driver, the theft report. */
+     token, three wide sheets: Add vehicle, Add driver, the theft report. */
   --overlay-width-wide: clamp(720px, 58vw, 840px);
   --overlay-width-medium: min(680px, calc(100vw - 64px));
   --dialog-width-standard: min(600px, calc(100vw - 32px));
@@ -609,7 +609,7 @@
 
   /* ── Reading a figure ──────────────────────────────────────── */
   /* Chart geometry. Flutter carries --size-chart-height for a full chart; a
-     sparkline is not a chart, it is a shape a number makes, and it is sized
+     sparkline is not a chart. It is the shape a number makes, and it is sized
      to sit under one line of type rather than to be read off. */
   --size-spark-height: 40px;
   --size-spark-stroke: 1.5px;
@@ -1293,7 +1293,7 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
 
 /* ── Skeleton rows ───────────────────────────────────────────────────────
  * A loading table is one row repeated, and the varying bar widths are what
- * stop it reading as a barcode. They were written into every cell — seven
+ * stop it reading as a barcode. They were written into every cell, seven
  * widths x six rows x two tables, eighty-four inline styles for fourteen
  * decisions. The width belongs to the column, so it is stated per column.
  */
@@ -1689,7 +1689,7 @@ textarea.field {
 select.field { appearance: none; background-image: none; }
 /* The error summary that used to live here is gone. It listed the field
  * names as one wrapping sentence separated by middots, under the heading
- * "Complete the required details" — a shape the component no longer has. It
+ * "Complete the required details". A shape the component no longer has. It
  * is .error-summary now: a real list, one fault per row, each saying what the
  * field itself says. The class was also claimed by two components at once,
  * which is how the import review came to paint the form. */
@@ -1917,7 +1917,7 @@ body.drawer-open .drawer { animation: slide-in var(--duration-base) var(--ease-d
  *
  * Open is a property of the popover: the trigger stays visibly held down for as
  * long as the panel is attached to it. Focus is a property of the keyboard, and
- * only the keyboard — :focus-visible keeps the ring off a mouse press, which is
+ * only the keyboard, :focus-visible keeps the ring off a mouse press, which is
  * where the big blue halo after every click was coming from.
  *
  * .is-on is the same treatment for a trigger carrying active filters while the
@@ -2313,7 +2313,7 @@ tbody tr[data-row] { cursor: pointer; }
 /* Four buttons that would not wrap.
  *
  * This is the one thing in the product that made the page itself scroll
- * sideways. Everything else wide — the tables, the specimen grids — sits in
+ * sideways. Everything else wide (the tables, the specimen grids) sits in
  * a container that scrolls on its own; this was a nowrap flex row of four
  * buttons pinned right, so on a phone "Suspend / Allow fuelling / Mark as
  * left / Clear" ran 150px past the edge and took the whole document with it.
@@ -2448,7 +2448,7 @@ tbody tr.is-selected { background: var(--color-brand-tint); }
  * that is the tell that it belongs at this level rather than deeper.
  *
  * Rendered as an anchor wherever the figure has somewhere to go. A count of
- * licences expiring is not information, it is a queue. The number is only
+ * licences expiring is not information. It is a queue. The number is only
  * useful to somebody who can then get at the three drivers it is counting.
  */
 .stat-tile {
@@ -2883,11 +2883,11 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 /* Inside a sheet the unit wrapper fills its grid cell: the column is already
    the constraint, and a second cap inside it left the suffix stranded. */
 /* Jumped to from the error summary, a field would otherwise land under the
-   sticky header — visibly focused and out of sight. */
+   sticky header, visibly focused and out of sight. */
 .focus-sheet .form-field,
 .focus-sheet .radio-group { scroll-margin-top: calc(var(--focus-sheet-header-height) + var(--space-2-0)); }
 
-/* Inside a sheet, a field group is a two-column grid — the same grid the
+/* Inside a sheet, a field group is a two-column grid, the same grid the
    vehicle form's sections use, so the two sheets cannot drift apart. Outside
    one, .fields stays the single column the record drawer wants. */
 .focus-sheet .fields {
@@ -2909,7 +2909,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 
    The rule and the air belong to .sheet-section, which draws them once between
    one section and the next. They were also declared here, on the heading, for
-   the driver drawer, which had no section wrappers — so its second and later
+   the driver drawer, which had no section wrappers, so its second and later
    headings added a 40px margin and 32px of padding on top of the body's own
    40px gap, and 112px of air opened above every divider. The drawer has the
    wrappers now, and the heading contributes only the space beneath itself. */
@@ -2921,7 +2921,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
      down, because the sheet body's own gap was landing between it and the
      heading it belongs to. It sits inside .sheet-section now, whose gap is the
      one that applies, so a note is the same distance from its heading as it is
-     from the fields it introduces — which is what it always should have been.
+     from the fields it introduces. Which is what it always should have been.
      "One gap between fields, set here and nowhere else" is the rule this file
      already states about the fields; it holds here for the same reason. */
   margin: 0;
@@ -2957,8 +2957,8 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 .discard p { margin: 0 0 var(--space-3-0); color: var(--color-on-surface-variant); }
 .discard-actions { display: flex; justify-content: flex-end; gap: var(--space-1-5); }
 
-/* The new row, for a moment. Colour is not the only carrier — the row also
-   scrolls into view — because a highlight nobody sees is not feedback. */
+/* The new row, for a moment. Colour is not the only carrier, the row also
+   scrolls into view. Because a highlight nobody sees is not feedback. */
 tbody tr.is-new > td {
   background: var(--color-brand-tint);
   animation: row-settle 2.4s var(--ease-standard) forwards;
@@ -3055,7 +3055,7 @@ body.theft-open .sheet-backdrop { display: block; }
 
 /* ── SelectField ─────────────────────────────────────────────────────────
  * The trigger is the same shell as a text input, because a field that opens a
- * list and a field you type into are both fields — they were different heights
+ * list and a field you type into are both fields. They were different heights
  * and different type before, on rows a centimetre apart.
  */
 .select-field { position: relative; }
@@ -3271,8 +3271,8 @@ body.theft-open .sheet-backdrop { display: block; }
   padding-top: var(--space-1-5);
 }
 
-/* The word beside the glyph. Carried in the markup at every width — a label
-   is content, not decoration — and shown where there is room for it, which
+/* The word beside the glyph. Carried in the markup at every width, a label
+   is content, not decoration. And shown where there is room for it, which
    on the column rail there is not. */
 .navrail__label {
   position: absolute;
@@ -3287,14 +3287,14 @@ body.theft-open .sheet-backdrop { display: block; }
  * A vertical rail pinned to the left is desktop furniture. It is 56px of a
  * 390px screen, it is the first thing between a thumb and anything useful,
  * and it was taking a seventh of the width from the one screen somebody
- * genuinely opens on a phone — a manager approving a fill while the driver
+ * genuinely opens on a phone, a manager approving a fill while the driver
  * stands at the pump. Everything else this product does (importing a
  * spreadsheet, editing a fleet) nobody does on a phone at all, so this is
  * not a mobile portal: it is the one urgent path made to work.
  *
  * At the bottom because that is where the thumb is, and four sections is
  * exactly what a bottom bar is for. Labelled, because an icon that needs a
- * tooltip has already failed the person squinting at it — and on a bar this
+ * tooltip has already failed the person squinting at it, and on a bar this
  * wide the words cost nothing.
  *
  * 560px is the width the phone rules in this file already use. A new
@@ -3351,8 +3351,8 @@ body.theft-open .sheet-backdrop { display: block; }
   .page { padding-bottom: var(--size-navbar-height); }
 
   /* The figure and the rule it broke sit side by side while there is room.
-     At this width there is not: the number wrapped to two lines — "30" over
-     "min" — which reads as two facts instead of one, and it is the one thing
+     At this width there is not: the number wrapped to two lines, "30" over
+     "min". Which reads as two facts instead of one, and it is the one thing
      on the screen somebody decides from. Stacked, each gets a full line. */
   .panel-key {
     flex-wrap: wrap;
@@ -4132,9 +4132,9 @@ body.drawer-open .drawer { display: flex; }
      for one, and two rows when there is not.
      
      Without this the row could only ever be one line: the title took what it
-     needed and the countdown beside it — nowrap, and pinned right by the
-     rule below — was pushed past the edge of a phone. On the override screens
-     that is the whole point of the header. A manager looking at a request
+     needed and the countdown beside it: nowrap, and pinned right by the
+     rule below, was pushed past the edge of a phone. On the override screens
+     that is what the header is for. A manager looking at a request
      that expires in 1:47 could not see the 1:47, and the number is the
      reason the screen is urgent at all. */
   flex-wrap: wrap;
@@ -4211,7 +4211,7 @@ body.drawer-open .drawer { display: flex; }
 }
 
 /* The band closed itself with a hairline and the foot underneath opened with
-   one, so the two met and drew 2px — a weight this system does not have and
+   one, so the two met and drew 2px. A weight this system does not have and
    which reads as a heavier division than the one above the band. Whatever
    follows the band inherits the line the band already drew. */
 .panel > .panel-key + * { border-top: 0; }
@@ -4276,7 +4276,7 @@ body.drawer-open .drawer { display: flex; }
  * grid above won and the modifier lost every time. It was not a cosmetic
  * loss. The base's first track is `max-content`, the rules screen puts a
  * two-column before/after comparison in here, and max-content of that is
- * 935px inside a 600px panel that clips at its edge — so below about 1440px
+ * 935px inside a 600px panel that clips at its edge, so below about 1440px
  * the "after" half of a before-and-after was simply not on the screen, with
  * no scrollbar to reach it. The one screen whose entire job is comparing two
  * things could only show one of them.
@@ -4717,7 +4717,7 @@ tbody td.app-col, thead th.app-col { min-width: 17ch; }
 }
 
 /* The fifth tone, and it was missing. `.badge-quiet` is the one whose whole
-   job is a hairline — it has no fill to carry it — so falling through to the
+   job is a hairline, it has no fill to carry it, so falling through to the
    bare `.status-pill` rules left "Invite sending" drawn as plain text with a
    caret, identical to the Active beside it. The same failure the comment
    above describes, on the one tone where it is hardest to see. */
@@ -4805,11 +4805,11 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 /* ── The menu the pill opens ──────────────────────────────────────────────
  * Wider than the filter popover, because every option carries the sentence
  * that says what it does. Reviewed as: "make the words explain themselves",
- * and this is where that explanation belongs — beside the choice, while it is
+ * and this is where that explanation belongs: beside the choice, while it is
  * being made, rather than as a paragraph inside every pop-up forever.
  */
-/* The cap is the same width, said once. It was written twice on this line —
-   the token and the number it holds — so a popover narrowed in the palette
+/* The cap is the same width, said once. It was written twice on this line, 
+   the token and the number it holds, so a popover narrowed in the palette
    would have kept its old maximum. */
 .status-pop { width: var(--size-popover-width); max-width: min(92vw, var(--size-popover-width)); }
 
@@ -4970,7 +4970,7 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 .record-panel.hidden { display: none; }
 
 /* The panel is documented as non-modal so the table stays reachable, and it
-   was a 520px overlay pinned to the right edge — directly over the Status
+   was a 520px overlay pinned to the right edge, directly over the Status
    column, which is the one thing somebody reading a record wants to reach
    beside it. The list gives up the width instead of being covered by it.
 
@@ -5054,7 +5054,7 @@ body.record-panel-open .topbar {
 
 /* The latest note, quoted, because it is somebody's own words and the rest of
    this tab is generated. */
-/* Free text can arrive as one unbroken run — a VIN, a URL, a reference. It
+/* Free text can arrive as one unbroken run: a VIN, a URL, a reference. It
    breaks rather than pushing the record sideways under the reader. */
 .rp-note, .activity-what, .activity-move { overflow-wrap: anywhere; }
 
@@ -5366,8 +5366,8 @@ body.record-panel-open .topbar {
  *
  * `.spec-note` is a review affordance: it takes the left rule that marks the
  * prototype talking about itself, and it goes under the clean toggle. These
- * paragraphs are the contract's own prose — what nine columns means, why there
- * are two identity columns — and they have to survive the toggle with the
+ * paragraphs are the contract's own prose. What nine columns means, why there
+ * are two identity columns. And they have to survive the toggle with the
  * table they belong to. Sharing a class with the commentary is exactly how
  * they ended up hidden. */
 .contract-note {
@@ -5512,8 +5512,8 @@ tbody td .is-past { color: var(--color-on-danger-container); }
  * a layer. */
 /* Flat, bordered, and carrying no decoration.
  *
- * This was three radial gradients under a medium shadow. The figure it holds —
- * how many drivers can be sent to a pump — is the most consequential number on
+ * This was three radial gradients under a medium shadow. The figure it holds, 
+ * how many drivers can be sent to a pump, is the most consequential number on
  * the account, and it was the only number in the product sitting on painted
  * light. Weight, size and position already make it the first thing read; the
  * wash was doing that job a second time and adding a surface whose contrast
@@ -5699,7 +5699,7 @@ tbody td .is-past { color: var(--color-on-danger-container); }
 
 .invite-row + .invite-row { border-top: var(--size-border-hairline) solid var(--color-outline-variant); }
 
-/* Plate, recipient, and — on a failure — what it cost. Wraps to its own line
+/* Plate, recipient, and, on a failure, what it cost. Wraps to its own line
    below the state on a narrow screen rather than squeezing the name. */
 .invite-who { display: flex; flex-direction: column; gap: var(--space-0-25); min-width: 0; flex: 1 1 16rem; }
 .invite-who .ident { flex: none; }
@@ -5726,7 +5726,7 @@ tbody td .is-past { color: var(--color-on-danger-container); }
 .invite-state.is-bad { color: var(--color-on-danger-container); }
 
 /* Recovery sits with the failure, not in a footer, and on its own line rather
-   than jammed against the words "Invitation failed" — a button touching the status
+   than jammed against the words "Invitation failed", a button touching the status
    it belongs to reads as part of the status. Two ways out, because a number
    that cannot receive WhatsApp will fail the retry as well. */
 .invite-acts {
@@ -5986,8 +5986,8 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
  *
  * Written here rather than beside the rail it belongs to, and that is not
  * tidiness: the two rules above are plain classes, this is a plain class,
- * and the one declared later wins. Next to `.navrail` — 2,600 lines earlier
- * — this lost silently and the cover kept a 56px gap on the left for a rail
+ * and the one declared later wins. Next to `.navrail`: 2,600 lines earlier
+ *, this lost silently and the cover kept a 56px gap on the left for a rail
  * that was no longer there. The same collision `.panel-facts--stacked` was
  * fixed for one commit ago. */
 @media (max-width: 560px) {
@@ -6076,7 +6076,7 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
 .preview-record > * + * { border-top: var(--size-border-hairline) solid var(--color-outline-variant); }
 .preview-record > * { border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
 /* Panels stack flush here, and each one carries a border on all four sides of
-   its own. The line above owns every join — so the panel above closes without
+   its own. The line above owns every join, so the panel above closes without
    one, or the two hairlines meet and the seam between two panels is drawn
    twice as heavily as the seams inside them. The last child keeps its bottom,
    which is the bottom of the record. */
@@ -6084,7 +6084,7 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
 /* And nothing in the column is squeezed shorter than what it holds.
    The record is a fixed-height flex column, so a panel taller than the space
    left for it was being shrunk to fit and then clipped by its own
-   `overflow: hidden` — the first panel here ended at 567px with its footer
+   `overflow: hidden`, the first panel here ended at 567px with its footer
    running to 628, so the last 61px of it, text and all, was cut off. What
    showed instead was a 29px strip of the footer's grey between the band above
    it and the panel below, which reads as one rule drawn twice.
@@ -6175,8 +6175,8 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
  *
  * The notes here are mine: things the prototype says about itself, which no
  * product would ship. The column contract is not one of them. It is the answer
- * to the only question the import screen exists to raise — what goes in the
- * spreadsheet — and clean view is the default (`data-clean="true"` on the
+ * to the only question the import screen exists to raise. What goes in the
+ * spreadsheet. And clean view is the default (`data-clean="true"` on the
  * body, because a file somebody double-clicks has no query string to put
  * `?clean` in). So every person who has opened this prototype without knowing
  * about the N key has seen an import screen offering a download and a dropzone
@@ -6201,8 +6201,8 @@ body.clean #clean { display: inline-flex !important; }
  * Nothing is deleted to achieve this. The notes are the reason somebody can
  * rebuild these screens, and they are one URL away.
  */
-/* The harness, gone in demo. This rule was described in app.js — "?demo
-   goes further: clean, plus the screen rail and this toggle taken out" — and
+/* The harness, gone in demo. This rule was described in app.js, "?demo
+   goes further: clean, plus the screen rail and this toggle taken out", and
    never written, so ?demo left a 232px development sidebar in place beside the
    product's own navigation. Every screenshot taken of this prototype showed a
    fleet portal with two sidebars, and the missing width is why the content
@@ -6284,8 +6284,8 @@ body.clean .surfaces:has(.panel) { grid-template-columns: minmax(0, 1fr); }
 /* ── A task, down the middle ─────────────────────────────────────────────
  *
  * This was a two-column layout: the upload on the left, the column reference
- * on the right. It replaced a worse one — everything crammed into the left
- * half with 640px of nothing beside it — and traded that fault for a bigger
+ * on the right. It replaced a worse one. Everything crammed into the left
+ * half with 640px of nothing beside it, and traded that fault for a bigger
  * one. Two columns is two pages. The reference is a document somebody reads
  * once, if ever, and giving it half the screen said it mattered as much as the
  * thing they came to do.
@@ -6610,7 +6610,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
          Reports used to sit at the bottom: an ordinary-looking,
          keyboard-reachable button with a pointer cursor that did nothing when
          pressed and gave no reason. The comment called that "inert rather than
-         pretending", which is the opposite of what it did — somebody presses
+         pretending", which is the opposite of what it did. Somebody presses
          it, nothing happens, and they press it again. A destination that does
          not exist is not offered, and it comes back the day it does. -->
     <nav class="navrail" aria-label="Sections">
@@ -6767,7 +6767,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
       <!-- One task, read top to bottom.
            This was two columns: the upload on the left and the column
            reference on the right, each at half the page. Two columns is two
-           pages, and the reference — the part somebody needs once, if at all —
+           pages, and the reference. The part somebody needs once, if at all, 
            was given the same weight as the thing they came to do. A person
            importing a fleet is doing one job in two steps, and a layout that
            is honest about that has one column and a number on each step.
@@ -7026,7 +7026,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <p class="surface-note"><b>Two lists, not one list with a marked
             chip.</b> It was a single row captioned "areas these drivers can
             already use" with Goodwood sitting in it, under a heading asking
-            whether to add Goodwood — so the screen said the thing had
+            whether to add Goodwood. So the screen said the thing had
             happened and asked permission for it in the same breath, and a
             tint on the fourth chip was all that separated the two. Before and
             after, side by side, with the count under each, so the change is
@@ -7161,7 +7161,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         </div>
 
         <h2 class="spec-h">Stat tile</h2>
-        <p class="spec-note">A label, a figure, and one line saying what to do about it. Four atoms doing one job, which is what puts this at molecule rather than organism: there is one thing here, and it is a number. It carries its own card because it is used standalone in a grid. Dropping one into a panel would give it two borders, and that is the tell that it belongs at this level. Rendered as a link wherever the figure has somewhere to go, because a count of lapsed licences is not information, it is a queue.</p>
+        <p class="spec-note">A label, a figure, and one line saying what to do about it. Four atoms doing one job, which is what puts this at molecule rather than organism: there is one thing here, and it is a number. It carries its own card because it is used standalone in a grid. Dropping one into a panel would give it two borders, and that is the tell that it belongs at this level. Rendered as a link wherever the figure has somewhere to go, because a count of lapsed licences is not information. It is a queue.</p>
         <div class="spec-grid">
           <a class="stat-tile" href="#drivers-directory">
             <span class="stat-label">Needs review</span>
@@ -7296,7 +7296,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="page-head">
           <div>
             <h1>Vehicle states</h1>
-            <p>Four controls, over two fields. Three of them say whether a vehicle may buy fuel today; the fourth says it is no longer yours. Everything else people call a status &mdash; broken down, waiting for parts, accident damage &mdash; is a reason underneath one of these, because the pump reads the state and only a person reads the reason.</p>
+            <p>Four controls, over two fields. Three of them say whether a vehicle may buy fuel today; the fourth says it is no longer yours. Everything else people call a status (broken down, waiting for parts, accident damage) is a reason underneath one of these, because the pump reads the state and only a person reads the reason.</p>
           </div>
         </div>
 
@@ -7304,7 +7304,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
              There is no waiting state: adding or importing a vehicle puts it
              in the fleet on Can fuel, and its invitation is a background
              message that governs nothing here. -->
-        <h2 class="spec-h">Fuel access &mdash; may it buy fuel today?</h2>
+        <h2 class="spec-h">Fuel access: may it buy fuel today?</h2>
         <table class="states-table">
           <thead>
             <tr><th>State</th><th>What station staff see</th><th>Set by</th><th>Way back</th></tr>
@@ -7314,7 +7314,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               <td>Can fuel</td>
               <td>Fuel flows, inside the driver&rsquo;s rules. Where every vehicle lands the moment it is added.</td>
               <td>Manager, one press</td>
-              <td>&mdash;</td>
+              <td>None</td>
             </tr>
             <tr>
               <td><span class="badge badge-warning">Cannot fuel</span> <span class="status-reason">+ a reason</span></td>
@@ -7331,7 +7331,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           </tbody>
         </table>
 
-        <h2 class="spec-h">Fleet lifecycle &mdash; is it still yours?</h2>
+        <h2 class="spec-h">Fleet lifecycle: is it still yours?</h2>
         <p class="spec-note">Two values, one of them terminal. A vehicle in the fleet shows its fuel access in the list; one that has left shows this instead, because a fuel permission on a sold van is a control that changes nothing.</p>
         <table class="states-table">
           <thead>
@@ -7342,7 +7342,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               <td>In fleet</td>
               <td>Yours, and on the books. Where every vehicle lands the moment it is added or imported. Fuel access decides what happens at a pump.</td>
               <td>Adding or importing the vehicle</td>
-              <td>&mdash;</td>
+              <td>None</td>
             </tr>
             <tr>
               <td><span class="badge badge-neutral">Removed from fleet</span> <span class="status-reason">+ a reason</span></td>
@@ -7404,7 +7404,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <tbody>
             <tr><td>Sending invitation</td><td>The message is on its way to the driver&rsquo;s mobile number.</td><td>None. The vehicle can already fuel.</td></tr>
             <tr><td>Invitation sent</td><td>It reached the driver&rsquo;s phone. The message clears.</td><td>None.</td></tr>
-            <tr><td>Invitation failed &mdash; Retry</td><td>Delivery did not succeed. A problem with the message, not a state the vehicle is in, so the way out is Retry or a different number &mdash; never a status change.</td><td>None. What it delays is the driver setting up the vehicle&rsquo;s fuel tag.</td></tr>
+            <tr><td>Invitation failed: Retry</td><td>Delivery did not succeed. A problem with the message, not a state the vehicle is in, so the way out is Retry or a different number, never a status change.</td><td>None. What it delays is the driver setting up the vehicle&rsquo;s fuel tag.</td></tr>
           </tbody>
         </table>
 
@@ -7426,8 +7426,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           A vehicle is in the fleet and able to fuel the moment it is added or
           imported. Its invitation is sent automatically in the background and
           governs nothing here. What the import has instead is
-          <a href="#invites">three delivery messages</a> &mdash; sending
-          invitation, invitation sent, invitation failed with a retry &mdash;
+          <a href="#invites">three delivery messages</a> (sending
+          invitation, invitation sent, invitation failed with a retry) 
           which clear when the request lands and never touch this column.
           Writing "invitation sent" into a status field would put a fact about
           a delivery attempt where a rule about a forecourt goes.</p>
@@ -7443,7 +7443,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           different things, and the reason is not a preset any more.</b> It was
           a short list per status, chosen so that a year of them would be a
           report: how many vehicle-weeks went to accident damage. That is worth
-          having and it is not what this is yet &mdash; the categories have not
+          having and it is not what this is yet. The categories have not
           been agreed, and a preset built on a first draft writes that draft
           into every record before anybody can correct it. So the reason is
           typed, and the question above the box still comes from the status.
@@ -7457,8 +7457,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           been recovered. That was not a wording slip, it was the single-field
           model showing through, and splitting the fields is what made it
           impossible to reach. It now lands on Cannot fuel rather than on a
-          waiting state, which keeps the old promise &mdash; somebody looks the
-          vehicle over before it fuels &mdash; using a state that still
+          waiting state, which keeps the old promise. Somebody looks the
+          vehicle over before it fuels, using a state that still
           exists.</p>
         <p class="surface-note states-note"><b>Every state here is set by a
           person.</b> The moment anything is suspended automatically after
@@ -7487,7 +7487,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <!-- Named counts, not a percentage. A percentage of an unknown
                  total tells somebody nothing they can act on; "112 of 340"
                  tells them how long this is and that it is moving. -->
-            <p>112 of 340 from <span class="ident">vehicles.csv</span>. You can leave this page &mdash; the import carries on without you.</p>
+            <p>112 of 340 from <span class="ident">vehicles.csv</span>. You can leave this page. The import carries on without you.</p>
           </div>
         </div>
 
@@ -7658,13 +7658,13 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               quietly requires you to stay is the same trap as a step that
               quietly requires you to press something.</p>
             <p class="surface-note is-review"><b>Waiting on grouping.</b> The
-              recipient is settled &mdash; the driver, on their mobile number,
+              recipient is settled: the driver, on their mobile number,
               which is why <i>Send to another number</i> is the second way out
               of a failure. An imported row carries its driver, so this page can
               name one. A vehicle added by hand cannot, because linking a
               vehicle to a driver is the grouping work and that is a later
               phase. Until it exists, a single add says the vehicle is in the
-              fleet and fuelling and that the invitation follows &mdash; rather
+              fleet and fuelling and that the invitation follows, rather
               than claiming a message went to somebody the product cannot
               name.</p>
           </div>
@@ -7760,7 +7760,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               <div class="fields">
                 <!-- Was two fields: four circumstances to pick from, then a
                      box for everything the four could not hold. The list is
-                     gone — it was a guess at a taxonomy nobody has agreed —
+                     gone. It was a guess at a taxonomy nobody has agreed, 
                      and with it the reason for the split. One box, and what
                      somebody writes in it is the report. -->
                 <div class="form-field">
@@ -8170,8 +8170,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
       <!-- Break-glass in the portal. A refused fill lands here, and the
            manager decides at a desk.
 
-           The example was a geofence refusal — a driver filling outside the
-           areas his policy allows — and that is a request that cannot happen.
+           The example was a geofence refusal, a driver filling outside the
+           areas his policy allows. And that is a request that cannot happen.
            A driver who may not fuel in an area is stopped before the
            transaction starts; nothing gets as far as a pump for a manager to
            release. The screen was answering a question the product never asks.
@@ -8263,7 +8263,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
                being asked to release an unbounded fill and told only where it
                was happening. The two together are what makes "one transaction"
                a real limit rather than a promise. -->
-          <dl class="panel-facts"><dt>Driver</dt><dd>Thabo Mokoena &middot; 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd><dt>Filling at</dt><dd>Engen N1 City, Goodwood</dd><dt>Last fill</dt><dd>08:12 at Engen Sandton &middot; 62 litres</dd><dt>Time since</dt><dd>30 minutes</dd><dt>Tank capacity</dt><dd>80 litres</dd><dt>Room left in the tank</dt><dd><b>18 litres</b>, if the last fill filled it</dd><dt>Most this can pump</dt><dd><b>18 litres</b>, about R390 &mdash; the room left, whichever is lower against your R2 000 cap</dd><dt>Requested</dt><dd>08:42</dd><dt>Expires</dt><dd>08:52, ten minutes after it was asked</dd></dl>
+          <dl class="panel-facts"><dt>Driver</dt><dd>Thabo Mokoena &middot; 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd><dt>Filling at</dt><dd>Engen N1 City, Goodwood</dd><dt>Last fill</dt><dd>08:12 at Engen Sandton &middot; 62 litres</dd><dt>Time since</dt><dd>30 minutes</dd><dt>Tank capacity</dt><dd>80 litres</dd><dt>Room left in the tank</dt><dd><b>18 litres</b>, if the last fill filled it</dd><dt>Most this can pump</dt><dd><b>18 litres</b>, about R390. The room left, whichever is lower against your R2 000 cap</dd><dt>Requested</dt><dd>08:42</dd><dt>Expires</dt><dd>08:52, ten minutes after it was asked</dd></dl>
           <div class="panel-links"><a href="#override"><svg data-lucide="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>See on map</a><a href="tel:+27821234567"><svg data-lucide="phone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>Call Thabo</a></div>
           <div class="panel-foot">
             <!-- The whole of what pressing Approve does, in one sentence, in the
@@ -8283,14 +8283,14 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="figure-notes">
           <p class="surface-note"><b>The arithmetic is the answer.</b> A tank
             that took 62 litres half an hour ago has room for 18 more, and a
-            request to pump 80 into it is not a second fill, it is a second
+            request to pump 80 into it is not a second fill. It is a second
             vehicle. A manager can settle that from two numbers without opening
             anything or ringing anybody.</p>
           <p class="surface-note"><b>How much, and for how long, are part of
             the decision.</b> This screen asked a manager to release a fill
             without telling them the size of it. Tank capacity bounds the
             litres, your policy bounds the rand, and the sentence above the
-            button states the lower of the two &mdash; because "one fill" on
+            button states the lower of the two, because "one fill" on
             an 80-litre bakkie and "one fill" on a 400-litre truck are not the
             same amount of trust.</p>
           <p class="surface-note"><b>The expiry is an actual time, not only a
@@ -8382,7 +8382,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         <div class="figure-notes">
           <p class="surface-note"><b>The second button is the point.</b> Three
-            approvals for the same station is not an emergency, it is a rule
+            approvals for the same station is not an emergency. It is a rule
             that needs changing, and this is the moment somebody notices.
             Without it they approve the same fill every week for a year.</p>
           <p class="surface-note"><b>It is a receipt, so it says what was
@@ -8565,7 +8565,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
       <!-- The race. Two managers get the same notification and both open it.
            Without this screen the second press either silently does nothing, or
-           worse, releases a second fill — and "prevent duplicate approvals" is
+           worse, releases a second fill. And "prevent duplicate approvals" is
            not a thing you can implement only on the server, because the person
            who pressed still has to be told what happened to their press. -->
             <section id="screen-override-taken" class="hidden">
@@ -8631,7 +8631,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
                 <div class="key-figure"><b>1</b><span>transaction released, not two</span></div>
                 <div class="key-reason"><span class="badge badge-neutral">Your press did nothing</span><span>Nothing was double-released</span></div>
               </div>
-              <dl class="panel-facts"><dt>Answered by</dt><dd>Sipho Dube, 08:43</dd><dt>Decision</dt><dd>Approved &mdash; one transaction at Engen N1 City</dd><dt>Limit</dt><dd>Up to 80 litres, about R1 720</dd><dt>Valid until</dt><dd>08:52</dd><dt>Driver told</dt><dd>08:43, by the system</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span></dd></dl>
+              <dl class="panel-facts"><dt>Answered by</dt><dd>Sipho Dube, 08:43</dd><dt>Decision</dt><dd>Approved: one transaction at Engen N1 City</dd><dt>Limit</dt><dd>Up to 80 litres, about R1 720</dd><dt>Valid until</dt><dd>08:52</dd><dt>Driver told</dt><dd>08:43, by the system</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span></dd></dl>
               <div class="panel-foot">
                 <p class="panel-scope">A request can only be answered once. Yours was refused by the system, not by Sipho, and nothing about the vehicle or Thabo&rsquo;s rules changed twice.</p>
                 <div class="panel-actions"><button class="btn btn-primary">Back to requests</button></div>
@@ -8646,7 +8646,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="figure-notes">
           <p class="surface-note"><b>Two managers, one notification, one
             pump.</b> Break-glass goes to everybody who can answer it, which
-            is the point &mdash; somebody is standing at a forecourt. It also
+            is the point. Somebody is standing at a forecourt. It also
             means two people will open the same request, and the second press
             has to be answered rather than swallowed.</p>
           <p class="surface-note"><b>It leads with the outcome, not with the
@@ -8733,9 +8733,9 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
                 <div class="key-figure"><b>400 L</b><span>tank capacity on this truck</span></div>
                 <div class="key-reason"><span class="badge badge-warning">Over the R2 000 cap</span><span>A full tank is about R8 600</span></div>
               </div>
-              <dl class="panel-facts"><dt>Driver</dt><dd>Sibusiso Mahlangu &middot; 072 111 3333</dd><dt>Vehicle</dt><dd><span class="ident">NCA 875 GP</span> &middot; MAN TGS 26.440</dd><dt>Tank capacity</dt><dd>400 litres, about R8 600</dd><dt>Your cap on a released fill</dt><dd>R2 000</dd><dt>Most this can pump</dt><dd><b>93 litres</b>, about R2 000 &mdash; the cap, which is lower than the tank</dd></dl>
+              <dl class="panel-facts"><dt>Driver</dt><dd>Sibusiso Mahlangu &middot; 072 111 3333</dd><dt>Vehicle</dt><dd><span class="ident">NCA 875 GP</span> &middot; MAN TGS 26.440</dd><dt>Tank capacity</dt><dd>400 litres, about R8 600</dd><dt>Your cap on a released fill</dt><dd>R2 000</dd><dt>Most this can pump</dt><dd><b>93 litres</b>, about R2 000. The cap, which is lower than the tank</dd></dl>
               <div class="panel-foot">
-                <p class="panel-scope"><b>Approve one transaction at Engen Beaufort West, up to 93 litres, within the next 10 minutes.</b> That is a part tank. If he needs the full 400 litres, an administrator has to raise the cap on your policy &mdash; this screen cannot exceed it.</p>
+                <p class="panel-scope"><b>Approve one transaction at Engen Beaufort West, up to 93 litres, within the next 10 minutes.</b> That is a part tank. If he needs the full 400 litres, an administrator has to raise the cap on your policy, this screen cannot exceed it.</p>
                 <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve 93 litres</button></div>
               </div>
             </div>
@@ -8752,7 +8752,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             shortfall would send a driver away from a pump with half of what
             he came for and no idea why.</p>
           <p class="surface-note"><b>The button says the number it will
-            actually release.</b> Not "Approve" &mdash; 93 litres. A manager
+            actually release.</b> Not "Approve", 93 litres. A manager
             who presses expecting a full tank and gets a quarter of one has
             been misled by the control, not by the policy.</p>
           <p class="surface-note"><b>Raising the cap is deliberately not
@@ -9356,7 +9356,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <div class="page-head">
           <div>
             <h1>Driver states</h1>
-            <p>Three fields, because there are three questions. <b>Driver access</b> says whether this person is on the fleet: On the fleet, Left &mdash; a manager decides it. <b>App status</b> says where their EngenXT invitation got to: six values, and the system decides every one of them. <b>Fuel access</b> says whether their card works today: Can fuel, Cannot fuel. All proposed &mdash; unlike the vehicle set there is no shipped driver status to compare against.</p>
+            <p>Three fields, because there are three questions. <b>Driver access</b> says whether this person is on the fleet: On the fleet, Left. A manager decides it. <b>App status</b> says where their EngenXT invitation got to: six values, and the system decides every one of them. <b>Fuel access</b> says whether their card works today: Can fuel, Cannot fuel. All proposed, unlike the vehicle set there is no shipped driver status to compare against.</p>
           </div>
         </div>
 
@@ -9382,7 +9382,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
           report of something that already happened somewhere else: a message
           queued, a message delivered, a phone that opened the app, a number
           that was not on WhatsApp. The menu behind the badge is an action
-          menu, not a picker &mdash; it offers <i>Send</i>, <i>Resend</i>,
+          menu, not a picker: it offers <i>Send</i>, <i>Resend</i>,
           <i>Copy link</i>, <i>Review the number</i>, and never <i>Invite
           sent</i> or <i>Active</i>. The old row menu did offer the second one,
           as <i>They have the app</i>, and it was a control for asserting a
@@ -9610,7 +9610,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 <!-- ── A refused fuel attempt ────────────────────────────────────────────
      Read, not edited, so: medium width, definition-list facts, and actions
      that are about the event rather than about the vehicle. Marking a vehicle
-     recovered is deliberately not among them — an attempt to fuel a stolen
+     recovered is deliberately not among them, an attempt to fuel a stolen
      vehicle is evidence of where it is, not evidence that anybody has it
      back. -->
 <aside class="detail-sheet hidden" id="incident-sheet" role="dialog" aria-modal="true"
@@ -9755,7 +9755,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     <div class="focus-sheet__heading">
       <h2 class="focus-sheet__title" id="vehicle-drawer-title" data-role="title">Add a vehicle</h2>
       <!-- One line, and it does the work the old header did with four. There
-           was a live count here — "7 required details left" — which turned a
+           was a live count here, "7 required details left", which turned a
            form into a scoreboard and was wrong the moment a conditional field
            appeared. Saying which fields are optional, once, covers every one
            of them and never goes stale. -->
@@ -9874,8 +9874,8 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <select class="field" id="f-year"></select>
       </div>
 
-      <!-- "Category", not "type". Type was doing two jobs — the kind of
-           vehicle and the shape of its body — and a manager choosing between
+      <!-- "Category", not "type". Type was doing two jobs, the kind of
+           vehicle and the shape of its body, and a manager choosing between
            "LCV" and "Other" was answering neither. Filled from the taxonomy at
            start-up; typing the options here is what let this select and the
            CSV specification drift apart. -->
@@ -9887,8 +9887,8 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <!-- Shown only when Other is chosen, and required then. What is typed
            here becomes a category on this account, so the next vehicle of the
            same kind is chosen from the list rather than described again. Full
-           width because the answer is a phrase — "refrigerated trailer",
-           "water bowser" — and half a sheet trims it. -->
+           width because the answer is a phrase: "refrigerated trailer",
+           "water bowser", and half a sheet trims it. -->
       <div class="form-field field-wide" data-field="vehicleTypeOther" hidden>
         <label for="f-type-other">What kind of vehicle is it?</label>
         <input class="field" id="f-type-other" maxlength="100" autocomplete="off"
@@ -9901,7 +9901,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
            rather than invented:
 
              the reading is kept as the first row of a history, not as a field
-             on the vehicle — Fleetio logs every meter entry, Geotab stores an
+             on the vehicle: Fleetio logs every meter entry, Geotab stores an
              odometer adjustment carrying its own date;
 
              a reading has its own date, because the day the odometer read
@@ -9911,7 +9911,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
              it is checked for going backwards, not for being large. An
              odometer only counts up, and that single fact catches the errors
              a made-up ceiling never would. A vehicle can genuinely read lower
-             than last time — a replaced instrument cluster — so it is
+             than last time, a replaced instrument cluster, so it is
              questioned rather than refused, which is this form's rule for
              anything that is unlikely but possible;
 
@@ -9947,7 +9947,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
            Motorcycle. Motorcycle sub-types were the last three standing and
            they are gone too, so nothing asks the question and the field is
            not kept hidden against the day something might: a control nobody
-           can fill is not storage, it is somewhere for a stale answer to
+           can fill is not storage. It is somewhere for a stale answer to
            survive. -->
 
       <!-- Asked on three categories and no others. On Other and Special-purpose
@@ -10278,7 +10278,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
      status pop-up and only two of them belong together. Overview is what is
      true now. Activity is what happened and who did it, which is generated
      rather than written, plus the notes people leave, in the same column and
-     in time order — because "Lerato stopped this vehicle at 09:14" and "the
+     in time order. Because "Lerato stopped this vehicle at 09:14" and "the
      gearbox part is on back order" are read together or not at all.
 
      A panel and not a modal: nothing in here is a decision, so nothing in here
@@ -10464,7 +10464,7 @@ function form(spec) {
        a fieldset carrying data-field is its own group, and querySelector does
        not match the element it is called on. The tank-count question was the
        first field built that way, and its invalid state was landing on the
-       hidden input that holds the answer — an element no screen reader ever
+       hidden input that holds the answer, an element no screen reader ever
        reaches. */
     if (wrap.getAttribute('role') === 'radiogroup') return wrap;
     return wrap.querySelector('[role="radiogroup"]') || el(field);
@@ -10516,7 +10516,7 @@ function form(spec) {
       n.className = 'advice';
       n.textContent = advice;
       /* The way out of a warning, offered beside it. Checking the value needs
-         no button — the field is right there — so the only action that needs
+         no button: the field is right there, so the only action that needs
          one is the deliberate decision to keep what was typed. */
       if (accept) {
         const b = document.createElement('button');
@@ -10542,8 +10542,8 @@ function form(spec) {
       /* A button, not an anchor.
        *
        * It was <a href="#">, which does two wrong things at once. It has no
-       * handler, so the offer it makes — "use these details", "split it into
-       * the fields" — applied nothing when taken. And a bare # rewrites the
+       * handler, so the offer it makes: "use these details", "split it into
+       * the fields", applied nothing when taken. And a bare # rewrites the
        * address, which on a route-owned sheet is a navigation: the sheet came
        * down and everything typed went with it, without the discard question
        * being asked. An offer that loses the work it was offering to tidy.
@@ -10609,8 +10609,8 @@ function form(spec) {
       /* Emptied, not just hidden. display:none takes the list off the screen
          and out of the accessibility tree, but it leaves the sentences in the
          document, and they are sentences about faults that have been fixed.
-         Anything that reads the markup rather than the screen — a test, an
-         export, the next person to open the inspector — is told the form is
+         Anything that reads the markup rather than the screen: a test, an
+         export, the next person to open the inspector, is told the form is
          still blocked by fields that are answered. */
       summary.classList.add('hidden');
       summaryList.innerHTML = '';
@@ -10665,8 +10665,8 @@ function form(spec) {
     // fix it, which is how the error goes away without a second press.
     //
     // Leaving a field somebody never touched is not the same event. Opening
-    // the sheet focuses the first field, so tabbing past it — or clicking
-    // anywhere else — fired blur on an empty box and complained that it was
+    // the sheet focuses the first field, so tabbing past it, or clicking
+    // anywhere else, fired blur on an empty box and complained that it was
     // empty, before anybody had done anything. A field is answered when
     // somebody has put something in it or has already been told about it.
     node.addEventListener('blur', () => {
@@ -10753,7 +10753,7 @@ function form(spec) {
 
     // Values first, then the complaints, so a field never shows an error about
     // a value it is no longer holding.
-    /* Controls the ID map does not name — radios, tick boxes — are reset with
+    /* Controls the ID map does not name (radios, tick boxes) are reset with
        the rest of the form. Without this a value survives from one record to
        the next and disagrees with the field the engine actually reads. */
     root.querySelectorAll('input[type="radio"], input[type="checkbox"]')
@@ -10791,7 +10791,7 @@ function form(spec) {
       const [tone, text, action] = s.alert;
       alertBox.className = `form-alert form-alert-${tone}`;
       /* Wired below. The tuple carries a label and nothing to run, so the
-         handler re-applies the state the alert belongs to — which is what
+         handler re-applies the state the alert belongs to. Which is what
          "try again" means on a form whose save failed: put me back where I
          was and let me press Save again. */
       /* Built from nodes: the alert text names the record on some states,
@@ -11127,7 +11127,7 @@ function directory(spec) {
    * scans a list by. It is one press in Columns to bring it back. */
   const hidden = new Set(spec.columns.filter(c => c[3]).map(c => c[0]));
   /* What the table ships with. The trigger's active treatment means "you have
-     changed something", and a column that starts hidden is not a change — the
+     changed something", and a column that starts hidden is not a change, the
      control was announcing a customisation nobody had made. */
   const DEFAULT_HIDDEN = new Set(hidden);
   const sameAsDefault = () => hidden.size === DEFAULT_HIDDEN.size
@@ -11225,7 +11225,7 @@ function directory(spec) {
       return `<div class="table-empty"><h2>${own.title}</h2><p>${own.body}</p></div>`;
     }
     /* Filters only. The way out is a button, matching the search case, and
-       it says filters rather than search — offering "Clear search" to somebody
+       it says filters rather than search, offering "Clear search" to somebody
        who never typed one sends them to the wrong control. The chosen values
        stay on screen in the panel behind this, so nothing has to be
        remembered. */
@@ -11279,7 +11279,7 @@ function directory(spec) {
   }
 
   /* Both are reachable from two places: the delegated handler on the
-     directory, and a direct binding on the popover the button lives in —
+     directory, and a direct binding on the popover the button lives in, 
      because a popover's own clicks do not reach the directory, which is how
      Clear filters and Reset to default came to be controls that did nothing. */
   function clearAllFacets() {
@@ -11304,7 +11304,7 @@ function directory(spec) {
    * licence or a permit has lapsed, and it was drawing the rows and hiding
    * the dates. Forced on for as long as that tab is selected, and released
    * with it, so nobody has to remember to put it back. The Columns control
-   * still shows the underlying choice — this overrides what is drawn, not
+   * still shows the underlying choice. This overrides what is drawn, not
    * what was chosen. */
   const forced = () => new Set(
     (spec.tabs && spec.tabs[tab] && spec.tabs[tab][2] && spec.tabs[tab][2].columns) || []);
@@ -11421,7 +11421,7 @@ function directory(spec) {
     const all = Object.entries(chosen).flatMap(([k, s]) => [...s].map(v => [k, v]));
     chipsBox.classList.toggle('hidden', !all.length);
     /* The chip reads back what the panel offered. It was printing the stored
-       code — 'rigid_truck' where the filter said 'Rigid truck' — so the two
+       code, 'rigid_truck' where the filter said 'Rigid truck', so the two
        halves of the same control spoke different vocabularies. The value the
        button removes is still the code, because that is what matching is done
        against. */
@@ -11601,7 +11601,7 @@ function directory(spec) {
   if (searchBox) {
     searchBox.addEventListener('input', () => {
       query = searchBox.value.trim().toLowerCase();
-      /* A tick on a row the search has just hidden is a tick nobody meant — but
+      /* A tick on a row the search has just hidden is a tick nobody meant, but
          a tick on a row the search still shows is one they did mean, and
          clearing the lot meant narrowing a list to find the rest of what you
          wanted lost what you already had. render() prunes exactly what has
@@ -11635,7 +11635,7 @@ function directory(spec) {
       }
 
       /* The button is held for the beat, and the selection is emptied inside
-         it — so a second press within the beat finds the same rows rather than
+         it, so a second press within the beat finds the same rows rather than
          an empty list, and cannot report "nothing changed" over the undo for
          the change that did land. */
       if (bulk.dataset.busy === '1') return;
@@ -11649,7 +11649,7 @@ function directory(spec) {
     }
 
     /* Anywhere inside an open popover belongs to the popover, including the
-       parts of it that are not controls — so a press on a menu's padding or on
+       parts of it that are not controls, so a press on a menu's padding or on
        a separator no longer falls through to the row and opens the record.
 
        Its own controls are exempt: the footer buttons and the tick boxes are
@@ -11680,7 +11680,7 @@ function directory(spec) {
       if (open) pinPop(more, pop);
       /* The menu declares role="menu", which promises a keyboard. Opening it
          puts focus on the first item, and the handler below moves between
-         them — a role that promises arrow keys and answers none is worse than
+         them. A role that promises arrow keys and answers none is worse than
          no role at all, because it tells somebody to expect them. */
       if (open) {
         const items = [...pop.querySelectorAll('[data-act]')];
@@ -11716,8 +11716,8 @@ function directory(spec) {
 
     /* A control inside a cell answers for itself.
      *
-     * The status cell now holds four of them — two value pills, the reason and
-     * the note count — and each changes one thing without opening the record.
+     * The status cell now holds four of them: two value pills, the reason and
+     * the note count, and each changes one thing without opening the record.
      * Without this guard every one of them would fall through to the row
      * handler below and open the drawer, which is the row's job and not
      * theirs. Same shape as the tick and the overflow menu above: one handler,
@@ -11870,7 +11870,7 @@ function hideToast() {
   clearTimeout(toastTimer);
 }
 
-/* `extra` is the quieter offer beside Undo — {label, run}, or an array of them.
+/* `extra` is the quieter offer beside Undo: {label, run}, or an array of them.
    They exist so a status change can carry "Add a reason" and "Add a note"
    without either ever standing between somebody and the change: the state is
    already set by the time this appears, and ignoring both costs nothing.
@@ -12037,7 +12037,7 @@ function pinPop(anchor, pop) {
    * A select inside a form field is a button with a label above it and a line
    * of help below, and all three are one thing to the person reading them.
    * Anchored to the button alone, the list opened eight pixels under it and
-   * landed halfway down the help — "Professional driving permit. No PrDP is
+   * landed halfway down the help, "Professional driving permit. No PrDP is
    * an answer." was sliced through the middle, with the top half readable and
    * the bottom half behind a panel. Half-covered text does not read as a
    * panel in front of a sentence; it reads as a rendering fault.
@@ -12109,8 +12109,8 @@ function unpinPop(pop) {
  * change lands immediately and the toast carries Undo and Add note, so an
  * explanation is available and never compulsory.
  *
- * What was here before sent every change — including "this one is back from
- * the workshop" — through a centred modal with a paragraph in it. A modal
+ * What was here before sent every change, including "this one is back from
+ * the workshop", through a centred modal with a paragraph in it. A modal
  * should mean stop, this is important. Spend it on everything and it stops
  * meaning anything, so the two genuinely dangerous moves lose their guard.
  * Those two, and only those two, still open the dialog below.
@@ -12119,7 +12119,7 @@ function unpinPop(pop) {
  *
  *   { label, value, groups: [{ title, items: [...] }], help }
  *
- * An item is either a value to set — { value, says } — or a route to
+ * An item is either a value to set ({ value, says }) or a route to
  * something that asks first: { label, act, danger, says }. `says` is the
  * one-line explanation under the option, which is where an explanation
  * belongs: present while somebody is choosing, gone the rest of the time.
@@ -12225,13 +12225,13 @@ const statusMenu = (() => {
         /* Neither a value to set nor an action to take: this item is the state
            the record is already in, put there so the menu says what it is
            rather than opening on nothing. It is marked as current and is not a
-           control — a button that does nothing when pressed is worse than no
+           control. A button that does nothing when pressed is worse than no
            button, because somebody presses it twice before believing it. */
         if (it.value === undefined && !it.act) {
           return `<p class="pick pick-current" role="note">
                     <span class="pick-mark" aria-hidden="true">${tick}</span>
                     <span class="pick-body">
-                      <span class="pick-label">${it.label}<span class="pick-now"> — current</span></span>
+                      <span class="pick-label">${it.label}<span class="pick-now">, current</span></span>
                       ${it.says ? `<span class="pick-says">${it.says}</span>` : ''}
                     </span>
                   </p>`;
@@ -12253,8 +12253,8 @@ const statusMenu = (() => {
     el._items = items;
     /* What this status means, said once under the heading.
      *
-     * Three of the app menus used `pick-current` for this — the ticked "this
-     * is what you have" row the value pickers use — and a tick in a menu that
+     * Three of the app menus used `pick-current` for this, the ticked "this
+     * is what you have" row the value pickers use, and a tick in a menu that
      * offers no values is a promise of a choice that is not there. The
      * sentence is the same sentence; it is just not pretending to be an item
      * any more, so the keyboard walks straight to the first real action. */
@@ -12270,7 +12270,7 @@ const statusMenu = (() => {
     /* preventScroll, and it is not a nicety.
      *
      * A pinned pop is `position: fixed`, and this file closes every pinned pop
-     * on scroll — deliberately, because a menu belongs to a row and a row that
+     * on scroll: deliberately, because a menu belongs to a row and a row that
      * has moved is a different question. Focusing the first item scrolls it
      * into view, which fires that handler, which closed the menu roughly one
      * frame after it opened. On the last rows of the table it never appeared
@@ -12292,14 +12292,14 @@ const statusMenu = (() => {
  * This was a picker: six reasons a card might be off, four ways a vehicle
  * might have gone, five things that might have happened to it. Each list read
  * well and each one was a guess at a taxonomy nobody has agreed yet, which is
- * a specific kind of expensive — a preset is a promise that a year of them
+ * a specific kind of expensive. A preset is a promise that a year of them
  * can be counted, and a preset list that turns out to be wrong has already
  * been written into every record before anybody notices.
  *
  * So the reason is a sentence somebody types. Nothing is being counted off it
  * yet, and pretending otherwise put a taxonomy into the data on the strength
- * of a first draft. The question above the box still comes from the status —
- * "Why is it off the road?" is a better prompt than "Reason" — and the answer
+ * of a first draft. The question above the box still comes from the status, 
+ * "Why is it off the road?" is a better prompt than "Reason", and the answer
  * is theirs.
  *
  * A popover rather than a field on the row, for the same reason the picker
@@ -12530,7 +12530,7 @@ const statusDialog = (() => {
     /* Everything behind it stops being reachable. The record panel sits above
        the scrim in the layer order and was never made inert, so while a dialog
        said aria-modal="true" the panel underneath stayed fully operable by
-       mouse and by Tab — a modal that was only modal to the eye. */
+       mouse and by Tab. A modal that was only modal to the eye. */
     document.querySelectorAll('#record-panel, .app > *').forEach(el => {
       if (el !== box && !el.contains(box)) el.setAttribute('inert', '');
     });
@@ -12607,7 +12607,7 @@ const recordPanel = (() => {
 
   /* ── Overview: what is true now ─────────────────────────────────────────
    *
-   * It used to be three rows — status, reason, and a sentence about a pump —
+   * It used to be three rows: status, reason, and a sentence about a pump, 
    * beside an Activity tab holding the whole history. Two tabs are only worth
    * their cost when both hold something the other does not, and a three-row
    * Overview did not clear that bar: it read as a worse summary of the thing
@@ -12633,7 +12633,7 @@ const recordPanel = (() => {
   /* One entry, in a shape the reader can scan.
    *
    * A status change stores its previous value, its new value, who made it and
-   * when — as fields, not as a sentence — so the arrow can be drawn, the two
+   * when (as fields, not as a sentence) so the arrow can be drawn, the two
    * values can be told apart at a glance, and a report could count them later.
    * A note is somebody's own words and is quoted. An event is something that
    * happened to the record with no before-and-after to show. */
@@ -12740,7 +12740,7 @@ const recordPanel = (() => {
 addEventListener('scroll', e => {
   /* Scrolling the popover is the popover being used, not the page moving out
      from under it. The filter panel is 828px of content in a 512px box, so it
-     scrolls — and every wheel notch inside it reached this listener and shut
+     scrolls, and every wheel notch inside it reached this listener and shut
      it. Its last facet group, its result count and its Clear filters button
      could not be reached with a mouse at any viewport. */
   const t = e.target;
@@ -13162,7 +13162,7 @@ function check(field, v, get, people) {
     return {};
   }
 
-  // A comma is not a surname, it is a spreadsheet cell that brought its
+  // A comma is not a surname. It is a spreadsheet cell that brought its
   // neighbours. A doubt rather than a refusal, because it is a guess at intent.
   if ((field === 'first' || field === 'last') && /[,\t]/.test(v)) {
     return { advice: 'That looks like a whole spreadsheet row. Paste just the name, or save it as it is.' };
@@ -13224,7 +13224,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = DriverRule
 /* The vehicle taxonomy: one list, read by every surface that names a type.
  *
  * It replaces LCV / HCV / Other, which was not a South African fleet
- * vocabulary — it was a weight class borrowed from a licensing form. Three
+ * vocabulary. It was a weight class borrowed from a licensing form. Three
  * options cannot tell a scooter from a bus, so a courier fleet and a coach
  * operator both arrived at "Other", and "Other" cannot be validated, filtered
  * or banded. Everything downstream inherited that: the capacity check had
@@ -13232,7 +13232,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = DriverRule
  * should have been able to judge.
  *
  * The categories below are the ones a South African fleet actually runs, and
- * they are ordered the way somebody scans a list — smallest to largest, with
+ * they are ordered the way somebody scans a list: smallest to largest, with
  * the escape hatch last.
  *
  * ── One list, six readers ────────────────────────────────────────────────
@@ -13240,8 +13240,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = DriverRule
  * The form's select, the CSV specification, the importer's parser, the
  * directory column, the filter's options and the capacity service's band
  * lookup all read this file. None of them holds its own copy of the
- * vocabulary, because the previous arrangement — the same three strings typed
- * into a select, a table of CSV rules and two band maps — is exactly how a
+ * vocabulary, because the previous arrangement, the same three strings typed
+ * into a select, a table of CSV rules and two band maps, is exactly how a
  * spreadsheet came to be accepted with a value the form would have rejected.
  */
 window.VehicleTypes = (() => {
@@ -13271,16 +13271,16 @@ window.VehicleTypes = (() => {
  * form, the filter, the table, the importer and the export all go through it.
  */
 const TYPES = [
-  { code: 'lcv',        label: 'LCV',        long: 'LCV — Light commercial vehicle', band: 'lcv' },
-  { code: 'hcv',        label: 'HCV',        long: 'HCV — Heavy commercial vehicle', band: 'hcv' },
+  { code: 'lcv',        label: 'LCV',        long: 'LCV: Light commercial vehicle', band: 'lcv' },
+  { code: 'hcv',        label: 'HCV',        long: 'HCV: Heavy commercial vehicle', band: 'hcv' },
   { code: 'motorcycle', label: 'Motorcycle', long: 'Motorcycle',                     band: 'motorcycle' },
   /* The escape hatch, and the only governed category with no band. A fleet
-     carries things the three above do not describe — a refrigerated trailer,
-     a forklift, a water bowser — and the choice was previously to file them
+     carries things the three above do not describe: a refrigerated trailer,
+     a forklift, a water bowser. And the choice was previously to file them
      under whichever of the three was least wrong. Choosing Other asks what it
      is, and the answer becomes a category of its own, so the second one of
      the same kind is picked rather than described again. */
-  { code: 'other',      label: 'Other',      long: 'Other — not one of the above', band: null },
+  { code: 'other',      label: 'Other',      long: 'Other: not one of the above', band: null },
 ];
 
 /* Where the governed list stops. Everything after this index was named by
@@ -13297,8 +13297,8 @@ function codeFor(name) {
 }
 
 /* Adds a category this account named, and returns the code to store on the
-   record. Idempotent: naming a category that already exists — in any case, or
-   as one of the governed labels — returns the existing code rather than
+   record. Idempotent: naming a category that already exists: in any case, or
+   as one of the governed labels, returns the existing code rather than
    growing a second entry that means the same thing. */
 function add(name) {
   const clean = String(name == null ? '' : name).trim();
@@ -13314,8 +13314,8 @@ function add(name) {
   return code;
 }
 
-/* Configurations were here. Motorcycle kept three — street, dual-purpose and
-   off-road — after LCV and HCV lost theirs, on the argument that the answer
+/* Configurations were here. Motorcycle kept three: street, dual-purpose and
+   off-road: after LCV and HCV lost theirs, on the argument that the answer
    was still true of the whole category and moved the tank a great deal. It
    was, and it did; it was also one more question on every motorcycle, and the
    product asks for the total capacity directly. A category is the only thing
@@ -13450,7 +13450,7 @@ return {
  * operating-system menu.
  *
  * Which control a field takes is decided by the list behind it, not by
- * preference. A short fixed list is a select — Fuel type has two options and
+ * preference. A short fixed list is a select, Fuel type has two options and
  * search would be furniture. A long one, or one that depends on another
  * answer, is a combobox. Model depends on Make; Country is long enough that
  * scrolling it is worse than typing three letters.
@@ -13658,7 +13658,7 @@ return {
  *
  * Nine fields were native <select>s and one was a hand-built combobox, so the
  * form opened a dark operating-system menu for Fuel type and a white
- * application menu for Make — different type, different option heights,
+ * application menu for Make: different type, different option heights,
  * different selected indicators, different keyboard, on two fields a
  * centimetre apart. The opened part of a native select cannot be styled, so
  * matching them means not using it.
@@ -13678,7 +13678,7 @@ return {
  * ── The placeholder is not an option ────────────────────────────────────
  *
  * A native select shows its first option when nothing is chosen, so "Select"
- * appeared in the menu as a value with a tick beside it — a thing you could
+ * appeared in the menu as a value with a tick beside it. A thing you could
  * pick, which meant unpicking your answer by choosing the word "Select". Here
  * the empty option is the trigger's placeholder and is not in the list at all.
  */
@@ -13749,8 +13749,8 @@ return {
     /* Twelve is where scanning stops being faster than typing. Below it a
        search box is one more thing to look past; above it, hunting a year in a
        column of twenty-seven is worse than typing two digits. */
-    /* Built from the select, so a field whose options are filled later — the
-       taxonomy, the licence codes, the makes — is right the moment it is. */
+    /* Built from the select, so a field whose options are filled later, the
+       taxonomy, the licence codes, the makes, is right the moment it is. */
     function draw(query) {
       rows = [];
       list.textContent = '';
@@ -14004,7 +14004,7 @@ return {
       if (row) move(rows.indexOf(row));
     });
 
-    /* Anything that rewrites the options — the taxonomy, the licence codes —
+    /* Anything that rewrites the options: the taxonomy, the licence codes, 
        or writes the value in script. */
     const api = { close, refresh: () => { draw(); paint(); }, trigger, sel };
     sel.addEventListener('change', paint);
@@ -14108,7 +14108,7 @@ return {
    * 2000. They were right only because of the year the file happened to be
    * written in: on 1 January 2027 the newest year a person could choose was
    * silently wrong, with nothing anywhere to catch it. A list whose first
-   * entry is "now" is not content, it is a calculation, and this is it.
+   * entry is "now" is not content. It is a calculation, and this is it.
    *
    * OLDEST is the floor the CSV specification publishes, so the two cannot
    * disagree about what a vehicle year may be.
@@ -14213,7 +14213,7 @@ const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
 const word = n => WORDS[n] || String(n);
 
 /* A header a person can compare their own against, and a row that the parser
-   actually accepts — generated, so the example can never drift from the rule
+   actually accepts: generated, so the example can never drift from the rule
    it is illustrating. */
 const header = () => COLUMNS.map(c => c.key).join(',');
 const exampleRow = () => COLUMNS.map(c => c.example).join(',');
@@ -14248,7 +14248,7 @@ return {
 /* csv-spec.js */
 /* Everything the import screens say about the file, written from the schema.
    The specification is a contract, and a contract maintained in two places is
-   a contract in one place and a rumour in the other — which is how the page
+   a contract in one place and a rumour in the other. Which is how the page
    came to say "seven columns… two more optional" above "Ten columns". */
 (() => {
   if (!window.ImportSchema) return;
@@ -14264,7 +14264,7 @@ return {
     el.textContent = `${c.required} required \u00b7 ${c.optional} optional`;
   });
 
-  /* The literal first two lines of a file that works — generated, so the
+  /* The literal first two lines of a file that works: generated, so the
      example can never illustrate a rule it would fail. */
   document.querySelectorAll('[data-role="csv-sample"]').forEach(el => {
     el.textContent = S.header() + '\n' + S.exampleRow();
@@ -14323,7 +14323,7 @@ return {
 /* capacity-rules.js */
 /* Engine displacement and fuel-tank capacity: one set of rules, one service.
  *
- * These numbers were in three places — a TANK_BANDS map for the form, a second
+ * These numbers were in three places: a TANK_BANDS map for the form, a second
  * BANDS map for the needs-attention filter, and a third set written into the
  * import review's copy as prose. Three thresholds for one question is how a
  * spreadsheet row gets waved through that the form would have queried, and how
@@ -14337,7 +14337,7 @@ return {
  * Engine displacement is how big the engine is; tank capacity is how much fuel
  * the vehicle carries. They are stored separately, in different canonical
  * units, and the commonest data-entry fault in a fleet import is one being
- * typed into the other — 125 in the tank field on a motorcycle, 2000 in the
+ * typed into the other: 125 in the tank field on a motorcycle, 2000 in the
  * engine field meaning cc but read as litres. Both are detected by name below
  * rather than being left to a range check to trip over.
  *
@@ -14345,8 +14345,8 @@ return {
  *
  * Every range here is a prompt to check, never a refusal. A vehicle may
  * genuinely carry an auxiliary tank, and a product that refuses a true answer
- * is worse than one that questions it. Only values that cannot be true —
- * missing, non-numeric, zero, negative — block.
+ * is worse than one that questions it. Only values that cannot be true, 
+ * missing, non-numeric, zero, negative, block.
  */
 /* incidents.js */
 /* Theft incidents: their own records, with their own immutable timelines.
@@ -14439,7 +14439,7 @@ function addAttempt(incident, attempt) {
 
 function forVehicle(reg) {
   /* An incident stays findable until it is finished. Recovery is a step in it,
-     not the end of it — the inspection and the return to service belong on the
+     not the end of it, the inspection and the return to service belong on the
      same timeline, and looking only for 'open' left them unrecorded. */
   return all.filter(i => i.reg === reg && i.state !== 'closed' && i.state !== 'corrected')
     .slice(-1)[0] || null;
@@ -14488,7 +14488,7 @@ function check(raw, year) {
 
   /* An absent year has to be absent, not zero. `Number('')` is 0, and 0 is a
      finite number below 1996, so a blank year was quietly taking the lenient
-     pre-1996 branch — the exact opposite of what the paragraph above promises,
+     pre-1996 branch: the exact opposite of what the paragraph above promises,
      and the common case now that the VIN is optional and often typed before
      anybody has chosen a year. */
   const yearText = String(year == null ? '' : year).trim();
@@ -14905,7 +14905,7 @@ return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
  *
  * So each row draws exactly one: fuel access while the vehicle is in the
  * fleet, and Removed from fleet once it is not. One dropdown, carrying the
- * four controls that actually operate a vehicle — can fuel, cannot fuel,
+ * four controls that actually operate a vehicle: can fuel, cannot fuel,
  * report stolen, remove from fleet. The fields stay separate underneath,
  * because removing a vehicle is not a fuel permission and a report that
  * counts vehicle-weeks off the road must not count sold ones.
@@ -14923,8 +14923,8 @@ return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
    dozen places and renumbering them all to make the list read tidily is a
    change with no reader and every risk.
 
-   MODEL used to hold "Toyota Hilux 2.4 GD-6" — make and model glued together
-   — and three separate places pulled them apart again by splitting on the
+   MODEL used to hold "Toyota Hilux 2.4 GD-6", make and model glued together
+, and three separate places pulled them apart again by splitting on the
    first space. That works until a make has a space in it: "UD Trucks Quon"
    split into the make "UD" and the model "Trucks Quon". Both are stored on
    their own now, and nothing splits anything. */
@@ -14942,8 +14942,8 @@ const F = {
  * manual add does not: linking a vehicle to a driver is the grouping work, and
  * that is a later phase TFN has not designed yet.
  *
- * So a single add says what is true — in the fleet, fuelling, invitation to
- * follow — and does not claim a message went to somebody the product cannot
+ * So a single add says what is true: in the fleet, fuelling, invitation to
+ * follow. And does not claim a message went to somebody the product cannot
  * name. Deliberately parked, not overlooked: inventing a recipient here would
  * be a promise the system cannot keep, and the honest sentence costs nothing.
  */
@@ -15024,7 +15024,7 @@ const accountMakes = ['Foton'];
 
    `fuels` is what the status implies at a pump, and it is read rather than
    stored so the two can never disagree. `release` says whether a manager can
-   still let one fill through — the difference between a vehicle that is off
+   still let one fill through. The difference between a vehicle that is off
    the road and one that has been taken. */
 const STATUS = {
   Active: {
@@ -15042,7 +15042,7 @@ const STATUS = {
     fuels: false, release: false,
     says: 'Reported to the police. Fuel is blocked everywhere and nobody can release a fill, including you.',
   },
-  'Recovered — inspection required': {
+  'Recovered, inspection required': {
     badge: 'badge-warning',
     fuels: false, release: false,
     says: 'Back in your hands and not yet on the road. Fuel stays blocked until somebody has inspected it and put it back into service.',
@@ -15057,7 +15057,7 @@ const STATUS = {
 /* The one thing a manager can say about fuelling that the operational status
    does not already imply: stop this vehicle, for a reason of your own, while
    nothing about its condition has changed. Only meaningful on an Active
-   vehicle — everything else is already blocked by its status, and offering a
+   vehicle. Everything else is already blocked by its status, and offering a
    second way to say so is how the two came to contradict each other. */
 const BLOCK = {
   Allowed: { badge: null, says: 'No administrative block on this vehicle.' },
@@ -15132,7 +15132,7 @@ const BADGE = Object.fromEntries(
 const REQUIRED = [
   /* VIN was required here and is not any more: the story this form is built
      from asks for it as an optional detail. The ISO 3779 rules it is checked
-     against stay exactly as they were — an optional field is not an unchecked
+     against stay exactly as they were. An optional field is not an unchecked
      one, and a VIN typed off a licence disc with an O for a 0 is still wrong.
      They simply only run once somebody has typed something. */
   ['registration', 'Registration number', 'Enter the registration number'],
@@ -15176,7 +15176,7 @@ const STATES = {
   /* A getter, because `values` is read each time a state is applied and the
      default has to be today then rather than whenever this file loaded. It
      lives here rather than in the sheet controller because apply() writes
-     every field from the state it is given — anything filled in outside that
+     every field from the state it is given, anything filled in outside that
      is overwritten by it a moment later. */
   blank:     { title: 'Add a vehicle', get values() { return { odometerDate: todayISO() }; }, errors: [] },
   blocked:   { title: 'Add a vehicle', values: {}, errors: REQUIRED.map(r => r[0]) },
@@ -15322,7 +15322,7 @@ const STATES = {
   /* A second identity clash, over the field nobody expects to collide.
    *
    * A VIN is unique to a vehicle in the world, so two records holding one means
-   * the same vehicle has been added twice — usually a re-import of a file
+   * the same vehicle has been added twice, usually a re-import of a file
    * somebody already ran. The message names the plate it is already on, because
    * "already in use" without saying where sends a person hunting through a
    * list. Same shape as the driver form's duplicate ID. */
@@ -15368,7 +15368,7 @@ const STATES = {
 
 const MAX_MODEL = 100;
 
-/* The most recent reading on the record being edited, or null while adding —
+/* The most recent reading on the record being edited, or null while adding, 
    a vehicle that does not exist yet has nothing to have gone backwards from. */
 /* One reading. `on` is the day the odometer showed that figure; `at` is the
    moment somebody wrote it down. They are different facts and a record that
@@ -15405,7 +15405,7 @@ function check(field, v, get, state) {
         && row[0] !== (state && state.editing))) {
       return { error: 'Already in your fleet' };
     }
-    // A comma is not a non-standard plate, it is a spreadsheet cell that
+    // A comma is not a non-standard plate. It is a spreadsheet cell that
     // brought its neighbours. A doubt, because it is a guess about intent.
     if (/[,\t]/.test(v)) {
       return { advice: 'That looks like a whole spreadsheet row. Paste just the plate, or save it as it is.' };
@@ -15419,7 +15419,7 @@ function check(field, v, get, state) {
 
   /* Both capacity fields defer to the one service. The form decides how to
      draw an answer; it does not decide what the answer is. A blocking level
-     becomes an error, everything else becomes advice — which is what keeps a
+     becomes an error, everything else becomes advice. Which is what keeps a
      plausibility warning saveable. */
   if (field === 'tankCapacity') {
     const r = Capacity.tank({
@@ -15439,7 +15439,7 @@ function check(field, v, get, state) {
     }
   }
 
-  /* Blocking only what cannot be true, and questioning the rest — the same
+  /* Blocking only what cannot be true, and questioning the rest, the same
      shape as the capacity check above. A reading is refused for being the
      wrong kind of thing, or for being further than any vehicle has travelled.
      A high but possible reading is questioned and can be kept. */
@@ -15457,7 +15457,7 @@ function check(field, v, get, state) {
       return {
         advice: `Lower than the last reading of ${Records.groupNum(last.km)} km`
           + `${last.on ? ' on ' + readingDay(last.on) : ''}. An odometer counts up, `
-          + 'so this is usually a typing slip — unless the instrument cluster '
+          + 'so this is usually a typing slip, unless the instrument cluster '
           + 'was replaced.',
         accept: 'Record it anyway',
       };
@@ -15514,7 +15514,7 @@ const form = Records.form({
 
   /* Which questions this form is actually asking, given what has been chosen.
      Configuration exists only on categories that have configurations, and
-     primary use only where the answer changes something — so both sit in the
+     primary use only where the answer changes something, so both sit in the
      one required list and are filtered out here when they are not on screen.
      A required field that is not being shown must never appear in the error
      summary: it sends somebody looking for a control that is not there. */
@@ -15532,7 +15532,7 @@ const form = Records.form({
 
   /* One conditional question. Naming the category is asked only when the
      category is Other, and a required field that is not on screen must never
-     reach the error summary — it sends somebody looking for a control that is
+     reach the error summary. It sends somebody looking for a control that is
      not there. */
   applies: (field, get) => field !== 'vehicleTypeOther' || get('vehicleType') === 'other',
   menu: state => {
@@ -15550,13 +15550,13 @@ const form = Records.form({
        written into one string here and split apart again by whoever needed
        them. */
     /* Registered here: after everything that could refuse the save has run,
-       before any row referencing it is written, and on both paths — an edit
+       before any row referencing it is written, and on both paths, an edit
        that names a new make creates it just as an add does. */
     if (window.__commitPendingMake) __commitPendingMake();
 
     /* Other is an answer about what the category is not. What it is was typed
        beside it, and saving is what turns that into a category this account
-       owns — so the record stores the new category, never the word "other",
+       owns: so the record stores the new category, never the word "other",
        and the next vehicle of the kind is chosen from the list. */
     let category = v.vehicleType;
     if (category === 'other' && window.VehicleTypes) {
@@ -15693,7 +15693,7 @@ const form = Records.form({
  * Details held both and neither could be relied on.
  *
  * What changed is that the reason is no longer chosen from a list. It was,
- * and the argument for it was a good one — "In for a service" can be counted
+ * and the argument for it was a good one, "In for a service" can be counted
  * at the end of the year and "waiting for Ford to confirm the repair date"
  * cannot. But counting only works if the categories are right, none of these
  * have been agreed, and a wrong preset is not a wrong label: it is a year of
@@ -15706,7 +15706,7 @@ const form = Records.form({
  */
 /* ── The question, without the answers ───────────────────────────────────
  *
- * Each status asks a different question and always did — "Why is it off the
+ * Each status asks a different question and always did, "Why is it off the
  * road?" is a better prompt than "Reason", and that part was right. What went
  * with it was a list of answers per status: seven ways a vehicle might be off
  * the road, four ways one might have gone, five things that might have
@@ -15714,15 +15714,15 @@ const form = Records.form({
  *
  * Those lists are gone. A preset is a claim that the categories are settled
  * and that a year of them will be worth counting, and none of that has been
- * mapped yet. The cost of guessing is not that the list reads badly — most of
- * them read well — it is that every record written before the guess is
+ * mapped yet. The cost of guessing is not that the list reads badly, most of
+ * them read well. It is that every record written before the guess is
  * corrected is written in the wrong vocabulary, and there is no migration
  * from "Something else" back to what somebody actually meant.
  *
  * So the reason is a sentence, typed. `placeholder` is an example rather than
  * an option: it shows the shape of a useful answer and commits the data to
  * nothing. When the taxonomy is agreed, the lists come back here and the
- * popover grows a picker above the box — the shape of this object is what
+ * popover grows a picker above the box. The shape of this object is what
  * makes that a small change rather than a rewrite.
  */
 const WHY = {
@@ -15736,7 +15736,7 @@ const WHY = {
     title: r => `What happened to ${r[0]}?`,
     placeholder: 'Taken from the Sandton yard overnight.',
   },
-  'Recovered — inspection required': {
+  'Recovered, inspection required': {
     label: 'How it came back',
     title: r => `How did ${r[0]} come back?`,
     placeholder: 'Recovered by the police, found in Alexandra.',
@@ -15747,7 +15747,7 @@ const WHY = {
     placeholder: 'Sold to the lease company at the end of term.',
   },
   /* The block is a decision rather than a condition, so what goes in here is
-     the manager's own reasoning — none of it says anything about the
+     the manager's own reasoning, none of it says anything about the
      vehicle. */
   Blocked: {
     label: 'Why you stopped it',
@@ -15778,7 +15778,7 @@ function REASON_FOR(r) {
  * way, so the two screens mean the same thing by the same words. */
 /* The third copy of the bands, gone. A vehicle needs attention when it has no
    fleet number, or when the one capacity service says its tank is worth a
-   look — so the list, the form and the importer cannot disagree about which
+   look: so the list, the form and the importer cannot disagree about which
    vehicles are odd. */
 function needsAttention(r) {
   if (!r[1]) return true;
@@ -15827,14 +15827,14 @@ const vehicles = Records.directory({
   // their left, and ticking "LCV" or "Diesel" quietly matched nothing.
   //
   /* One status facet, over the four values a row can actually show. It reads
-     the same rule the cell draws by — fuel access while the vehicle is yours,
-     Removed from fleet once it is not — so filtering can never offer a value
+     the same rule the cell draws by: fuel access while the vehicle is yours,
+     Removed from fleet once it is not. So filtering can never offer a value
      no row displays. Two facets over two fields was right while the lifecycle
      had three values; with one of them terminal it produced a filter whose
      only useful answer was In fleet. */
   /* Four groups, and the last two are the two fields rather than one merged
-     list. Collapsing them was convenient for the cell — a row shows whichever
-     is deciding — and wrong for the filter, where "show me everything I still
+     list. Collapsing them was convenient for the cell. A row shows whichever
+     is deciding: and wrong for the filter, where "show me everything I still
      own that cannot fuel" needs both dimensions at once. A single Status
      heading over Can fuel, Reported stolen and Removed from fleet also asks a
      reader to work out which kind of thing each value is before using any of
@@ -15872,7 +15872,7 @@ const vehicles = Records.directory({
    *
    * Every everyday move came out of here and went onto the row itself, where
    * the value already is. A menu is the right home for things that have no
-   * representation on screen — Edit, Remove — and the wrong home for changing
+   * representation on screen (Edit, Remove) and the wrong home for changing
    * a value that is sitting in the cell three columns to the left.
    *
    * Neither status verb is offered while the last one is still landing. A menu
@@ -15887,7 +15887,7 @@ const vehicles = Records.directory({
       ...(r[F.STATUS] === 'Reported stolen'
         ? [{ act: 'report', label: 'Theft report…' },
            { act: 'recovered', label: 'Mark as recovered…' }]
-        : r[F.STATUS] === 'Recovered — inspection required'
+        : r[F.STATUS] === 'Recovered, inspection required'
           ? [{ act: 'inspect', label: 'Put back into service…' }]
           : [{ act: 'stolen', label: 'Report stolen…', danger: true }]),
       { act: 'remove', label: 'Remove from fleet…', danger: true },
@@ -16211,7 +16211,7 @@ function esc(s) {
  * somebody wanted to say about it. */
 /* Remove one known entry from a log, wherever it now sits. Undo used to take
    the last one, which is only the right entry when nothing has happened since
-   — and the ten seconds an undo toast stays up is exactly long enough for
+, and the ten seconds an undo toast stays up is exactly long enough for
    something to have happened. */
 function unlog(list, entry) {
   if (!list || !entry) return;
@@ -16233,7 +16233,7 @@ function logEvent(vehicle, text) {
 }
 
 /* A note never touches the status. It is filed, the row's count goes up, and
-   nothing else about the vehicle moves — which is the guarantee that makes a
+   nothing else about the vehicle moves. Which is the guarantee that makes a
    note safe to leave in a hurry. */
 function addNote(vehicle, text) {
   const entry = { kind: 'note', who: 'You', at: stamp(), text };
@@ -16259,13 +16259,13 @@ function panelSpec(vehicle, tab) {
        the fleet is not shown a fuel access value it can never use. */
     /* Two rows, in the order they are decided: the status somebody set, then
        what it means at a pump. Fuel access is never editable here because it
-       is not stored — changing it means changing the status or lifting the
+       is not stored, changing it means changing the status or lifting the
        block, and offering it as a field would invite the contradiction the
        split exists to prevent. */
     status: [
       ['Operational status', `<span class="badge ${tone || 'badge-quiet'}">${life}</span>`],
       ['Fuel access', accessWhy
-        ? `${access} <span class="rp-none">— ${esc(accessWhy)}</span>`
+        ? `${access} <span class="rp-none">, ${esc(accessWhy)}</span>`
         : access],
       ...(why ? [['Reason', vehicle[F.REASON]
         ? esc(vehicle[F.REASON])
@@ -16309,7 +16309,7 @@ const PUMP = {
   Active: 'Fuel flows, inside the driver’s rules.',
   'In maintenance': 'No fuel. A manager can still release one fill at the pump.',
   'Reported stolen': 'No fuel, anywhere. Nobody can release a fill. An attempt tells you the station and the time.',
-  'Recovered — inspection required': 'No fuel. It stays blocked until somebody inspects the vehicle and puts it back into service.',
+  'Recovered, inspection required': 'No fuel. It stays blocked until somebody inspects the vehicle and puts it back into service.',
   'Removed from fleet': 'No fuel. Nobody can release one, not even an administrator.',
   /* Said of the administrative block rather than of a status, because the
      vehicle is otherwise ordinary and that is the point of it. */
@@ -16475,7 +16475,7 @@ function vehicleAction(key, act, extra) {
     const wasAccess = vehicle[F.BLOCK];
     const wasReason = vehicle[F.REASON];
     /* Opened before the state changes, so the incident carries what the
-       vehicle was — the only thing that can put it back if the report turns
+       vehicle was. The only thing that can put it back if the report turns
        out to be wrong. */
     const incident = Incidents.open(vehicle, { how: extra || '' });
     incident.priorState = vehicle[F.STATUS];
@@ -16601,7 +16601,7 @@ function vehicleAction(key, act, extra) {
     }
 
     if (answer.what === 'error') {
-      /* Not a recovery. The vehicle returns to what it was before the report —
+      /* Not a recovery. The vehicle returns to what it was before the report, 
          which the incident recorded, because "back to Active" is a guess and
          a vehicle that was in maintenance before a mistaken report is still in
          maintenance after it. */
@@ -16623,13 +16623,13 @@ function vehicleAction(key, act, extra) {
 
     /* Recovered. Back in the fleet's hands, not back on the road. */
     const was = vehicle[F.STATUS];
-    vehicle[F.STATUS] = 'Recovered — inspection required';
+    vehicle[F.STATUS] = 'Recovered, inspection required';
     vehicle[F.REASON] = '';
     if (incident) {
       incident.state = 'recovered';
       Incidents.file(incident, 'Vehicle recovered', { note: answer.note });
     }
-    logChange(vehicle, 'Operational status', was, 'Recovered — inspection required');
+    logChange(vehicle, 'Operational status', was, 'Recovered, inspection required');
     if (answer.note) addNote(vehicle, answer.note);
     vehicles.render();
     Records.toast(
@@ -16650,7 +16650,7 @@ function vehicleAction(key, act, extra) {
 
   if (act === 'inspect') {
     return void Records.statusDialog.ask({
-      eyebrow: 'Recovered — inspection required',
+      eyebrow: 'Recovered: inspection required',
       title: `Put ${vehicle[0]} back into service?`,
       sub: 'Confirm the vehicle has been inspected. Fuel access is restored when you do.',
       fields: `
@@ -16738,13 +16738,13 @@ function accessMenu(vehicle, anchor) {
   /* Recovered has one way forward and it is not a value in a list: an
      inspection somebody carries out and confirms. The menu says where the
      vehicle is and offers that. */
-  if (status === 'Recovered — inspection required') {
+  if (status === 'Recovered, inspection required') {
     return Records.statusMenu.open(anchor, {
       label: 'Operational status',
       value: status,
       groups: [
-        { items: [{ label: 'Recovered — inspection required',
-                    says: STATUS['Recovered — inspection required'].says }] },
+        { items: [{ label: 'Recovered: inspection required',
+                    says: STATUS['Recovered: inspection required'].says }] },
         { title: 'Back to the road', items: [{ label: 'Put back into service…', act: 'inspect',
             says: 'Confirm the inspection. Fuel access is restored when you do.' }] },
         { title: 'Fleet', items: [{ label: 'Remove from fleet…', act: 'remove', danger: true,
@@ -16868,7 +16868,7 @@ const DRIVERS = [
     prdp: 'PrDP G', prdpExpiry: '2027-02-28', group: 'Sales fleet', employeeId: 'EMP-104', vehicle: '',
     access: 'Left', app: 'Deactivated', appAt: '2026-07-31T16:00', appWhy: '', appWas: 'Active', fuel: 'Cannot fuel', reason: 'Resigned', notes: [] },
   /* The number is a landline. Nothing on the driver record is wrong, the
-     message simply had nowhere to go — which is why the way out of this state
+     message simply had nowhere to go. Which is why the way out of this state
      is the number, not the status. */
   { first: 'Mandla', last: 'Nkosi', mobile: '079 333 4444', email: 'mandla.nkosi@abccouriers.co.za',
     idNumber: '8706045685082', licenceCode: 'Code A', licenceExpiry: '2030-01-31',
@@ -16942,8 +16942,8 @@ const LICENCE_CODES = [
 
 /* A driving licence code says which class of vehicle somebody may drive. A
    PrDP category says what they may be paid to carry. They are different
-   questions about different documents, and the old values — "PrDP G", "PrDP
-   P", "PrDP D" — put the letter from the permit where a reader had to know
+   questions about different documents, and the old values: "PrDP G", "PrDP
+   P", "PrDP D", put the letter from the permit where a reader had to know
    the scheme to decode it. */
 const PRDP = [
   ['No PrDP', 'No professional driving permit'],
@@ -16975,8 +16975,8 @@ const COUNTRIES = ['Zimbabwe', 'Mozambique', 'Lesotho', 'Eswatini', 'Botswana', 
  *
  * What that cost, concretely:
  *
- *   A manager could set Active by hand — the row menu offered "They have the
- *   app" — and the only thing that can make that true is a driver opening the
+ *   A manager could set Active by hand. The row menu offered "They have the
+ *   app". And the only thing that can make that true is a driver opening the
  *   app on their phone. The product was letting somebody assert a fact about
  *   a device they do not have.
  *
@@ -17020,7 +17020,7 @@ const DACCESS_LIFE = {
  *
  * Six values, none of them settable by a manager, and that is the design
  * rather than an omission. Every one of these is a report of something that
- * has already happened somewhere else — a message queued, a message
+ * has already happened somewhere else: a message queued, a message
  * delivered, a phone that opened the app, a number that bounced. A control
  * that let somebody choose "Invite sent" would be a control for lying to the
  * next person who reads the row.
@@ -17031,19 +17031,19 @@ const DACCESS_LIFE = {
  *
  * Tones, and why each:
  *
- *   Not invited    neutral — nothing has started, and nothing is wrong
- *   Invite sending quiet   — in flight, and gone again in seconds
- *   Invite sent    info    — waiting on the driver, same tone the old
+ *   Not invited    neutral. Nothing has started, and nothing is wrong
+ *   Invite sending quiet: in flight, and gone again in seconds
+ *   Invite sent    info: waiting on the driver, same tone the old
  *                            Invited pill carried, because it is the same
  *                            fact wearing a more honest name
- *   Active         plain   — the ordinary answer, drawn quiet
- *   Invite failed  danger  — somebody has to do something
- *   Deactivated    neutral — finished
+ *   Active         plain: the ordinary answer, drawn quiet
+ *   Invite failed  danger. Somebody has to do something
+ *   Deactivated    neutral, finished
  *
  * Not invited and Deactivated share the neutral tone and are the two ends of
  * the same line: no app account, at the start and at the end. They are told
  * apart by the word and by where they sit in a driver's history, which is
- * the one case where reading the word is the right answer — there is no
+ * the one case where reading the word is the right answer. There is no
  * urgency in either, so there is nothing for a colour to rank.
  */
 const APP = {
@@ -17107,7 +17107,7 @@ const STATUS_MEANING = {
     kind: 'App status',
     pump: 'No fuel yet. The message has not landed.',
     back: null,
-    by: 'The system, while the message is in flight', undo: '\u2014',
+    by: 'The system, while the message is in flight', undo: 'None',
   },
   'Invite sent': {
     kind: 'App status',
@@ -17119,7 +17119,7 @@ const STATUS_MEANING = {
     kind: 'App status',
     pump: 'Nothing on its own. Fuel access says what happens at the pump.',
     back: null,
-    by: 'The driver, by setting up the app', undo: '\u2014',
+    by: 'The driver, by setting up the app', undo: 'None',
   },
   'Invite failed': {
     kind: 'App status',
@@ -17136,7 +17136,7 @@ const STATUS_MEANING = {
   'Can fuel': {
     kind: 'Fuel access',
     pump: 'Fuel flows, inside their rules.', back: null,
-    by: 'Manager, one press', undo: '\u2014',
+    by: 'Manager, one press', undo: 'None',
   },
   'Cannot fuel': {
     kind: 'Fuel access',
@@ -17215,7 +17215,7 @@ const drivers = Records.directory({
    * The licence and permit columns went off rather than away. They are read
    * on the day somebody audits the permits and on no other day, and they were
    * taking the width the two status columns now need. The Needs attention tab
-   * turns the expiry pair back on by itself — a tab whose whole purpose is
+   * turns the expiry pair back on by itself. A tab whose whole purpose is
    * "these two lapsed" cannot be a tab that hides which two. */
   columns: [
     // The identity column keeps its width; the long, low-value one gives it up.
@@ -17364,7 +17364,7 @@ const drivers = Records.directory({
   },
   tabs: [
     ['All', () => true],
-    // Zero here is not an empty result, it is the good news, so it says so.
+    // Zero here is not an empty result. It is the good news, so it says so.
     ['Needs attention', needsAttention, {
       title: 'Nothing needs attention',
       body: 'Every licence card and permit on file is current.',
@@ -17837,14 +17837,14 @@ function fill(id, values, placeholder) {
 }
 
 /* The same, for a list whose entries carry what they mean. The value stored is
-   the code alone — the description is there to be read while the answer is
+   the code alone. The description is there to be read while the answer is
    chosen, and would be noise in every table, filter and export afterwards. */
 function fillPairs(id, pairs, placeholder) {
   const sel = document.getElementById(id);
   if (!sel) return;
   sel.innerHTML = `<option value="">${placeholder}</option>` +
     pairs.map(([code, says]) =>
-      `<option value="${code}">${code} — ${says}</option>`).join('');
+      `<option value="${code}">${code}, ${says}</option>`).join('');
 }
 /* Filled from the pairs, so the code leads and its meaning follows it. A
    select is the one place the explanation is worth the width: it is read once,
@@ -18230,7 +18230,7 @@ function driverAction(key, act, extra) {
  * invitation depends entirely on where it got to. A single menu carrying all
  * seven actions would offer Resend to somebody who has never been invited and
  * Send to somebody who is already using the app, and a menu that offers moves
- * that make no sense is a menu people stop reading — which is the argument
+ * that make no sense is a menu people stop reading. Which is the argument
  * the row menu already makes two hundred lines up.
  *
  * What each one holds, and why that and not more:
@@ -18239,7 +18239,7 @@ function driverAction(key, act, extra) {
  *                   start it.
  *   Invite sending  no verbs at all beyond View driver. It is in flight, and
  *                   every button here would be a button that fights it.
- *   Invite sent     the facts first — which number, and when — because the
+ *   Invite sent     the facts first (which number, and when) because the
  *                   question behind opening this is almost always "did it go
  *                   to the right phone", and the answer is more often useful
  *                   than resending is.
@@ -18371,7 +18371,7 @@ window.DriverFixtures = { DRIVERS, STATES, ID, LICENCE_CODES, PRDP, COUNTRIES, n
 
 /* Read by tools/app-status.js. The status list and the settable list are
    exported rather than retyped in the checker, so renaming a status breaks
-   the check that names it instead of quietly passing against a stale copy —
+   the check that names it instead of quietly passing against a stale copy, 
    the failure the vehicle dashboard shipped for a week. */
 window.__appStatuses = Object.keys(APP);
 window.__appSettable = Object.keys(APP).filter(k => APP[k].set);
@@ -18474,7 +18474,7 @@ const counts = {
      change. On the road means in service and allowed to fuel. */
   /* Compared against the fixtures' own vocabulary rather than a string typed
      here. This read 'Active' after the lifecycle value was renamed to 'In
-     fleet' and silently counted nothing — a dashboard showing 0 of 9 on a
+     fleet' and silently counted nothing, a dashboard showing 0 of 9 on a
      fleet where six vehicles were fuelling. Reading the key off the exported
      map means the next rename cannot do it again. */
   /* Reads the derived answer rather than a stored field, so the dashboard
@@ -18707,7 +18707,7 @@ function showScreen(name) {
 
 /* Every generic way out of a form goes through here, so this is where the
    question gets asked. A sheet with something typed in it does not close on
-   Escape, on Cancel, on its own close button or on a backdrop click — it asks,
+   Escape, on Cancel, on its own close button or on a backdrop click: it asks,
    and stays exactly where it is while the answer is decided. */
 const closeForms = () => {
   const open = window.__openSheet && window.__openSheet();
@@ -18763,7 +18763,7 @@ function setHash(key, replace) {
     if (location.hash.replace('#', '') !== key) {
       /* A move somebody made earns a history entry. Only the initial sync,
          which corrects the address without anybody having navigated, replaces
-         — otherwise Back would step through states nobody visited. */
+, otherwise Back would step through states nobody visited. */
       if (replace) history.replaceState(null, '', '#' + key);
       else history.pushState(null, '', '#' + key);
     }
@@ -18848,7 +18848,7 @@ const railButtons = () =>
 
   /* Navigating to a screen opens the group holding it. Without this the rail
      highlights a button inside a closed group, which is a highlight nobody can
-     see. Only navigation does this — collapsing the group you are standing in
+     see. Only navigation does this, collapsing the group you are standing in
      is a deliberate act and is left alone. */
   window.__railReveal = (btn) => {
     const group = btn && btn.closest('.rail-group');
@@ -18903,7 +18903,7 @@ window.addEventListener('hashchange', fromHash);
  *
  * The form engine already knows how to validate a vehicle and how to paint a
  * field that is wrong. What it did not know is that this particular form is a
- * place you go to — with an address, a way back, and a directory behind it
+ * place you go to: with an address, a way back, and a directory behind it
  * that has to survive the trip. That is what this file adds, and it is
  * deliberately the only file that knows it: the engine stays a form engine.
  *
@@ -18912,7 +18912,7 @@ window.addEventListener('hashchange', fromHash);
  * A fleet manager adding a vehicle has usually just been looking for it. They
  * have a filter on, a search term typed, a scroll position and a page number.
  * A route change throws all four away, and the cost lands after the form is
- * finished — they save the vehicle and then have to rebuild the view they were
+ * finished. They save the vehicle and then have to rebuild the view they were
  * in. The sheet has its own address so Back works and a refresh restores it,
  * and the directory underneath is never unmounted, so there is nothing to
  * rebuild.
@@ -19014,7 +19014,7 @@ function makeSheet(config) {
   let discardTrigger = null;
 
   /* Per sheet, not per page. There are two sheets now and `body.sheet-open`
-     says only that one of them is up — so opening the driver form while the
+     says only that one of them is up, so opening the driver form while the
      vehicle form was up saw the flag already set, skipped its own open(), and
      left a sheet that was never raised. */
   let opened = false;
@@ -19045,7 +19045,7 @@ function makeSheet(config) {
     opened = true;
     document.body.classList.add('sheet-open');
     sheet.classList.remove('hidden');
-    /* Everything behind the sheet stops being reachable — by pointer, by tab
+    /* Everything behind the sheet stops being reachable: by pointer, by tab
        and to a screen reader. inert does all three in one attribute, which is
        the only way the three stay in agreement. */
     document.querySelectorAll('.app > *:not(.focus-sheet):not(.sheet-backdrop)')
@@ -19055,7 +19055,7 @@ function makeSheet(config) {
        whatever the last record left them in. */
     syncCategory();
     /* The rail gives every state its own address. If the address names one,
-       the rail is steering and this sheet does not own it — claiming it would
+       the rail is steering and this sheet does not own it, claiming it would
        fight the thing that just opened the sheet. */
     ownsRoute = !railOwns(location.hash);
     if (!fromRoute && ownsRoute) { suppress = true; location.hash = ROUTE; suppress = false; }
@@ -19096,7 +19096,7 @@ function makeSheet(config) {
      two are the same sentence, and that is the only form this was ever tested
      against. Open an existing driver to look at them and every field is
      prefilled from the record, so the sheet was dirty the instant it appeared
-     — and closing it, having typed nothing, asked "Discard entered details?"
+, and closing it, having typed nothing, asked "Discard entered details?"
      about details nobody entered. Which is exactly the confirmation this
      comment says must not become one people click through.
      
@@ -19119,8 +19119,8 @@ function makeSheet(config) {
      would be of an empty form every time.
      
      `editing` comes with it rather than being inferred from the snapshot. A
-     blank Add form is not empty — it carries a year, a category default, a
-     couple of hidden fields — so "the baseline has something in it" reads as
+     blank Add form is not empty. It carries a year, a category default, a
+     couple of hidden fields. So "the baseline has something in it" reads as
      an edit on a form nobody has touched, and the confirmation tells somebody
      adding their first vehicle that it "stays as it was". The state object
      already says which this is; asking it is free. */
@@ -19162,7 +19162,7 @@ function makeSheet(config) {
 
     dlg.classList.remove('hidden');
     document.body.classList.add('discard-open');
-    /* The sheet stays mounted, visible and full of what was typed — it is the
+    /* The sheet stays mounted, visible and full of what was typed. It is the
        thing being asked about. It goes inert so nothing behind the
        confirmation can be tabbed to or clicked. */
     sheet.setAttribute('inert', '');
@@ -19217,7 +19217,7 @@ function makeSheet(config) {
      its own, because it is not a [data-close-form]. */
   /* One backdrop element serves both sheets, and each makeSheet call bound
      its own exit to it. So a click reached the vehicle sheet's tryClose and
-     the driver sheet's, and whichever was not on screen ran back() — which
+     the driver sheet's, and whichever was not on screen ran back(), which
      cleared the page-global sheet-open class and hid the sheet the other one
      was in the middle of asking about. Keep editing then returned to an
      invisible form behind a full-page scrim, and the only lit control was
@@ -19261,8 +19261,8 @@ window.__driverSheet = makeSheet({
   firstField: '#d-first', dialog: 'discard-driver',
 });
 
-/* Whichever is on screen. Everything generic — closeForms, the engine's own
-   open and close — asks this rather than naming one of them. */
+/* Whichever is on screen. Everything generic: closeForms, the engine's own
+   open and close, asks this rather than naming one of them. */
 window.__openSheet = () =>
   [window.__vehicleSheet, window.__driverSheet].find(x => x && x.isOpen()) || null;
 
@@ -19683,7 +19683,7 @@ document.addEventListener('keydown', e => {
 /* A decision that goes to a pump takes a beat first: a result that appears
    instantly reads as though nothing was asked. `data-beat` says which
    buttons those are, on the button, rather than being inferred from its
-   wording — inference is what killed Approve.
+   wording, inference is what killed Approve.
 
    There is no label table any more. Every one of these buttons names its own
    destination in the markup, which is the rule the rest of the file already
@@ -19825,7 +19825,7 @@ const ROWS = [
     level: 'info',
     reg: 'RTS 018 GP',
     what: 'Hino 300 815, 2020, rigid truck',
-    why: 'No fleet number. The column is optional, so this imports either way — it just will not appear in your own numbering until you give it one.',
+    why: 'No fleet number. The column is optional, so this imports either way. It just will not appear in your own numbering until you give it one.',
     fix: {
       label: 'Fleet number',
       hint: 'Your own reference. Anything you like.',
@@ -19839,8 +19839,8 @@ const ROWS = [
     skipped: 'Left out of this import',
   },
   /* This row's question is asked by the capacity service, exactly as the form
-     asks it. The importer used to carry its own sentence — "HCVs in your fleet
-     run 60 to 600" — which was a fourth place the thresholds were written down
+     asks it. The importer used to carry its own sentence, "HCVs in your fleet
+     run 60 to 600". Which was a fourth place the thresholds were written down
      and the first to go stale. its message and validator are now derived,
      so a change to the bands reaches the spreadsheet review for free. */
   (() => {
@@ -20034,7 +20034,7 @@ function render() {
 
   /* What the file held, which does not change, and what is still open, which
      does. This line was written out by hand as "8 rows read, 6 with nothing to
-     query, 2 need a look" and never touched again — two of its three numbers
+     query, 2 need a look" and never touched again, two of its three numbers
      were wrong the moment the fixture grew, and it sat directly beneath the
      comment explaining why the sentence below it stopped being hard-coded. */
   const read = root.querySelector('[data-role="review-read"]');
@@ -20335,15 +20335,15 @@ if (mount) {
  *
  * Everything on the Atoms, Molecules, Organisms, hierarchy, state-map and
  * one-off screens is produced from this file plus the live document. Nothing is
- * transcribed. That is the whole point: a hand-written component inventory is
+ * transcribed. That is what this is for: a hand-written component inventory is
  * a second copy of the truth, and the second copy is wrong by the next commit.
- * Three of the four columns cannot be typed at all —
+ * Three of the four columns cannot be typed at all, 
  *
  *   Token dependencies  parsed out of the stylesheets by selector
  *   Appears on          found by querying every screen section for the class
  *   Used once           counted from the same query
  *
- * — so they cannot drift. What is authored here is the part a machine cannot
+ *, so they cannot drift. What is authored here is the part a machine cannot
  * know: what a component is for, and what would be wrong to do with it.
  *
  * Load order matters. This runs last, after every other script has rendered,
@@ -20378,7 +20378,7 @@ const REGISTRY = [
     purpose: 'An action with no room for a label: row overflow, close, bell.',
     variants: 'default, on a toned surface',
     states: 'default, hover, pressed, focus-visible',
-    a11y: 'aria-label is mandatory — the icon carries no accessible name of its own.',
+    a11y: 'aria-label is mandatory. The icon carries no accessible name of its own.',
     good: 'Where the surrounding context already names the record.',
     bad: 'For a destructive action nobody can name from the glyph.',
     uses: [] },
@@ -20398,14 +20398,14 @@ const REGISTRY = [
     states: 'static',
     a11y: 'The word is the state. Colour never carries it alone.',
     good: 'On the exceptional row, with the ordinary state left plain.',
-    bad: 'On every row — a column of identical pills costs the exception its only chance of being noticed.',
+    bad: 'On every row. A column of identical pills costs the exception its only chance of being noticed.',
     uses: [] },
 
   { name: 'Identifier', level: 'atom', sel: 'ident',
     purpose: 'Plates, VINs, fleet numbers, CSV column names. Read character by character.',
     variants: 'inline, in a table cell, in a heading',
     states: 'static',
-    a11y: 'Monospace so 1/l/I and 0/O stay distinct — the exact confusions a plate produces.',
+    a11y: 'Monospace so 1/l/I and 0/O stay distinct: the exact confusions a plate produces.',
     good: 'Anything compared character by character against another one.',
     bad: 'Ordinary prose, a person’s name, or a reason.',
     uses: [] },
@@ -20434,7 +20434,7 @@ const REGISTRY = [
     states: 'static',
     a11y: 'role=img with a full text label; the key names every colour.',
     good: 'When the comparison is between the parts.',
-    bad: 'Without its key — a colour with no name is decoration.',
+    bad: 'Without its key. A colour with no name is decoration.',
     uses: [] },
 
   /* ── Molecules ── */
@@ -20444,7 +20444,7 @@ const REGISTRY = [
     states: 'default, invalid, disabled',
     a11y: 'Label bound to the control; the message is aria-describedby, so it is read with the field.',
     good: 'One message at a time.',
-    bad: 'Help text and an error stacked together — the reader picks the wrong one.',
+    bad: 'Help text and an error stacked together: the reader picks the wrong one.',
     uses: ['Field'] },
 
   { name: 'Popover', level: 'molecule', sel: 'pop',
@@ -20453,7 +20453,7 @@ const REGISTRY = [
     states: 'closed, open, pinned to viewport',
     a11y: 'aria-haspopup and aria-expanded on the trigger, Escape closes, focus returns to it.',
     good: 'Routine, reversible choices made beside the thing they change.',
-    bad: 'Anything consequential — those get a modal.',
+    bad: 'Anything consequential: those get a modal.',
     uses: ['Button', 'IconButton'] },
 
   { name: 'InlineAlert', level: 'molecule', sel: 'form-alert',
@@ -20489,7 +20489,7 @@ const REGISTRY = [
     states: 'default, selected, focus-visible, invalid',
     a11y: 'Radio inputs in a radiogroup, so arrow keys work.',
     good: 'Two to five options a reader should see at once.',
-    bad: 'A long list — that is a select.',
+    bad: 'A long list. That is a select.',
     uses: [] },
 
   { name: 'ActivityEntry', level: 'molecule', sel: 'activity-item',
@@ -20507,7 +20507,7 @@ const REGISTRY = [
     states: 'default, hover, focus-visible, checked, disabled',
     a11y: 'A real checkbox inside its own label, so the row is the hit area and the name is bound to the control. Checked is carried by ink and weight as well as by the box.',
     good: 'Applied the moment it is ticked, with the panel left open.',
-    bad: 'Closing the panel after each tick — choosing three filters is one task, not three.',
+    bad: 'Closing the panel after each tick: choosing three filters is one task, not three.',
     uses: ['Field'] },
 
   { name: 'FilterGroup', level: 'molecule', sel: 'group-label',
@@ -20545,7 +20545,7 @@ const REGISTRY = [
     good: 'Active filters echoed as removable chips under the toolbar.',
     bad: 'A filter state visible only inside a closed popover.',
     /* The toolbar holds the two buttons and the search field. It opens the
-       filter popover; it does not contain one — the popover is a sibling
+       filter popover; it does not contain one. The popover is a sibling
        anchored to the button, the same way StatusControl triggers the status
        menu. The edge said organism uses organism, which the architecture does
        not allow and which was also not what the code did. */
@@ -20575,7 +20575,7 @@ const REGISTRY = [
     variants: 'default',
     states: 'default, replaced by an error',
     a11y: 'Tied to its control by aria-describedby.',
-    good: '"Find it on the licence disc." — where the answer physically is.',
+    good: '"Find it on the licence disc.": where the answer physically is.',
     bad: 'Restating the label, which is text a reader has already read.',
     uses: [] },
 
@@ -20584,7 +20584,7 @@ const REGISTRY = [
     variants: 'default',
     states: 'hidden, shown',
     a11y: 'aria-describedby plus aria-invalid on the control; colour is never the only carrier.',
-    good: '"Enter the VIN" — the same words the summary uses.',
+    good: '"Enter the VIN": the same words the summary uses.',
     bad: '"This field is required", which names no field and no action.',
     uses: [] },
 
@@ -20609,7 +20609,7 @@ const REGISTRY = [
   { name: 'InputWithUnit', level: 'molecule', sel: 'suffix-wrap',
     purpose: 'A number and the unit it is in, in one control. Where the number is '
       + 'a capacity, it is checked against the vehicle it belongs to rather than '
-      + 'against a fixed range — the same control, a different service behind it.',
+      + 'against a fixed range: the same control, a different service behind it.',
     variants: 'litres, cc',
     states: 'default, hover, focus-visible, information, warning, error',
     a11y: 'The unit is inside the field wrapper and named in the label, not left '
@@ -20804,7 +20804,7 @@ function screensFor(cls) {
  * The drawer, the record panel, the confirmation modal and the navigation
  * rail are siblings of the page rather than children of a section, so
  * counting sections reported the most reused components in the product as
- * used zero times — and then listed them as one-offs. Anything present in
+ * used zero times, and then listed them as one-offs. Anything present in
  * the document but outside every section is global, and is neither counted
  * nor accused. */
 function isGlobal(cls) {
@@ -20884,8 +20884,8 @@ if (hier) {
       const used = REGISTRY.filter(o => o.uses.includes(c.name)).map(o => o.name);
       return `<tr>
         <td><b>${esc(c.name)}</b></td>
-        <td>${c.uses.length ? c.uses.map(esc).join(', ') : '<span class="rp-none">nothing — leaf</span>'}</td>
-        <td>${used.length ? used.map(esc).join(', ') : '<span class="rp-none">nothing — entry point</span>'}</td>
+        <td>${c.uses.length ? c.uses.map(esc).join(', ') : '<span class="rp-none">nothing, leaf</span>'}</td>
+        <td>${used.length ? used.map(esc).join(', ') : '<span class="rp-none">nothing, entry point</span>'}</td>
       </tr>`;
     }).join('');
     return `<h2 class="spec-h">${LEVELS[level]}s</h2>

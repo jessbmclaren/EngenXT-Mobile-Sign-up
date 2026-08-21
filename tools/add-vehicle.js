@@ -319,7 +319,7 @@ const NO_TANK_COUNT = `(function(){
     huge.error ? 'refused for being large' : 'nothing invented about how far a vehicle goes');
 
   /* Saved and then reopened inside one page load. Navigating would reload the
-     prototype, and the fleet lives in memory — a vehicle added on the last
+     prototype, and the fleet lives in memory, a vehicle added on the last
      visit is not there on the next one. */
   await openAdd(6);
   await run(`(${FILL})({registration:'CA 111 004', make:'Ford', model:'Ranger 2.0 SiT',

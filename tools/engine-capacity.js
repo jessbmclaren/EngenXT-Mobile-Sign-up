@@ -261,7 +261,7 @@ const ABSENT = `(function(){
    * The contract's promise is that a fleet's existing file is not refused for
    * carrying a column the product stopped reading. It used to be kept by
    * listing engine_capacity_cc in the schema, which also put it in the
-   * published template, the example row and the column guide — a column nobody
+   * published template, the example row and the column guide, a column nobody
    * fills in, explained on a page whose whole job is to be short.
    *
    * It is off the published contract now and recognised on the way in instead,

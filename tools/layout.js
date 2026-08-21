@@ -6,7 +6,7 @@
 
   This product has one rule about width and it is easy to break by accident:
   anything wider than the screen lives in a container that scrolls on its own
-  — a table in its wrapper, a specimen grid in its panel — and the document
+, a table in its wrapper, a specimen grid in its panel, and the document
   itself never scrolls horizontally. Break it anywhere and you break it
   everywhere, because the document is a single scroller: one nowrap row of
   four buttons on the drivers list made every other screen in the prototype
@@ -14,14 +14,14 @@
 
   Two failures are checked, at three widths, on every catalogued screen:
 
-    the document scrolls horizontally — the rule above, broken;
-    content sits past the right edge with no scroller above it — visible in
+    the document scrolls horizontally: the rule above, broken;
+    content sits past the right edge with no scroller above it, visible in
       the DOM, unreachable on the screen, which is worse than absent because
       nothing says it is missing.
 
   Both were real. `.bulk-actions` was a nowrap flex row that ran 150px past a
   390px screen. `.panel-facts--stacked` was declared 2800 lines before the
-  rule it modifies, at equal specificity, so it never applied — and the base's
+  rule it modifies, at equal specificity, so it never applied, and the base's
   max-content column stretched a before-and-after comparison to 935px inside a
   600px panel that clipped it, so below 1440px the "after" half of the one
   screen built for comparing two things was simply not there.
@@ -87,7 +87,7 @@ function cdp(ws) {
 
 /* Stranded: past the right edge, with nothing above it that can scroll to
    reveal it. The walk up stops at the first ancestor that both allows
-   horizontal overflow and actually has some — a container with `auto` that
+   horizontal overflow and actually has some, a container with `auto` that
    fits its content is not a way to reach anything. */
 const STRANDED = (id) => `(function(){
   var sec = document.getElementById('screen-' + ${JSON.stringify(id)});
@@ -180,7 +180,7 @@ const STRANDED = (id) => `(function(){
   }
 
   /* The bulk bar is the one that made the document scroll, and it only exists
-     once rows are ticked — which is why sweeping the screens never saw it. */
+     once rows are ticked. Which is why sweeping the screens never saw it. */
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   for (const [screen, noun] of [['drivers-directory', 'drivers'], ['directory', 'vehicles']]) {
     await load(screen);
@@ -210,7 +210,7 @@ const STRANDED = (id) => `(function(){
   check('laptop', 'a before-and-after shows both halves at 1280px',
     !ba.missing && ba.sides.length === 2 && !ba.anyCut,
     ba.missing ? 'the comparison did not render'
-      : `${ba.sides.map(s => s.w + 'px').join(' + ')}${ba.anyCut ? ' — one is CUT OFF' : ''}`);
+      : `${ba.sides.map(s => s.w + 'px').join(' + ')}${ba.anyCut ? '. One is CUT OFF' : ''}`);
 
   /* Two hit areas for one control is how the harder one goes unnoticed. */
   await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });

@@ -244,7 +244,7 @@ function cdp(ws) {
 
          Written against the grouping rather than a fixed count. The list was
          three, is four with Other, and grows by one every time an account
-         names a category of its own — a count in here would fail on the
+         names a category of its own. A count in here would fail on the
          product working, which is the least useful thing a check can do. */
       check(F, 'a short list carries no group heading',
         geo.heads.length === 0 && geo.groups.length === 0 && geo.opts.length >= 3,
@@ -467,8 +467,8 @@ function cdp(ws) {
 
   /* 4. There is no dependent field left to clear. Vehicle configuration was
         the only one, and it went with the motorcycle sub-types. The probe that
-        drove it — set a category, set a configuration, change the category,
-        read what the trigger says — sat here disabled behind `if (false)`,
+        drove it: set a category, set a configuration, change the category,
+        read what the trigger says: sat here disabled behind `if (false)`,
         which is a test that cannot fail and cannot pass. Its replacement is
         the element count in 'a choice takes, and there is no dependent field
         to reveal' above, and the same assertion in tools/vehicle-taxonomy.js. */

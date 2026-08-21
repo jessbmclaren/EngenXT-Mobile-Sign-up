@@ -18,7 +18,7 @@
     markup carries values, never styling.
 
   The last one is the line this file draws. `style="flex:7"` on a meter is a
-  quantity — that meter is seven parts wide and no stylesheet can know it.
+  quantity. That meter is seven parts wide and no stylesheet can know it.
   `style="margin-top: 24px"` is a design decision hiding in the markup, where
   nothing can override it, reuse it or find it. The first is allowed by name
   below; the second is what this refuses.
@@ -81,9 +81,9 @@ check('tokens', 'no token is declared twice',
     : `${Object.keys(decls).length} names, each declared once`);
 
 /* There was a check here for two names sharing one value inside a family. It
-   was wrong and is not coming back. A semantic token that aliases a base one —
+   was wrong and is not coming back. A semantic token that aliases a base one, 
    --color-primary and --color-brand-ink resolving to the same blue, or
-   --color-on-danger being white — is how a palette is supposed to work: the
+   --color-on-danger being white, is how a palette is supposed to work: the
    name says what the colour is for, and two purposes may honestly agree today
    and diverge tomorrow. Nothing automated can tell that apart from a slip, so
    it flagged thirty families and meant none of them.
@@ -137,7 +137,7 @@ for (const line of rules) {
     lengths.get(v).push(line.trim().slice(0, 70));
   }
 }
-/* A value used once, in one rule, is already where it belongs — naming it
+/* A value used once, in one rule, is already where it belongs, naming it
    would add a level of indirection without naming a decision. A value used
    twice is a decision being made twice. */
 const repeated = [...lengths.entries()].filter(([, at]) => at.length > 1);

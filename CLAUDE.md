@@ -1,4 +1,4 @@
-# Working instructions — EngenXT fleet portal
+# Working instructions, EngenXT fleet portal
 
 ## Read this before acting on section 9
 
@@ -13,14 +13,14 @@ things section 9 describes as contamination are, here, the artefact itself:
 | Annotation blocks (`.figure-notes`) | 11 |
 
 The Screens/Notes rail, the "ADD VEHICLE STATES" and "ONE THEFT, IN ORDER"
-groups, and every note explaining why a screen is the way it is — these are
+groups, and every note explaining why a screen is the way it is. These are
 what the file is for. `tfn-fleet-portal.html` is a single document that holds
 the product and the argument for it side by side, and the argument is reviewed
 by opening it.
 
 So: **section 9 applies to the production build, when there is one.** It is
 recorded here so it is not lost, and so the production work starts from a
-written rule rather than a memory of one. Do not apply it to this repository —
+written rule rather than a memory of one. Do not apply it to this repository, 
 doing so would delete the deliverable.
 
 Two consequences worth stating now, while the rule is fresh:
