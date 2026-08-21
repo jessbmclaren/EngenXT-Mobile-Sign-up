@@ -485,6 +485,10 @@
      fleet") and no wider: a filter panel is a list of short phrases, and the
      extra width only buys covered table. */
   --size-popover-width: 340px;
+  /* Three lines of it, which is the length of the reasons people actually
+     write: "Booked in for a service, Ford has the gearbox". Taller and the
+     box invites an essay into a popover; shorter and a sentence scrolls. */
+  --size-reason-box-min: 76px;
   --size-panel-width: 380px;
 
   /* The measure a block of copy is set to. Wide enough for the body to read
@@ -1299,13 +1303,15 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
 .sk-rows--fleet td:nth-child(6) .sk { width: 35%; }
 .sk-rows--fleet td:nth-child(7) .sk { width: 55%; }
 
+/* Six columns, and each bar roughly the length of what lands in it. A
+   skeleton whose columns do not match the table it precedes is a layout
+   shift dressed as a loading state. */
 .sk-rows--drivers td:nth-child(1) .sk { width: 60%; }
 .sk-rows--drivers td:nth-child(2) .sk { width: 55%; }
-.sk-rows--drivers td:nth-child(3) .sk { width: 85%; }
+.sk-rows--drivers td:nth-child(3) .sk { width: 45%; }
 .sk-rows--drivers td:nth-child(4) .sk { width: 40%; }
-.sk-rows--drivers td:nth-child(5) .sk { width: 35%; }
-.sk-rows--drivers td:nth-child(6) .sk { width: 45%; }
-.sk-rows--drivers td:nth-child(7) .sk { width: 50%; }
+.sk-rows--drivers td:nth-child(5) .sk { width: 50%; }
+.sk-rows--drivers td:nth-child(6) .sk { width: 65%; }
 
 .sk {
   display: block;
@@ -2474,68 +2480,6 @@ a.stat-tile:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   a.stat-tile { transition-duration: 0.01ms; }
-}
-
-/* Moved here from templates.css: the refresh strip is a molecule — a label
-   and an indeterminate bar doing one job together. */
-/* ── Refreshing ───────────────────────────────────────────────────────────
- * The other half of loading, and the half that was missing.
- *
- * A skeleton is right exactly once: the first time, when there is nothing to
- * keep. Every load after that has a perfectly good list already on the screen,
- * and replacing it with grey bars throws away something correct in order to
- * say "working". The person loses their place in a list they were reading,
- * their scroll position, and any sense of whether anything actually changed.
- *
- * So the rows stay, at full strength, and the news that they are a moment old
- * goes in a strip above them. Not dimmed: dimming is a way of saying "do not
- * trust this", and last minute's fleet is trustworthy. It is the same bargain
- * every mail client makes.
- */
-.refresh-strip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1-5);
-  padding: var(--space-1-0) var(--space-2-0);
-  margin-bottom: var(--space-2-0);
-  background: var(--color-surface-muted);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-on-surface-variant);
-}
-
-.refresh-strip b { color: var(--color-on-surface); font-weight: var(--font-weight-label-md); }
-
-/* An indeterminate bar rather than a spinner, because it is sitting in a line
-   of text and a spinner in a line of text is a bullet point that moves. */
-.refresh-bar {
-  position: relative;
-  flex: none;
-  width: var(--space-6-0);
-  height: var(--space-0-5);
-  border-radius: var(--radius-full);
-  background: var(--color-control-track);
-  overflow: hidden;
-}
-
-.refresh-bar::after {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 40%;
-  border-radius: inherit;
-  background: var(--color-brand-ink);
-  animation: refresh-slide var(--duration-scene) var(--ease-standard) infinite;
-}
-
-@keyframes refresh-slide {
-  0% { transform: translateX(-110%); }
-  100% { transform: translateX(260%); }
-}
-
-/* Reduced motion keeps the strip and drops the travel. The words carry it. */
-@media (prefers-reduced-motion: reduce) {
-  .refresh-bar::after { animation: none; width: 100%; opacity: 0.4; }
 }
 
 </style>
@@ -4549,6 +4493,12 @@ body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim);
    gave the reason four characters and an ellipsis. */
 tbody td.status-col, thead th.status-col { min-width: 30ch; }
 
+/* One pill and nothing else, so it is told the width of its longest word
+   rather than being left to the content-based guess that broke "Invite
+   sending" onto two lines and made that row taller than the eleven around
+   it. A list you scan by height is a list you scan by the wrong thing. */
+tbody td.app-col, thead th.app-col { min-width: 17ch; }
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -4605,17 +4555,30 @@ tbody td.status-col, thead th.status-col { min-width: 30ch; }
   border-color: var(--color-danger-container-border);
 }
 
+/* The fifth tone, and it was missing. `.badge-quiet` is the one whose whole
+   job is a hairline — it has no fill to carry it — so falling through to the
+   bare `.status-pill` rules left "Invite sending" drawn as plain text with a
+   caret, identical to the Active beside it. The same failure the comment
+   above describes, on the one tone where it is hardest to see. */
+.status-pill.badge-quiet {
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  border-color: var(--color-outline-variant);
+}
+
 /* Hover on a toned pill is the border, not the fill: the fill is carrying the
    meaning and darkening it would read as a different tone. */
 .status-pill.badge-neutral:hover,
 .status-pill.badge-info:hover,
 .status-pill.badge-warning:hover,
-.status-pill.badge-danger:hover { border-color: currentColor; }
+.status-pill.badge-danger:hover,
+.status-pill.badge-quiet:hover { border-color: currentColor; }
 
 .status-pill.badge-warning .caret,
 .status-pill.badge-danger .caret,
 .status-pill.badge-info .caret,
-.status-pill.badge-neutral .caret { color: currentColor; }
+.status-pill.badge-neutral .caret,
+.status-pill.badge-quiet .caret { color: currentColor; }
 
 /* The reason. Text until you touch it, because it is being read far more often
    than it is being changed, and a boxed control here would put a third
@@ -4742,6 +4705,71 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 
 .pick.is-on .pick-label { color: var(--color-brand-ink); }
 
+/* What the menu knows, above what the menu offers.
+ *
+ * Two columns rather than a stacked label and value, because every one of
+ * these is short and a fleet office reads them as a run: who it went to, when
+ * it went, why it did not arrive. The term keeps the muted ink so the value
+ * is the thing the eye lands on, and the gutter lines up with `.pick-mark`
+ * so the facts and the actions below them share one left edge. */
+.pick-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-0-5) var(--space-1-0);
+  margin: 0;
+  padding: var(--space-0-5) var(--space-1-0) var(--space-1-0)
+           calc(var(--space-1-0) + var(--icon-xs) + var(--space-1-0));
+  font-size: var(--font-size-label-sm);
+}
+
+/* ── The reason box ──────────────────────────────────────────────────────
+ *
+ * The same popover shell the pickers use, holding one text box instead of a
+ * list. It keeps `.pick-head` so the question above it is set the way every
+ * other popover sets its heading, and stops there: a reason is one field and
+ * two buttons, and anything more would be a form in a tooltip. */
+.reason-pop { width: var(--size-popover-width); max-width: min(92vw, var(--size-popover-width)); }
+
+.reason-body { padding: 0 var(--space-1-0); }
+
+/* Resizable vertically only. A box a person can widen inside a fixed-width
+   popover is a box that can be dragged outside it. */
+.reason-text {
+  width: 100%;
+  resize: vertical;
+  min-height: var(--size-reason-box-min);
+}
+
+.reason-help {
+  margin: var(--space-0-5) 0 0;
+  font-size: var(--font-size-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.reason-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1-0);
+  padding: var(--space-1-0);
+}
+
+/* Clear sits away from Save rather than beside it: they are opposite
+   outcomes, and adjacency is how the wrong one gets pressed. */
+.reason-foot [data-role="reason-clear"] { margin-right: auto; }
+.reason-foot [hidden] { display: none; }
+
+/* The heading says which field; this says what the value in it means. Sized
+   with the other explanatory text in the menu, not with the labels. */
+.pick-note {
+  margin: 0;
+  padding: 0 var(--space-1-0) var(--space-1-0);
+  font-size: var(--font-size-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.pick-facts dt { color: var(--color-on-surface-variant); }
+.pick-facts dd { margin: 0; color: var(--color-on-surface); }
+
 /* Marked rather than hidden, and set apart by the same rule the row menu uses.
    A destructive option flush against a benign one gets pressed by somebody
    moving fast. */
@@ -4854,6 +4882,12 @@ body.record-panel-open .topbar {
 /* An absent value is said, not left blank. A gap in a definition list is
    indistinguishable from a rendering fault. */
 .rp-none { color: var(--color-on-surface-variant); font-style: italic; }
+
+/* A fact that qualifies the badge beside it rather than competing with it:
+   when the invitation went, why it did not arrive. Upright rather than
+   italic, because it is a value somebody read off the system and not the
+   absence `.rp-none` marks. */
+.rp-quiet { color: var(--color-on-surface-variant); }
 
 .rp-empty { margin: 0; font-size: var(--font-size-body-sm); color: var(--color-on-surface-variant); }
 
@@ -6198,7 +6232,6 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-screen="directory">Vehicles: directory</button>
     <button data-screen="no-results">Directory: no results</button>
     <button data-screen="loading">Directory: loading</button>
-    <button data-screen="refreshing">Directory: refreshing</button>
     <button data-screen="failed">Directory: could not load</button>
     <!-- Under Vehicles, not under Vehicle states, and the distinction is the
          point: delivering an invitation is a step in the import flow, not a
@@ -6476,78 +6509,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <p class="surface-note"><b>Only the first time.</b> A skeleton is the
           right answer when there is nothing to keep, and the wrong one every
           load after that, because by then the screen already holds a correct
-          list. What happens then is the next state along:
-          <a href="#refreshing">Directory: refreshing</a>.</p>
-      </section>
-
-      <!-- The second load, and every load after it. Reviewed as: "keep the old
-           list visible when only refreshing it." A separate state rather than a
-           second half of the loading screen, because that is what these screens
-           are: one state each, reachable by name, so a rebuild can be checked
-           against them one at a time. -->
-      <section id="screen-refreshing" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Vehicles</h1>
-            <p>The vehicles your drivers operate.</p>
-          </div>
-          <div class="actions">
-            <button class="btn btn-secondary" data-goto="import">Import CSV</button>
-            <button class="btn btn-primary" data-open="vehicle:blank"><svg data-lucide="plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add vehicle</button>
-          </div>
-        </div>
-
-        <div class="tabs" role="tablist">
-          <button class="tab" role="tab" aria-selected="true">All <span class="count">10</span></button>
-          <button class="tab" role="tab" aria-selected="false">Needs review <span class="count">1</span></button>
-        </div>
-
-        <div class="toolbar">
-          <input class="field search" type="search" placeholder="Search vehicles" aria-label="Search vehicles">
-          <div class="controls">
-            <button class="btn btn-tertiary">Filter</button>
-            <button class="btn btn-tertiary">Columns</button>
-          </div>
-        </div>
-
-        <!-- role="status" rather than an alert: it is worth hearing, and not
-             worth interrupting anyone for. -->
-        <div class="refresh-strip" role="status">
-          <span class="refresh-bar" aria-hidden="true"></span>
-          <span><b>Checking for changes.</b> These are your vehicles as of a
-            moment ago, and they stay until there is something newer to show.</span>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Registration</th><th>Fleet number</th><th>Vehicle</th>
-                <th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>HRV 482 GP</td><td class="ident">FL-014</td><td>Toyota Hilux 2.4 GD-6 · 2021</td><td>Bakkie</td><td>Diesel</td><td class="num">80 L</td><td>Can fuel</td></tr>
-              <tr><td>JTM 901 GP</td><td class="ident">FL-002</td><td>Isuzu D-Max 250 · 2020</td><td>Bakkie</td><td>Diesel</td><td class="num">76 L</td><td>Can fuel</td></tr>
-              <tr><td>JXR 771 GP</td><td class="ident">FL-023</td><td>Toyota Hilux 2.4 GD-6 · 2024</td><td>Bakkie</td><td>Diesel</td><td class="num">80 L</td><td>Can fuel</td></tr>
-              <tr><td>KPL 337 GP</td><td class="ident">FL-021</td><td>Ford Ranger 2.0 SiT · 2022</td><td>Bakkie</td><td>Diesel</td><td class="num">80 L</td><td>Can fuel</td></tr>
-              <tr><td>LDW 129 GP</td><td class="ident">FL-008</td><td>Nissan NP200 1.6 · 2019</td><td>Bakkie</td><td>Petrol</td><td class="num">50 L</td><td>Can fuel</td></tr>
-              <tr><td>MHB 664 GP</td><td class="ident">FL-011</td><td>Volkswagen Transporter 2.0 TDI · 2021</td><td>Van</td><td>Diesel</td><td class="num">70 L</td><td>Can fuel</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p class="surface-note"><b>Nothing is taken away to say "working".</b>
-          The skeleton belongs to the first load, when there is nothing to keep.
-          On every load after it the screen already holds a correct list, and
-          swapping it for grey bars costs the person their place in it, their
-          scroll position, and any way of telling whether anything actually
-          changed. The rows stay and the strip carries the news.</p>
-        <p class="surface-note"><b>Not dimmed, either.</b> Fading the list is a
-          way of saying do not trust this, and last minute's fleet is worth
-          trusting: a plate does not go stale in four seconds. It is stated as
-          an age instead, in words, which is the one thing a dimmed table cannot
-          say.</p>
+          list. What happens on a reload is that the rows stay exactly as they
+          are.</p>
       </section>
 
       <section id="screen-failed" class="hidden">
@@ -7275,12 +7238,18 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           translate and six a manager has to tell apart under pressure; as one
           state and a reason it is one badge, one filter and a list that can
           grow next year without touching the gate.</p>
-        <p class="surface-note states-note"><b>A reason and a note are also
-          different things.</b> The reason is a preset, so a year of them is a
-          report: how many vehicle-weeks went to accident damage. The note is
-          whatever somebody needs to write &mdash; "waiting for Ford to confirm
-          the repair date" &mdash; and nothing counts it. They used to share one
-          box called Details, which meant neither could be relied on.</p>
+        <p class="surface-note states-note"><b>A reason and a note are still
+          different things, and the reason is not a preset any more.</b> It was
+          a short list per status, chosen so that a year of them would be a
+          report: how many vehicle-weeks went to accident damage. That is worth
+          having and it is not what this is yet &mdash; the categories have not
+          been agreed, and a preset built on a first draft writes that draft
+          into every record before anybody can correct it. So the reason is
+          typed, and the question above the box still comes from the status.
+          The note stays what it always was: whatever somebody needs to write,
+          stamped with who and when. The two are still separate fields, which
+          is the part that was right; they used to share one box called
+          Details, and neither could be relied on.</p>
         <p class="surface-note states-note"><b>Mark recovered belongs to a
           stolen vehicle and nowhere else.</b> It used to be offered on a
           permanently removed one, where it meant nothing: a sold van has not
@@ -7588,24 +7557,15 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
                 </div>
               </div>
               <div class="fields">
+                <!-- Was two fields: four circumstances to pick from, then a
+                     box for everything the four could not hold. The list is
+                     gone — it was a guess at a taxonomy nobody has agreed —
+                     and with it the reason for the split. One box, and what
+                     somebody writes in it is the report. -->
                 <div class="form-field">
-                  <span class="label">What happened? <span class="opt">Optional</span></span>
-                  <!-- The four answers are written here and generated from WHY
-                       in the live sheet, which is two places for one list. The
-                       figure is filled from WHY at load; this markup is the
-                       fallback and is kept in step by tools/copy-check. -->
-                  <div class="seg is-stacked" role="radiogroup" aria-label="What happened" data-role="why-stolen">
-                    <label><input type="radio" name="stolen-how">Hijacking</label>
-                    <label><input type="radio" name="stolen-how">Stolen while parked</label>
-                    <label><input type="radio" name="stolen-how">Vehicle not returned</label>
-                    <label><input type="radio" name="stolen-how">Not sure</label>
-                  </div>
-                  <span class="help">Choose Not sure if the circumstances are unknown.</span>
-                </div>
-                <div class="form-field">
-                  <label for="stolen-note">Anything else <span class="opt">Optional</span></label>
-                  <textarea id="stolen-note" class="field" rows="3" placeholder="Where it was last seen, who was driving, anything else you know."></textarea>
-                  <span class="help">Write it the way you would say it out loud.</span>
+                  <label for="stolen-note">What happened?</label>
+                  <textarea id="stolen-note" class="field" rows="4" placeholder="Where it was last seen, who was driving, anything else you know."></textarea>
+                  <span class="help">Write it the way you would say it out loud. Say so if you do not know.</span>
                 </div>
               </div>
               <div class="panel-foot">
@@ -8923,15 +8883,17 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <thead>
               <tr data-role="head">
                 <th scope="col" class="select"><input type="checkbox" class="select-all" aria-label="Select all drivers"></th>
-                <th class="sortable" aria-sort="ascending" scope="col">Name <span class="arrow">↑</span></th>
-                <th scope="col">Mobile</th>
+                <th class="sortable" aria-sort="ascending" scope="col">Driver <span class="arrow">↑</span></th>
+                <th scope="col">Mobile number</th>
+                <th scope="col">Branch or department</th>
+                <th scope="col">Assigned vehicle</th>
+                <th scope="col" class="app-col">App status</th>
+                <th scope="col" class="status-col">Driver access</th>
                 <th scope="col">Email</th>
                 <th scope="col">Licence</th>
                 <th scope="col">Licence expiry</th>
                 <th scope="col">PrDP</th>
                 <th scope="col">PrDP expiry</th>
-                <th scope="col">Group</th>
-                <th scope="col">Operational status</th>
                 <th scope="col" class="row-actions" aria-label="Actions"></th>
               </tr>
             </thead>
@@ -8973,8 +8935,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         </div>
         <div class="table-wrap">
           <table aria-busy="true">
-            <thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Licence</th><th>PrDP</th><th>Group</th><th>Status</th></tr></thead>
-            <tbody class="sk-rows sk-rows--drivers"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
+            <thead><tr><th>Driver</th><th>Mobile number</th><th>Branch or department</th><th>Assigned vehicle</th><th>App status</th><th>Driver access</th></tr></thead>
+            <tbody class="sk-rows sk-rows--drivers"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
           </table>
         </div>
         <p class="surface-note"><b>The shape of the answer, not a spinner.</b>
@@ -9002,7 +8964,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Licence</th><th>PrDP</th><th>Group</th><th>Status</th></tr></thead>
+            <thead><tr><th>Driver</th><th>Mobile number</th><th>Branch or department</th><th>Assigned vehicle</th><th>App status</th><th>Driver access</th></tr></thead>
             <tbody><tr><td colspan="7">
               <div class="table-empty">
                 <h2>We could not load your drivers</h2>
@@ -9051,8 +9013,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <table>
             <thead>
               <tr>
-                <th>Name</th><th>Mobile</th><th>Email</th>
-                <th>Licence</th><th>PrDP</th><th>Group</th><th>Status</th>
+                <th>Driver</th><th>Mobile number</th><th>Branch or department</th>
+                <th>Assigned vehicle</th><th>App status</th><th>Driver access</th>
               </tr>
             </thead>
             <tbody>
@@ -9193,7 +9155,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <div class="page-head">
           <div>
             <h1>Driver states</h1>
-            <p>Two fields, the same way the vehicle record splits them. <b>Account status</b> says whether this person is on the account: Invited, Active, Left. <b>Fuel access</b> says whether their card works today: Can fuel, Cannot fuel. All proposed &mdash; unlike the vehicle set there is no shipped driver status to compare against.</p>
+            <p>Three fields, because there are three questions. <b>Driver access</b> says whether this person is on the fleet: On the fleet, Left &mdash; a manager decides it. <b>App status</b> says where their EngenXT invitation got to: six values, and the system decides every one of them. <b>Fuel access</b> says whether their card works today: Can fuel, Cannot fuel. All proposed &mdash; unlike the vehicle set there is no shipped driver status to compare against.</p>
           </div>
         </div>
 
@@ -9204,16 +9166,37 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
           <tbody data-role="status-rows"><!-- built from STATUS_MEANING in drivers.js --></tbody>
         </table>
 
-        <p class="surface-note states-note"><b>Account status and fuel access
-          are two fields.</b> Invited and Left say whether somebody is on the
-          account; Can fuel and Cannot fuel say whether their card works this
-          morning. As one list of four they could not express the combination a
-          fleet office needs weekly: signed up, on the account, card stopped
-          while they are on sick leave. It also made resending an invitation and
-          allowing a card to fuel the same gesture, because both wrote the same
-          field.</p>
+        <p class="surface-note states-note"><b>Three fields, and the split was
+          only half done.</b> The record already separated &ldquo;is this
+          person on the account&rdquo; from &ldquo;may their card be used
+          today&rdquo;. It did not separate the third question, and the third
+          question was hiding inside the first: <i>Invited</i> and <i>Active</i>
+          are facts about an app, and <i>Left</i> is a fact about employment,
+          and all three lived in one field. So the product could not say that a
+          driver is still employed and their app account is off, and could not
+          say that an invitation bounced at all.</p>
 
-        <p class="surface-note states-note"><b>Invited is the one you cannot
+        <p class="surface-note states-note"><b>The app status is the one
+          nothing on this screen can set.</b> Every one of its six values is a
+          report of something that already happened somewhere else: a message
+          queued, a message delivered, a phone that opened the app, a number
+          that was not on WhatsApp. The menu behind the badge is an action
+          menu, not a picker &mdash; it offers <i>Send</i>, <i>Resend</i>,
+          <i>Copy link</i>, <i>Review the number</i>, and never <i>Invite
+          sent</i> or <i>Active</i>. The old row menu did offer the second one,
+          as <i>They have the app</i>, and it was a control for asserting a
+          fact about a device nobody in the office can see.</p>
+
+        <p class="surface-note states-note"><b>Which is why leaving writes two
+          fields and nothing writes the app status on its own.</b> Marking
+          somebody as left deactivates their app account, because that is what
+          leaving means for the phone in their pocket. Bringing them back
+          restores what the app status was before they left, so a driver who
+          returns in March is not invited a second time to an app already
+          installed. One gesture, two consequences, and the second one is
+          derived rather than chosen.</p>
+
+        <p class="surface-note states-note"><b>An invitation you cannot
           skip.</b> A record is not a driver until the app is on their phone.
           Until then a card exists with nobody attached to it, and no manager
           can make that not so: the driver has to do something.</p>
@@ -10022,7 +10005,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <input class="field ident" id="d-emp" autocomplete="off">
       </div>
       <div class="form-field" data-field="group">
-        <label for="d-group">Group <span class="opt">Optional</span></label>
+        <label for="d-group">Branch or department <span class="opt">Optional</span></label>
         <select class="field" id="d-group"></select>
       </div>
     </div>
@@ -10127,6 +10110,14 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
      holds the driver checks with no DOM in them, so `check.js` can run every
      one of them under node; `app.js` is the chrome and goes last because it
      opens whichever drawer the URL asks for. -->
+<script>
+/* A page that throws while drawing a row draws most of the row and says
+   nothing. The checkers assert on what rendered, so a swallowed error reads
+   as a passing test. This is the only global here and it exists for them. */
+window.__pageErrors = [];
+window.addEventListener('error', e => window.__pageErrors.push(String(e.message)));
+window.addEventListener('unhandledrejection', e => window.__pageErrors.push(String(e.reason)));
+</script>
 <script>
 /* records.js */
 /* TFN fleet portal prototype: the record engine.
@@ -11088,8 +11079,22 @@ function directory(spec) {
     render();
   }
 
+  /* A tab may insist on a column.
+   *
+   * Hiding a column is a default, not a rule, and one tab has a stronger
+   * claim than the default does: "Needs attention" exists to say that a
+   * licence or a permit has lapsed, and it was drawing the rows and hiding
+   * the dates. Forced on for as long as that tab is selected, and released
+   * with it, so nobody has to remember to put it back. The Columns control
+   * still shows the underlying choice — this overrides what is drawn, not
+   * what was chosen. */
+  const forced = () => new Set(
+    (spec.tabs && spec.tabs[tab] && spec.tabs[tab][2] && spec.tabs[tab][2].columns) || []);
+
   function render() {
     const rows = showing();
+    const on = forced();
+    const off = name => hidden.has(name) && !on.has(name);
     /* A selection is only meaningful against what is on screen. Search and the
        tabs already cleared it; facets, columns and Clear filters did not, so a
        tick could survive out of sight and be acted on later. */
@@ -11097,7 +11102,7 @@ function directory(spec) {
       const visible = new Set(rows.map(r => spec.rowKey(r)));
       [...selected].forEach(k => { if (!visible.has(k)) selected.delete(k); });
     }
-    const shown = spec.columns.filter(c => !hidden.has(c[0]));
+    const shown = spec.columns.filter(c => !off(c[0]));
 
     rowsBox.innerHTML = rows.length
       ? rows.map(r => {
@@ -11120,7 +11125,7 @@ function directory(spec) {
           }
           const body = cells.map((c, i) => {
             const [name, , cls] = spec.columns[i];
-            if (hidden.has(name)) return '';
+            if (off(name)) return '';
             /* A column that gives up its width has to give the value back
                some other way. The stylesheet promised a tooltip on the
                truncating columns and nothing ever set one, so a clipped
@@ -11141,7 +11146,7 @@ function directory(spec) {
     head.querySelectorAll('th:not(.select):not(.row-actions)').forEach((th, i) => {
       const col = spec.columns[i];
       if (!col) return;
-      th.classList.toggle('hidden', hidden.has(col[0]));
+      th.classList.toggle('hidden', off(col[0]));
       // The arrow used to be painted on one header and sorted nothing. It says
       // which column is carrying the order now, and which way.
       const active = sort.col === col[0];
@@ -11652,10 +11657,11 @@ function hideToast() {
    without either ever standing between somebody and the change: the state is
    already set by the time this appears, and ignoring both costs nothing.
 
-   An array, because a stopped vehicle wants both. A reason is structured and
-   gets counted; a note is prose and does not. Offering only one of them at the
-   moment the change lands means the other has to be remembered later, and the
-   thing people do with "later" is nothing. */
+   An array, because a stopped vehicle wants both. The reason belongs to the
+   status and answers the question it raises; the note belongs to the record
+   and can say anything. Offering only one of them at the moment the change
+   lands means the other has to be remembered later, and the thing people do
+   with "later" is nothing. */
 function toast(message, undo, extra) {
   const extras = (Array.isArray(extra) ? extra : extra ? [extra] : []).filter(Boolean);
   /* Found by its role, not its class. The Molecules page carries two toasts as
@@ -11808,6 +11814,30 @@ function closeAllPops() {
  */
 function pinPop(anchor, pop) {
   const a = anchor.getBoundingClientRect();
+  /* What the panel has to clear, which is not always what opened it.
+   *
+   * A select inside a form field is a button with a label above it and a line
+   * of help below, and all three are one thing to the person reading them.
+   * Anchored to the button alone, the list opened eight pixels under it and
+   * landed halfway down the help — "Professional driving permit. No PrDP is
+   * an answer." was sliced through the middle, with the top half readable and
+   * the bottom half behind a panel. Half-covered text does not read as a
+   * panel in front of a sentence; it reads as a rendering fault.
+   *
+   * Clearing the whole field fixes it and costs nothing anywhere else: a
+   * trigger with no help has a field box the same height as itself, and a
+   * popup opened from a table row is not in a form field at all, so both keep
+   * the placement they had. The help also stays readable while somebody is
+   * choosing, which is when it is worth reading.
+   *
+   * Only when the field is a sensible size. A `.form-field` that wraps a
+   * whole fieldset would push a menu halfway down the page, so anything
+   * taller than a couple of rows falls back to the anchor. */
+  const field = anchor.closest('.form-field');
+  const f = field ? field.getBoundingClientRect() : null;
+  const clear = (f && f.height - a.height < 120 && f.top <= a.top && f.bottom >= a.bottom)
+    ? f : a;
+
   pop.style.position = 'fixed';
   pop.style.top = '0px';
   pop.style.left = '0px';
@@ -11817,8 +11847,8 @@ function pinPop(anchor, pop) {
   /* Measured before a height is imposed, so `above` is decided on what the
      panel actually wants rather than on a cap already applied to it. */
   let p = pop.getBoundingClientRect();
-  const below = window.innerHeight - a.bottom - gap * 2;
-  const over = a.top - gap * 2;
+  const below = window.innerHeight - clear.bottom - gap * 2;
+  const over = clear.top - gap * 2;
   const above = below < p.height && over > below;
 
   /* Whichever side it lands on, it may not exceed the room there. Below a
@@ -11837,7 +11867,7 @@ function pinPop(anchor, pop) {
   if (left + p.width > window.innerWidth - gap) left = a.right - p.width;
   left = Math.max(gap, Math.min(left, window.innerWidth - p.width - gap));
 
-  let top = above ? a.top - p.height - gap : a.bottom + gap;
+  let top = above ? clear.top - p.height - gap : clear.bottom + gap;
   /* And clamped, so a panel can never be placed with its head above the
      viewport or its foot below it. */
   top = Math.max(gap, Math.min(top, window.innerHeight - p.height - gap));
@@ -11958,6 +11988,21 @@ const statusMenu = (() => {
 
     const items = [];
     const html = (spec.groups || []).map(g => {
+      /* A group of facts rather than a group of choices.
+       *
+       * "Sent to 073 111 2222, at 09:14 this morning" is the first thing
+       * somebody wants when they open an invitation's menu, and it is not a
+       * thing they can pick. Written as `pick` rows it would be four more
+       * buttons that do nothing, which is the complaint `pick-current`
+       * already answers once; written above the actions as a definition list
+       * it is what it is, and the keyboard walks straight past it to the
+       * first thing it can actually press. */
+      if (g.facts) {
+        return (g.title ? `<p class="group-label">${g.title}</p>` : '')
+          + `<dl class="pick-facts">`
+          + g.facts.map(([term, value]) => `<dt>${term}</dt><dd>${value}</dd>`).join('')
+          + `</dl>`;
+      }
       const rows = g.items.map(it => {
         /* Neither a value to set nor an action to take: this item is the state
            the record is already in, put there so the menu says what it is
@@ -11988,7 +12033,15 @@ const statusMenu = (() => {
     }).join('<div class="pop-split" role="separator"></div>');
 
     el._items = items;
-    el.innerHTML = `<p class="pick-head">${spec.label}</p>${html}` +
+    /* What this status means, said once under the heading.
+     *
+     * Three of the app menus used `pick-current` for this — the ticked "this
+     * is what you have" row the value pickers use — and a tick in a menu that
+     * offers no values is a promise of a choice that is not there. The
+     * sentence is the same sentence; it is just not pretending to be an item
+     * any more, so the keyboard walks straight to the first real action. */
+    el.innerHTML = `<p class="pick-head">${spec.label}</p>` +
+      (spec.says ? `<p class="pick-note">${spec.says}</p>` : '') + html +
       (spec.help ? `<div class="pop-foot"><a href="#${spec.help}">What do these mean?</a></div>` : '');
 
     closeAllPops();
@@ -12005,6 +12058,125 @@ const statusMenu = (() => {
      * frame after it opened. On the last rows of the table it never appeared
      * at all. */
     el.querySelector('[data-pick]')?.focus({ preventScroll: true });
+  }
+
+  document.addEventListener('click', e => {
+    if (!pop || pop.classList.contains('hidden')) return;
+    if (pop.contains(e.target) || e.target === pop._anchor || pop._anchor?.contains(e.target)) return;
+    close();
+  }, true);
+
+  return { open, close };
+})();
+
+/* ── The reason, in the words of whoever is writing it ────────────────────
+ *
+ * This was a picker: six reasons a card might be off, four ways a vehicle
+ * might have gone, five things that might have happened to it. Each list read
+ * well and each one was a guess at a taxonomy nobody has agreed yet, which is
+ * a specific kind of expensive — a preset is a promise that a year of them
+ * can be counted, and a preset list that turns out to be wrong has already
+ * been written into every record before anybody notices.
+ *
+ * So the reason is a sentence somebody types. Nothing is being counted off it
+ * yet, and pretending otherwise put a taxonomy into the data on the strength
+ * of a first draft. The question above the box still comes from the status —
+ * "Why is it off the road?" is a better prompt than "Reason" — and the answer
+ * is theirs.
+ *
+ * A popover rather than a field on the row, for the same reason the picker
+ * was one: the reason is read far more often than it is changed, and a text
+ * box sitting open in every row of a table is a table nobody can scan.
+ */
+const reasonPop = (() => {
+  let pop = null;
+  let onSave = null;
+
+  function ensure() {
+    if (pop) return pop;
+    pop = document.createElement('div');
+    /* `.pop`, so closeAllPops and the scroll and resize handlers already know
+       how to shut it. Nothing new to remember. */
+    pop.className = 'pop reason-pop hidden';
+    pop.setAttribute('role', 'dialog');
+    document.body.appendChild(pop);
+    return pop;
+  }
+
+  function close() {
+    if (!pop) return;
+    const had = pop.contains(document.activeElement);
+    pop.classList.add('hidden');
+    unpinPop(pop);
+    document.removeEventListener('keydown', keys, true);
+    const anchor = pop._anchor;
+    anchor?.setAttribute('aria-expanded', 'false');
+    if (had && anchor && document.contains(anchor)) anchor.focus({ preventScroll: true });
+  }
+
+  function keys(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      /* The record panel listens on the document too, and one press used to
+         close this and the panel behind it. A layer closes itself. */
+      e.stopImmediatePropagation();
+      close();
+      return;
+    }
+    /* Enter saves from the input, because the box holds one line and a person
+       typing one line expects Enter to mean done. Shift+Enter is left alone
+       so a second line is still reachable. */
+    if (e.key === 'Enter' && !e.shiftKey && pop.contains(document.activeElement)
+        && document.activeElement.tagName === 'TEXTAREA') {
+      e.preventDefault();
+      pop.querySelector('[data-role="reason-save"]').click();
+    }
+  }
+
+  function open(anchor, spec, save) {
+    const el = ensure();
+    onSave = save;
+    el._anchor = anchor;
+
+    const esc = v => String(v == null ? '' : v)
+      .replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    el.innerHTML = `
+      <p class="pick-head">${esc(spec.label)}</p>
+      <div class="reason-body">
+        <textarea id="reason-text" class="field reason-text" rows="3"
+                  aria-label="${esc(spec.label)}"
+                  placeholder="${esc(spec.placeholder || 'Write it the way you would say it out loud.')}"
+                  >${esc(spec.value || '')}</textarea>
+        ${spec.help ? `<p class="reason-help">${esc(spec.help)}</p>` : ''}
+      </div>
+      <div class="reason-foot">
+        <button type="button" class="btn btn-tertiary" data-role="reason-clear"
+                ${spec.value ? '' : 'hidden'}>Clear</button>
+        <button type="button" class="btn btn-primary" data-role="reason-save">Save</button>
+      </div>`;
+
+    el.querySelector('[data-role="reason-save"]').onclick = () => {
+      const text = el.querySelector('.reason-text').value.trim();
+      close();
+      onSave?.(text);
+    };
+    el.querySelector('[data-role="reason-clear"]').onclick = () => {
+      close();
+      onSave?.('');
+    };
+
+    closeAllPops();
+    el.classList.remove('hidden');
+    pinPop(anchor, el);
+    anchor.setAttribute('aria-expanded', 'true');
+    document.addEventListener('keydown', keys, true);
+    const box = el.querySelector('.reason-text');
+    box.focus({ preventScroll: true });
+    /* At the end of what is already there, not selecting it. Somebody
+       reopening a reason is usually adding to it, and a select-all means the
+       next keystroke throws it away. */
+    box.setSelectionRange(box.value.length, box.value.length);
   }
 
   document.addEventListener('click', e => {
@@ -12360,7 +12532,7 @@ addEventListener('scroll', e => {
 addEventListener('resize', () => closeAllPops());
 
 return { form, directory, forms, closeAllPops, groupNum, toast, hideToast, pinPop, unpinPop,
-  statusDialog, statusMenu, recordPanel, wrapWideTables, pending };
+  statusDialog, statusMenu, reasonPop, recordPanel, wrapWideTables, pending };
 })();
 </script>
 <script>
@@ -14477,7 +14649,7 @@ return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
  *
  *   [9]  lifecycle    In fleet · Removed from fleet
  *   [7]  fuel access  Can fuel · Cannot fuel · Reported stolen
- *   [8]  reason       a preset, so it can be filtered and counted
+ *   [8]  reason       a sentence, in the words of whoever wrote it
  *   [10] notes        free writing, with who and when, kept separately
  *
  * ── There is no waiting state ────────────────────────────────────────────
@@ -14509,8 +14681,9 @@ return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
  *
  * A reason and a note are not the same thing and no longer share a box:
  *   status  what is true now
- *   reason  why that status was chosen. A preset, so a year of these is a
- *           report rather than a pile of sentences
+ *   reason  why that status was chosen, written out. It was a preset, so a
+ *           year of them would be a report; the categories are not agreed
+ *           yet and a wrong one is worse than none
  *   note    whatever a person wants to leave for the next person
  *   activity who changed what, when, kept automatically
  */
@@ -15283,55 +15456,72 @@ const form = Records.form({
 
 /* ── Reasons ──────────────────────────────────────────────────────────────
  *
- * A reason is a preset, and that is the whole point of separating it from a
- * note. "In for a service" can be counted, filtered and put in a report at the
- * end of the year; "waiting for Ford to confirm the repair date" cannot, and
- * has to be able to be said anyway. So the reason is one of a short list and
- * the note is whatever somebody wants to write, and they live in different
- * places rather than in one box called Details.
+ * A reason and a note are still two fields. The reason is short, belongs to
+ * the status, and answers the question that status raises; the note is
+ * whatever somebody wants to write and belongs to the record. One box called
+ * Details held both and neither could be relied on.
  *
- * Which list applies depends on which field is carrying the exception, which
- * is exactly the thing the single Status column could not express: Sold is not
- * a reason a vehicle cannot fuel this week, and a hijacking is not a workshop
- * booking.
+ * What changed is that the reason is no longer chosen from a list. It was,
+ * and the argument for it was a good one — "In for a service" can be counted
+ * at the end of the year and "waiting for Ford to confirm the repair date"
+ * cannot. But counting only works if the categories are right, none of these
+ * have been agreed, and a wrong preset is not a wrong label: it is a year of
+ * records filed under a word nobody meant.
+ *
+ * Which question gets asked still depends on which field is carrying the
+ * exception, which is the thing the single Status column could not express:
+ * Sold is not a reason a vehicle cannot fuel this week, and a hijacking is
+ * not a workshop booking.
+ */
+/* ── The question, without the answers ───────────────────────────────────
+ *
+ * Each status asks a different question and always did — "Why is it off the
+ * road?" is a better prompt than "Reason", and that part was right. What went
+ * with it was a list of answers per status: seven ways a vehicle might be off
+ * the road, four ways one might have gone, five things that might have
+ * happened to it.
+ *
+ * Those lists are gone. A preset is a claim that the categories are settled
+ * and that a year of them will be worth counting, and none of that has been
+ * mapped yet. The cost of guessing is not that the list reads badly — most of
+ * them read well — it is that every record written before the guess is
+ * corrected is written in the wrong vocabulary, and there is no migration
+ * from "Something else" back to what somebody actually meant.
+ *
+ * So the reason is a sentence, typed. `placeholder` is an example rather than
+ * an option: it shows the shape of a useful answer and commits the data to
+ * nothing. When the taxonomy is agreed, the lists come back here and the
+ * popover grows a picker above the box — the shape of this object is what
+ * makes that a small change rather than a rewrite.
  */
 const WHY = {
   'In maintenance': {
     label: 'Why it is off the road',
     title: r => `Why is ${r[0]} off the road?`,
-    /* "Recovered, not yet checked" is on the list because Mark recovered now
-       sets it. A reason a state can arrive holding has to be a reason somebody
-       can also choose and change. */
-    list: ['In for a service', 'Broken down', 'Accident damage', 'Waiting for parts',
-      'Recovered, not yet checked', 'Driver suspended', 'Not in use'],
+    placeholder: 'In for a service, waiting on a gearbox.',
   },
   'Reported stolen': {
     label: 'What happened',
     title: r => `What happened to ${r[0]}?`,
-    /* "Taken overnight" is gone. It described one shift pattern rather than a
-       circumstance, and a driver who kept the bakkie over a weekend fitted
-       none of the four. The replacements are the categories a report is
-       actually filed under. */
-    list: ['Hijacking', 'Stolen while parked', 'Vehicle not returned', 'Not sure'],
+    placeholder: 'Taken from the Sandton yard overnight.',
   },
   'Recovered — inspection required': {
     label: 'How it came back',
     title: r => `How did ${r[0]} come back?`,
-    list: ['Recovered by the police', 'Found by the driver', 'Returned by the person who took it',
-      'Found abandoned', 'Something else'],
+    placeholder: 'Recovered by the police, found in Alexandra.',
   },
   'Removed from fleet': {
     label: 'What happened to it',
     title: r => `What happened to ${r[0]}?`,
-    list: ['Sold', 'Written off', 'Scrapped', 'End of lease, returned', 'Something else'],
+    placeholder: 'Sold to the lease company at the end of term.',
   },
-  /* The block is a decision rather than a condition, so its reasons are the
-     manager's own — none of them says anything about the vehicle. */
+  /* The block is a decision rather than a condition, so what goes in here is
+     the manager's own reasoning — none of it says anything about the
+     vehicle. */
   Blocked: {
     label: 'Why you stopped it',
     title: r => `Why did you stop ${r[0]} fuelling?`,
-    list: ['Driver suspended', 'Under investigation', 'Not in use', 'Awaiting reassignment',
-      'Something else'],
+    placeholder: 'Under investigation after last week\u2019s fills.',
   },
 };
 
@@ -15573,7 +15763,8 @@ const vehicles = Records.directory({
 
     const why = REASON_FOR(r)
       ? `<button class="status-why${r[F.REASON] ? '' : ' is-none'}" data-why="1"
-                 title="${r[F.REASON] || 'No reason given'}">${r[F.REASON] || 'Add a reason'}</button>`
+                 aria-haspopup="dialog" aria-expanded="false"
+                 title="${esc(r[F.REASON] || 'No reason given')}">${esc(r[F.REASON] || 'Add a reason')}</button>`
       : '';
 
     return [
@@ -15767,12 +15958,14 @@ const stamp = () => new Date().toLocaleString('en-ZA', {
   day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
 }).replace(',', ',');
 
-/* A plate cannot contain a bracket and a preset reason cannot either, but the
+/* A plate cannot contain a bracket, and a typed reason certainly can, so the
    panel writes both into innerHTML and one of these fields is a free-text
    model name off an import. Four characters, because that is all this has to
    survive. */
-const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => (
-  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
 
 /* Every change writes its own line, as fields rather than as a sentence.
  *
@@ -15858,12 +16051,18 @@ function panelSpec(vehicle, tab) {
       ['Fuel', esc(vehicle[F.FUEL])],
       ['Tank capacity', `${Records.groupNum(vehicle[F.CAP])} L`],
     ],
-    /* GAP, stated rather than hidden: linking a vehicle to a driver is the
-       grouping work and it is a later phase. An Overview that silently omitted
-       the relationship would read as a vehicle with no driver rather than as a
-       product that cannot answer yet. */
+    /* The link is real now, and it is read from the driver rather than stored
+       twice. A vehicle holding a driver and a driver holding a vehicle is two
+       copies of one fact, and the copy that is not written to is the one that
+       goes stale. This note used to say the relationship did not exist. */
     links: [
-      ['Driver', '<span class="rp-none">Not linked yet — driver grouping is a later phase</span>'],
+      ['Driver', (function () {
+        const people = window.DriverFixtures ? window.DriverFixtures.DRIVERS : [];
+        const who = people.find(p => p.vehicle === vehicle[F.REG]);
+        return who
+          ? `<a href="#drivers-directory">${esc(who.first + ' ' + who.last)}</a>`
+          : '<span class="rp-none">Nobody is assigned to it</span>';
+      })()],
       ['Fuel policy', '<a href="#rules">Gauteng fuel policy</a>'],
     ],
     activity: vehicle[F.NOTES] || [],
@@ -15998,14 +16197,17 @@ function vehicleAction(key, act, extra) {
       sub: `${vehicle[2]} · ${vehicle[3]}`,
       body: '<b>This blocks the vehicle everywhere, right now.</b> No manager can release a fill for it, including you. If anyone tries, you get the station and the time.',
       calm: 'It stays in your fleet and nothing is deleted. Mark recovered undoes it, and the vehicle comes back stopped so somebody can look it over.',
-      fields: `<div class="form-field"><span class="label">What happened? <span class="opt">Optional</span></span>
-          <div class="seg is-stacked" role="radiogroup" aria-label="What happened">
-            ${WHY['Reported stolen'].list.map(w => `<label><input type="radio" name="cf-took">${w}</label>`).join('')}
-          </div></div>`,
-      read: slot => {
-        const picked = slot.querySelector('input[name="cf-took"]:checked');
-        return picked ? picked.parentElement.textContent.trim() : '';
-      },
+      fields: `<div class="form-field"><label for="cf-took">What happened?</label>
+          <textarea id="cf-took" class="field" rows="3"
+                    placeholder="${WHY['Reported stolen'].placeholder}"></textarea>
+          <span class="help">In your own words. Nothing counts this yet, so write what is true rather than what fits a category.</span>
+        </div>`,
+      /* Typed rather than picked, and required rather than optional. The four
+         circumstances it used to offer were a guess at a taxonomy, and the
+         one thing worse than no categories is categories a year of reports
+         get filed under before anybody agrees them. */
+      gate: slot => !!slot.querySelector('#cf-took').value.trim(),
+      read: slot => slot.querySelector('#cf-took').value.trim(),
       confirmLabel: 'Report stolen',
       act: 'stolen-confirmed',
     }, (next, picked) => vehicleAction(key, next, picked), openerFor(key));
@@ -16019,22 +16221,20 @@ function vehicleAction(key, act, extra) {
       body: '<b>Only an administrator can bring it back.</b> It stops fuelling everywhere and stops counting against your fleet.',
       calm: 'Its fills, invoices and history stay where they are. If it might come back, set fuel access to Cannot fuel instead.',
       /* Both gates the screen carried: a reason, and the plate typed. */
-      fields: `<div class="form-field"><span class="label">What happened to it?</span>
-          <div class="seg is-stacked" role="radiogroup" aria-label="What happened to the vehicle">
-            ${WHY['Removed from fleet'].list.map(w => `<label><input type="radio" name="cf-gone">${w}</label>`).join('')}
-          </div></div>
+      fields: `<div class="form-field"><label for="cf-gone">What happened to it?</label>
+          <textarea id="cf-gone" class="field" rows="3"
+                    placeholder="${WHY['Removed from fleet'].placeholder}"></textarea>
+          <span class="help">In your own words. Nothing counts this yet.</span>
+        </div>
         <div class="form-field"><label for="cf-plate">Type the registration to confirm</label>
           <input id="cf-plate" class="field ident field-sm" placeholder="${vehicle[0]}" autocomplete="off"></div>`,
       gate: slot => {
         const tidy = v => (v || '').replace(/\s+/g, '').toUpperCase();
         const plate = slot.querySelector('#cf-plate');
-        const why = slot.querySelector('input[name="cf-gone"]:checked');
-        return !!why && tidy(plate && plate.value) === tidy(vehicle[0]);
+        return !!slot.querySelector('#cf-gone').value.trim()
+          && tidy(plate && plate.value) === tidy(vehicle[0]);
       },
-      read: slot => {
-        const why = slot.querySelector('input[name="cf-gone"]:checked');
-        return why ? why.parentElement.textContent.trim() : '';
-      },
+      read: slot => slot.querySelector('#cf-gone').value.trim(),
       confirmLabel: 'Remove from fleet',
       act: 'removed-confirmed',
     }, (next, picked) => vehicleAction(key, next, picked), openerFor(key));
@@ -16373,14 +16573,12 @@ function askReason(key, anchor) {
   if (!why) return;
   const at = anchor || document.querySelector(`tr[data-row="${CSS.escape(key)}"] .status-why`);
   if (!at) return;
-  Records.statusMenu.open(at, {
+  Records.reasonPop.open(at, {
     label: why.label,
     value: vehicle[F.REASON],
-    groups: [
-      { items: why.list.map(v => ({ value: v })) },
-      ...(vehicle[F.REASON] ? [{ items: [{ label: 'Clear the reason', value: '' }] }] : []),
-    ],
-  }, item => vehicleAction(key, 'reason-set', item.value));
+    placeholder: why.placeholder,
+    help: 'Nothing counts this yet. Write what is true.',
+  }, text => vehicleAction(key, 'reason-set', text));
 }
 
 /* `F` goes out with the rows. The dashboard used to carry its own
@@ -16421,45 +16619,72 @@ const { MSG } = R;
 const DRIVERS = [
   { first: 'Ayanda', last: 'Zulu', mobile: '073 111 2222', email: 'ayanda.zulu@abccouriers.co.za',
     idNumber: '9007225137088', licenceCode: 'Code EB', licenceExpiry: '2029-03-31',
-    prdp: 'PrDP G', prdpExpiry: '2028-01-31', group: 'Service crew', employeeId: 'EMP-101', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2028-01-31', group: 'Service crew', employeeId: 'EMP-101', vehicle: 'JXR 771 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-06-02T07:41', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
   { first: 'Bongani', last: 'Khumalo', mobile: '082 333 7777', email: 'bongani.khumalo@abccouriers.co.za',
     idNumber: '8501095274089', licenceCode: 'Code EB', licenceExpiry: '2027-11-30',
-    prdp: 'PrDP G', prdpExpiry: '2027-09-30', group: 'Gauteng deliveries', employeeId: 'EMP-102', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2027-09-30', group: 'Gauteng deliveries', employeeId: 'EMP-102', vehicle: 'JTM 901 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-05-18T14:09', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
   { first: 'Derek', last: 'Naidoo', mobile: '076 777 8888', email: 'derek.naidoo@abccouriers.co.za',
     idNumber: '7911305411085', licenceCode: 'Code A1', licenceExpiry: '2028-06-30',
-    prdp: 'No PrDP', prdpExpiry: '', group: 'Service crew', employeeId: 'EMP-103', lifecycle: 'Active', fuel: 'Cannot fuel', reason: 'Sick leave', notes: [{ kind: 'note', who: 'Lerato Mokoena', at: '17 Aug, 08:30', text: 'Booked off until the 24th. Doctor’s note is with HR.' }] },
+    prdp: 'No PrDP', prdpExpiry: '', group: 'Service crew', employeeId: 'EMP-103', vehicle: 'KPL 337 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-04-22T11:26', appWhy: '', fuel: 'Cannot fuel', reason: 'Sick leave', notes: [{ kind: 'note', who: 'Lerato Mokoena', at: '17 Aug, 08:30', text: 'Booked off until the 24th. Doctor\u2019s note is with HR.' }] },
+  /* Left the company in July. The app was deactivated by that, not by anybody
+     choosing to deactivate it, which is the whole argument for the two fields
+     being two fields. */
   { first: 'Johan', last: 'van der Merwe', mobile: '084 555 6666', email: 'johan.vdmerwe@abccouriers.co.za',
     idNumber: '9202155548087', licenceCode: 'Code EB', licenceExpiry: '2027-02-28',
-    prdp: 'PrDP G', prdpExpiry: '2027-02-28', group: 'Sales fleet', employeeId: 'EMP-104', lifecycle: 'Left', fuel: 'Cannot fuel', reason: 'Resigned', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2027-02-28', group: 'Sales fleet', employeeId: 'EMP-104', vehicle: '',
+    access: 'Left', app: 'Deactivated', appAt: '2026-07-31T16:00', appWhy: '', appWas: 'Active', fuel: 'Cannot fuel', reason: 'Resigned', notes: [] },
+  /* The number is a landline. Nothing on the driver record is wrong, the
+     message simply had nowhere to go — which is why the way out of this state
+     is the number, not the status. */
   { first: 'Mandla', last: 'Nkosi', mobile: '079 333 4444', email: 'mandla.nkosi@abccouriers.co.za',
     idNumber: '8706045685082', licenceCode: 'Code A', licenceExpiry: '2030-01-31',
-    prdp: 'No PrDP', prdpExpiry: '', group: 'Gauteng deliveries', employeeId: 'EMP-105', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'No PrDP', prdpExpiry: '', group: 'Gauteng deliveries', employeeId: 'EMP-105', vehicle: 'LDW 129 GP',
+    access: 'On the fleet', app: 'Invite failed', appAt: '2026-08-19T10:12',
+    appWhy: 'That number is not on WhatsApp.', fuel: 'Can fuel', reason: '', notes: [] },
   { first: 'Nandi', last: 'Mthembu', mobile: '078 222 5555', email: 'nandi.mthembu@abccouriers.co.za',
     idNumber: '8309185822084', licenceCode: 'Code EB', licenceExpiry: '2028-08-31',
-    prdp: 'PrDP G', prdpExpiry: '2029-05-31', group: 'Sales fleet', employeeId: 'EMP-106', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2029-05-31', group: 'Sales fleet', employeeId: 'EMP-106', vehicle: 'MHB 664 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-03-09T08:55', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
+  /* Sent four days ago and still waiting. This is the state a driver sits in
+     for days, and the only one where a manager's move is to nudge rather than
+     to fix anything. */
   { first: 'Nomsa', last: 'Dlamini', mobile: '083 222 3333', email: 'nomsa.dlamini@abccouriers.co.za',
     idNumber: '9504275959080', licenceCode: 'Code EB', licenceExpiry: '2029-10-31',
-    prdp: 'PrDP G', prdpExpiry: '2028-10-31', group: 'Sales fleet', employeeId: 'EMP-107', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2028-10-31', group: 'Sales fleet', employeeId: 'EMP-107', vehicle: 'NCA 875 GP',
+    access: 'On the fleet', app: 'Invite sent', appAt: '2026-08-17T09:14', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
   // Needs attention: the licence lapsed in May and nobody was told.
   { first: 'Pretty', last: 'Mahlangu', mobile: '071 444 9999', email: 'pretty.mahlangu@abccouriers.co.za',
     idNumber: '7708016096084', licenceCode: 'Code EB', licenceExpiry: '2026-05-03',
-    prdp: 'PrDP G', prdpExpiry: '2027-05-31', group: 'Service crew', employeeId: 'EMP-108', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2027-05-31', group: 'Service crew', employeeId: 'EMP-108', vehicle: 'PBK 550 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-02-14T12:30', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
+  /* Added a minute ago from the drawer. The message is in flight: nobody set
+     this, and nobody can. */
   { first: 'Refiloe', last: 'Tshabalala', mobile: '074 999 0000', email: '',
     idNumber: '9103126233082', licenceCode: 'Code EB', licenceExpiry: '2028-12-31',
-    prdp: 'PrDP G', prdpExpiry: '2028-03-31', group: '', employeeId: '', lifecycle: 'Invited', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2028-03-31', group: '', employeeId: '', vehicle: '',
+    access: 'On the fleet', app: 'Invite sending', appAt: '', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
   // Needs attention: the PrDP lapsed last month, and a PrDP is the permit the
   // load depends on rather than the licence.
   { first: 'Sibusiso', last: 'Mahlangu', mobile: '072 111 3333', email: 'sibusiso.mahlangu@abccouriers.co.za',
     idNumber: '8605236370084', licenceCode: 'Code EB', licenceExpiry: '2029-07-31',
-    prdp: 'PrDP G', prdpExpiry: '2026-07-19', group: '', employeeId: 'EMP-110', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
-  // The non-South African driver the identity question exists for.
+    prdp: 'PrDP G', prdpExpiry: '2026-07-19', group: '', employeeId: 'EMP-110', vehicle: 'RTS 018 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2026-01-27T15:02', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
+  /* The non-South African driver the identity question exists for. On the
+     fleet since last week and nobody has sent the invitation yet: a record
+     exists, an app account does not, and the table has to be able to say so
+     without implying anything went wrong. */
   { first: 'Tendai', last: 'Moyo', mobile: '081 777 1212', email: 'tendai.moyo@abccouriers.co.za',
     idNumber: '', passportNumber: 'ZN482113', passportCountry: 'Zimbabwe',
     licenceCode: 'Code EC', licenceExpiry: '2028-04-30',
-    prdp: 'PrDP D', prdpExpiry: '2027-08-31', group: 'Gauteng deliveries', employeeId: 'EMP-111', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP D', prdpExpiry: '2027-08-31', group: 'Gauteng deliveries', employeeId: 'EMP-111', vehicle: '',
+    access: 'On the fleet', app: 'Not invited', appAt: '', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
   { first: 'Thabo', last: 'Mokoena', mobile: '082 123 4567', email: 'thabo.mokoena@abccouriers.co.za',
     idNumber: '8803145000088', licenceCode: 'Code EB', licenceExpiry: '2029-01-31',
-    prdp: 'PrDP G', prdpExpiry: '2028-02-29', group: 'Sales fleet', employeeId: 'EMP-014', lifecycle: 'Active', fuel: 'Can fuel', reason: '', notes: [] },
+    prdp: 'PrDP G', prdpExpiry: '2028-02-29', group: 'Sales fleet', employeeId: 'EMP-014', vehicle: 'HRV 482 GP',
+    access: 'On the fleet', app: 'Active', appAt: '2025-11-11T06:20', appWhy: '', fuel: 'Can fuel', reason: '', notes: [] },
 ];
 
 const name = d => `${d.first} ${d.last}`;
@@ -16503,53 +16728,117 @@ const codeValues = list => list.map(x => (Array.isArray(x) ? x[0] : x));
  * Gauteng courier actually employs, enough to review the question with. */
 const COUNTRIES = ['Zimbabwe', 'Mozambique', 'Lesotho', 'Eswatini', 'Botswana', 'Namibia', 'Malawi', 'Zambia'];
 
-/* Four states and four readings, which they did not have.
+/* Three axes, and they are three because they answer three questions.
  *
  * Active stays plain: the ordinary answer drawn quiet is what gives the
  * exceptional row its one chance of being noticed, and it is the rule the
  * Atoms page already states.
  *
- * Invited and Left were the same grey pill. One means nothing has started and
- * the other means it is over, and telling them apart meant reading the word.
- * Invited is waiting on somebody, so it takes the informational tone; Left is
- * finished, so it keeps the grey that says archived.
+ * ── The split that was still half-done ──────────────────────────────────
  *
- * "Left the company" was also the longest label in the table and was setting
- * the width of the column. The header says Status; the word only has to say
- * which one. */
-/* ── The same split, on the driver record ─────────────────────────────────
+ * The record already split "is this person on the account" from "may their
+ * card be used today". It did not split the third question, and the third
+ * question was hiding inside the first: `lifecycle` held Invited, Active and
+ * Left, where Invited and Active are facts about the EngenXT app and Left is
+ * a fact about employment. One field, two owners.
  *
- * The same split the vehicle record got, for the same reason, over the same
- * four words. Invited and Left answer "is this person on the account"; Can
- * fuel and Cannot fuel answer "may their card be used today". One list of four
- * mixed both, so the product could not say the ordinary thing: this driver is
- * signed up and on the account, and their card is off this week.
+ * What that cost, concretely:
  *
- * It also made two unrelated verbs write one field. Resending an invitation
- * and allowing a card to fuel were both "change status", and the menu could
- * not tell them apart.
+ *   A manager could set Active by hand — the row menu offered "They have the
+ *   app" — and the only thing that can make that true is a driver opening the
+ *   app on their phone. The product was letting somebody assert a fact about
+ *   a device they do not have.
  *
- *   lifecycle  Invited · Active · Left
- *   fuel       Can fuel · Cannot fuel
- *   reason     a preset
- *   notes      free writing, with who and when
+ *   A failed invitation had nowhere to live. The message bounced, and the row
+ *   still read Invited, which says "waiting on them" when the truth was
+ *   "waiting on you, and the number is wrong".
  *
- * Fuel access is only read while the lifecycle is Active. An invited driver
- * has no card yet and somebody who has left has no account, so the row draws
- * one pill for them rather than two.
+ *   Deactivating the app and marking somebody as left were the same write,
+ *   so the product could not express a driver who is still employed and
+ *   whose app account is off.
+ *
+ * So the three are now three:
+ *
+ *   access   On the fleet · Left            a manager decides
+ *   app      six values, below              the system decides
+ *   fuel     Can fuel · Cannot fuel         a manager decides
+ *   reason   a preset
+ *   notes    free writing, with who and when
+ *
+ * Access says On the fleet rather than Active for one reason: the app status
+ * beside it already uses Active, and two pills reading Active in one row is
+ * exactly the "telling them apart meant reading the word" failure the tones
+ * below exist to prevent. "Off the fleet" was already how this file described
+ * Left in prose, so the word is the file's own.
+ *
+ * Fuel access is only read while somebody is on the fleet. A driver who has
+ * left has no card, so the row draws one pill for them rather than two.
  */
-const DLIFE = {
-  'Invited': {
-    badge: 'badge-info',
-    says: 'On the account, not signed in yet. No card until they set up the app.',
-  },
-  'Active': {
+const DACCESS_LIFE = {
+  'On the fleet': {
     badge: null,
-    says: 'Signed up and working. Fuel access decides what happens at the pump.',
+    says: 'Employed and on the account. Fuel access decides what happens at the pump.',
   },
   'Left': {
     badge: 'badge-neutral',
     says: 'Off the fleet. Their fills and history stay in your reports.',
+  },
+};
+
+/* ── The app invitation ───────────────────────────────────────────────────
+ *
+ * Six values, none of them settable by a manager, and that is the design
+ * rather than an omission. Every one of these is a report of something that
+ * has already happened somewhere else — a message queued, a message
+ * delivered, a phone that opened the app, a number that bounced. A control
+ * that let somebody choose "Invite sent" would be a control for lying to the
+ * next person who reads the row.
+ *
+ * `set` is written down rather than implied, so the menus and the checker
+ * read the same rule instead of two copies of it. Nothing has `set: true`.
+ * The field is here for the day one of them legitimately does.
+ *
+ * Tones, and why each:
+ *
+ *   Not invited    neutral — nothing has started, and nothing is wrong
+ *   Invite sending quiet   — in flight, and gone again in seconds
+ *   Invite sent    info    — waiting on the driver, same tone the old
+ *                            Invited pill carried, because it is the same
+ *                            fact wearing a more honest name
+ *   Active         plain   — the ordinary answer, drawn quiet
+ *   Invite failed  danger  — somebody has to do something
+ *   Deactivated    neutral — finished
+ *
+ * Not invited and Deactivated share the neutral tone and are the two ends of
+ * the same line: no app account, at the start and at the end. They are told
+ * apart by the word and by where they sit in a driver's history, which is
+ * the one case where reading the word is the right answer — there is no
+ * urgency in either, so there is nothing for a colour to rank.
+ */
+const APP = {
+  'Not invited': {
+    badge: 'badge-neutral', set: false,
+    says: 'No invitation has gone out. They cannot fuel until the app is on their phone.',
+  },
+  'Invite sending': {
+    badge: 'badge-quiet', set: false,
+    says: 'The WhatsApp message is on its way. This clears itself.',
+  },
+  'Invite sent': {
+    badge: 'badge-info', set: false,
+    says: 'Delivered, and waiting on the driver to open it.',
+  },
+  'Active': {
+    badge: null, set: false,
+    says: 'The app is set up on their phone. Only the driver can make this true.',
+  },
+  'Invite failed': {
+    badge: 'badge-danger', set: false,
+    says: 'The message did not arrive. Check the number before sending it again.',
+  },
+  'Deactivated': {
+    badge: 'badge-neutral', set: false,
+    says: 'The app account is off. Marking somebody as left does this on its own.',
   },
 };
 
@@ -16565,28 +16854,58 @@ const DACCESS = {
  * tooltip, the record, the panel and the statuses screen, so the four cannot
  * end up saying different things about one word. */
 const STATUS_MEANING = {
-  'Invited': {
-    kind: 'Account status',
-    pump: 'No fuel yet. They have not set up the app.',
-    back: 'Send the invitation again from the actions menu.',
-    by: 'Whoever adds them', undo: 'Send the invitation again',
-  },
-  'Active': {
-    kind: 'Account status',
+  'On the fleet': {
+    kind: 'Driver access',
     pump: 'Nothing on its own. Fuel access says what happens at the pump.',
     back: null,
-    by: 'The driver, by setting up the app', undo: '—',
+    by: 'Manager, when they add somebody', undo: 'Mark as left',
   },
   'Left': {
-    kind: 'Account status',
+    kind: 'Driver access',
     pump: 'No fuel, and nobody can release one. Their history stays in your reports.',
-    back: 'Add them again if they come back.',
-    by: 'Manager, in a confirmation', undo: 'Add them again if they return',
+    back: 'Reactivate them from the app status menu, or add them again.',
+    by: 'Manager, in a confirmation', undo: 'Reactivate driver',
+  },
+  'Not invited': {
+    kind: 'App status',
+    pump: 'No fuel. There is no app account yet.',
+    back: 'Send the invitation from the App status menu.',
+    by: 'The system, when a driver is added without one', undo: 'Send invitation',
+  },
+  'Invite sending': {
+    kind: 'App status',
+    pump: 'No fuel yet. The message has not landed.',
+    back: null,
+    by: 'The system, while the message is in flight', undo: '\u2014',
+  },
+  'Invite sent': {
+    kind: 'App status',
+    pump: 'No fuel yet. They have not set up the app.',
+    back: 'Resend it, or copy the link and send it another way.',
+    by: 'The system, on delivery', undo: 'Resend invitation',
+  },
+  'Active': {
+    kind: 'App status',
+    pump: 'Nothing on its own. Fuel access says what happens at the pump.',
+    back: null,
+    by: 'The driver, by setting up the app', undo: '\u2014',
+  },
+  'Invite failed': {
+    kind: 'App status',
+    pump: 'No fuel. There is still no app account.',
+    back: 'Check the mobile number, then send it again.',
+    by: 'The system, when delivery fails', undo: 'Resend invitation',
+  },
+  'Deactivated': {
+    kind: 'App status',
+    pump: 'No fuel, and nobody can release one.',
+    back: 'Reactivate the driver.',
+    by: 'The system, when somebody is marked as left', undo: 'Reactivate driver',
   },
   'Can fuel': {
     kind: 'Fuel access',
     pump: 'Fuel flows, inside their rules.', back: null,
-    by: 'Manager, one press', undo: '—',
+    by: 'Manager, one press', undo: '\u2014',
   },
   'Cannot fuel': {
     kind: 'Fuel access',
@@ -16600,24 +16919,27 @@ const STATUS_MEANING = {
    of the reasons it covered are not accusations: sick leave, annual leave,
    waiting for a vehicle. */
 const STATUS_TONE = Object.fromEntries(
-  [...Object.entries(DLIFE), ...Object.entries(DACCESS)].map(([k, v]) => [k, v.badge]));
+  [...Object.entries(DACCESS_LIFE), ...Object.entries(APP), ...Object.entries(DACCESS)]
+    .map(([k, v]) => [k, v.badge]));
 
-/* Which reasons belong to which exception, same rule as the vehicles: a
-   preset, so a year of them can be counted. */
+/* The question per status, and no list of answers. Same change as the vehicle
+   side and for the same reason: the six ways a card might be off and the five
+   ways somebody might have left were a taxonomy nobody has agreed, and a
+   preset writes that guess into every record before anyone can correct it.
+   The prompts are examples of a useful answer, not options. */
 const DWHY = {
   'Cannot fuel': {
     label: 'Why their card is off',
-    list: ['Sick leave', 'On leave', 'Disciplinary', 'Waiting for a vehicle', 'Training', 'Not in use'],
+    placeholder: 'Booked off sick until the 24th.',
   },
   'Left': {
     label: 'Why they left',
-    list: ['Resigned', 'Dismissed', 'End of contract', 'Retired', 'Something else'],
+    placeholder: 'Resigned, last day was Friday.',
   },
 };
 
 function DREASON_FOR(d) {
-  if (d.lifecycle === 'Left') return DWHY['Left'];
-  if (d.lifecycle !== 'Active') return null;
+  if (d.access === 'Left') return DWHY['Left'];
   return DWHY[d.fuel] || null;
 }
 
@@ -16655,10 +16977,23 @@ const drivers = Records.directory({
   root: '#screen-drivers-directory',
   data: DRIVERS,
   noun: 'drivers',
+  /* Six columns are on by default and they are the six a fleet office answers
+   * the phone with: who, how to reach them, where they work, what they drive,
+   * whether the app is on their phone, and what to do about it.
+   *
+   * The licence and permit columns went off rather than away. They are read
+   * on the day somebody audits the permits and on no other day, and they were
+   * taking the width the two status columns now need. The Needs attention tab
+   * turns the expiry pair back on by itself — a tab whose whole purpose is
+   * "these two lapsed" cannot be a tab that hides which two. */
   columns: [
     // The identity column keeps its width; the long, low-value one gives it up.
-    ['Name', true, 'nowrap'],
-    ['Mobile', false, 'ident nowrap'],
+    ['Driver', true, 'nowrap'],
+    ['Mobile number', false, 'ident nowrap'],
+    ['Branch or department', false, 'nowrap'],
+    ['Assigned vehicle', false, 'ident nowrap'],
+    ['App status', false, 'app-col'],
+    ['Driver access', false, 'status-col'],
     // Off by default: nobody scans a driver list by email address, and it
     // was taking the width the name needed. One press in Columns brings it back.
     ['Email', false, 'truncate', true],
@@ -16666,17 +17001,19 @@ const drivers = Records.directory({
     // Left to wrap they broke onto two at 1280 and took the row with them, and
     // a list where the rows needing attention are the tall ones is a list you
     // scan by height instead of by what it says.
-    ['Licence', false, 'nowrap'],
+    ['Licence', false, 'nowrap', true],
     ['Licence expiry', false, 'nowrap', true],
-    ['PrDP', false, 'nowrap'],
+    ['PrDP', false, 'nowrap', true],
     ['PrDP expiry', false, 'nowrap', true],
-    ['Group', false, 'nowrap'],
-    ['Operational status', false, 'status-col'],
   ],
   facets: [
     ['Driving licence code', 'code', codeValues(LICENCE_CODES), d => d.licenceCode],
     ['PrDP category', 'prdp', codeValues(PRDP), d => d.prdp],
-    ['Account status', 'life', Object.keys(DLIFE), d => d.lifecycle],
+    /* Three facets over three fields, because they are three questions. The
+       app one is the reason a manager comes to this screen on a Monday: show
+       me everyone whose invitation has not landed. */
+    ['App status', 'app', Object.keys(APP), d => d.app],
+    ['Driver access', 'life', Object.keys(DACCESS_LIFE), d => d.access],
     ['Fuel access', 'access', Object.keys(DACCESS), d => d.fuel],
   ],
   /* Written once, in STATUS_MEANING, and read here, on the record and on the
@@ -16692,8 +17029,8 @@ const drivers = Records.directory({
   rowKey: d => d.idNumber || d.passportNumber,
   rowLabel: d => name(d),
   // Everything somebody might have in their head when they come looking.
-  searchable: d => [name(d), d.mobile, d.email, d.employeeId, d.group,
-    d.licenceCode, d.prdp, d.idNumber, d.passportNumber, d.lifecycle, d.fuel, d.reason]
+  searchable: d => [name(d), d.mobile, d.email, d.employeeId, d.group, d.vehicle,
+    d.licenceCode, d.prdp, d.idNumber, d.passportNumber, d.access, d.app, d.fuel, d.reason]
     .filter(Boolean).join(' '),
   // "3 May 2026" sorts as words; the stored date sorts as a date.
   sortValue: (d, col) => (col === 'Licence expiry' ? (d.licenceExpiry || '')
@@ -16705,14 +17042,18 @@ const drivers = Records.directory({
    * did for vehicles. What is left is what has no representation in the table:
    * the form, the panel, the invitation, and the one move that gets a
    * confirmation. */
+  /* The invitation actions left this menu and went into the App status pill,
+   * where the status they act on is. "They have the app" left the product
+   * altogether: it wrote Active by hand, and the only thing that can make
+   * Active true is a driver opening the app on a phone this menu cannot see.
+   * A control that lets a manager assert somebody else's fact is a control
+   * for making the row lie. */
   rowMenu: d => [
     { act: 'edit', label: 'Edit driver' },
     { act: 'notes', label: 'Notes and activity' },
-    ...(d.lifecycle === 'Invited' ? [
-      { act: 'resend', label: 'Resend invitation' },
-      { act: 'accepted', label: 'They have the app' },
-    ] : []),
-    ...(d.lifecycle === 'Left' ? [] : [{ act: 'left', label: 'Mark as left…', danger: true }]),
+    ...(d.access === 'Left'
+      ? [{ act: 'reactivate', label: 'Reactivate driver' }]
+      : [{ act: 'left', label: 'Mark as left\u2026', danger: true }]),
   ],
   /* Confirm before one, undo after many.
    *
@@ -16734,11 +17075,11 @@ const drivers = Records.directory({
      * The row menu is state-aware and the bar has to be too. */
     const RULE = {
       suspend: { field: 'fuel', to: 'Cannot fuel', said: 'stopped', why: 'not fuelling',
-        can: p => p.lifecycle === 'Active' && p.fuel === 'Can fuel' },
+        can: p => p.access === 'On the fleet' && p.fuel === 'Can fuel' },
       activate: { field: 'fuel', to: 'Can fuel', said: 'allowed to fuel', why: 'not stopped',
-        can: p => p.lifecycle === 'Active' && p.fuel === 'Cannot fuel' },
-      left: { field: 'lifecycle', to: 'Left', said: 'marked as left', why: 'already gone',
-        can: p => p.lifecycle !== 'Left' },
+        can: p => p.access === 'On the fleet' && p.fuel === 'Cannot fuel' },
+      left: { field: 'access', to: 'Left', said: 'marked as left', why: 'already gone',
+        can: p => p.access !== 'Left' },
     }[act];
     if (!RULE) return null;
 
@@ -16747,8 +17088,15 @@ const drivers = Records.directory({
       .filter(Boolean);
     const eligible = people.filter(RULE.can);
     const skipped = people.length - eligible.length;
-    const was = eligible.map(p => [p, p[RULE.field]]);
-    was.forEach(([p]) => { p[RULE.field] = RULE.to; });
+    const was = eligible.map(p => [p, p[RULE.field], p.app, p.appWas]);
+    was.forEach(([p]) => {
+      p[RULE.field] = RULE.to;
+      /* The same consequence the single confirmation carries. Without this,
+         Mark as left on a bar of twelve left twelve app accounts running,
+         and the only difference between the two paths was which control
+         somebody happened to reach for. */
+      if (act === 'left') setApp(p, 'Deactivated', { at: nowStamp() });
+    });
 
     // Says what happened rather than what was asked for. Ticking twelve and
     // changing nine is a different sentence from changing twelve, and the
@@ -16760,7 +17108,11 @@ const drivers = Records.directory({
     return {
       message: `${plural(eligible.length)} ${RULE.said}.` +
         (skipped ? ` ${plural(skipped)} ${skipped === 1 ? 'was' : 'were'} ${RULE.why}.` : ''),
-      revert: () => was.forEach(([p, before]) => { p[RULE.field] = before; }),
+      revert: () => was.forEach(([p, before, app, appWas]) => {
+        p[RULE.field] = before;
+        p.app = app;
+        p.appWas = appWas;
+      }),
     };
   },
   onRowOpen: key => {
@@ -16773,6 +17125,7 @@ const drivers = Records.directory({
   onCell: (key, kind, el) => {
     const person = DRIVERS.find(p => (p.idNumber || p.passportNumber) === key);
     if (!person) return;
+    if (kind === 'pill:app') return dAppMenu(person, el);
     if (kind === 'pill:life') return dLifeMenu(person, el);
     if (kind === 'pill:access') return dAccessMenu(person, el);
     if (kind === 'why') return dAskReason(key, el);
@@ -16784,26 +17137,61 @@ const drivers = Records.directory({
     ['Needs attention', needsAttention, {
       title: 'Nothing needs attention',
       body: 'Every licence card and permit on file is current.',
+      /* Turned on for as long as this tab is selected, and turned off again
+         with it. The expiry pair is off in the default six because most days
+         nobody reads dates; on the one tab that exists to say two of them
+         have passed, hiding them would leave a list of names and no reason. */
+      columns: ['Licence expiry', 'PrDP expiry'],
     }],
   ],
   cell: d => {
     // Notes, not activity entries. Same rule as the vehicle list.
     const notes = (d.notes || []).filter(n => n.kind === 'note').length;
+    /* "Change it" is what these carried, and for the app status it is a lie:
+       the menu behind that pill cannot change it and is not allowed to. A
+       screen reader that announces a control by what it does not do is worse
+       than one that says nothing, so the promise is read off the field rather
+       than assumed. */
     const pill = (value, kind, label) => {
       const tone = STATUS_TONE[value];
+      const does = kind === 'app' ? 'What can be done about it' : 'Change it';
       return `<button class="status-pill${tone ? ' ' + tone : ''}" data-pill="${kind}"
                       aria-haspopup="menu" aria-expanded="false"
                       title="${STATUS_MEANING[value] ? STATUS_MEANING[value].pump : ''}"
-                      aria-label="${label}: ${value}. Change it">${value}<svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
+                      aria-label="${label}: ${value}. ${does}">${value}<svg class="caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
     };
     const why = DREASON_FOR(d)
       ? `<button class="status-why${d.reason ? '' : ' is-none'}" data-why="1"
-                 title="${d.reason || 'No reason given'}">${d.reason || 'Add a reason'}</button>`
+                 aria-haspopup="dialog" aria-expanded="false"
+                 title="${dEsc(d.reason || 'No reason given')}">${dEsc(d.reason || 'Add a reason')}</button>`
       : '';
     return [
       `<a class="rec" href="#">${name(d)}</a>`,
       d.mobile,
-      d.email || 'None',
+      d.group || '<span class="cell-none">None</span>',
+      /* The registration, because that is what a yard says out loud. The
+         descriptor is on the vehicle record and does not belong in a column
+         somebody scans. Not linked is drawn as an absent value rather than
+         left blank: a blank cell reads as a column that failed to load. */
+      d.vehicle || '<span class="cell-none">Not linked</span>',
+      /* One pill, and it is a menu rather than a picker. What it opens
+         depends entirely on which of the six it is, because "resend it" and
+         "check the number" and "there is nothing to do, they have it" are
+         different situations wearing one control. */
+      `<span class="status-cell">${pill(d.app, 'app', 'App status')}</span>`,
+      // Four controls, the same four the vehicle rows carry. The word still
+      // carries its meaning for a pointer; the record and the panel say the
+      // same thing where somebody has stopped to read.
+      `<span class="status-cell">
+         ${pill(d.access, 'life', 'Driver access')}
+         ${d.access === 'On the fleet' ? pill(d.fuel, 'access', 'Fuel access') : ''}
+         ${why}
+         <button class="status-notes${notes ? '' : ' is-empty'}" data-notes="1"
+                 aria-label="${notes} note${notes === 1 ? '' : 's'} and activity">
+           <svg data-lucide="message-square" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${notes || ''}
+         </button>
+       </span>`,
+      d.email || '<span class="cell-none">None</span>',
       /* One word, and the same word in both columns.
        *
        * It was a pill carrying a date, and that did three things at once. It
@@ -16821,19 +17209,6 @@ const drivers = Records.directory({
       d.prdp + (prdpLapsed(d)
         ? ` <span class="badge badge-warning" title="Expired ${shortDate(d.prdpExpiry)}">Expired</span>` : ''),
       dateCell(d.prdpExpiry, prdpLapsed(d)),
-      d.group || 'None',
-      // Four controls, the same four the vehicle rows carry. The word still
-      // carries its meaning for a pointer; the record and the panel say the
-      // same thing where somebody has stopped to read.
-      `<span class="status-cell">
-         ${pill(d.lifecycle, 'life', 'Account status')}
-         ${d.lifecycle === 'Active' ? pill(d.fuel, 'access', 'Fuel access') : ''}
-         ${why}
-         <button class="status-notes${notes ? '' : ' is-empty'}" data-notes="1"
-                 aria-label="${notes} note${notes === 1 ? '' : 's'} and activity">
-           <svg data-lucide="message-square" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${notes || ''}
-         </button>
-       </span>`,
     ];
   },
 });
@@ -17137,13 +17512,20 @@ Records.form({
       return;
     }
 
-    const person = { ...details, ...identity, lifecycle: 'Invited', fuel: 'Can fuel', reason: '', notes: [] };
+    /* On the fleet the moment they are saved; the app account is a separate
+       thing that has only just been asked for. The row says Invite sending
+       rather than claiming the message arrived, and the delivery result
+       arrives on its own a beat later like every other invitation. */
+    const person = { ...details, ...identity, vehicle: '',
+      access: 'On the fleet', app: 'Not invited', appAt: '', appWhy: '',
+      fuel: 'Can fuel', reason: '', notes: [] };
     DRIVERS.push(person);
     DRIVERS.sort(byName);
     drivers.render();
     Records.forms.driver.close();
+    driverAction(person.idNumber || person.passportNumber, 'send');
     Records.toast(
-      `${v.first} ${v.last} added. We have texted them a link to set up the app.`,
+      `${v.first} ${v.last} added. The invitation is going to ${v.mobile}.`,
       () => {
         DRIVERS.splice(DRIVERS.indexOf(person), 1);
         drivers.render();
@@ -17164,14 +17546,19 @@ Records.form({
   statusLine: state => {
     const person = DRIVERS.find(p => p.idNumber === state.editing);
     if (!person) return null;
-    const which = person.lifecycle === 'Active' ? person.fuel : person.lifecycle;
+    /* Which of the three is deciding the pump, in the order they override
+       each other: off the fleet beats no app account, and no app account
+       beats a card that would otherwise work. */
+    const which = person.access === 'Left' ? person.access
+      : person.app !== 'Active' ? person.app
+      : person.fuel;
     const meaning = STATUS_MEANING[which] || {};
-    const life = STATUS_TONE[person.lifecycle];
-    const acc = STATUS_TONE[person.fuel];
+    const tone = v => STATUS_TONE[v] || 'badge-quiet';
     return {
-      badge: `<span class="badge ${life || 'badge-quiet'}">${person.lifecycle}</span>` +
-        (person.lifecycle === 'Active'
-          ? ` <span class="badge ${acc || 'badge-quiet'}">${person.fuel}</span>` : ''),
+      badge: `<span class="badge ${tone(person.access)}">${person.access}</span>` +
+        ` <span class="badge ${tone(person.app)}">${person.app}</span>` +
+        (person.access === 'On the fleet'
+          ? ` <span class="badge ${tone(person.fuel)}">${person.fuel}</span>` : ''),
       pump: meaning.pump || '',
       back: meaning.back || null,
     };
@@ -17275,26 +17662,86 @@ function dEvent(person, text) {
   return entry;
 }
 
-const dEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => (
-  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+/* ── Writing the app status ───────────────────────────────────────────────
+ *
+ * One door into the field, and it is here rather than at the eleven call
+ * sites for a reason the old code demonstrates: `person.lifecycle = 'Active'`
+ * was written in four places, one of which was a menu item, and that is how
+ * a system-owned value ends up being set by a person.
+ *
+ * It also carries the memory. `appWas` is what the app status was before the
+ * driver left, and it is the difference between a returning driver walking
+ * back into a working app and a returning driver being invited a second time
+ * to an app already on their phone.
+ */
+const nowStamp = () => {
+  const d = new Date();
+  const p2 = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`;
+};
+
+function setApp(person, value, opts = {}) {
+  if (!APP[value]) return;
+  if (value === 'Deactivated' && person.app !== 'Deactivated') person.appWas = person.app;
+  person.app = value;
+  if (opts.at !== undefined) person.appAt = opts.at;
+  if (opts.why !== undefined) person.appWhy = opts.why;
+  if (value !== 'Invite failed') person.appWhy = '';
+  return person;
+}
+
+/* When it happened, said the way a fleet office says it. "Today, 09:14" is
+   read at a glance; "17 Aug 2026, 09:14" is read by stopping. The full date
+   is there once the day stops being one somebody is holding in their head. */
+function appWhen(iso) {
+  if (!iso) return '';
+  const at = new Date(iso);
+  if (Number.isNaN(at.getTime())) return '';
+  const time = at.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+  const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const days = Math.round((midnight(new Date()) - midnight(at)) / 86400000);
+  if (days === 0) return `Today, ${time}`;
+  if (days === 1) return `Yesterday, ${time}`;
+  if (days > 1 && days < 7) return `${days} days ago, ${time}`;
+  return `${at.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}, ${time}`;
+}
+
+/* Declared rather than assigned, for the reason the vehicle side's `esc` is:
+   the row cell that calls it renders before this line is reached. */
+function dEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
 
 /* Overview is what is true about this person now; Activity is what happened to
    the record. Same division as the vehicle panel, same sections, so somebody
    who has read one record can read the other. */
 function dPanelSpec(person, tab) {
-  const which = person.lifecycle === 'Active' ? person.fuel : person.lifecycle;
-  const life = STATUS_TONE[person.lifecycle];
-  const acc = STATUS_TONE[person.fuel];
+  const which = person.access === 'Left' ? person.access
+    : person.app !== 'Active' ? person.app
+    : person.fuel;
+  const tone = v => STATUS_TONE[v];
   const lapsedCard = lapsed(person);
   const lapsedPrdp = prdpLapsed(person);
   return {
     title: name(person),
     sub: person.employeeId ? `Employee ${person.employeeId}` : 'No employee number',
     tab,
+    /* Three rows where there were two, and the third one carries its own
+       date. "Invite sent" on its own leaves the next question unanswered on
+       every record a manager opens, and the answer is four days old often
+       enough to matter. */
     status: [
-      ['Account status', life ? `<span class="badge ${life}">${person.lifecycle}</span>` : person.lifecycle],
-      ...(person.lifecycle === 'Active'
-        ? [['Fuel access', acc ? `<span class="badge ${acc}">${person.fuel}</span>` : person.fuel]]
+      ['Driver access', tone(person.access)
+        ? `<span class="badge ${tone(person.access)}">${person.access}</span>` : person.access],
+      ['App status', (tone(person.app)
+        ? `<span class="badge ${tone(person.app)}">${person.app}</span>` : person.app)
+        + (appWhen(person.appAt) ? ` <span class="rp-quiet">${dEsc(appWhen(person.appAt))}</span>` : '')
+        + (person.app === 'Invite failed' && person.appWhy
+          ? ` <span class="rp-quiet">${dEsc(person.appWhy)}</span>` : '')],
+      ...(person.access === 'On the fleet'
+        ? [['Fuel access', tone(person.fuel)
+            ? `<span class="badge ${tone(person.fuel)}">${person.fuel}</span>` : person.fuel]]
         : []),
       ...(DREASON_FOR(person) ? [['Reason', person.reason
         ? dEsc(person.reason)
@@ -17317,7 +17764,10 @@ function dPanelSpec(person, tab) {
         : person.prdpExpiry ? ` · to ${shortDate(person.prdpExpiry)}` : ''}`],
     ],
     links: [
-      ['Group', person.group ? dEsc(person.group) : '<span class="rp-none">None</span>'],
+      ['Branch or department', person.group ? dEsc(person.group) : '<span class="rp-none">None</span>'],
+      ['Assigned vehicle', person.vehicle
+        ? `<a href="#directory"><span class="ident">${dEsc(person.vehicle)}</span></a>`
+        : '<span class="rp-none">Not linked</span>'],
       ['Fuel policy', '<a href="#rules">Gauteng fuel policy</a>'],
     ],
     activity: person.notes || [],
@@ -17345,7 +17795,7 @@ function driverAction(key, act, extra) {
      somebody to a screen whose primary button only navigated, so all three
      routes into it changed nothing. */
   if (act === 'set-life' || act === 'set-access') {
-    const field = act === 'set-life' ? 'lifecycle' : 'fuel';
+    const field = act === 'set-life' ? 'access' : 'fuel';
     const to = extra;
     const was = person[field];
     const wasWhy = person.reason;
@@ -17353,13 +17803,13 @@ function driverAction(key, act, extra) {
 
     person[field] = to;
     if (!DREASON_FOR(person)) person.reason = '';
-    const entry = dLog(person, act === 'set-life' ? 'Account status' : 'Fuel access', was, to);
+    const entry = dLog(person, act === 'set-life' ? 'Driver access' : 'Fuel access', was, to);
     drivers.render();
     if (Records.recordPanel.isOpen()) Records.recordPanel.open(dPanelSpec(person, 'activity'));
 
     Records.toast(
       act === 'set-life'
-        ? `${name(person)} is ${to.toLowerCase()}.`
+        ? `${name(person)} is ${to === 'On the fleet' ? 'back on the fleet' : to.toLowerCase()}.`
         : (to === 'Cannot fuel'
           ? `${name(person)} cannot fuel. Their card is declined from now.`
           : `${name(person)} can fuel again.`),
@@ -17390,21 +17840,99 @@ function driverAction(key, act, extra) {
     return;
   }
 
-  if (act === 'accepted') {
-    person.lifecycle = 'Active';
-    dEvent(person, 'Set up the app on their phone.');
-    dLog(person, 'Account status', 'Invited', 'Active');
+  /* ── The invitation, as a machine rather than as a menu ─────────────────
+   *
+   * Every one of these sets the app status as a *consequence* of something,
+   * never as the thing being asked for. Pressing "Send invitation" asks for a
+   * message to go out; Invite sending is what that looks like on the row, and
+   * Invite sent or Invite failed is what the network came back with. Nobody
+   * chose any of the three.
+   *
+   * The two-step is deliberately not instant. A status that flicks from Not
+   * invited to Invite sent in the same frame teaches somebody that the
+   * product is drawing a label rather than doing a thing, and the first time
+   * a message genuinely fails they will not believe the failure either.
+   *
+   * A real build reaches this from the delivery webhook. Here the number
+   * decides: 079 333 4444 is the landline in the fixtures, and it bounces, so
+   * the failure state is reachable by pressing a button rather than only by
+   * being seeded into a fixture. */
+  const BOUNCES = /^079 333/;
+
+  if (act === 'send' || act === 'resend') {
+    if (person.access === 'Left') return;
+    const was = person.app;
+    setApp(person, 'Invite sending');
     drivers.render();
-    Records.toast(`${name(person)} can fuel now.`);
+    setTimeout(() => {
+      const failed = BOUNCES.test(person.mobile || '');
+      setApp(person, failed ? 'Invite failed' : 'Invite sent', {
+        at: nowStamp(),
+        why: failed ? 'That number is not on WhatsApp.' : '',
+      });
+      dLog(person, 'App status', was, person.app);
+      dEvent(person, failed
+        ? `Invitation to ${person.mobile} did not arrive: not on WhatsApp.`
+        : `Invitation sent to ${person.mobile}.`);
+      drivers.render();
+      if (Records.recordPanel.isOpen()) Records.recordPanel.open(dPanelSpec(person, 'activity'));
+      Records.toast(failed
+        ? `The invitation to ${name(person)} did not arrive. That number is not on WhatsApp.`
+        : `Invitation sent to ${name(person)} on ${person.mobile}.`);
+    }, 1200);
     return;
   }
 
-  // Nothing on screen changes, so the product has to say it out loud, or the
-  // same button gets pressed three times and the driver gets three messages.
-  // The menu has already closed, so there is no button left to go busy. The
-  // beat is still real, because the message is still going somewhere.
-  if (act === 'resend') {
-    setTimeout(() => Records.toast(`Invitation sent again to ${name(person)}.`), 450);
+  /* The one invitation action that does not touch the status. A copied link
+     is a link somebody is about to paste into an email or read down a phone,
+     and none of that is delivery this product can see. Claiming Invite sent
+     off the back of a clipboard write would be the product guessing. */
+  if (act === 'copy-link') {
+    const link = `https://app.engenxt.co.za/join/${(person.idNumber || person.passportNumber || '').slice(-6)}`;
+    const said = () => Records.toast(`Invitation link copied. It is the same link the WhatsApp message carries, and it expires in 7 days.`);
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(link).then(said, said);
+    else said();
+    return;
+  }
+
+  /* The number is the fix, so this goes to the number. Opening the whole
+     record and leaving somebody to find the field is what the failure menu
+     used to do by offering "View driver" and nothing else. */
+  if (act === 'fix-number') {
+    Records.forms.driver.open(editState(person));
+    setTimeout(() => {
+      const field = document.getElementById(ID.mobile);
+      if (field) { field.focus(); field.select?.(); }
+    }, 260);
+    return;
+  }
+
+  if (act === 'view') {
+    Records.forms.driver.open(editState(person));
+    return;
+  }
+
+  if (act === 'reactivate') {
+    const wasAccess = person.access;
+    const wasApp = person.app;
+    person.access = 'On the fleet';
+    /* Back to what it was before they left, not to a fresh Not invited. An
+       app that was set up on a phone in March is still set up on that phone;
+       inventing a new invitation for somebody who already has one is how a
+       returning driver ends up with two. */
+    setApp(person, person.appWas === 'Active' ? 'Active' : 'Not invited');
+    dLog(person, 'Driver access', wasAccess, 'On the fleet');
+    dLog(person, 'App status', wasApp, person.app);
+    drivers.render();
+    if (Records.recordPanel.isOpen()) Records.recordPanel.open(dPanelSpec(person, 'activity'));
+    Records.toast(person.app === 'Active'
+      ? `${name(person)} is back on the fleet and their app works again.`
+      : `${name(person)} is back on the fleet. They still need an invitation.`,
+      () => {
+        person.access = wasAccess;
+        setApp(person, wasApp);
+        drivers.render();
+      });
     return;
   }
 
@@ -17422,15 +17950,13 @@ function driverAction(key, act, extra) {
       sub: person.group ? person.group : 'No group',
       body: '<b>Their card stops working immediately.</b> No manager can release a fill for them, and they lose access to the app.',
       calm: 'Their fills and history stay in your reports. If they come back, adding them again is a new record rather than an undo.',
-      fields: `<div class="form-field"><span class="label">Why are they leaving?</span>
-          <div class="seg is-stacked" role="radiogroup" aria-label="Why they are leaving">
-            ${DWHY['Left'].list.map(w => `<label><input type="radio" name="cf-left">${w}</label>`).join('')}
-          </div></div>`,
-      gate: slot => !!slot.querySelector('input[name="cf-left"]:checked'),
-      read: slot => {
-        const picked = slot.querySelector('input[name="cf-left"]:checked');
-        return picked ? picked.parentElement.textContent.trim() : '';
-      },
+      fields: `<div class="form-field"><label for="cf-left">Why are they leaving?</label>
+          <textarea id="cf-left" class="field" rows="3"
+                    placeholder="${DWHY['Left'].placeholder}"></textarea>
+          <span class="help">In your own words. Nothing counts this yet.</span>
+        </div>`,
+      gate: slot => !!slot.querySelector('#cf-left').value.trim(),
+      read: slot => slot.querySelector('#cf-left').value.trim(),
       confirmLabel: 'Mark as left',
       act: 'left-confirmed',
     }, (next, picked) => driverAction(key, next, picked),
@@ -17438,47 +17964,150 @@ function driverAction(key, act, extra) {
   }
 
   if (act === 'left-confirmed') {
-    const wasLife = person.lifecycle;
+    const wasLife = person.access;
     const wasFuel = person.fuel;
+    const wasApp = person.app;
     const wasReason = person.reason;
-    person.lifecycle = 'Left';
+    person.access = 'Left';
     person.fuel = 'Cannot fuel';
     person.reason = extra || '';
-    dLog(person, 'Account status', wasLife, 'Left');
+    /* The app account goes off *because* they left, which is the whole reason
+       these are two fields and not one. Nobody chose Deactivated; it is what
+       Left means for the phone in their pocket. `setApp` remembers what it
+       was, so coming back does not mean being invited to an app they already
+       have. */
+    setApp(person, 'Deactivated', { at: nowStamp() });
+    dLog(person, 'Driver access', wasLife, 'Left');
+    dLog(person, 'App status', wasApp, 'Deactivated');
     if (wasFuel !== 'Cannot fuel') dLog(person, 'Fuel access', wasFuel, 'Cannot fuel');
     if (extra) dLog(person, 'Reason', wasReason, extra, 'reason');
     drivers.render();
-    Records.toast(`${name(person)} is marked as left. Their card stops working now.`,
+    Records.toast(`${name(person)} is marked as left. Their card and their app stop working now.`,
       null, { label: 'What this means', run: () => { location.hash = 'driver-left'; } });
   }
 }
 
-/* The two menus, in the drivers' vocabulary. */
+/* ── The app status menu ──────────────────────────────────────────────────
+ *
+ * A contextual action menu wearing a badge, and specifically not a picker.
+ * There is no `value` on any item in here, which is what stops `statusMenu`
+ * drawing tick marks and treating the list as a set of things to choose
+ * between: every row is either a fact the system knows or a verb a manager
+ * can press.
+ *
+ * Six statuses, six different menus, because the useful thing to do about an
+ * invitation depends entirely on where it got to. A single menu carrying all
+ * seven actions would offer Resend to somebody who has never been invited and
+ * Send to somebody who is already using the app, and a menu that offers moves
+ * that make no sense is a menu people stop reading — which is the argument
+ * the row menu already makes two hundred lines up.
+ *
+ * What each one holds, and why that and not more:
+ *
+ *   Not invited     one verb. Nothing has happened; the only thing to do is
+ *                   start it.
+ *   Invite sending  no verbs at all beyond View driver. It is in flight, and
+ *                   every button here would be a button that fights it.
+ *   Invite sent     the facts first — which number, and when — because the
+ *                   question behind opening this is almost always "did it go
+ *                   to the right phone", and the answer is more often useful
+ *                   than resending is.
+ *   Active          one fact and one way out. There is nothing to fix.
+ *   Invite failed   why, then the number, then the retry. In that order: a
+ *                   retry to the same wrong number is the same failure again,
+ *                   so the fix is offered above the repeat.
+ *   Deactivated     the way back, which is a driver-access move rather than
+ *                   an app move, and says so.
+ */
+function dAppMenu(person, anchor) {
+  const key = person.idNumber || person.passportNumber;
+  const view = { label: 'View driver', act: 'view', says: 'Opens the full record.' };
+
+  const GROUPS = {
+    'Not invited': [
+      { items: [{ label: 'Send invitation', act: 'send',
+                  says: `A WhatsApp message to ${person.mobile}.` }, view] },
+    ],
+    'Invite sending': [
+      { items: [view] },
+    ],
+    'Invite sent': [
+      { facts: [
+        ['Sent to', dEsc(person.mobile)],
+        ['Sent at', dEsc(appWhen(person.appAt))],
+      ] },
+      { items: [
+        { label: 'Resend invitation', act: 'resend', says: 'Sends the same message again.' },
+        { label: 'Copy invitation link', act: 'copy-link',
+          says: 'For sending another way. Does not count as a delivery.' },
+        view,
+      ] },
+    ],
+    'Active': [
+      { facts: [['Set up', dEsc(appWhen(person.appAt))]] },
+      { items: [view] },
+    ],
+    'Invite failed': [
+      { facts: [
+        ['Why', dEsc(person.appWhy || 'The message did not arrive.')],
+        ['Tried', dEsc(appWhen(person.appAt))],
+        ['Number', dEsc(person.mobile)],
+      ] },
+      { items: [
+        { label: 'Review mobile number', act: 'fix-number',
+          says: 'Opens the record with the number selected.' },
+        { label: 'Resend invitation', act: 'resend',
+          says: 'Same number, same message. Fix the number first if it is wrong.' },
+        view,
+      ] },
+    ],
+    'Deactivated': [
+      { items: [
+        view,
+        { label: 'Reactivate driver', act: 'reactivate',
+          says: 'Puts them back on the fleet. This is a driver access change.' },
+      ] },
+    ],
+  };
+
+  Records.statusMenu.open(anchor, {
+    label: 'App status',
+    /* The status, said in the head rather than offered in the list. */
+    says: APP[person.app].says,
+    /* No value. The menu is a list of things to do, not a list of things to
+       be, and passing one would put a tick beside a status nobody picked. */
+    groups: GROUPS[person.app] || [{ items: [view] }],
+    help: 'driver-states',
+  }, item => driverAction(key, item.act));
+}
+
+/* The driver-access menu, in the drivers' vocabulary. */
 function dLifeMenu(person, anchor) {
-  if (person.lifecycle === 'Left') {
+  const key = person.idNumber || person.passportNumber;
+  if (person.access === 'Left') {
     return Records.statusMenu.open(anchor, {
-      label: 'Account status',
-      value: person.lifecycle,
-      groups: [{ items: [{ label: 'Left', says: 'Adding them again is a new record, not an undo. Their history stays in your reports.' }] }],
+      label: 'Driver access',
+      groups: [
+        { items: [{ label: 'Left', says: DACCESS_LIFE['Left'].says }] },
+        { items: [{ label: 'Reactivate driver', act: 'reactivate',
+                    says: 'Puts them back on the fleet and turns their app account back on.' }] },
+      ],
       help: 'driver-states',
-    }, () => {});
+    }, item => driverAction(key, item.act));
   }
   Records.statusMenu.open(anchor, {
-    label: 'Account status',
-    value: person.lifecycle,
+    label: 'Driver access',
+    value: person.access,
     groups: [
-      /* Invited is a record of something that happened, so it is stated when
-         it is true and never offered as a value to set. Sending another
-         invitation is the action beneath, which is the real thing somebody
-         wants when they reach for it. */
-      { items: [{ value: 'Active', says: DLIFE.Active.says }] },
-      ...(person.lifecycle === 'Invited'
-        ? [{ title: 'Invitation', items: [{ label: 'Resend invitation', act: 'resend', says: 'Sends the WhatsApp message again. Nothing on this row changes.' }] }]
-        : []),
-      { title: 'Fleet', items: [{ label: 'Mark as left…', act: 'left', danger: true, says: DLIFE['Left'].says }] },
+      /* The invitation used to hang off this menu, because the invitation
+         used to be a value in this field. It has its own pill now and its
+         own machine behind it, and this menu is back to the one question it
+         is actually about: is this person on the fleet. */
+      { items: [{ value: 'On the fleet', says: DACCESS_LIFE['On the fleet'].says }] },
+      { title: 'Fleet', items: [{ label: 'Mark as left\u2026', act: 'left', danger: true, says: DACCESS_LIFE['Left'].says }] },
     ],
     help: 'driver-states',
-  }, item => driverAction(person.idNumber || person.passportNumber, item.act || 'set-life', item.value));
+  }, item => driverAction(key, item.act || 'set-life', item.value));
 }
 
 function dAccessMenu(person, anchor) {
@@ -17498,18 +18127,24 @@ function dAskReason(key, anchor) {
   if (!why) return;
   const at = anchor || document.querySelector(`tr[data-row="${CSS.escape(key)}"] .status-why`);
   if (!at) return;
-  Records.statusMenu.open(at, {
+  Records.reasonPop.open(at, {
     label: why.label,
     value: person.reason,
-    groups: [
-      { items: why.list.map(v => ({ value: v })) },
-      ...(person.reason ? [{ items: [{ label: 'Clear the reason', value: '' }] }] : []),
-    ],
-  }, item => driverAction(key, 'reason-set', item.value));
+    placeholder: why.placeholder,
+    help: 'Nothing counts this yet. Write what is true.',
+  }, text => driverAction(key, 'reason-set', text));
 }
 
 
 window.DriverFixtures = { DRIVERS, STATES, ID, LICENCE_CODES, PRDP, COUNTRIES, needsAttention, codeValues };
+
+/* Read by tools/app-status.js. The status list and the settable list are
+   exported rather than retyped in the checker, so renaming a status breaks
+   the check that names it instead of quietly passing against a stale copy —
+   the failure the vehicle dashboard shipped for a week. */
+window.__appStatuses = Object.keys(APP);
+window.__appSettable = Object.keys(APP).filter(k => APP[k].set);
+window.__drivers = drivers;
 
 })();
 </script>
@@ -17586,7 +18221,7 @@ const soonPrdp = d => d.prdp !== 'No PrDP' && R.expiresWithin(d.prdpExpiry, SOON
    and holding a card and a permit that have not lapsed. It is the same
    predicate the directory's "Needs review" tab filters on, negated, so the
    two cannot drift apart. */
-const active = DRIVERS.filter(d => d.lifecycle === 'Active' && d.fuel === 'Can fuel');
+const active = DRIVERS.filter(d => d.access === 'On the fleet' && d.app === 'Active' && d.fuel === 'Can fuel');
 const blocked = active.filter(needsAttention);
 const ready = active.length - blocked.length;
 
@@ -17594,7 +18229,14 @@ const counts = {
   attention: DRIVERS.filter(needsAttention).length,
   licence: DRIVERS.filter(soonLicence).length,
   prdp: DRIVERS.filter(soonPrdp).length,
-  invited: DRIVERS.filter(d => d.lifecycle === 'Invited').length,
+  /* Everyone whose app account is not working, whatever the reason. It read
+     one status before, which meant a bounced invitation counted as nothing
+     at all: the driver could not fuel, nobody was waiting on them, and the
+     dashboard said the fleet was fine. Failed is the one in here somebody
+     has to act on, so it is counted separately as well. */
+  waiting: DRIVERS.filter(d => d.access === 'On the fleet'
+    && ['Not invited', 'Invite sending', 'Invite sent', 'Invite failed'].includes(d.app)).length,
+  failed: DRIVERS.filter(d => d.access === 'On the fleet' && d.app === 'Invite failed').length,
   /* Both fields, because either one alone is a wrong number: a vehicle that
      has left the fleet still carries a fuel access value, and one that is not
      in service yet carries Can fuel so that activating it is a single
@@ -17632,11 +18274,15 @@ const counts = {
  * Cannot fuel and this list was not. So Derek was in none of the four bands
  * and the meter drew eleven people over a caption that said twelve. */
 const MIX = [
-  ['Cleared to fuel', 'is-active', d => d.lifecycle === 'Active' && d.fuel === 'Can fuel' && !needsAttention(d)],
-  ['With a lapsed card or permit', 'is-warning', d => d.lifecycle === 'Active' && d.fuel === 'Can fuel' && needsAttention(d)],
-  ['Cannot fuel', 'is-stopped', d => d.lifecycle === 'Active' && d.fuel === 'Cannot fuel'],
-  ['Invited', 'is-invited', d => d.lifecycle === 'Invited'],
-  ['Left', 'is-quiet', d => d.lifecycle === 'Left'],
+  ['Cleared to fuel', 'is-active', d => d.access === 'On the fleet' && d.app === 'Active' && d.fuel === 'Can fuel' && !needsAttention(d)],
+  ['With a lapsed card or permit', 'is-warning', d => d.access === 'On the fleet' && d.app === 'Active' && d.fuel === 'Can fuel' && needsAttention(d)],
+  ['Cannot fuel', 'is-stopped', d => d.access === 'On the fleet' && d.app === 'Active' && d.fuel === 'Cannot fuel'],
+  /* One band, not four. The bar answers "how many of my drivers can fuel
+     today", and for that question Not invited, Invite sending, Invite sent
+     and Invite failed are one answer: no. Which of the four it is, and what
+     to do about it, is the App status column's job on the list. */
+  ['No app account yet', 'is-invited', d => d.access === 'On the fleet' && d.app !== 'Active'],
+  ['Left', 'is-quiet', d => d.access === 'Left'],
 ];
 
 /* An arc, drawn from the top. The circle is stroked all the way round and the
@@ -17758,10 +18404,12 @@ function render() {
       goto: 'drivers-directory',
     }),
     tile({
-      label: 'Invitations out', value: counts.invited,
-      foot: counts.invited
-        ? 'Sent, not yet accepted. They cannot fuel until they are.'
-        : 'Nobody is waiting to accept an invitation.',
+      label: 'Without the app', value: counts.waiting,
+      foot: counts.failed
+        ? `${counts.failed} invitation${counts.failed === 1 ? '' : 's'} did not arrive. Check the number.`
+        : counts.waiting
+          ? 'Invited or waiting to be. They cannot fuel until the app is set up.'
+          : 'Every driver on the fleet has the app.',
       goto: 'drivers-directory',
     }),
     tile({
@@ -18629,19 +19277,6 @@ wireDiscard('discard-driver', '__driverSheet');
  * reported stolen, fuel stays blocked, and the button says so rather than
  * going grey and leaving somebody stuck on a screen with no way forward.
  */
-/* The four circumstances are generated, not typed. They exist once in WHY,
-   which the live report sheet already builds its radio list from; the figure
-   used to carry a second hand-written copy and the two had already drifted:
-   "Not returned" against "Not returned from a trip", and a "Taken overnight"
-   that only the figure still offered. */
-(function fillWhyStolen() {
-  const group = document.querySelector('[data-role="why-stolen"]');
-  const source = typeof WHY !== 'undefined' && WHY['Reported stolen'];
-  if (!group || !source) { return; }
-  group.innerHTML = source.list
-    .map(w => `<label><input type="radio" name="stolen-how">${w}</label>`).join('');
-})();
-
 (function wireRecovery() {
   const form = document.querySelector('[data-role="recovered-form"]');
   const submit = document.querySelector('[data-role="recovered-submit"]');
@@ -19276,7 +19911,7 @@ const BADGES = [
   ['Warning', 'badge-warning', 'Cannot fuel', 'Blocked, but a manager can still release one fill. The reason sits beside it, not inside it.'],
   ['Danger', 'badge-danger', 'Reported stolen', 'Blocked at every Engen site, and urgent.'],
   ['Neutral', 'badge-neutral', 'Permanently removed', 'Out of the fleet. Deliberately not red: a decision, not a fault.'],
-  ['Info', 'badge-info', 'Invited', 'Sent, not yet accepted. Bordered as well as tinted: the tint is the selected-row background, so without the border an invited driver vanishes the moment somebody ticks their row.'],
+  ['Info', 'badge-info', 'Invite sent', 'Delivered, waiting on the driver. Bordered as well as tinted: the tint is the selected-row background, so without the border an invited driver vanishes the moment somebody ticks their row.'],
   ['Quiet', 'badge-quiet', 'Active', 'Where the ordinary state is one of four things being named and has to take a shape like the others.'],
 ];
 
@@ -19635,7 +20270,7 @@ const REGISTRY = [
   { name: 'RecordTable', level: 'organism', sel: 'table-wrap',
     purpose: 'The directory. One engine renders both vehicles and drivers.',
     variants: 'by column set, tabs, facets and bulk actions',
-    states: 'loading, refreshing, loaded, no results, failed, rows selected',
+    states: 'loading, loaded, no results, failed, rows selected',
     a11y: 'Sortable headers are focusable and answer Enter and Space; rows are reachable.',
     good: 'Configured through the directory spec.',
     bad: 'A second table implementation for a second record type.',

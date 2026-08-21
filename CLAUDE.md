@@ -7,9 +7,9 @@ things section 9 describes as contamination are, here, the artefact itself:
 
 | | count |
 |---|---|
-| Catalogued screen states (`<section id="screen-…">`) | 40 |
-| Rail buttons that reach them (`data-screen="…"`) | 40 |
-| Design annotations (`.surface-note`) | 71 |
+| Catalogued screen states (`<section id="screen-…">`) | 39 |
+| Rail buttons that reach them (`data-screen="…"`) | 39 |
+| Design annotations (`.surface-note`) | 86 |
 | Annotation blocks (`.figure-notes`) | 11 |
 
 The Screens/Notes rail, the "ADD VEHICLE STATES" and "ONE THEFT, IN ORDER"
