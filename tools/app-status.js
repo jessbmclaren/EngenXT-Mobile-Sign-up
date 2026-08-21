@@ -856,6 +856,45 @@ const READ_MENU = `(function(){
     !channel.sms && channel.whatsapp > 0,
     channel.sms ? 'SMS still appears on screen' : `WhatsApp named ${channel.whatsapp} time(s), SMS never`);
 
+  /* ── Coming back to it on Friday ─────────────────────────────────────── */
+
+  /* Choosing Invite later on Tuesday means somebody has to find their way
+     back. By then the toast that told them where to go is gone and all that
+     is left is a grey badge, so the action has to be where a person looks for
+     something to do to a row, not only on the badge they have to guess is a
+     button. And it has to stay out of the four statuses that already have an
+     account or a message in flight, or Resend ends up in two places with two
+     different amounts of ceremony. */
+  await load();
+  const rowMenus = JSON.parse(await run(`JSON.stringify((function(){
+    var out = {};
+    var rows = document.querySelectorAll('#screen-drivers-directory tbody tr[data-row]');
+    for (var i = 0; i < rows.length; i++) {
+      var st = rows[i].querySelector('[data-pill="app"]').textContent.trim();
+      if (out[st]) continue;
+      out[st] = rows[i].getAttribute('data-row');
+    }
+    return out;})())`));
+  const offers = {};
+  for (const [status, key] of Object.entries(rowMenus)) {
+    await load();
+    await run(`document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify('')} + k_) + '"] .row-more').click()`
+      .replace('k_', JSON.stringify(key)));
+    await sleep(380);
+    offers[status] = JSON.parse(await run(`JSON.stringify([].map.call(
+      document.querySelectorAll('.pop:not(.hidden) button'),
+      function(x){ return x.textContent.trim(); }).filter(Boolean))`));
+  }
+  const hasSend = s => (offers[s] || []).some(a => /invitation/i.test(a));
+  check('coming back', 'the row menu offers it where there is no app account',
+    hasSend('Not invited') && hasSend('Invite failed'),
+    `Not invited: ${hasSend('Not invited')}, Invite failed: ${hasSend('Invite failed')}`);
+  check('coming back', 'and stays out of the menu where there is',
+    !hasSend('Active') && !hasSend('Invite sent') && !hasSend('Invite sending')
+      && !hasSend('Deactivated'),
+    ['Active', 'Invite sent', 'Invite sending', 'Deactivated']
+      .filter(hasSend).join(', ') || 'four statuses, none of them offering a send');
+
   const errs = await run(`JSON.stringify(window.__pageErrors || [])`);
   check('nobody sets it', 'the page ran clean',
     errs === '[]', errs === '[]' ? 'no uncaught errors' : errs);

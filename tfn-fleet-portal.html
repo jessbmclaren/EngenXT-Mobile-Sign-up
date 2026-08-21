@@ -17355,13 +17355,28 @@ const drivers = Records.directory({
    * did for vehicles. What is left is what has no representation in the table:
    * the form, the panel, the invitation, and the one move that gets a
    * confirmation. */
-  /* The invitation actions left this menu and went into the App status pill,
-   * where the status they act on is. "They have the app" left the product
-   * altogether: it wrote Active by hand, and the only thing that can make
-   * Active true is a driver opening the app on a phone this menu cannot see.
-   * A control that lets a manager assert somebody else's fact is a control
-   * for making the row lie. */
+  /* The invitation actions moved to the App status pill, where the status
+   * they act on is. "They have the app" left the product altogether: it wrote
+   * Active by hand, and the only thing that can make Active true is a driver
+   * opening the app on a phone this menu cannot see. A control that lets a
+   * manager assert somebody else's fact is a control for making the row lie.
+   *
+   * Send invitation comes back here, and only here, for a driver who has no
+   * app account. Not because the pill is not the right home for it, but
+   * because of when this one gets used: somebody chose Invite later on
+   * Tuesday and comes back on Friday, by which time the toast that told them
+   * where to go is long gone and all that is left is a grey badge. This is
+   * where a person looks for something to do to a row, and finding nothing
+   * here teaches them there is nothing to do.
+   *
+   * Not offered for the four statuses that already have an app account or a
+   * message in flight: those are the pill's, and duplicating them would put
+   * Resend in two places with two different amounts of ceremony. */
   rowMenu: d => [
+    ...(d.access !== 'Left' && (d.app === 'Not invited' || d.app === 'Invite failed')
+      ? [{ act: d.app === 'Invite failed' ? 'ask-resend' : 'ask-send',
+           label: d.app === 'Invite failed' ? 'Resend invitation' : 'Send invitation' }]
+      : []),
     { act: 'edit', label: 'Edit driver' },
     { act: 'notes', label: 'Notes and activity' },
     ...(d.access === 'Left'
