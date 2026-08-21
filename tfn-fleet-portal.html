@@ -423,6 +423,9 @@
   --size-marker-border-width: 1.5px;
   --size-marker-diameter: 18px;
   --size-nav-rail-width: 56px;
+  /* The bottom bar, and the room the page leaves for it. One number, so the
+     bar and the gap it needs cannot drift apart. */
+  --size-navbar-height: 64px;
   /* The product viewport a screen-pack figure is drawn at, and the width a
      decision is allowed to take inside one. A dialog that grows past the width
      is a dialog with too much in it: the answer is to take content out, not to
@@ -3268,6 +3271,95 @@ body.theft-open .sheet-backdrop { display: block; }
   padding-top: var(--space-1-5);
 }
 
+/* The word beside the glyph. Carried in the markup at every width — a label
+   is content, not decoration — and shown where there is room for it, which
+   on the column rail there is not. */
+.navrail__label {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+}
+
+/* ── The rail becomes a bottom bar on a phone ─────────────────────────────
+ *
+ * A vertical rail pinned to the left is desktop furniture. It is 56px of a
+ * 390px screen, it is the first thing between a thumb and anything useful,
+ * and it was taking a seventh of the width from the one screen somebody
+ * genuinely opens on a phone — a manager approving a fill while the driver
+ * stands at the pump. Everything else this product does (importing a
+ * spreadsheet, editing a fleet) nobody does on a phone at all, so this is
+ * not a mobile portal: it is the one urgent path made to work.
+ *
+ * At the bottom because that is where the thumb is, and four sections is
+ * exactly what a bottom bar is for. Labelled, because an icon that needs a
+ * tooltip has already failed the person squinting at it — and on a bar this
+ * wide the words cost nothing.
+ *
+ * 560px is the width the phone rules in this file already use. A new
+ * threshold here would have been an eleventh number for somebody to hold in
+ * their head, to buy nothing. */
+@media (max-width: 560px) {
+  .navrail {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: stretch;
+    gap: 0;
+    padding-top: 0;
+    border-right: 0;
+    border-top: var(--size-border-hairline) solid var(--color-outline-variant);
+    /* The same rung as the top bar, because it is the same kind of thing:
+       fixed page chrome, over the page and under every popover, scrim,
+       dialog and toast. A token of its own would be a second name for a
+       decision already made. */
+    z-index: var(--z-topbar);
+    /* Clear of the home indicator on a phone that has one. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Room for a glyph and a word under it. Without a height of its own the
+       bar takes the buttons' height, the buttons take the icon's, and the
+       label underneath is drawn past the bottom edge of the screen. The page
+       already leaves exactly this much room, so one token holds both. */
+    min-height: var(--size-navbar-height);
+  }
+
+  .navrail button {
+    width: auto;
+    height: auto;
+    flex: 1;
+    /* Glyph, then word, in that order down the button. */
+    grid-auto-flow: row;
+    align-content: center;
+    gap: var(--space-0-5);
+    padding: var(--space-1-0) var(--space-0-5);
+    border-radius: 0;
+  }
+
+  .navrail__label {
+    position: static;
+    width: auto; height: auto;
+    margin: 0; clip-path: none;
+    font-size: var(--font-size-label-sm);
+    line-height: 1;
+  }
+
+  /* The bar is over the page, so the page has to end above it rather than
+     underneath it. Without this the last row of any list is unreachable. */
+  .page { padding-bottom: var(--size-navbar-height); }
+
+  /* The figure and the rule it broke sit side by side while there is room.
+     At this width there is not: the number wrapped to two lines — "30" over
+     "min" — which reads as two facts instead of one, and it is the one thing
+     on the screen somebody decides from. Stacked, each gets a full line. */
+  .panel-key {
+    flex-wrap: wrap;
+    gap: var(--space-2-0);
+  }
+}
+
 .navrail button {
   width: var(--size-control-diameter-md);
   height: var(--size-control-diameter-md);
@@ -5885,6 +5977,34 @@ tbody td .is-past { color: var(--color-on-danger-container); }
 body.demo .preview-overlay,
 body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
 
+/* On a phone the rail is along the bottom, so the cover starts at the left
+   edge and stops short of the bar instead.
+ *
+ * The scrim's promise is unchanged: it deliberately leaves the product's
+ * navigation uncovered, because a decision you have been stopped on must not
+ * dim the way out of it. Only the direction it keeps clear has moved.
+ *
+ * Written here rather than beside the rail it belongs to, and that is not
+ * tidiness: the two rules above are plain classes, this is a plain class,
+ * and the one declared later wins. Next to `.navrail` — 2,600 lines earlier
+ * — this lost silently and the cover kept a 56px gap on the left for a rail
+ * that was no longer there. The same collision `.panel-facts--stacked` was
+ * fixed for one commit ago. */
+@media (max-width: 560px) {
+  /* All three of the selectors above, because two of them are `body.<class>
+     .preview-overlay` and a bare `.preview-overlay` here loses to both. The
+     bottom inset applied and the left one silently did not, which is the
+     same collision twice in one afternoon and the reason this file keeps
+     saying it: a modifier only wins if it matches at least as specifically
+     as everything it means to override. */
+  .preview-overlay,
+  body.demo .preview-overlay,
+  body.rail-closed .preview-overlay {
+    left: 0;
+    bottom: var(--size-navbar-height);
+  }
+}
+
 /* Flat and uniform. A gradient, a mask and a blur have each been on this
    element at some point, and none of them said what the product meant. */
 .preview-scrim {
@@ -6494,10 +6614,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
          it, nothing happens, and they press it again. A destination that does
          not exist is not offered, and it comes back the day it does. -->
     <nav class="navrail" aria-label="Sections">
-      <button aria-label="Home" data-goto="home" data-section="home"><svg data-lucide="house" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
-      <button aria-label="Vehicles" data-goto="directory" data-section="vehicles"><svg data-lucide="truck" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></button>
-      <button aria-label="Drivers" data-goto="drivers-directory" data-section="drivers"><svg data-lucide="user" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
-      <button aria-label="Rules" data-goto="rules" data-section="rules"><svg data-lucide="sliders-horizontal" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg></button>
+      <button data-goto="home" data-section="home"><svg data-lucide="house" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="navrail__label">Home</span></button>
+      <button data-goto="directory" data-section="vehicles"><svg data-lucide="truck" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg><span class="navrail__label">Vehicles</span></button>
+      <button data-goto="drivers-directory" data-section="drivers"><svg data-lucide="user" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="navrail__label">Drivers</span></button>
+      <button data-goto="rules" data-section="rules"><svg data-lucide="sliders-horizontal" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg><span class="navrail__label">Rules</span></button>
     </nav>
     <div class="cols">
     <div class="topbar">
