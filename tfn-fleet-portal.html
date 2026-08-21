@@ -10172,6 +10172,45 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     </div>
     </section>
 
+    <!-- The invitation is a decision, not a side effect of saving.
+         It sat inside the Add button's label and nowhere else, so the only
+         way to find out that adding a driver messages them was to read the
+         button. A manager who is entering twelve drivers from a spreadsheet
+         on a Tuesday and wants to invite them on Friday had no way to say so,
+         and no way to tell that they could not. -->
+    <section class="sheet-section">
+    <h3 class="sheet-section__title">EngenXT app invitation</h3>
+    <p class="group-note">The driver cannot fuel until the app is on their
+      phone. You can start that now or later.</p>
+    <div class="fields">
+      <div class="form-field field-wide" data-field="invite">
+        <!-- No visible label above these. The section is called EngenXT app
+             invitation, the note under it says "now or later", and the two
+             options say "now" and "later". A fourth line reading "When to
+             invite" was the same sentence a third time. The group still needs
+             a name for anything not reading the screen, so it has one. -->
+        <div class="seg is-stacked seg--says" role="radiogroup" aria-label="When to invite">
+          <label>
+            <input type="radio" name="d-invite-choice" value="now" checked>
+            <span class="seg-body">
+              <span class="seg-title">Send invitation now</span>
+              <span class="seg-says">The driver will receive a WhatsApp message with a link to download and activate the EngenXT app.</span>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="d-invite-choice" value="later">
+            <span class="seg-body">
+              <span class="seg-title">Invite later</span>
+              <span class="seg-says">You can send the invitation from the Drivers table when you&rsquo;re ready.</span>
+            </span>
+          </label>
+        </div>
+        <!-- The answer, where the form engine reads every other field's. -->
+        <input type="hidden" id="d-invite" value="now">
+      </div>
+    </div>
+    </section>
+
     <section class="sheet-section">
     <h3 class="sheet-section__title">Identification</h3>
     <p class="group-note">One document, not both. Some of your drivers will not
@@ -10245,45 +10284,6 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
     </div>
       </section>
-
-    <!-- The invitation is a decision, not a side effect of saving.
-         It sat inside the Add button's label and nowhere else, so the only
-         way to find out that adding a driver messages them was to read the
-         button. A manager who is entering twelve drivers from a spreadsheet
-         on a Tuesday and wants to invite them on Friday had no way to say so,
-         and no way to tell that they could not. -->
-    <section class="sheet-section">
-    <h3 class="sheet-section__title">EngenXT app invitation</h3>
-    <p class="group-note">The driver cannot fuel until the app is on their
-      phone. You can start that now or later.</p>
-    <div class="fields">
-      <div class="form-field field-wide" data-field="invite">
-        <!-- No visible label above these. The section is called EngenXT app
-             invitation, the note under it says "now or later", and the two
-             options say "now" and "later". A fourth line reading "When to
-             invite" was the same sentence a third time. The group still needs
-             a name for anything not reading the screen, so it has one. -->
-        <div class="seg is-stacked seg--says" role="radiogroup" aria-label="When to invite">
-          <label>
-            <input type="radio" name="d-invite-choice" value="now" checked>
-            <span class="seg-body">
-              <span class="seg-title">Send invitation now</span>
-              <span class="seg-says">The driver will receive a WhatsApp message with a link to download and activate the EngenXT app.</span>
-            </span>
-          </label>
-          <label>
-            <input type="radio" name="d-invite-choice" value="later">
-            <span class="seg-body">
-              <span class="seg-title">Invite later</span>
-              <span class="seg-says">You can send the invitation from the Drivers table when you&rsquo;re ready.</span>
-            </span>
-          </label>
-        </div>
-        <!-- The answer, where the form engine reads every other field's. -->
-        <input type="hidden" id="d-invite" value="now">
-      </div>
-    </div>
-    </section>
 
     <section class="sheet-section">
     <h3 class="sheet-section__title">Fleet details</h3>
