@@ -181,8 +181,9 @@ const READ_MENU = `(function(){
   };
 
   let visit = 0;
-  const load = async () => {
-    await send('Page.navigate', { url: `file://${FILE}?demo&v=${++visit}#drivers-directory` });
+  const load = async (screen) => {
+    await send('Page.navigate',
+      { url: `file://${FILE}?demo&v=${++visit}#${screen || 'drivers-directory'}` });
     await sleep(1700);
   };
   await load();
@@ -703,49 +704,64 @@ const READ_MENU = `(function(){
 
   /* The invitation used to live inside the Add button's label and nowhere
      else, so the only way to learn that saving a driver messages their
-     personal phone was to read the button, and a manager entering twelve
-     drivers on a Tuesday to invite on Friday could not say so. */
+     personal phone was to read the button. It is a checkbox at the end of the
+     form now: last because everything above it identifies a person and this
+     is something done to them once they exist. */
   await load();
   await run(`document.querySelector('#screen-drivers-directory [data-open="driver:blank"]').click()`);
   await sleep(1000);
-  const sheet = JSON.parse(await run(`JSON.stringify((function(){
+
+  const order = JSON.parse(await run(`JSON.stringify(
+    [].map.call(document.querySelectorAll('#driver-drawer .sheet-section__title'),
+      function(t){ return t.textContent.trim(); }))`));
+  check('the form', 'sections run in the agreed order',
+    JSON.stringify(order) === JSON.stringify(
+      ['Personal details', 'Identification', 'Driving licence', 'Work details', 'Invite to EngenXT']),
+    order.join(' > '));
+  check('the form', 'nothing about the invitation interrupts Identification',
+    order.indexOf('Invite to EngenXT') === order.length - 1
+      && order.indexOf('Identification') === 1,
+    `invitation at ${order.indexOf('Invite to EngenXT') + 1} of ${order.length}`);
+
+  const tickRow = JSON.parse(await run(`JSON.stringify((function(){
     var w = document.querySelector('#driver-drawer [data-field="invite"]');
     if (!w) return { missing: true };
-    var head = [].filter.call(document.querySelectorAll('#driver-drawer .sheet-section__title'),
-      function(x){ return /invitation/i.test(x.textContent); })[0];
+    var cb = document.getElementById('d-invite-send');
+    var lab = cb ? cb.closest('label') : null;
+    var foot = document.querySelector('#driver-drawer [data-role="count"]');
     return {
-      shown: w.checkVisibility(),
-      heading: head ? head.textContent.trim() : null,
-      options: [].map.call(w.querySelectorAll('label'), function(l){
-        return { title: (l.querySelector('.seg-title')||{}).textContent.trim(),
-                 says: (l.querySelector('.seg-says')||{}).textContent.trim(),
-                 checked: l.querySelector('input').checked }; }),
-      button: document.querySelector('#driver-drawer [data-role="submit"]').textContent.trim()
+      isCheckbox: !!cb && cb.type === 'checkbox',
+      radios: w.querySelectorAll('input[type=radio]').length,
+      checked: !!cb && cb.checked,
+      title: lab ? (lab.querySelector('.check-title') || {}).textContent : null,
+      says: lab ? (lab.querySelector('.check-says') || {}).textContent : null,
+      /* The whole row is the target, not the thirteen pixels of the tickRow. */
+      rowWidth: lab ? Math.round(lab.getBoundingClientRect().width) : 0,
+      cta: document.querySelector('#driver-drawer [data-role="submit"]').textContent.trim(),
+      counter: foot ? foot.textContent.trim() : '(no element)'
     };})())`));
-  check('inviting later', 'the sheet asks when to invite',
-    !sheet.missing && sheet.shown && sheet.heading === 'EngenXT app invitation',
-    sheet.missing ? 'no invite field on the sheet' : sheet.heading);
-  check('inviting later', 'two options, and the words are the agreed words',
-    sheet.options && sheet.options.length === 2
-      && sheet.options[0].title === 'Send invitation now'
-      && sheet.options[1].title === 'Invite later'
-      && /WhatsApp message with a link to download and activate the EngenXT app/.test(sheet.options[0].says)
-      && /send the invitation from the Drivers table when you/.test(sheet.options[1].says),
-    (sheet.options || []).map(o => o.title).join(' | '));
-  check('inviting later', 'sending now is what happens unless you say otherwise',
-    sheet.options && sheet.options[0].checked && !sheet.options[1].checked
-      && sheet.button === 'Add driver and send invite',
-    `"${sheet.button}"`);
+  check('the invitation', 'one checkbox, not two radio cards',
+    tickRow.isCheckbox && tickRow.radios === 0, `${tickRow.radios} radio(s)`);
+  check('the invitation', 'ticked to begin with, and worded as agreed',
+    tickRow.checked
+      && tickRow.title === 'Send a WhatsApp invitation when I add this driver'
+      && /can fuel after activating the app/.test(tickRow.says || '')
+      && /send the invitation later from Drivers/.test(tickRow.says || ''),
+    tickRow.title);
+  check('the invitation', 'the whole label is the target',
+    tickRow.rowWidth > 300, `${tickRow.rowWidth}px`);
+  check('the invitation', 'ticked, the button says it will send',
+    tickRow.cta === 'Add driver and send invitation', `"${tickRow.cta}"`);
+  /* The count named a quantity and never a field, and the only way to find
+     out which was to press the button it implied would not work. */
+  check('the invitation', 'the footer carries no required-count',
+    tickRow.counter === '' || tickRow.counter === '(no element)', tickRow.counter);
 
-  /* The label is the last thing read before pressing, so it is the last place
-     the promise can still be wrong. */
-  await run(`(function(){ var r = [].filter.call(
-    document.querySelectorAll('input[name="d-invite-choice"]'),
-    function(x){ return x.value === 'later'; })[0];
-    r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+  await run(`(function(){ var b = document.getElementById('d-invite-send');
+    b.checked = false; b.dispatchEvent(new Event('change', { bubbles: true })); })()`);
   await sleep(400);
   const relabelled = await run(`document.querySelector('#driver-drawer [data-role="submit"]').textContent.trim()`);
-  check('inviting later', 'choosing later renames the button',
+  check('the invitation', 'unticked, the button stops promising one',
     relabelled === 'Add driver', `"${relabelled}"`);
 
   await run(`(function(){
@@ -765,19 +781,20 @@ const READ_MENU = `(function(){
       sheetShut: [].filter.call(document.querySelectorAll('.focus-sheet'),
         function(x){ return x.getBoundingClientRect().height > 50; }).length === 0,
       toast: t ? (t.innerText || '').split(String.fromCharCode(10)).join(' ').trim() : '' };})())`));
-  check('inviting later', 'the driver lands as Not invited, and the sheet closes',
+  check('the invitation', 'unticked, the driver lands as Not invited',
     added.found && added.app === 'Not invited' && added.sheetShut,
     added.found ? `${added.app}, sheet ${added.sheetShut ? 'closed' : 'STILL OPEN'}` : 'no driver created');
-  check('inviting later', 'and it says where to invite them from',
-    /Driver added/.test(added.toast) && /invite this driver from the Drivers table/.test(added.toast),
+  /* Creating a driver and delivering a message are two things, and the toast
+     says which one happened. */
+  check('the invitation', 'and the toast says so, with a way to send it',
+    /Driver added\. Invitation not sent\./.test(added.toast) && /Send invitation/.test(added.toast),
     added.toast || 'no toast');
 
-  /* The point of the choice: no message went anywhere. */
   await sleep(1700);
   const quiet = JSON.parse(await run(`JSON.stringify((function(){
     var d = window.DriverFixtures.DRIVERS.filter(function(p){ return p.first === 'Testy'; })[0];
     return { app: d && d.app, at: d && d.appAt };})())`));
-  check('inviting later', 'nothing was sent',
+  check('the invitation', 'nothing was sent',
     quiet.app === 'Not invited' && !quiet.at,
     `${quiet.app}, stamped ${quiet.at || 'never'}`);
 
@@ -786,8 +803,73 @@ const READ_MENU = `(function(){
      about the driver. */
   const invented = JSON.parse(await run(`JSON.stringify(
     (window.__appStatuses || []).filter(function(s){ return /later/i.test(s); }))`));
-  check('inviting later', 'no Invite later status was invented',
+  check('the invitation', 'no Invite later status was invented',
     invented.length === 0, invented.length ? invented.join(', ') : 'six statuses, none of them a decision');
+
+  /* Ticked, the driver is created and the message is queued rather than
+     waited on: somebody who exists should not be reported as not-yet-added
+     because a WhatsApp gateway is slow. */
+  await load();
+  await run(`document.querySelector('#screen-drivers-directory [data-open="driver:blank"]').click()`);
+  await sleep(1000);
+  await run(`(function(){
+    var set = function(i, v){ var x = document.getElementById(i); if (!x) return;
+      x.value = v; x.dispatchEvent(new Event('input', { bubbles: true }));
+      x.dispatchEvent(new Event('change', { bubbles: true })); };
+    set('d-first','Ticked'); set('d-last','McTest'); set('d-mobile','082 555 0002');
+    set('d-idtype','South African ID'); set('d-id','9001015800088');
+    set('d-code','A1'); set('d-prdp','No PrDP'); })()`);
+  await sleep(700);
+  await run(`document.querySelector('#driver-drawer [data-role="submit"]').click()`);
+  await sleep(900);
+  const queued = await run(`(function(){ var t = document.querySelector('[data-role="toast"]');
+    return t ? (t.innerText || '').split(String.fromCharCode(10)).join(' ').trim() : ''; })()`);
+  check('the invitation', 'ticked, the toast reports a queue not a delivery',
+    /Driver added\. Invitation queued\./.test(queued), queued);
+  await sleep(1900);
+  check('the invitation', 'and the message lands by itself',
+    await run(`(function(){ var d = window.DriverFixtures.DRIVERS.filter(function(p){
+      return p.first === 'Ticked'; })[0]; return !!d && d.app === 'Invite sent'; })()`),
+    await run(`(function(){ var d = window.DriverFixtures.DRIVERS.filter(function(p){
+      return p.first === 'Ticked'; })[0]; return d ? d.app : 'gone'; })()`));
+
+  /* The choice has to survive being told the form is wrong, or somebody
+     fixes one field and silently sends a message they had declined. */
+  await load();
+  await run(`document.querySelector('#screen-drivers-directory [data-open="driver:blank"]').click()`);
+  await sleep(1000);
+  await run(`(function(){ var b = document.getElementById('d-invite-send');
+    b.checked = false; b.dispatchEvent(new Event('change', { bubbles: true }));
+    var x = document.getElementById('d-first'); x.value = 'Only';
+    x.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  await sleep(400);
+  await run(`document.querySelector('#driver-drawer [data-role="submit"]').click()`);
+  await sleep(900);
+  const survived = JSON.parse(await run(`JSON.stringify((function(){
+    var d = document.getElementById('driver-drawer');
+    var sum = [].filter.call(d.querySelectorAll('.error-summary'),
+      function(x){ return !x.classList.contains('hidden'); })[0];
+    return {
+      open: [].filter.call(document.querySelectorAll('.focus-sheet'),
+        function(x){ return x.getBoundingClientRect().height > 50; }).length > 0,
+      first: document.getElementById('d-first').value,
+      box: document.getElementById('d-invite-send').checked,
+      cta: d.querySelector('[data-role="submit"]').textContent.trim(),
+      links: sum ? sum.querySelectorAll('[data-field-link]').length : 0,
+      /* A hidden conditional field is not a fault somebody can fix. */
+      leaked: sum ? [].map.call(sum.querySelectorAll('[data-field-link]'), function(a){
+        var w = d.querySelector('[data-field="' + a.dataset.fieldLink + '"]');
+        return w && !w.checkVisibility() ? a.dataset.fieldLink : null; }).filter(Boolean) : []
+    };})())`));
+  check('validation', 'a refused save keeps the sheet, the values and the choice',
+    survived.open && survived.first === 'Only' && survived.box === false
+      && survived.cta === 'Add driver',
+    `first "${survived.first}", box ${survived.box}, cta "${survived.cta}"`);
+  check('validation', 'the summary links each fault to its field',
+    survived.links > 0, `${survived.links} link(s)`);
+  check('validation', 'and lists no field that is not on screen',
+    survived.leaked.length === 0,
+    survived.leaked.length ? survived.leaked.join(', ') : 'nothing hidden was listed');
 
   /* ── The question before the message ─────────────────────────────────── */
 
@@ -894,6 +976,68 @@ const READ_MENU = `(function(){
       && !hasSend('Deactivated'),
     ['Active', 'Invite sent', 'Invite sending', 'Deactivated']
       .filter(hasSend).join(', ') || 'four statuses, none of them offering a send');
+
+  /* ── The two sheets are one sheet ────────────────────────────────────── */
+
+  /* Add vehicle and Add driver are the same primitive, and the way that stops
+     being true is somebody setting a width on one of them. Measured rather
+     than read off the stylesheet: a local override wins in the cascade and
+     says nothing about itself in the source. */
+  const sheetOf = async (screen, opener) => {
+    await load(screen);
+    await run('document.querySelector(' + JSON.stringify('#screen-' + screen + ' ' + opener) + ').click()');
+    await sleep(1000);
+    return JSON.parse(await run(`JSON.stringify((function(){
+      var s = [].filter.call(document.querySelectorAll('.focus-sheet'),
+        function(x){ return x.getBoundingClientRect().height > 50; })[0];
+      if (!s) return null;
+      var cs = getComputedStyle(s);
+      var part = function(sel){ var e = s.querySelector(sel); if (!e) return null;
+        var c = getComputedStyle(e);
+        return { pad: c.paddingTop + ' ' + c.paddingRight + ' ' + c.paddingBottom + ' ' + c.paddingLeft,
+                 top: c.borderTopWidth, bottom: c.borderBottomWidth }; };
+      return { width: Math.round(s.getBoundingClientRect().width),
+        cls: s.className, shadow: cs.boxShadow, radius: cs.borderRadius,
+        head: part('.focus-sheet__head'), body: part('.focus-sheet__body'),
+        foot: part('.focus-sheet__foot'),
+        bodyScrolls: getComputedStyle(s.querySelector('.focus-sheet__body')).overflowY };})())`));
+  };
+
+  await send('Emulation.setDeviceMetricsOverride',
+    { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+  const veh = await sheetOf('directory', '[data-open="vehicle:blank"]');
+  const drv = await sheetOf('drivers-directory', '[data-open="driver:blank"]');
+
+  check('one sheet', 'both are the same primitive at the same width',
+    !!veh && !!drv && veh.cls === drv.cls && veh.width === drv.width,
+    veh && drv ? `${veh.cls} ${veh.width}px vs ${drv.cls} ${drv.width}px` : 'a sheet did not open');
+  check('one sheet', 'header, body and footer padding match',
+    veh.head.pad === drv.head.pad && veh.body.pad === drv.body.pad && veh.foot.pad === drv.foot.pad,
+    `head ${drv.head.pad} | body ${drv.body.pad} | foot ${drv.foot.pad}`);
+  /* One divider each, owned by the piece above or below it. Two edges meeting
+     draws a two-pixel line that no single rule is responsible for. */
+  check('one sheet', 'one divider each, and the body owns neither',
+    veh.head.bottom === drv.head.bottom && veh.foot.top === drv.foot.top
+      && drv.body.top === '0px' && drv.body.bottom === '0px'
+      && drv.head.bottom !== '0px' && drv.foot.top !== '0px',
+    `head-bottom ${drv.head.bottom}, body ${drv.body.top}/${drv.body.bottom}, foot-top ${drv.foot.top}`);
+  check('one sheet', 'same shadow, and one scrollable body',
+    veh.shadow === drv.shadow && drv.bodyScrolls === 'auto',
+    `body overflow-y ${drv.bodyScrolls}`);
+
+  /* Full screen below the breakpoint, and the corners and the left edge go
+     with it: a rounded corner against the side of a phone is a gap. */
+  await send('Emulation.setDeviceMetricsOverride',
+    { width: 800, height: 900, deviceScaleFactor: 1, mobile: false });
+  const narrow = await sheetOf('drivers-directory', '[data-open="driver:blank"]');
+  const narrowCols = await run(`getComputedStyle(document.querySelector('#driver-drawer .fields'))
+    .gridTemplateColumns.split(' ').length`);
+  check('one sheet', 'at 800px it takes the screen and drops its edges',
+    narrow.width === 800 && narrow.radius === '0px' && narrowCols === 1,
+    `${narrow.width}px, radius ${narrow.radius}, ${narrowCols} column`);
+
+  await send('Emulation.setDeviceMetricsOverride',
+    { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 
   const errs = await run(`JSON.stringify(window.__pageErrors || [])`);
   check('nobody sets it', 'the page ran clean',

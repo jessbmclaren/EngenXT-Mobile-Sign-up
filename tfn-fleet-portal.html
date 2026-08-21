@@ -1580,6 +1580,64 @@ textarea.field {
   margin-bottom: var(--space-0-5);
 }
 
+/* ── A checkbox and the sentence it belongs to ────────────────────────────
+ *
+ * The product styled checkboxes three different ways and had none for a form
+ * field: one set inside the Columns popover, one inside the recovery list,
+ * and nothing a sheet could use. This is the one, and it is a `label` so the
+ * whole row is the target rather than the thirteen pixels of the box.
+ *
+ * The states are deliberately three different things. Hover is a ground.
+ * Checked is the box, drawn by the browser in the brand ink. Focus is the
+ * one shared ring every other control uses. A selected state drawn as an
+ * outline would be indistinguishable from a focused one, and a container
+ * that grows when it is chosen is a second selected state competing with the
+ * tick.
+ */
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1-5);
+  padding: var(--space-1-5);
+  margin-inline: calc(var(--space-1-5) * -1);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.check:hover { background: var(--color-surface-hover); }
+
+/* The ring belongs to the row, not to the box inside it, so it surrounds the
+   thing a person is actually aiming at. */
+.check:has(:focus-visible) {
+  outline: var(--size-focus-ring-width) solid var(--color-brand-ink);
+  outline-offset: var(--size-focus-ring-offset);
+}
+.check input:focus-visible { outline: none; }
+
+.check input {
+  flex: none;
+  margin: 0;
+  width: var(--size-marker-diameter);
+  height: var(--size-marker-diameter);
+  accent-color: var(--color-brand-ink);
+  cursor: pointer;
+}
+
+.check-body { display: block; min-width: 0; }
+
+.check-title {
+  display: block;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-label-md);
+}
+
+.check-says {
+  display: block;
+  margin-top: var(--space-0-5);
+  font-size: var(--font-size-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
 .form-field .suffix-wrap { position: relative; display: block; }
 
 .form-field .suffix {
@@ -10140,7 +10198,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     </div>
 
     <section class="sheet-section">
-    <h3 class="sheet-section__title">Driver details</h3>
+    <h3 class="sheet-section__title">Personal details</h3>
     <div class="fields">
       <div class="form-field" data-field="first">
         <label for="d-first">First name</label>
@@ -10153,12 +10211,11 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <div class="form-field" data-field="mobile">
         <label for="d-mobile">Mobile number</label>
         <input class="field ident" id="d-mobile" inputmode="tel" autocomplete="off" placeholder="e.g. 082 123 4567">
-        <!-- Said where the number is typed, because this field is the reason
-             the driver ever hears from the product. -->
-        <span class="help">We’ll send the WhatsApp invitation to this number.</span>
-        <!-- The rule is the driver sign-up flow's, not a second opinion: this
-             is the number they type to reach the app. -->
-        <span class="help">The number they sign in to the app with.</span>
+        <!-- One sentence where there were two. They said the same thing from
+             two directions, and the first one promised a message that the
+             person filling this in may have decided not to send. This says
+             what the number is for without committing to when. -->
+        <span class="help">The driver will use this number to sign in and receive their invitation.</span>
       </div>
       <div class="form-field" data-field="email">
         <label for="d-email">Email <span class="opt">Optional</span></label>
@@ -10172,49 +10229,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     </div>
     </section>
 
-    <!-- The invitation is a decision, not a side effect of saving.
-         It sat inside the Add button's label and nowhere else, so the only
-         way to find out that adding a driver messages them was to read the
-         button. A manager who is entering twelve drivers from a spreadsheet
-         on a Tuesday and wants to invite them on Friday had no way to say so,
-         and no way to tell that they could not. -->
-    <section class="sheet-section">
-    <h3 class="sheet-section__title">EngenXT app invitation</h3>
-    <p class="group-note">The driver cannot fuel until the app is on their
-      phone. You can start that now or later.</p>
-    <div class="fields">
-      <div class="form-field field-wide" data-field="invite">
-        <!-- No visible label above these. The section is called EngenXT app
-             invitation, the note under it says "now or later", and the two
-             options say "now" and "later". A fourth line reading "When to
-             invite" was the same sentence a third time. The group still needs
-             a name for anything not reading the screen, so it has one. -->
-        <div class="seg is-stacked seg--says" role="radiogroup" aria-label="When to invite">
-          <label>
-            <input type="radio" name="d-invite-choice" value="now" checked>
-            <span class="seg-body">
-              <span class="seg-title">Send invitation now</span>
-              <span class="seg-says">The driver will receive a WhatsApp message with a link to download and activate the EngenXT app.</span>
-            </span>
-          </label>
-          <label>
-            <input type="radio" name="d-invite-choice" value="later">
-            <span class="seg-body">
-              <span class="seg-title">Invite later</span>
-              <span class="seg-says">You can send the invitation from the Drivers table when you&rsquo;re ready.</span>
-            </span>
-          </label>
-        </div>
-        <!-- The answer, where the form engine reads every other field's. -->
-        <input type="hidden" id="d-invite" value="now">
-      </div>
-    </div>
-    </section>
-
     <section class="sheet-section">
     <h3 class="sheet-section__title">Identification</h3>
-    <p class="group-note">One document, not both. Some of your drivers will not
-      hold a South African ID.</p>
+    <p class="group-note">Choose one identity document.</p>
     <div class="fields">
       <div class="form-field" data-field="identityType">
         <span class="label" id="d-idtype-label">Identity type</span>
@@ -10263,13 +10280,10 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
       <p class="group-note is-review">Both optional, settled 14 August. Needs
         attention only covers drivers who have an expiry on file.</p>
-      </div>
-    </section>
-
-      <section class="sheet-section">
-      <h3 class="sheet-section__title">Professional driving permit</h3>
-      <p class="group-note">Record whether this driver has a professional driving permit.</p>
-      <div class="fields">
+      <!-- The permit was a section of its own between the licence and the
+           work details. It is the same document family and the same question,
+           what this person is allowed to drive and carry, so it sits with the
+           licence rather than interrupting the form to ask again. -->
       <div class="form-field" data-field="prdp">
         <label for="d-prdp">PrDP category</label>
         <select class="field" id="d-prdp"></select>
@@ -10283,10 +10297,10 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <input class="field" id="d-prdpexp" type="date">
       </div>
     </div>
-      </section>
+    </section>
 
     <section class="sheet-section">
-    <h3 class="sheet-section__title">Fleet details</h3>
+    <h3 class="sheet-section__title">Work details</h3>
     <p class="group-note">Optional information used by your organisation.</p>
     <div class="fields">
       <div class="form-field" data-field="employeeId">
@@ -10299,12 +10313,35 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
     </div>
     </section>
+
+    <!-- Last, and last for a reason. Everything above identifies a person;
+         this is something done to them once they exist. It was two large
+         radio cards higher up the form, which made an optional action look
+         like a required field and put a decision about messaging somebody
+         between their surname and their ID number. -->
+    <section class="sheet-section">
+    <h3 class="sheet-section__title">Invite to EngenXT</h3>
+    <div class="fields">
+      <div class="form-field field-wide" data-field="invite">
+        <label class="check">
+          <input type="checkbox" id="d-invite-send" checked>
+          <span class="check-body">
+            <span class="check-title">Send a WhatsApp invitation when I add this driver</span>
+            <span class="check-says">The driver can fuel after activating the app. You can also send the invitation later from Drivers.</span>
+          </span>
+        </label>
+        <!-- The answer, where the form engine reads every other field's. -->
+        <input type="hidden" id="d-invite" value="now">
+      </div>
+    </div>
+    </section>
   </div>
 
   <div class="focus-sheet__foot">
-    <span class="count" data-role="count">Ready to add</span>
+    <!-- No count element, the same as Add vehicle's footer. The two sheets
+         now hold the same two controls and nothing else. -->
     <button class="btn btn-secondary" data-close-form>Cancel</button>
-    <button class="btn btn-primary" data-role="submit">Add driver and send invite</button>
+    <button class="btn btn-primary" data-role="submit">Add driver and send invitation</button>
   </div>
 </aside>
 
@@ -10666,6 +10703,10 @@ function form(spec) {
   }
 
   function paintFooter() {
+    /* A form may decline the count. Two places write this line, and opting
+       out of one of them left the number blank on open and back on the first
+       keystroke, which is worse than either. */
+    if (spec.countRequired === false) { setCount(''); return; }
     const n = liveRequired().filter(([f]) => !get(f)).length;
     setCount(n
       ? `${n} ${noun}${n === 1 ? '' : 's'} left`
@@ -10981,10 +11022,22 @@ function form(spec) {
       setSummaryHeading(0);
     }
 
-    // The number is said once, here.
-    const outstanding = liveRequired().filter(([field]) => !(s.values[field] || '').trim()).length;
+    /* The number is said once, here, and a form may decline to say it.
+     *
+     * It tracks the conditionals correctly: choosing Passport takes it from
+     * six to seven because a country becomes required. Correct is not the
+     * same as useful. It names a quantity and not one of the fields, so it
+     * tells somebody there is work left without telling them where, and the
+     * only way to find out is to press the button that the number implies
+     * will not work. The error summary does that job properly, on submit,
+     * with each fault linked to its field. */
+    const outstanding = spec.countRequired === false
+      ? 0
+      : liveRequired().filter(([field]) => !(s.values[field] || '').trim()).length;
     if (outstanding) {
       setCount(`${outstanding} ${noun}${outstanding === 1 ? '' : 's'} left`);
+    } else if (spec.countRequired === false) {
+      setCount('');
     } else {
       // "Ready to create" is a promise about a record that does not exist yet.
       // An edit changes one that does, so it says nothing rather than
@@ -17758,6 +17811,10 @@ const others = state => DRIVERS
   }));
 
 /* Which fields are on screen, given what has been answered. */
+/* Which state the sheet was opened in, so the button label knows whether it
+   is looking at an add or an edit. */
+let driverSheetState = null;
+
 function sync(get, root, state) {
   const show = (field, on) => {
     const wrap = root.querySelector(`[data-field="${field}"]`);
@@ -17767,21 +17824,23 @@ function sync(get, root, state) {
   // The buttons follow the value, so a state that sets one shows it chosen.
   root.querySelectorAll('input[name="d-idtype-choice"]')
     .forEach(r => { r.checked = r.value === type; });
-  /* Send now unless somebody says otherwise.
+  /* Send unless somebody unticks it.
    *
    * The hidden input carries `value="now"` in the markup, and applyState
    * clears every field it is not given a value for, so opening the sheet
    * emptied it and the save read "" instead of a choice. The default belongs
    * here, where the field is reconciled, rather than in the markup where the
    * engine will overwrite it. */
-  const box = root.querySelector('#d-invite');
+  const held = root.querySelector('#d-invite');
   const when = get('invite') || 'now';
-  if (box && box.value !== when) box.value = when;
-  root.querySelectorAll('input[name="d-invite-choice"]')
-    .forEach(r => { r.checked = r.value === when; });
+  if (held && held.value !== when) held.value = when;
+  const tick = root.querySelector('#d-invite-send');
+  if (tick) tick.checked = when !== 'later';
   /* The invitation is a question about a driver who does not exist yet.
      Editing one who does has nothing to ask. */
   show('invite', !(state && state.editing));
+  driverSheetState = state || null;
+  if (typeof paintInviteButton === 'function') paintInviteButton();
   show('idNumber', type === 'South African ID');
   show('passportNumber', type === 'Passport');
   show('passportCountry', type === 'Passport');
@@ -17873,16 +17932,23 @@ Records.form({
     drivers.render();
     Records.forms.driver.close();
 
+    /* Creating the driver and delivering a message are two things, and the
+       toast says which one happened. The invitation is queued rather than
+       waited on: a driver who exists should not be reported as not-yet-added
+       because a WhatsApp gateway is slow. */
     const now = (v.invite || 'now') !== 'later';
-    if (now) driverAction(person.idNumber || person.passportNumber, 'send');
+    const key = person.idNumber || person.passportNumber;
+    if (now) driverAction(key, 'send');
     Records.toast(
-      now
-        ? `${v.first} ${v.last} added. The invitation is going to ${v.mobile}.`
-        : `Driver added. You can invite this driver from the Drivers table.`,
+      now ? 'Driver added. Invitation queued.' : 'Driver added. Invitation not sent.',
       () => {
         DRIVERS.splice(DRIVERS.indexOf(person), 1);
         drivers.render();
       },
+      /* Unticked, the next thing somebody wants is the way to send it, and
+         the row they would have to find is one of twelve. Offered here while
+         they are still looking at the result of what they did. */
+      now ? null : { label: 'Send invitation', run: () => driverAction(key, 'ask-send') },
     );
   },
   /* Their name and the group they drive for. A drawer that says only "Edit
@@ -17919,8 +17985,20 @@ Records.form({
   /* The button says both halves of what pressing it does. Creating the
      record and sending the invitation are one gesture to the person doing it
      and two operations underneath, and the second is the one they cannot see. */
-  submitLabel: 'Add driver and send invite',
-  readyText: 'Ready to add',
+  submitLabel: 'Add driver and send invitation',
+  /* No count in this footer. See the note where it is calculated: it is
+     accurate and it names nothing, and a number with no field attached
+     cannot be acted on. */
+  countRequired: false,
+  /* No count in the footer.
+   *
+   * It read "6 required details left", and it was wrong the moment the form
+   * became conditional: choosing Passport hides three South African ID
+   * fields and reveals two others, and the number did not follow. A count
+   * that cannot name what it is counting is a number somebody plans around
+   * and then cannot reconcile. The error summary names the actual fields, on
+   * submit, and links to each one. */
+  readyText: '',
   noun: 'required detail',
   backdrop: key => (key === 'blank' ? 'drivers-empty' : 'drivers-directory'),
 });
@@ -17994,23 +18072,27 @@ document.querySelectorAll('input[name="d-idtype-choice"]').forEach(radio => {
  * over a form set to Invite later would be the button lying about what it is
  * about to do. */
 const inviteWhen = document.getElementById('d-invite');
+const inviteBox = document.getElementById('d-invite-send');
 const inviteSubmit = document.querySelector('#driver-drawer [data-role="submit"]');
+
+/* The button says what pressing it will do, and the checkbox is the only
+   thing that decides. Kept in step in one place rather than at each call
+   site, because the two going out of sync is a button that lies. */
 function paintInviteButton() {
-  if (!inviteSubmit) return;
-  const st = Records.forms.driver && Records.forms.driver.state && Records.forms.driver.state();
-  /* Editing an existing driver keeps whatever label that state asked for.
-     The choice only governs the add. */
-  if (st && st.save) return;
-  inviteSubmit.textContent = inviteWhen.value === 'later'
-    ? 'Add driver' : 'Add driver and send invite';
+  if (!inviteSubmit || !inviteBox) return;
+  const editing = !!(driverSheetState && driverSheetState.editing);
+  if (editing) return;
+  inviteSubmit.textContent = inviteBox.checked
+    ? 'Add driver and send invitation' : 'Add driver';
 }
-document.querySelectorAll('input[name="d-invite-choice"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    inviteWhen.value = radio.value;
+
+if (inviteBox) {
+  inviteBox.addEventListener('change', () => {
+    inviteWhen.value = inviteBox.checked ? 'now' : 'later';
     inviteWhen.dispatchEvent(new Event('change'));
     paintInviteButton();
   });
-});
+}
 
 /* Exposed for check.js, which drives every state without a browser. */
 /* ── What a driver row action does, in one place ──────────────────────────
