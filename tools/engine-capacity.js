@@ -256,18 +256,29 @@ const ABSENT = `(function(){
     }
   }
 
-  /* 5. Still a recognised, optional CSV column. */
+  /* 5. An older export still loads.
+   *
+   * The contract's promise is that a fleet's existing file is not refused for
+   * carrying a column the product stopped reading. It used to be kept by
+   * listing engine_capacity_cc in the schema, which also put it in the
+   * published template, the example row and the column guide — a column nobody
+   * fills in, explained on a page whose whole job is to be short.
+   *
+   * It is off the published contract now and recognised on the way in instead,
+   * so the promise holds and the document does not carry it. The test follows:
+   * it asks whether an older header is still understood, not whether it is
+   * still advertised. */
   const col = JSON.parse(await evalIn(`(function(){
     if(!window.ImportSchema) return JSON.stringify({err:'no ImportSchema'});
-    var c=ImportSchema.COLUMNS.filter(function(x){return x.key==='engine_capacity_cc';})[0];
+    var S=ImportSchema;
     return JSON.stringify({
-      present: !!c, required: c?!!c.required:null,
-      inHeader: ImportSchema.header().split(',').indexOf('engine_capacity_cc') >= 0,
-      canonical: ImportSchema.canonical ? ImportSchema.canonical('engine_capacity_cc') : null
+      published: S.header().split(',').indexOf('engine_capacity_cc') >= 0,
+      recognised: typeof S.retired === 'function' ? S.retired('engine_capacity_cc') : null,
+      notAColumn: !S.COLUMNS.some(function(x){return x.key==='engine_capacity_cc';})
     });})()`));
   if (col.err) fail(5, col.err);
-  else if (col.present && col.required === false && col.inHeader)
-    pass(5, 'listed in the schema, required:false, and present in the generated header row');
+  else if (col.recognised === true && col.published === false && col.notAColumn)
+    pass(5, 'off the published template and still recognised on an older file');
   else fail(5, 'column contract broken: ' + JSON.stringify(col));
 
   /* 9 and 10. The two capacities are independent, and only one is required. */

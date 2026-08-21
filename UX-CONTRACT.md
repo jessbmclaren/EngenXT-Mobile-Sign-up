@@ -30,8 +30,12 @@ compares one to a displacement.
 
 - Tank capacity is required, and is validated on its own. It never reads engine
   capacity, and engine capacity never changes it.
-- `engine_capacity_cc` stays an optional, recognised CSV import column, so an
-  existing fleet export loads without being edited first.
+- An existing fleet export still loads without being edited first. `engine_capacity_cc`
+  was an optional column in the published contract; it is recognised on the way in
+  now but no longer appears in the template, the example row or the column guide.
+  The promise is the same — a fleet is never asked to strip a column the product
+  stopped reading — and it is kept without explaining a column nobody fills in
+  on a page whose job is to be short. Checked by test 5.
 - The vehicle taxonomy still records which categories would want a displacement
   if anything asked. That key is the fact, not the wiring. Nothing reads it to
   decide whether to show a field.

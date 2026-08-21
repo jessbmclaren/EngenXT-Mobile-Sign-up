@@ -309,7 +309,49 @@
   --size-dialog-max-width-md: 560px;
   --size-dialog-max-width-sm: 460px;
   --size-dialog-min-height: 240px;
+  /* ── Breakpoints ──────────────────────────────────────────────────────
+   * Not tokens, and not an oversight: CSS does not resolve var() inside a
+   * media query, so every one of these has to be a literal at its site. What
+   * can be done is write them down in one place, so the set is visible.
+   *
+   *   560   the narrowest thing here still has to work
+   *   600   a sheet stops being a sheet and becomes the page
+   *   699 / 700   a deliberate pair, not a typo: below seven hundred, and
+   *               seven hundred and up, with no pixel belonging to both
+   *   720   two columns collapse to one
+   *   800   the annotated notes column is dropped
+   *   820   the rail gains its labels
+   *   900   tables start scrolling inside themselves
+   *   960   the preview shows product and notes side by side
+   *   1180  the page stops growing and centres
+   *
+   * Eight thresholds for four or five real layout changes. Consolidating them
+   * is worth doing and is not a rename: it moves things on screen, so it wants
+   * a person looking at it rather than a regex.
+   */
   --size-focus-ring-width: 2px;
+  /* The coloured rail down the left of a block that is saying something: an
+     error summary, a failed attempt, a quoted aside. Named for the accent and
+     not just "the rail", because --size-rail-width was already taken by the
+     navigation rail — 232px of sidebar. Declared second, it won, and three
+     components spent a version drawing a 232px border. */
+  --size-accent-rail-width: 3px;
+  /* How far a button moves when it is pressed. */
+  --size-press-shift: 1px;
+  /* Present, but standing back: a button that is working and cannot be
+     pressed, a second line in a toast that is not the message. The only
+     opacity in the file used more than once. */
+  --opacity-muted: 0.85;
+  /* A radio's dot. Deliberately not --icon-xs, which is 14px and is for
+     icons — one site was already reaching for it with a 16px fallback that
+     never applied, so the mark it draws is 14px and reads as 16. */
+  --size-radio-diameter: 16px;
+  /* Underlines sit off their text by one of two amounts: tight for a link
+     inside running text, looser where the link is the whole line. */
+  --size-underline-offset: 2px;
+  --size-underline-offset-lg: 3px;
+  /* How much heavier an underline gets when the pointer is over it. */
+  --size-underline-thickness-hover: 2px;
   --size-font-size-base: 16px;
   --size-form-border-radius: 10px;
   --size-input-border-width: 1px;
@@ -571,6 +613,9 @@
   /* ── Focus ─────────────────────────────────────────────────── */
   /* The ring is a border; this is the halo around it. Flutter draws focus with
      a border and no halo, so it has no counterpart to export. */
+  /* The menu's own shadow. Shorter and harder than the surface elevations,
+     because a menu is close to the thing it came out of. */
+  --elevation-menu: 0 8px 24px var(--color-menu-shadow-ink);
   --elevation-glow: 0 0 0 4px color-mix(in srgb, var(--color-brand-ink) 12%, transparent);
 }
 </style>
@@ -654,6 +699,11 @@ body {
  * the heading it belongs to.
  */
 @media (max-width: 900px) {
+  /* The review rail is 232px of prototype furniture. On a narrow window it was
+     taking more than half the width from the thing being reviewed, so below
+     this it stands down and the product gets the page. The icon rail stays:
+     that one is the product's own. */
+  .rail { display: none; }
   .page-head { flex-wrap: wrap; }
   .page-head .actions { margin-left: 0; width: 100%; }
   .toolbar { flex-wrap: wrap; }
@@ -673,7 +723,7 @@ body {
   to   { opacity: 1; transform: none; }
 }
 
-@keyframes slide-in { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes slide-in { from { transform: translateX(var(--space-2-0)); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* The keyframes live here and the rules that play them do not.
@@ -835,10 +885,10 @@ td.ident,
 .btn-primary:hover, .btn-primary.is-hover,
 .btn-danger:hover, .btn-danger.is-hover { transform: translateY(-1px); box-shadow: var(--elevation-low); }
 .btn-primary:active, .btn-primary.is-pressed,
-.btn-danger:active, .btn-danger.is-pressed { transform: translateY(1px); box-shadow: none; }
+.btn-danger:active, .btn-danger.is-pressed { transform: translateY(var(--size-press-shift)); box-shadow: none; }
 
 .btn-secondary:hover, .btn-secondary.is-hover { background: var(--color-surface-hover); }
-.btn-secondary:active, .btn-secondary.is-pressed { background: var(--color-button-pressed-tint); transform: translateY(1px); }
+.btn-secondary:active, .btn-secondary.is-pressed { background: var(--color-button-pressed-tint); transform: translateY(var(--size-press-shift)); }
 
 .btn-tertiary:hover, .btn-tertiary.is-hover { background: var(--color-surface-hover); }
 .btn-tertiary:active, .btn-tertiary.is-pressed { background: var(--color-button-pressed-tint); }
@@ -875,7 +925,7 @@ td.ident,
 
 /* Busy is its own state, not a disabled one wearing a spinner: the label
    stays readable so nobody loses track of what they pressed. */
-.btn.is-busy { pointer-events: none; opacity: 0.85; }
+.btn.is-busy { pointer-events: none; opacity: var(--opacity-muted); }
 
 .btn.is-busy::before {
   content: "";
@@ -913,7 +963,7 @@ td.ident,
 .rail button:active { background: var(--color-button-pressed-tint); }
 
 .quick-btn { transition: background-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard); }
-.quick-btn:active { transform: translateY(1px); background: var(--color-button-pressed-tint); }
+.quick-btn:active { transform: translateY(var(--size-press-shift)); background: var(--color-button-pressed-tint); }
 
 .field { transition: border-color var(--duration-fast) var(--ease-standard); }
 .field:hover:not(:focus), .field.is-hover { border-color: var(--color-on-surface-variant); }
@@ -1209,12 +1259,60 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
  * right widths, so the page does not jump when the rows arrive and the
  * headings can be read while waiting.
  */
+/* ── Specimens ───────────────────────────────────────────────────────────
+ * A component photographed for the documentation is the same component, held
+ * still. These are the four ways it has to be held: a toast shown where it is
+ * written rather than where it flies in, a bar without the margin its live
+ * position gives it, a summary cropped to the width it is being discussed at,
+ * and a fact list stacked rather than columned.
+ *
+ * They were inline styles. An inline style is the one declaration nothing in
+ * the system can override, reuse or find, which makes it the worst place to
+ * keep a decision and the easiest place to leave one behind.
+ */
+.toast[data-specimen] { position: static; opacity: 1; transform: none; }
+.bulk--specimen { margin: 0; }
+.error-summary--specimen { max-width: 440px; }
+.panel-facts--stacked { display: block; }
+.review-why--flush { margin: 0; }
+
+/* The documentation's own specimen cells: a sparkline and a meter need a
+   width to be worth looking at, and the table will not give them one. */
+.doc-spark { width: 120px; }
+.doc-meter { width: 220px; }
+
+/* Separated from the block above it by the same step the rest of the page
+   uses, rather than by a number typed into the markup twice. */
+.surfaces--spaced { margin-top: var(--space-3-0); }
+
+/* ── Skeleton rows ───────────────────────────────────────────────────────
+ * A loading table is one row repeated, and the varying bar widths are what
+ * stop it reading as a barcode. They were written into every cell — seven
+ * widths x six rows x two tables, eighty-four inline styles for fourteen
+ * decisions. The width belongs to the column, so it is stated per column.
+ */
+.sk-rows--fleet td:nth-child(1) .sk { width: 70%; }
+.sk-rows--fleet td:nth-child(2) .sk { width: 50%; }
+.sk-rows--fleet td:nth-child(3) .sk { width: 85%; }
+.sk-rows--fleet td:nth-child(4) .sk { width: 40%; }
+.sk-rows--fleet td:nth-child(5) .sk { width: 45%; }
+.sk-rows--fleet td:nth-child(6) .sk { width: 35%; }
+.sk-rows--fleet td:nth-child(7) .sk { width: 55%; }
+
+.sk-rows--drivers td:nth-child(1) .sk { width: 60%; }
+.sk-rows--drivers td:nth-child(2) .sk { width: 55%; }
+.sk-rows--drivers td:nth-child(3) .sk { width: 85%; }
+.sk-rows--drivers td:nth-child(4) .sk { width: 40%; }
+.sk-rows--drivers td:nth-child(5) .sk { width: 35%; }
+.sk-rows--drivers td:nth-child(6) .sk { width: 45%; }
+.sk-rows--drivers td:nth-child(7) .sk { width: 50%; }
+
 .sk {
   display: block;
   height: var(--font-size-body-sm);
   border-radius: var(--radius-xxs);
   background: var(--color-surface-hover);
-  animation: sk-pulse 1.4s var(--ease-standard) infinite;
+  animation: sk-pulse var(--duration-scene) var(--ease-standard) infinite;
 }
 
 @keyframes sk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
@@ -1440,10 +1538,10 @@ textarea.field {
   font: inherit;
   font-weight: var(--font-weight-label-md);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: var(--size-underline-offset-lg);
   cursor: pointer;
 }
-.next-step__action:hover { text-decoration-thickness: 2px; }
+.next-step__action:hover { text-decoration-thickness: var(--size-underline-thickness-hover); }
 
 /* ── Form ─────────────────────────────────────────────────────────────────── */
 
@@ -1528,6 +1626,30 @@ textarea.field {
   font-size: var(--font-size-body-sm);
 }
 
+/* Inside the warning it answers, so the offer and the doubt cannot be read
+   apart. Underlined rather than boxed: a second filled button beside a form's
+   own submit is two things competing to look like the way forward. */
+.form-field .advice-accept {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: var(--font-weight-label-md);
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: var(--size-underline-offset);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.form-field .advice-accept:hover { text-decoration-thickness: var(--size-underline-thickness-hover); }
+.form-field .advice-accept:focus-visible {
+  outline: var(--size-focus-ring-width) solid var(--color-on-warning-container);
+  outline-offset: var(--size-focus-ring-offset);
+  border-radius: var(--radius-xxs);
+}
+
 /* What a changed value costs, said where it is changed. */
 .form-field .consequence { color: var(--color-on-surface-variant); }
 
@@ -1548,7 +1670,7 @@ textarea.field {
   font: inherit;
   color: var(--color-brand-ink);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: var(--size-underline-offset);
   cursor: pointer;
 }
 
@@ -1591,7 +1713,7 @@ select.field { appearance: none; background-image: none; }
   background: var(--color-surface);
   border: var(--size-border-hairline) solid var(--color-outline-variant);
   border-radius: var(--radius-xs);
-  box-shadow: 0 8px 24px var(--color-menu-shadow-ink);
+  box-shadow: var(--elevation-menu);
 }
 
 .combo-list li {
@@ -2403,7 +2525,7 @@ a.stat-tile:focus-visible {
   width: 40%;
   border-radius: inherit;
   background: var(--color-brand-ink);
-  animation: refresh-slide 1.4s var(--ease-standard) infinite;
+  animation: refresh-slide var(--duration-scene) var(--ease-standard) infinite;
 }
 
 @keyframes refresh-slide {
@@ -2527,7 +2649,7 @@ a.stat-tile:focus-visible {
   width: var(--dialog-width-standard);
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  box-shadow: var(--elevation-high, var(--elevation-medium));
+  box-shadow: var(--elevation-high);
   padding: var(--space-3-0);
 }
 .overlay-dialog h2 {
@@ -2752,7 +2874,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 }
 /* The dot keeps its size while the answer beside it wraps. */
 .radio input { flex: none; }
-.radio input { width: 16px; height: 16px; accent-color: var(--color-brand-ink); margin: 0; }
+.radio input { width: var(--size-radio-diameter); height: var(--size-radio-diameter); accent-color: var(--color-brand-ink); margin: 0; }
 
 /* MultiTankEditor's styles were here: a row per tank, and a total ruled off
    below them. The form asks for one combined figure now, so the rows and the
@@ -2765,7 +2887,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 /* Named for what it is, because .summary was claimed by the import review as
    well and the two were painting each other. */
 .error-summary {
-  border-left: 3px solid var(--color-error);
+  border-left: var(--size-accent-rail-width) solid var(--color-error);
   border-radius: 0 var(--radius-control) var(--radius-control) 0;
   padding: var(--space-1-5) var(--space-2-0);
   background: var(--color-surface);
@@ -2773,7 +2895,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 /* The ring goes on the rule, not around the block: focus has to be visible
    without the summary growing a second outline the width of the sheet. */
 .error-summary:focus { outline: none; border-left-color: var(--color-brand-ink); box-shadow: none; }
-.error-summary:focus-visible { outline: 2px solid var(--color-brand-ink); outline-offset: 2px; }
+.error-summary:focus-visible { outline: var(--size-focus-ring-width) solid var(--color-brand-ink); outline-offset: var(--size-focus-ring-offset); }
 .error-summary h3 {
   margin: 0 0 var(--space-0-5);
   font-size: var(--font-size-label-md);
@@ -2785,7 +2907,7 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
   padding-left: var(--space-2-0);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-0-25);
 }
 .error-summary li { font-size: var(--font-size-body-sm); line-height: 1.45; }
 .error-summary a { color: var(--color-error); }
@@ -2815,19 +2937,26 @@ body.sheet-open .sheet-backdrop { animation: fade-in var(--duration-sheet) var(-
 }
 
 /* Section headings inside a sheet take the sheet's rhythm: a rule above and
-   air, rather than a card around each group. */
+   air, rather than a card around each group.
+
+   The rule and the air belong to .sheet-section, which draws them once between
+   one section and the next. They were also declared here, on the heading, for
+   the driver drawer, which had no section wrappers — so its second and later
+   headings added a 40px margin and 32px of padding on top of the body's own
+   40px gap, and 112px of air opened above every divider. The drawer has the
+   wrappers now, and the heading contributes only the space beneath itself. */
 .focus-sheet .sheet-section__title {
-  margin: var(--space-5-0) 0 var(--space-2-0);
-  padding-top: var(--space-4-0);
-  border-top: var(--size-border-hairline) solid var(--color-outline-variant);
-}
-.focus-sheet .sheet-section__title:first-of-type {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
+  margin: 0 0 var(--space-2-0);
 }
 .focus-sheet .group-note {
-  margin: calc(var(--space-1-0) * -1) 0 var(--space-2-5);
+  /* No margins. The note used to pull itself up eight pixels and push twenty
+     down, because the sheet body's own gap was landing between it and the
+     heading it belongs to. It sits inside .sheet-section now, whose gap is the
+     one that applies, so a note is the same distance from its heading as it is
+     from the fields it introduces — which is what it always should have been.
+     "One gap between fields, set here and nowhere else" is the rule this file
+     already states about the fields; it holds here for the same reason. */
+  margin: 0;
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
 }
@@ -2900,7 +3029,7 @@ tbody tr.is-new > td {
 .detail-note {
   margin: var(--space-3-0) 0 0;
   padding-left: var(--space-2-0);
-  border-left: 3px solid var(--color-outline-variant);
+  border-left: var(--size-accent-rail-width) solid var(--color-outline-variant);
   font-size: var(--font-size-body-sm);
   color: var(--color-on-surface-variant);
 }
@@ -2924,8 +3053,11 @@ tbody tr.is-new > td {
 }
 .block-state--ok { background: var(--color-surface-muted); }
 .block-state--failed {
-  background: var(--color-error-container, var(--color-surface-muted));
-  border-left: 3px solid var(--color-error);
+  /* --color-error-container was never declared, so this fell through to the
+     same muted grey .block-state--ok uses and a failed attempt looked exactly
+     like a fine one. The family this palette publishes is `danger`. */
+  background: var(--color-danger-container);
+  border-left: var(--size-accent-rail-width) solid var(--color-error);
 }
 .block-state b { color: var(--color-on-surface); }
 
@@ -3119,6 +3251,39 @@ body.theft-open .sheet-backdrop { display: block; }
   font-weight: var(--font-weight-label-md);
 }
 
+/* ── Rail groups ─────────────────────────────────────────────────────────
+ * Forty screens in eleven groups is a list nobody can hold in their head, and
+ * the one you want is usually below the fold. The group headings were text;
+ * they are the control now.
+ *
+ * The items collapse with the `hidden` attribute rather than a class, so a
+ * closed group leaves the tab order and the accessibility tree together. A
+ * group that is only visually gone is still eleven stops on the way to the
+ * next one for anybody on a keyboard.
+ */
+.rail .group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1-0);
+  font-size: var(--font-size-label-sm);
+  font-weight: var(--font-weight-label-md);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  padding: var(--space-2-5) var(--space-2-0) var(--space-1-0);
+}
+/* The heading is furniture until you go for it. */
+.rail .group-toggle:hover { color: var(--color-on-surface); }
+.rail .group-caret {
+  flex: none;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+.rail .group-toggle[aria-expanded="false"] .group-caret { transform: rotate(-90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .rail .group-caret { transition: none; }
+}
+
 /* ── Product chrome ───────────────────────────────────────────────────────── */
 
 .stage { flex: 1; min-width: 0; display: flex; }
@@ -3194,7 +3359,7 @@ body.theft-open .sheet-backdrop { display: block; }
   align-items: flex-start;
   gap: var(--space-3-0);
   margin: 0 0 var(--space-4-0);
-  padding: var(--space-2-5, var(--space-2-0));
+  padding: var(--space-2-5);
   background: var(--color-danger-container);
   color: var(--color-on-danger-container);
   border: var(--size-border-hairline) solid var(--color-danger-container-border);
@@ -3843,6 +4008,15 @@ body.drawer-open .drawer { display: flex; }
  * read after the thing it was meant to explain.
  */
 
+/* Two tables with no heading between them met edge to edge, and their two
+   hairlines drew one 2px rule where every other block on this page is held
+   apart by the space a heading occupies. The gap here is that same space.
+
+   Written against the wrapper, not the table: wrapWideTables() puts every
+   spec and states table inside a .table-wrap of its own at load, so by the
+   time this matters no table is its own sibling. */
+.table-wrap + .table-wrap { margin-top: var(--space-5-0); }
+
 .states-table { max-width: var(--size-measure-wide); }
 .states-table td { vertical-align: top; }
 .states-table td:first-child { white-space: nowrap; }
@@ -3955,6 +4129,12 @@ body.drawer-open .drawer { display: flex; }
   border-top: var(--size-border-hairline) solid var(--color-outline-variant);
   border-bottom: var(--size-border-hairline) solid var(--color-outline-variant);
 }
+
+/* The band closed itself with a hairline and the foot underneath opened with
+   one, so the two met and drew 2px — a weight this system does not have and
+   which reads as a heavier division than the one above the band. Whatever
+   follows the band inherits the line the band already drew. */
+.panel > .panel-key + * { border-top: 0; }
 
 .key-figure b {
   display: block;
@@ -4197,7 +4377,7 @@ body.drawer-open .drawer { display: flex; }
   overflow-y: auto;
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  box-shadow: var(--elevation-high, var(--elevation-medium));
+  box-shadow: var(--elevation-high);
 }
 
 .status-dialog.hidden { display: none; }
@@ -4266,7 +4446,7 @@ body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim);
 /* The why, drawn as part of the state and not as a footnote to it. */
 .status-reason {
   font-size: var(--font-size-body-md);
-  font-weight: var(--font-weight-body-md, 400);
+  font-weight: var(--font-weight-body-md);
   color: var(--color-on-surface-variant);
 }
 
@@ -4320,7 +4500,7 @@ body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim);
   font-weight: var(--font-weight-label-md);
   color: inherit;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: var(--size-underline-offset-lg);
   cursor: pointer;
 }
 
@@ -4328,8 +4508,8 @@ body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim);
    of class names is a list somebody has to remember to join, and the one that
    forgot was the close button on the product's main working surface. */
 :where(a[href], button, input, select, textarea, [tabindex]):focus-visible {
-  outline: var(--size-focus-ring-width, 2px) solid var(--color-brand-ink);
-  outline-offset: 2px;
+  outline: var(--size-focus-ring-width) solid var(--color-brand-ink);
+  outline-offset: var(--size-focus-ring-offset);
 }
 
 .result-count {
@@ -4504,7 +4684,10 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
  * and this is where that explanation belongs — beside the choice, while it is
  * being made, rather than as a paragraph inside every pop-up forever.
  */
-.status-pop { width: var(--size-popover-width); max-width: min(92vw, 340px); }
+/* The cap is the same width, said once. It was written twice on this line —
+   the token and the number it holds — so a popover narrowed in the palette
+   would have kept its old maximum. */
+.status-pop { width: var(--size-popover-width); max-width: min(92vw, var(--size-popover-width)); }
 
 .pick-head {
   margin: 0;
@@ -4540,7 +4723,7 @@ tbody tr:focus-within .status-notes.is-empty { visibility: visible; }
 
 /* The tick's gutter is reserved whether or not there is a tick in it, so the
    labels line up and the list does not shift as the value changes. */
-.pick-mark { flex: none; width: var(--icon-xs, 16px); color: var(--color-brand-ink); }
+.pick-mark { flex: none; width: var(--icon-xs); color: var(--color-brand-ink); }
 .pick-body { min-width: 0; }
 
 .pick-label {
@@ -5107,7 +5290,7 @@ body.record-panel-open .topbar {
 /* Quieter than Undo, and to its left. Undo is the one somebody grabs at in the
    six seconds it lives; a note can wait and can also be added from the record
    whenever they get round to it. */
-.toast-extra { font-weight: inherit; opacity: 0.85; }
+.toast-extra { font-weight: inherit; opacity: var(--opacity-muted); }
 
 @media (prefers-reduced-motion: reduce) {
   .toast { transition: none; }
@@ -5301,7 +5484,7 @@ tbody td .is-past { color: var(--color-on-danger-container); }
 .invite-head span {
   letter-spacing: normal;
   text-transform: none;
-  font-weight: var(--font-weight-body-md, 400);
+  font-weight: var(--font-weight-body-md);
   font-size: var(--font-size-body-sm);
 }
 
@@ -5640,7 +5823,7 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
   overflow: auto;
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  box-shadow: var(--elevation-high, var(--elevation-medium));
+  box-shadow: var(--elevation-high);
 }
 
 /* A record sits at the drawer's width, as one surface rather than a stack of
@@ -5669,6 +5852,24 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
 
 .preview-record > * + * { border-top: var(--size-border-hairline) solid var(--color-outline-variant); }
 .preview-record > * { border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
+/* Panels stack flush here, and each one carries a border on all four sides of
+   its own. The line above owns every join — so the panel above closes without
+   one, or the two hairlines meet and the seam between two panels is drawn
+   twice as heavily as the seams inside them. The last child keeps its bottom,
+   which is the bottom of the record. */
+.preview-record > *:not(:last-child) { border-bottom: 0; }
+/* And nothing in the column is squeezed shorter than what it holds.
+   The record is a fixed-height flex column, so a panel taller than the space
+   left for it was being shrunk to fit and then clipped by its own
+   `overflow: hidden` — the first panel here ended at 567px with its footer
+   running to 628, so the last 61px of it, text and all, was cut off. What
+   showed instead was a 29px strip of the footer's grey between the band above
+   it and the panel below, which reads as one rule drawn twice.
+
+   The record already scrolls. Letting it is the honest answer: an annotated
+   screenshot that quietly truncates the product is describing something the
+   product does not do. */
+.preview-record > * { flex: none; }
 .preview-dialog > * { border-radius: 0; box-shadow: none; }
 .preview-dialog > *, .preview-record > * { max-width: none; width: 100%; }
 
@@ -5835,6 +6036,123 @@ body.clean .surfaces:has(.panel) { grid-template-columns: minmax(0, 1fr); }
   max-width: var(--size-measure-wide);
 }
 
+/* A heading is only a heading of what sits under it, and a title spanning the
+   full page above a column of cards half that wide reads as two unrelated
+   things. The cards are not widened to meet it: a row of buttons and a
+   sentence explaining a queried value both want a measure, and 1 384px of
+   them would be worse than the gap. The title comes to the content instead.
+
+   Not applied to every panel screen, though the mismatch is there too. That
+   is a change to a dozen layouts and wants a person looking at each. */
+.headed-column > .page-head { max-width: var(--size-panel-max); }
+
+/* ── A task, down the middle ─────────────────────────────────────────────
+ *
+ * This was a two-column layout: the upload on the left, the column reference
+ * on the right. It replaced a worse one — everything crammed into the left
+ * half with 640px of nothing beside it — and traded that fault for a bigger
+ * one. Two columns is two pages. The reference is a document somebody reads
+ * once, if ever, and giving it half the screen said it mattered as much as the
+ * thing they came to do.
+ *
+ * One column, centred, and the reference underneath and closed. The width is
+ * a reading measure rather than the space available: a form is not improved by
+ * being wider, and a page that fills a 27-inch screen is harder to use than
+ * one that does not.
+ */
+.task-flow {
+  /* Centred in the product's content area. The icon rail and the review rail
+     are outside .page, so this is measured against what a person is actually
+     looking at rather than the window. */
+  max-width: 864px;
+  margin-inline: auto;
+  padding-inline: var(--space-2-0);
+}
+
+.task-card {
+  /* .panel caps itself at the panel measure, which is narrower than the flow.
+     Inside a task flow the container has already decided the width, and a card
+     that stops short of the disclosure beneath it reads as two widths on one
+     page. */
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4-0);
+  padding: var(--space-4-0);
+  margin-top: var(--space-3-0);
+}
+
+.task-step { display: flex; flex-direction: column; gap: var(--space-1-5); }
+.task-step__title {
+  margin: 0;
+  font-size: var(--font-size-heading-sm);
+  font-weight: var(--font-weight-heading-sm);
+  color: var(--color-on-surface);
+}
+.task-step__note { margin: 0; color: var(--color-on-surface-variant); }
+/* The button sits to its own width, not the card's. */
+.task-step .quick-btn { align-self: flex-start; }
+
+/* The dropzone carried margins for a panel that held it flush to the edges.
+   Inside the card the padding is the card's, said once. */
+.task-card .dropzone { margin: 0; }
+@media (max-width: 560px) {
+  /* Its three lines of copy wrap to five here and the box grew past the height
+     it is meant to keep. Less padding, same box, still comfortably a target. */
+  .task-card .dropzone { padding: var(--space-3-0) var(--space-2-0); }
+}
+
+/* ── The column guide ────────────────────────────────────────────────────
+ * Closed until asked for, and opening it changes nothing but its own height.
+ */
+.guide { margin-top: var(--space-3-0); }
+.guide__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2-0);
+  flex-wrap: wrap;
+  padding: var(--space-2-0);
+  border: var(--size-border-hairline) solid var(--color-outline-variant);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+  list-style: none;
+}
+.guide__summary::-webkit-details-marker { display: none; }
+.guide__summary:hover { background: var(--color-surface-hover); }
+.guide__head { display: flex; align-items: baseline; gap: var(--space-1-5); flex-wrap: wrap; }
+.guide__title { font-weight: var(--font-weight-label-md); color: var(--color-on-surface); }
+.guide__count { font-size: var(--font-size-body-sm); color: var(--color-on-surface-variant); }
+.guide__cue {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-brand-ink);
+  font-weight: var(--font-weight-label-md);
+}
+.guide[open] .guide__cue { visibility: hidden; }
+.guide__body { padding: var(--space-3-0) 0 0; }
+/* Explanations wrap rather than widening the table past the column. */
+.guide__table { table-layout: auto; width: 100%; }
+.guide__table td { vertical-align: top; }
+.guide__table td:last-child { white-space: normal; }
+
+.csv-sample-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2-0);
+}
+.csv-copy { flex: none; }
+
+/* The field name and the header it maps to, stacked in one cell. */
+.spec-field { display: block; color: var(--color-on-surface); }
+.spec-key {
+  display: block;
+  margin-top: var(--space-0-5);
+  font-size: var(--font-size-label-sm);
+  color: var(--color-on-surface-variant);
+}
+
 /* These two carry a column of notes beside them while the notes are on, and
    that column is what fills the width. Under the toggle it goes, and the card
    is left on its own in the middle of nowhere. */
@@ -5842,7 +6160,7 @@ body.clean .page > section:has(.approve-card) > :not(.page-head):not(.preview):n
   max-width: var(--size-measure-narrow);
 }
 
-body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.figure-notes) {
+body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.figure-notes):not(.task-flow) {
   max-width: var(--size-panel-max);
 }
 </style>
@@ -5867,34 +6185,44 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
       <button class="tab rail-tab" role="tab" aria-selected="false" data-rail="notes">Notes</button>
     </div>
     <div class="rail-screens">
-    <div class="group">Fleet</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-fleet"><span>Fleet</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-fleet">
   <button data-screen="home">Home</button>
-  <div class="group">Vehicles</div>
+      </div>
+    </div>
+  <div class="rail-group">
+    <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-vehicles"><span>Vehicles</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="rail-group__items" id="rg-vehicles">
     <button data-screen="empty" aria-current="true">Vehicles: empty</button>
     <button data-screen="directory">Vehicles: directory</button>
     <button data-screen="no-results">Directory: no results</button>
     <button data-screen="loading">Directory: loading</button>
     <button data-screen="refreshing">Directory: refreshing</button>
     <button data-screen="failed">Directory: could not load</button>
-    <button data-screen="import">Import CSV</button>
-    <button data-screen="import-review">Import: ready to bring in</button>
     <!-- Under Vehicles, not under Vehicle states, and the distinction is the
          point: delivering an invitation is a step in the import flow, not a
          state a vehicle can be in. -->
-    <button data-screen="import-progress">Import: bringing them in</button>
-    <button data-screen="invites">Import: vehicles imported</button>
     <button data-screen="rules">Add a station to the rules</button>
+    </div>
+  </div>
     <!-- Named for what it is. This group was called "Vehicle states", which
          was true when it held five of them and became wrong when the waiting
          state went: what is left is one theft, told in order. It also collided
          with the documentation screen of the same name two groups down, so the
          rail had two entries called Vehicle states meaning different things. -->
-    <div class="group">One theft, in order</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-one-theft-in-order"><span>One theft, in order</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-one-theft-in-order">
     <button data-screen="stolen-filed">Reported: the receipt</button>
     <button data-screen="stolen-sighting">Someone tried to fuel it</button>
     <button data-screen="stolen-record">Blocked: twelve days later</button>
     <button data-screen="stolen-recovered">Mark recovered</button>
-    <div class="group">Break-glass</div>
+      </div>
+    </div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-break-glass"><span>Break-glass</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-break-glass">
     <button data-screen="override">Request to fuel</button>
     <button data-screen="override-approved">Approved</button>
     <button data-screen="override-declined">Declined</button>
@@ -5902,7 +6230,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-screen="override-taken">Already answered</button>
     <button data-screen="override-cap">Over the limit</button>
     <button data-screen="override-lands">Where it lands in the portal</button>
-    <div class="group">Add vehicle states</div>
+      </div>
+    </div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-add-vehicle-states"><span>Add vehicle states</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-add-vehicle-states">
     <button data-form="vehicle" data-state="blank">Blank form</button>
     <button data-form="vehicle" data-state="blocked">Blocked: nothing answered</button>
     <button data-form="vehicle" data-state="duplicate">Blocked: duplicate plate</button>
@@ -5928,23 +6260,29 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-form="vehicle" data-state="dupvin" data-hash="vehicle-dup-vin">Duplicate VIN</button>
     <button data-form="vehicle" data-state="serverrejected" data-hash="vehicle-server-rejected">Server refused two answers</button>
     <button data-form="vehicle" data-state="unsaved" data-hash="vehicle-unsaved">Unsaved changes on close</button>
+      </div>
+    </div>
 
     <!-- Drivers. The same two screens over a different record, and the same
          rail: a directory, an empty state, an import, and every state the
          drawer has. The hashes carry a `driver-` prefix because both drawers
          have a blank form and only one of them can be #blank. -->
-    <div class="group">Drivers</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-drivers"><span>Drivers</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-drivers">
     <button data-screen="drivers-empty">Empty</button>
     <button data-screen="drivers-directory">Directory</button>
     <button data-screen="drivers-no-results">No results</button>
     <button data-screen="drivers-loading">Loading</button>
     <button data-screen="drivers-failed">Could not load</button>
-    <button data-screen="drivers-import">Import CSV</button>
-    <button data-screen="drivers-import-review">Import review</button>
     <button data-screen="driver-left">Mark as left</button>
     <button data-screen="driver-open">Decisions</button>
+      </div>
+    </div>
 
-    <div class="group">Add driver</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-add-driver"><span>Add driver</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-add-driver">
     <button data-form="driver" data-state="blank" data-hash="driver-blank">Blank form</button>
     <button data-form="driver" data-state="blocked" data-hash="driver-blocked">Nothing answered</button>
     <button data-form="driver" data-state="blockedsa" data-hash="driver-blocked-sa">Nothing answered, South African</button>
@@ -5957,8 +6295,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-form="driver" data-state="edit" data-hash="driver-edit">Edit</button>
     <button data-form="driver" data-state="editchange" data-hash="driver-edit-change">Edit with consequences</button>
     <button data-form="driver" data-state="editgap" data-hash="driver-edit-gap">Edit, details missing</button>
+      </div>
+    </div>
 
-    <div class="group">Refusals</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-refusals"><span>Refusals</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-refusals">
     <button data-form="driver" data-state="badmobile" data-hash="driver-bad-mobile">Not a mobile number</button>
     <button data-form="driver" data-state="bademail" data-hash="driver-bad-email">Not an email address</button>
     <button data-form="driver" data-state="badid" data-hash="driver-bad-id">Not a valid ID number</button>
@@ -5968,8 +6310,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-form="driver" data-state="duppassport" data-hash="driver-dup-passport">Duplicate passport</button>
     <button data-form="driver" data-state="dupmobile" data-hash="driver-dup-mobile">Duplicate mobile</button>
     <button data-form="driver" data-state="dupemployee" data-hash="driver-dup-employee">Duplicate employee ID</button>
+      </div>
+    </div>
 
-    <div class="group">Photo and system</div>
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-photo-and-system"><span>Photo and system</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-photo-and-system">
     <button data-form="driver" data-state="phototype" data-hash="driver-photo-type">Photo not supported</button>
     <button data-form="driver" data-state="photosize" data-hash="driver-photo-size">Photo too large</button>
     <button data-form="driver" data-state="photofailed" data-hash="driver-photo-failed">Photo upload failed</button>
@@ -5978,19 +6324,49 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
     <button data-form="driver" data-state="offline" data-hash="driver-offline">No connection</button>
     <button data-form="driver" data-state="savefail" data-hash="driver-save-failed">Save failed</button>
     <button data-form="driver" data-state="conflict" data-hash="driver-conflict">Changed by someone else</button>
+      </div>
+    </div>
 
+    <!-- Bringing a fleet in at once is its own piece of work, and it was
+         scattered: four screens buried in Vehicles between the directory
+         states and the rules, two more the same distance down Drivers.
+         Together, and last, because nobody imports before they have seen
+         what they are importing into.
+    
+         The two labels that both read "Import CSV" are prefixed now. That
+         only worked while one sat under Vehicles and the other under
+         Drivers; side by side they were the same button twice. -->
+    <div class="rail-group">
+      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-phase-2"><span>Phase 2</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="rail-group__items" id="rg-phase-2">
+        <button data-screen="import">Vehicles: import CSV</button>
+        <button data-screen="import-review">Vehicles: ready to bring in</button>
+        <button data-screen="import-progress">Vehicles: bringing them in</button>
+        <button data-screen="invites">Vehicles: imported</button>
+        <button data-screen="drivers-import">Drivers: import CSV</button>
+        <button data-screen="drivers-import-review">Drivers: import review</button>
+      </div>
+    </div>
     </div>
     <div class="rail-notes hidden">
-      <div class="group">The system</div>
+      <div class="rail-group">
+        <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-the-system"><span>The system</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="rail-group__items" id="rg-the-system">
       <button data-screen="atoms">Atoms</button>
       <button data-screen="molecules">Molecules</button>
       <button data-screen="organisms">Organisms</button>
       <button data-screen="hierarchy">Component hierarchy</button>
       <button data-screen="state-map">States to templates</button>
       <button data-screen="oneoffs">One-off components</button>
-      <div class="group">What each state means</div>
+        </div>
+      </div>
+      <div class="rail-group">
+        <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-what-each-state-means"><span>What each state means</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="rail-group__items" id="rg-what-each-state-means">
       <button data-screen="states">Vehicle states</button>
       <button data-screen="driver-states">Driver states</button>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -6037,7 +6413,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <div class="bell-head">Notifications <span class="badge badge-warning">1 waiting</span></div>
             <a class="bell-row live" href="#override">
               <span class="dot"></span>
-              <span><b>Thabo is waiting to fuel</b><br>Outside his areas. <span class="ident">HRV 482 GP</span>, Engen N1 City.</span>
+              <span><b>Thabo is waiting to fuel</b><br>Second fill within an hour. <span class="ident">HRV 482 GP</span>, Engen N1 City.</span>
               <span class="expiry">1:47</span>
             </a>
             <a class="bell-row" href="#override-approved">
@@ -6090,7 +6466,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="table-wrap">
           <table aria-busy="true">
             <thead><tr><th>Registration</th><th>Fleet number</th><th>Vehicle</th><th>Vehicle category</th><th>Fuel type</th><th class="num">Tank capacity</th><th>Status</th></tr></thead>
-            <tbody><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:55%"></span></td></tr></tbody>
+            <tbody class="sk-rows sk-rows--fleet"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
           </table>
         </div>
         <p class="surface-note"><b>The shape of the answer, not a spinner.</b>
@@ -6224,70 +6600,67 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           into a resume.</p>
       </section>
 
+      <!-- One task, read top to bottom.
+           This was two columns: the upload on the left and the column
+           reference on the right, each at half the page. Two columns is two
+           pages, and the reference — the part somebody needs once, if at all —
+           was given the same weight as the thing they came to do. A person
+           importing a fleet is doing one job in two steps, and a layout that
+           is honest about that has one column and a number on each step.
+
+           The guide is still here, underneath, closed. Open it and it opens in
+           place, at the same width, so nothing moves sideways. -->
       <section id="screen-import" class="hidden">
+        <div class="task-flow">
         <div class="page-head">
           <div>
-            <h1>Import vehicles</h1>
-            <p>Add a whole fleet at once. Fill in the template, then upload it.</p>
+            <h1>Import vehicles from a CSV</h1>
+            <p>Download the template, add your vehicle details, then upload the completed file.</p>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Start with the template</h2>
-              <p class="panel-sub">It has the columns in the order the import expects.</p>
+        <div class="panel task-card">
+          <div class="task-step">
+            <h2 class="task-step__title">1. Download the CSV template</h2>
+            <p class="task-step__note">It includes all columns in the required order.</p>
+            <a class="quick-btn" href="#import" download><svg data-lucide="download" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Download CSV template</a>
+          </div>
+
+          <div class="task-step">
+            <h2 class="task-step__title">2. Upload the completed file</h2>
+            <div class="dropzone">
+              <svg data-lucide="upload" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <p><b>Drop your CSV here</b></p>
+              <p class="dz-sub">or <a href="#import-review">choose a file</a></p>
+              <p class="dz-meta">CSV, up to 10 MB</p>
             </div>
           </div>
-          <div class="panel-body-pad">
-            <a class="quick-btn" href="#import"><svg data-lucide="download" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg> Download vehicles.csv</a>
-            <!-- The columns, named, before the dropzone rather than under it.
-                 Somebody who already has a spreadsheet from their old system is
-                 not going to download a template; they want to know whether
-                 what they have will do. This is that answer in one line, and
-                 the full table below says what goes in each. -->
-            <!-- Written from the import schema at start-up. Kept here as the
-               same sentence the schema produces, so the file reads correctly
-               before a line of it has run. -->
-          <p class="panel-note" data-role="import-summary">Whatever you upload needs these eight columns:
-              <span class="ident">vin</span>, <span class="ident">registration</span>,
-              <span class="ident">make</span>, <span class="ident">model</span>,
-              <span class="ident">year</span>, <span class="ident">vehicle_category</span>,
-              <span class="ident">fuel_type</span>,
-              <span class="ident">total_tank_capacity_l</span>. Two more are optional.
-              <a href="#import-contract">What goes in each</a>.</p>
-          </div>
-          <div class="dropzone">
-            <svg data-lucide="upload" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
-            <p><b>Drop your completed file here</b></p>
-            <p class="dz-sub">or <a href="#import-review">choose it from your device</a></p>
-            <p class="dz-meta">CSV only, up to 10 MB</p>
-          </div>
         </div>
 
-        <!-- Reference material, so it takes the width. It was in the
-             commentary column at a third of this, wrapping "non-standard
-             plates are fine" over four lines.
-
-             It was also in the clean-view hide list, which meant that in the
-             default view of this prototype the import screen never named a
-             single column. That is fixed in the stylesheet, not here. -->
-        <div class="contract" id="import-contract">
-          <h2 class="spec-h">What the file must contain</h2>
-          <p class="contract-note" data-role="contract-count">Ten columns. The same fields the
-            form asks for, so somebody who has added one vehicle by hand already
-            knows the spreadsheet.</p>
-
-          <!-- The literal first two lines of a file that works. A table of
-               column names describes the shape; this one *is* the shape, and it
-               is what somebody compares their own header row against without
-               having to translate anything. -->
-          <p class="contract-label">The first two lines of a file that works</p>
-          <pre class="csv-sample"><code data-role="csv-sample"></code></pre>
-          <table class="spec">
-            <thead><tr><th>Column</th><th>Required</th><th>What to enter</th></tr></thead>
-            <tbody data-role="spec-rows"></tbody>
-          </table>
+        <!-- Closed, because it answers a question most people do not have: the
+             template already has the columns in order. Somebody arriving with a
+             spreadsheet from an old system is the one who opens it. -->
+        <details class="guide" id="import-contract">
+          <summary class="guide__summary">
+            <span class="guide__head">
+              <span class="guide__title">CSV requirements</span>
+              <span class="guide__count" data-role="contract-count">8 required &middot; 2 optional</span>
+            </span>
+            <span class="guide__cue">View column guide</span>
+          </summary>
+          <div class="guide__body">
+            <div class="csv-sample-wrap">
+              <p class="contract-label" id="csv-sample-label">The first two lines of a file that works</p>
+              <button type="button" class="btn btn-tertiary csv-copy" data-role="csv-copy"
+                      aria-describedby="csv-sample-label">Copy</button>
+            </div>
+            <pre class="csv-sample"><code data-role="csv-sample"></code></pre>
+            <table class="spec guide__table">
+              <thead><tr><th>Field</th><th>Required</th><th>What to enter</th></tr></thead>
+              <tbody data-role="spec-rows"></tbody>
+            </table>
+          </div>
+        </details>
         </div>
       </section>
 
@@ -6299,7 +6672,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
            a problem while telling them they cannot do anything about it is
            worse than not mentioning it: it is a screen that has decided, and
            written to inform. The list below is rendered by import-review.js. -->
-      <section id="screen-import-review" class="hidden">
+      <section id="screen-import-review" class="hidden headed-column">
         <div class="page-head">
           <div>
             <h1>Ready to bring in</h1>
@@ -6314,7 +6687,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               <div class="panel-head">
                 <div>
                   <h2 class="panel-title"><span class="ident">vehicles.csv</span></h2>
-                  <p class="panel-sub">8 rows read, 6 with nothing to query, 2 need a look</p>
+                  <p class="panel-sub" data-role="review-read">Reading the file…</p>
                 </div>
                 <span class="badge badge-good">Read</span>
               </div>
@@ -6437,7 +6810,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
                    before list has no remove buttons on it: it is a record of
                    the present, and this screen is a yes or no about one
                    addition, not a place to edit the policy. -->
-              <div class="panel-facts" style="display:block">
+              <div class="panel-facts panel-facts--stacked">
                 <div class="before-after">
                   <div class="ba-side">
                     <p class="rules-label">Now</p>
@@ -6652,8 +7025,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           second thing to do about a thing that already worked. Where the action
           can be taken back, this is where you take it back.</p>
         <div class="spec-grid">
-          <div class="toast is-up" data-specimen style="position: static; opacity: 1; transform: none;"><span>Invitation sent again to Refiloe Tshabalala.</span></div>
-          <div class="toast is-up" data-specimen style="position: static; opacity: 1; transform: none;"><span>9 drivers suspended. 3 drivers were not active.</span><button class="toast-undo" type="button">Undo</button></div>
+          <div class="toast is-up" data-specimen><span>Invitation sent again to Refiloe Tshabalala.</span></div>
+          <div class="toast is-up" data-specimen><span>9 drivers suspended. 3 drivers were not active.</span><button class="toast-undo" type="button">Undo</button></div>
         </div>
 
         <h2 class="spec-h">Bulk bar</h2>
@@ -6662,7 +7035,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           asking to be pressed and refusing. It obeys the same rules the row
           menu does, so Allow fuelling cannot quietly bring back somebody who
           left, or lift a stolen lock.</p>
-        <div class="bulk" style="margin: 0;">
+        <div class="bulk bulk--specimen">
           <span class="bulk-count">3 selected</span>
           <div class="bulk-actions">
             <button class="btn btn-tertiary">Suspend</button>
@@ -6676,7 +7049,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <p class="spec-note">A route, not a second count. One link per blocked field, and the number is said once, in the footer.</p>
         <!-- The real component, so the specimen cannot show a shape the
              product no longer has. -->
-        <div class="error-summary" style="max-width:440px">
+        <div class="error-summary error-summary--specimen">
           <h3>Check 3 fields</h3>
           <ul><li><a href="#molecules">Enter the VIN</a></li><li><a href="#molecules">Choose a make</a></li><li><a href="#molecules">Enter or choose a model</a></li></ul>
         </div>
@@ -7636,11 +8009,22 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
       <!-- Break-glass in the portal. A refused fill lands here, and the
            manager decides at a desk.
 
-           The example is a geofence refusal rather than a paused vehicle,
-           because it is the one a manager cannot answer from memory. Whether
-           this is a delivery that ran long or somebody filling a friend's car
-           is the whole question, so the screen leads with the distance and
-           names the areas he is allowed to use. -->
+           The example was a geofence refusal — a driver filling outside the
+           areas his policy allows — and that is a request that cannot happen.
+           A driver who may not fuel in an area is stopped before the
+           transaction starts; nothing gets as far as a pump for a manager to
+           release. The screen was answering a question the product never asks.
+
+           A second fill inside an hour is the real one. It is a rule that can
+           only fire mid-flow, because the first fill has to have happened, and
+           it is the case a manager genuinely cannot answer from memory:
+           a long day with two drivers on one card, a pump that cut out at 62
+           litres, or somebody filling a friend's car on the way home.
+
+           So the screen leads with the time since the last fill and the room
+           left in the tank, because those two numbers are what decide it. A
+           tank that can hold eighteen more litres and a request to pump eighty
+           is the tell, and it is arithmetic rather than judgement. -->
             <section id="screen-override" class="hidden">
         <div class="alert-bar">
           <span class="dot"></span>
@@ -7708,24 +8092,24 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <span class="timer">Expires <b>08:52</b> · in <b>1:47</b></span>
           </div>
           <div class="panel-key">
-            <div class="key-figure"><b>42 km</b><span>from Centurion, the nearest area he can use</span></div>
-            <div class="key-reason"><span class="badge badge-warning">Outside his areas</span><span>Gauteng fuel policy</span></div>
+            <div class="key-figure"><b>30 min</b><span>since he last filled, at Engen Sandton</span></div>
+            <div class="key-reason"><span class="badge badge-warning">Second fill within an hour</span><span>Gauteng fuel policy</span></div>
           </div>
-          <p class="panel-pattern">You have approved this station for Thabo
-            <b>twice before</b>, on 2 and 9 August.</p>
+          <p class="panel-pattern">His last fill put in <b>62 litres</b>. The tank
+            holds 80, so <b>18 litres</b> is the most that can be missing.</p>
           <!-- Everything the decision turns on, on the screen the decision is
                made on. The capacity and the cap were missing: a manager was
                being asked to release an unbounded fill and told only where it
                was happening. The two together are what makes "one transaction"
                a real limit rather than a promise. -->
-          <dl class="panel-facts"><dt>Driver</dt><dd>Thabo Mokoena &middot; 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd><dt>Filling at</dt><dd>Engen N1 City, Goodwood</dd><dt>Distance out</dt><dd>42 km from Centurion</dd><dt>Areas he can use</dt><dd>Sandton, Midrand, Centurion</dd><dt>Tank capacity</dt><dd>80 litres</dd><dt>Most this can pump</dt><dd><b>80 litres</b>, about R1 720 &mdash; the tank, whichever is lower against your R2 000 cap</dd><dt>Requested</dt><dd>08:42</dd><dt>Expires</dt><dd>08:52, ten minutes after it was asked</dd></dl>
+          <dl class="panel-facts"><dt>Driver</dt><dd>Thabo Mokoena &middot; 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span> &middot; Toyota Hilux 2.4 GD-6</dd><dt>Filling at</dt><dd>Engen N1 City, Goodwood</dd><dt>Last fill</dt><dd>08:12 at Engen Sandton &middot; 62 litres</dd><dt>Time since</dt><dd>30 minutes</dd><dt>Tank capacity</dt><dd>80 litres</dd><dt>Room left in the tank</dt><dd><b>18 litres</b>, if the last fill filled it</dd><dt>Most this can pump</dt><dd><b>18 litres</b>, about R390 &mdash; the room left, whichever is lower against your R2 000 cap</dd><dt>Requested</dt><dd>08:42</dd><dt>Expires</dt><dd>08:52, ten minutes after it was asked</dd></dl>
           <div class="panel-links"><a href="#override"><svg data-lucide="map-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>See on map</a><a href="tel:+27821234567"><svg data-lucide="phone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>Call Thabo</a></div>
           <div class="panel-foot">
             <!-- The whole of what pressing Approve does, in one sentence, in the
                  place the press happens. It was "Releases one fill at this
                  station", which is true and says nothing about how much or for
                  how long. -->
-            <p class="panel-scope"><b>Approve one transaction at Engen N1 City, up to 80 litres, within the next 10 minutes.</b> Nothing else changes: not Thabo&rsquo;s fuel rules, not this vehicle&rsquo;s status. A second fill outside his areas comes back to you.</p>
+            <p class="panel-scope"><b>Approve one transaction at Engen N1 City, up to 18 litres, within the next 10 minutes.</b> Nothing else changes: not Thabo&rsquo;s fuel rules, not this vehicle&rsquo;s status. A third fill inside the hour comes back to you.</p>
             <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve one fill</button></div>
           </div>
         </div>
@@ -7736,11 +8120,11 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         </div>
 
         <div class="figure-notes">
-          <p class="surface-note"><b>The distance is the answer.</b> Forty two
-            kilometres out is a delivery that ran long or somebody filling a
-            friend's car, and a manager can usually tell which from the number
-            alone. Naming the areas he can use gives them the comparison
-            without opening anything.</p>
+          <p class="surface-note"><b>The arithmetic is the answer.</b> A tank
+            that took 62 litres half an hour ago has room for 18 more, and a
+            request to pump 80 into it is not a second fill, it is a second
+            vehicle. A manager can settle that from two numbers without opening
+            anything or ringing anybody.</p>
           <p class="surface-note"><b>How much, and for how long, are part of
             the decision.</b> This screen asked a manager to release a fill
             without telling them the size of it. Tank capacity bounds the
@@ -7825,8 +8209,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <dl class="panel-facts"><dt>Approved by</dt><dd>Lerato Mokoena (you), 08:43</dd><dt>Driver told</dt><dd>08:43, on 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span></dd><dt>Released</dt><dd>One transaction at Engen N1 City</dd><dt>Limit</dt><dd>Up to 80 litres, about R1 720</dd><dt>Valid until</dt><dd>08:52</dd><dt>Recorded</dt><dd>On the vehicle&rsquo;s <a href="#directory">activity history</a> and on Thabo&rsquo;s</dd></dl>
 
           <div class="panel-foot">
-            <p class="panel-scope"><b>Thabo&rsquo;s fuel rules and this vehicle&rsquo;s status are unchanged.</b> The release covers one transaction and expires at 08:52 whether it is used or not. The next fill outside his areas comes back to you.</p>
-            <div class="panel-actions"><button class="btn btn-secondary" data-goto="rules">Add Goodwood to his rules</button><button class="btn btn-primary">Back to requests</button></div>
+            <p class="panel-scope"><b>Thabo&rsquo;s fuel rules and this vehicle&rsquo;s status are unchanged.</b> The release covers one transaction and expires at 08:52 whether it is used or not. A third fill inside the hour comes back to you.</p>
+            <div class="panel-actions"><button class="btn btn-secondary" data-goto="rules">See his fuel rules</button><button class="btn btn-primary">Back to requests</button></div>
           </div>
         </div>
         </div>
@@ -7908,12 +8292,12 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Thabo cannot fill up here</h2>
-              <p class="panel-sub">Thabo has been told which areas he can use.</p>
+              <p class="panel-sub">Thabo has been told the fill was not released.</p>
             </div>
             <span class="badge badge-neutral">Declined</span>
           </div>
           
-          <dl class="panel-facts"><dt>Declined by</dt><dd>Lerato Mokoena (you), 08:43</dd><dt>Driver told</dt><dd>08:43, on 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span></dd><dt>Nearest he can use</dt><dd>Centurion, 42 km</dd><dt>Recorded</dt><dd>On the vehicle&rsquo;s <a href="#directory">activity history</a> and on Thabo&rsquo;s</dd></dl>
+          <dl class="panel-facts"><dt>Declined by</dt><dd>Lerato Mokoena (you), 08:43</dd><dt>Driver told</dt><dd>08:43, on 082 123 4567</dd><dt>Vehicle</dt><dd><span class="ident">HRV 482 GP</span></dd><dt>Last fill</dt><dd>08:12 at Engen Sandton &middot; 62 litres</dd><dt>Recorded</dt><dd>On the vehicle&rsquo;s <a href="#directory">activity history</a> and on Thabo&rsquo;s</dd></dl>
           <div class="panel-links"><a href="tel:+27821234567"><svg data-lucide="phone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>Call Thabo</a></div>
           <div class="panel-foot">
             <p class="panel-scope">Nothing changed on the vehicle or on his rules.</p>
@@ -8224,7 +8608,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="alert-bar">
           <span class="dot"></span>
           <b>Thabo is waiting at Engen N1 City.</b>
-          <span>Outside his areas, 42 km from Centurion.</span>
+          <span>Second fill within an hour, 30 minutes after the last.</span>
           <span class="expiry">1:47 left</span>
           <button class="btn btn-primary" data-goto="override">Open request</button>
         </div>
@@ -8238,7 +8622,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <button class="btn btn-primary" data-open="vehicle:blank">Add vehicle</button>
           </div>
         </div>
-        <div class="surfaces" style="margin-top: 24px;">
+        <div class="surfaces surfaces--spaced">
           <div class="surface">
             <p class="surface-note"><b>The banner sits above the page and is the
               only thing allowed to.</b> It is there because the request is
@@ -8555,7 +8939,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           </table>
         </div>
 
-        <div class="surfaces" style="margin-top: 24px;">
+        <div class="surfaces surfaces--spaced">
           <div class="surface">
             <p class="surface-note"><b>Expiry shows only when it matters.</b>
               A date next to all twelve licence codes is noise. Two drivers
@@ -8590,7 +8974,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="table-wrap">
           <table aria-busy="true">
             <thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Licence</th><th>PrDP</th><th>Group</th><th>Status</th></tr></thead>
-            <tbody><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr><tr><td><span class="sk" style="width:60%"></span></td><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:85%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:35%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:50%"></span></td></tr></tbody>
+            <tbody class="sk-rows sk-rows--drivers"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
           </table>
         </div>
         <p class="surface-note"><b>The shape of the answer, not a spinner.</b>
@@ -8687,6 +9071,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
       </section>
 
       <section id="screen-drivers-import" class="hidden">
+        <div class="task-flow">
         <div class="page-head">
           <div>
             <h1>Import drivers</h1>
@@ -8751,9 +9136,10 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
             both is refused. The message says to remove one, not which one: the
             person who wrote the file knows, the import does not.</p>
         </div>
+        </div>
       </section>
 
-      <section id="screen-drivers-import-review" class="hidden">
+      <section id="screen-drivers-import-review" class="hidden headed-column">
         <div class="page-head">
           <div>
             <h1>Ready to bring in</h1>
@@ -9236,15 +9622,16 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     <section class="sheet-section">
       <h3 class="sheet-section__title">Identification</h3>
       <div class="sheet-grid">
-        <!-- VIN first, full width, required.
-             It was the last field on the form, under a heading that said the
-             identifiers were optional. The VIN is the one number that survives
-             a re-plating or a branch transfer, and matching on registration
-             alone is how the same vehicle ends up in a fleet twice. Asking for
-             it first also means the lookup can offer the make, model and year
-             before somebody types them. -->
+        <!-- VIN first and full width, and optional.
+             It stays at the top because it is the one number that survives a
+             re-plating or a branch transfer, and because a lookup that offers
+             the make, model and year has to be asked before those fields are
+             typed. It stopped being required when the story it is built from
+             said it was optional. Marked so on the label, which is where
+             somebody decides whether to answer, rather than left to be
+             discovered by pressing Add vehicle and not being stopped. -->
         <div class="form-field field-wide" data-field="vin">
-          <label for="f-vin">VIN</label>
+          <label for="f-vin">VIN <span class="opt">Optional</span></label>
           <input class="field ident" id="f-vin" maxlength="17" autocomplete="off"
                  placeholder="e.g. AHTFR22G30A123456">
           <span class="help">Find it on the licence disc.</span>
@@ -9291,36 +9678,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
       <div class="form-field" data-field="year">
         <label for="f-year">Year</label>
-        <select class="field" id="f-year">
-          <option value="">Select year</option>
-          <option>2026</option>
-          <option>2025</option>
-          <option>2024</option>
-          <option>2023</option>
-          <option>2022</option>
-          <option>2021</option>
-          <option>2020</option>
-          <option>2019</option>
-          <option>2018</option>
-          <option>2017</option>
-          <option>2016</option>
-          <option>2015</option>
-          <option>2014</option>
-          <option>2013</option>
-          <option>2012</option>
-          <option>2011</option>
-          <option>2010</option>
-          <option>2009</option>
-          <option>2008</option>
-          <option>2007</option>
-          <option>2006</option>
-          <option>2005</option>
-          <option>2004</option>
-          <option>2003</option>
-          <option>2002</option>
-          <option>2001</option>
-          <option>2000</option>
-        </select>
+        <select class="field" id="f-year"></select>
       </div>
 
       <!-- "Category", not "type". Type was doing two jobs — the kind of
@@ -9333,19 +9691,71 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <select class="field" id="f-type"></select>
       </div>
 
-      <!-- Appears once a category with configurations is chosen, and takes the
-           full width because its options carry weights: "Medium, 8 to 16 tons"
-           does not fit in half a sheet and does not mean anything trimmed. -->
-      <!-- Vehicle configuration was here: single cab against double cab, light
-           against heavy truck, street against off-road. Every one of those was
-           a fact about a granular category, and the categories are now LCV,
-           HCV and Motorcycle. A configuration list that covered a whole
-           category would be a guess in a field somebody has to answer. -->
-      <div class="form-field field-wide hidden" data-field="vehicleConfiguration" hidden>
-        <label for="f-config">Vehicle configuration</label>
-        <select class="field" id="f-config"></select>
-        <span class="help" data-role="config-help"></span>
+      <!-- Shown only when Other is chosen, and required then. What is typed
+           here becomes a category on this account, so the next vehicle of the
+           same kind is chosen from the list rather than described again. Full
+           width because the answer is a phrase — "refrigerated trailer",
+           "water bowser" — and half a sheet trims it. -->
+      <div class="form-field field-wide" data-field="vehicleTypeOther" hidden>
+        <label for="f-type-other">What kind of vehicle is it?</label>
+        <input class="field" id="f-type-other" maxlength="100" autocomplete="off"
+               placeholder="e.g. Refrigerated trailer">
+        <span class="help">Saved as a category you can choose next time.</span>
       </div>
+
+      <!-- The story asks for an initial reading and defines nothing else about
+           it, so the rules here are taken from what fleet systems actually do
+           rather than invented:
+
+             the reading is kept as the first row of a history, not as a field
+             on the vehicle — Fleetio logs every meter entry, Geotab stores an
+             odometer adjustment carrying its own date;
+
+             a reading has its own date, because the day the odometer read
+             84 500 and the day somebody typed it in are different facts, and
+             an imported or remembered reading is almost never today's;
+
+             it is checked for going backwards, not for being large. An
+             odometer only counts up, and that single fact catches the errors
+             a made-up ceiling never would. A vehicle can genuinely read lower
+             than last time — a replaced instrument cluster — so it is
+             questioned rather than refused, which is this form's rule for
+             anything that is unlikely but possible;
+
+             kilometres, because nothing in this product measures distance in
+             anything else. Not a display setting: Fleetio's is, and changing
+             it relabels stored values without converting them, so 91 000
+             miles silently becomes 91 000 kilometres. A unit that can be
+             flipped over stored numbers is worse than one that cannot;
+
+             zero is a real answer, because a new vehicle reads zero;
+             and it is optional, which is what every system surveyed does. -->
+      <div class="form-field" data-field="odometer">
+        <label for="f-odo">Odometer reading <span class="opt">Optional</span></label>
+        <span class="suffix-wrap">
+          <input class="field" id="f-odo" inputmode="decimal" autocomplete="off"
+                 placeholder="e.g. 84500">
+          <span class="suffix">km</span>
+        </span>
+        <span class="help">The reading, if you have it.</span>
+      </div>
+
+      <!-- Shown with the reading and defaulted to today, so the common case is
+           already answered and the uncommon one is possible. -->
+      <div class="form-field" data-field="odometerDate">
+        <label for="f-odo-date">Date of the reading <span class="opt">Optional</span></label>
+        <input class="field" id="f-odo-date" type="date" autocomplete="off">
+        <span class="help">When the odometer showed that figure.</span>
+      </div>
+
+      <!-- Vehicle configuration was here: single cab against double cab,
+           light against heavy truck, street against off-road. Every one was a
+           fact about a granular category, and the categories are LCV, HCV and
+           Motorcycle. Motorcycle sub-types were the last three standing and
+           they are gone too, so nothing asks the question and the field is
+           not kept hidden against the day something might: a control nobody
+           can fill is not storage, it is somewhere for a stale answer to
+           survive. -->
 
       <!-- Asked on three categories and no others. On Other and Special-purpose
            the category has told the product nothing, so this is the only field
@@ -9496,6 +9906,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <ul data-role="summary-list"></ul>
     </div>
 
+    <section class="sheet-section">
     <h3 class="sheet-section__title">Driver details</h3>
     <div class="fields">
       <div class="form-field" data-field="first">
@@ -9526,7 +9937,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
            documented operational requirement exists, with its retention and
            who-may-view-it settled first. -->
     </div>
+    </section>
 
+    <section class="sheet-section">
     <h3 class="sheet-section__title">Identification</h3>
     <p class="group-note">One document, not both. Some of your drivers will not
       hold a South African ID.</p>
@@ -9554,7 +9967,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <select class="field" id="d-country"></select>
       </div>
     </div>
+    </section>
 
+    <section class="sheet-section">
     <h3 class="sheet-section__title">Driving licence</h3>
     <p class="group-note">What they are allowed to drive, and what they are
       allowed to carry.</p>
@@ -9577,7 +9992,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       <p class="group-note is-review">Both optional, settled 14 August. Needs
         attention only covers drivers who have an expiry on file.</p>
       </div>
+    </section>
 
+      <section class="sheet-section">
       <h3 class="sheet-section__title">Professional driving permit</h3>
       <p class="group-note">Record whether this driver has a professional driving permit.</p>
       <div class="fields">
@@ -9594,7 +10011,9 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <input class="field" id="d-prdpexp" type="date">
       </div>
     </div>
+      </section>
 
+    <section class="sheet-section">
     <h3 class="sheet-section__title">Fleet details</h3>
     <p class="group-note">Optional information used by your organisation.</p>
     <div class="fields">
@@ -9607,6 +10026,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <select class="field" id="d-group"></select>
       </div>
     </div>
+    </section>
   </div>
 
   <div class="focus-sheet__foot">
@@ -9774,6 +10194,11 @@ function form(spec) {
   const noun = spec.noun || 'required detail';
 
   const touched = new Set();
+  /* What somebody has already answered a warning about. Keyed field → the
+     exact value they accepted, so editing the number asks again and retyping
+     the same number does not. A warning with no way to accept it is a warning
+     that comes back for ever, which teaches people to read past it. */
+  const accepted = new Map();
   let scripted = null; // the state's own messages, which live checks do not fight
   // The state on screen, which interaction does *not* clear. A duplicate check
   // needs to know it is looking at an edit, or a record is a duplicate of
@@ -9821,7 +10246,11 @@ function form(spec) {
     const v = get(field);
     const req = REQUIRED.find(r => r[0] === field);
     if (!v) return req ? { error: req[2] } : {};
-    return spec.check ? spec.check(field, v, get, current) || {} : {};
+    const r = spec.check ? spec.check(field, v, get, current) || {} : {};
+    /* Advice that has been accepted for this exact value is spent. An error
+       is never spent: accepting cannot make an impossible value possible. */
+    if (r.advice && !r.error && accepted.get(field) === v) return {};
+    return r;
   }
 
   /* Where a field's state is announced. Usually the control itself; for a
@@ -9874,7 +10303,7 @@ function form(spec) {
     wrap.querySelectorAll('.error, .advice, .notice').forEach(n => n.remove());
     if (!touched.has(field)) { say(field, null, null); return; }
 
-    const { error, advice, notice } = checkField(field);
+    const { error, advice, accept, notice } = checkField(field);
     if (error) {
       wrap.classList.add('invalid');
       const n = document.createElement('span');
@@ -9885,6 +10314,23 @@ function form(spec) {
       const n = document.createElement('span');
       n.className = 'advice';
       n.textContent = advice;
+      /* The way out of a warning, offered beside it. Checking the value needs
+         no button — the field is right there — so the only action that needs
+         one is the deliberate decision to keep what was typed. */
+      if (accept) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'advice-accept';
+        b.textContent = accept;
+        b.addEventListener('click', () => {
+          accepted.set(field, get(field));
+          paint(field);
+          paintFooter();
+          focusable(field)?.focus({ preventScroll: true });
+        });
+        n.appendChild(document.createTextNode(' '));
+        n.appendChild(b);
+      }
       say(field, 'advice', n);
     } else if (notice) {
       // An offer the value itself made. It reads as a question with a verb,
@@ -10083,6 +10529,9 @@ function form(spec) {
     scripted = s;
     current = s;
     touched.clear();
+    /* A new record has not accepted anything, and neither has a record being
+       opened again: the question is about the value on screen now. */
+    accepted.clear();
 
     title.textContent = s.title;
 
@@ -10115,11 +10564,13 @@ function form(spec) {
     });
     writeValues();
     sync();
-    /* Written again after sync, because a select whose options sync builds
-       could not hold its value the first time: assigning `double` to an empty
-       <select> silently leaves it empty, and the record's configuration was
-       lost between arriving and being shown. Idempotent, so every other field
-       is simply reassigned the value it already has. */
+    /* Written again after sync, because a value cannot be assigned to a
+       select before sync has built its options: the assignment is silently
+       dropped and the record arrives holding a field the screen shows empty.
+       Found on vehicle configuration, which no longer exists; the rule
+       outlives it, because it is a fact about selects and not about that
+       field. Idempotent, so every other field is simply reassigned the value
+       it already has. */
     writeValues();
 
     root.querySelectorAll('.form-field').forEach(f => {
@@ -10224,10 +10675,13 @@ function form(spec) {
 
     // The summary is a route, not a second count: one link per blocked field,
     // and the footer states the number once.
-    /* Only fields the form is actually asking for. Vehicle configuration and
-       primary use are in the required list and are not always on screen, and
-       this path was listing every entry regardless — so a blank form asked for
-       a configuration before a category had been chosen to have one. */
+    /* Only fields the form is actually asking for. A required field that is
+       not on screen must never reach the summary: it sends somebody looking
+       for a control that is not there. This path listed every entry
+       regardless, which is how a blank vehicle form came to ask for a
+       configuration before a category had been chosen to have one. Neither
+       that field nor primary use survives, but the engine is shared and the
+       next conditional field will be along. */
     const missing = REQUIRED.filter(r => errors.includes(r[0]) && applies(r[0], get));
     if (missing.length > 1) {
       summary.classList.remove('hidden');
@@ -12430,20 +12884,52 @@ const TYPES = [
   { code: 'lcv',        label: 'LCV',        long: 'LCV — Light commercial vehicle', band: 'lcv' },
   { code: 'hcv',        label: 'HCV',        long: 'HCV — Heavy commercial vehicle', band: 'hcv' },
   { code: 'motorcycle', label: 'Motorcycle', long: 'Motorcycle',                     band: 'motorcycle' },
+  /* The escape hatch, and the only governed category with no band. A fleet
+     carries things the three above do not describe — a refrigerated trailer,
+     a forklift, a water bowser — and the choice was previously to file them
+     under whichever of the three was least wrong. Choosing Other asks what it
+     is, and the answer becomes a category of its own, so the second one of
+     the same kind is picked rather than described again. */
+  { code: 'other',      label: 'Other',      long: 'Other — not one of the above', band: null },
 ];
 
-/* A configuration is offered only where the answer is still true of the whole
-   category. On a motorcycle it is, and it changes the tank a great deal. LCV
-   and HCV have none: single cab against double cab was a fact about bakkies,
-   and inventing a list that covers every light commercial vehicle would be
-   guessing in a field somebody has to answer. */
-const CONFIGS = {
-  motorcycle: [
-    { code: 'street',  label: 'Street',        band: 'motorcycle.street' },
-    { code: 'dual',    label: 'Dual-purpose',  band: 'motorcycle.dual' },
-    { code: 'offroad', label: 'Off-road',      band: 'motorcycle.offroad' },
-  ],
-};
+/* Where the governed list stops. Everything after this index was named by
+   somebody on this account, and the CSV specification publishes only the
+   governed ones: a template that listed another account's words would be
+   publishing one fleet's vocabulary to every other fleet. */
+const GOVERNED = TYPES.length;
+
+/* Slugged the way a stored value is read back: lower case, spaces and
+   punctuation collapsed to underscores. flatten() is what normalise() uses on
+   the way in, so a code made here is a code that reads back. */
+function codeFor(name) {
+  return flatten(name).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
+
+/* Adds a category this account named, and returns the code to store on the
+   record. Idempotent: naming a category that already exists — in any case, or
+   as one of the governed labels — returns the existing code rather than
+   growing a second entry that means the same thing. */
+function add(name) {
+  const clean = String(name == null ? '' : name).trim();
+  if (!clean) return null;
+  const already = normalise(clean);
+  if (already.code) return already.code;
+  const code = codeFor(clean);
+  if (!code) return null;
+  const hit = TYPES.find(t => t.code === code);
+  if (hit) return hit.code;
+  TYPES.push({ code, label: clean, long: clean, band: null, named: true });
+  reindex();
+  return code;
+}
+
+/* Configurations were here. Motorcycle kept three — street, dual-purpose and
+   off-road — after LCV and HCV lost theirs, on the argument that the answer
+   was still true of the whole category and moved the tank a great deal. It
+   was, and it did; it was also one more question on every motorcycle, and the
+   product asks for the total capacity directly. A category is the only thing
+   this file resolves a band from now. */
 
 /* ── What an older value becomes ──────────────────────────────────────────
  *
@@ -12528,7 +13014,12 @@ function label(code) {
   return r.stored.replace(/[_-]+/g, ' ').replace(/^./, m => m.toUpperCase());
 }
 
-const BY_CODE = Object.fromEntries(TYPES.map(t => [t.code, t]));
+/* Rebuilt rather than frozen at load: add() can grow TYPES, and a snapshot
+   taken once would leave a category the product just created unreadable by
+   the label and long lookups. */
+let BY_CODE = {};
+function reindex() { BY_CODE = Object.fromEntries(TYPES.map(t => [t.code, t])); }
+reindex();
 
 return {
   list: () => TYPES.slice(),
@@ -12540,22 +13031,21 @@ return {
   normalise,
   /* Convenience for the places that only need the yes or no. */
   needsReview: v => normalise(v).review,
-  /* The band a category and configuration resolve to together. A configuration
-     always wins, because it is the more specific answer to the same question;
-     without one the category's own band applies, which is wider on purpose. */
-  bandFor: (c, config) => {
+  /* The band a category resolves to. It took a configuration as well, which
+     won when one was supplied because it was the more specific answer to the
+     same question. Nothing supplies one. */
+  bandFor: c => {
     const code = normalise(c).code;
-    if (config && CONFIGS[code]) {
-      const found = CONFIGS[code].find(x => x.code === config);
-      if (found) return found.band;
-    }
     return BY_CODE[code] ? BY_CODE[code].band : null;
   },
-  configsFor: c => (CONFIGS[normalise(c).code] || []).slice(),
-  hasConfigs: c => !!CONFIGS[normalise(c).code],
+  /* Names a category this account uses and returns the code to store. */
+  add,
   /* The exact strings the CSV specification publishes, so the document and the
-     parser cannot disagree about what is accepted. */
-  csvValues: () => TYPES.map(t => t.code),
+     parser cannot disagree about what is accepted. Governed values only. */
+  csvValues: () => TYPES.slice(0, GOVERNED).map(t => t.code),
+  /* Everything the form may offer, which is the governed list plus whatever
+     this account has named. */
+  named: () => TYPES.slice(GOVERNED).map(t => ({ code: t.code, label: t.label })),
 };
 })();
 
@@ -12725,9 +13215,11 @@ return {
         const m = make.value.trim().toLowerCase();
         if (!m) return [];
         const seen = new Set();
-        (window.VehicleFixtures ? VehicleFixtures.VEHICLES : []).forEach(r => {
-          const [mk, ...rest] = String(r[2] || '').split(' ');
-          if (mk.toLowerCase() === m && rest.length) seen.add(rest.join(' '));
+        const VF = window.VehicleFixtures;
+        (VF ? VF.VEHICLES : []).forEach(r => {
+          if (String(r[VF.F.MAKE] || '').trim().toLowerCase() !== m) return;
+          const mdl = String(r[VF.F.MODEL] || '').trim();
+          if (mdl) seen.add(mdl);
         });
         return [...seen].sort();
       },
@@ -13207,9 +13699,46 @@ return {
      a heading. The option text is the expanded reading, because "LCV" alone is
      an abbreviation somebody has to already know; tables and other compact
      places use the short label through VehicleTypes.label(). */
-  sel.innerHTML = '<option value="">Select vehicle category</option>' +
-    VehicleTypes.list()
-      .map(t => `<option value="${t.code}">${t.long}</option>`).join('');
+  /* A function, not a one-off: naming a new category has to put it in the
+     list without a reload. The custom select watches its own options and
+     repaints itself, so re-filling here is the whole update. */
+  function fill() {
+    const held = sel.value;
+    sel.innerHTML = '<option value="">Select vehicle category</option>' +
+      VehicleTypes.list()
+        .map(t => `<option value="${t.code}">${t.long}</option>`).join('');
+    if (held) sel.value = held;
+  }
+  window.__fillTypeSelect = fill;
+  fill();
+
+  /* ── Years ──────────────────────────────────────────────────────────
+   *
+   * Twenty-seven <option> elements were typed into the markup, 2026 down to
+   * 2000. They were right only because of the year the file happened to be
+   * written in: on 1 January 2027 the newest year a person could choose was
+   * silently wrong, with nothing anywhere to catch it. A list whose first
+   * entry is "now" is not content, it is a calculation, and this is it.
+   *
+   * OLDEST is the floor the CSV specification publishes, so the two cannot
+   * disagree about what a vehicle year may be.
+   */
+  const OLDEST = 2000;
+  const years = () => {
+    const now = new Date().getFullYear();
+    const out = [];
+    for (let y = now; y >= OLDEST; y--) out.push(String(y));
+    return out;
+  };
+  window.__vehicleYears = years;
+
+  const ysel = document.getElementById('f-year');
+  if (ysel) {
+    const held = ysel.value;
+    ysel.innerHTML = '<option value="">Select year</option>' +
+      years().map(y => `<option>${y}</option>`).join('');
+    if (held) ysel.value = held;
+  }
 
 })();
 
@@ -13225,7 +13754,8 @@ window.ImportSchema = (() => {
 
 const COLUMNS = [
   { key: 'vin', label: 'VIN', required: true,
-    says: 'Seventeen characters, from the licence disc. This is what identifies the vehicle if its plate ever changes.',
+    says: 'Up to 50 characters, from the licence disc. This is what identifies '
+      + 'the vehicle if its plate ever changes.',
     example: 'AHTFR22G30A123456' },
   { key: 'registration', label: 'Registration number', required: true,
     says: 'Any text. No format rule, so non-standard plates are fine.',
@@ -13237,16 +13767,18 @@ const COLUMNS = [
     says: 'Free text, up to 100 characters.',
     example: 'Hilux 2.4 GD-6' },
   { key: 'year', label: 'Year', required: true,
-    says: '2000 to this year.',
+    /* Derived, so the document and the control cannot drift: both count down
+       from the year it is now to the same floor. */
+    says: `${(window.__vehicleYears ? window.__vehicleYears().slice(-1)[0] : '2000')} to this year.`,
     example: '2021' },
   { key: 'vehicle_category', label: 'Vehicle category', required: true,
     aliases: ['vehicle_type'],
-    says: 'lcv, hcv or motorcycle. Older words for the same three are read as '
+    says: 'LCV, HCV or Motorcycle. Older words for the same three are read as '
       + 'well: bakkie, van and pickup are an LCV; rigid truck, tractor unit and '
-      + 'horse are an HCV; scooter and motorbike are a motorcycle. Anything '
+      + 'horse are an HCV; scooter and motorbike are a Motorcycle. Anything '
       + 'that could be more than one of them is not guessed at, and comes back '
       + 'at review for you to answer.',
-    example: 'lcv' },
+    example: 'LCV' },
   { key: 'fuel_type', label: 'Fuel type', required: true,
     says: 'Diesel or Petrol.',
     example: 'Diesel' },
@@ -13254,9 +13786,16 @@ const COLUMNS = [
     aliases: ['tank_capacity_l'],
     says: 'The combined capacity of all fitted fuel tanks, in litres. Not the AdBlue tank.',
     example: '80' },
-  { key: 'engine_capacity_cc', label: 'Engine capacity', required: false,
-    says: 'In cc, if your export has it. Nothing in the product reads it yet, so leave it empty rather than look it up. It is accepted so an existing fleet export loads without being edited first.',
-    example: '' },
+  /* Engine capacity was here as an optional, ignored column, accepted so an
+     existing fleet export loaded without being edited first. It is out of the
+     template, the example and the guide: a column the product never reads is
+     one more thing to explain in a document whose whole job is to be short.
+     The parser still tolerates the header on an older file. */
+  { key: 'odo_reading', label: 'ODO reading', required: false,
+    aliases: ['odometer', 'odometer_km'],
+    says: 'The reading in whole kilometres, if you have it. Kept as the first '
+      + 'entry in the vehicle\u2019s odometer history.',
+    example: '84500' },
   { key: 'fleet_number', label: 'Fleet number', required: false,
     says: 'Your own reference. You can add it later.',
     example: 'FL-014' },
@@ -13283,8 +13822,15 @@ const canonical = name => {
   return hit ? hit.key : null;
 };
 
+/* Headers the file may carry that the product no longer publishes. Recognised
+   so an older export is not refused for a column nobody has to fill in, and
+   listed here rather than left in COLUMNS so they cannot reach the template,
+   the example or the guide. */
+const RETIRED = ['engine_capacity_cc', 'engine_capacity'];
+const retired = name => RETIRED.includes(String(name || '').trim().toLowerCase());
+
 return {
-  COLUMNS, required, optional, header, exampleRow, canonical, word,
+  COLUMNS, required, optional, header, exampleRow, canonical, retired, word,
   counts: () => ({ required: required().length, optional: optional().length, total: COLUMNS.length }),
   /* The one sentence, said once, in the two places that need it. */
   sentence: () => {
@@ -13308,18 +13854,11 @@ return {
   const ident = k => `<span class="ident">${esc(k)}</span>`;
   const c = S.counts();
 
-  /* The summary above the dropzone: the required columns named, and the
-     optional ones counted. */
-  document.querySelectorAll('[data-role="import-summary"]').forEach(el => {
-    el.innerHTML = `Whatever you upload needs these ${S.word(c.required)} columns: ` +
-      S.required().map(x => ident(x.key)).join(', ') +
-      `. ${S.word(c.optional).replace(/^./, m => m.toUpperCase())} more are optional.`;
-  });
-
-  /* And the line over the specification table. */
+  /* The count beside the disclosure title. Digits, not words: it is a label
+     sitting next to a heading, not a sentence, and "eight required" reads as
+     prose where "8 required" reads as a fact. */
   document.querySelectorAll('[data-role="contract-count"]').forEach(el => {
-    el.innerHTML = `${S.sentence()} The same fields the form asks for, so ` +
-      'somebody who has added one vehicle by hand already knows the spreadsheet.';
+    el.textContent = `${c.required} required \u00b7 ${c.optional} optional`;
   });
 
   /* The literal first two lines of a file that works — generated, so the
@@ -13336,7 +13875,7 @@ return {
       const values = x.key === 'vehicle_category'
         ? `<details class="spec-values"><summary>See the accepted values</summary>
              <ul>${VehicleTypes.list().map(t =>
-               `<li><code>${t.code}</code> <span>${esc(t.label)}</span></li>`).join('')}</ul>
+               `<li><code>${esc(t.label)}</code></li>`).join('')}</ul>
              <p class="spec-values__note">Older files using <code>vehicle_type</code> with
                <code>LCV</code>, <code>HCV</code> or <code>Other</code> still import. Each one
                is matched to its closest category and shown to you at review before anything
@@ -13346,9 +13885,35 @@ return {
       const alias = (x.aliases || []).length
         ? ` <span class="spec-alias">Older files may call this ${x.aliases.map(a => `<code>${esc(a)}</code>`).join(' or ')}.</span>`
         : '';
-      return `<tr><td class="ident">${esc(x.key)}</td><td>${need}</td>` +
+      /* The name a person knows leads; the header their spreadsheet needs
+         sits under it. It was the other way round, which asked somebody to
+         translate `total_tank_capacity_l` before they could tell whether the
+         row was about the thing they were looking for. */
+      return `<tr><td><span class="spec-field">${esc(x.label)}</span>` +
+             `<span class="spec-key ident">${esc(x.key)}</span></td>` +
+             `<td>${need}</td>` +
              `<td>${esc(x.says)}${alias}${values}</td></tr>`;
     }).join('');
+  });
+  /* Copy, because the example exists to be compared against somebody's own
+     header row and comparing is easier in their editor than on this page. The
+     button reports what happened rather than assuming: a clipboard write can
+     be refused, and a button that says "Copied" when nothing was copied is
+     worse than one that says nothing. */
+  document.querySelectorAll('[data-role="csv-copy"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = S.header() + '\n' + S.exampleRow();
+      const said = (word) => {
+        btn.textContent = word;
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      };
+      try {
+        await navigator.clipboard.writeText(text);
+        said('Copied');
+      } catch (e) {
+        said('Press \u2318C');
+      }
+    });
   });
 })();
 
@@ -13518,7 +14083,13 @@ function check(raw, year) {
       message: `A VIN is ${LENGTH} characters. This one is ${v.length}` };
   }
 
-  const y = Number(year);
+  /* An absent year has to be absent, not zero. `Number('')` is 0, and 0 is a
+     finite number below 1996, so a blank year was quietly taking the lenient
+     pre-1996 branch — the exact opposite of what the paragraph above promises,
+     and the common case now that the VIN is optional and often typed before
+     anybody has chosen a year. */
+  const yearText = String(year == null ? '' : year).trim();
+  const y = yearText === '' ? NaN : Number(yearText);
   const modern = !Number.isFinite(y) || y >= 1996;
 
   if (modern) {
@@ -13564,20 +14135,6 @@ window.Capacity = (() => {
  * so they can be tuned without touching a component.
  */
 const BANDS = {
-  /* Motorcycles differ enough between configurations that one band would be
-     useless: a scooter and a dual-purpose bike are not the same vehicle. */
-  'motorcycle.scooter':    { review: [4, 15],  warn: [2, 25],  label: 'scooter' },
-  'motorcycle.underbone':  { review: [5, 18],  warn: [2, 30],  label: 'commuter motorcycle' },
-  'motorcycle.street':     { review: [7, 25],  warn: [3, 40],  label: 'street motorcycle' },
-  'motorcycle.dual':       { review: [7, 35],  warn: [3, 45],  label: 'dual-purpose motorcycle' },
-  'motorcycle.offroad':    { review: [5, 20],  warn: [2, 35],  label: 'off-road motorcycle' },
-
-  /* Deliberately unbanded. A tricycle or a utility quad is not a motorcycle
-     with a different badge, and inventing a narrow range for either would
-     produce confident warnings about vehicles nobody researched. */
-  'motorcycle.tricycle':   { review: null, warn: [1, 120], label: 'motor tricycle' },
-  'motorcycle.quad':       { review: null, warn: [1, 120], label: 'quadricycle or utility ATV' },
-
   /* ── The three current categories ──────────────────────────────────────
      Each is the union of the bands it replaces, so no vehicle that passed
      before is warned about now. LCV is bakkie and van, which carried the same
@@ -13589,25 +14146,26 @@ const BANDS = {
   'hcv':         { review: [70, 1510], warn: [40, 1600],  label: 'heavy commercial vehicle' },
   'motorcycle':  { review: [4, 35],    warn: [2, 45],     label: 'motorcycle' },
 
+  /* Other, and every category an account names for itself, deliberately has
+     no band. A range invented for "a category we have not seen" would produce
+     confident warnings about vehicles nobody researched, which is the one
+     thing a plausibility check must never do. */
+  'other': null,
+
   /* ── Kept for what is already stored ───────────────────────────────────
-     Nothing selectable resolves here, but a record written before the
-     taxonomy narrowed still carries one of these, and a motorcycle
-     configuration still resolves to its own key, which is narrower and
-     better than the category's. */
+     Nothing selectable resolves here, but a record written before the taxonomy
+     narrowed still carries one of these as its category, and its own band is
+     narrower than the one it would otherwise fall back to.
+
+     Every dotted key used to be here as well: motorcycle.street, truck.heavy,
+     bus.coach and ten more. A dotted key could only ever be produced by a
+     category and a configuration together, and nothing asks for a
+     configuration now, so not one of them could be reached. They are deleted
+     rather than kept, because a band nothing resolves to reads as a
+     researched range and is never once applied. */
   'bakkie':      { review: [50, 120],  warn: [30, 200],   label: 'bakkie' },
-  /* An SUV carries noticeably more than a hatchback, and a coach more than
-     twice what a midibus does. Both were inside one band that had to stretch
-     across the pair, which is the same as having no band. */
-  'passenger.suv': { review: [55, 100], warn: [40, 140],   label: 'SUV' },
-  'bus.midi':      { review: [100, 250], warn: [60, 350],  label: 'midibus' },
-  'bus.coach':     { review: [300, 680], warn: [200, 900], label: 'coach' },
   'van':         { review: [50, 120],  warn: [30, 200],   label: 'van' },
   'passenger':   { review: [30, 100],  warn: [15, 150],   label: 'passenger vehicle' },
-  'truck.light':  { review: [70, 250],  warn: [40, 500],   label: 'light truck' },
-  'truck.medium': { review: [100, 500], warn: [60, 800],   label: 'medium truck' },
-  /* Heavy trucks run multiple tanks, so the range is wide by design: 615L
-     across two tanks is ordinary, and configured combinations reach ~1 510L. */
-  'truck.heavy':  { review: [150, 1510], warn: [100, 1600], label: 'heavy truck' },
 
   /* Kept without a band. Nothing selectable maps here any more, but a record
      imported before the taxonomy narrowed can still carry one of these, and a
@@ -13658,17 +14216,12 @@ function resolveModel({ make, model }) {
    which are ordinary lower-case nouns, so the vowel test is enough. */
 const article = word => (/^[aeiou]/i.test(String(word)) ? 'an' : 'a');
 
-function bandFor({ vehicleCategory, vehicleConfiguration }) {
+function bandFor({ vehicleCategory }) {
   if (!vehicleCategory) return null;
-  /* The taxonomy owns the category-to-band mapping now. LEGACY stays behind it
-     for the three strings that predate the taxonomy and still arrive in old
-     exports. */
-  /* The taxonomy resolves category plus configuration to a band key in one
-     step. It used to be concatenated here — category, a dot, configuration —
-     which only worked while every configuration happened to be a suffix of its
-     own category's key, and silently produced a missing band the moment one
-     was not. */
-  const key = (window.VehicleTypes && VehicleTypes.bandFor(vehicleCategory, vehicleConfiguration))
+  /* The taxonomy owns the category-to-band mapping. LEGACY stays behind it for
+     the strings that predate the taxonomy and still arrive in old exports, and
+     the stored category itself is the last resort. */
+  const key = (window.VehicleTypes && VehicleTypes.bandFor(vehicleCategory))
     || LEGACY[vehicleCategory] || vehicleCategory;
   /* `mapped` used to be read on the next two lines and was never declared in
      this function. It could not fire while every category had a band, so it
@@ -13689,8 +14242,7 @@ const grouped = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
  */
 function tank(input = {}) {
   const {
-    tankCapacityLitres: raw, vehicleCategory, vehicleConfiguration,
-    make, model,
+    tankCapacityLitres: raw, vehicleCategory, make, model,
   } = input;
 
   const text = String(raw == null ? '' : raw).trim();
@@ -13710,7 +14262,7 @@ function tank(input = {}) {
     return { level: 'error', field: 'tankCapacity', message: 'Tank capacity must be greater than 0 litres.' };
   }
 
-  const band = bandFor({ vehicleCategory, vehicleConfiguration });
+  const band = bandFor({ vehicleCategory });
   const what = band ? band.label : 'this vehicle';
   const spec = resolveModel({ make, model });
 
@@ -13962,10 +14514,21 @@ return { tank, engine, BANDS, LEGACY, MODELS, resolveModel, bandFor };
  *   note    whatever a person wants to leave for the next person
  *   activity who changed what, when, kept automatically
  */
+/* MAKE and ODO are appended rather than slotted in beside the fields they
+   belong with, because every existing index is a number written down in a
+   dozen places and renumbering them all to make the list read tidily is a
+   change with no reader and every risk.
+
+   MODEL used to hold "Toyota Hilux 2.4 GD-6" — make and model glued together
+   — and three separate places pulled them apart again by splitting on the
+   first space. That works until a make has a space in it: "UD Trucks Quon"
+   split into the make "UD" and the model "Trucks Quon". Both are stored on
+   their own now, and nothing splits anything. */
 const F = {
   REG: 0, FLEET: 1, MODEL: 2, YEAR: 3, TYPE: 4, FUEL: 5, CAP: 6,
-  BLOCK: 7, REASON: 8, STATUS: 9, NOTES: 10, VIN: 11, CONFIG: 12,
+  BLOCK: 7, REASON: 8, STATUS: 9, NOTES: 10, VIN: 11, MAKE: 12, ODO: 13,
 };
+
 
 /* Who the invitation goes to: the driver, on their mobile number. Confirmed by
  * TFN, and written once so the toast, the import page and the states screen
@@ -13985,15 +14548,15 @@ const INVITE_TO = 'the driver’s mobile number';
 /* The eight sample vehicles the Flutter prototype imports, so the table reads
  * the same in both and a screenshot of one can be checked against the other. */
 const VEHICLES = [
-  ['HRV 482 GP', 'FL-014', 'Toyota Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G30A123456', 'double'],
-  ['JTM 901 GP', 'FL-002', 'Isuzu D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Allowed', '', 'Active', [], 'ADMFR22G7L1234567', 'double'],
-  ['KPL 337 GP', 'FL-021', 'Ford Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AFAPXXMJ2PNE12345', 'double'],
-  ['LDW 129 GP', 'FL-008', 'Nissan NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Allowed', '', 'Active', [], 'ADNUJUD22Z0123456', 'single'],
-  ['MHB 664 GP', 'FL-011', 'Volkswagen Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Allowed', '', 'Active', [], 'AAVZZZ7HZMX123456', ''],
-  ['NCA 875 GP', 'FL-005', 'MAN TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Allowed', '', 'Active', [], 'WMA06XZZ8JM123456', ''],
+  ['HRV 482 GP', 'FL-014', 'Hilux 2.4 GD-6', '2021', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G30A123456', 'Toyota', []],
+  ['JTM 901 GP', 'FL-002', 'D-Max 250', '2020', 'bakkie', 'Diesel', 76, 'Allowed', '', 'Active', [], 'ADMFR22G7L1234567', 'Isuzu', []],
+  ['KPL 337 GP', 'FL-021', 'Ranger 2.0 SiT', '2022', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AFAPXXMJ2PNE12345', 'Ford', []],
+  ['LDW 129 GP', 'FL-008', 'NP200 1.6', '2019', 'bakkie', 'Petrol', 50, 'Allowed', '', 'Active', [], 'ADNUJUD22Z0123456', 'Nissan', []],
+  ['MHB 664 GP', 'FL-011', 'Transporter 2.0 TDI', '2021', 'van', 'Diesel', 70, 'Allowed', '', 'Active', [], 'AAVZZZ7HZMX123456', 'Volkswagen', []],
+  ['NCA 875 GP', 'FL-005', 'TGS 26.440', '2018', 'tractor_unit', 'Diesel', 400, 'Allowed', '', 'Active', [], 'WMA06XZZ8JM123456', 'MAN', []],
   /* Uploaded this morning. Its invitation went out with the upload and it is
      an ordinary vehicle. */
-  ['JXR 771 GP', 'FL-023', 'Toyota Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G50A987654', 'double'],
+  ['JXR 771 GP', 'FL-023', 'Hilux 2.4 GD-6', '2024', 'bakkie', 'Diesel', 80, 'Allowed', '', 'Active', [], 'AHTFR22G50A987654', 'Toyota', []],
   /* A stolen vehicle belongs in the list. The product could report one, draw
      it a receipt and keep a record for it, and the directory had no row in
      that state and no way to filter for one. So the fleet screen quietly
@@ -14006,16 +14569,16 @@ const VEHICLES = [
      column is only visible when they are interleaved: "Lerato stopped this
      vehicle at 09:14" and "waiting for Ford to confirm the repair date" are
      read together or not at all. */
-  ['PBK 550 GP', 'FL-007', 'Toyota Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Allowed', 'Hijacked', 'Reported stolen',
+  ['PBK 550 GP', 'FL-007', 'Land Cruiser 79', '2022', 'bakkie', 'Diesel', 130, 'Allowed', 'Hijacked', 'Reported stolen',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Operational status', from: 'Active', to: 'Reported stolen' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '19 Aug, 06:38', field: 'Reason', from: '', to: 'Hijacked' },
-     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. Case 411/8/2026 opened.' }], 'AHTFB71J40A234567', 'single'],
-  ['RTS 018 GP', '', 'Hino 300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Allowed', '', 'In maintenance',
+     { kind: 'note', who: 'Lerato Mokoena', at: '19 Aug, 06:40', text: 'Taken from the Sandton yard overnight. Case 411/8/2026 opened.' }], 'AHTFB71J40A234567', 'Toyota', []],
+  ['RTS 018 GP', '', '300 815', '2020', 'rigid_truck', 'Diesel', 100, 'Allowed', '', 'In maintenance',
     [{ kind: 'change', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Operational status', from: 'Active', to: 'In maintenance' },
      { kind: 'reason', who: 'Lerato Mokoena', at: '18 Aug, 09:14', field: 'Reason', from: '', to: 'Booked in for a service' },
      { kind: 'note', who: 'Lerato Mokoena', at: '18 Aug, 09:15', text: 'Waiting for Ford to confirm the repair date.' },
-     { kind: 'note', who: 'Sipho Dube', at: '19 Aug, 07:02', text: 'Gearbox part is on back order. Two weeks at least.' }], 'JHDFC9JEL0X123456', 'light'],
-  ['VBN 442 GP', 'FL-019', 'Mercedes-Benz Sprinter 519', '2023', 'van', 'Diesel', 93, 'Allowed', 'Sold', 'Removed from fleet', [], 'WDB9066332P123456', ''],
+     { kind: 'note', who: 'Sipho Dube', at: '19 Aug, 07:02', text: 'Gearbox part is on back order. Two weeks at least.' }], 'JHDFC9JEL0X123456', 'Hino', []],
+  ['VBN 442 GP', 'FL-019', 'Sprinter 519', '2023', 'van', 'Diesel', 93, 'Allowed', 'Sold', 'Removed from fleet', [], 'WDB9066332P123456', 'Mercedes-Benz', []],
 ];
 
 /* The 25 governed makes. "Other" is not among them: it was a control rather
@@ -14103,6 +14666,14 @@ const BLOCK = {
 /* Derived, never stored. Three answers, because "not applicable" and "blocked"
    are different things to a reader: one is a vehicle that could fuel and is
    stopped, the other is a vehicle that is no longer in the fleet to fuel. */
+/* Make and model are two fields and one name. Every screen that prints a
+   vehicle prints it the same way, from here, so the table, the report and the
+   sheet cannot drift apart on a space. */
+function vehicleName(row) {
+  return [row[F.MAKE], row[F.MODEL]].map(x => String(x || '').trim())
+    .filter(Boolean).join(' ');
+}
+
 function fuelAccess(row) {
   const st = STATUS[row[F.STATUS]];
   if (!st) return 'Blocked';
@@ -14155,16 +14726,20 @@ const BADGE = Object.fromEntries(
  * question you have not answered, in the words of the question.
  */
 const REQUIRED = [
-  ['vin', 'VIN', 'Enter the VIN'],
+  /* VIN was required here and is not any more: the story this form is built
+     from asks for it as an optional detail. The ISO 3779 rules it is checked
+     against stay exactly as they were — an optional field is not an unchecked
+     one, and a VIN typed off a licence disc with an O for a 0 is still wrong.
+     They simply only run once somebody has typed something. */
   ['registration', 'Registration number', 'Enter the registration number'],
   ['make', 'Make', 'Choose a make'],
   ['model', 'Model', 'Enter or choose a model'],
   ['year', 'Year', 'Choose the vehicle year'],
   ['vehicleType', 'Vehicle category', 'Choose a vehicle category'],
-  /* Vehicle configuration was the conditional entry here, required only where
-     the chosen category had configurations. No category is asked for one now,
-     so the list is eight questions asked of every vehicle and `applies` is
-     the constant it says it is. */
+  /* Conditional, and the only conditional entry in this list. `applies` below
+     filters it out on every category except Other, so it is inert on a bakkie
+     and binding the moment somebody says the category is not listed. */
+  ['vehicleTypeOther', 'Vehicle category name', 'Name the kind of vehicle'],
   ['fuelType', 'Fuel type', 'Choose a fuel type'],
   ['tankCapacity', 'Total fuel-tank capacity', 'Enter the total fuel-tank capacity'],
 ];
@@ -14178,8 +14753,9 @@ const FILLED = {
 
 const ID = {
   registration: 'f-reg', make: 'f-make', model: 'f-model', year: 'f-year',
-  vehicleType: 'f-type', fuelType: 'f-fuel', tankCapacity: 'f-tank',
-  vehicleConfiguration: 'f-config',
+  vehicleType: 'f-type', vehicleTypeOther: 'f-type-other',
+  fuelType: 'f-fuel', tankCapacity: 'f-tank',
+  odometer: 'f-odo', odometerDate: 'f-odo-date',
   fleetNumber: 'f-fleet', vin: 'f-vin',
   /* A radio group reports through its checked input; every other field is
      the control a summary link lands on. */
@@ -14188,8 +14764,17 @@ const ID = {
 /* Each state: the values the form holds, which fields are refused, and any
  * value that is merely doubted. Blocked refuses the save; doubt questions it
  * and lets it through: the difference a static mock cannot show. */
+/* Today, as a date input reads it. A function, not a constant: a prototype
+   left open overnight would otherwise go on offering yesterday. */
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
 const STATES = {
-  blank:     { title: 'Add a vehicle', values: {}, errors: [] },
+  /* A getter, because `values` is read each time a state is applied and the
+     default has to be today then rather than whenever this file loaded. It
+     lives here rather than in the sheet controller because apply() writes
+     every field from the state it is given — anything filled in outside that
+     is overwritten by it a moment later. */
+  blank:     { title: 'Add a vehicle', get values() { return { odometerDate: todayISO() }; }, errors: [] },
   blocked:   { title: 'Add a vehicle', values: {}, errors: REQUIRED.map(r => r[0]) },
   duplicate: {
     title: 'Add a vehicle',
@@ -14379,6 +14964,35 @@ const STATES = {
 
 const MAX_MODEL = 100;
 
+/* The most recent reading on the record being edited, or null while adding —
+   a vehicle that does not exist yet has nothing to have gone backwards from. */
+/* One reading. `on` is the day the odometer showed that figure; `at` is the
+   moment somebody wrote it down. They are different facts and a record that
+   keeps only the second cannot answer when the vehicle was actually read. */
+function reading(km, on) {
+  return {
+    km: Number(km),
+    on: String(on || '').trim() || todayISO(),
+    at: stamp(),
+    by: 'You',
+  };
+}
+
+/* An ISO date read the way a person says it. The stored form stays ISO, which
+   is what a date input and a sort both want; this is only for the sentence. */
+function readingDay(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function lastReading(state) {
+  if (!state || !state.editing) return null;
+  const r = VEHICLES.find(x => x[0] === state.editing);
+  const h = (r && r[F.ODO]) || [];
+  return h.length ? h[h.length - 1] : null;
+}
+
 function check(field, v, get, state) {
   if (field === 'registration') {
     // Everything except the vehicle being edited: a plate is not a duplicate
@@ -14407,14 +15021,49 @@ function check(field, v, get, state) {
     const r = Capacity.tank({
       tankCapacityLitres: v,
       vehicleCategory: get('vehicleType'),
-      vehicleConfiguration: get('vehicleConfiguration'),
       make: get('make'),
       model: get('model'),
     });
     if (r.level === 'error') return { error: r.message };
     if (r.level === 'warning' || r.level === 'info') {
-      return { advice: [r.message, r.verify].filter(Boolean).join(' ') };
+      return {
+        advice: [r.message, r.verify].filter(Boolean).join(' '),
+        /* The service has always worked out what keeping the value would
+           mean; until now nothing put it on screen. */
+        accept: 'Save as entered',
+      };
     }
+  }
+
+  /* Blocking only what cannot be true, and questioning the rest — the same
+     shape as the capacity check above. A reading is refused for being the
+     wrong kind of thing, or for being further than any vehicle has travelled.
+     A high but possible reading is questioned and can be kept. */
+  if (field === 'odometer') {
+    if (!/^\d+(\.\d+)?$/.test(v)) {
+      return { error: 'Enter the reading in kilometres, using digits only' };
+    }
+    /* No upper bound. The first version of this refused anything over two
+       million kilometres and questioned anything over one, and both numbers
+       were invented. No fleet system validates an odometer that way: they
+       check that it has not gone backwards, because an odometer only counts
+       up and that one fact catches the errors a ceiling never sees. */
+    const last = lastReading(state);
+    if (last && Number(v) < last.km) {
+      return {
+        advice: `Lower than the last reading of ${Records.groupNum(last.km)} km`
+          + `${last.on ? ' on ' + readingDay(last.on) : ''}. An odometer counts up, `
+          + 'so this is usually a typing slip — unless the instrument cluster '
+          + 'was replaced.',
+        accept: 'Record it anyway',
+      };
+    }
+  }
+
+  /* A reading cannot have been taken tomorrow. This one is refused rather than
+     questioned: unlike a low reading, there is no vehicle it could be true of. */
+  if (field === 'odometerDate') {
+    if (v > todayISO()) return { error: 'A reading cannot be from the future' };
   }
 
   /* The VIN is normalised as well as checked: what gets stored is the trimmed,
@@ -14442,15 +15091,19 @@ const form = Records.form({
   // Tank capacity takes digits and a point, filtered at the input the way the
   // Flutter field filters it, so "Enter a number" is unreachable by typing and
   // only a paste can produce it.
-  filters: { tankCapacity: v => v.replace(/[^0-9.]/g, '') },
+  filters: {
+    tankCapacity: v => v.replace(/[^0-9.]/g, ''),
+    /* Digits and one point. Decimals are allowed because the systems this was
+       modelled on allow them; the minus is filtered out because a distance
+       travelled has no sign. */
+    odometer: v => v.replace(/[^0-9.]/g, ''),
+  },
   /* Everything the capacity answer depends on. Without make and model here, an
      exact specification could not overrule a band the moment the model was
-     typed; without vehicleConfiguration, a scooter kept a motorcycle-wide
-     warning. */
+     typed. */
   recheck: {
     year: ['vin'],
-    vehicleType: ['tankCapacity'],
-    vehicleConfiguration: ['tankCapacity'],
+    vehicleType: ['tankCapacity', 'vehicleTypeOther'],
     make: ['tankCapacity'],
     model: ['tankCapacity'],
   },
@@ -14473,11 +15126,11 @@ const form = Records.form({
 
   },
 
-  /* Every question this form asks, it asks of every vehicle. Total fuel-tank
-     capacity was conditional on a tank count that no longer exists, and
-     vehicle configuration was conditional on a category granular enough to
-     have configurations, which no category is now. */
-  applies: () => true,
+  /* One conditional question. Naming the category is asked only when the
+     category is Other, and a required field that is not on screen must never
+     reach the error summary — it sends somebody looking for a control that is
+     not there. */
+  applies: (field, get) => field !== 'vehicleTypeOther' || get('vehicleType') === 'other',
   menu: state => {
     const veh = VEHICLES.find(x => x[0] === state.editing);
     return veh ? vehicles.menuFor(veh).filter(i => i.act !== 'edit') : [];
@@ -14489,13 +15142,41 @@ const form = Records.form({
   onSave: (v, state) => {
     /* A new vehicle is in the fleet and able to fuel. Adding it sends the
        invitation on its own, so there is nothing left for a person to press. */
-    const row = [v.registration, v.fleetNumber, `${v.make} ${v.model}`.trim(),
-      v.year, v.vehicleType,
+    /* Model alone in its own column, make alongside it. The two used to be
+       written into one string here and split apart again by whoever needed
+       them. */
+    /* Registered here: after everything that could refuse the save has run,
+       before any row referencing it is written, and on both paths — an edit
+       that names a new make creates it just as an add does. */
+    if (window.__commitPendingMake) __commitPendingMake();
+
+    /* Other is an answer about what the category is not. What it is was typed
+       beside it, and saving is what turns that into a category this account
+       owns — so the record stores the new category, never the word "other",
+       and the next vehicle of the kind is chosen from the list. */
+    let category = v.vehicleType;
+    if (category === 'other' && window.VehicleTypes) {
+      const named = VehicleTypes.add(v.vehicleTypeOther);
+      if (named) {
+        category = named;
+        if (window.__fillTypeSelect) __fillTypeSelect();
+      }
+    }
+
+    const km = String(v.odometer || '').trim();
+    const row = [v.registration, v.fleetNumber, (v.model || '').trim(),
+      v.year, category,
       v.fuelType, Number(v.tankCapacity), 'Allowed', '', 'Active', [],
       /* Stored normalised, so two people typing the same VIN two ways produce
          one string to match on. */
       (window.VIN ? VIN.normalise(v.vin) : v.vin) || '',
-      v.vehicleConfiguration || ''];
+      (v.make || '').trim(),
+      /* The seed row of the odometer history, and only when a reading was
+         given. An empty history says nobody has read the odometer; a history
+         holding a zero says somebody read it and it said zero, which is what
+         a new vehicle says. The two are different facts and are stored
+         differently. */
+      km === '' ? [] : [reading(km, v.odometerDate)]];
     if (state && state.editing) {
       const existing = VEHICLES.find(x => x[0] === state.editing);
       if (existing) {
@@ -14505,6 +15186,15 @@ const form = Records.form({
         row[F.REASON] = existing[F.REASON];
         row[F.STATUS] = existing[F.STATUS];
         row[F.NOTES] = existing[F.NOTES];
+        /* The odometer is a history, so an edit adds to it. Rebuilding the
+           row from the form would otherwise throw away every earlier reading
+           and leave the vehicle looking as though it had been read once. A
+           reading equal to the last one is not a new reading. */
+        const past = existing[F.ODO] || [];
+        const last = past.length ? past[past.length - 1].km : null;
+        row[F.ODO] = (km !== '' && Number(km) !== last)
+          ? past.concat([reading(km, v.odometerDate)])
+          : past;
         VEHICLES[VEHICLES.indexOf(existing)] = row;
       }
       // A changed plate has to move the row, for the same reason a renamed
@@ -14678,11 +15368,10 @@ function needsAttention(r) {
     const cat = VehicleTypes.normalise(r[4]);
     if (!cat.code && cat.stored) return true;
   }
-  const [make, ...model] = String(r[2] || '').split(' ');
   return Capacity.tank({
     tankCapacityLitres: r[6],
     vehicleCategory: r[4],
-    make, model: model.join(' '),
+    make: r[F.MAKE] || '', model: r[F.MODEL] || '',
   }).level !== 'ok';
 }
 
@@ -14751,8 +15440,11 @@ const vehicles = Records.directory({
   rowLabel: r => r[0],
   /* Fuel access is searchable by its derived word, so typing "blocked" finds
      the vehicles a manager means by it. */
-  searchable: r => [r[0], r[1], r[2], r[3], r[4], r[5], r[F.STATUS], fuelAccess(r), r[F.REASON]]
-    .filter(Boolean).join(' '),
+  /* Make is in here on its own now. It used to be reachable only because it
+     happened to be the first word of the model string; a fleet searching for
+     "Toyota" was matching a substring, not a field. */
+  searchable: r => [r[0], r[1], r[F.MAKE], r[2], r[3], r[4], r[5],
+    r[F.STATUS], fuelAccess(r), r[F.REASON]].filter(Boolean).join(' '),
   // `80 L` and `400 L` are strings, and as strings 400 sorts before 80.
   sortValue: (r, col) => (col === 'Tank capacity' ? r[6] : undefined),
   /* What is left in the row menu.
@@ -14889,7 +15581,7 @@ const vehicles = Records.directory({
          not to whether it happens to be a link. */
       `<a class="rec ident" href="#">${r[0]}</a>`,
       r[1] || '<span class="cell-none">Not assigned</span>',
-      `${r[2]} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${Records.groupNum(r[6])} L`,
+      `${vehicleName(r)} · ${r[3]}`, VehicleTypes.label(r[4]), r[5], `${Records.groupNum(r[6])} L`,
       `<span class="status-cell">
          ${pill(status, 'status', 'Operational status')}
          ${showAccess ? '<span class="status-derived">Fuel blocked</span>' : ''}
@@ -14908,16 +15600,28 @@ const vehicles = Records.directory({
  * wants to correct one tank capacity had no route from the list to the form.
  */
 const editState = r => {
-  // The table folds make and model into one cell. Every governed make is one
-  // word, so the first is the make and the rest is the model.
-  const [make, ...model] = r[2].split(' ');
+  /* Read, not reconstructed. The table still folds make and model into one
+     cell, but the record keeps them apart, so opening a UD Trucks vehicle no
+     longer offers "UD" as the make and "Trucks Quon" as the model. */
+  const make = r[F.MAKE] || '';
+  const model = r[F.MODEL] || '';
   return {
     title: 'Edit vehicle',
     save: 'Save changes',
     editing: r[0],
     values: {
-      registration: r[0], fleetNumber: r[1], make, model: model.join(' '),
+      registration: r[0], fleetNumber: r[1], make, model,
       year: r[3],
+      /* The latest reading, so an edit shows what the vehicle is on rather
+         than the number it was bought with. Blank when it has never had one. */
+      odometer: (() => {
+        const h = r[F.ODO] || [];
+        return h.length ? String(h[h.length - 1].km) : '';
+      })(),
+      odometerDate: (() => {
+        const h = r[F.ODO] || [];
+        return h.length ? (h[h.length - 1].on || '') : '';
+      })(),
       /* The record keeps the word it was written with; the form has to offer
          one of three. A recognised older value resolves to its current
          category here and nowhere else, so the row is untouched until somebody
@@ -14927,7 +15631,6 @@ const editState = r => {
       vehicleType: (window.VehicleTypes ? VehicleTypes.normalise(r[4]).code : '') || '',
       fuelType: r[5],
       tankCapacity: String(r[6]), vin: r[F.VIN] || '',
-    vehicleConfiguration: r[F.CONFIG] || '',
     },
   };
 };
@@ -14987,16 +15690,33 @@ function closeList() {
   cursor = -1;
 }
 
+/* Held, not registered. Selecting the create row used to push the make into
+   the account list there and then, so abandoning the sheet afterwards left a
+   make behind with no vehicle on it. The typed value waits here and is
+   committed by onSave, which is the only moment a vehicle actually exists. */
+let pendingMake = null;
+
+/* Called by onSave. Trimmed before comparing as well as before storing: the
+   guard and the write have to agree about what counts as the same make, or
+   "Foton " and "Foton" become two. */
+function commitPendingMake() {
+  const name = String(pendingMake || '').trim();
+  pendingMake = null;
+  if (!name) return;
+  if (!allMakes().some(m => m.trim().toLowerCase() === name.toLowerCase())) {
+    accountMakes.push(name);
+  }
+}
+window.__commitPendingMake = commitPendingMake;
+
 function choose(el) {
   if (!el) return;
   const created = el.dataset.create;
   if (created) {
-    // Registered before the vehicle, so the next one finds it on the list.
-    if (!allMakes().some(m => m.toLowerCase() === created.toLowerCase())) {
-      accountMakes.push(created);
-    }
+    pendingMake = created;
     makeInput.value = created;
   } else if (el.dataset.make) {
+    pendingMake = null;
     makeInput.value = el.dataset.make;
   } else {
     return;
@@ -15133,7 +15853,7 @@ function panelSpec(vehicle, tab) {
       ['Fleet number', vehicle[F.FLEET]
         ? `<span class="ident">${esc(vehicle[F.FLEET])}</span>`
         : '<span class="rp-none">None</span>'],
-      ['Vehicle', `${esc(vehicle[F.MODEL])} · ${esc(vehicle[F.YEAR])}`],
+      ['Vehicle', `${esc(vehicleName(vehicle))} · ${esc(vehicle[F.YEAR])}`],
       ['Type', `${esc(VehicleTypes.label(vehicle[F.TYPE]))}`],
       ['Fuel', esc(vehicle[F.FUEL])],
       ['Tank capacity', `${Records.groupNum(vehicle[F.CAP])} L`],
@@ -15667,7 +16387,8 @@ function askReason(key, anchor) {
    `const VEHICLE_STATUS = 7`, which is a second copy of this file's column
    order living in another file, and the kind of thing that is correct until
    somebody inserts a column. */
-window.VehicleFixtures = { VEHICLES, STATES, ID, F, STATUS, BLOCK, PUMP, fuelAccess, fuelAccessWhy };
+window.VehicleFixtures = { VEHICLES, STATES, ID, F, STATUS, BLOCK, PUMP,
+  vehicleName, fuelAccess, fuelAccessWhy };
 
 })();
 </script>
@@ -17119,8 +17840,9 @@ const closeForms = () => {
  * record would land on. `data-form` says which drawer; without it, it is an
  * ordinary screen. */
 function railTo(btn) {
-  document.querySelectorAll('.rail button')
+  document.querySelectorAll('.rail button:not(.rail-tab):not(.group-toggle)')
     .forEach(b => b.setAttribute('aria-current', String(b === btn)));
+  if (window.__railReveal) __railReveal(btn);
 
   const form = Records.forms[btn.dataset.form];
   if (form) {
@@ -17181,7 +17903,12 @@ window.addEventListener('popstate', () => {
 /* The tab buttons are in the rail too, so they must not be mistaken for
    screen buttons: keyOf would return undefined for them and the hash router
    would try to match it. */
-const railButtons = () => [...document.querySelectorAll('.rail button:not(.rail-tab)')];
+/* The group toggles are excluded for the same reason the tabs are: they are
+   controls of the rail, not destinations in it. Left in, each one navigated to
+   an undefined key and then reopened the group it had just closed, so a group
+   could not be collapsed at all. */
+const railButtons = () =>
+  [...document.querySelectorAll('.rail button:not(.rail-tab):not(.group-toggle)')];
 
 /* ── Two lists, one rail ──────────────────────────────────────────────────
  * Screens are the product. Design notes are the pages that explain it. They
@@ -17205,6 +17932,56 @@ const railButtons = () => [...document.querySelectorAll('.rail button:not(.rail-
   }
 
   tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.rail)));
+
+  /* ── Collapsing a group ───────────────────────────────────────────────
+   *
+   * Remembered between reloads, because this file is reloaded constantly
+   * while it is being reviewed and a rail that forgets is a rail somebody
+   * re-collapses forty times an afternoon. Stored under file:// where the
+   * origin is opaque and Chrome may refuse, so every touch is guarded: a
+   * browser that will not store it still opens and closes, it just starts
+   * open each time. */
+  const KEY = 'engenxt.rail.collapsed';
+  const shut = new Set((() => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+  })());
+  const remember = () => {
+    try { localStorage.setItem(KEY, JSON.stringify([...shut])); } catch (e) { /* not stored */ }
+  };
+
+  document.querySelectorAll('.rail-group').forEach((group) => {
+    const toggle = group.querySelector('.group-toggle');
+    const items = group.querySelector('.rail-group__items');
+    if (!toggle || !items) return;
+    const name = toggle.textContent.trim();
+    const set = (open) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      items.hidden = !open;
+    };
+    set(!shut.has(name));
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      set(open);
+      if (open) shut.delete(name); else shut.add(name);
+      remember();
+    });
+  });
+
+  /* Navigating to a screen opens the group holding it. Without this the rail
+     highlights a button inside a closed group, which is a highlight nobody can
+     see. Only navigation does this — collapsing the group you are standing in
+     is a deliberate act and is left alone. */
+  window.__railReveal = (btn) => {
+    const group = btn && btn.closest('.rail-group');
+    if (!group) return;
+    const toggle = group.querySelector('.group-toggle');
+    const items = group.querySelector('.rail-group__items');
+    if (!toggle || !items || !items.hidden) return;
+    toggle.setAttribute('aria-expanded', 'true');
+    items.hidden = false;
+    shut.delete(toggle.textContent.trim());
+    remember();
+  };
 
   /* Arriving at a notes page by hash, a pasted link or a reload, should show
      the list that contains it, or the highlighted item sits in a hidden half
@@ -17277,8 +18054,7 @@ function makeSheet(config) {
      guard on it, so the controller stays one implementation instead of two
      with a shared name. */
   const typeSel = document.getElementById('f-type');
-  const configWrap = field('vehicleConfiguration');
-  const configSel = document.getElementById('f-config');
+  const otherWrap = field('vehicleTypeOther');
   const useWrap = field('primaryUse');
   const useSel = document.getElementById('f-use');
   const useText = document.getElementById('f-use-text');
@@ -17292,10 +18068,9 @@ function makeSheet(config) {
     const T = window.VehicleTypes;
     if (!T) return;
 
-    /* No category has configurations any more, so the field never appears.
-       The element stays in the markup holding whatever a legacy record had in
-       it, which is what keeps that value on the record through a save. */
-    if (configWrap) { configWrap.hidden = true; }
+    /* The one conditional field left. Other is an answer that says the list
+       does not have it; the field beside it asks what it is instead. */
+    if (otherWrap) { otherWrap.hidden = code !== 'other'; }
 
     /* Primary use was asked on three-wheelers, special-purpose vehicles and
        Other, and on nothing else. None of those is a category any more, so
@@ -17543,7 +18318,10 @@ function makeSheet(config) {
 /* The two sheets. Same controller, different form. */
 window.__vehicleSheet = makeSheet({
   id: 'vehicle-drawer', route: '#vehicles/new',
-  firstField: '#f-vin', dialog: 'discard-vehicle',
+  /* Registration, not VIN. The first field a sheet lands on should be the
+     one every vehicle has and the one a person came here holding; VIN is
+     optional now, and opening on an optional field reads as a demand. */
+  firstField: '#f-reg', dialog: 'discard-vehicle',
 });
 window.__driverSheet = makeSheet({
   id: 'driver-drawer', route: '#drivers/new',
@@ -18290,7 +19068,7 @@ function rowHtml(r, i) {
     <li class="review-row${done ? ' is-settled' : ''}">
       <div class="review-head">
         <b class="ident">${esc(r.reg)}</b>
-        <span class="review-why" style="margin:0">Row ${r.row} · ${esc(r.what)}</span>
+        <span class="review-why review-why--flush">Row ${r.row} · ${esc(r.what)}</span>
         ${done
           ? `<span class="badge ${done.tone}">${done.word}</span>`
           : r.level === 'info'
@@ -18333,6 +19111,19 @@ function render() {
     <li class="review-all">
       <button class="btn btn-tertiary" data-review="approve-all">Import all ${untouched()} as they are</button>
     </li>` : '');
+
+  /* What the file held, which does not change, and what is still open, which
+     does. This line was written out by hand as "8 rows read, 6 with nothing to
+     query, 2 need a look" and never touched again — two of its three numbers
+     were wrong the moment the fixture grew, and it sat directly beneath the
+     comment explaining why the sentence below it stopped being hard-coded. */
+  const read = root.querySelector('[data-role="review-read"]');
+  if (read) {
+    const total = CLEAN + ROWS.length;
+    read.textContent = left
+      ? `${total} rows read, ${CLEAN} with nothing to query, ${plural(left, 'needs', 'need')} a look`
+      : `${total} rows read, every one of them answered`;
+  }
 
   /* The one sentence that changes as decisions are made. */
   const headline = root.querySelector('[data-role="review-headline"]');
@@ -18575,12 +19366,12 @@ function figureTable() {
     ['Trend, plain', '<span class="trend">&ndash; 0</span>',
      'No movement, no colour.'],
     ...SPARKS.map(([name, cls, vals]) => [
-      `Sparkline, ${name.toLowerCase()}`, `<div style="width:120px">${spark(cls, vals)}</div>`,
+      `Sparkline, ${name.toLowerCase()}`, `<div class="doc-spark">${spark(cls, vals)}</div>`,
       name === 'Rising' ? 'Not a chart: no axes, no scale, nothing to read off. It answers "steady, or not" and stops there.' : 'Illustrative data.',
     ]),
     ['Gauge', gauge(0.78),
      'A proportion. Round caps because a square-ended arc reads as a slice of something and a round one reads as a level.'],
-    ['Meter', `<div style="width:220px">
+    ['Meter', `<div class="doc-meter">
        <div class="meter"><span class="is-active" style="flex:7"></span><span class="is-warning" style="flex:2"></span><span class="is-stopped" style="flex:1"></span><span class="is-invited" style="flex:1"></span><span class="is-quiet" style="flex:1"></span></div>
        <ul class="meter-key"><li><i class="is-active"></i><b>7</b> cleared to fuel</li><li><i class="is-warning"></i><b>2</b> lapsed</li></ul>
      </div>`,

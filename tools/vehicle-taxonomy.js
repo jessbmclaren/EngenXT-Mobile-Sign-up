@@ -7,8 +7,9 @@
 
   Vehicle category was thirteen values, then eight, and is now lcv, hcv and
   motorcycle. Fuel-tank count is gone: the product needs the total a vehicle
-  holds, not how many tanks add up to it. Vehicle configuration went with the
-  granular categories that gave it its lists.
+  holds, not how many tanks add up to it. Vehicle configuration is gone
+  outright — motorcycle sub-types were the last three it offered — so a band
+  is resolved from a category and from nothing else.
 
   Nothing rewrites a stored value. A record saved as `bakkie` stays `bakkie`
   and reads as LCV through VehicleTypes.normalise(), which is the only function
@@ -100,7 +101,11 @@ const NO_TANK_COUNT = `(function(){
       return f ? f.textContent.trim() : null; })(),
     capacityHelp: (function(){ var f=s.querySelector('[data-field="tankCapacity"] .help');
       return f ? f.textContent.trim() : null; })(),
-    config: s.querySelectorAll('[data-field="vehicleConfiguration"]:not([hidden])').length
+    /* Every one, not only the visible ones. A hidden control is still a
+       place for a stale answer to sit, and the field was removed rather than
+       hidden, so the number to assert is zero elements. */
+    config: s.querySelectorAll('[data-field="vehicleConfiguration"]').length
+      + document.querySelectorAll('#f-config, #f-config-trigger').length
   });
 })()`;
 
@@ -173,21 +178,32 @@ const NO_TANK_COUNT = `(function(){
       codes: list.map(function(t){return t.code;}),
       labels: list.map(function(t){return t.label;}),
       longs: list.map(function(t){return t.long;}),
-      csv: T.csvValues()
+      csv: T.csvValues(),
+      otherBand: T.bandFor('other')
     });})()`));
-  check('taxonomy', 'exactly three selectable categories',
-    JSON.stringify(three.codes) === JSON.stringify(['lcv', 'hcv', 'motorcycle']),
+  /* Four governed categories, not three. Other was added so a fleet carrying
+     something the three do not describe stops filing it under whichever is
+     least wrong; what it actually is gets named, and the name becomes a
+     category of its own further down. */
+  const GOVERNED = ['lcv', 'hcv', 'motorcycle', 'other'];
+  check('taxonomy', 'exactly four governed categories',
+    JSON.stringify(three.codes) === JSON.stringify(GOVERNED),
     three.err || `stored values ${three.codes.join(', ')}`);
   check('taxonomy', 'the menu shows the expanded reading',
     JSON.stringify(three.longs) === JSON.stringify(
-      ['LCV — Light commercial vehicle', 'HCV — Heavy commercial vehicle', 'Motorcycle']),
+      ['LCV — Light commercial vehicle', 'HCV — Heavy commercial vehicle',
+       'Motorcycle', 'Other — not one of the above']),
     (three.longs || []).join(' / '));
   check('taxonomy', 'compact places get the short label',
-    JSON.stringify(three.labels) === JSON.stringify(['LCV', 'HCV', 'Motorcycle']),
+    JSON.stringify(three.labels) === JSON.stringify(['LCV', 'HCV', 'Motorcycle', 'Other']),
     (three.labels || []).join(' / '));
-  check('taxonomy', 'the CSV publishes the same three',
-    JSON.stringify(three.csv) === JSON.stringify(['lcv', 'hcv', 'motorcycle']),
+  check('taxonomy', 'the CSV publishes the governed four',
+    JSON.stringify(three.csv) === JSON.stringify(GOVERNED),
     (three.csv || []).join(', '));
+  check('taxonomy', 'Other carries no plausibility band',
+    three.otherBand === null,
+    'a range invented for "a category we have not seen" would warn about '
+      + 'vehicles nobody researched');
 
   /* ── Legacy mapping, and what is refused ─────────────────────────────── */
   const mapped = JSON.parse(await run(`(function(){
@@ -241,8 +257,27 @@ const NO_TANK_COUNT = `(function(){
     add.capacityLabel === 'Total fuel-tank capacity' &&
     add.capacityHelp === 'Enter the combined capacity of all the vehicle’s fuel tanks.',
     `"${add.capacityLabel}" / "${add.capacityHelp}"`);
-  check('add vehicle', 'vehicle configuration is not shown',
-    add.config === 0, `${add.config} visible configuration fields`);
+  check('add vehicle', 'vehicle configuration is gone, not hidden',
+    add.config === 0, `${add.config} configuration elements of any kind`);
+
+  /* The sweep that removed the sub-types: a category is the whole input to a
+     band now, and the two helpers that existed to answer "does this category
+     have configurations?" have nothing left to answer for. */
+  const bands = JSON.parse(await run(`(function(){
+    var T = window.VehicleTypes;
+    return JSON.stringify({
+      motorcycle: T.bandFor('motorcycle'),
+      scooter: T.bandFor('scooter'),
+      arity: T.bandFor.length,
+      helpers: ['configsFor','hasConfigs'].filter(function(k){ return k in T; })
+    });})()`));
+  check('add vehicle', 'a motorcycle resolves to the one motorcycle band',
+    bands.motorcycle === 'motorcycle' && bands.scooter === 'motorcycle',
+    `motorcycle → ${bands.motorcycle}, a stored "scooter" → ${bands.scooter}`);
+  check('add vehicle', 'nothing is left to ask a category for its sub-types',
+    bands.helpers.length === 0 && bands.arity === 1,
+    bands.helpers.length ? 'still exported: ' + bands.helpers.join(', ')
+      : `bandFor takes ${bands.arity} argument, and no configsFor or hasConfigs`);
 
   const options = JSON.parse(await run(`(function(){
     var s=document.getElementById('f-type');
@@ -250,9 +285,52 @@ const NO_TANK_COUNT = `(function(){
       values: [].map.call(s.options, function(o){return o.value;}),
       texts: [].map.call(s.options, function(o){return o.textContent;}),
       groups: s.querySelectorAll('optgroup').length});})()`));
-  check('add vehicle', 'the select offers the three and a placeholder',
-    JSON.stringify(options.values) === JSON.stringify(['', 'lcv', 'hcv', 'motorcycle']),
+  check('add vehicle', 'the select offers the governed four and a placeholder',
+    JSON.stringify(options.values) === JSON.stringify(['', 'lcv', 'hcv', 'motorcycle', 'other']),
     options.values.join(', '));
+
+  /* ── Other, and the category it creates ──────────────────────────────── */
+  const other = JSON.parse(await run(`(function(){
+    var s=${SHEET};
+    var wrap=s.querySelector('[data-field="vehicleTypeOther"]');
+    var sel=document.getElementById('f-type');
+    function setType(v){ sel.value=v;
+      sel.dispatchEvent(new Event('input',{bubbles:true}));
+      sel.dispatchEvent(new Event('change',{bubbles:true})); }
+    setType('lcv');
+    var hiddenOnLcv = wrap ? wrap.hidden : null;
+    setType('other');
+    var shownOnOther = wrap ? !wrap.hidden : null;
+    return JSON.stringify({exists:!!wrap, hiddenOnLcv:hiddenOnLcv, shownOnOther:shownOnOther,
+      label:(wrap&&wrap.querySelector('label'))?wrap.querySelector('label').textContent.trim():null});})()`));
+  check('add vehicle', 'Other asks what the vehicle is, and only Other does',
+    other.exists && other.hiddenOnLcv === true && other.shownOnOther === true,
+    other.exists ? `hidden on LCV ${other.hiddenOnLcv}, shown on Other ${other.shownOnOther}, `
+      + `labelled "${other.label}"` : 'no vehicleTypeOther field');
+
+  const named = JSON.parse(await run(`(function(){
+    var T=window.VehicleTypes;
+    var before=T.list().length;
+    var code=T.add('Refrigerated trailer');
+    var again=T.add('refrigerated  trailer');
+    var sel=document.getElementById('f-type');
+    if (window.__fillTypeSelect) __fillTypeSelect();
+    var offered=[].map.call(sel.options,function(o){return o.value;});
+    return JSON.stringify({
+      code:code, again:again, grew:T.list().length-before,
+      label:T.label(code), band:T.bandFor(code),
+      inSelect:offered.indexOf(code)>=0,
+      csvUnchanged:JSON.stringify(T.csvValues())===JSON.stringify(['lcv','hcv','motorcycle','other']),
+      named:T.named().length});})()`));
+  check('add vehicle', 'naming a category creates it once and offers it',
+    named.code === 'refrigerated_trailer' && named.grew === 1 && named.inSelect,
+    `"${named.label}" → ${named.code}, list grew by ${named.grew}, in the select ${named.inSelect}`);
+  check('add vehicle', 'naming the same thing twice does not make two',
+    named.again === named.code && named.named === 1,
+    `second attempt returned ${named.again}, account categories: ${named.named}`);
+  check('add vehicle', 'a named category has no band and stays out of the CSV',
+    named.band === null && named.csvUnchanged,
+    `band ${named.band}, published values unchanged ${named.csvUnchanged}`);
 
   /* Submitting empty: what is required, and what is not. */
   await run(`(function(){var s=${SHEET};s.querySelector('[data-role="submit"]').click();})()`);
@@ -373,15 +451,23 @@ const NO_TANK_COUNT = `(function(){
       cells: cells.filter(function(v,i,a){return v && a.indexOf(v)===i;}),
       csv: window.ImportSchema
         ? ImportSchema.COLUMNS.filter(function(c){return c.key==='vehicle_category';})[0].example : null,
+      csvParsed: (window.ImportSchema && window.VehicleTypes)
+        ? VehicleTypes.parse(ImportSchema.COLUMNS
+            .filter(function(c){return c.key==='vehicle_category';})[0].example) : null,
       header: window.ImportSchema ? ImportSchema.header().indexOf('vehicle_category')>=0 : null
     });})()`));
   const strays = shared.cells.filter((c) => !['LCV', 'HCV', 'Motorcycle'].includes(c));
   check('one taxonomy', 'the directory shows only the three',
     strays.length === 0, strays.length ? 'also showing: ' + strays.join(', ')
       : shared.cells.join(', '));
-  check('one taxonomy', 'the CSV example is a current value',
-    ['lcv', 'hcv', 'motorcycle'].includes(shared.csv) && shared.header === true,
-    `example "${shared.csv}", column present in the template header`);
+  /* The example is shown the way the product displays a category — LCV, not
+     lcv — so the test is not "is it one of the stored codes" but "does the
+     parser accept what the page prints". A published example that the importer
+     would refuse is the one failure this check exists to catch, and comparing
+     against the codes missed it in the other direction. */
+  check('one taxonomy', 'the CSV example is a value the importer accepts',
+    ['lcv', 'hcv', 'motorcycle'].includes(shared.csvParsed) && shared.header === true,
+    `example "${shared.csv}" parses to "${shared.csvParsed}", column present in the header`);
 
   reap();
 

@@ -239,11 +239,16 @@ function cdp(ws) {
       check(F, 'groups are announced', geo.groups.length > 0 && geo.groups.every((g) => g.label),
         `${geo.groups.length} groups, all labelled`);
     } else if (f.id === 'f-type') {
-      /* The opposite assertion, and it is the one that matters here: three
-         options must not be grouped, and every one of them is selectable. */
-      check(F, 'three options carry no group heading',
-        geo.heads.length === 0 && geo.groups.length === 0 && geo.opts.length === 3,
-        `${geo.opts.length} options, ${geo.groups.length} groups`);
+      /* The opposite assertion, and it is the one that matters here: a short
+         list must not be grouped, and every option in it is selectable.
+
+         Written against the grouping rather than a fixed count. The list was
+         three, is four with Other, and grows by one every time an account
+         names a category of its own — a count in here would fail on the
+         product working, which is the least useful thing a check can do. */
+      check(F, 'a short list carries no group heading',
+        geo.heads.length === 0 && geo.groups.length === 0 && geo.opts.length >= 3,
+        `${geo.opts.length} options, ${geo.groups.length} groups, none of them headings`);
     }
     if (geo.lh >= geo.maxH - 1) {
       check(F, 'a long list scrolls inside itself', geo.scrolls && geo.overflowY === 'auto',
@@ -339,17 +344,19 @@ function cdp(ws) {
     if(!row) return JSON.stringify({err:'no lcv option'});
     row.click();
     var sheet=[].filter.call(document.querySelectorAll('.focus-sheet'),function(x){return x.getBoundingClientRect().height>50;})[0];
-    var cfg=sheet.querySelector('[data-field="vehicleConfiguration"]');
     var v=document.querySelector('#f-type-trigger .select-value');
     return JSON.stringify({
       value: document.getElementById('f-type').value,
       shown: v?v.textContent.trim():null,
-      configShown: cfg ? !cfg.hidden : false
+      /* Absent, not hidden: the field was deleted with the motorcycle
+         sub-types that were the last thing asking for it. */
+      configEls: sheet.querySelectorAll('[data-field="vehicleConfiguration"]').length
+        + document.querySelectorAll('#f-config, #f-config-trigger').length
     });})()`));
-  check('shared', 'a choice takes, and reveals no dependent field',
-    dependent.value === 'lcv' && /LCV/.test(dependent.shown || '') && dependent.configShown === false,
+  check('shared', 'a choice takes, and there is no dependent field to reveal',
+    dependent.value === 'lcv' && /LCV/.test(dependent.shown || '') && dependent.configEls === 0,
     dependent.err || `chose "${dependent.value}", trigger reads "${dependent.shown}", ` +
-    'no configuration field appears because no category has one');
+    `${dependent.configEls} configuration elements anywhere in the document`);
 
   const validation = JSON.parse(await run(`(function(){
     var sheet=[].filter.call(document.querySelectorAll('.focus-sheet'),function(x){return x.getBoundingClientRect().height>50;})[0];
@@ -458,33 +465,13 @@ function cdp(ws) {
     `disabled ${state.disabled}, opened while disabled ${state.openedWhileDisabled}, ` +
     `aria-required ${state.required}`);
 
-  /* 4. Vehicle configuration was the only dependent field and it is gone with
-        the granular categories that gave it its lists. What is left to assert
-        is that nothing appears: covered by 'a choice takes, and reveals no
-        dependent field' above and by tools/vehicle-taxonomy.js. */
-  /* (was: a dependent field cleared clears what it shows) */
-  if (false) {
-  const dep = JSON.parse(await runAsync(`(function(){
-    var type=document.getElementById('f-type'), cfg=document.getElementById('f-config'),
-        ct=document.getElementById('f-config-trigger');
-    type.value='bakkie'; type.dispatchEvent(new Event('change',{bubbles:true}));
-    cfg.value='double'; cfg.dispatchEvent(new Event('change',{bubbles:true}));
-    var had = ct ? ct.querySelector('.select-value').textContent.trim() : null;
-    /* A category with no configurations at all. Switching bakkie to bus kept
-       the answer, which is correct: both have a code the other recognises. */
-    type.value='van'; type.dispatchEvent(new Event('change',{bubbles:true}));
-    return new Promise(function(done){
-      /* The repaint runs in a MutationObserver callback, which is a microtask.
-         Reading in the same task reads the trigger before it has been told. */
-      setTimeout(function(){
-        var v = ct ? ct.querySelector('.select-value') : null;
-        var wrap = document.querySelector('[data-field="vehicleConfiguration"]');
-        done(JSON.stringify({had:had, now:v?v.textContent.trim():null,
-          placeholder:v?v.classList.contains('is-placeholder'):null, value:cfg.value,
-          hidden: wrap?wrap.hidden:null}));
-      }, 60);
-    });})()`, true));
-  }
+  /* 4. There is no dependent field left to clear. Vehicle configuration was
+        the only one, and it went with the motorcycle sub-types. The probe that
+        drove it — set a category, set a configuration, change the category,
+        read what the trigger says — sat here disabled behind `if (false)`,
+        which is a test that cannot fail and cannot pass. Its replacement is
+        the element count in 'a choice takes, and there is no dependent field
+        to reveal' above, and the same assertion in tools/vehicle-taxonomy.js. */
 
   /* 5. Re-initialising must not wrap twice or bind twice. */
   const reinit = JSON.parse(await run(`(function(){
