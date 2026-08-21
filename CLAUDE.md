@@ -1,41 +1,45 @@
 # Working instructions, EngenXT fleet portal
 
-## Read this before acting on section 9
+## Section 9 has been applied. This file is now the product.
 
-This repository is the **annotated prototype**, not the production build. The
-things section 9 describes as contamination are, here, the artefact itself:
+It used to hold the product and the argument for it side by side, and the
+note here said so, at length, and said section 9 must never be run against
+it. That was true until it was not. The owner was asked directly, with the
+counts and the consequence in front of them, and chose to apply it.
+
+What was taken out of the rendered page:
 
 | | count |
 |---|---|
-| Catalogued screen states (`<section id="screen-…">`) | 39 |
-| Rail buttons that reach them (`data-screen="…"`) | 39 |
-| Design annotations (`.surface-note`) | 86 |
+| Screens and Notes rail | 1 |
+| Design annotations (`.surface-note`) | 87 |
 | Annotation blocks (`.figure-notes`) | 11 |
+| Documentation screens | 9 |
+| Developer state switchers | 2 |
 
-The Screens/Notes rail, the "ADD VEHICLE STATES" and "ONE THEFT, IN ORDER"
-groups, and every note explaining why a screen is the way it is. These are
-what the file is for. `tfn-fleet-portal.html` is a single document that holds
-the product and the argument for it side by side, and the argument is reviewed
-by opening it.
+What was kept, and where:
 
-So: **section 9 applies to the production build, when there is one.** It is
-recorded here so it is not lost, and so the production work starts from a
-written rule rather than a memory of one. Do not apply it to this repository, 
-doing so would delete the deliverable.
+- **`DESIGN-NOTES.md`** holds all 98 notes, keyed by the screen each was
+  written against. No route renders it. Nothing was deleted, only moved.
+- **30 product screens** remain and all of them still route.
+- The five `.surfaces` wrappers that held working figures were kept. They
+  looked like annotation containers and were not: the import review's whole
+  interactive figure lived inside one, and removing them wholesale deleted
+  it. That was caught by opening the page, not by reading the source.
 
-Two consequences worth stating now, while the rule is fresh:
+`tools/production.js` now holds the line: it walks every screen, asks the
+rendered page rather than the file, and fails on a rail, an annotation, a
+reviewer's vocabulary, a documentation route, a design-only accessible
+name, or a state switcher. It also checks the product still works, because
+the cheapest way to pass a removal test is to remove too much.
 
-- The separation section 9 asks for does not exist yet. There is no build step
-  that strips annotations, and no production route. Creating one is the real
-  task behind section 9, and it is larger than the deletions the section lists.
-- The production-mode test it asks for cannot be written until something
-  produces a production build to test. Writing one against the prototype would
-  assert that the prototype is not itself, which is false and would fail
-  immediately.
+Two things worth knowing before the next change:
 
-When the production build exists, the checkers in `tools/` are the pattern to
-follow: they drive the real DOM in a browser and assert on what renders, which
-is exactly what "not in the accessibility tree" needs to be proved by.
+- Routing no longer goes through the rail. `go()` falls back to showing the
+  section a key names, because every route used to be a rail button and with
+  the rail gone the address bar stopped meaning anything.
+- The counts above are what the checker asserts. If a screen is added, the
+  checker walks it too; nothing needs updating by hand.
 
 ---
 

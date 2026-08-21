@@ -6495,200 +6495,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
   <!-- The screen rail. A review affordance, the same one the Flutter builder
        carries, so the two prototypes are navigated the same way. -->
-  <nav class="rail" id="review-rail">
-    <!-- Two things were sharing one list: the product, and the pages that
-         explain it. A reviewer walking the flow kept landing on a specimen
-         table, and somebody looking for the token spec had to know it lived
-         under Components between two screens. They are separate jobs, so they
-         get separate lists. -->
-    <div class="tabs rail-tabs" role="tablist" aria-label="What to browse">
-      <button class="tab rail-tab" role="tab" aria-selected="true" data-rail="screens">Screens</button>
-      <button class="tab rail-tab" role="tab" aria-selected="false" data-rail="notes">Notes</button>
-    </div>
-    <div class="rail-screens">
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-fleet"><span>Fleet</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-fleet">
-  <button data-screen="home">Home</button>
-      </div>
-    </div>
-  <div class="rail-group">
-    <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-vehicles"><span>Vehicles</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-    <div class="rail-group__items" id="rg-vehicles">
-    <button data-screen="empty" aria-current="true">Vehicles: empty</button>
-    <button data-screen="directory">Vehicles: directory</button>
-    <button data-screen="no-results">Directory: no results</button>
-    <button data-screen="loading">Directory: loading</button>
-    <button data-screen="failed">Directory: could not load</button>
-    <!-- Under Vehicles, not under Vehicle states, and the distinction is the
-         point: delivering an invitation is a step in the import flow, not a
-         state a vehicle can be in. -->
-    <button data-screen="rules">Add a station to the rules</button>
-    </div>
-  </div>
-    <!-- Named for what it is. This group was called "Vehicle states", which
-         was true when it held five of them and became wrong when the waiting
-         state went: what is left is one theft, told in order. It also collided
-         with the documentation screen of the same name two groups down, so the
-         rail had two entries called Vehicle states meaning different things. -->
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-one-theft-in-order"><span>One theft, in order</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-one-theft-in-order">
-    <button data-screen="stolen-filed">Reported: the receipt</button>
-    <button data-screen="stolen-sighting">Someone tried to fuel it</button>
-    <button data-screen="stolen-record">Blocked: twelve days later</button>
-    <button data-screen="stolen-recovered">Mark recovered</button>
-      </div>
-    </div>
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-break-glass"><span>Break-glass</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-break-glass">
-    <button data-screen="override">Request to fuel</button>
-    <button data-screen="override-approved">Approved</button>
-    <button data-screen="override-declined">Declined</button>
-    <button data-screen="override-lapsed">Nobody answered</button>
-    <button data-screen="override-taken">Already answered</button>
-    <button data-screen="override-cap">Over the limit</button>
-    <button data-screen="override-lands">Where it lands in the portal</button>
-      </div>
-    </div>
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-add-vehicle-states"><span>Add vehicle states</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-add-vehicle-states">
-    <button data-form="vehicle" data-state="blank">Blank form</button>
-    <button data-form="vehicle" data-state="blocked">Blocked: nothing answered</button>
-    <button data-form="vehicle" data-state="duplicate">Blocked: duplicate plate</button>
-    <button data-form="vehicle" data-state="long">Blocked: pasted too long</button>
-    <button data-form="vehicle" data-state="zero">Blocked: capacity of zero</button>
-    <button data-form="vehicle" data-state="small">Doubt: capacity too small</button>
-    <button data-form="vehicle" data-state="large">Doubt: capacity too large</button>
-    <button data-form="vehicle" data-state="row">Doubt: a whole spreadsheet row</button>
-    <button data-form="vehicle" data-state="othermake">Make not on the list</button>
-    <button data-form="vehicle" data-state="vinoffer">VIN offers the make and year</button>
-    <button data-form="vehicle" data-state="vinclash">VIN disagrees with the answers</button>
-    <button data-form="vehicle" data-state="edit">Edit an existing vehicle</button>
-    <button data-form="vehicle" data-state="editchange">Edit: a consequential change</button>
-    <button data-form="vehicle" data-state="editgap">Edit: record arrived incomplete</button>
-    <!-- The five nothing on the form can fix. The driver form has carried
-         these all along; the vehicle form did not, so half the product had a
-         specified answer for a dropped connection and half had none. -->
-    <button data-form="vehicle" data-state="permission" data-hash="vehicle-permission">No permission</button>
-    <button data-form="vehicle" data-state="options" data-hash="vehicle-options">Makes did not load</button>
-    <button data-form="vehicle" data-state="offline" data-hash="vehicle-offline">No connection</button>
-    <button data-form="vehicle" data-state="savefail" data-hash="vehicle-save-failed">Save failed</button>
-    <button data-form="vehicle" data-state="conflict" data-hash="vehicle-conflict">Changed by someone else</button>
-    <button data-form="vehicle" data-state="dupvin" data-hash="vehicle-dup-vin">Duplicate VIN</button>
-    <button data-form="vehicle" data-state="serverrejected" data-hash="vehicle-server-rejected">Server refused two answers</button>
-    <button data-form="vehicle" data-state="unsaved" data-hash="vehicle-unsaved">Unsaved changes on close</button>
-      </div>
-    </div>
-
-    <!-- Drivers. The same two screens over a different record, and the same
-         rail: a directory, an empty state, an import, and every state the
-         drawer has. The hashes carry a `driver-` prefix because both drawers
-         have a blank form and only one of them can be #blank. -->
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-drivers"><span>Drivers</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-drivers">
-    <button data-screen="drivers-empty">Empty</button>
-    <button data-screen="drivers-directory">Directory</button>
-    <button data-screen="drivers-no-results">No results</button>
-    <button data-screen="drivers-loading">Loading</button>
-    <button data-screen="drivers-failed">Could not load</button>
-    <button data-screen="driver-left">Mark as left</button>
-    <button data-screen="driver-open">Decisions</button>
-      </div>
-    </div>
-
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-add-driver"><span>Add driver</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-add-driver">
-    <button data-form="driver" data-state="blank" data-hash="driver-blank">Blank form</button>
-    <button data-form="driver" data-state="blocked" data-hash="driver-blocked">Nothing answered</button>
-    <button data-form="driver" data-state="blockedsa" data-hash="driver-blocked-sa">Nothing answered, South African</button>
-    <button data-form="driver" data-state="blockedpassport" data-hash="driver-blocked-passport">Nothing answered, passport</button>
-    <button data-form="driver" data-state="passport" data-hash="driver-passport">Passport and country</button>
-    <button data-form="driver" data-state="idclash" data-hash="driver-id-clash">ID number in the passport field</button>
-    <button data-form="driver" data-state="expired" data-hash="driver-expired">Licence card expired</button>
-    <button data-form="driver" data-state="prdpexpired" data-hash="driver-prdp-expired">PrDP expired</button>
-    <button data-form="driver" data-state="row" data-hash="driver-row">Spreadsheet row pasted</button>
-    <button data-form="driver" data-state="edit" data-hash="driver-edit">Edit</button>
-    <button data-form="driver" data-state="editchange" data-hash="driver-edit-change">Edit with consequences</button>
-    <button data-form="driver" data-state="editgap" data-hash="driver-edit-gap">Edit, details missing</button>
-      </div>
-    </div>
-
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-refusals"><span>Refusals</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-refusals">
-    <button data-form="driver" data-state="badmobile" data-hash="driver-bad-mobile">Not a mobile number</button>
-    <button data-form="driver" data-state="bademail" data-hash="driver-bad-email">Not an email address</button>
-    <button data-form="driver" data-state="badid" data-hash="driver-bad-id">Not a valid ID number</button>
-    <button data-form="driver" data-state="badpassport" data-hash="driver-bad-passport">Not a valid passport</button>
-    <button data-form="driver" data-state="long" data-hash="driver-long">Too long</button>
-    <button data-form="driver" data-state="dupid" data-hash="driver-dup-id">Duplicate ID number</button>
-    <button data-form="driver" data-state="duppassport" data-hash="driver-dup-passport">Duplicate passport</button>
-    <button data-form="driver" data-state="dupmobile" data-hash="driver-dup-mobile">Duplicate mobile</button>
-    <button data-form="driver" data-state="dupemployee" data-hash="driver-dup-employee">Duplicate employee ID</button>
-      </div>
-    </div>
-
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-photo-and-system"><span>Photo and system</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-photo-and-system">
-    <button data-form="driver" data-state="phototype" data-hash="driver-photo-type">Photo not supported</button>
-    <button data-form="driver" data-state="photosize" data-hash="driver-photo-size">Photo too large</button>
-    <button data-form="driver" data-state="photofailed" data-hash="driver-photo-failed">Photo upload failed</button>
-    <button data-form="driver" data-state="permission" data-hash="driver-permission">No permission</button>
-    <button data-form="driver" data-state="options" data-hash="driver-options">Options did not load</button>
-    <button data-form="driver" data-state="offline" data-hash="driver-offline">No connection</button>
-    <button data-form="driver" data-state="savefail" data-hash="driver-save-failed">Save failed</button>
-    <button data-form="driver" data-state="conflict" data-hash="driver-conflict">Changed by someone else</button>
-      </div>
-    </div>
-
-    <!-- Bringing a fleet in at once is its own piece of work, and it was
-         scattered: four screens buried in Vehicles between the directory
-         states and the rules, two more the same distance down Drivers.
-         Together, and last, because nobody imports before they have seen
-         what they are importing into.
-    
-         The two labels that both read "Import CSV" are prefixed now. That
-         only worked while one sat under Vehicles and the other under
-         Drivers; side by side they were the same button twice. -->
-    <div class="rail-group">
-      <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-phase-2"><span>Phase 2</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="rail-group__items" id="rg-phase-2">
-        <button data-screen="import">Vehicles: import CSV</button>
-        <button data-screen="import-review">Vehicles: ready to bring in</button>
-        <button data-screen="import-progress">Vehicles: bringing them in</button>
-        <button data-screen="invites">Vehicles: imported</button>
-        <button data-screen="drivers-import">Drivers: import CSV</button>
-        <button data-screen="drivers-import-review">Drivers: import review</button>
-      </div>
-    </div>
-    </div>
-    <div class="rail-notes hidden">
-      <div class="rail-group">
-        <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-the-system"><span>The system</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="rail-group__items" id="rg-the-system">
-      <button data-screen="atoms">Atoms</button>
-      <button data-screen="molecules">Molecules</button>
-      <button data-screen="organisms">Organisms</button>
-      <button data-screen="hierarchy">Component hierarchy</button>
-      <button data-screen="state-map">States to templates</button>
-      <button data-screen="oneoffs">One-off components</button>
-        </div>
-      </div>
-      <div class="rail-group">
-        <button type="button" class="group group-toggle" aria-expanded="true" aria-controls="rg-what-each-state-means"><span>What each state means</span><svg class="group-caret" data-lucide="chevron-down" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="rail-group__items" id="rg-what-each-state-means">
-      <button data-screen="states">Vehicle states</button>
-      <button data-screen="driver-states">Driver states</button>
-        </div>
-      </div>
-    </div>
-  </nav>
+  
 
   <div class="stage">
     <!-- Product chrome. Every icon here goes where it says.
@@ -6789,15 +6596,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <tbody class="sk-rows sk-rows--fleet"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
           </table>
         </div>
-        <p class="surface-note"><b>The shape of the answer, not a spinner.</b>
-          Seven columns of the right widths means the page does not jump when
-          the rows arrive, and somebody can start reading the headings while
-          they wait.</p>
-        <p class="surface-note"><b>Only the first time.</b> A skeleton is the
-          right answer when there is nothing to keep, and the wrong one every
-          load after that, because by then the screen already holds a correct
-          list. What happens on a reload is that the rows stay exactly as they
-          are.</p>
+        
+        
       </section>
 
       <section id="screen-failed" class="hidden">
@@ -6837,17 +6637,8 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             </td></tr></tbody>
           </table>
         </div>
-        <p class="surface-note"><b>It says what did not happen.</b> A person
-          whose fleet will not load wonders whether something broke on their
-          account, so the first thing to answer is that nothing has changed.
-          Then the retry, because that fixes it most of the time.</p>
-        <p class="surface-note"><b>And it holds on to the search.</b> A failure
-          is not a reason to throw away what somebody typed. The word stays in
-          the box, the message names it so they can see it survived, and Try
-          again carries it back into the list rather than landing them on an
-          unfiltered hundred rows. It is one attribute
-          (<span class="ident">data-goto-search</span>) and it turns a retry
-          into a resume.</p>
+        
+        
       </section>
 
       <!-- One task, read top to bottom.
@@ -6961,31 +6752,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               </div>
             </div>
           </div>
-          <div class="surface">
-            <p class="surface-note"><b>Three answers, on the row that raised the
-              question.</b> Fix it, bring it in as it is, or leave it out of this
-              import. The screen used to name the two rows and then say they
-              were coming in either way, which is a notification dressed as a
-              review: the only thing left to decide was whether to abandon the
-              whole file over one missing fleet number.</p>
-            <p class="surface-note"><b>Fixing happens here, not in the
-              spreadsheet.</b> A tank capacity typed into this row is worth
-              about ninety seconds; the alternative is opening the file, finding
-              the line, saving, and uploading again, and what people actually do
-              with that alternative is press Import and mean to come back.</p>
-            <p class="surface-note"><b>The button counts what is coming, and it
-              will not move until both rows are answered.</b> This is the one
-              place in the product where a control is held closed, and it is
-              because there is no honest default: importing the flagged rows and
-              dropping them are both real answers, and the file cannot tell you
-              which one you meant. The line above it says how many are
-              outstanding, so it is never a button that has gone quiet for no
-              stated reason.</p>
-            <p class="surface-note"><b>Needs a look is still not an error.</b>
-              Nothing here is refused. A row that cannot be imported at all is a
-              refusal, it is counted separately, and the driver import shows
-              that case.</p>
-          </div>
+          
         </div>
       </section>
 
@@ -7102,26 +6869,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The last line is the whole screen.</b>
-            The offer came from one driver being refused three times, and
-            accepting it changes the rules for twelve vehicles and nine
-            people. Somebody pressing this from a notification has not
-            thought about the other eleven, and it costs one sentence to make
-            them.</p>
-          <p class="surface-note"><b>Two lists, not one list with a marked
-            chip.</b> It was a single row captioned "areas these drivers can
-            already use" with Goodwood sitting in it, under a heading asking
-            whether to add Goodwood. So the screen said the thing had
-            happened and asked permission for it in the same breath, and a
-            tint on the fourth chip was all that separated the two. Before and
-            after, side by side, with the count under each, so the change is
-            read rather than deduced.</p>
-          <p class="surface-note"><b>The before list cannot be edited.</b> The
-            three chips lost their remove buttons: this screen asks one
-            question with two answers, and a policy editor that appears inside
-            a confirmation is a second decision nobody came here to make.</p>
-        </div>
+        
       </section>
 
       <!-- ── Atoms ────────────────────────────────────────────────────────
@@ -7130,182 +6878,10 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
            screens and obvious the moment the six sit in a row. This page is
            what a rebuild works from: it is the only place the whole set can
            be checked in one pass. -->
-      <section id="screen-atoms" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Atoms</h1>
-            <p>The smallest pieces, in every state they have. States are forced with a class, so nothing here needs a pointer to be reviewed.</p>
-          </div>
-        </div>
-
-        <div id="atoms-mount"></div>
-
-        <h2 class="spec-h">Icon button, chip, identifier</h2>
-        <table class="spec">
-          <thead><tr><th>Atom</th><th>Default</th><th>Hover</th><th>Pressed</th><th>Note</th></tr></thead>
-          <tbody>
-            <tr><td>Icon button</td>
-              <td><button class="icon-btn" aria-label="Notifications"><svg data-lucide="bell" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button></td>
-              <td><button class="icon-btn is-hover" aria-label="Notifications"><svg data-lucide="bell" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button></td>
-              <td><button class="icon-btn is-pressed" aria-label="Notifications"><svg data-lucide="bell" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button></td>
-              <td>Carries a dot, never a number: out here the only question is whether anything needs a person.</td></tr>
-            <tr><td>Chip</td>
-              <td><span class="chip">Diesel<button aria-label="Remove Diesel">&times;</button></span></td>
-              <td colspan="2">One per choice, each removable on its own.</td>
-              <td>A single clear-all makes you undo four decisions to change one.</td></tr>
-            <tr><td>Identifier</td>
-              <td><span class="ident">HRV 482 GP</span></td>
-              <td colspan="2"><span class="ident">AHTFR22G3M0123456</span></td>
-              <td>Mono, because 1/l/I and 0/O converge in a proportional face and this product tells vehicles apart.</td></tr>
-          </tbody>
-        </table>
-        <div id="atoms-doc"></div>
-
-      </section>
+      
 
       <!-- ── Molecules ───────────────────────────────────────────────────── -->
-      <section id="screen-molecules" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Molecules</h1>
-            <p>Atoms doing a job together. Each one owns the thing the atoms cannot say on their own.</p>
-          </div>
-        </div>
-
-        <h2 class="spec-h">Form field</h2>
-        <p class="spec-note">A label, a control, and one line under it. The line has four jobs and only ever does one at a time, because two things under a field is a pile-up and the reader picks the wrong one.</p>
-        <div class="spec-grid">
-          <div class="form-field"><label for="spec-reg-1">Registration</label><input id="spec-reg-1" class="field ident" value="HRV 482 GP"><span class="help">Find it on the licence disc.</span></div>
-          <div class="form-field invalid"><label for="spec-reg-2">Registration</label><input id="spec-reg-2" class="field ident" value="HRV 482 GP"><span class="error">Already in your fleet</span></div>
-          <div class="form-field"><label for="spec-tank">Total tank capacity</label><span class="suffix-wrap"><input id="spec-tank" class="field" value="8"><span class="suffix">litres</span></span><span class="advice">8 litres is unusual for a light commercial vehicle. Check the combined capacity of all its tanks, or save it as it is.</span></div>
-          <div class="form-field"><label for="spec-reg-3">Registration</label><input id="spec-reg-3" class="field ident" value="HRV 482 GX"><span class="consequence">Was HRV 482 GP. This vehicle&rsquo;s fuel history and cards follow its plate.</span></div>
-        </div>
-
-        <h2 class="spec-h">Tabs, quick actions, notice</h2>
-        <div class="spec-grid">
-          <div class="tabs"><button class="tab" aria-selected="true">All <span class="count">8</span></button><button class="tab" aria-selected="false">Needs attention <span class="count">1</span></button></div>
-          <div class="quick"><a class="quick-btn" href="#atoms">See where he is</a><a class="quick-btn" href="#atoms">Call Thabo</a></div>
-          <div class="form-field"><p class="notice">This VIN looks like a 2021 Toyota. <a href="#atoms">Use it</a> for the make and year.</p></div>
-        </div>
-
-        <h2 class="spec-h">Form alert</h2>
-        <p class="spec-note">For the thing no field can fix. Three tones, and
-          the difference between them is what happens next: stop is a refusal
-          nobody on this screen can lift, warn is worth another press, good is
-          done. Deliberately unlike the error summary below it. That one is a
-          route to fields you can correct, and drawing them alike sends
-          somebody hunting the form for a field that is not there.</p>
-        <div class="spec-grid">
-          <div class="form-alert form-alert-stop"><p>You do not have permission to add or edit drivers.</p></div>
-          <div class="form-alert form-alert-warn"><p>The driver could not be saved. Try again.</p><p class="form-alert-do"><button class="btn btn-secondary">Try again</button></p></div>
-          <div class="form-alert form-alert-good"><p>Sipho Ndlovu has been added. They will get a WhatsApp message with the link to set up the app.</p></div>
-        </div>
-
-        <h2 class="spec-h">Segmented choice</h2>
-        <p class="spec-note">Two answers, both on screen, one press. A select
-          for a binary choice costs a click to open, a menu to read and a click
-          to pick, and it hides the option you did not take at the moment you
-          are deciding between them. Radios underneath, because that is what it
-          is, and the pick decides which field appears next.</p>
-        <div class="spec-grid">
-          <div class="form-field">
-            <span class="label">Identity type</span>
-            <div class="seg" role="radiogroup" aria-label="Identity type, unanswered">
-              <label><input type="radio" name="spec-idtype">South African ID</label>
-              <label><input type="radio" name="spec-idtype">Passport</label>
-            </div>
-          </div>
-          <div class="form-field">
-            <span class="label">Identity type</span>
-            <div class="seg" role="radiogroup" aria-label="Identity type, answered">
-              <label><input type="radio" name="spec-idtype2" checked>South African ID</label>
-              <label><input type="radio" name="spec-idtype2">Passport</label>
-            </div>
-          </div>
-        </div>
-
-        <h2 class="spec-h">Photo picker, optional marker</h2>
-        <p class="spec-note">The circle is there empty as well as filled,
-          because an empty circle is what tells somebody the photo is a face
-          rather than a document. Optional is said on the few that are, rather
-          than starring the many that are not: most of a driver form is
-          required, so marking the exceptions is less ink.</p>
-        <div class="spec-grid">
-          <div class="form-field">
-            <label>Profile photo <span class="opt">Optional</span></label>
-            <div class="photo-pick">
-              <span class="photo-thumb" aria-hidden="true"><svg data-lucide="user" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-              <input class="field" readonly placeholder="No photo chosen" aria-label="Chosen photo">
-              <button class="btn btn-secondary" type="button">Choose</button>
-            </div>
-            <span class="help">JPEG, PNG or HEIC, up to 5 MB.</span>
-          </div>
-          <div class="form-field">
-            <label>Email <span class="opt">Optional</span></label>
-            <input class="field" value="thabo.mokoena@abccouriers.co.za" aria-label="Email">
-          </div>
-        </div>
-
-        <h2 class="spec-h">Stat tile</h2>
-        <p class="spec-note">A label, a figure, and one line saying what to do about it. Four atoms doing one job, which is what puts this at molecule rather than organism: there is one thing here, and it is a number. It carries its own card because it is used standalone in a grid. Dropping one into a panel would give it two borders, and that is the tell that it belongs at this level. Rendered as a link wherever the figure has somewhere to go, because a count of lapsed licences is not information. It is a queue.</p>
-        <div class="spec-grid">
-          <a class="stat-tile" href="#drivers-directory">
-            <span class="stat-label">Needs review</span>
-            <span class="stat-figure"><span class="numeral numeral-sm trend-bad">2</span></span>
-            <p class="stat-foot">A licence card or a PrDP has already lapsed. Open the list.</p>
-          </a>
-          <div class="stat-tile">
-            <span class="stat-label">Cards expiring</span>
-            <span class="stat-figure"><span class="numeral numeral-sm">0</span><span class="qual">in 90 days</span></span>
-            <p class="stat-foot">Zero is the good answer, so it is said properly rather than left as a bare nought under a label that implies a problem.</p>
-          </div>
-          <div class="stat-tile">
-            <span class="stat-label">Vehicles on the road</span>
-            <span class="stat-figure"><span class="numeral numeral-sm">6</span><span class="qual">of 8</span></span>
-            <p class="stat-foot">In the fleet and allowed to fuel.</p>
-          </div>
-        </div>
-
-        <h2 class="spec-h">Toast</h2>
-        <p class="spec-note">For an action whose result is invisible. Resending
-          an invitation changes nothing on screen, so without a word from the
-          product the same button gets pressed three times and the driver gets
-          three messages. It announces itself politely to a screen reader and
-          leaves on its own, because a confirmation you have to dismiss is a
-          second thing to do about a thing that already worked. Where the action
-          can be taken back, this is where you take it back.</p>
-        <div class="spec-grid">
-          <div class="toast is-up" data-specimen><span>Invitation sent again to Refiloe Tshabalala.</span></div>
-          <div class="toast is-up" data-specimen><span>9 drivers suspended. 3 drivers were not active.</span><button class="toast-undo" type="button">Undo</button></div>
-        </div>
-
-        <h2 class="spec-h">Bulk bar</h2>
-        <p class="spec-note">Appears when something is ticked and goes when
-          nothing is. A permanent bar of disabled buttons is a row of things
-          asking to be pressed and refusing. It obeys the same rules the row
-          menu does, so Allow fuelling cannot quietly bring back somebody who
-          left, or lift a stolen lock.</p>
-        <div class="bulk bulk--specimen">
-          <span class="bulk-count">3 selected</span>
-          <div class="bulk-actions">
-            <button class="btn btn-tertiary">Suspend</button>
-            <button class="btn btn-tertiary">Allow fuelling</button>
-            <button class="btn btn-tertiary is-danger">Mark as left</button>
-            <button class="btn btn-tertiary">Clear</button>
-          </div>
-        </div>
-
-        <h2 class="spec-h">Error summary</h2>
-        <p class="spec-note">A route, not a second count. One link per blocked field, and the number is said once, in the footer.</p>
-        <!-- The real component, so the specimen cannot show a shape the
-             product no longer has. -->
-        <div class="error-summary error-summary--specimen">
-          <h3>Check 3 fields</h3>
-          <ul><li><a href="#molecules">Enter the VIN</a></li><li><a href="#molecules">Choose a make</a></li><li><a href="#molecules">Enter or choose a model</a></li></ul>
-        </div>
-        <div id="molecules-doc"></div>
-
-      </section>
+      
 
       <!-- ── Organisms ───────────────────────────────────────────────────── -->
       <!-- Generated from the live document by system.js. Nothing on these three
@@ -7313,245 +6889,19 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
            the token lists from parsing the stylesheets, and the screen usage from
            querying each section. A hand-written inventory is a document that is
            wrong by the second commit. -->
-      <section id="screen-hierarchy" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Component hierarchy</h1>
-            <p>What composes what, and which direction dependencies are allowed to run. An atom that appears under an organism is used by it; nothing may depend upwards.</p>
-          </div>
-        </div>
-        <div id="hierarchy-mount"></div>
-      </section>
+      
 
-      <section id="screen-state-map" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Screen states to templates</h1>
-            <p>Every state in this prototype, and the template and organisms it is built from. Derived by inspecting each section, so a screen that stops using a shared template shows up here rather than in a review.</p>
-          </div>
-        </div>
-        <div id="state-map-mount"></div>
-      </section>
+      
 
-      <section id="screen-oneoffs" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>One-off components</h1>
-            <p>Components used on exactly one screen, and whether that is a problem. A single-use component is only a fault if something else should have been reusing it.</p>
-          </div>
-        </div>
-        <div id="oneoffs-mount"></div>
-      </section>
+      
 
-      <section id="screen-organisms" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Organisms</h1>
-            <p>The pieces a screen is actually built from. Each one is on a screen of its own in this prototype, listed here so the set can be counted. Vehicles and drivers share every one of them, and run on one engine, so a fix to the table or the drawer lands on both.</p>
-          </div>
-        </div>
-        <table class="spec">
-          <thead><tr><th>Organism</th><th>States it has</th><th>See it</th></tr></thead>
-          <tbody>
-            <tr><td>Record table</td><td>Populated, filtered, no results, loading, could not load, columns hidden, sorted. A row opens its own record; the name inside it is the keyboard's way in.</td><td><a href="#directory">Vehicles</a> &middot; <a href="#drivers-directory">Drivers</a></td></tr>
-            <tr><td>Empty state</td><td>Can create, cannot create</td><td><a href="#empty">Vehicles</a> &middot; <a href="#drivers-empty">Drivers</a></td></tr>
-            <tr><td>Add / edit drawer</td><td>Blank, blocked, doubted, offered, editing, consequential edit, and the system states nothing on the form can fix</td><td><a href="#blocked">Add vehicle</a> &middot; <a href="#driver-blocked">Add driver</a></td></tr>
-            <tr><td>Form alert</td><td>Stop, warn, good</td><td><a href="#driver-save-failed">The save failed</a></td></tr>
-            <tr><td>Bulk bar</td><td>Absent at nothing selected. Actions obey the same state rules as the row menu, and report what was skipped.</td><td><a href="#drivers-directory">Drivers</a> &middot; <a href="#directory">Vehicles</a></td></tr>
-            <tr><td>Toast</td><td>Plain, or carrying the undo for something that can be taken back</td><td><a href="#molecules">Molecules</a></td></tr>
-            <tr><td>Row menu</td><td>By status: what an active driver offers is not what a suspended one offers. Marked, not hidden, where it is destructive.</td><td><a href="#drivers-directory">Drivers</a> &middot; <a href="#directory">Vehicles</a></td></tr>
-            <tr><td>Popover</td><td>Filter, columns, notifications, row actions, record actions</td><td><a href="#directory">Vehicles</a> &middot; <a href="#drivers-directory">Drivers</a></td></tr>
-            <tr><td>Request card</td><td>Waiting, approved, declined, lapsed, no override possible</td><td><a href="#override">Request to fuel</a></td></tr>
-            <tr><td>Focus card</td><td>Two readings: a queue with names in it, or everybody cleared. Inverted, and the only inverted surface on the page. A second dark card and neither is the anchor any more. Uses the toast&rsquo;s tokens, which are already guarded at 4.5:1 against each other.</td><td><a href="#home">Home</a></td></tr>
-            <tr><td>Dashboard hero</td><td>One figure worth reading first, on painted light. Two readings: everybody cleared, or somebody on the road who should not be.</td><td><a href="#home">Home</a></td></tr>
-            <tr><td>Stat grid</td><td>Five tiles at desktop, wrapping rather than squashing below it. Every figure computed from the same fixtures and predicates the directories use, so it cannot disagree with the list it links to.</td><td><a href="#home">Home</a></td></tr>
-            <tr><td>Alert bar</td><td>Live only. It leaves when the request closes.</td><td><a href="#override-lands">Where it lands</a></td></tr>
-            <tr><td>Next step block</td><td>Present when there is a next step, absent otherwise</td><td><a href="#directory">Vehicles</a> &middot; <a href="#drivers-directory">Drivers</a></td></tr>
-            <tr><td>Identity choice</td><td>Unanswered, South African ID, passport and country</td><td><a href="#driver-passport">Passport and country</a></td></tr>
-          </tbody>
-        </table>
-        <div id="organisms-doc"></div>
-
-      </section>
+      
 
       <!-- Four values over two fields, where the shipped product has three in
            one. The gaps it leaves that a fuel-fraud product cannot afford: a
            stolen vehicle, and the difference between "we stopped using it" and
            "we do not own it". Proposals, not shipped behaviour. -->
-      <section id="screen-states" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Vehicle states</h1>
-            <p>Four controls, over two fields. Three of them say whether a vehicle may buy fuel today; the fourth says it is no longer yours. Everything else people call a status (broken down, waiting for parts, accident damage) is a reason underneath one of these, because the pump reads the state and only a person reads the reason.</p>
-          </div>
-        </div>
-
-        <!-- One list, three values, and the row draws exactly one of them.
-             There is no waiting state: adding or importing a vehicle puts it
-             in the fleet on Can fuel, and its invitation is a background
-             message that governs nothing here. -->
-        <h2 class="spec-h">Fuel access: may it buy fuel today?</h2>
-        <table class="states-table">
-          <thead>
-            <tr><th>State</th><th>What station staff see</th><th>Set by</th><th>Way back</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Can fuel</td>
-              <td>Fuel flows, inside the driver&rsquo;s rules. Where every vehicle lands the moment it is added.</td>
-              <td>Manager, one press</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-warning">Cannot fuel</span> <span class="status-reason">+ a reason</span></td>
-              <td>No fuel. A manager can still release one fill at the pump. The reason says why: in for a service, broken down, accident damage, waiting for parts, recovered and not yet checked, driver suspended, not in use.</td>
-              <td>Manager, one press</td>
-              <td>Set it back to Can fuel</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-danger">Reported stolen</span> <span class="status-reason">+ a reason</span></td>
-              <td>No fuel, immediately, and nobody can release one, including the manager who set it. An attempt tells you the station and the time.</td>
-              <td>Manager, in a confirmation</td>
-              <td>Mark recovered, which sets it to Cannot fuel so somebody looks it over</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="spec-h">Fleet lifecycle: is it still yours?</h2>
-        <p class="spec-note">Two values, one of them terminal. A vehicle in the fleet shows its fuel access in the list; one that has left shows this instead, because a fuel permission on a sold van is a control that changes nothing.</p>
-        <table class="states-table">
-          <thead>
-            <tr><th>State</th><th>What it means</th><th>Set by</th><th>Way back</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>In fleet</td>
-              <td>Yours, and on the books. Where every vehicle lands the moment it is added or imported. Fuel access decides what happens at a pump.</td>
-              <td>Adding or importing the vehicle</td>
-              <td>None</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-neutral">Removed from fleet</span> <span class="status-reason">+ a reason</span></td>
-              <td>No longer yours. Sold, written off, scrapped or handed back at the end of a lease. Its fills, invoices and history stay in your reports.</td>
-              <td>Manager, typing the plate, in a confirmation</td>
-              <td>An administrator</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="spec-h">All four states, in a list</h2>
-        <p class="spec-note">The same table the product uses, with one vehicle in
-          each state. A state described in a documentation row and a state seen
-          in a fleet list are not the same reading: this is where somebody
-          actually meets it, four rows apart, at the width they will scan.</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Registration</th><th scope="col">Fleet number</th><th scope="col">Vehicle</th>
-                <th scope="col">Vehicle category</th><th scope="col" class="num">Tank capacity</th><th scope="col" class="status-col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>HRV 482 GP</td><td class="ident">FL-014</td><td>Toyota Hilux 2.4 GD-6 · 2021</td><td>Bakkie</td><td class="num">80 L</td>
-                <td class="status-col"><span class="status-cell"><span class="status-pill">Can fuel</span></span></td>
-              </tr>
-              <tr>
-                <td>RTS 018 GP</td><td class="ident">None</td><td>Hino 300 815 · 2020</td><td>Rigid truck</td><td class="num">100 L</td>
-                <td class="status-col"><span class="status-cell"><span class="status-pill badge-warning">Cannot fuel</span><span class="status-why">In for a service</span></span></td>
-              </tr>
-              <tr>
-                <td>PBK 550 GP</td><td class="ident">FL-007</td><td>Toyota Land Cruiser 79 · 2022</td><td>Bakkie</td><td class="num">130 L</td>
-                <td class="status-col"><span class="status-cell"><span class="status-pill badge-danger">Reported stolen</span><span class="status-why">Hijacking</span></span></td>
-              </tr>
-              <tr>
-                <td>VBN 442 GP</td><td class="ident">FL-019</td><td>Mercedes-Benz Sprinter 519 · 2023</td><td>Van</td><td class="num">93 L</td>
-                <td class="status-col"><span class="status-cell"><span class="status-pill badge-neutral">Removed from fleet</span><span class="status-why">Sold</span></span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <table class="states-table">
-          <thead><tr><th>The row reads</th><th>What it means</th></tr></thead>
-          <tbody>
-            <tr><td>Can fuel</td><td>In fleet, and allowed to fuel. The ordinary vehicle, and where a new one starts. Drawn plain, so the three below it carry.</td></tr>
-            <tr><td><span class="badge badge-warning">Cannot fuel</span> <span class="status-reason">In for a service</span></td><td>In fleet, off the road this week. The combination the old single Status column could not express, because Sold and In for a service were competing for the same word.</td></tr>
-            <tr><td><span class="badge badge-danger">Reported stolen</span> <span class="status-reason">Hijacking</span></td><td>In fleet and still counted; blocked at every forecourt.</td></tr>
-            <tr><td><span class="badge badge-neutral">Removed from fleet</span> <span class="status-reason">Sold</span></td><td>Gone. Only an administrator can bring it back. The one row where the pill is the lifecycle rather than fuel access.</td></tr>
-          </tbody>
-        </table>
-
-        <h2 class="spec-h">Not states: invitation delivery</h2>
-        <p class="spec-note">These three appear on the <a href="#invites">import flow</a> and clear when the request lands. None is stored on a vehicle, none appears in the Status column, and none decides anything at a pump. Adding or importing a vehicle puts it in the fleet on Can fuel immediately; the invitation is a message sent afterwards, in the background.</p>
-        <table class="states-table">
-          <thead><tr><th>Message</th><th>What it is</th><th>Effect on fuelling</th></tr></thead>
-          <tbody>
-            <tr><td>Sending invitation</td><td>The message is on its way to the driver&rsquo;s mobile number.</td><td>None. The vehicle can already fuel.</td></tr>
-            <tr><td>Invitation sent</td><td>It reached the driver&rsquo;s phone. The message clears.</td><td>None.</td></tr>
-            <tr><td>Invitation failed: Retry</td><td>Delivery did not succeed. A problem with the message, not a state the vehicle is in, so the way out is Retry or a different number, never a status change.</td><td>None. What it delays is the driver setting up the vehicle&rsquo;s fuel tag.</td></tr>
-          </tbody>
-        </table>
-
-        <p class="surface-note states-note"><b>Two fields, one column.</b> Fuel
-          access and fleet lifecycle answer different questions and were being
-          held in one word, so a reader had to work out which kind of thing each
-          of five options was before they could use any of them. Separating them
-          is what keeps <i>Removed from fleet</i> out of a report counting
-          vehicle-weeks off the road: a sold van and a van in the workshop are
-          not the same absence and should not be counted together.</p>
-        <p class="surface-note states-note"><b>The column still shows one
-          value.</b> Both fields were drawn for a while, and once the waiting
-          state went, the lifecycle pill read the same on every vehicle in the
-          fleet and changed for none of them. A column of identical badges costs
-          the exceptional row its one chance of being noticed, so the row draws
-          whichever field is currently deciding anything: fuel access while the
-          vehicle is yours, lifecycle once it is not.</p>
-        <p class="surface-note states-note"><b>Importing is not a state.</b>
-          A vehicle is in the fleet and able to fuel the moment it is added or
-          imported. Its invitation is sent automatically in the background and
-          governs nothing here. What the import has instead is
-          <a href="#invites">three delivery messages</a> (sending
-          invitation, invitation sent, invitation failed with a retry) 
-          which clear when the request lands and never touch this column.
-          Writing "invitation sent" into a status field would put a fact about
-          a delivery attempt where a rule about a forecourt goes.</p>
-        <p class="surface-note states-note"><b>Broken down, in for a service,
-          accident damage, waiting for parts: none of these is a
-          state.</b> They are all the same answer at a pump, which is no, and
-          the difference between them is a reason, not a status. Modelling them
-          as six statuses means six things to draw, six to filter, six to
-          translate and six a manager has to tell apart under pressure; as one
-          state and a reason it is one badge, one filter and a list that can
-          grow next year without touching the gate.</p>
-        <p class="surface-note states-note"><b>A reason and a note are still
-          different things, and the reason is not a preset any more.</b> It was
-          a short list per status, chosen so that a year of them would be a
-          report: how many vehicle-weeks went to accident damage. That is worth
-          having and it is not what this is yet. The categories have not
-          been agreed, and a preset built on a first draft writes that draft
-          into every record before anybody can correct it. So the reason is
-          typed, and the question above the box still comes from the status.
-          The note stays what it always was: whatever somebody needs to write,
-          stamped with who and when. The two are still separate fields, which
-          is the part that was right; they used to share one box called
-          Details, and neither could be relied on.</p>
-        <p class="surface-note states-note"><b>Mark recovered belongs to a
-          stolen vehicle and nowhere else.</b> It used to be offered on a
-          permanently removed one, where it meant nothing: a sold van has not
-          been recovered. That was not a wording slip, it was the single-field
-          model showing through, and splitting the fields is what made it
-          impossible to reach. It now lands on Cannot fuel rather than on a
-          waiting state, which keeps the old promise. Somebody looks the
-          vehicle over before it fuels, using a state that still
-          exists.</p>
-        <p class="surface-note states-note"><b>Every state here is set by a
-          person.</b> The moment anything is suspended automatically after
-          repeated breaches, status stops being a decision and becomes partly a
-          consequence, which changes who is allowed to undo it. Worth deciding
-          before it is built.</p>
-      </section>
+      
 
       <!-- The import completion page.
            A vehicle is in the fleet and able to fuel the moment the import
@@ -7709,51 +7059,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               </div>
             </div>
           </div>
-          <div class="surface">
-            <p class="surface-note"><b>The page is named after what finished.</b>
-              It was called <i>Sending invitations</i>, which names a completion
-              page after the one part of it still in progress and makes the
-              outcome look conditional on the progress. The vehicles are in the
-              fleet and fuelling; the invitations are a footnote with a retry on
-              it, so they sit below the fold of the sentence.</p>
-            <p class="surface-note"><b>Three delivery states, none of them a
-              vehicle status.</b> Sending invitation, invitation sent, and
-              invitation failed with a retry. They describe a message in flight,
-              they clear when it lands, and they never appear in the Status
-              column. Writing "invitation sent" into a status field would put a
-              fact about a delivery attempt where a rule about a forecourt
-              belongs, and the column would stop meaning one thing.</p>
-            <p class="surface-note"><b>Every row names its recipient.</b> The
-              invitation goes to the driver, on their mobile number. An
-              invitation whose recipient is not on screen cannot be chased: the
-              manager knows a message failed and not who to phone. Name and
-              number together, because the number is both the thing that failed
-              and the thing they will correct.</p>
-            <p class="surface-note"><b>A failed invitation does not stop the
-              vehicle.</b> Stated on the row, in the band above it, and again in
-              the footer, because this is the exact place a fleet manager will
-              otherwise invent a rule that does not exist and go looking for an
-              activation step that does not exist. What the failure does cost
-              is named too: the
-              recipient cannot set the fuel tag up yet.</p>
-            <p class="surface-note"><b>Leaving is safe, and the way out is in
-              the header.</b> The primary button sits beside the heading rather
-              than at the end of the delivery list, so it is reachable before
-              the list has been read at all. Delivery continues in the
-              background and failures are addressable later. A screen that
-              quietly requires you to stay is the same trap as a step that
-              quietly requires you to press something.</p>
-            <p class="surface-note is-review"><b>Waiting on grouping.</b> The
-              recipient is settled: the driver, on their mobile number,
-              which is why <i>Send to another number</i> is the second way out
-              of a failure. An imported row carries its driver, so this page can
-              name one. A vehicle added by hand cannot, because linking a
-              vehicle to a driver is the grouping work and that is a later
-              phase. Until it exists, a single add says the vehicle is in the
-              fleet and fuelling and that the invitation follows, rather
-              than claiming a message went to somebody the product cannot
-              name.</p>
-          </div>
+          
         </div>
       </section>
 
@@ -7866,47 +7172,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The first line is the whole screen.</b>
-            A person who has just pressed a red button wants one thing, which
-            is to know it took. A time is what makes that believable; a tick
-            is not. 14:32 is a thing you can repeat down a phone.</p>
-          <p class="surface-note"><b>A reference number, because the proof has
-            to leave the building.</b> SR-4821 is what gets read to the
-            recovery company, the insurer and the station manager. It is the
-            part of this that exists outside the app.</p>
-          <p class="surface-note"><b>What the attendant sees.</b> The block is
-            a claim about a forecourt three hundred kilometres away, and
-            showing the words a stranger will read is the only way to make
-            that concrete. The line about not confronting anyone is there
-            because a fuel attendant is not security.</p>
-          <p class="surface-note"><b>No attempts since 14:32.</b> Silence
-            after a block is ambiguous. It reads as working or as
-            broken, and a worried person will keep opening the app to find
-            out. Counting nothing is still an answer.</p>
-          <p class="surface-note"><b>The note comes after the block, and says
-            so.</b> Asking what happened before blocking the vehicle would
-            make a theft into a form. Asking after costs nothing, and this is
-            the only moment somebody has the details in their head.</p>
-          <p class="surface-note"><b>Optional, all of them.</b> The case
-            number does not exist yet at 14:32. It is issued once the
-            case is registered, and the law allows twenty-four hours,
-            so the field says that rather than sitting there looking unfilled.
-            A required field here would be guessed at or would send somebody
-            out of the screen.</p>
-          <p class="surface-note"><b>Four buttons and a box, not a box
-            alone.</b> A tap gives the fleet something countable across a
-            year of reports; the box catches what only this person knows. Not
-            sure is one of the four on purpose, because a rattled person
-            should never have to overstate what they know to get to the end.</p>
-          <p class="surface-note"><b>Saved as you type.</b> Details arrive
-            over hours, not in one sitting. A save button turns every
-            interruption into a question about whether the typing survived.</p>
-          <p class="surface-note"><b>The way out is named before it is
-            needed.</b> Nobody presses an absolute button comfortably unless
-            they already know what happens if they are wrong, and sometimes
-            the answer is that a driver took the bakkie home.</p>
-        </div>
+        
       </section>
 
       <!-- The payoff. A silent block throws away the most useful thing this
@@ -7992,18 +7258,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>This is the reason the state is worth
-            having.</b> Blocking the card silently is correct and useless. The
-            same event, reported, is a station, a time and a card number, which
-            is more than most people get in the first day.</p>
-          <p class="surface-note"><b>Copy details</b> copies the details as
-            text somebody can read down a phone. It does not pretend to file a
-            case.</p>
-          <p class="surface-note"><b>Mark recovered sits here and stays
-            quiet.</b> Sometimes the answer is that a driver took the vehicle
-            home and nobody told the office.</p>
-        </div>
+        
       </section>
 
 
@@ -8095,32 +7350,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The banner is the answer to a question
-            nobody asks out loud.</b> Twelve days after reporting a vehicle a
-            person wants to know the block is still on, and without a durable
-            state they find out by reporting it again. It repeats the
-            confirmation card's own words, because a receipt that paraphrases
-            reads as a different event.</p>
-          <p class="surface-note"><b>Still blocked, twelve days.</b> A count
-            of nothing is still news. Silence after a block reads as working
-            or as broken, and only one of those is true.</p>
-          <p class="surface-note"><b>The block sits at the foot of the record.</b>
-            It was at the head, above the history, which put the loudest thing
-            on the screen in front of the thing somebody opened the record to
-            read. The state and the way out of it now close the record instead
-            of opening it, and Mark recovered stays inside the block, so the
-            exit is in the same place as the state it undoes rather than
-            hunted for under stress.</p>
-          <p class="surface-note"><b>One column, not two.</b> A refused fill
-            is machine news and the note above it is human, and splitting
-            them into separate feeds means reading the story twice. This is
-            also where the note from the receipt ends up, which is why the
-            form did not need to be a place of its own.</p>
-          <p class="surface-note"><b>Add to, never edit.</b> A record somebody
-            can quietly rewrite is worth nothing to an investigation, and the append-only
-            rule is cheaper to build than a permissions argument.</p>
-        </div>
+        
       </section>
 
       <!-- Where the friction actually belongs. Reporting is an emergency and
@@ -8232,25 +7462,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>This is the only place in the flow that
-            asks for anything, and it is the right place.</b> Reporting a
-            theft is done in a hurry by somebody who has just lost a vehicle.
-            Undoing it is done at a desk, days later, and it is the move that
-            starts a vehicle back towards a pump. The friction belongs on the
-            way back in, not on the way out.</p>
-          <p class="surface-note"><b>Both fields are on the screen with the
-            button.</b> A rule that rejects the press afterwards and does not
-            say where to type is the one failure this flow must never have.</p>
-          <p class="surface-note"><b>No, but it was never stolen.</b> A fair
-            number of these end with a driver who took the bakkie home. That
-            is a different fact from a recovery and the record should not be
-            made to call it one.</p>
-          <p class="surface-note"><b>Stopped, not fuelling.</b> The catch was
-            named on the card that started this, twelve days and two screens
-            ago, and it is named again here. A reassurance that turns out to
-            have a condition attached costs more than it bought.</p>
-        </div>
+        
       </section>
 
       <!-- Break-glass in the portal. A refused fill lands here, and the
@@ -8366,31 +7578,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The arithmetic is the answer.</b> A tank
-            that took 62 litres half an hour ago has room for 18 more, and a
-            request to pump 80 into it is not a second fill. It is a second
-            vehicle. A manager can settle that from two numbers without opening
-            anything or ringing anybody.</p>
-          <p class="surface-note"><b>How much, and for how long, are part of
-            the decision.</b> This screen asked a manager to release a fill
-            without telling them the size of it. Tank capacity bounds the
-            litres, your policy bounds the rand, and the sentence above the
-            button states the lower of the two, because "one fill" on
-            an 80-litre bakkie and "one fill" on a 400-litre truck are not the
-            same amount of trust.</p>
-          <p class="surface-note"><b>The expiry is an actual time, not only a
-            countdown.</b> A manager who looks away for a minute needs to know
-            whether it is worth reading; 1:47 is unreadable the moment it is
-            stale, and 08:52 is not.</p>
-          <p class="surface-note"><b>Both extra actions are things managers
-            already do.</b> They ring the driver, or they check the location.
-            Having them here means the answer takes fifteen seconds rather
-            than a walk to somebody else's desk.</p>
-          <p class="surface-note"><b>Approve is not the bigger button.</b>
-            Decline sits first and quieter. Two buttons of equal weight on a
-            decision about money is a coin toss.</p>
-        </div>
+        
       </section>
 
             <section id="screen-override-approved" class="hidden">
@@ -8466,22 +7654,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The second button is the point.</b> Three
-            approvals for the same station is not an emergency. It is a rule
-            that needs changing, and this is the moment somebody notices.
-            Without it they approve the same fill every week for a year.</p>
-          <p class="surface-note"><b>It is a receipt, so it says what was
-            released and what was not.</b> One transaction, a stated ceiling,
-            an expiry that runs whether or not he pumps, and the two things
-            that did not move. A manager who is not sure afterwards whether
-            they widened somebody's rules is a manager who stops using
-            break-glass.</p>
-          <p class="surface-note"><b>Named, timed and written down.</b> The
-            approval goes into the vehicle's activity history and the
-            driver's, with who did it. A one-off release of company money that
-            leaves no trail is the thing an auditor asks about first.</p>
-        </div>
+        
       </section>
 
             <section id="screen-override-declined" class="hidden">
@@ -8557,14 +7730,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>Declining leaves somebody stranded, so the
-            driver's number stays one click away.</b> A driver who cannot fuel
-            and cannot reach anyone is the version of this that ends in a tow
-            truck.</p>
-          <p class="surface-note">It also tells the manager what the driver was
-            told, so the call starts from the same facts.</p>
-        </div>
+        
       </section>
 
             <section id="screen-override-lapsed" class="hidden">
@@ -8640,13 +7806,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>It says what happened to Thabo, not to the
-            request.</b> "Expired" describes a row in a database. He is the one
-            standing at a pump that will not pay.</p>
-          <p class="surface-note">Ringing him is the only useful thing left, so
-            it is the only thing offered.</p>
-        </div>
+        
       </section>
 
       <!-- The race. Two managers get the same notification and both open it.
@@ -8729,21 +7889,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>Two managers, one notification, one
-            pump.</b> Break-glass goes to everybody who can answer it, which
-            is the point. Somebody is standing at a forecourt. It also
-            means two people will open the same request, and the second press
-            has to be answered rather than swallowed.</p>
-          <p class="surface-note"><b>It leads with the outcome, not with the
-            refusal.</b> What the second manager needs first is that Thabo can
-            fuel; that their own press did nothing is the second sentence. An
-            error-shaped screen here would read as though the driver were
-            still stuck.</p>
-          <p class="surface-note"><b>And it names who.</b> Otherwise the next
-            thing that happens is a phone call to find out whether anybody
-            answered it.</p>
-        </div>
+        
       </section>
 
       <!-- The ceiling, hit. A request that cannot be approved as asked is not
@@ -8821,7 +7967,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
               </div>
               <dl class="panel-facts"><dt>Driver</dt><dd>Sibusiso Mahlangu &middot; 072 111 3333</dd><dt>Vehicle</dt><dd><span class="ident">NCA 875 GP</span> &middot; MAN TGS 26.440</dd><dt>Tank capacity</dt><dd>400 litres, about R8 600</dd><dt>Your cap on a released fill</dt><dd>R2 000</dd><dt>Most this can pump</dt><dd><b>93 litres</b>, about R2 000. The cap, which is lower than the tank</dd></dl>
               <div class="panel-foot">
-                <p class="panel-scope"><b>Approve one transaction at Engen Beaufort West, up to 93 litres, within the next 10 minutes.</b> That is a part tank. If he needs the full 400 litres, an administrator has to raise the cap on your policy, this screen cannot exceed it.</p>
+                <p class="panel-scope"><b>Approve one transaction at Engen Beaufort West, up to 93 litres, within the next 10 minutes.</b> That is a part tank. If he needs the full 400 litres, an administrator has to raise the cap on your policy. No approval can go above it.</p>
                 <div class="panel-actions"><button class="btn btn-secondary" data-goto="override-declined" data-beat>Decline</button><button class="btn btn-primary" data-goto="override-approved" data-beat>Approve 93 litres</button></div>
               </div>
             </div>
@@ -8831,21 +7977,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
 
         </div>
 
-        <div class="figure-notes">
-          <p class="surface-note"><b>The cap is a fact about the policy, not a
-            refusal.</b> So the screen offers the largest thing it is allowed
-            to offer and says plainly that it is a part tank. Hiding the
-            shortfall would send a driver away from a pump with half of what
-            he came for and no idea why.</p>
-          <p class="surface-note"><b>The button says the number it will
-            actually release.</b> Not "Approve", 93 litres. A manager
-            who presses expecting a full tank and gets a quarter of one has
-            been misled by the control, not by the policy.</p>
-          <p class="surface-note"><b>Raising the cap is deliberately not
-            here.</b> It is an administrator's change to a policy that governs
-            twelve vehicles, and doing it from a forecourt request at 11:15 is
-            how a one-off becomes a permanent hole.</p>
-        </div>
+        
       </section>
 
       <!-- Where a live request lands for somebody already at a screen. Two
@@ -8869,22 +8001,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <button class="btn btn-primary" data-open="vehicle:blank">Add vehicle</button>
           </div>
         </div>
-        <div class="surfaces surfaces--spaced">
-          <div class="surface">
-            <p class="surface-note"><b>The banner sits above the page and is the
-              only thing allowed to.</b> It is there because the request is
-              expiring, and a badge you have to notice is the wrong instrument
-              for something with ninety seconds on it.</p>
-            <p class="surface-note">It leaves when the request is answered or
-              closes. A bar that outlives its moment teaches people to scroll
-              past the next one.</p>
-            <p class="surface-note"><b>The bell is up in the bar, where every
-              product puts it.</b> Open it from there to see the panel: the live
-              request first and marked, then what already happened. The count
-              says <b>waiting</b> rather than a bare number, because "3" could
-              be three things nobody needs to look at.</p>
-          </div>
-        </div>
+        
       </section>
 
       <section id="screen-empty">
@@ -9049,12 +8166,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             </tbody>
           </table>
         </div>
-        <p class="surface-note"><b>A search that found nothing is a screen with
-          one thing worth doing on it.</b> So that one thing is a button in the
-          middle of the empty table, not a sentence recommending that somebody
-          go back up the page and delete eight characters by hand. A second
-          button appears beside it only when filters are narrowing the list too,
-          because then there genuinely are two different things to undo.</p>
+        
       </section>
 
       <!-- ══ Drivers ══════════════════════════════════════════════════════
@@ -9188,25 +8300,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           </table>
         </div>
 
-        <div class="surfaces surfaces--spaced">
-          <div class="surface">
-            <p class="surface-note"><b>Expiry shows only when it matters.</b>
-              A date next to all twelve licence codes is noise. Two drivers
-              here have lapsed: Pretty Mahlangu’s licence in May, Sibusiso
-              Mahlangu’s PrDP last month. Both are still Active, on live
-              cards.</p>
-            <p class="surface-note"><b>Needs attention is a filter, not a
-              status.</b> A lapsed permit does not change what someone is. It
-              changes what you have to do about them. Status still answers one
-              question: can this person fuel right now.</p>
-            <p class="surface-note"><b>The tab needs the expiry field.</b>
-              Licence expiry is optional on the form, so a driver added without
-              one never shows up here.</p>
-            <p class="surface-note"><b>Your design shows this tab at zero.</b>
-              The vehicle screen settled this already: a tab appears when it
-              holds something. Worth settling once, for both.</p>
-          </div>
-        </div>
+        
       </section>
 
       <!-- The two states every table has and nobody draws, in the driver
@@ -9226,10 +8320,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             <tbody class="sk-rows sk-rows--drivers"><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr><tr><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td><td><span class="sk"></span></td></tr></tbody>
           </table>
         </div>
-        <p class="surface-note"><b>The shape of the answer, not a spinner.</b>
-          Seven columns of the right widths means the page does not jump when
-          the rows arrive, and somebody can start reading the headings while
-          they wait.</p>
+        
       </section>
 
       <section id="screen-drivers-failed" class="hidden">
@@ -9265,10 +8356,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
             </td></tr></tbody>
           </table>
         </div>
-        <p class="surface-note"><b>It says what did not happen.</b> Somebody
-          whose team will not load wonders whether they have been locked out of
-          their own account, so the first thing to answer is that nothing has
-          changed. Then the retry, because that fixes it most of the time.</p>
+        
       </section>
 
       <section id="screen-drivers-no-results" class="hidden">
@@ -9423,119 +8511,14 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
               </div>
             </div>
           </div>
-          <div class="surface">
-            <p class="surface-note"><b>This screen does not say whether twelve
-              WhatsApp messages are about to be sent, and it is the screen that
-              most needs to.</b> The Add driver sheet asks the question: send
-              the invitation now, or invite later from the table. That choice
-              was built for one driver at a time, and one driver at a time is
-              not when it matters. The case it was written for is exactly this
-              one, twelve people entered on a Tuesday to be invited on Friday,
-              and this is the button that would message all twelve without
-              mentioning it. Import is Phase 2, so this is recorded rather
-              than drawn: the same two options belong beside <b>Import 12
-              drivers</b>, and the button should name what it is about to do
-              the way the sheet's does.</p>
-            <p class="surface-note"><b>Refused and flagged are different, and
-              this file has both.</b> A lapsed licence is true, so it imports
-              and gets flagged. A landline cannot receive the setup link, so
-              that row is not a driver yet.</p>
-            <p class="surface-note"><b>The button counts what is coming.</b>
-              Twelve, not fourteen. "Import" alone leaves you guessing whether
-              the refused rows come too.</p>
-          </div>
+          
         </div>
       </section>
 
       <!-- Four states, all proposed: unlike the vehicle set there is no
            shipped driver status to compare against, so nothing here is
            labelled "today". -->
-      <section id="screen-driver-states" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Driver states</h1>
-            <p>Three fields, because there are three questions. <b>Driver access</b> says whether this person is on the fleet: On the fleet, Left. A manager decides it. <b>App status</b> says where their EngenXT invitation got to: six values, and the system decides every one of them. <b>Fuel access</b> says whether their card works today: Can fuel, Cannot fuel. All proposed, unlike the vehicle set there is no shipped driver status to compare against.</p>
-          </div>
-        </div>
-
-        <table class="states-table">
-          <thead>
-            <tr><th>Status</th><th>Which field</th><th>What station staff see</th><th>Set by</th><th>Way back</th></tr>
-          </thead>
-          <tbody data-role="status-rows"><!-- built from STATUS_MEANING in drivers.js --></tbody>
-        </table>
-
-        <p class="surface-note states-note"><b>Three fields, and the split was
-          only half done.</b> The record already separated &ldquo;is this
-          person on the account&rdquo; from &ldquo;may their card be used
-          today&rdquo;. It did not separate the third question, and the third
-          question was hiding inside the first: <i>Invited</i> and <i>Active</i>
-          are facts about an app, and <i>Left</i> is a fact about employment,
-          and all three lived in one field. So the product could not say that a
-          driver is still employed and their app account is off, and could not
-          say that an invitation bounced at all.</p>
-
-        <p class="surface-note states-note"><b>The app status is the one
-          nothing on this screen can set.</b> Every one of its six values is a
-          report of something that already happened somewhere else: a message
-          queued, a message delivered, a phone that opened the app, a number
-          that was not on WhatsApp. The menu behind the badge is an action
-          menu, not a picker: it offers <i>Send</i>, <i>Resend</i>,
-          <i>Copy link</i>, <i>Review the number</i>, and never <i>Invite
-          sent</i> or <i>Active</i>. The old row menu did offer the second one,
-          as <i>They have the app</i>, and it was a control for asserting a
-          fact about a device nobody in the office can see.</p>
-
-        <p class="surface-note states-note"><b>Which is why leaving writes two
-          fields and nothing writes the app status on its own.</b> Marking
-          somebody as left deactivates their app account, because that is what
-          leaving means for the phone in their pocket. Bringing them back
-          restores what the app status was before they left, so a driver who
-          returns in March is not invited a second time to an app already
-          installed. One gesture, two consequences, and the second one is
-          derived rather than chosen.</p>
-
-        <p class="surface-note states-note"><b>An invitation you cannot
-          skip.</b> A record is not a driver until the app is on their phone.
-          Until then a card exists with nobody attached to it, and no manager
-          can make that not so: the driver has to do something.</p>
-
-        <p class="surface-note states-note"><b>Which is why the vehicles do not
-          have this state and the drivers do.</b> A vehicle's invitation goes
-          out with the upload and nothing is waiting on anyone, so vehicles get
-          <a href="#invites">three temporary messages</a> on the import flow and
-          no waiting state at all. A driver's invitation is waiting on a person
-          with a phone, and that genuinely is a state they sit in for days. The
-          two look alike and are not, and copying the driver pattern onto the
-          vehicles is exactly the duplicated step this prototype removed.</p>
-
-        <p class="surface-note states-note"><b>Sick leave is not a status
-          either, and neither is annual leave, a disciplinary or waiting for a
-          vehicle.</b> All four stop the card and nothing else about them is
-          alike, which is the definition of a reason rather than a state. Model
-          them as four statuses and the list needs four badges, four filters
-          and four translations for one answer at a pump; model them as one
-          state with a reason and the list stays readable and the reason is
-          what a report counts.</p>
-
-        <p class="surface-note states-note"><b>Which makes Suspended the wrong
-          word for the state.</b> It is the right word for one of the reasons
-          and an accusation attached to the rest. A driver on sick leave
-          should not read as suspended to their manager, or in a report their
-          supervisor sees. The state wants a neutral name that says what is
-          true at a pump, the way the vehicles now say <i>cannot fuel</i>, and
-          the reason underneath carries the meaning.</p>
-
-        <p class="surface-note states-note"><b>A lapsed licence is not a
-          status.</b> A clock would set it, not a person, and that changes who
-          is allowed to undo it. It is a flag on the record and a tab on the
-          list instead, and it does not stop fuel: the card expires, the licence
-          does not, and a driver inside the three-month renewal grace is driving
-          legally on a receipt this system cannot see. The state that would
-          justify stopping fuel is a licence that has been suspended or
-          cancelled, and nothing here carries it yet. See
-          <a href="#driver-open">decisions</a>.</p>
-      </section>
+      
 
 
       <section id="screen-driver-left" class="hidden">
@@ -9569,132 +8552,13 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
               </div>
             </div>
           </div>
-          <div class="surface">
-            <p class="surface-note"><b>It asks a question rather than stating an
-              intention.</b> "Has Thabo left the company?" is answerable from
-              what somebody knows. "Mark as left" is a thing they are about to
-              do to a record, and the two invite different amounts of care.</p>
-            <p class="surface-note"><b>The vehicle is named on purpose.</b> A
-              driver leaving strands a bakkie, and the person doing this is the
-              one who knows who takes it next. Nothing here reassigns it; the
-              line exists so nobody forgets it happened.</p>
-            <p class="surface-note is-review">Absolute, so it takes the red that
-              Report stolen takes. Undoing it means adding the person again,
-              which is a new record and a new invitation, not an undo.</p>
-          </div>
+          
         </div>
       </section>
 
       <!-- The audit, in the prototype rather than beside it. What was asked,
            what was answered, and what each answer changed. -->
-      <section id="screen-driver-open" class="hidden">
-        <div class="page-head">
-          <div>
-            <h1>Decisions</h1>
-            <p>Thirteen questions from the annotated screen and the review. Twelve answered, one still open. Every answer is one switch in <span class="ident">driver-rules.js</span> or one line in <span class="ident">DECISIONS.md</span>.</p>
-          </div>
-        </div>
-
-        <h2 class="spec-h">Answered</h2>
-        <table class="spec">
-          <thead><tr><th>Question</th><th>Answer</th><th>Why, and what it changed</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Is name and surname mandatory?</td>
-              <td><b>Yes.</b></td>
-              <td>Two required fields. A blank form now asks for six things, not four.</td>
-            </tr>
-            <tr>
-              <td>Do licence number and expiry belong on the form?</td>
-              <td><b>Yes, both optional.</b></td>
-              <td>Asked, checked when filled, never required. Needs attention only covers drivers who have an expiry on file.</td>
-            </tr>
-            <tr>
-              <td>Does an expired licence block the save?</td>
-              <td><b>No. It warns.</b></td>
-              <td>The driver saves and lands under Needs attention. Blocking would teach people to type a date that fits.</td>
-            </tr>
-            <tr>
-              <td>Is a mobile number unique?</td>
-              <td><b>Yes.</b></td>
-              <td>A second driver on the same number is refused. <span class="ident">082 123 4567</span> and <span class="ident">+27 82 123 4567</span> count as the same number.</td>
-            </tr>
-            <tr>
-              <td>Is an employee ID unique?</td>
-              <td><b>Yes.</b></td>
-              <td>Case is ignored, so <span class="ident">EMP-014</span> and <span class="ident">emp-014</span> clash.</td>
-            </tr>
-            <tr>
-              <td>Is Level gone?</td>
-              <td><b>Out of this form for good.</b></td>
-              <td>It is a position in an org tree, not a fact about a person. It follows from where a driver is created rather than being typed next to their licence code. When the hierarchy exists, Level belongs in the table and the filter.</td>
-            </tr>
-            <tr>
-              <td>What is a valid passport number?</td>
-              <td><b>There is nothing to validate.</b></td>
-              <td>ICAO 9303 standardises the machine-readable strip, not the number printed on the page. And this field is only ever a foreign passport, because a South African driver goes down the ID branch. The form takes 5 to 20 letters and numbers. The country sits in the next field, so a per-country rule is buildable the day somebody wants one.</td>
-            </tr>
-            <tr>
-              <td>One name message, or two?</td>
-              <td><b>Two.</b></td>
-              <td>Break-glass rings a driver by their first name. The South African ID card is laid out Surname and Names, and the licence card carries surname and initials, so the documents already split it. The approved single sentence is kept in the code, unused, in case this reverses.</td>
-            </tr>
-            <tr>
-              <td>Do messages end in a full stop?</td>
-              <td><b>Not under a field. Yes in a box.</b></td>
-              <td>GOV.UK writes field errors with no stop, Material 3 says not to end a single sentence with one, Polaris says to skip punctuation under two sentences. A doubt or an alert is prose and keeps its stops. The vehicle form already did this, so the two now agree.</td>
-            </tr>
-            <tr>
-              <td>Should a lapsed licence stop fuel at the pump?</td>
-              <td><b>No. It warns.</b></td>
-              <td>In law it is the card that expires, not the licence: the National Road Traffic Act says a licence is valid indefinitely unless it is suspended or cancelled. There is also a three-month grace that turns on whether the driver applied before expiry and is carrying the receipt, which is a piece of paper in a cab and not a field in this database. Blocking on half the facts strands somebody who is legally entitled to drive. Samsara flags rather than blocks even when an unqualified driver moves a hazmat load.</td>
-            </tr>
-            <tr>
-              <td>Is a lapsed PrDP the same thing?</td>
-              <td><b>No, and it stopped sharing a message.</b></td>
-              <td>A PrDP is valid for 24 months. Driving for reward on an expired one is the same offence as holding none, and insurance cover lapses with it. Same tab, and words that say what it costs.</td>
-            </tr>
-            <tr>
-              <td>Should Needs attention show when it reads zero?</td>
-              <td><b>Yes.</b></td>
-              <td>It is a filter, not a notification badge. A badge hides at zero because its job is to say something is there. A filter persists, because people expect it to and hiding it costs discoverability. And in a compliance product zero is the answer somebody opened the page for, so the tab now says it in its own words instead of falling back to "no drivers match these filters".</td>
-            </tr>
-            <tr>
-              <td>Should a message say a value is "valid"?</td>
-              <td><b>No.</b></td>
-              <td>GOV.UK: it does not add anything to the message. Every check already knew the real fault, and the real fault is the part somebody can act on: a landline, a number one digit short, a failed check digit, a birth date that cannot exist.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="spec-h">Still open</h2>
-        <table class="spec">
-          <thead><tr><th>Question</th><th>What happens meanwhile</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><b>Should the portal know when a licence is suspended or cancelled?</b></td>
-              <td>It does not. This is the one state that would justify stopping fuel, because it is the Act’s own test for a licence that has stopped being valid, and AARTO demerits can trigger it. Nothing in the record carries it today, so nothing can act on it. Wiring that data is a bigger piece of work than this form and worth costing on its own.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <h2 class="spec-h">Rules that did not exist</h2>
-        <p class="spec-note">Each was invented to make the screen work, and is
-          marked <span class="ident">GAP</span> in the code. A guess in a
-          validation rule refuses somebody real.</p>
-        <table class="spec">
-          <thead><tr><th>Rule</th><th>What the form uses</th><th>Where it came from</th></tr></thead>
-          <tbody>
-            <tr><td>Mobile number</td><td>Nine national digits, starting 6, 7 or 8</td><td><b>Not a gap.</b> Copied from the driver sign-up flow, where a driver types this same number to reach the app.</td></tr>
-            <tr><td>South African ID</td><td>Thirteen digits, a real date of birth, a valid check digit</td><td>The published structure of the number. Nobody here has signed it off.</td></tr>
-            <tr><td>Passport number</td><td>5 to 20 letters and numbers</td><td><b>No longer a gap.</b> A decision: there is no format to check, and this field never holds a South African passport.</td></tr>
-            <tr><td>Email address</td><td>Something, an @, something, a dot, two more</td><td>Invented, and deliberately loose.</td></tr>
-            <tr><td>Field lengths</td><td>Names 100, employee ID 50, passport 20</td><td>Copied from the vehicle form. Home Affairs prints two ID card layouts because names and surnames run long, so generous is right.</td></tr>
-            <tr><td>Photo type and size</td><td>JPEG, PNG or HEIC, up to 5 MB</td><td>Invented. Ordinary web defaults.</td></tr>
-            <tr><td>Country list</td><td>Eight neighbours</td><td>Placeholder. A real form takes the full list.</td></tr>
-          </tbody>
-        </table>
-      </section>
+      
 
     </main>
     </div>
@@ -9876,23 +8740,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
 
   <!-- Prototype affordance: switches the form between the states the rail
        lists, so all of them can be compared without leaving the screen. -->
-  <div class="states">
-    <span class="lbl">State</span>
-    <button data-state="blank" aria-pressed="true">Blank</button>
-    <button data-state="blocked" aria-pressed="false">Nothing answered</button>
-    <button data-state="duplicate" aria-pressed="false">Duplicate plate</button>
-    <button data-state="long" aria-pressed="false">Pasted too long</button>
-    <button data-state="zero" aria-pressed="false">Capacity of zero</button>
-    <button data-state="small" aria-pressed="false">Capacity too small</button>
-    <button data-state="large" aria-pressed="false">Capacity too large</button>
-    <button data-state="row" aria-pressed="false">Spreadsheet row</button>
-    <button data-state="othermake" aria-pressed="false">Make not listed</button>
-    <button data-state="vinoffer" aria-pressed="false">VIN offers</button>
-    <button data-state="vinclash" aria-pressed="false">VIN disagrees</button>
-    <button data-state="edit" aria-pressed="false">Edit</button>
-    <button data-state="editchange" aria-pressed="false">Edit consequences</button>
-    <button data-state="editgap" aria-pressed="false">Edit incomplete</button>
-  </div>
+  
 
   <div class="focus-sheet__body" data-role="sheet-body">
     <div class="form-alert hidden" data-role="alert"></div>
@@ -10146,38 +8994,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
     </button>
   </div>
 
-  <div class="states">
-    <span class="lbl">State</span>
-    <button data-state="blank" aria-pressed="true">Blank</button>
-    <button data-state="blocked" aria-pressed="false">Nothing answered</button>
-    <button data-state="blockedsa" aria-pressed="false">Nothing answered, SA</button>
-    <button data-state="blockedpassport" aria-pressed="false">Nothing answered, passport</button>
-    <button data-state="passport" aria-pressed="false">Passport</button>
-    <button data-state="idclash" aria-pressed="false">ID typed as passport</button>
-    <button data-state="expired" aria-pressed="false">Card expired</button>
-    <button data-state="prdpexpired" aria-pressed="false">PrDP expired</button>
-    <button data-state="row" aria-pressed="false">Spreadsheet row</button>
-    <button data-state="badmobile" aria-pressed="false">Not a mobile</button>
-    <button data-state="bademail" aria-pressed="false">Not an email</button>
-    <button data-state="badid" aria-pressed="false">Not a valid ID</button>
-    <button data-state="badpassport" aria-pressed="false">Not a valid passport</button>
-    <button data-state="long" aria-pressed="false">Pasted too long</button>
-    <button data-state="dupid" aria-pressed="false">Duplicate ID</button>
-    <button data-state="duppassport" aria-pressed="false">Duplicate passport</button>
-    <button data-state="dupmobile" aria-pressed="false">Duplicate mobile</button>
-    <button data-state="dupemployee" aria-pressed="false">Duplicate employee ID</button>
-    <button data-state="phototype" aria-pressed="false">Photo type</button>
-    <button data-state="photosize" aria-pressed="false">Photo size</button>
-    <button data-state="photofailed" aria-pressed="false">Photo failed</button>
-    <button data-state="permission" aria-pressed="false">No permission</button>
-    <button data-state="options" aria-pressed="false">Options failed</button>
-    <button data-state="offline" aria-pressed="false">No connection</button>
-    <button data-state="savefail" aria-pressed="false">Save failed</button>
-    <button data-state="conflict" aria-pressed="false">Changed elsewhere</button>
-    <button data-state="edit" aria-pressed="false">Edit</button>
-    <button data-state="editchange" aria-pressed="false">Edit consequences</button>
-    <button data-state="editgap" aria-pressed="false">Edit incomplete</button>
-  </div>
+  
 
   <div class="focus-sheet__body">
     <!-- Nothing on this form can fix a save that failed or a permission that
@@ -19164,10 +17981,23 @@ const railButtons = () =>
   reveal();
 })();
 
+/* Where a key goes, with or without a review rail.
+ *
+ * Every route used to be a rail button, and `go` found one and clicked it.
+ * With the rail gone that returned false for everything and the address bar
+ * stopped meaning anything: #drivers-directory landed on whatever screen was
+ * first. The rail is one way to reach a screen, not the definition of one, so
+ * this falls back to showing the section the key names and opening the form
+ * the key belongs to. */
 function go(key) {
   const btn = railButtons().find(b => keyOf(b) === key);
-  if (btn) btn.click();
-  return !!btn;
+  if (btn) { btn.click(); return true; }
+  if (document.getElementById('screen-' + key)) {
+    closeForms();
+    showScreen(key);
+    return true;
+  }
+  return false;
 }
 
 railButtons().forEach(btn => {
