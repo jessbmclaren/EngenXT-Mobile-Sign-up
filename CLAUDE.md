@@ -1,45 +1,46 @@
 # Working instructions, EngenXT fleet portal
 
-## Section 9 has been applied. This file is now the product.
+## The rail stays. The annotations moved.
 
-It used to hold the product and the argument for it side by side, and the
-note here said so, at length, and said section 9 must never be run against
-it. That was true until it was not. The owner was asked directly, with the
-counts and the consequence in front of them, and chose to apply it.
+Section 9 was applied and then half taken back, on the owner's call both
+times, and the result is the useful middle: every screen is still one press
+away, and no commentary is printed on any of them.
 
-What was taken out of the rendered page:
-
-| | count |
+| | where it is now |
 |---|---|
-| Screens and Notes rail | 1 |
-| Design annotations (`.surface-note`) | 87 |
-| Annotation blocks (`.figure-notes`) | 11 |
-| Documentation screens | 9 |
-| Developer state switchers | 2 |
+| Screens and Notes rail | in the product, all 39 screens and 51 drawer states |
+| Documentation screens | in the product, all 9 |
+| Design annotations (87) | `DESIGN-NOTES.md`, keyed by screen |
+| Annotation blocks (11) | `DESIGN-NOTES.md` |
+| In-sheet state switchers | removed, the rail already reached those states |
 
-What was kept, and where:
+The reasoning, so the next change does not undo it: the rail is how this
+file is reviewed and losing it costs the reviewer everything. A paragraph
+explaining why a control reads the way it does is a different thing, and
+printing it beside the control means whoever is trying to read the control
+reads that instead.
 
-- **`DESIGN-NOTES.md`** holds all 98 notes, keyed by the screen each was
-  written against. No route renders it. Nothing was deleted, only moved.
-- **30 product screens** remain and all of them still route.
-- The five `.surfaces` wrappers that held working figures were kept. They
-  looked like annotation containers and were not: the import review's whole
-  interactive figure lived inside one, and removing them wholesale deleted
-  it. That was caught by opening the page, not by reading the source.
+`tools/production.js` holds the line, eleven checks, asked of the rendered
+page rather than the source:
 
-`tools/production.js` now holds the line: it walks every screen, asks the
-rendered page rather than the file, and fails on a rail, an annotation, a
-reviewer's vocabulary, a documentation route, a design-only accessible
-name, or a state switcher. It also checks the product still works, because
-the cheapest way to pass a removal test is to remove too much.
+- the rail reaches every screen in the document, and every drawer state
+- no annotation renders on any screen
+- no reviewer's vocabulary on a product screen. The nine catalogue pages
+  are exempt: a page titled "Screen states to templates" cannot be written
+  without the words, and naming what you catalogue is not commentary
+- the documentation screens are still reachable
+- the notes are still written down
+- and the product still works, because the cheapest way to pass a removal
+  test is to remove too much
 
-Two things worth knowing before the next change:
+Two things learned the expensive way, both worth not repeating:
 
-- Routing no longer goes through the rail. `go()` falls back to showing the
-  section a key names, because every route used to be a rail button and with
-  the rail gone the address bar stopped meaning anything.
-- The counts above are what the checker asserts. If a screen is added, the
-  checker walks it too; nothing needs updating by hand.
+- `.surfaces` looks like an annotation wrapper and five of the seven are
+  not. The import review's whole interactive figure lives inside one. Strip
+  the prose first, then remove a wrapper only if that left it empty.
+- Routing runs through the rail. `go()` finds a rail button and clicks it,
+  so removing the rail silently breaks every address in the file. There is
+  a fallback now, but the rail is the primary path.
 
 ---
 

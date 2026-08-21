@@ -1,16 +1,22 @@
 /*
-  Nothing that explains the product may be inside it.
+  The screens stay reachable. The commentary does not sit on them.
 
-  This file used to hold the product and the argument for it side by side: a
-  Screens and Notes rail down the left, 87 annotations explaining why a screen
-  is the way it is, and nine pages of design documentation reachable by name.
-  That was the point of it, and it is now the point of DESIGN-NOTES.md
-  instead. What ships is the product.
+  This file held the product and the argument for it on the same page: a
+  Screens and Notes rail down the left, and 87 annotations printed beside the
+  things they explained. The rail is the point of the file and it stays, with
+  every screen and every drawer state still one press away. The annotations
+  moved to DESIGN-NOTES.md, because a note explaining why a control reads the
+  way it does is not something to hand a person who is trying to read the
+  control.
 
-  The failure this guards is not somebody re-adding the rail on purpose. It is
-  one note, written next to the thing it is about, because that is where it is
-  useful to write it. So this asks the rendered page rather than the source,
-  and it asks in the words a reviewer would use.
+  So the line this holds is narrow: no annotation renders, and no reviewer's
+  vocabulary reaches the screen. Navigation is not the fault; prose printed
+  next to a form is.
+
+  It asks the rendered page rather than the source, because the failure to
+  guard against is not a deliberate restoration. It is one note written next
+  to the thing it is about, which is exactly where it is most tempting to
+  write it.
 
   Run it:  node tools/production.js
   Exits 0 when nothing design-only reaches the screen, 1 with a report.
@@ -146,19 +152,36 @@ const STRANDED = (id) => `(function(){
 
   /* ── The review apparatus ─────────────────────────────────────────────── */
 
+  /* The rail stays. It is how the thing is reviewed, and every screen and
+     drawer state is meant to be one press from any other. What it must not
+     do is lose one. */
   const rail = await j(`({
-    rails: document.querySelectorAll('.rail, .rail-tab, .rail-screens, .rail-notes, .rail-group').length,
-    stateButtons: document.querySelectorAll('[data-screen], [data-state]').length
+    rails: document.querySelectorAll('.rail').length,
+    screens: document.querySelectorAll('.rail button[data-screen]').length,
+    states: document.querySelectorAll('.rail button[data-form]').length,
+    sections: document.querySelectorAll('section[id^="screen-"]').length,
+    inSheet: document.querySelectorAll('.focus-sheet .states').length
   })`);
-  check('navigation', 'no Screens or Notes rail is rendered',
-    rail.rails === 0, rail.rails ? `${rail.rails} rail element(s)` : 'none in the document');
-  check('navigation', 'no developer state switcher survives',
-    rail.stateButtons === 0,
-    rail.stateButtons ? `${rail.stateButtons} state control(s)` : 'none');
+  check('navigation', 'the rail reaches every screen in the document',
+    rail.rails === 1 && rail.screens === rail.sections,
+    `${rail.screens} buttons for ${rail.sections} screens`);
+  check('navigation', 'and every drawer state as well',
+    rail.states > 0, `${rail.states} drawer states`);
+  /* The rail is one way in. A second switcher inside the sheet was another,
+     sitting among the fields somebody is filling in. */
+  check('navigation', 'no second state switcher inside a sheet',
+    rail.inSheet === 0, rail.inSheet ? `${rail.inSheet} in-sheet switcher(s)` : 'none');
 
   /* ── Annotations, on every screen rather than the first ──────────────── */
 
   const notes = [], words = [];
+  /* The catalogue pages are allowed to name what they catalogue. "Screen
+     states to templates" is the title of one of them, and a page whose
+     subject is the prototype's own states cannot be written without the
+     words. The rule is about a product screen carrying commentary, not
+     about the documentation being documentation. */
+  const CATALOGUE = ['atoms', 'molecules', 'organisms', 'hierarchy',
+    'state-map', 'oneoffs', 'states', 'driver-states', 'driver-open'];
   /* The vocabulary a reviewer writes in. Bounded so an operational note a
      fleet manager typed about a vehicle is not mistaken for one of these. */
   const TELLS = ['design note', 'for review', 'screen state', 'this prototype',
@@ -177,22 +200,26 @@ const STRANDED = (id) => `(function(){
           return new RegExp(w.replace(/[.*+?^$()|[\\]\\\\]/g, '\\\\$&'), 'i').test(t); })
       };})()`);
     if (r.n) notes.push(`${s}: ${r.n}`);
-    if (r.hits.length) words.push(`${s}: ${r.hits.join(', ')}`);
+    if (r.hits.length && !CATALOGUE.includes(s)) words.push(`${s}: ${r.hits.join(', ')}`);
   }
   check('annotations', 'no annotation element on any screen',
     notes.length === 0,
     notes.length ? notes.slice(0, 3).join(' · ') : `${SCREENS.length} screens, none`);
-  check('annotations', 'no reviewer vocabulary reaches the screen',
+  check('annotations', 'no reviewer vocabulary on a product screen',
     words.length === 0,
-    words.length ? words.slice(0, 3).join(' · ') : `${SCREENS.length} screens, none`);
+    words.length ? words.slice(0, 3).join(' · ')
+      : `${SCREENS.length - CATALOGUE.length} product screens, none`);
 
   /* ── Documentation is not a route ─────────────────────────────────────── */
 
+  /* The documentation screens stay too. They are catalogues of what the
+     product is built from, reviewed by opening them, and they are not
+     commentary printed over a working form. */
   const DOCS = ['atoms', 'molecules', 'organisms', 'hierarchy', 'state-map',
     'oneoffs', 'states', 'driver-states', 'driver-open'];
-  const alive = DOCS.filter(d => SCREENS.includes(d));
-  check('routes', 'the design documentation has no route',
-    alive.length === 0, alive.length ? alive.join(', ') : `${DOCS.length} pages, none reachable`);
+  const missing = DOCS.filter(d => !SCREENS.includes(d));
+  check('routes', 'the design documentation is still reachable',
+    missing.length === 0, missing.length ? `lost: ${missing.join(', ')}` : `${DOCS.length} pages`);
 
   /* Kept, not deleted: the argument still exists, it is simply not shipped. */
   const kept = fs.existsSync(path.join(ROOT, 'DESIGN-NOTES.md'))
@@ -225,7 +252,7 @@ const STRANDED = (id) => `(function(){
       return !!e && e.checkVisibility() && e.getBoundingClientRect().height > 100; })()`);
     if (!ok) worksList.push(s);
   }
-  check('the product', 'every remaining screen still routes and renders',
+  check('the product', 'every screen still routes and renders',
     worksList.length === 0,
     worksList.length ? worksList.join(', ') : `${SCREENS.length} screens`);
 
