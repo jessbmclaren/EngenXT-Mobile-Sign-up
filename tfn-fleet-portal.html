@@ -14023,9 +14023,22 @@ return {
 window.ImportSchema = (() => {
 
 const COLUMNS = [
-  { key: 'vin', label: 'VIN', required: true,
-    says: 'Up to 50 characters, from the licence disc. This is what identifies '
-      + 'the vehicle if its plate ever changes.',
+  /* Optional, and the same optional the form means.
+   *
+   * The comment above this list promises that `required` is the rule the
+   * manual form applies, so the two cannot disagree about what a vehicle
+   * needs. On this one field they did: the form marked VIN Optional and this
+   * said required, so a spreadsheet row without one was rejected while the
+   * same vehicle typed by hand was accepted. Two rules for one field, and
+   * which one a fleet met depended only on how they happened to add the
+   * vehicle.
+   *
+   * The length said 50 while the form allows 17. A VIN is 17 characters by
+   * standard and the form is what enforces it, so the document now says what
+   * the product actually does rather than a number it never checked. */
+  { key: 'vin', label: 'VIN', required: false,
+    says: 'Optional. Up to 17 characters, from the licence disc. This is what '
+      + 'identifies the vehicle if its plate ever changes.',
     example: 'AHTFR22G30A123456' },
   { key: 'registration', label: 'Registration number', required: true,
     says: 'Any text. No format rule, so non-standard plates are fine.',
