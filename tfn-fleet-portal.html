@@ -9366,6 +9366,18 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
             </div>
           </div>
           <div class="surface">
+            <p class="surface-note"><b>This screen does not say whether twelve
+              WhatsApp messages are about to be sent, and it is the screen that
+              most needs to.</b> The Add driver sheet asks the question: send
+              the invitation now, or invite later from the table. That choice
+              was built for one driver at a time, and one driver at a time is
+              not when it matters. The case it was written for is exactly this
+              one, twelve people entered on a Tuesday to be invited on Friday,
+              and this is the button that would message all twelve without
+              mentioning it. Import is Phase 2, so this is recorded rather
+              than drawn: the same two options belong beside <b>Import 12
+              drivers</b>, and the button should name what it is about to do
+              the way the sheet's does.</p>
             <p class="surface-note"><b>Refused and flagged are different, and
               this file has both.</b> A lapsed licence is true, so it imports
               and gets flagged. A landline cannot receive the setup link, so
@@ -10246,8 +10258,12 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       phone. You can start that now or later.</p>
     <div class="fields">
       <div class="form-field field-wide" data-field="invite">
-        <span class="label" id="d-invite-label">When to invite</span>
-        <div class="seg is-stacked seg--says" role="radiogroup" aria-labelledby="d-invite-label">
+        <!-- No visible label above these. The section is called EngenXT app
+             invitation, the note under it says "now or later", and the two
+             options say "now" and "later". A fourth line reading "When to
+             invite" was the same sentence a third time. The group still needs
+             a name for anything not reading the screen, so it has one. -->
+        <div class="seg is-stacked seg--says" role="radiogroup" aria-label="When to invite">
           <label>
             <input type="radio" name="d-invite-choice" value="now" checked>
             <span class="seg-body">
@@ -18439,7 +18455,11 @@ function dAppMenu(person, anchor) {
         ['Sent at', dEsc(appWhen(person.appAt))],
       ] },
       { items: [
-        { label: 'Resend invitation', act: 'ask-resend', says: 'Sends the same WhatsApp message again.' },
+        /* No confirmation on this one. The number already took a message,
+           so the thing the dialog exists to check is not in doubt, and this
+           is a nudge rather than a first contact. The product's own rule for
+           a one-press change applies: do it, and hand back the undo. */
+        { label: 'Resend invitation', act: 'resend', says: 'Sends the same WhatsApp message again.' },
         { label: 'Copy invitation link', act: 'copy-link',
           says: 'For sending another way. Does not count as a delivery.' },
         view,
