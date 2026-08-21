@@ -1277,7 +1277,6 @@ tbody tr:hover .rec, tbody tr:hover .reg { text-decoration-color: currentColor; 
 .toast[data-specimen] { position: static; opacity: 1; transform: none; }
 .bulk--specimen { margin: 0; }
 .error-summary--specimen { max-width: 440px; }
-.panel-facts--stacked { display: block; }
 .review-why--flush { margin: 0; }
 
 /* The documentation's own specimen cells: a sparkline and a meter need a
@@ -2298,6 +2297,8 @@ tbody tr[data-row] { cursor: pointer; }
   background: var(--color-brand-tint);
   border-radius: var(--radius-sm);
   animation: answer var(--duration-fast) var(--ease-standard);
+  /* The count and its actions share a line while there is room for one. */
+  flex-wrap: wrap;
 }
 
 .bulk-count {
@@ -2306,10 +2307,30 @@ tbody tr[data-row] { cursor: pointer; }
   color: var(--color-brand-ink);
 }
 
+/* Four buttons that would not wrap.
+ *
+ * This is the one thing in the product that made the page itself scroll
+ * sideways. Everything else wide — the tables, the specimen grids — sits in
+ * a container that scrolls on its own; this was a nowrap flex row of four
+ * buttons pinned right, so on a phone "Suspend / Allow fuelling / Mark as
+ * left / Clear" ran 150px past the edge and took the whole document with it.
+ * Every other screen then scrolled sideways too, because the document is one
+ * scroller, and the only way to reach the last button was to drag the page.
+ *
+ * It appears only once rows are ticked, which is why a sweep of the screens
+ * never saw it: the Molecules page draws the bar as a specimen with nothing
+ * selected, and that is where it surfaced. */
 .bulk-actions {
   margin-left: auto;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-0-5);
+}
+
+/* Once the bar has wrapped, the auto margin is holding the buttons against a
+   right edge on a line of their own. They go back under the count. */
+@media (max-width: 560px) {
+  .bulk-actions { margin-left: 0; width: 100%; }
 }
 
 /* The tick column. Narrow, and never hidden by the Columns control: the way to
@@ -4015,6 +4036,16 @@ body.drawer-open .drawer { display: flex; }
   align-items: flex-start;
   gap: var(--space-2-0);
   padding: var(--space-3-0);
+  /* The title and whatever sits opposite it are one row while there is room
+     for one, and two rows when there is not.
+     
+     Without this the row could only ever be one line: the title took what it
+     needed and the countdown beside it — nowrap, and pinned right by the
+     rule below — was pushed past the edge of a phone. On the override screens
+     that is the whole point of the header. A manager looking at a request
+     that expires in 1:47 could not see the 1:47, and the number is the
+     reason the screen is urgent at all. */
+  flex-wrap: wrap;
 }
 
 /* A badge names a status, and the layout is not allowed to abbreviate it.
@@ -4047,11 +4078,24 @@ body.drawer-open .drawer { display: flex; }
 
 .panel-sub { margin: var(--space-0-5) 0 0; color: var(--color-on-surface-variant); font-size: var(--font-size-body-sm); }
 /* Only when there are two. With a single child the last-child selector caught
-   it and shoved the whole header to the right edge. */
+   it and shoved the whole header to the right edge.
+   
+   `margin-left: auto` pushes it to the far side while the two share a line.
+   Once the header wraps, that same auto margin would hold it against the
+   right edge on a line of its own, under a left-aligned title, which reads as
+   a stray number rather than as the title's companion. So on the wrapped
+   layout it goes back to the left and gives up the right-alignment with it. */
 .panel-head > :last-child:not(:first-child) {
   margin-left: auto;
   text-align: right;
   white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .panel-head > :last-child:not(:first-child) {
+    margin-left: 0;
+    text-align: left;
+  }
 }
 
 .timer { font-size: var(--font-size-body-sm); color: var(--color-on-surface-variant); }
@@ -4131,6 +4175,26 @@ body.drawer-open .drawer { display: flex; }
     gap: var(--space-0-5);
   }
   .panel-facts dd { margin-bottom: var(--space-1-0); }
+}
+
+/* One column, for a block that is not a list of facts.
+ *
+ * This lived 2800 lines earlier, in the specimen styles, where it did nothing
+ * at all: same specificity as `.panel-facts` and declared before it, so the
+ * grid above won and the modifier lost every time. It was not a cosmetic
+ * loss. The base's first track is `max-content`, the rules screen puts a
+ * two-column before/after comparison in here, and max-content of that is
+ * 935px inside a 600px panel that clips at its edge — so below about 1440px
+ * the "after" half of a before-and-after was simply not on the screen, with
+ * no scrollbar to reach it. The one screen whose entire job is comparing two
+ * things could only show one of them.
+ *
+ * Next to the rule it modifies, it wins on source order, which is the whole
+ * mechanism a modifier relies on. */
+.panel-facts--stacked {
+  display: block;
+  /* And it may not be wider than what holds it, whatever it contains. */
+  min-width: 0;
 }
 
 .panel-facts dt { color: var(--color-on-surface-variant); }
@@ -4463,7 +4527,12 @@ body.status-dialog-open .scrim { display: block; z-index: var(--z-dialog-scrim);
 }
 
 /* The whole cell, so aiming at the row's tick does not require aiming at
-   thirteen pixels of it. */
+   thirteen pixels of it.
+   
+   The header's Select all was the one tick this was never put around. Same
+   control, same thirteen pixels, and the harder one to hit: it is the cell
+   somebody reaches for when they mean to act on the whole page, and it sat in
+   a 53×46 cell that did nothing outside the box itself. */
 .tick-target {
   display: flex;
   align-items: center;
@@ -5926,6 +5995,18 @@ body.rail-closed .preview-overlay { left: var(--size-nav-rail-width); }
  * for one component, not prose.
  */
 .doc-table { width: 100%; max-width: none; table-layout: fixed; }
+
+/* A reference table is told to fit its container and to divide the width by
+   percentage, which works until the container is a phone: five fixed columns
+   of a 390px screen leave the first one 48px, and a 58px word like
+   "molecules" simply hangs out of it and off the page. A word that has to
+   break is worse to read than one that does not, and better than one that is
+   not there. Only where the columns are genuinely too narrow to hold a word;
+   at every width above this the tables are unchanged. */
+@media (max-width: 560px) {
+  .spec td, .spec th,
+  .doc-table td, .doc-table th { overflow-wrap: anywhere; }
+}
 .doc-table th:nth-child(1), .doc-table td:nth-child(1) { width: 17%; }
 .doc-table th:nth-child(4), .doc-table td:nth-child(4) { width: 20%; }
 .doc-table th:nth-child(5), .doc-table td:nth-child(5) { width: 16%; }
@@ -8690,7 +8771,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <table>
             <thead>
               <tr data-role="head">
-                <th scope="col" class="select"><input type="checkbox" class="select-all" aria-label="Select all vehicles"></th>
+                <th scope="col" class="select"><label class="tick-target"><input type="checkbox" class="select-all" aria-label="Select all vehicles"></label></th>
                 <th scope="col" class="sortable" aria-sort="ascending">Registration <span class="arrow">↑</span></th>
                 <th scope="col">Fleet number</th>
                 <th scope="col">Vehicle</th>
@@ -8882,7 +8963,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
           <table>
             <thead>
               <tr data-role="head">
-                <th scope="col" class="select"><input type="checkbox" class="select-all" aria-label="Select all drivers"></th>
+                <th scope="col" class="select"><label class="tick-target"><input type="checkbox" class="select-all" aria-label="Select all drivers"></label></th>
                 <th class="sortable" aria-sort="ascending" scope="col">Driver <span class="arrow">↑</span></th>
                 <th scope="col">Mobile number</th>
                 <th scope="col">Branch or department</th>
