@@ -892,8 +892,11 @@ const READ_MENU = `(function(){
       danger: /btn-danger/.test(d.querySelector('[data-role="cf-go"]').className) };})())`));
   check('the question', 'a WhatsApp message is confirmed before it is sent',
     ask.shown && ask.title === 'Send WhatsApp invitation?', ask.shown ? ask.title : 'no dialog');
+  /* Named in the format the record holds, not reformatted. See the
+     one-number checks further down for why. */
   check('the question', 'it names the number the message will reach',
-    /We\u2019ll send a WhatsApp invitation to \+27 /.test(ask.body || ''), ask.body);
+    /We\u2019ll send a WhatsApp invitation to 0\d/.test(ask.body || '')
+      && !/\+27/.test(ask.body || ''), ask.body);
   check('the question', 'Cancel, and a Send that is not dressed as a danger',
     ask.cancel === 'Cancel' && ask.go === 'Send invitation' && !ask.danger,
     `${ask.cancel} | ${ask.go}`);
@@ -1038,6 +1041,59 @@ const READ_MENU = `(function(){
 
   await send('Emulation.setDeviceMetricsOverride',
     { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+
+  /* ── One number, one way of writing it ───────────────────────────────── */
+
+  /* The confirmation exists so somebody can check a number against what they
+     know. It used to reformat to +27 82 123 4567, which appears nowhere else
+     in the product, so verifying meant converting one format into the other
+     first. Work added to the one step whose whole job is preventing a
+     mistake. */
+  await load();
+  const shownAs = JSON.parse(await run(`JSON.stringify((function(){
+    var tr = document.querySelector('#screen-drivers-directory tbody tr[data-row]');
+    var d = window.DriverFixtures.DRIVERS.filter(function(p){
+      return (p.idNumber || p.passportNumber) === tr.getAttribute('data-row'); })[0];
+    return { record: d.mobile, column: tr.querySelectorAll('td')[2].textContent.trim() };})())`));
+  const nk = await run(ROW_WITH('Not invited'));
+  await run(`document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify('')} + k_) + '"] [data-pill="app"]').click()`
+    .replace('k_', JSON.stringify(nk)));
+  await sleep(420);
+  await run(`(function(){ var p = document.querySelector('.status-pop:not(.hidden)');
+    [].filter.call(p.querySelectorAll('[data-pick]'), function(b){
+      return /Send invitation/.test(b.textContent); })[0].click(); })()`);
+  await sleep(650);
+  const inDialog = await run(`(document.querySelector('[data-role="cf-body"]') || {}).textContent || ''`);
+  const theNumber = await run(`(function(){ var d = window.DriverFixtures.DRIVERS.filter(function(p){
+    return (p.idNumber || p.passportNumber) === ${JSON.stringify(nk)}; })[0]; return d.mobile; })()`);
+  check('one number', 'the confirmation shows the number the record holds',
+    inDialog.includes(theNumber) && !/\+27/.test(inDialog),
+    `record ${theNumber} · dialog "${inDialog.trim()}"`);
+  check('one number', 'and the column shows the same',
+    shownAs.column === shownAs.record, `${shownAs.column} / ${shownAs.record}`);
+
+  /* ── A tile is a queue, not a fact ───────────────────────────────────── */
+
+  /* It counted four and landed on all twelve, which is a number promising a
+     set and a destination not delivering it. Ticked through the real filter
+     checkboxes, so the chips appear on their own and Clear still works. */
+  await load('home');
+  await sleep(400);
+  await run(`(function(){ var t = [].filter.call(document.querySelectorAll('#screen-home .stat-tile'),
+    function(x){ return /without the app/i.test(x.innerText || ''); })[0]; if (t) t.click(); })()`);
+  await sleep(800);
+  const tileLanded = JSON.parse(await run(`JSON.stringify((function(){
+    var rows = document.querySelectorAll('#screen-drivers-directory tbody tr[data-row]').length;
+    var chips = document.querySelector('#screen-drivers-directory [data-role="chips"]');
+    var counted = window.DriverFixtures.DRIVERS.filter(function(d){
+      return d.access === 'On the fleet' && d.app !== 'Active'; }).length;
+    return { rows: rows, counted: counted,
+      chips: chips && !chips.classList.contains('hidden') ? chips.querySelectorAll('*').length : 0 };})())`));
+  check('the tile', 'lands on the drivers it counted, not all of them',
+    tileLanded.rows === tileLanded.counted && tileLanded.rows > 0,
+    `${tileLanded.rows} rows for a count of ${tileLanded.counted}`);
+  check('the tile', 'and says what it filtered, so it can be cleared',
+    tileLanded.chips > 0, `${tileLanded.chips} chip element(s)`);
 
   const errs = await run(`JSON.stringify(window.__pageErrors || [])`);
   check('nobody sets it', 'the page ran clean',

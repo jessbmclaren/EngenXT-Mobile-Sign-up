@@ -17814,20 +17814,17 @@ function driverAction(key, act, extra) {
    * being seeded into a fixture. */
   const BOUNCES = /^079 333/;
 
-  /* The number as it will be dialled, not as it was typed.
+  /* The number exactly as the record holds it.
    *
-   * A South African mobile is entered 082 123 4567 and a WhatsApp message
-   * goes to +27 82 123 4567. The confirmation names the second one, because
-   * the question it is asking is "is this the phone the message will reach",
-   * and the answer is the international number. */
-  const dialled = (m) => {
-    const digits = String(m || '').replace(/\D/g, '');
-    if (digits.length === 10 && digits.startsWith('0')) {
-      const n = digits.slice(1);
-      return `+27 ${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5)}`;
-    }
-    return m;
-  };
+   * This used to reformat to +27 82 123 4567, on the reasoning that the
+   * international number is the one a message is actually dialled to. That
+   * was wrong about what the confirmation is for. It is not describing the
+   * network, it is asking somebody to check a number against what they know,
+   * and every other place in this product says 082. Two formats mean the
+   * person verifying has to convert one into the other before they can
+   * compare them, which is work added to the one step that exists to prevent
+   * a mistake. One value, one way of writing it. */
+  const dialled = (m) => m;
 
   /* ── The question before the message ────────────────────────────────────
    *
@@ -18318,9 +18315,12 @@ function gauge(value, total) {
 
 /* Zero is the good answer for three of these five, so it gets said properly
    rather than being left as a bare 0 with a label that implies a problem. */
-function tile({ label, value, qual, foot, tone, goto: to, tab }) {
+function tile({ label, value, qual, foot, tone, goto: to, tab, facet }) {
   const el = to ? 'a' : 'div';
-  const href = to ? ` href="#${to}"${tab ? ` data-goto-tab="${tab}"` : ''}` : '';
+  const href = to
+    ? ` href="#${to}"${tab ? ` data-goto-tab="${tab}"` : ''}` +
+      (facet ? ` data-goto-facet="${facet.join('|')}"` : '')
+    : '';
   const cls = tone ? ` trend-${tone}` : '';
   return `
     <${el} class="stat-tile"${href}>
@@ -18425,6 +18425,10 @@ function render() {
           ? 'Invited or waiting to be. They cannot fuel until the app is set up.'
           : 'Every driver on the fleet has the app.',
       goto: 'drivers-directory',
+      /* The four the number is counting. It landed on all twelve before,
+         which is a tile promising a set and a destination not delivering
+         it: the count says four and you arrive to find them yourself. */
+      facet: ['Not invited', 'Invite sending', 'Invite sent', 'Invite failed'],
     }),
     tile({
       label: 'Vehicles on the road', value: counts.vehiclesReady,
@@ -18448,6 +18452,30 @@ document.addEventListener('click', e => {
     const tab = [...(screen?.querySelectorAll('.tab') || [])]
       .find(t => t.textContent.trim().startsWith(want));
     tab?.click();
+  });
+});
+
+/* The same idea over the filter panel, for a tile whose set is a handful of
+   status values rather than a tab.
+ *
+ * Ticked through the real checkboxes, the way the tab above is clicked: the
+ * directory's own listener does the filtering, the chips appear on their own
+ * saying what is being filtered, and Clear works because nothing here
+ * reached past the control to set state directly. */
+document.addEventListener('click', e => {
+  const a = e.target.closest('a.stat-tile[data-goto-facet]');
+  if (!a) return;
+  const want = a.dataset.gotoFacet.split('|');
+  requestAnimationFrame(() => {
+    const screen = document.querySelector('.page > section:not(.hidden)');
+    if (!screen) return;
+    const boxes = [...screen.querySelectorAll('[data-facet]')]
+      .filter(i => want.includes(i.value));
+    boxes.forEach(i => {
+      if (i.checked) return;
+      i.checked = true;
+      i.dispatchEvent(new Event('change', { bubbles: true }));
+    });
   });
 });
 
