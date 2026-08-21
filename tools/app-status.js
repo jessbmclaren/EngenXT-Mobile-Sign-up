@@ -57,7 +57,10 @@ const STATUSES = ['Not invited', 'Invite sending', 'Invite sent', 'Active',
    page, because a checker that asks the page what it should do agrees with
    the page by construction. */
 const OFFERS = {
-  'Not invited': ['Send invitation', 'View driver'],
+  /* The number is what decides whether the message lands, and this is the
+     last moment before it goes, so checking it is offered here rather than
+     only after a bounce. */
+  'Not invited': ['Send invitation', 'Edit mobile number', 'View driver'],
   'Invite sending': ['View driver'],
   'Invite sent': ['Resend invitation', 'Copy invitation link', 'View driver'],
   'Active': ['View driver'],
@@ -418,6 +421,9 @@ const READ_MENU = `(function(){
     [].filter.call(pop.querySelectorAll('[data-pick]'), function(b){
       return /Send invitation/.test(b.textContent); })[0].click();
   })()`);
+  /* A WhatsApp message to a personal phone asks once before it goes. */
+  await sleep(600);
+  await run(`document.querySelector('[data-role="cf-go"]').click()`);
   await sleep(300);
   const midway = await run(`(function(){
     var tr = document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify(freshKey)}) + '"]');
@@ -461,6 +467,8 @@ const READ_MENU = `(function(){
     [].filter.call(pop.querySelectorAll('[data-pick]'), function(b){
       return /Send invitation/.test(b.textContent); })[0].click();
   })()`);
+  await sleep(600);
+  await run(`document.querySelector('[data-role="cf-go"]').click()`);
   await sleep(1800);
   const bounced = JSON.parse(await run(`JSON.stringify((function(){
     var d = window.DriverFixtures.DRIVERS.filter(function(p){
@@ -690,6 +698,163 @@ const READ_MENU = `(function(){
     copy.add && copy.edit
       ? `add: "${copy.add.slice(0, 34)}…" edit: "${copy.edit.slice(0, 34)}…"`
       : `add: ${copy.add} / edit: ${copy.edit}`);
+
+  /* ── Inviting later ──────────────────────────────────────────────────── */
+
+  /* The invitation used to live inside the Add button's label and nowhere
+     else, so the only way to learn that saving a driver messages their
+     personal phone was to read the button, and a manager entering twelve
+     drivers on a Tuesday to invite on Friday could not say so. */
+  await load();
+  await run(`document.querySelector('#screen-drivers-directory [data-open="driver:blank"]').click()`);
+  await sleep(1000);
+  const sheet = JSON.parse(await run(`JSON.stringify((function(){
+    var w = document.querySelector('#driver-drawer [data-field="invite"]');
+    if (!w) return { missing: true };
+    var head = [].filter.call(document.querySelectorAll('#driver-drawer .sheet-section__title'),
+      function(x){ return /invitation/i.test(x.textContent); })[0];
+    return {
+      shown: w.checkVisibility(),
+      heading: head ? head.textContent.trim() : null,
+      options: [].map.call(w.querySelectorAll('label'), function(l){
+        return { title: (l.querySelector('.seg-title')||{}).textContent.trim(),
+                 says: (l.querySelector('.seg-says')||{}).textContent.trim(),
+                 checked: l.querySelector('input').checked }; }),
+      button: document.querySelector('#driver-drawer [data-role="submit"]').textContent.trim()
+    };})())`));
+  check('inviting later', 'the sheet asks when to invite',
+    !sheet.missing && sheet.shown && sheet.heading === 'EngenXT app invitation',
+    sheet.missing ? 'no invite field on the sheet' : sheet.heading);
+  check('inviting later', 'two options, and the words are the agreed words',
+    sheet.options && sheet.options.length === 2
+      && sheet.options[0].title === 'Send invitation now'
+      && sheet.options[1].title === 'Invite later'
+      && /WhatsApp message with a link to download and activate the EngenXT app/.test(sheet.options[0].says)
+      && /send the invitation from the Drivers table when you/.test(sheet.options[1].says),
+    (sheet.options || []).map(o => o.title).join(' | '));
+  check('inviting later', 'sending now is what happens unless you say otherwise',
+    sheet.options && sheet.options[0].checked && !sheet.options[1].checked
+      && sheet.button === 'Add driver and send invite',
+    `"${sheet.button}"`);
+
+  /* The label is the last thing read before pressing, so it is the last place
+     the promise can still be wrong. */
+  await run(`(function(){ var r = [].filter.call(
+    document.querySelectorAll('input[name="d-invite-choice"]'),
+    function(x){ return x.value === 'later'; })[0];
+    r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+  await sleep(400);
+  const relabelled = await run(`document.querySelector('#driver-drawer [data-role="submit"]').textContent.trim()`);
+  check('inviting later', 'choosing later renames the button',
+    relabelled === 'Add driver', `"${relabelled}"`);
+
+  await run(`(function(){
+    var set = function(i, v){ var x = document.getElementById(i); if (!x) return;
+      x.value = v; x.dispatchEvent(new Event('input', { bubbles: true }));
+      x.dispatchEvent(new Event('change', { bubbles: true })); };
+    set('d-first','Testy'); set('d-last','McTest'); set('d-mobile','082 555 0000');
+    set('d-idtype','South African ID'); set('d-id','9001015800088');
+    set('d-code','A1'); set('d-prdp','No PrDP'); })()`);
+  await sleep(700);
+  await run(`document.querySelector('#driver-drawer [data-role="submit"]').click()`);
+  await sleep(1000);
+  const added = JSON.parse(await run(`JSON.stringify((function(){
+    var d = window.DriverFixtures.DRIVERS.filter(function(p){ return p.first === 'Testy'; })[0];
+    var t = document.querySelector('[data-role="toast"]');
+    return { found: !!d, app: d && d.app, at: d && d.appAt,
+      sheetShut: [].filter.call(document.querySelectorAll('.focus-sheet'),
+        function(x){ return x.getBoundingClientRect().height > 50; }).length === 0,
+      toast: t ? (t.innerText || '').split(String.fromCharCode(10)).join(' ').trim() : '' };})())`));
+  check('inviting later', 'the driver lands as Not invited, and the sheet closes',
+    added.found && added.app === 'Not invited' && added.sheetShut,
+    added.found ? `${added.app}, sheet ${added.sheetShut ? 'closed' : 'STILL OPEN'}` : 'no driver created');
+  check('inviting later', 'and it says where to invite them from',
+    /Driver added/.test(added.toast) && /invite this driver from the Drivers table/.test(added.toast),
+    added.toast || 'no toast');
+
+  /* The point of the choice: no message went anywhere. */
+  await sleep(1700);
+  const quiet = JSON.parse(await run(`JSON.stringify((function(){
+    var d = window.DriverFixtures.DRIVERS.filter(function(p){ return p.first === 'Testy'; })[0];
+    return { app: d && d.app, at: d && d.appAt };})())`));
+  check('inviting later', 'nothing was sent',
+    quiet.app === 'Not invited' && !quiet.at,
+    `${quiet.app}, stamped ${quiet.at || 'never'}`);
+
+  /* There is no Invite later status. Later is a decision somebody made; Not
+     invited is the state the driver is in, and only one of those is a fact
+     about the driver. */
+  const invented = JSON.parse(await run(`JSON.stringify(
+    (window.__appStatuses || []).filter(function(s){ return /later/i.test(s); }))`));
+  check('inviting later', 'no Invite later status was invented',
+    invented.length === 0, invented.length ? invented.join(', ') : 'six statuses, none of them a decision');
+
+  /* ── The question before the message ─────────────────────────────────── */
+
+  await load();
+  const freshK = await run(ROW_WITH('Not invited'));
+  await run(`document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify('')} + freshK_) + '"] [data-pill="app"]').click()`
+    .replace('freshK_', JSON.stringify(freshK)));
+  await sleep(450);
+  await run(`(function(){ var p = document.querySelector('.status-pop:not(.hidden)');
+    [].filter.call(p.querySelectorAll('[data-pick]'), function(b){
+      return /Send invitation/.test(b.textContent); })[0].click(); })()`);
+  await sleep(700);
+  const ask = JSON.parse(await run(`JSON.stringify((function(){
+    var d = document.getElementById('status-dialog');
+    if (d.classList.contains('hidden')) return { shown: false };
+    var t = function(r){ var e = d.querySelector('[data-role="' + r + '"]');
+      return e ? e.textContent.trim() : ''; };
+    return { shown: true, title: t('cf-title'), body: t('cf-body'),
+      cancel: t('cf-back'), go: t('cf-go'),
+      danger: /btn-danger/.test(d.querySelector('[data-role="cf-go"]').className) };})())`));
+  check('the question', 'a WhatsApp message is confirmed before it is sent',
+    ask.shown && ask.title === 'Send WhatsApp invitation?', ask.shown ? ask.title : 'no dialog');
+  check('the question', 'it names the number the message will reach',
+    /We\u2019ll send a WhatsApp invitation to \+27 /.test(ask.body || ''), ask.body);
+  check('the question', 'Cancel, and a Send that is not dressed as a danger',
+    ask.cancel === 'Cancel' && ask.go === 'Send invitation' && !ask.danger,
+    `${ask.cancel} | ${ask.go}`);
+
+  await run(`document.querySelector('[data-role="cf-back"]').click()`);
+  await sleep(500);
+  const afterCancel = await run(`(function(){ var d = window.DriverFixtures.DRIVERS.filter(function(p){
+    return (p.idNumber || p.passportNumber) === ${JSON.stringify(freshK)}; })[0]; return d.app; })()`);
+  check('the question', 'Cancel sends nothing',
+    afterCancel === 'Not invited', afterCancel);
+
+  /* One message at a time. The menu shuts on the press, so without a guard a
+     second press during the beat queues a second message to a real phone. */
+  await run(`document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify(freshK)}) + '"] [data-pill="app"]').click()`);
+  await sleep(400);
+  await run(`(function(){ var p = document.querySelector('.status-pop:not(.hidden)');
+    [].filter.call(p.querySelectorAll('[data-pick]'), function(b){
+      return /Send invitation/.test(b.textContent); })[0].click(); })()`);
+  await sleep(600);
+  await run(`document.querySelector('[data-role="cf-go"]').click()`);
+  await sleep(350);
+  await run(`document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify(freshK)}) + '"] [data-pill="app"]').click()`);
+  await sleep(400);
+  const inFlight = JSON.parse(await run(`JSON.stringify((function(){
+    var tr = document.querySelector('tr[data-row="' + CSS.escape(${JSON.stringify(freshK)}) + '"]');
+    var p = document.querySelector('.status-pop:not(.hidden)');
+    return { pill: tr.querySelector('[data-pill="app"]').textContent.trim(),
+      offered: p ? [].map.call(p.querySelectorAll('[data-pick] .pick-label'),
+        function(x){ return x.textContent.trim(); }) : [] };})())`));
+  check('the question', 'while it sends, no second send is offered',
+    inFlight.pill === 'Invite sending'
+      && !inFlight.offered.some(a => /invitation/i.test(a)),
+    `${inFlight.pill} · offers ${inFlight.offered.join(', ') || 'nothing'}`);
+
+  /* ── One channel, named the same way everywhere ──────────────────────── */
+
+  const channel = JSON.parse(await run(`JSON.stringify((function(){
+    var t = document.body.innerText;
+    return { sms: /\bSMS\b/i.test(t) || /text message/i.test(t),
+      whatsapp: (t.match(/WhatsApp/g) || []).length };})())`));
+  check('one channel', 'the product says WhatsApp and never SMS',
+    !channel.sms && channel.whatsapp > 0,
+    channel.sms ? 'SMS still appears on screen' : `WhatsApp named ${channel.whatsapp} time(s), SMS never`);
 
   const errs = await run(`JSON.stringify(window.__pageErrors || [])`);
   check('nobody sets it', 'the page ran clean',

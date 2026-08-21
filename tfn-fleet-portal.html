@@ -2111,6 +2111,34 @@ body.drawer-open .drawer { animation: slide-in var(--duration-base) var(--ease-d
               inset 0 0 0 var(--size-marker-diameter) var(--color-brand-ink);
 }
 
+/* A choice that needs a sentence to explain it.
+ *
+ * The plain stacked segment is one line per option and centres its marker on
+ * that line. With a title and an explanation the marker has to sit against
+ * the first line instead, or it floats in the middle of a paragraph pointing
+ * at nothing. */
+.seg--says label { align-items: flex-start; }
+.seg--says label::before { margin-top: var(--space-0-25); }
+
+.seg-body { display: block; }
+
+.seg-title {
+  display: block;
+  font-weight: var(--font-weight-label-md);
+}
+
+.seg-says {
+  display: block;
+  margin-top: var(--space-0-25);
+  font-size: var(--font-size-label-sm);
+  font-weight: var(--font-weight-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* The explanation follows the option it belongs to, including when that
+   option is the chosen one. */
+.seg--says label:has(:checked) .seg-says { color: var(--color-on-surface-variant); }
+
 .seg label {
   flex: 1;
   display: flex;
@@ -7112,7 +7140,7 @@ body.clean .page > section:has(.panel) > :not(.page-head):not(.preview):not(.fig
         <div class="spec-grid">
           <div class="form-alert form-alert-stop"><p>You do not have permission to add or edit drivers.</p></div>
           <div class="form-alert form-alert-warn"><p>The driver could not be saved. Try again.</p><p class="form-alert-do"><button class="btn btn-secondary">Try again</button></p></div>
-          <div class="form-alert form-alert-good"><p>Sipho Ndlovu has been added. They will get an SMS with the link to set up the app.</p></div>
+          <div class="form-alert form-alert-good"><p>Sipho Ndlovu has been added. They will get a WhatsApp message with the link to set up the app.</p></div>
         </div>
 
         <h2 class="spec-h">Segmented choice</h2>
@@ -10115,7 +10143,7 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
         <input class="field ident" id="d-mobile" inputmode="tel" autocomplete="off" placeholder="e.g. 082 123 4567">
         <!-- Said where the number is typed, because this field is the reason
              the driver ever hears from the product. -->
-        <span class="help">We’ll send the app invitation to this number.</span>
+        <span class="help">We’ll send the WhatsApp invitation to this number.</span>
         <!-- The rule is the driver sign-up flow's, not a second opinion: this
              is the number they type to reach the app. -->
         <span class="help">The number they sign in to the app with.</span>
@@ -10205,6 +10233,41 @@ Ayanda,Zulu,073 111 2222,9007225137088,,,Code EB,PrDP G,2028-01-31,2029-03-31,ay
       </div>
     </div>
       </section>
+
+    <!-- The invitation is a decision, not a side effect of saving.
+         It sat inside the Add button's label and nowhere else, so the only
+         way to find out that adding a driver messages them was to read the
+         button. A manager who is entering twelve drivers from a spreadsheet
+         on a Tuesday and wants to invite them on Friday had no way to say so,
+         and no way to tell that they could not. -->
+    <section class="sheet-section">
+    <h3 class="sheet-section__title">EngenXT app invitation</h3>
+    <p class="group-note">The driver cannot fuel until the app is on their
+      phone. You can start that now or later.</p>
+    <div class="fields">
+      <div class="form-field field-wide" data-field="invite">
+        <span class="label" id="d-invite-label">When to invite</span>
+        <div class="seg is-stacked seg--says" role="radiogroup" aria-labelledby="d-invite-label">
+          <label>
+            <input type="radio" name="d-invite-choice" value="now" checked>
+            <span class="seg-body">
+              <span class="seg-title">Send invitation now</span>
+              <span class="seg-says">The driver will receive a WhatsApp message with a link to download and activate the EngenXT app.</span>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="d-invite-choice" value="later">
+            <span class="seg-body">
+              <span class="seg-title">Invite later</span>
+              <span class="seg-says">You can send the invitation from the Drivers table when you&rsquo;re ready.</span>
+            </span>
+          </label>
+        </div>
+        <!-- The answer, where the form engine reads every other field's. -->
+        <input type="hidden" id="d-invite" value="now">
+      </div>
+    </div>
+    </section>
 
     <section class="sheet-section">
     <h3 class="sheet-section__title">Fleet details</h3>
@@ -10645,7 +10708,10 @@ function form(spec) {
   }
 
   function sync() {
-    if (spec.sync) spec.sync(get, root);
+    /* `current` is the state the sheet was opened in. A field can be about
+       the act of creating a record rather than about the record, and those
+       have no business appearing over one that already exists. */
+    if (spec.sync) spec.sync(get, root, current);
     paintRequired();
   }
 
@@ -17452,7 +17518,7 @@ const ID = {
   passportNumber: 'd-passport', passportCountry: 'd-country',
   licenceCode: 'd-code', licenceNumber: 'd-licnum', licenceExpiry: 'd-licexp',
   prdp: 'd-prdp', prdpExpiry: 'd-prdpexp',
-  employeeId: 'd-emp', group: 'd-group',
+  employeeId: 'd-emp', group: 'd-group', invite: 'd-invite',
 };
 
 /* A driver who is not on the list, so the ordinary add is not fighting a
@@ -17661,7 +17727,7 @@ const others = state => DRIVERS
   }));
 
 /* Which fields are on screen, given what has been answered. */
-function sync(get, root) {
+function sync(get, root, state) {
   const show = (field, on) => {
     const wrap = root.querySelector(`[data-field="${field}"]`);
     if (wrap) wrap.classList.toggle('hidden', !on);
@@ -17670,6 +17736,21 @@ function sync(get, root) {
   // The buttons follow the value, so a state that sets one shows it chosen.
   root.querySelectorAll('input[name="d-idtype-choice"]')
     .forEach(r => { r.checked = r.value === type; });
+  /* Send now unless somebody says otherwise.
+   *
+   * The hidden input carries `value="now"` in the markup, and applyState
+   * clears every field it is not given a value for, so opening the sheet
+   * emptied it and the save read "" instead of a choice. The default belongs
+   * here, where the field is reconciled, rather than in the markup where the
+   * engine will overwrite it. */
+  const box = root.querySelector('#d-invite');
+  const when = get('invite') || 'now';
+  if (box && box.value !== when) box.value = when;
+  root.querySelectorAll('input[name="d-invite-choice"]')
+    .forEach(r => { r.checked = r.value === when; });
+  /* The invitation is a question about a driver who does not exist yet.
+     Editing one who does has nothing to ask. */
+  show('invite', !(state && state.editing));
   show('idNumber', type === 'South African ID');
   show('passportNumber', type === 'Passport');
   show('passportCountry', type === 'Passport');
@@ -17747,6 +17828,12 @@ Records.form({
        thing that has only just been asked for. The row says Invite sending
        rather than claiming the message arrived, and the delivery result
        arrives on its own a beat later like every other invitation. */
+    /* Not invited either way, and that is the honest starting value. Choosing
+       to invite now does not make an app account exist; it starts a message.
+       The row says Not invited until the send below moves it on, which is the
+       same path the Drivers table uses when somebody invites on Friday. There
+       is no Invite later status, because "later" is a decision a person made,
+       not a state the driver is in. */
     const person = { ...details, ...identity, vehicle: '',
       access: 'On the fleet', app: 'Not invited', appAt: '', appWhy: '',
       fuel: 'Can fuel', reason: '', notes: [] };
@@ -17754,9 +17841,13 @@ Records.form({
     DRIVERS.sort(byName);
     drivers.render();
     Records.forms.driver.close();
-    driverAction(person.idNumber || person.passportNumber, 'send');
+
+    const now = (v.invite || 'now') !== 'later';
+    if (now) driverAction(person.idNumber || person.passportNumber, 'send');
     Records.toast(
-      `${v.first} ${v.last} added. The invitation is going to ${v.mobile}.`,
+      now
+        ? `${v.first} ${v.last} added. The invitation is going to ${v.mobile}.`
+        : `Driver added. You can invite this driver from the Drivers table.`,
       () => {
         DRIVERS.splice(DRIVERS.indexOf(person), 1);
         drivers.render();
@@ -17862,6 +17953,31 @@ document.querySelectorAll('input[name="d-idtype-choice"]').forEach(radio => {
   radio.addEventListener('change', () => {
     idType.value = radio.value;
     idType.dispatchEvent(new Event('change'));
+  });
+});
+
+/* The invitation choice, the same way, and it also renames the button.
+ *
+ * The label is the last thing somebody reads before pressing, so it is the
+ * last place the promise can still be wrong. "Add driver and send invite"
+ * over a form set to Invite later would be the button lying about what it is
+ * about to do. */
+const inviteWhen = document.getElementById('d-invite');
+const inviteSubmit = document.querySelector('#driver-drawer [data-role="submit"]');
+function paintInviteButton() {
+  if (!inviteSubmit) return;
+  const st = Records.forms.driver && Records.forms.driver.state && Records.forms.driver.state();
+  /* Editing an existing driver keeps whatever label that state asked for.
+     The choice only governs the add. */
+  if (st && st.save) return;
+  inviteSubmit.textContent = inviteWhen.value === 'later'
+    ? 'Add driver' : 'Add driver and send invite';
+}
+document.querySelectorAll('input[name="d-invite-choice"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    inviteWhen.value = radio.value;
+    inviteWhen.dispatchEvent(new Event('change'));
+    paintInviteButton();
   });
 });
 
@@ -18090,8 +18206,54 @@ function driverAction(key, act, extra) {
    * being seeded into a fixture. */
   const BOUNCES = /^079 333/;
 
+  /* The number as it will be dialled, not as it was typed.
+   *
+   * A South African mobile is entered 082 123 4567 and a WhatsApp message
+   * goes to +27 82 123 4567. The confirmation names the second one, because
+   * the question it is asking is "is this the phone the message will reach",
+   * and the answer is the international number. */
+  const dialled = (m) => {
+    const digits = String(m || '').replace(/\D/g, '');
+    if (digits.length === 10 && digits.startsWith('0')) {
+      const n = digits.slice(1);
+      return `+27 ${n.slice(0, 2)} ${n.slice(2, 5)} ${n.slice(5)}`;
+    }
+    return m;
+  };
+
+  /* ── The question before the message ────────────────────────────────────
+   *
+   * A WhatsApp message to somebody's personal phone is not undoable, and the
+   * thing most likely to be wrong is the number. So the send asks once, and
+   * what it puts in front of somebody is the number, not the driver's name:
+   * the name is what they were looking at when they decided to send, and the
+   * number is what they have not checked. */
+  if (act === 'ask-send' || act === 'ask-resend') {
+    if (person.access === 'Left') return;
+    /* Already in flight. Asking again would queue a second message for a
+       driver whose first one has not landed. */
+    if (person.app === 'Invite sending') return;
+    const again = act === 'ask-resend';
+    return void Records.statusDialog.ask({
+      eyebrow: again ? 'Resend invitation' : 'Send invitation',
+      title: 'Send WhatsApp invitation?',
+      sub: name(person),
+      body: `We\u2019ll send a WhatsApp invitation to <b>${dEsc(dialled(person.mobile))}</b>.`,
+      calm: again
+        ? 'The link is the same one the first message carried. It expires 7 days after it is sent.'
+        : 'They open the link, set up the app, and can fuel from then on. The link expires in 7 days.',
+      confirmLabel: 'Send invitation',
+      tone: 'btn-primary',
+      act: 'send',
+    }, (next) => driverAction(key, next),
+      document.querySelector(`tr[data-row="${CSS.escape(key)}"] [data-pill="app"]`));
+  }
+
   if (act === 'send' || act === 'resend') {
     if (person.access === 'Left') return;
+    /* One message at a time. The menu is closed by the time this runs, so
+       without this a second press during the beat sends a second message. */
+    if (person.app === 'Invite sending') return;
     const was = person.app;
     setApp(person, 'Invite sending');
     drivers.render();
@@ -18256,8 +18418,17 @@ function dAppMenu(person, anchor) {
 
   const GROUPS = {
     'Not invited': [
-      { items: [{ label: 'Send invitation', act: 'send',
-                  says: `A WhatsApp message to ${person.mobile}.` }, view] },
+      { items: [
+        { label: 'Send invitation', act: 'ask-send',
+          says: `A WhatsApp message to ${person.mobile}.` },
+        /* The number is the thing that decides whether the message lands, and
+           this is the last moment before it goes. Offered here rather than
+           only after a failure, because checking it costs one press and a
+           bounce costs a day. */
+        { label: 'Edit mobile number', act: 'fix-number',
+          says: 'Opens the record with the number selected.' },
+        view,
+      ] },
     ],
     'Invite sending': [
       { items: [view] },
@@ -18268,7 +18439,7 @@ function dAppMenu(person, anchor) {
         ['Sent at', dEsc(appWhen(person.appAt))],
       ] },
       { items: [
-        { label: 'Resend invitation', act: 'resend', says: 'Sends the same message again.' },
+        { label: 'Resend invitation', act: 'ask-resend', says: 'Sends the same WhatsApp message again.' },
         { label: 'Copy invitation link', act: 'copy-link',
           says: 'For sending another way. Does not count as a delivery.' },
         view,
@@ -18287,7 +18458,7 @@ function dAppMenu(person, anchor) {
       { items: [
         { label: 'Review mobile number', act: 'fix-number',
           says: 'Opens the record with the number selected.' },
-        { label: 'Resend invitation', act: 'resend',
+        { label: 'Resend invitation', act: 'ask-resend',
           says: 'Same number, same message. Fix the number first if it is wrong.' },
         view,
       ] },
