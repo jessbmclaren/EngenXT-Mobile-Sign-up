@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EngenXT Money: one app for all things money</title>
+<meta name="description" content="Spend, save, send and manage fleet money in one app.">
+<style>
+  :root {
+    /* Palette pulled from the logo (orange left out) and balanced so the three hues sit together */
+    --ink:        #16122b;   /* deep aubergine-navy, the anchor */
+    --ink-2:      #2a2347;
+    --purple:     #8a3a8c;
+    --purple-d:   #5f2766;
+    --purple-t:   #f2e9f6;
+    --blue:       #3d94d6;
+    --blue-d:     #1f6fb2;   /* white text on this passes AA */
+    --blue-t:     #e7f2fb;
+    --green:      #a8cf3a;
+    --green-d:    #6f9a14;
+    --green-t:    #f1f7dc;
+    --bg:         #f6f5fa;
+    --card:       #ffffff;
+    --line:       #e4e1ee;
+    --muted:      #5d5878;
+    --radius:     28px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#100d20; --card:#1b1634; --line:#2f2850; --muted:#a9a3c6; --ink:#f4f2fb; --ink-2:#d9d5ec;
+            --purple-t:#2a1f40; --blue-t:#14263b; --green-t:#1f2a12; }
+    .btn-dark { background: var(--green); color:#16122b; }
+    .nav { background: rgba(16,13,32,.78); }
+    .hero h1 .grad { filter: brightness(1.15); }
+    .tile.ink { background:#241d45; color:#f4f2fb; }
+    .tile.ink p { color:#c9c4e2; }
+    .cta { background:#241d45; }
+    footer { background:#0b0917; }
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "Inter", "SF Pro Display", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         background: var(--bg); color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: min(1180px, 100% - 40px); margin-inline: auto; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+
+  /* ---------- nav ---------- */
+  .nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(246,245,250,.82);
+         border-bottom: 1px solid transparent; }
+  .nav .wrap { display: flex; align-items: center; gap: 28px; height: 72px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; }
+  .brand svg { width: 34px; height: 34px; }
+  .links { display: flex; gap: 6px; margin-left: 12px; }
+  .links a { padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: .95rem; color: var(--ink-2); }
+  .links a:hover { background: var(--purple-t); }
+  .spacer { flex: 1; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer;
+         font: inherit; font-weight: 700; padding: 14px 26px; border-radius: 999px; transition: transform .15s, box-shadow .15s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-dark   { background: var(--ink); color: #fff; }
+  .btn-ghost  { background: transparent; color: var(--ink); padding-inline: 16px; }
+  .btn-green  { background: var(--green); color: #16122b; }
+  .btn-sm { padding: 10px 20px; font-size: .92rem; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; overflow: hidden; padding: 72px 0 96px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px;
+             background: var(--card); border: 1px solid var(--line); font-size: .85rem; font-weight: 600; color: var(--muted); }
+  .eyebrow b { background: var(--green); color: #16122b; border-radius: 999px; padding: 2px 10px; font-size: .75rem; }
+  .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.4rem); line-height: .98; letter-spacing: -.045em; font-weight: 800; margin: 22px 0 22px; }
+  .hero h1 .grad { background: linear-gradient(100deg, var(--blue) 0%, var(--purple) 55%, var(--purple-d) 100%);
+                   -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lede { font-size: 1.2rem; color: var(--muted); max-width: 30em; }
+  .signup { display: flex; gap: 10px; margin-top: 32px; max-width: 480px; padding: 8px; background: var(--card);
+            border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 10px 30px -14px rgba(95,39,102,.35); }
+  .signup input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; padding: 0 18px; color: var(--ink); }
+  .signup input:focus { outline: none; }
+  .signup:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(61,148,214,.22); }
+  .fine { margin-top: 14px; font-size: .85rem; color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+  .fine span::before { content: "✓ "; color: var(--green-d); font-weight: 800; }
+
+  /* organic background shapes (editable: change the path d= values) */
+  .blob { position: absolute; z-index: 0; pointer-events: none; }
+  .blob.a { right: -120px; top: -80px; width: 640px; opacity: .9; }
+  .blob.b { left: -180px; bottom: -220px; width: 520px; opacity: .55; }
+  .hero .wrap { position: relative; z-index: 1; }
+
+  /* ---------- phone ---------- */
+  .stage { position: relative; display: grid; place-items: center; min-height: 600px; }
+  .phone { position: relative; width: 300px; aspect-ratio: 9/18.5; background: var(--ink); border-radius: 46px; padding: 11px;
+           box-shadow: 0 50px 80px -30px rgba(95,39,102,.55), 0 0 0 2px rgba(255,255,255,.06) inset; transform: rotate(4deg); }
+  .screen { height: 100%; border-radius: 36px; overflow: hidden; background: #fff; color: #16122b; padding: 18px 16px;
+            display: flex; flex-direction: column; gap: 14px; position: relative; }
+  .notch { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); width: 86px; height: 22px; border-radius: 99px; background: #16122b; }
+  .sbar { display: flex; justify-content: space-between; font-size: .7rem; font-weight: 700; padding: 0 8px; }
+  .acct { margin-top: 6px; text-align: center; }
+  .acct small { color: #5d5878; font-size: .72rem; font-weight: 600; }
+  .acct strong { display: block; font-size: 2.1rem; letter-spacing: -.04em; line-height: 1.1; }
+  .acct .chip { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 99px; background: #f2e9f6; font-size: .72rem; font-weight: 700; color: #5f2766; }
+  .actions { display: flex; justify-content: space-between; padding: 4px 6px; }
+  .actions div { display: grid; justify-items: center; gap: 4px; font-size: .62rem; font-weight: 700; }
+  .actions i { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 1rem; color: #fff; }
+  .actions div:nth-child(1) i { background: #1f6fb2; }
+  .actions div:nth-child(2) i { background: #8a3a8c; }
+  .actions div:nth-child(3) i { background: #6f9a14; }
+  .actions div:nth-child(4) i { background: #16122b; }
+  .card-mini { border-radius: 18px; padding: 14px; color: #fff; background: linear-gradient(135deg, #1f6fb2 0%, #8a3a8c 100%);
+               display: flex; justify-content: space-between; align-items: flex-end; height: 98px; position: relative; overflow: hidden; }
+  .card-mini::after { content: ""; position: absolute; right: -30px; top: -40px; width: 120px; height: 120px; border-radius: 50%;
+                      background: radial-gradient(closest-side, rgba(168,207,58,.75), transparent); }
+  .card-mini span { font-size: .72rem; font-weight: 700; opacity: .9; }
+  .card-mini b { font-size: .8rem; letter-spacing: .08em; }
+  .tx { display: grid; gap: 10px; }
+  .tx div { display: flex; align-items: center; gap: 10px; font-size: .78rem; }
+  .tx i { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: .8rem; }
+  .tx div:nth-child(1) i { background: #e7f2fb; color: #1f6fb2; }
+  .tx div:nth-child(2) i { background: #f1f7dc; color: #6f9a14; }
+  .tx div:nth-child(3) i { background: #f2e9f6; color: #5f2766; }
+  .tx em { font-style: normal; flex: 1; font-weight: 700; line-height: 1.2; }
+  .tx em small { display: block; font-weight: 500; color: #5d5878; font-size: .68rem; }
+  .tx b { font-weight: 800; }
+  .float { position: absolute; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 12px 16px;
+           box-shadow: 0 24px 40px -22px rgba(22,18,43,.45); font-size: .85rem; font-weight: 700; display: flex; gap: 10px; align-items: center; }
+  .float i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-style: normal; color:#16122b; background: var(--green); }
+  .float small { display: block; font-weight: 500; color: var(--muted); font-size: .75rem; }
+  .float.f1 { left: -10px; top: 120px; }
+  .float.f2 { right: -6px; bottom: 100px; }
+  .float.f2 i { background: var(--blue); color: #fff; }
+
+  /* ---------- trust strip ---------- */
+  .strip { border-block: 1px solid var(--line); background: var(--card); }
+  .strip .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 34px 0; text-align: center; }
+  .strip strong { display: block; font-size: 2rem; letter-spacing: -.03em; }
+  .strip span { color: var(--muted); font-size: .92rem; }
+
+  /* ---------- sections ---------- */
+  section { padding: 96px 0; }
+  .head { max-width: 760px; margin-bottom: 48px; }
+  .head h2 { font-size: clamp(2rem, 4.4vw, 3.4rem); line-height: 1.04; letter-spacing: -.035em; font-weight: 800; }
+  .head p { margin-top: 16px; font-size: 1.1rem; color: var(--muted); }
+
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+  .tile { border-radius: var(--radius); padding: 32px; min-height: 280px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+  .tile h3 { font-size: 1.6rem; letter-spacing: -.025em; line-height: 1.1; margin-bottom: 8px; }
+  .tile p { max-width: 24em; }
+  .tile .tag { position: absolute; top: 28px; left: 32px; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+  .t1 { grid-column: span 3; background: var(--blue-d); color: #fff; }
+  .t2 { grid-column: span 3; background: var(--green); color: #16122b; }
+  .t3 { grid-column: span 2; background: var(--purple); color: #fff; }
+  .t4 { grid-column: span 2; background: var(--card); border: 1px solid var(--line); }
+  .t4 p { color: var(--muted); }
+  .tile.ink { grid-column: span 2; background: var(--ink); color: #fff; }
+  .tile.ink p { color: #cfcae6; }
+  .deco { position: absolute; right: -50px; bottom: -60px; width: 260px; height: 260px; opacity: .18; }
+  .big { position: absolute; right: 32px; top: 24px; font-size: 4.4rem; font-weight: 800; letter-spacing: -.05em; opacity: .95; }
+  .bars { position: absolute; right: 32px; top: 36px; display: flex; gap: 8px; align-items: flex-end; height: 120px; }
+  .bars i { width: 16px; border-radius: 8px; background: rgba(22,18,43,.85); }
+
+  /* ---------- plans ---------- */
+  .plans-wrap { background: var(--card); border-block: 1px solid var(--line); }
+  .toggle { display: inline-flex; padding: 5px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); margin-top: 22px; }
+  .toggle button { border: 0; background: transparent; font: inherit; font-weight: 700; padding: 10px 22px; border-radius: 999px; color: var(--muted); cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  @media (prefers-color-scheme: dark) { .toggle button[aria-pressed="true"] { background: var(--green); color: #16122b; } }
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .plan { border-radius: var(--radius); border: 1px solid var(--line); padding: 32px; background: var(--bg); display: flex; flex-direction: column; gap: 6px; }
+  .plan.pop { background: var(--ink); color: #fff; border-color: transparent; position: relative; }
+  .plan.pop::before { content: "Most popular"; position: absolute; top: -14px; left: 28px; background: var(--green); color: #16122b; font-size: .75rem; font-weight: 800; padding: 5px 14px; border-radius: 99px; }
+  .plan h3 { font-size: 1.2rem; }
+  .price { font-size: 3rem; font-weight: 800; letter-spacing: -.04em; margin: 8px 0 4px; }
+  .price small { font-size: 1rem; font-weight: 600; opacity: .65; letter-spacing: 0; }
+  .plan ul { list-style: none; padding: 0; margin: 14px 0 28px; display: grid; gap: 10px; flex: 1; }
+  .plan li { display: flex; gap: 10px; font-size: .95rem; }
+  .plan li::before { content: ""; flex: none; width: 20px; height: 20px; margin-top: 2px; border-radius: 50%; background: var(--green) center/12px no-repeat
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3L9.5 3.8' fill='none' stroke='%2316122b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .plan .btn { width: 100%; }
+  .plan:not(.pop) .btn { background: var(--ink); color: #fff; }
+  @media (prefers-color-scheme: dark) { .plan:not(.pop) .btn { background: var(--green); color:#16122b; } .plan.pop { background:#241d45; } }
+
+  /* ---------- steps ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: s; }
+  .step { counter-increment: s; padding: 32px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); }
+  .step::before { content: counter(s); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font-weight: 800; margin-bottom: 20px; color: #fff; }
+  .step:nth-child(1)::before { background: var(--blue-d); }
+  .step:nth-child(2)::before { background: var(--purple); }
+  .step:nth-child(3)::before { background: var(--green); color: #16122b; }
+  .step h3 { font-size: 1.3rem; letter-spacing: -.02em; margin-bottom: 6px; }
+  .step p { color: var(--muted); }
+
+  /* ---------- CTA + footer ---------- */
+  .cta { margin: 0 0 96px; border-radius: 40px; padding: 72px 40px; text-align: center; color: #fff; position: relative; overflow: hidden;
+         background: var(--ink); }
+  .cta h2 { font-size: clamp(2rem, 4.6vw, 3.6rem); letter-spacing: -.035em; line-height: 1.04; max-width: 14em; margin: 0 auto 14px; position: relative; }
+  .cta p { color: #cfcae6; margin-bottom: 30px; position: relative; }
+  .cta .btn { position: relative; }
+  .cta svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .5; }
+
+  footer { background: #0f0b20; color: #b9b4d4; padding: 56px 0 40px; font-size: .9rem; }
+  footer .wrap { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+  footer h4 { color: #fff; margin-bottom: 12px; font-size: .95rem; }
+  footer ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+  footer a:hover { color: #fff; }
+  footer .legal { grid-column: 1 / -1; border-top: 1px solid #2a2347; padding-top: 24px; font-size: .8rem; opacity: .8; }
+  footer .brand { color: #fff; margin-bottom: 12px; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .links { display: none; }
+    .hero .wrap { grid-template-columns: 1fr; }
+    .stage { min-height: 560px; }
+    .strip .wrap { grid-template-columns: repeat(2, 1fr); }
+    .bento { grid-template-columns: 1fr; }
+    .tile, .t1, .t2, .t3, .t4, .tile.ink { grid-column: auto; min-height: 240px; }
+    .plans, .steps { grid-template-columns: 1fr; }
+    footer .wrap { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .nav .btn-ghost { display: none; }
+    .hero { padding-top: 40px; }
+    .float.f1 { left: -4px; top: 60px; }
+    .float.f2 { right: -4px; }
+    .phone { width: 260px; }
+    .signup { flex-direction: column; border-radius: 28px; padding: 10px; }
+    .signup input { padding: 12px 14px; }
+    section { padding: 64px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+
+<!-- reusable mark: swirl in blue, green and purple (orange removed) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="orb"><circle cx="50" cy="50" r="46"/></clipPath>
+    <symbol id="mark" viewBox="0 0 100 100">
+      <g clip-path="url(#orb)">
+        <path fill="#3d94d6" d="M0 0H100V30C80 44 60 12 36 24C22 31 10 28 0 22Z"/>
+        <path fill="#a8cf3a" d="M0 40C22 50 38 26 60 36C78 44 90 40 100 34V54C82 62 64 50 46 58C28 66 12 58 0 54Z"/>
+        <path fill="#8a3a8c" d="M0 66C22 74 42 56 64 64C80 70 92 64 100 58V100H0Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="EngenXT Money home">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      EngenXT
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#features">Personal</a>
+      <a href="#features">Business</a>
+      <a href="#plans">Plans</a>
+      <a href="#how">How it works</a>
+      <a href="#help">Help</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-ghost btn-sm" href="#">Log in</a>
+    <a class="btn btn-dark btn-sm" href="#join">Get the app</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <div class="hero">
+    <svg class="blob a" viewBox="0 0 600 600" aria-hidden="true">
+      <path fill="#3d94d6" fill-opacity=".30" d="M426 70c70 40 120 126 100 210s-110 110-190 150-140 110-210 70S0 380 60 290 160 150 240 100s116-70 186-30Z"/>
+      <path fill="#a8cf3a" fill-opacity=".38" d="M470 190c40 50 40 130 0 190s-120 90-190 80-120-60-110-120 70-90 130-130 130-70 170-20Z"/>
+    </svg>
+    <svg class="blob b" viewBox="0 0 600 600" aria-hidden="true">
+      <path fill="#8a3a8c" fill-opacity=".30" d="M440 90c60 50 90 140 50 220s-140 130-230 120S90 340 100 250 180 90 270 70s110-30 170 20Z"/>
+    </svg>
+
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><b>New</b> Fuel authorisation now in the app</span>
+        <h1>One app for <span class="grad">all things money</span></h1>
+        <p class="lede">Spend, save, send and track every rand across your fleet. No hidden fees, no queues, nothing in the way.</p>
+
+        <form class="signup" onsubmit="event.preventDefault(); this.querySelector('button').textContent='We’ll text you';">
+          <label for="phone" class="sr" style="position:absolute;left:-9999px">Mobile number</label>
+          <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+27 82 123 4567" required>
+          <button class="btn btn-dark" type="submit">Get started</button>
+        </form>
+        <p class="fine"><span>Free to open</span><span>Ready in 5 minutes</span><span>Cancel any time</span></p>
+      </div>
+
+      <div class="stage" aria-hidden="true">
+        <div class="phone">
+          <div class="screen">
+            <div class="notch"></div>
+            <div class="sbar"><span>9:41</span><span>5G ▮▮▮</span></div>
+            <div class="acct">
+              <small>Fleet account · ZAR</small>
+              <strong>R 128,450.20</strong>
+              <span class="chip">Accounts ▾</span>
+            </div>
+            <div class="actions">
+              <div><i>＋</i>Add money</div>
+              <div><i>⇄</i>Move</div>
+              <div><i>↗</i>Send</div>
+              <div><i>⋯</i>More</div>
+            </div>
+            <div class="card-mini"><span>Pump 4</span><b>62 L authorised</b></div>
+            <div class="tx">
+              <div><i>⛽</i><em>Engen Rivonia<small>Fuel · today</small></em><b>−R 1,240.00</b></div>
+              <div><i>↓</i><em>Client payment<small>Received · yesterday</small></em><b style="color:#6f9a14">+R 18,000.00</b></div>
+              <div><i>🛠</i><em>Tyre Mart<small>Maintenance · Mon</small></em><b>−R 3,310.50</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="float f1"><i>✓</i><span>Payment sent<small>R 4,500 to Bongani</small></span></div>
+        <div class="float f2"><i>%</i><span>Cashback<small>R 312 earned this month</small></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="strip">
+    <div class="wrap">
+      <div><strong>2.4M</strong><span>litres tracked every month</span></div>
+      <div><strong>0%</strong><span>fees on local transfers</span></div>
+      <div><strong>&lt; 10s</strong><span>to authorise a fill-up</span></div>
+      <div><strong>24/7</strong><span>in-app support</span></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="head">
+        <h2>Everything your money does, in one place</h2>
+        <p>Replace the slips and spreadsheets with a single account your whole team can use.</p>
+      </div>
+
+      <div class="bento">
+        <article class="tile t1">
+          <span class="tag">Spend</span>
+          <svg class="deco" viewBox="0 0 100 100" aria-hidden="true"><use href="#mark"/></svg>
+          <div class="big">R0</div>
+          <h3>Fuel authorisation that follows your rules</h3>
+          <p>Limit by driver, by vehicle or by fuel type. Pause any vehicle in seconds.</p>
+        </article>
+
+        <article class="tile t2">
+          <span class="tag">Save</span>
+          <div class="bars" aria-hidden="true"><i style="height:34px"></i><i style="height:54px"></i><i style="height:48px"></i><i style="height:82px"></i><i style="height:116px"></i></div>
+          <h3>Put idle cash to work</h3>
+          <p>Set money aside for tyres, licences and services, and watch it grow while it waits.</p>
+        </article>
+
+        <article class="tile t3">
+          <span class="tag">Send</span>
+          <h3>Pay anyone, instantly</h3>
+          <p>Local transfers land in seconds, at no cost.</p>
+        </article>
+
+        <article class="tile t4">
+          <span class="tag">Track</span>
+          <h3>See every rand</h3>
+          <p>Live feed of spend, with receipts attached automatically.</p>
+        </article>
+
+        <article class="tile ink">
+          <span class="tag">Protect</span>
+          <h3>Safe by default</h3>
+          <p>Instant alerts, biometric login and one-tap vehicle lock.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANS -->
+  <div class="plans-wrap" id="plans">
+    <section>
+      <div class="wrap">
+        <div class="head">
+          <h2>Pick the plan that fits your fleet</h2>
+          <p>Start free. Upgrade when you need more vehicles, more people or more control.</p>
+          <div class="toggle" role="group" aria-label="Billing period">
+            <button type="button" aria-pressed="true" data-period="m">Monthly</button>
+            <button type="button" aria-pressed="false" data-period="y">Yearly · save 20%</button>
+          </div>
+        </div>
+
+        <div class="plans">
+          <article class="plan">
+            <h3>Standard</h3>
+            <p class="price"><span data-m="0" data-y="0">R0</span><small> /mo</small></p>
+            <ul><li>1 vehicle</li><li>Free local transfers</li><li>Live spend feed</li></ul>
+            <a class="btn" href="#join">Choose Standard</a>
+          </article>
+          <article class="plan pop">
+            <h3>Plus</h3>
+            <p class="price"><span data-m="149" data-y="119">R149</span><small> /mo</small></p>
+            <ul><li>Up to 10 vehicles</li><li>Per-driver limits</li><li>Savings pots</li><li>Priority support</li></ul>
+            <a class="btn btn-green" href="#join">Choose Plus</a>
+          </article>
+          <article class="plan">
+            <h3>Fleet</h3>
+            <p class="price"><span data-m="499" data-y="399">R499</span><small> /mo</small></p>
+            <ul><li>Unlimited vehicles</li><li>Team roles and approvals</li><li>Accounting export</li><li>Dedicated manager</li></ul>
+            <a class="btn" href="#join">Choose Fleet</a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW -->
+  <section id="how">
+    <div class="wrap">
+      <div class="head"><h2>Up and running in three steps</h2></div>
+      <div class="steps">
+        <div class="step"><h3>Download the app</h3><p>Verify your number and confirm who you are in a couple of minutes.</p></div>
+        <div class="step"><h3>Add your team</h3><p>Invite drivers, assign vehicles and set a limit for each one.</p></div>
+        <div class="step"><h3>Start spending</h3><p>Your vehicles appear in the app instantly. The POS is set up at your site.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="wrap" id="join">
+    <div class="cta">
+      <svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path fill="#3d94d6" fill-opacity=".45" d="M-40 40C120 -30 260 130 420 60S700 -20 860 60V-40H-40Z"/>
+        <path fill="#8a3a8c" fill-opacity=".55" d="M-40 330C140 230 300 340 460 280S720 230 860 290V340H-40Z"/>
+        <path fill="#a8cf3a" fill-opacity=".35" d="M560 340C620 270 720 280 780 220S860 140 860 140V340Z"/>
+      </svg>
+      <h2>Join the people who finally enjoy their money</h2>
+      <p>Open your account in minutes. No paperwork, no branch visit.</p>
+      <a class="btn btn-green" href="#top">Get the app</a>
+    </div>
+  </div>
+</main>
+
+<footer id="help">
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top"><svg aria-hidden="true"><use href="#mark"/></svg>EngenXT</a>
+      <p>Money that moves as fast as your fleet.</p>
+    </div>
+    <div><h4>Product</h4><ul><li><a href="#features">Fuel</a></li><li><a href="#features">Savings</a></li><li><a href="#plans">Plans</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+    <div><h4>Support</h4><ul><li><a href="#">Help centre</a></li><li><a href="#">Contact us</a></li><li><a href="#">Security</a></li></ul></div>
+    <p class="legal">© 2026 EngenXT. Banking services are provided by a licensed partner. Terms and conditions apply.</p>
+  </div>
+</footer>
+
+<script>
+  // Monthly / yearly price switch
+  var buttons = document.querySelectorAll('.toggle button');
+  var prices = document.querySelectorAll('.price span');
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      buttons.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      var key = b.dataset.period === 'y' ? 'y' : 'm';
+      prices.forEach(function (p) { p.textContent = 'R' + p.dataset[key]; });
+    });
+  });
+</script>
+</body>
+</html>

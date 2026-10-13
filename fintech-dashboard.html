@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tfn: overview</title>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:     #dcdae5;
+    --text:   #0a0a0c;
+    --muted:  #6a697a;
+    --faint:  #a9a8b8;
+    --card:   rgba(255,255,255,.58);
+    --card-bd: rgba(255,255,255,.85);
+    --hair:   rgba(10,10,20,.08);
+    --sky:    #c5cce2;
+    --mint:   #cfdcdf;
+    --lilac:  #d3c9e6;
+    --ease:   cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { min-height: 100%; }
+  body { background-image: linear-gradient(160deg, #c9c7d6 0%, #dedce7 48%, #cfcddb 100%); background-attachment: fixed; font-family: "Hanken Grotesk", "Aeonik Pro", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  :focus-visible { outline: 2px solid #3a7bd5; outline-offset: 3px; border-radius: 10px; }
+
+  /* soft colour behind everything, kept low so the cards carry the page */
+  .ground { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .ground i { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .7; animation: float 28s ease-in-out infinite alternate; }
+  .ground i:nth-child(1) { width: 52vmax; height: 52vmax; left: -14vmax; top: -18vmax; background: radial-gradient(circle, var(--sky), transparent 68%); }
+  .ground i:nth-child(2) { width: 46vmax; height: 46vmax; right: -12vmax; top: 8vmax; background: radial-gradient(circle, var(--lilac), transparent 68%); animation-duration: 34s; animation-delay: -9s; }
+  .ground::before { content: ""; position: absolute; inset: 0; background: radial-gradient(55% 45% at 72% 0%, rgba(255,255,255,.75), transparent 70%); }
+  .ground i:nth-child(3) { width: 44vmax; height: 44vmax; left: 24vmax; bottom: -26vmax; background: radial-gradient(circle, var(--mint), transparent 68%); animation-duration: 40s; animation-delay: -15s; }
+  @keyframes float { to { transform: translate3d(4vmax, 3vmax, 0) scale(1.08); } }
+
+  .glass { background: var(--card); border: 1px solid var(--card-bd); box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 24px 60px -34px rgba(40,40,90,.35);
+           -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass { background: rgba(255,255,255,.92); } }
+
+  .shell { position: relative; z-index: 1; width: min(1240px, 100% - 40px); margin-inline: auto; padding: 18px 0 48px; }
+
+  /* ---------- top bar ---------- */
+  .bar { display: flex; align-items: center; gap: 14px; height: 60px; padding: 0 12px 0 20px; border-radius: 999px; margin-bottom: 18px; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand .mi { width: 28px; height: 28px; } .brand .wm { width: 42px; height: 25px; }
+  .tabs { display: flex; gap: 2px; margin: 0 auto; }
+  .tabs a { padding: 8px 16px; border-radius: 999px; font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); transition: color .25s, background .25s; }
+  .tabs a:hover { color: var(--text); }
+  .tabs a[aria-current="page"] { color: var(--text); background: rgba(255,255,255,.85); }
+  .icon { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; }
+  .icon:hover { background: rgba(255,255,255,.8); }
+  .create { background: #0a0a0a; color: #fff; padding: 10px 18px; border-radius: 999px; font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; display: inline-flex; gap: 8px; align-items: center; transition: transform .2s var(--ease); }
+  .create:hover { transform: translateY(-1px); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; background: #0a0a0a; color: #fff; font-size: .72rem; font-weight: 700; display: grid; place-items: center; }
+
+  /* ---------- grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+  .card { border-radius: 30px; padding: 26px; position: relative; overflow: hidden; }
+  .tag { font-size: .66rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+  .tag b { color: var(--text); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: rgba(255,255,255,.8); border: 1px solid var(--card-bd); transition: transform .2s var(--ease), background .2s; }
+  .pill:hover { transform: translateY(-1px); background: #fff; }
+  .pill.dark { background: #0a0a0a; color: #fff; border-color: transparent; }
+
+  /* trend card */
+  .trend { grid-column: span 5; grid-row: span 2; display: flex; flex-direction: column; min-height: 560px; }
+  .trend h1 { font-size: clamp(2.2rem, 3.8vw, 3.2rem); font-weight: 500; letter-spacing: -.035em; line-height: 1.02; margin: 22px 0 14px; max-width: 8.5em; }
+  .trend p { color: var(--muted); font-size: .86rem; line-height: 1.5; max-width: 26em; }
+  .chips { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
+  .stack { display: flex; } .stack i { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; margin-left: -10px; display: grid; place-items: center; font-style: normal; font-size: .62rem; font-weight: 700; color: #0a0a0a; }
+  .stack i:first-child { margin-left: 0; background: linear-gradient(135deg, #e3ebf7, #b9cdee); }
+  .stack i:nth-child(2) { background: linear-gradient(135deg, #e2f1ea, #b6dccb); }
+  .stack i:nth-child(3) { background: linear-gradient(135deg, #ebe5f7, #c8bbe6); }
+  .later { margin-top: 34px; border-top: 1px solid var(--hair); padding-top: 22px; }
+  .later h2 { font-size: 1.9rem; font-weight: 500; letter-spacing: -.03em; color: var(--faint); }
+  .later p { color: var(--faint); margin-top: 6px; }
+  .trend .foot { margin-top: auto; padding-top: 26px; }
+
+  /* alert card with slides */
+  .alert { grid-column: span 7; min-height: 270px; display: grid; grid-template-columns: 1fr 150px; gap: 22px; }
+  .slide-wrap { position: relative; }
+  .slide { position: absolute; inset: 0; opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease), transform .6s var(--ease); pointer-events: none; display: flex; flex-direction: column; }
+  .slide.on { opacity: 1; transform: none; pointer-events: auto; position: relative; }
+  .slide h3 { font-size: 1.5rem; font-weight: 500; letter-spacing: -.03em; line-height: 1.14; margin: 20px 0 10px; max-width: 13em; }
+  .slide p { color: var(--muted); font-size: .84rem; line-height: 1.5; max-width: 30em; }
+  .thumb { border-radius: 22px; background: #0a0a0a var(--img) center / cover; align-self: start; height: 150px; position: relative; overflow: hidden; }
+  .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,.35)); }
+  .alert .meta { position: absolute; left: 26px; right: 26px; bottom: 22px; display: flex; align-items: center; gap: 12px; font-size: .72rem; color: var(--muted); }
+  .alert .meta .src { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid var(--hair); display: grid; place-items: center; font-size: .6rem; font-weight: 700; color: var(--text); }
+  .dots { display: flex; gap: 6px; margin-left: auto; margin-right: auto; }
+  .dots i { width: 6px; height: 6px; border-radius: 99px; background: var(--faint); transition: width .3s var(--ease), background .3s; cursor: pointer; }
+  .dots i.on { width: 20px; background: var(--text); }
+
+  /* assistant card: the one place colour is allowed to be loud */
+  .ask { grid-column: span 3; min-height: 270px; color: #0a0a0a; display: flex; flex-direction: column; justify-content: flex-end; isolation: isolate; border: 0; }
+  .ask::before { content: ""; position: absolute; inset: -20%; z-index: -1; filter: blur(22px); animation: float 16s ease-in-out infinite alternate;
+    background: radial-gradient(45% 45% at 18% 24%, #d6e4f7, transparent 70%), radial-gradient(45% 45% at 84% 22%, #e5dcf5, transparent 70%), radial-gradient(55% 55% at 50% 100%, #dbeee6, transparent 70%), radial-gradient(30% 30% at 55% 40%, #fff, transparent 70%); }
+  .ask .orb { position: absolute; top: 20px; left: 22px; width: 34px; height: 34px; }
+  .ask h3 { font-size: 1.5rem; font-weight: 500; letter-spacing: -.03em; line-height: 1.08; }
+  .ask small { display: block; color: #3a3a42; margin-top: 4px; font-size: .78rem; }
+  .ask .go { position: absolute; right: 18px; bottom: 18px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.8); display: grid; place-items: center; transition: transform .25s var(--ease); }
+  .ask:hover .go { transform: translateX(4px); }
+
+  /* matrix card */
+  .matrix { grid-column: span 4; min-height: 270px; }
+  .matrix h3 { font-size: 2rem; font-weight: 500; letter-spacing: -.03em; margin: 14px 0 0; }
+  .vbox { position: absolute; inset: 70px 20px 20px 20px; }
+  .vchip { position: absolute; display: flex; align-items: center; gap: 8px; padding: 8px 12px 8px 8px; border-radius: 16px; background: rgba(255,255,255,.88); border: 1px solid var(--card-bd); font-size: .7rem; font-weight: 600; box-shadow: 0 14px 30px -20px rgba(40,40,90,.5); animation: bob 6s ease-in-out infinite alternate; }
+  .vchip i { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; font-style: normal; font-size: .6rem; }
+  .vchip small { display: block; font-weight: 500; color: var(--muted); font-size: .62rem; }
+  .vchip.a { left: 4%; top: 28%; } .vchip.b { right: 2%; top: 4%; animation-delay: -2s; } .vchip.c { right: 16%; bottom: 0; animation-delay: -4s; }
+  .vchip.a i { background: #dde8f7; } .vchip.b i { background: #e6dff3; } .vchip.c i { background: #dcefe6; }
+  @keyframes bob { to { transform: translateY(-8px); } }
+  .axis { position: absolute; left: 22px; bottom: 18px; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+
+  /* entrance */
+  .in { animation: up .9s var(--ease) both; animation-delay: var(--d, 0s); }
+  @keyframes up { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+  .card { transition: transform .4s var(--ease), box-shadow .4s; } .card:hover { transform: translateY(-4px); }
+
+  @media (max-width: 1020px) {
+    .tabs { display: none; } .bar { justify-content: space-between; }
+    .trend, .alert, .ask, .matrix { grid-column: 1 / -1; min-height: 0; }
+    .trend { min-height: 420px; } .alert { grid-template-columns: 1fr; padding-bottom: 80px; } .thumb { height: 140px; order: -1; }
+    .ask { min-height: 220px; } .matrix { min-height: 260px; }
+  }
+  @media (max-width: 560px) {
+    .shell { width: calc(100% - 24px); }
+    .bar { gap: 8px; padding: 0 8px 0 14px; } .icon { display: none; }
+    .create { padding: 9px 13px; } .avatar { width: 34px; height: 34px; }
+    .card { padding: 22px; border-radius: 26px; } .tag { flex-wrap: wrap; gap: 4px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ground i, .ask::before, .vchip { animation: none; } .in { animation: none; } .card, .slide, .dots i { transition: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="oclip"><circle cx="50" cy="50" r="48"/></clipPath>
+    <filter id="oblur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="oGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="1" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <radialGradient id="oBase" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#eef6ff"/><stop offset="1" stop-color="#c3dcf5"/></radialGradient>
+    <radialGradient id="oHi" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".55" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="oShade" cx=".5" cy=".42" r=".62"><stop offset=".6" stop-color="#0a2540" stop-opacity="0"/><stop offset="1" stop-color="#0a2540" stop-opacity=".45"/></radialGradient>
+    <linearGradient id="oRim" x1=".2" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/></linearGradient>
+    <symbol id="mark" viewBox="-4 -4 108 108"><g clip-path="url(#oclip)">
+      <circle cx="50" cy="50" r="48" fill="#2f78bd"/>
+      <g filter="url(#oblur)">
+        <ellipse cx="52" cy="10" rx="46" ry="22" fill="#10346f"/>
+        <ellipse cx="50" cy="98" rx="46" ry="20" fill="#1b4a92"/>
+        <ellipse cx="66" cy="54" rx="34" ry="28" fill="#9fd6fa"/>
+        <ellipse cx="30" cy="40" rx="22" ry="18" fill="#4a9be0"/>
+        <ellipse cx="76" cy="74" rx="15" ry="10" fill="#dcf2ff"/>
+        <ellipse cx="16" cy="62" rx="14" ry="16" fill="#2a6fb8"/>
+      </g>
+      <circle cx="50" cy="50" r="48" fill="url(#oShade)" opacity=".5"/>
+      <rect x="2" y="2" width="96" height="96" filter="url(#oGrain)" opacity=".62" style="mix-blend-mode:overlay"/>
+    </g></symbol>
+    <symbol id="logo" viewBox="120 50 440 260"><g fill="none" stroke="currentColor" stroke-width="50" stroke-linejoin="round">
+      <path d="M145 75V245Q145 285 185 285H222M120 155H222"/><path d="M275 310V105Q275 75 305 75H365M250 155H350"/>
+      <path d="M405 310V145M405 210C405 175 430 160 470 160C510 160 535 178 535 215V310"/></g></symbol>
+  </defs>
+</svg>
+
+<div class="ground" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="shell">
+  <header class="bar glass in">
+    <a class="brand" href="#" aria-label="tfn overview"><svg class="mi" aria-hidden="true"><use href="#mark"/></svg><svg class="wm" aria-hidden="true"><use href="#logo"/></svg></a>
+    <nav class="tabs" aria-label="Main">
+      <a href="#" aria-current="page">Overview</a><a href="#">Fuel</a><a href="#">Insurance</a><a href="#">Vehicles</a><a href="#">Drivers</a>
+    </nav>
+    <button class="icon" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="create">Create <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button>
+    <span class="avatar" role="img" aria-label="Signed in as Jessica McLaren">JM</span>
+  </header>
+
+  <main class="grid">
+    <!-- headline -->
+    <section class="card glass trend in" style="--d:.08s">
+      <div class="tag">This week <span>·</span> <b>24 vehicles</b></div>
+      <h1>Fuel spend is down 6%</h1>
+      <p>Three vehicles account for most of the saving after limits were set by fuel type. Litres per 100 km are steady.</p>
+      <div class="chips"><div class="stack" aria-hidden="true"><i>CA</i><i>GP</i><i>WC</i></div><a class="pill" href="#">Explore</a></div>
+      <div class="later"><h2>Cover renewals</h2><p>Four policies renew within 30 days. Nothing needs action yet.</p></div>
+      <div class="foot"><a class="pill dark" href="#">View all</a></div>
+    </section>
+
+    <!-- alerts -->
+    <section class="card glass alert in" style="--d:.16s" aria-label="Alerts">
+      <div class="slide-wrap" id="slides">
+        <div class="slide on"><div class="tag">Alert <span>·</span> <b>Fuel</b></div><h3>A fill-up at Engen Sandton looks wrong</h3><p>R2,100 for 118 L against a 90 L tank on CA 482 193. Review it before the month closes.</p></div>
+        <div class="slide"><div class="tag">Alert <span>·</span> <b>Licence</b></div><h3>Disc for GP 301 884 expires in 14 days</h3><p>Renew it from the vehicle page so the vehicle is never stopped at the roadside.</p></div>
+        <div class="slide"><div class="tag">Alert <span>·</span> <b>Service</b></div><h3>Three vehicles are due for a service</h3><p>Book them together at Tyre Mart Rivonia and save a second trip.</p></div>
+      </div>
+      <div class="thumb" id="thumb" style="--img:url(https://images.unsplash.com/photo-1771340012319-0b4fca008b54?auto=format&fit=crop&w=500&q=75)" aria-hidden="true"></div>
+      <div class="meta"><span class="src" aria-hidden="true">tf</span><span id="when">Pump 4 · 8 min ago</span><div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div><a class="pill" href="#">Review</a></div>
+    </section>
+
+    <!-- assistant -->
+    <section class="card ask in" style="--d:.24s" aria-label="Ask tfn">
+      <svg class="orb" aria-hidden="true"><use href="#mark"/></svg>
+      <h3>Plan a service route</h3><small>Ask tfn to group the three due vehicles</small>
+      <a class="go" href="#" aria-label="Start"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m0 0-5-5m5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </section>
+
+    <!-- matrix -->
+    <section class="card glass matrix in" style="--d:.32s" aria-label="Vehicles">
+      <div class="tag">Vehicles</div>
+      <h3>Efficiency</h3>
+      <div class="vbox" aria-hidden="true">
+        <div class="vchip a"><i>CA</i><span>CA 482 193<small>R142 / 100 km</small></span></div>
+        <div class="vchip b"><i>GP</i><span>GP 301 884<small>R151 / 100 km</small></span></div>
+        <div class="vchip c"><i>WC</i><span>WC 77 120<small>R138 / 100 km</small></span></div>
+      </div>
+      <span class="axis" aria-hidden="true">Cost per 100 km</span>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slides = [].slice.call(document.querySelectorAll('#slides .slide')), dots = [].slice.call(document.querySelectorAll('#dots i'));
+  var when = document.getElementById('when'), thumb = document.getElementById('thumb');
+  var meta = ['Pump 4 · 8 min ago', 'Licence · due 27 Oct', 'Service · 3 vehicles'];
+  var imgs = ['photo-1771340012319-0b4fca008b54', 'photo-1760944016370-0490373446f7', 'photo-1688619101875-0528b48b68e7'];
+  var cur = 0, timer;
+  function show(n) {
+    cur = (n + slides.length) % slides.length;
+    slides.forEach(function (s, i) { s.classList.toggle('on', i === cur); });
+    dots.forEach(function (d, i) { d.classList.toggle('on', i === cur); });
+    when.textContent = meta[cur];
+    thumb.style.setProperty('--img', 'url(https://images.unsplash.com/' + imgs[cur] + '?auto=format&fit=crop&w=500&q=75)');
+  }
+  function play() { if (reduce) return; clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 4500); }
+  dots.forEach(function (d, i) { d.addEventListener('click', function () { show(i); play(); }); });
+  play();
+})();
+</script>
+</body>
+</html>
