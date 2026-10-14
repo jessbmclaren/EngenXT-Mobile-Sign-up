@@ -43,12 +43,18 @@ two differ.
   - Homebase: **teal**
   The one exception is the orb's **All** state, a soft pastel mix of blue,
   green and purple taken from the old swirl logo. Never orange, never gold.
-- **Colour says which product, the finish says your tier.** Each product has a hue
-  (On-Road blue, LCV sky, Non-Fuel lilac and lime, Network blue on black, Homebase
-  teal, TFN Africa violet, Credit pink). Tiers are materials, never hues: brushed
-  bronze, silver, pale gold, clear prismatic glass (Diamond) and brushed platinum on
-  black. Tiers follow TFN's own volume ladder (tfn.co.za/price-list) and appear as a
-  squircle badge, not a card; the app looks the same in every tier.
+- **Colour says which product, the finish says your tier.** Product pages are
+  white, told apart by a faint gradient wash and one muted accent: On-Road blue
+  `#2a6fd0`, LCV cyan `#0e8fb3`, Non-Fuel slate `#4f6b8a`, Network indigo `#3346a8`,
+  Homebase teal `#138a85`, TFN Africa violet `#6b62c9` (accent only), Credit rose
+  `#b0436e` (accent only). No pastel toys, neon, coins or glows: it must never look
+  childish. **Black is for premium** (the tiers page). Tiers are materials, never
+  hues: brushed bronze, silver, pale gold, clear prismatic glass (Diamond) and
+  brushed platinum on black, shown as a squircle badge, not a card. TFN's own volume
+  ladder (tfn.co.za/price-list).
+- **One app.** Every product shows the same neutral phone; only the accent changes.
+  The TFN wordmark sits top-left of every screen and the portal sidebar, the way
+  Revolut places its mark.
 - **Photos stay natural.** No duotones or cut-outs: colour in a photo comes
   from real light (a blue office at night, blue hour, daylight), never orange.
 - **Maps are dark by default.**
