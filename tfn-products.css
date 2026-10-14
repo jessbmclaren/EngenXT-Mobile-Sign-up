@@ -1,0 +1,159 @@
+/* TFN product pages: shared styles. Each product has its own colour world (see BRAND.md). */
+  :root { --sans: "Aeonik Pro", "Satoshi", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --text: #1f1f1f; --muted: #717173; --grey: #f4f4f4; --ease: cubic-bezier(.2,.7,.2,1); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); color: var(--text); background: #fff; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: min(1000px, calc(100% - 32px)); margin-inline: auto; }
+  h1, h2 { font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+  h1 { font-size: clamp(2.6rem, 6.4vw, 5.1rem); letter-spacing: -.025em; }
+  h2 { font-size: clamp(2.1rem, 4vw, 3.15rem); }
+  h3 { font-weight: 500; letter-spacing: -.01em; }
+  .kicker { font-size: 1.05rem; font-weight: 500; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .soon { font-size: .74rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,.07); color: #3a3a3a; }
+  .dk .soon { background: rgba(255,255,255,.12); color: #fff; }
+  .sub { color: var(--muted); font-size: 1.125rem; max-width: 30em; margin: 20px 0 30px; }
+  .btn { display: inline-flex; align-items: center; height: 44px; padding: 0 24px; border-radius: 999px; font-weight: 500; background: #1f1f1f; color: #fff; transition: opacity .2s; white-space: nowrap; }
+  .btn:hover { opacity: .85; } .btn.light { background: #fff; color: #000; }
+
+  .nav { position: sticky; top: 0; z-index: 10; height: 72px; background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.06); transition: background .3s, border-color .3s, color .3s; }
+  .nav .wrap { display: flex; align-items: center; height: 100%; gap: 6px; }
+  .brand svg { width: 76px; height: 29px; display: block; margin-right: 14px; }
+  .links { display: flex; overflow-x: auto; scrollbar-width: none; } .links::-webkit-scrollbar { display: none; }
+  .links a { padding: 8px 4px; margin: 0 8px; font-weight: 500; font-size: .93rem; color: #3a3a3a; white-space: nowrap; } .links a:hover { color: #000; }
+  .grow { flex: 1; }
+  .nav.dark { background: rgba(0,0,0,.72); border-color: rgba(255,255,255,.08); color: #fff; }
+  .nav.dark .links a { color: #d0d0d4; } .nav.dark .links a:hover { color: #fff; } .nav.dark .btn { background: #fff; color: #000; }
+
+  /* ---------- the phone: each product's real screen, in a finish per product (the range's answer to Revolut's card colours) ---------- */
+  .ph { --w: 260px; width: var(--w); aspect-ratio: 9 / 17.5; padding: calc(var(--w) * .035); border-radius: calc(var(--w) * .16); background: var(--frame); flex: none;
+        box-shadow: 0 calc(var(--w) * .2) calc(var(--w) * .26) calc(var(--w) * -.12) rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 0 calc(var(--w) * .012) rgba(0,0,0,.08); }
+  .ph .s { height: 100%; border-radius: calc(var(--w) * .125); overflow: hidden; position: relative; font-size: calc(var(--w) * .047); line-height: 1.35;
+           background: var(--scr, #fff); color: var(--ink, #1f1f1f); padding: 3.2em 1.1em 1.1em; display: flex; flex-direction: column; gap: .7em; }
+  .ph .s::before { content: ""; position: absolute; top: .8em; left: 50%; width: 28%; height: 1.5em; border-radius: 999px; background: #000; transform: translateX(-50%); }
+  .s .t { font-size: .82em; color: var(--sub, #8e8e93); } .s .h { font-size: 1.15em; font-weight: 600; }
+  .s .big { font-size: 2.1em; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
+  .s .card { background: var(--card, #f4f5f7); border-radius: 1em; padding: .85em .9em; }
+  .s .row { display: flex; align-items: center; gap: .65em; padding: .5em 0; border-top: 1px solid var(--rule, #ececef); font-size: .9em; } .s .row:first-child { border-top: 0; }
+  .s .row i { width: 2.1em; height: 2.1em; border-radius: .7em; flex: none; background: var(--acc); opacity: .9; }
+  .s .row b { font-weight: 600; display: block; } .s .row small { color: var(--sub, #8e8e93); font-size: .85em; }
+  .s .row > span:last-child { margin-left: auto; text-align: right; } .s .row > span:only-child { margin-left: 0; text-align: left; }
+  .s .ok { display: inline-flex; align-items: center; gap: .4em; font-size: .82em; font-weight: 600; color: var(--okc, #1a9b55); }
+  .s .ok::before { content: ""; width: .55em; height: .55em; border-radius: 50%; background: currentColor; }
+  .s .cta { margin-top: auto; text-align: center; padding: .85em; border-radius: 999px; font-weight: 600; background: var(--acc); color: var(--ctac, #fff); }
+  .s .bar { height: .55em; border-radius: 999px; background: var(--rule, #ececef); overflow: hidden; } .s .bar i { display: block; height: 100%; width: var(--v); background: var(--acc); border-radius: inherit; }
+  .s .photo { height: 5.4em; border-radius: .8em; background: #333 url(img/pay-nozzle.jpg) 50% 45% / cover; position: relative; }
+  .s .photo span { position: absolute; left: .5em; bottom: .5em; font-size: .72em; font-weight: 600; color: #fff; background: rgba(0,0,0,.55); padding: .2em .6em; border-radius: 999px; }
+  .s .map { height: 11em; border-radius: 1em; overflow: hidden; background: #1f2023; } .s .map svg { width: 100%; height: 100%; display: block; }
+  .s .chips { display: flex; flex-wrap: wrap; gap: .35em; } .s .chips span { font-size: .75em; padding: .3em .7em; border-radius: 999px; background: var(--card, #f4f5f7); }
+  .s .qr { width: 62%; margin: 0 auto; aspect-ratio: 1; display: grid; grid-template-columns: repeat(21, 1fr); padding: .5em; border-radius: .8em; background: #fff; }
+  .s .qr i { background: #111; } .s .qr i.o { background: transparent; }
+
+  /* finishes, everyday to premium */
+  .p-road   { --frame: linear-gradient(145deg, #f7f8fa, #d9dce2); --acc: #2a6fd0; }
+  .p-lcv    { --frame: linear-gradient(145deg, #7fd3ff, #3d8ee0 45%, #2fb5b0); --acc: #2a6fd0; }
+  .p-nonfuel{ --frame: linear-gradient(145deg, #e9e2ff, #b6a3f2); --acc: #8f55d6; --ctac: #1f1f1f; }
+  .p-nonfuel .s .cta { background: #e4fb6a; }
+  .p-net    { --frame: linear-gradient(145deg, #3b3f47, #15171b); --scr: #141518; --ink: #f2f2f7; --sub: #8e8e93; --card: #202227; --rule: #2a2c31; --acc: #3d9bff; }
+  .p-home   { --frame: linear-gradient(145deg, #2a2e35, #08090b); --scr: #0d0f11; --ink: #e6f7f5; --sub: #7f9a97; --card: #161a1c; --rule: #22292b; --acc: #2fb5b0; --okc: #6fd8cf; }
+  .p-africa { --frame: linear-gradient(145deg, #6b4fb0, #2a1a5c); --scr: #151026; --ink: #efe9ff; --sub: #9d8fc4; --card: #221a3c; --rule: #2e2550; --acc: #8f55d6; --okc: #b99af0; }
+  .p-credit { --frame: repeating-linear-gradient(115deg, rgba(255,255,255,.25) 0 1px, rgba(0,0,0,.05) 1px 3px), linear-gradient(145deg, #f4f5f7, #a4a7ae 35%, #e9ebee 55%, #7c7f86 80%, #d9dbdf);
+              --scr: #0b0b0c; --ink: #f5f5f7; --sub: #8e8e93; --card: #17181a; --rule: #232427; --acc: #d9dbdf; --ctac: #000; --okc: #c9cbd0; }
+  .p-ins    { --frame: linear-gradient(145deg, #ffd6ea, #e0559a); --acc: #c23d86; }
+  .p-hub    { --frame: linear-gradient(145deg, #3a3a3e, #111113); --scr: #0f0f10; --ink: #f2f2f7; --sub: #8e8e93; --card: #1c1c1f; --rule: #28282c; --acc: #f2f2f7; --ctac: #000; }
+
+  /* the range */
+  .intro { padding: 110px 0 100px; text-align: center; } .intro .sub { margin: 20px auto 0; max-width: 36em; }
+  .range { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 60px; text-align: left; }
+  .tile { background: var(--grey); border-radius: 24px; padding: 30px 26px 24px; display: grid; grid-template-columns: 1fr auto; gap: 18px; overflow: hidden; min-height: 250px; transition: transform .4s var(--ease); }
+  .tile:hover { transform: translateY(-4px); }
+  .tile .ph { --w: 92px; transform: rotate(8deg) translateY(10px); transition: transform .5s var(--ease); align-self: end; margin-bottom: -60px; } .tile:hover .ph { transform: rotate(0) translateY(0); }
+  .tile > div { display: flex; flex-direction: column; }
+  .tile h3 { font-size: 1.3rem; } .tile p { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+  .tile .tier { margin-top: auto; padding-top: 16px; font-size: .78rem; font-weight: 500; color: #9a9a9c; }
+  .tile.later { background: #fafafa; box-shadow: inset 0 0 0 1px #ececef; }
+
+  /* each product page opens the same way: kicker, headline, line, button, then its screen in its own world */
+  .pp { position: relative; overflow: hidden; min-height: max(720px, 92vh); display: flex; align-items: center; }
+  .pp .wrap { display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 40px; position: relative; z-index: 1; }
+  .stage { position: relative; height: 600px; display: grid; place-items: center; }
+  .stage .ph { --w: 270px; position: relative; z-index: 2; }
+  .gl { position: absolute; z-index: 3; border-radius: 18px; padding: 12px 16px; font-size: .88rem; display: flex; align-items: center; gap: 10px;
+        background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 20px 50px -20px rgba(0,0,0,.3); }
+  .gl b { font-weight: 600; display: block; } .gl small { color: var(--muted); } .gl i { width: 30px; height: 30px; border-radius: 10px; flex: none; }
+  .g1 { left: -10px; top: 160px; } .g2 { right: -10px; bottom: 140px; }
+  .dk { color: #fff; } .dk .kicker, .dk .sub { color: #a8a8a8; }
+  .dk .gl { background: rgba(28,30,34,.6); color: #fff; border: 1px solid rgba(255,255,255,.1); } .dk .gl small { color: #a8a8a8; }
+  .stats { display: flex; gap: 34px; margin-top: 44px; } .stats b { display: block; font-size: 1.6rem; font-weight: 500; letter-spacing: -.02em; } .stats span { font-size: .85rem; color: var(--muted); }
+  .chiprow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; } .chiprow span { border-radius: 999px; padding: 8px 14px; font-size: .85rem; font-weight: 500; }
+
+  /* 2. LCV: the bright one, a clear sky gradient behind the phone */
+  #lcv { background: #f6f8fb; }
+  #lcv .sky { position: absolute; right: -10%; top: 10%; width: 60%; aspect-ratio: 1.2; border-radius: 50%; background: radial-gradient(closest-side, rgba(127,211,255,.55), rgba(61,142,224,.25) 55%, transparent); filter: blur(10px); }
+  #lcv .chiprow span { background: #fff; box-shadow: 0 6px 18px -10px rgba(20,60,140,.3); }
+  /* 3. Non-Fuel: the light, playful one, a pale studio with lilac and lime */
+  #nonfuel { background: radial-gradient(120% 90% at 70% 40%, #ffffff 0, #f1f0f5 46%, #e6e4ee 100%); }
+  #nonfuel .chiprow span { background: #fff; box-shadow: 0 6px 18px -10px rgba(70,50,140,.35); }
+  .pill3d { position: absolute; width: 170px; height: 62px; border-radius: 999px; left: 10px; top: 130px; background: linear-gradient(180deg, #e9e2ff, #b9a6f5); box-shadow: 0 30px 40px -24px rgba(70,50,140,.5), inset 0 -6px 12px rgba(80,50,160,.25); transform: rotate(-24deg); }
+  .cube { position: absolute; width: 96px; height: 96px; right: 30px; bottom: 90px; border-radius: 22px; background: linear-gradient(150deg, #f3ffb0, #d2ef3d); box-shadow: 0 30px 40px -24px rgba(110,130,0,.55), inset 0 -8px 14px rgba(120,140,0,.25); transform: rotate(14deg); }
+  .ring { position: absolute; width: 120px; height: 120px; right: 40px; top: 90px; border-radius: 50%; border: 22px solid #c9b8ff; box-shadow: 0 30px 40px -24px rgba(70,50,140,.5); transform: rotateX(55deg) rotate(20deg); }
+  /* 4. Network: black, the live map glows blue */
+  #network { background: #000; }
+  #network .glow { position: absolute; inset: auto 0 0 40%; height: 70%; background: radial-gradient(50% 60% at 50% 60%, rgba(61,155,255,.22), transparent 70%); }
+  #network .chiprow span, #credit .chiprow span { border: 1px solid #333; color: #d0d0d4; }
+  /* 5. Homebase: the workhorse, all black, one teal glow */
+  #home { background: #000; }
+  .tank { position: absolute; bottom: 70px; width: var(--w); height: var(--h); left: var(--x); }
+  .tank .body { position: absolute; inset: calc(var(--w) * .14) 0 0; border-radius: 0 0 50% 50% / 0 0 calc(var(--w) * .14) calc(var(--w) * .14); background: linear-gradient(90deg, #0d0f12 0%, #2a2e35 38%, #3a3f47 50%, #1a1d22 72%, #08090b 100%); }
+  .tank .body::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: repeating-linear-gradient(0deg, transparent 0 38px, rgba(255,255,255,.05) 38px 40px); }
+  .tank .lid { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--w) * .28); border-radius: 50%; background: radial-gradient(ellipse at 50% 45%, #d6fbf3 0, #6fd8cf 30%, #2fb5b0 60%, #14776f 100%); box-shadow: 0 0 60px 10px rgba(47,181,176,.45), 0 0 140px 30px rgba(47,181,176,.18); }
+  #home .stage .ph { margin-left: -140px; }
+  /* 6. TFN Africa: the explorer, a cinematic photo with a violet accent */
+  #africa { background: #0b0a14; }
+  #africa .bg { position: absolute; inset: 0; background: url(img/plan-africa.jpg) 50% 60% / cover no-repeat; filter: saturate(.55) brightness(.75) contrast(1.05); }
+  #africa .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,12,50,.55), rgba(20,12,50,.15) 40%, rgba(8,6,20,.85)), linear-gradient(90deg, rgba(28,16,64,.7), rgba(28,16,64,0) 60%); }
+  #africa .kicker, #africa .sub { color: rgba(255,255,255,.8); }
+  /* 7. Credit: premium, black and platinum, the hue drains out */
+  #credit { background: radial-gradient(80% 70% at 72% 45%, #1b1c1f 0, #050505 70%); }
+  .coin { position: absolute; width: var(--s); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; z-index: 1;
+          background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.12) 0 1px, transparent 1px 3px), conic-gradient(from 200deg, #f4f5f7, #8d9097, #e6e8ec, #5d6067, #f4f5f7);
+          box-shadow: 0 30px 40px -20px rgba(0,0,0,.8), inset 0 0 0 calc(var(--s) * .06) rgba(255,255,255,.35); }
+  .coin svg { width: 52%; height: 20%; color: #4a4d54; opacity: .85; }
+  .c1 { --s: 120px; left: 10px; top: 90px; } .c2 { --s: 72px; right: 40px; top: 150px; } .c3 { --s: 96px; right: 10px; bottom: 60px; }
+  .float { animation: float 7s ease-in-out infinite; } @keyframes float { 50% { transform: translateY(-12px); } }
+
+  footer { background: #191c1f; color: #a8a8a8; padding: 48px 0; font-size: .85rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; } footer svg { width: 60px; height: 23px; color: #fff; }
+
+  @media (max-width: 960px) {
+    .range { grid-template-columns: repeat(2, 1fr); }
+    .pp .wrap { grid-template-columns: 1fr; padding: 90px 0 30px; } .stage { height: 560px; }
+    .tank { transform: scale(.7); transform-origin: bottom center; } #home .stage .ph { margin-left: 0; }
+    .gl { display: none; } .stats { flex-wrap: wrap; gap: 20px; }
+  }
+  @media (max-width: 560px) { .range { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .float { animation: none; } html { scroll-behavior: auto; } }
+
+  /* ---------- below the hero: how it works, what you get, more from TFN, the close ---------- */
+  .band { padding: 110px 0; } .band.grey { background: var(--grey); } .band h2 { max-width: 16em; }
+  .band .sub { margin-bottom: 0; }
+  body.dark-page { background: #000; color: #fff; } body.dark-page .sub, body.dark-page .muted { color: #a8a8a8; }
+  body.dark-page .band.grey { background: #0c0c0d; }
+  .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 54px; counter-reset: st; }
+  .steps3 div { background: var(--grey); border-radius: 24px; padding: 30px 26px; counter-increment: st; }
+  .band.grey .steps3 div { background: #fff; }
+  body.dark-page .steps3 div { background: #111; border: 1px solid #222; } body.dark-page .band.grey .steps3 div { background: #151517; }
+  .steps3 div::before { content: counter(st); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--acc, #1f1f1f); color: var(--accink, #fff); font-weight: 600; margin-bottom: 22px; }
+  .steps3 h3, .feats h3 { font-size: 1.25rem; } .steps3 p, .feats p { color: var(--muted); margin-top: 8px; font-size: .97rem; }
+  body.dark-page .steps3 p, body.dark-page .feats p { color: #a8a8a8; }
+  .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px 40px; margin-top: 54px; }
+  .feats div { border-top: 1px solid #e3e3e6; padding-top: 22px; } body.dark-page .feats div { border-color: #262628; }
+  .more .range { margin-top: 48px; }
+  body.dark-page .tile { background: #111; color: #fff; } body.dark-page .tile.later { background: #0c0c0d; box-shadow: inset 0 0 0 1px #222; }
+  .close { padding: 120px 0; text-align: center; } .close .sub { margin: 20px auto 34px; }
+  .crumb { font-size: .9rem; color: var(--muted); margin-bottom: 26px; } .crumb a:hover { text-decoration: underline; }
+  .dk .crumb, body.dark-page .crumb { color: #8e8e93; }
+  .links a[aria-current="page"] { color: #000; font-weight: 600; } .nav.dark .links a[aria-current="page"] { color: #fff; }
+  footer .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; width: 100%; margin-bottom: 40px; }
+  footer h4 { color: #fff; font-weight: 500; font-size: .9rem; margin-bottom: 12px; } footer li { list-style: none; padding: 4px 0; } footer a:hover { color: #fff; }
+  @media (max-width: 960px) { .steps3, .feats { grid-template-columns: 1fr; } footer .cols { grid-template-columns: 1fr 1fr; } }
