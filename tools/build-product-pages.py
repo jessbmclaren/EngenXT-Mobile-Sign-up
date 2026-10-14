@@ -304,12 +304,12 @@ def product_page(k):
 def hub():
     intro = '''<section class="intro"><div class="wrap">
 <p class="kicker" style="justify-content:center">Truckers Hub <span class="soon">Coming soon</span></p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one place</h1>
-<p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork, with no cards, no cash and no slips. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for you.</p>
+<p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork, with no cards, no cash and no slips. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for your fleet managers.</p>
 <div class="range">%s%s</div></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
-    hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one manager portal, and holds the things every product needs, so you set them up once.</p>
+    hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one fleet manager portal, and holds the things every product needs, so you set them up once.</p>
 <div class="steps3" style="--acc:#1f1f1f;grid-template-columns:repeat(2,1fr)">
 <div><h3>The driver app</h3><p>On the driver’s phone: see orders, ask for fuel, fill up and book a stop. Drivers only see what they need to do the job.</p></div>
-<div><h3>The manager portal</h3><p>In the office: set up your company, people, vehicles and rules, top up your wallet, approve orders and see every transaction.</p></div>
+<div><h3>The fleet manager portal</h3><p>In the office: set up your company, people, vehicles and rules, top up your wallet, approve orders and see every transaction.</p></div>
 </div><div class="feats">
 <div><h3>Your company</h3><p>Your company profile and documents, captured once for every product.</p></div>
 <div><h3>Your people</h3><p>Give each person the access their job needs, from owner to driver.</p></div>
@@ -325,7 +325,7 @@ def hub():
 </div></div></section>'''
     close = '<section class="close"><div class="wrap"><h2>Not sure where to start?</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will show you what you’d save, within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
     body = nav() + '\n<main>\n' + intro + hubband + how + close + '\n</main>\n' + footer()
-    return page('TFN | Products and Truckers Hub', 'TFN products: On-Road, LCV, Non-Fuel, Network, Homebase, TFN Africa and Credit. Truckers Hub, coming soon, brings them into one driver app and one manager portal.', body)
+    return page('TFN | Products and Truckers Hub', 'TFN products: On-Road, LCV, Non-Fuel, Network, Homebase, TFN Africa and Credit. Truckers Hub, coming soon, brings them into one driver app and one fleet manager portal.', body)
 
 
 if __name__ == '__main__':
