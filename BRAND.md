@@ -1,8 +1,10 @@
 # TFN brand rules
 
 What makes a brand easy to recognise is a small set of rules applied without
-exception. These are tfn's. They are written for the marketing site
-(`fintech-site.html`) and apply to anything else that carries the tfn name.
+exception. These are tfn's. They are written for the marketing page
+(`tfn-page-examples.html`) and apply to anything else that carries the tfn
+name. Sections 4 to 10 still describe the older `fintech-site.html` where the
+two differ.
 
 ## 1. The logo
 
@@ -25,65 +27,44 @@ exception. These are tfn's. They are written for the marketing site
 
 ## 2. Colour
 
-- **White and cream carry the page, as on Wealthsimple.** Sections alternate
-  white `#ffffff` and cream `#f5f3ef`; tiles are white on cream and cream on
-  white; text `#0a0a0a`, secondary text `#6b6b6b`. Dark bands are a deep
-  navy-black `#080f16`, not pure black. Business mode switches the whole page
-  to black.
-- **The structure stays plain, as on Revolut.** Colour is the exception
-  and lives in imagery. Its look is ElevenLabs': deep, blurred, photographic
-  colour fields that run from bright to dark in one shape, a fine tiled grain
-  over everything (50% overlay), no gloss.
-- **One hue per gradient.** Every gradient is a single colour in light and
-  dark shades, like Revolut's and Wealthsimple's: blue here, pink there, never
-  every colour in one field. Nothing else is mixed in, not orange, not gold.
-  Each product owns one hue, used the same way everywhere:
-  - Fuel: **blue** (pale sky, blue, deep navy)
-  - Insurance: **pink** (pale pink, magenta-pink, deep wine)
-  - Tracking: **violet** (pale lilac, violet, deep indigo)
-  - Upkeep: **teal** (pale mint, teal, deep teal)
-  - Complete: **a dusk**, blue into violet into pink, the one gradient that
-    uses neighbouring hues, because it stands for all of them
-  Hues are never used in text or icons.
-- **Where colour goes, as on Revolut:** on black, in big product objects.
-  The gradient fields live inside device screens, the bundle header and the
-  photo tints, and the products and bundles sit on black bands so the colour
-  pops. White sections and grey tiles stay plain. Gradients are never behind
-  text on white and never a page background.
-- **Cream is the warm light inside the gradients.** There is **no gold in any
-  background or gradient**: Wealthsimple only uses gold on objects, and we have
-  no gold object, so gold is not part of the palette. Never on surfaces, text,
-  buttons or the logo.
-- **Borrowed from Wealthsimple:** the lilac-pink dusk across Complete, and a
-  text serif (Newsreader, standing in for Tiempos) for the small kicker and
-  persona lines above headlines.
-- **Texture:** every gradient, the orb and every photograph carry fine film
-  grain, so the imagery shares one surface.
+- **Sections are white or black, nothing else.** White `#ffffff` and black
+  `#000000` alternate down the page; the footer is charcoal. No cream, no
+  navy, no tinted bands. Text on white is `#1f1f1f`, secondary text `#717173`;
+  on black, text is white and secondary text `#a8a8a8`.
+- **Colour lives in things, never in the structure.** It appears only in
+  photographs, product UI (the app, portal and POS screens), the orb and the
+  maps. Buttons, headlines, links and section backgrounds stay black and white.
+- **One hue per gradient.** Each gradient is one colour in light and dark
+  shades. Each service owns one hue, used the same way everywhere (dots on
+  tabs and photo badges, device screens, the orb):
+  - Fuel: **blue**
+  - Insurance: **pink**
+  - Network: **violet**
+  - Homebase: **teal**
+  The one exception is the orb's **All** state, a soft pastel mix of blue,
+  green and purple taken from the old swirl logo. Never orange, never gold.
+- **Photos carry the brand hue.** Backgrounds are recoloured into a duotone of
+  one hue while people stay natural (`tools/photo-recolour.swift`).
+- **Maps are dark by default.**
+- **Coins are silver.**
+- **State:** green means fine, red means it needs you, grey means coming up.
+  Small dots only, never fills.
 - Glass (frosted translucent white) is only used over colour or photography.
-- **Colour has to mean something.** It is used in four ways and no others:
-  1. **Which product:** the hue says Fuel, Insurance or Upkeep, in the same
-     place every time (dots on tiles, photo tints, device screens, the line
-     under the nav while you are in that product's section).
-  2. **Which surface:** the app, the portal and the POS each get their own
-     device, never a card.
-  3. **State:** green means fine, red means it needs you, grey means coming
-     up. Small dots only, never fills.
-  4. **Touch:** a tile stays grey (or black) until you touch it, then the
-     product's own gradient, with grain, spreads in from the point you touched.
-     The same happens on the referral steps and the device buttons; nav links
-     and footer links take a line or colour in the product's hue.
-- Black bands exist to make colour pop. Put colour on black, not black on
-  colour.
 
 ## 3. Type
 
-- **Headlines:** Fraunces ExtraBold, large (up to 5.4rem on the hero), tight,
-  sentence case. It is the same family as the wordmark, so the logo and the
-  headlines read as one voice. Fraunces stands in for a licensed display serif.
-- **Everything else:** Hanken Grotesk (body, buttons, tiles, nav), standing in
-  for a licensed grotesque. Swap the single `--display` token to change it.
-- **Kickers and persona lines:** Newsreader, a quieter text serif.
-- No italics. No all-caps except the wordmark and small labels.
+- **One sans for everything.** Aeonik Pro is the intended face; Satoshi
+  (Fontshare) stands in until it is licensed. The `--sans` token lists
+  `"Aeonik Pro", "Satoshi"` so the licensed font takes over as soon as it is
+  loaded.
+- **Headlines:** weight 500, line-height 1, sentence case, short. h1 85px,
+  h2 50px at 1280px wide, slightly negative tracking.
+- **Body:** 18px, line-height 1.5, in a 1000px column.
+- **Buttons:** 42 to 44px tall full pills, `#1f1f1f` on white, white on black,
+  weight 500.
+- **Small print** goes in footnotes marked ¹ ² ³, not in the body copy.
+- Fraunces is kept only for the wordmark. No serif anywhere else, no italics,
+  no all-caps except the wordmark and small labels.
 
 ## 4. The page template
 
@@ -127,16 +108,21 @@ Things arrive, they do not bounce: content rises and fades in once, devices
 fan out, numbers count up, colour drifts slowly. Everything stops when the
 viewer has reduced motion switched on.
 
-## Tokens (as implemented)
+## Tokens (as implemented in `tfn-page-examples.html`)
 
 | token | value |
 |---|---|
-| text | `#0a0a0a` |
-| muted | `#6b6b6b` |
-| cream | `#f5f3ef` |
-| dark band | `#080f16` |
+| text | `#1f1f1f` |
+| muted | `#717173` |
+| muted on black | `#a8a8a8` |
+| sections | `#ffffff` / `#000000` |
+| font | `"Aeonik Pro", "Satoshi", …` |
+| headline | 500, line-height 1 |
+| h1 / h2 / body | 85px / 50px / 18px |
+| column | 1000px |
+| nav | 72px |
+| button | 42 to 44px pill, `#1f1f1f` |
 | radius | 20 to 28px, pills 999px |
-| headline | 500, `-0.03em` |
 | ease | `cubic-bezier(.2,.7,.2,1)` |
 
 ## 9. Maps
@@ -169,17 +155,11 @@ the TLDR, and navy for the referral and the footer.
 
 ## 11. Page transitions
 
-- **Intro curtain:** the orb and wordmark on navy, then the curtain lifts and
-  the hero begins.
-- **Colour wipe:** clicking a link to another section sweeps a sheet in that
-  product's hue up the screen, jumps the page behind it, and the sheet leaves
-  upward. Reduced motion gets a plain scroll.
 - **Scenes overlap** with rounded tops, and the scene underneath recedes and
   dims as the next one rises.
-- **Headlines** reveal word by word. **Photographs and devices** open from a
-  clipped frame.
-- **Drivers / Business** is a circular reveal that grows out of the switch.
-  Switching product is a cross-fade.
+- **Photographs and devices** open from a clipped frame. Numbers roll up.
+- There is no intro curtain, no colour wipe between sections and no
+  word-by-word headline reveal: they were tried and removed.
 - Everything above is switched off for viewers who ask for reduced motion.
 - **Nav mega menu:** hovering or focusing a nav item drops a frosted glass
   panel under the bar. It opens slightly smaller and settles, the links
