@@ -216,7 +216,6 @@ P['credit'] = dict(
 
 LATER = [
     ('Insurance', 'Cover for your trucks, through TFN.', 'p-ins'),
-    ('Truckers Hub', 'One login for your company, people, vehicles and wallet.', 'p-hub'),
 ]
 ORDER = ['road', 'lcv', 'nonfuel', 'network', 'home', 'africa', 'credit']
 
@@ -240,7 +239,7 @@ def later_tiles():
 def footer():
     prod = ''.join('<li><a href="%s">%s</a></li>' % (P[k]['file'], P[k]['name']) for k in ORDER)
     return ('<footer data-dark><div class="wrap"><div class="cols">'
-            '<div><h4>Products</h4><ul><li><a href="tfn-products.html">All products</a></li>%s</ul></div>'
+            '<div><h4>Products</h4><ul><li><a href="tfn-products.html">Truckers Hub</a></li>%s</ul></div>'
             '<div><h4>Plan and save</h4><ul><li><a href="https://tfn.co.za/tfn-network-map/">Network map</a></li><li><a href="https://tfn.co.za/price-list/">Fuel prices</a></li><li><a href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></li><li><a href="https://tfn.co.za/fuel-insights/">Fuel price outlook</a></li></ul></div>'
             '<div><h4>Company</h4><ul><li><a href="https://tfn.co.za/about-us/">About TFN</a></li><li><a href="https://tfn.co.za/contact-us/">Contact us</a></li><li><a href="https://tfn.co.za/tfn-support/">Support</a></li></ul></div>'
             '<div><h4>Account</h4><ul><li><a href="https://app.tfn.co.za/">Log in</a></li><li><a href="https://tfn.co.za/terms-conditions/">Terms and conditions</a></li></ul></div>'
@@ -283,7 +282,7 @@ def product_page(k):
     chips = '<div class="chiprow">%s</div>' % ''.join('<span>%s</span>' % c for c in p['chips']) if p.get('chips') else ''
     btn = 'btn light' if dark else 'btn'
     hero = '''<section class="pp%s" id="%s"%s>%s<div class="wrap"><div>
-<p class="crumb"><a href="tfn-products.html">Products</a> / %s</p>
+<p class="crumb"><a href="tfn-products.html">Truckers Hub</a> / %s</p>
 <p class="kicker">%s%s</p><h1>%s</h1><p class="sub">%s</p><a class="%s" href="%s">%s</a>%s%s</div>
 <div class="stage">%s<div class="ph %s float"><div class="s">%s</div></div>%s</div></div></section>''' % (
         dk, k, data_dark, p.get('before', ''), p['name'], p['kicker'], soon, p['title'], p['sub'], btn, p['cta'][1], p['cta'][0], stats, chips,
@@ -292,7 +291,7 @@ def product_page(k):
         data_dark, p['how'][0], p['acc'], p.get('accink', '#fff'), ''.join('<div><h3>%s</h3><p>%s</p></div>' % s for s in p['how'][1]))
     feats = '<section class="band"%s><div class="wrap"><h2>%s</h2><div class="feats">%s</div></div></section>' % (
         data_dark, p['feats'][0], ''.join('<div><h3>%s</h3><p>%s</p></div>' % f for f in p['feats'][1]))
-    more = '<section class="band grey more"%s><div class="wrap"><h2>More from TFN</h2><p class="sub">Everything runs on the same TFN account.</p><div class="range">%s</div></div></section>' % (
+    more = '<section class="band grey more"%s><div class="wrap"><h2>More on Truckers Hub</h2><p class="sub">Every TFN product lives in Truckers Hub, on one login and one account.</p><div class="range">%s</div></div></section>' % (
         data_dark, ''.join(tile(o) for o in ORDER if o != k))
     close = '<section class="close"%s><div class="wrap"><h2>%s</h2><p class="sub">%s</p><a class="%s" href="%s">%s</a></div></section>' % (
         data_dark, 'Be first in line for LCV' if p.get('soon') else 'See what you’d save',
@@ -304,17 +303,25 @@ def product_page(k):
 
 def hub():
     intro = '''<section class="intro"><div class="wrap">
-<h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one account</h1>
-<p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops, and handles the payment and the paperwork. No cards, no cash, no slips: drivers use the TFN Pay app, and you see every litre in the TFN Dashboard.</p>
+<p class="kicker" style="justify-content:center">Truckers Hub</p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one place</h1>
+<p class="sub">Truckers Hub is your home at TFN: one login for your company, your people, your vehicles and your wallet, with every TFN product inside it. Diesel at negotiated prices at 270+ truck stops, with no cards, no cash and no slips.</p>
 <div class="range">%s%s</div></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
+    hubband = '''<section class="band"><div class="wrap"><h2>One login for all of it</h2><p class="sub">Truckers Hub holds the things every product needs, so you set them up once.</p><div class="feats">
+<div><h3>Your company</h3><p>Your company profile and documents, captured once for every product.</p></div>
+<div><h3>Your people</h3><p>Give each person the access their job needs, from owner to driver.</p></div>
+<div><h3>Vehicles and drivers</h3><p>Add them once and use them across On-Road, LCV and Homebase.</p></div>
+<div><h3>Your wallet</h3><p>Top up, see your balance and pay for every product from one place.</p></div>
+<div><h3>Notifications</h3><p>Orders, approvals, low balances and anything unusual, as it happens.</p></div>
+<div><h3>Reports</h3><p>Every transaction from every product, in one set of reports.</p></div>
+</div></div></section>'''
     how = '''<section class="band grey"><div class="wrap"><h2>How TFN works</h2><div class="steps3" style="--acc:#1f1f1f">
 <div><h3>Open an account</h3><p>Sign up online, add your trucks and drivers, and choose cash (pre-loaded by EFT) or credit through your bank.</p></div>
 <div><h3>Order and fill up</h3><p>Order fuel in the TFN Dashboard. Your driver fills up at a TFN truck stop, checked by location and photographed at the pump.</p></div>
 <div><h3>See every litre</h3><p>Every fill lands in your dashboard straight away, ready for reports, statements and your accounting system.</p></div>
 </div></div></section>'''
     close = '<section class="close"><div class="wrap"><h2>Not sure where to start?</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will show you what you’d save, within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
-    body = nav() + '\n<main>\n' + intro + how + close + '\n</main>\n' + footer()
-    return page('TFN | Products', 'TFN products: On-Road, LCV, Non-Fuel, Network, Homebase, TFN Africa and Credit, on one account.', body)
+    body = nav() + '\n<main>\n' + intro + hubband + how + close + '\n</main>\n' + footer()
+    return page('Truckers Hub | Everything TFN does, in one place', 'Truckers Hub: one login for your company, people, vehicles and wallet, with every TFN product inside it.', body)
 
 
 if __name__ == '__main__':
