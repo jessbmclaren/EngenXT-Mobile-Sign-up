@@ -43,8 +43,8 @@ two differ.
   - Homebase: **teal**
   The one exception is the orb's **All** state, a soft pastel mix of blue,
   green and purple taken from the old swirl logo. Never orange, never gold.
-- **Photos carry the brand hue.** Backgrounds are recoloured into a duotone of
-  one hue while people stay natural (`tools/photo-recolour.swift`).
+- **Photos stay natural.** No duotones or cut-outs: colour in a photo comes
+  from real light (blue office at night, dusk, golden hour).
 - **Maps are dark by default.**
 - **Coins are silver.**
 - **State:** green means fine, red means it needs you, grey means coming up.
@@ -87,9 +87,22 @@ Buttons are always full pills, black on light and white on black.
 
 ## 6. Photography
 
-Real people doing the work: drivers, mechanics, people at the pump. Product
-UI is laid over the photo in glass. Photos get a dark tint in the product hue
-so text stays readable. Current photos are Unsplash stock placeholders.
+- **The main people are the buyers:** logistics, operations and tech-minded
+  managers at work, at a laptop or on a warehouse floor. Candid, not posed, and
+  never another person-on-a-phone shot.
+- **Supporting scenes:** trucks on the road at dusk, a hand on the nozzle,
+  trucks from above, farm diesel at golden hour. Cinematic, no fuel-brand
+  forecourts.
+- **South African context:** left-hand traffic and European cab-over trucks,
+  no American conventionals. A right-hand-traffic road photo can be mirrored
+  if no text shows.
+- **No visible brands** on lanyards, trailers, pumps or laptops where it can be
+  avoided; crop them out.
+- **Keep the subject off-centre** where copy or a glass card sits in the
+  middle; the hero subject sits right of the phone (`tools/photo-extend.swift`
+  widens a backdrop to get there).
+- Current photos are Unsplash placeholders in `img/`; a real TFN shoot
+  replaces them.
 
 ## 7. Voice
 

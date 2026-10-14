@@ -514,7 +514,7 @@
   .hbadges span { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 16px; background: rgba(255,255,255,.92); color: #111; font-size: .84rem; font-weight: 600;
     -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 18px 40px -16px rgba(5,20,60,.55); opacity: 0; animation: up .8s var(--ease) 1.4s forwards; }
   .hbadges span:nth-child(2) { animation-delay: 1.65s; } .hbadges i { width: 26px; height: 26px; border-radius: 8px; flex: none; }
-  @media (max-width: 960px) { .hero, .hin { min-height: 1010px; } .hphone { width: 210px; height: 433px; bottom: -50px; } .hphone .hp { border-radius: 40px; padding: 8px; } .hphone .phs, .hphone .hp::after { border-radius: 32px; } .hbadges { display: none; } }
+  @media (max-width: 960px) { .hero, .hin { min-height: 1010px; } .hbg { background: linear-gradient(#0c1f33 0, #0c1f33 330px, rgba(12,31,51,0) 470px), var(--img) right -130px top 300px / auto 760px no-repeat, #0c1f33 !important; } .hphone { width: 210px; height: 433px; bottom: -50px; } .hphone .hp { border-radius: 40px; padding: 8px; } .hphone .phs, .hphone .hp::after { border-radius: 32px; } .hbadges { display: none; } }
   @media (prefers-reduced-motion: reduce) { .hphone { animation: none; } .hbadges span { opacity: 1; animation: none; } }
 
   @media (max-width: 960px) {
@@ -603,7 +603,7 @@
 <main id="top">
   <!-- 1. hero, blue: the outline draws, the photograph arrives, the number counts -->
   <section class="hero h-blue" id="hero">
-    <div class="hbg" style="--img:url(img/hero-blue.jpg); background-position: 0 0, 0 0, 100% 40%" aria-hidden="true"></div>
+    <div class="hbg" style="--img:url(img/hero-manager.jpg); background-position: 0 0, 0 0, 100% 20%" aria-hidden="true"></div>
     <div class="hin">
       <div class="hcopy">
         <h1>Fuel management, sorted</h1>
@@ -652,11 +652,11 @@
 
 
 
-  <!-- 4. full-bleed photo scene: the pills swap the photograph and its tint (pink, violet, teal) -->
+  <!-- 4. full-bleed photo scene: the pills swap the photograph (at the pump, in the office, every truck from above) -->
   <section class="scene" id="b">
-    <div class="bg on" style="--img:url(img/phone-pink.jpg)" aria-hidden="true"></div>
-    <div class="bg" style="--img:url(img/save-violet.jpg)" aria-hidden="true"></div>
-    <div class="bg" style="--img:url(https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop&w=1800&q=75)" aria-hidden="true"></div>
+    <div class="bg on" style="--img:url(img/pay-nozzle.jpg)" aria-hidden="true"></div>
+    <div class="bg" style="--img:url(img/save-desk.jpg); background-position: 70% 40%" aria-hidden="true"></div>
+    <div class="bg" style="--img:url(img/track-trucks.jpg); background-position: 50% 50%" aria-hidden="true"></div>
     <div class="veil" aria-hidden="true"></div>
     <div class="wrap">
       <h2>Pay with your phone</h2>
@@ -846,9 +846,9 @@
   <section class="stack" id="k">
     <div class="wrap center"><h2 class="title">Join the transporters fuelling 44M+ litres a month</h2><p class="sub" style="margin-bottom:64px">Pick the set-up that fits how you move freight.</p></div>
     <div class="wrap scs">
-      <article class="sc"><div class="im" style="--img:url(https://images.unsplash.com/photo-1611746351408-c0a1346be8e8?auto=format&fit=crop&w=1400&q=75); background-position: 62% 40%" aria-hidden="true"><div class="gl"><span class="dot h-blue"></span>270+ truck stops</div></div><div class="tx"><h3>Transporters</h3><p>For your own trucks: refuel on the road, pay from one account and see every truck live.</p><a class="btn light" href="#f">Fuel for transporters</a></div></article>
-      <article class="sc"><div class="im" style="--img:url(img/meeting-pink.jpg)" aria-hidden="true"><div class="gl"><span class="dot h-pink"></span>One account for every contractor</div></div><div class="tx"><h3>Service providers</h3><p>For sub-contracted transporters: give every one the network and keep control of who fuels where.</p><a class="btn light" href="#f">Fuel for service providers</a></div></article>
-      <article class="sc"><div class="im" style="--img:url(https://images.unsplash.com/photo-1785679629582-ab592ec0a84c?auto=format&fit=crop&w=1400&q=75); background-position: 50% 60%" aria-hidden="true"><div class="gl"><span class="dot h-teal"></span>On the road and on the farm</div></div><div class="tx"><h3>Farmers</h3><p>For the farm run: fuel on the road and keep farm diesel on the same records.</p><a class="btn light" href="#f">Fuel for farmers</a></div></article>
+      <article class="sc"><div class="im" style="--img:url(img/k-scania.jpg); background-position: 70% 60%" aria-hidden="true"><div class="gl"><span class="dot h-blue"></span>270+ truck stops</div></div><div class="tx"><h3>Transporters</h3><p>For your own trucks: refuel on the road, pay from one account and see every truck live.</p><a class="btn light" href="#f">Fuel for transporters</a></div></article>
+      <article class="sc"><div class="im" style="--img:url(img/k-warehouse.jpg); background-position: 50% 30%" aria-hidden="true"><div class="gl"><span class="dot h-pink"></span>One account for every contractor</div></div><div class="tx"><h3>Service providers</h3><p>For sub-contracted transporters: give every one the network and keep control of who fuels where.</p><a class="btn light" href="#f">Fuel for service providers</a></div></article>
+      <article class="sc"><div class="im" style="--img:url(img/k-tractor.jpg); background-position: 50% 60%" aria-hidden="true"><div class="gl"><span class="dot h-teal"></span>On the road and on the farm</div></div><div class="tx"><h3>Farmers</h3><p>For the farm run: fuel on the road and keep farm diesel on the same records.</p><a class="btn light" href="#f">Fuel for farmers</a></div></article>
     </div>
   </section>
 
@@ -865,9 +865,9 @@
     </div>
   </section>
 
-  <!-- 12. a closing scene: a fuel tanker on the highway at dusk -->
+  <!-- 12. a closing scene: trucks on the highway at dusk -->
   <section class="scene" id="f" style="align-items:flex-end;padding-bottom:9vh">
-    <div class="bg on" style="--img:url(https://images.unsplash.com/photo-1725025007885-7c3627ef8a9a?auto=format&fit=crop&w=1800&q=75)" aria-hidden="true"></div>
+    <div class="bg on" style="--img:url(img/close-highway.jpg)" aria-hidden="true"></div>
     <div class="veil" style="background:linear-gradient(rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 35%, rgba(5,12,28,.55) 62%, rgba(5,12,28,.85) 100%)" aria-hidden="true"></div>
     <div class="wrap">
       <h2>Join 168K+ fills a month on TFN</h2>
