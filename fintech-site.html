@@ -22,7 +22,8 @@
   .p-care  { --p: #3fc4bd; --p2: #2fb5b0; --pk: #0a3a40; --pd: #e6f8f5; --c1: #d6fbf3; --c2: #2fb5b0; --c3: #1f9a95; --c4: #0a3a40; --c5: #6fd8cf; --c6: #14776f; }
 
   * { box-sizing: border-box; margin: 0; }
-  html { scroll-behavior: auto; }
+  /* scenes recede with a transform as the page scrolls; scroll anchoring would chase that transform and keep moving the page */
+  html { scroll-behavior: auto; overflow-anchor: none; }
   body { font-family: var(--display); color: var(--text); background: #fff; line-height: 1.5; -webkit-font-smoothing: antialiased; }
   a { color: inherit; text-decoration: none; } button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; } ul { list-style: none; padding: 0; }
   :focus-visible { outline: 3px solid #3a7bd5; outline-offset: 3px; border-radius: 8px; }
