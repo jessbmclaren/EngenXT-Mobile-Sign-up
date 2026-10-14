@@ -22,7 +22,7 @@
   .links { display: flex; overflow-x: auto; scrollbar-width: none; } .links::-webkit-scrollbar { display: none; }
   .links a { padding: 8px 4px; margin: 0 8px; font-weight: 500; font-size: .93rem; color: #3a3a3a; white-space: nowrap; } .links a:hover { color: #000; }
   .grow { flex: 1; }
-  .nav.dark { background: rgba(0,0,0,.72); border-color: rgba(255,255,255,.08); color: #fff; }
+  .nav.dark { background: rgba(0,0,0,.88); border-color: rgba(255,255,255,.08); color: #fff; }
   .nav.dark .links a { color: #d0d0d4; } .nav.dark .links a:hover { color: #fff; } .nav.dark .btn { background: #fff; color: #000; }
 
   /* ---------- the phone: each product's real screen, in a finish per product (the range's answer to Revolut's card colours) ---------- */
@@ -57,9 +57,8 @@
   .p-net    { --frame: linear-gradient(145deg, #3b3f47, #15171b); --scr: #141518; --ink: #f2f2f7; --sub: #8e8e93; --card: #202227; --rule: #2a2c31; --acc: #3d9bff; }
   .p-home   { --frame: linear-gradient(145deg, #2a2e35, #08090b); --scr: #0d0f11; --ink: #e6f7f5; --sub: #7f9a97; --card: #161a1c; --rule: #22292b; --acc: #2fb5b0; --okc: #6fd8cf; }
   .p-africa { --frame: linear-gradient(145deg, #6b4fb0, #2a1a5c); --scr: #151026; --ink: #efe9ff; --sub: #9d8fc4; --card: #221a3c; --rule: #2e2550; --acc: #8f55d6; --okc: #b99af0; }
-  .p-credit { --frame: repeating-linear-gradient(115deg, rgba(255,255,255,.25) 0 1px, rgba(0,0,0,.05) 1px 3px), linear-gradient(145deg, #f4f5f7, #a4a7ae 35%, #e9ebee 55%, #7c7f86 80%, #d9dbdf);
-              --scr: #0b0b0c; --ink: #f5f5f7; --sub: #8e8e93; --card: #17181a; --rule: #232427; --acc: #d9dbdf; --ctac: #000; --okc: #c9cbd0; }
-  .p-ins    { --frame: linear-gradient(145deg, #ffd6ea, #e0559a); --acc: #c23d86; }
+  .p-credit { --frame: linear-gradient(145deg, #f58ab8, #c23d86 50%, #6e1f55); --scr: #120a10; --ink: #fdf2f7; --sub: #b98aa4; --card: #1e1119; --rule: #2c1a25; --acc: #e0559a; --okc: #f58ab8; }
+  .p-ins    { --frame: linear-gradient(145deg, #f7f8fa, #d9dce2); --acc: #8e8e93; }
   .p-hub    { --frame: linear-gradient(145deg, #3a3a3e, #111113); --scr: #0f0f10; --ink: #f2f2f7; --sub: #8e8e93; --card: #1c1c1f; --rule: #28282c; --acc: #f2f2f7; --ctac: #000; }
 
   /* the range */
@@ -114,7 +113,7 @@
   #africa .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,12,50,.55), rgba(20,12,50,.15) 40%, rgba(8,6,20,.85)), linear-gradient(90deg, rgba(28,16,64,.7), rgba(28,16,64,0) 60%); }
   #africa .kicker, #africa .sub { color: rgba(255,255,255,.8); }
   /* 7. Credit: premium, black and platinum, the hue drains out */
-  #credit { background: radial-gradient(80% 70% at 72% 45%, #1b1c1f 0, #050505 70%); }
+  #credit { background: radial-gradient(80% 70% at 72% 45%, #2a0f22 0, #050505 70%); }
   .coin { position: absolute; width: var(--s); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; z-index: 1;
           background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.12) 0 1px, transparent 1px 3px), conic-gradient(from 200deg, #f4f5f7, #8d9097, #e6e8ec, #5d6067, #f4f5f7);
           box-shadow: 0 30px 40px -20px rgba(0,0,0,.8), inset 0 0 0 calc(var(--s) * .06) rgba(255,255,255,.35); }
@@ -157,3 +156,45 @@
   footer .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; width: 100%; margin-bottom: 40px; }
   footer h4 { color: #fff; font-weight: 500; font-size: .9rem; margin-bottom: 12px; } footer li { list-style: none; padding: 4px 0; } footer a:hover { color: #fff; }
   @media (max-width: 960px) { .steps3, .feats { grid-template-columns: 1fr; } footer .cols { grid-template-columns: 1fr 1fr; } }
+
+  /* ---------- tiers: hue says which product, the finish says your tier ---------- */
+  .badge { --w: 150px; position: relative; width: var(--w); aspect-ratio: 1; border-radius: 28%; flex: none; display: flex; flex-direction: column; justify-content: space-between;
+           padding: calc(var(--w) * .13); background: var(--fin); color: var(--fink, #1f1f1f); box-shadow: 0 calc(var(--w) * .18) calc(var(--w) * .25) calc(var(--w) * -.12) rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.45), inset 0 calc(var(--w) * -.03) calc(var(--w) * .06) rgba(0,0,0,.18); overflow: hidden; }
+  .badge::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 45%, transparent 60%); mix-blend-mode: soft-light; }
+  .badge svg { width: 46%; height: 18%; color: currentColor; } .badge b { font-weight: 600; font-size: calc(var(--w) * .12); letter-spacing: .02em; }
+  .t-bronze   { --fin: repeating-linear-gradient(100deg, rgba(255,255,255,.18) 0 1px, rgba(0,0,0,.04) 1px 3px), linear-gradient(135deg, #e3d2bb, #a8906f 38%, #ecdcc6 58%, #8a7255); --fink: #3a2e20; }
+  .t-silver   { --fin: repeating-linear-gradient(100deg, rgba(255,255,255,.25) 0 1px, rgba(0,0,0,.04) 1px 3px), linear-gradient(135deg, #f6f7f9, #aeb1b8 38%, #eceef1 58%, #8d9097); --fink: #2a2c31; }
+  .t-gold     { --fin: repeating-linear-gradient(100deg, rgba(255,255,255,.22) 0 1px, rgba(0,0,0,.04) 1px 3px), linear-gradient(135deg, #f7edd2, #cbb683 38%, #f9f1dc 58%, #a9925f); --fink: #3b3016; }
+  .t-diamond  { --fin: conic-gradient(from 210deg at 60% 40%, #f4fbff, #d9ecff, #f1e6ff, #e3fff7, #fffbe8, #f4fbff), linear-gradient(135deg, #ffffff, #e9eef5); --fink: #1f2a3a; }
+  .t-diamond::before { content: ""; position: absolute; inset: 0; background: linear-gradient(60deg, transparent 40%, rgba(255,255,255,.9) 50%, transparent 60%), linear-gradient(-30deg, transparent 45%, rgba(190,220,255,.6) 52%, transparent 60%); }
+  .t-platinum { --fin: repeating-linear-gradient(100deg, rgba(255,255,255,.12) 0 1px, rgba(0,0,0,.08) 1px 3px), linear-gradient(135deg, #5d6067, #2a2c30 38%, #6c6f76 58%, #1c1d20); --fink: #f2f2f4; }
+  .badge > * { position: relative; z-index: 1; }
+
+  .tiers-hero { background: radial-gradient(70% 60% at 50% 75%, #1a1b1e 0, #000 70%); color: #fff; text-align: center; margin-top: -72px; padding: 182px 0 90px; overflow: hidden; }
+  .tiers-hero .sub { color: #a8a8a8; margin: 20px auto 30px; }
+  .fan { display: flex; justify-content: center; align-items: center; gap: 0; margin-top: 60px; height: 260px; }
+  .fan .badge { --w: 190px; margin: 0 -22px; transform: translateY(calc(var(--i) * -14px)) rotate(var(--r)); transition: transform .6s var(--ease); }
+  .fan .badge:hover { transform: translateY(-40px) rotate(0); z-index: 5; }
+  .ladder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 54px; }
+  .ladder > div { background: var(--grey); border-radius: 24px; padding: 24px 18px 22px; display: flex; flex-direction: column; gap: 6px; }
+  .ladder .badge { --w: 84px; margin-bottom: 14px; }
+  .ladder h3 { font-size: 1.2rem; } .ladder .lit { color: var(--muted); font-size: .88rem; } .ladder .disc { font-size: 1.5rem; font-weight: 500; letter-spacing: -.02em; margin-top: 10px; } .ladder .disc small { display: block; font-size: .8rem; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+  .calc2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 50px; background: #fff; border-radius: 28px; padding: 40px; }
+  .calc2 label { font-weight: 500; display: block; margin-bottom: 14px; } .calc2 output { font-size: 2.6rem; font-weight: 500; letter-spacing: -.02em; display: block; margin-bottom: 16px; }
+  .calc2 input[type=range] { width: 100%; accent-color: #1f1f1f; height: 28px; }
+  .calc2 .res { display: flex; gap: 24px; align-items: center; } .calc2 .res .badge { --w: 120px; }
+  .calc2 dl { display: grid; grid-template-columns: auto auto; gap: 8px 22px; } .calc2 dt { color: var(--muted); } .calc2 dd { font-weight: 600; text-align: right; }
+  .portal { margin-top: 54px; border-radius: 22px; background: #111; border: 1px solid #262628; overflow: hidden; display: grid; grid-template-columns: 210px 1fr; min-height: 420px; color: #f2f2f4; }
+  .portal aside { background: #0b0b0c; padding: 22px 18px; font-size: .88rem; display: flex; flex-direction: column; gap: 4px; } .portal aside svg { width: 56px; height: 22px; margin-bottom: 18px; }
+  .portal aside span { padding: 8px 10px; border-radius: 10px; color: #a8a8a8; } .portal aside span.on { background: #1d1d20; color: #fff; }
+  .portal main { padding: 28px 30px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-content: start; }
+  .portal .card { background: #18181b; border-radius: 18px; padding: 20px; } .portal .card h4 { font-weight: 500; color: #a8a8a8; font-size: .85rem; margin-bottom: 10px; }
+  .portal .stat { display: flex; gap: 18px; align-items: center; } .portal .stat .badge { --w: 96px; }
+  .portal .big { font-size: 2rem; font-weight: 500; letter-spacing: -.02em; }
+  .portal .bar { height: 8px; border-radius: 99px; background: #2a2a2e; overflow: hidden; margin: 14px 0 8px; } .portal .bar i { display: block; height: 100%; width: var(--v); background: linear-gradient(90deg, #cbb683, #f1e6ff); border-radius: inherit; }
+  .portal small { color: #8e8e93; } .portal ul { list-style: none; } .portal li { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid #26262a; font-size: .9rem; } .portal li:first-child { border-top: 0; }
+  .fine { font-size: .82rem; color: var(--muted); margin-top: 26px; max-width: 46em; }
+  @media (max-width: 960px) {
+    .ladder { grid-template-columns: 1fr 1fr; } .calc2, .portal main { grid-template-columns: 1fr; } .portal { grid-template-columns: 1fr; } .portal aside { display: none; }
+    .fan .badge { --w: 120px; margin: 0 -14px; } .fan { height: 200px; }
+  }

@@ -188,7 +188,7 @@ P['africa'] = dict(
 )
 
 P['credit'] = dict(
-    file='tfn-credit.html', name='Credit', kicker='TFN Credit', dark=True, finish='p-credit', acc='#d9dbdf', accink='#000', tier='Finance',
+    file='tfn-credit.html', name='Credit', kicker='TFN Credit', dark=True, finish='p-credit', acc='#e0559a', tier='Finance',
     blurb='Fuel now and pay your bank later.',
     title='Fuel now, pay your bank later',
     sub='Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN, you repay your bank monthly, and you set spending limits per driver and truck.',
@@ -222,6 +222,7 @@ ORDER = ['road', 'lcv', 'nonfuel', 'network', 'home', 'africa', 'credit']
 
 def nav(current=None):
     links = ''.join('<a href="%s"%s>%s</a>' % (P[k]['file'], ' aria-current="page"' if k == current else '', P[k]['name']) for k in ORDER)
+    links += '<a href="tfn-tiers.html"%s>Tiers</a>' % (' aria-current="page"' if current == 'tiers' else '')
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#logo"/></svg></a>'
             '<nav class="links" aria-label="Products">%s</nav><span class="grow"></span><a class="btn" href="tfn-page-examples.html#f">Get a quote</a></div></header>' % links)
 
@@ -237,7 +238,7 @@ def later_tiles():
 
 
 def footer():
-    prod = ''.join('<li><a href="%s">%s</a></li>' % (P[k]['file'], P[k]['name']) for k in ORDER)
+    prod = ''.join('<li><a href="%s">%s</a></li>' % (P[k]['file'], P[k]['name']) for k in ORDER) + '<li><a href="tfn-tiers.html">Tiers</a></li>'
     return ('<footer data-dark><div class="wrap"><div class="cols">'
             '<div><h4>Products</h4><ul><li><a href="tfn-products.html">All products</a></li>%s</ul></div>'
             '<div><h4>Plan and save</h4><ul><li><a href="https://tfn.co.za/tfn-network-map/">Network map</a></li><li><a href="https://tfn.co.za/price-list/">Fuel prices</a></li><li><a href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></li><li><a href="https://tfn.co.za/fuel-insights/">Fuel price outlook</a></li></ul></div>'
@@ -305,7 +306,7 @@ def hub():
     intro = '''<section class="intro"><div class="wrap">
 <p class="kicker" style="justify-content:center">Truckers Hub <span class="soon">Coming soon</span></p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one place</h1>
 <p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork, with no cards, no cash and no slips. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for your fleet managers.</p>
-<div class="range">%s%s</div></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
+<div class="range">%s%s</div><p style="margin-top:40px"><a class="btn" href="tfn-tiers.html">The more you fuel, the less you pay: see the tiers</a></p></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
     hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one fleet manager portal, and holds the things every product needs, so you set them up once.</p>
 <div class="steps3" style="--acc:#1f1f1f;grid-template-columns:repeat(2,1fr)">
 <div><h3>The driver app</h3><p>On the driver’s phone: see orders, ask for fuel, fill up and book a stop. Drivers only see what they need to do the job.</p></div>
@@ -328,7 +329,55 @@ def hub():
     return page('TFN | Products and Truckers Hub', 'TFN products: On-Road, LCV, Non-Fuel, Network, Homebase, TFN Africa and Credit. Truckers Hub, coming soon, brings them into one driver app and one fleet manager portal.', body)
 
 
+# ---------- tiers: TFN's own volume ladder from tfn.co.za/price-list (monthly on-road litres, discount per litre) ----------
+TIERS = [
+    ('bronze', 'Bronze', 0, 10000, 0),
+    ('silver', 'Silver', 10000, 30000, 2),
+    ('gold', 'Gold', 30000, 50000, 4),
+    ('diamond', 'Diamond', 50000, 150000, 6),
+    ('platinum', 'Platinum', 150000, None, 8),
+]
+
+
+def badge(key, name, extra=''):
+    return '<div class="badge t-%s"%s><svg aria-hidden="true"><use href="#logo"/></svg><b>%s</b></div>' % (key, extra, name)
+
+
+def litres(lo, hi):
+    f = lambda n: '{:,}'.format(n).replace(',', ' ')
+    return 'Under %s L' % f(hi) if lo == 0 else ('%s L and up' % f(lo) if hi is None else '%s to %s L' % (f(lo), f(hi)))
+
+
+def tiers_page():
+    fan = ''.join(badge(k, n, ' style="--i:%d;--r:%ddeg"' % (min(i, 4 - i), (i - 2) * 7)) for i, (k, n, lo, hi, d) in enumerate(TIERS))
+    hero = """<section class="tiers-hero" data-dark><div class="wrap">
+<p class="kicker" style="justify-content:center;color:#a8a8a8">TFN tiers</p>
+<h1>The more you fuel, the less you pay</h1>
+<p class="sub">Every TFN account has a tier, set by how much diesel your trucks buy on the road each month. Move up a tier and every litre costs less.</p>
+<a class="btn light" href="#calc">Find my tier</a>
+<div class="fan" aria-hidden="true">%s</div></div></section>""" % fan
+    ladder = ''.join('<div>%s<h3>%s</h3><span class="lit">%s a month</span><span class="disc">%s<small>%s</small></span></div>' % (
+        badge(k, n), n, litres(lo, hi), ('%dc off' % d) if d else 'Network price', 'every litre of diesel' if d else 'below the grid price')
+        for k, n, lo, hi, d in TIERS)
+    steps = """<section class="band"><div class="wrap"><h2>Five tiers, the same app</h2><p class="sub">Everyone gets the same TFN app and the same network. Your tier changes what you pay, not how it works.</p>
+<div class="ladder">%s</div>
+<p class="fine">Tiers are based on your monthly on-road diesel volume across your whole account. Your Homebase fee is also set by your on-road tier. Prices and discounts are indicative; final pricing may vary by depot, grid zone and account.</p></div></section>""" % ladder
+    calc = """<section class="band grey" id="calc"><div class="wrap"><h2>What tier would you be?</h2><p class="sub">Slide to your monthly on-road diesel.</p>
+<div class="calc2" data-tiers='%s'>
+<div><label for="tlit">Litres a month</label><output id="tout" for="tlit">40 000 L</output><input type="range" id="tlit" min="0" max="200000" step="1000" value="40000"></div>
+<div class="res" aria-live="polite"><div id="tbadge">%s</div><dl><dt>Tier</dt><dd id="tname">Gold</dd><dt>Off every litre</dt><dd id="tdisc">4c</dd><dt>Saving a month</dt><dd id="tsave">R 1 600</dd><dt>To the next tier</dt><dd id="tnext">10 000 L to Diamond</dd></dl></div>
+</div></div></section>""" % (html.escape(__import__('json').dumps([[k, n, lo, hi, d] for k, n, lo, hi, d in TIERS])), badge('gold', 'Gold'))
+    portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal <span class="soon">Coming soon</span></p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one, and what it’s saving you, in the Truckers Hub fleet manager portal.</p>
+<div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
+<main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
+<div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
+    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
+    body = nav('tiers') + '\n<main>\n' + hero + steps + calc + portal + close + '\n</main>\n' + footer()
+    return page('TFN tiers | The more you fuel, the less you pay', 'TFN tiers: Bronze, Silver, Gold, Diamond and Platinum, set by monthly on-road diesel volume. Move up a tier and every litre costs less.', body)
+
+
 if __name__ == '__main__':
+    (ROOT / 'tfn-tiers.html').write_text(tiers_page())
     (ROOT / 'tfn-products.html').write_text(hub())
     for k in ORDER:
         (ROOT / P[k]['file']).write_text(product_page(k))

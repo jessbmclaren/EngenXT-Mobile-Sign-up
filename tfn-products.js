@@ -19,3 +19,19 @@ document.querySelectorAll('.s .qr').forEach(function (q) {
   function check() { var on = false; dark.forEach(function (d) { var r = d.getBoundingClientRect(); if (r.top <= 72 && r.bottom > 72) on = true; }); nav.classList.toggle('dark', on); }
   addEventListener('scroll', check, { passive: true }); check();
 })();
+
+// tiers: the "what tier would you be?" slider, using TFN's own ladder
+(function () {
+  var box = document.querySelector('.calc2[data-tiers]'); if (!box) return;
+  var T = JSON.parse(box.dataset.tiers), r = document.getElementById('tlit'), sp = function (n) { return n.toLocaleString('en-ZA').replace(/,/g, ' '); };
+  function upd() {
+    var l = +r.value, i = T.findIndex(function (t) { return t[3] === null || l < t[3]; }), t = T[i], nx = T[i + 1];
+    document.getElementById('tout').textContent = sp(l) + ' L';
+    document.getElementById('tname').textContent = t[1];
+    document.getElementById('tdisc').textContent = t[4] ? t[4] + 'c' : 'Network price';
+    document.getElementById('tsave').textContent = 'R ' + sp(Math.round(l * t[4] / 100));
+    document.getElementById('tnext').textContent = nx ? sp(nx[2] - l) + ' L to ' + nx[1] : 'Top tier';
+    var b = document.querySelector('#tbadge .badge'); b.className = 'badge t-' + t[0]; b.querySelector('b').textContent = t[1];
+  }
+  r.addEventListener('input', upd); upd();
+})();
