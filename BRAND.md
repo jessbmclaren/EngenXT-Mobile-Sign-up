@@ -44,7 +44,7 @@ two differ.
   The one exception is the orb's **All** state, a soft pastel mix of blue,
   green and purple taken from the old swirl logo. Never orange, never gold.
 - **Photos stay natural.** No duotones or cut-outs: colour in a photo comes
-  from real light (blue office at night, dusk, golden hour).
+  from real light (a blue office at night, blue hour, daylight), never orange.
 - **Maps are dark by default.**
 - **Coins are silver.**
 - **State:** green means fine, red means it needs you, grey means coming up.
@@ -90,9 +90,12 @@ Buttons are always full pills, black on light and white on black.
 - **The main people are the buyers:** logistics, operations and tech-minded
   managers at work, at a laptop or on a warehouse floor. Candid, not posed, and
   never another person-on-a-phone shot.
-- **Supporting scenes:** trucks on the road at dusk, a hand on the nozzle,
-  trucks from above, farm diesel at golden hour. Cinematic, no fuel-brand
-  forecourts.
+- **Supporting scenes:** trucks at night or at blue hour, a hand on the
+  nozzle, trucks from above, open southern African roads. Cinematic, no
+  fuel-brand forecourts. No farming.
+- **Cool light, not orange.** Blue hour, night, overcast or clear daylight.
+  No orange sunsets or golden hour: orange photos on black sections read as
+  Halloween.
 - **South African context:** left-hand traffic and European cab-over trucks,
   no American conventionals. A right-hand-traffic road photo can be mirrored
   if no text shows.
