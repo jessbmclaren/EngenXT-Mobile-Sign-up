@@ -55,6 +55,17 @@ two differ.
 - **One app.** Every product shows the same neutral phone; only the accent changes.
   The TFN wordmark sits top-left of every screen and the portal sidebar, the way
   Revolut places its mark.
+- **A little orange.** `#f2761d` is the one warm spark: live dots, savings, the best
+  price, a low-tank or over-limit warning. Small, on white or dark grey, never a
+  fill and never orange on black.
+- **Every product page shows its portal.** A fleet manager portal view below the
+  hero does that product's one job, interactively: live fills on a map (On-Road),
+  rules deciding a request (LCV), booking a stop (Non-Fuel), route and saving
+  (Network), a glass tank (Homebase, the one 3D object), a cross-border corridor
+  (TFN Africa) and credit limits (Credit). 3D stays restrained: the portal tilts in
+  as it arrives, phones lean toward the pointer.
+- **Dark mode.** Product pages and app screens follow the visitor's setting, with a
+  toggle in the nav.
 - **Photos stay natural.** No duotones or cut-outs: colour in a photo comes
   from real light (a blue office at night, blue hour, daylight), never orange.
 - **Maps are dark by default.**
