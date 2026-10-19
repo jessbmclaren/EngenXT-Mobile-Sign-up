@@ -58,6 +58,10 @@ two differ.
 - **A little orange.** `#f2761d` is the one warm spark: live dots, savings, the best
   price, a low-tank or over-limit warning. Small, on white or dark grey, never a
   fill and never orange on black.
+- **Orange is never a call to action.** No orange buttons, links, selected tabs, pills,
+  toggles or route lines. Orange means status (live, new, saving, warning), so an
+  orange button would read as an alert, not an action. Calls to action stay ink on
+  light grounds and white on dark; inside app screens the accent is TFN blue.
 - **Every product page shows its portal.** A fleet manager portal view below the
   hero does that product's one job, interactively: live fills on a map (On-Road),
   rules deciding a request (LCV), booking a stop (Non-Fuel), route and saving
