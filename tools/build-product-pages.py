@@ -183,7 +183,7 @@ P['africa'] = dict(
 )
 
 P['credit'] = dict(
-    file='tfn-credit.html', name='Credit', kicker='TFN Credit', dark=True, finish='p-credit', acc='#b0436e', tier='Finance',
+    file='tfn-credit.html', name='Credit', kicker='TFN Credit', dark=True, finish='p-credit', acc='#a2468e', tier='Finance',
     blurb='Fuel now and pay your bank later.',
     title='Fuel now, pay your bank later',
     sub='Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN, you repay your bank monthly, and you set spending limits per driver and truck.',
@@ -221,7 +221,7 @@ def nav(current=None):
     links = ''.join('<a href="%s"%s>%s</a>' % (P[k]['file'], ' aria-current="page"' if k == current else '', P[k]['name']) for k in ORDER)
     links += '<a href="tfn-tiers.html"%s>Tiers</a>' % (' aria-current="page"' if current == 'tiers' else '')
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#logo"/></svg></a>'
-            '<nav class="links" aria-label="Products">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="btn" href="tfn-page-examples.html#f">Get a quote</a></div></header>' % links)
+            '<nav class="links" aria-label="Products">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="btn" href="tfn-page-examples.html#f">Get a fuel quote</a></div></header>' % links)
 
 
 def tile(k):
@@ -289,7 +289,7 @@ PORTAL = {
    '<div class="outcome" data-out="mgr"><span class="who">You see</span><b></b><small></small></div></div></div>', 'rules'),
  'nonfuel': ('TFN Dashboard', 'Plan tonight’s stop', 'Pick where the truck stops tonight, see what’s on offer there, and book it on the same account as the diesel.', 'Orders',
    '<div class="pf-grid"><div class="pf-card"><h4>Tonight’s stop for TFN 204 GP</h4><div class="seg" data-stops role="group" aria-label="Truck stop"></div>'
-   '<p style="font-size:.84rem;color:#8e8e93;margin:16px 0 10px">Services at this stop</p><div class="tog" data-svc role="group" aria-label="Services"></div></div>'
+   '<p class="pfnote" style="font-size:.84rem;margin:16px 0 10px">Services at this stop</p><div class="tog" data-svc role="group" aria-label="Services"></div></div>'
    '<div class="pf-card"><h4>Booked <span data-count>0</span></h4><ul class="feed" data-booked></ul><div class="outcome ok" style="margin-top:12px"><b>On your TFN account</b><small>Paid with the diesel, on one statement</small></div></div></div>', 'stop'),
  'network': ('TFN Dashboard', 'Plan the cheapest route', 'Choose a route and see where to fill up. Set your truck’s consumption to see what the trip saves.', 'Live map',
    '<div class="seg" data-routes role="group" aria-label="Route"></div>'
@@ -310,7 +310,7 @@ PORTAL = {
    '<div class="pf-grid"><div class="pf-card"><h4>Weekly limits</h4><div class="ctl" data-limits></div></div>'
    '<div class="pf-card"><h4>How you repay</h4><div class="tl"><div><b>All month</b>Fuel on credit</div><div><b>1 Nov</b>Statement</div><div><b>1 Dec</b>Repay your bank</div></div>'
    '<div class="bars" style="margin-top:22px"><div><span>Allocated of your facility <b data-k="usedp">0%</b></span><i data-b="used" style="--v:26%"></i></div></div>'
-   '<p style="font-size:.8rem;color:#8e8e93;margin-top:14px">Through Standard Bank, Absa or Preference Capital. Terms are set by your credit provider.</p></div></div>', 'limits'),
+   '<p class="pfnote" style="font-size:.8rem;margin-top:14px">Through Standard Bank, Absa or Preference Capital. Terms are set by your credit provider.</p></div></div>', 'limits'),
 }
 
 

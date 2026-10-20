@@ -13,7 +13,7 @@ document.querySelectorAll('.s .qr').forEach(function (q) {
   q.innerHTML = html;
 });
 
-// the nav turns dark over the dark products, as Revolut's does on Business and Ultra
+// the nav turns dark over the dark products, so it never sits as a white bar on black
 (function () {
   var nav = document.querySelector('.nav'), dark = document.querySelectorAll('[data-dark]');
   function check() { var on = false; dark.forEach(function (d) { var r = d.getBoundingClientRect(); if (r.top <= 72 && r.bottom > 72) on = true; }); nav.classList.toggle('dark', on); }
@@ -63,6 +63,19 @@ if ('IntersectionObserver' in window) {
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); e.target.dispatchEvent(new Event('pfin')); io.unobserve(e.target); } }); }, { threshold: .25 });
   pfs.forEach(function (p) { io.observe(p); });
 } else pfs.forEach(function (p) { p.classList.add('in'); });
+// ---------- each portal shows itself working once, as it arrives; the first touch hands it over ----------
+function demo(pf, play, wait) {
+  if (REDUCE) return;
+  var off = false; ['pointerdown', 'keydown', 'wheel'].forEach(function (t) { pf.addEventListener(t, function () { off = true; }, { once: true, passive: true }); });
+  function go() { setTimeout(function () { if (!off) play(function () { return off; }); }, wait == null ? 450 : wait); }
+  if (pf.classList.contains('in')) go(); else pf.addEventListener('pfin', go, { once: true });
+}
+// a figure counts up to what it says, keeping its words: "R 4 210", "62%", "1 400 km"
+function roll(el, from, ms) {
+  if (!el || REDUCE) return; var t = el.textContent, m = t.match(/\d[\d\s,\u00a0\u202f]*/); if (!m) return;
+  var to = +m[0].replace(/\D/g, ''), a = from || 0, pre = t.slice(0, m.index), post = t.slice(m.index + m[0].length).replace(/^\s*/, function (w) { return /\s$/.test(m[0]) ? ' ' : w; }), t0 = performance.now();
+  (function f(now) { var k = Math.min(1, (now - t0) / (ms || 1100)), e = 1 - Math.pow(1 - k, 3); el.textContent = pre + SP(a + (to - a) * e) + post; if (k < 1) requestAnimationFrame(f); })(t0);
+}
 
 // a stylised map of the main truck routes (not to scale)
 var CITY = { pol: [440, 62, 'Polokwane'], pta: [418, 130, 'Pretoria'], jhb: [402, 152, 'Johannesburg'], mid: [478, 140, 'Middelburg'], mbo: [548, 128, 'Mbombela'],
@@ -77,7 +90,9 @@ function baseMap(svgHost, routeKey) {
   if (routeKey) s += '<polyline class="route" points="' + pts(routeKey) + '"/>';
   Object.keys(CITY).forEach(function (c) { var p = CITY[c]; s += '<circle class="city" cx="' + p[0] + '" cy="' + p[1] + '" r="3.5"/><text x="' + (p[0] + 7) + '" y="' + (p[1] + 3) + '">' + p[2] + '</text>'; });
   s += '</g><g data-pings></g></svg>'; svgHost.innerHTML = s;
-  var rt = svgHost.querySelector('.route'); if (rt) { var L = rt.getTotalLength(); rt.style.setProperty('--len', L); requestAnimationFrame(function () { requestAnimationFrame(function () { rt.classList.add('on'); }); }); }
+  var rt = svgHost.querySelector('.route'); if (rt) { var L = rt.getTotalLength(), pf = svgHost.closest('.pf'); rt.style.setProperty('--len', L);
+    var on = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { rt.classList.add('on'); }); }); };
+    if (!pf || pf.classList.contains('in')) on(); else pf.addEventListener('pfin', on, { once: true }); }
   return svgHost.querySelector('[data-pings]');
 }
 
@@ -114,24 +129,32 @@ var MODS = {
       mgr.querySelector('b').textContent = ok ? (v.ask > v.tank ? 'Capped at the tank size, ' + v.tank + ' L' : 'Within the rules') : 'Daily limit reached';
       mgr.querySelector('small').textContent = ok ? ('Asked for ' + v.ask + ' L · fill ' + (v.done + 1) + ' of ' + v.per + ' today') : (v.per + ' fill' + (v.per > 1 ? 's' : '') + ' a day allowed, ' + v.done + ' already today');
     }
-    pf.querySelectorAll('[data-i]').forEach(function (i) { i.addEventListener('input', run); }); run();
+    pf.querySelectorAll('[data-i]').forEach(function (i) { i.addEventListener('input', run); });
+    if (REDUCE) { run(); return; }
+    var drv = pf.querySelector('[data-out="drv"]'), mgr = pf.querySelector('[data-out="mgr"]'), done = false, fin = function () { if (!done) { done = true; run(); } };
+    drv.className = mgr.className = 'outcome wait';
+    drv.querySelector('b').textContent = 'Asking for ' + o('ask').textContent; drv.querySelector('small').textContent = 'Checking the rules';
+    mgr.querySelector('b').textContent = 'New request'; mgr.querySelector('small').textContent = 'CA 482-913 · just now';
+    pf.addEventListener('pointerdown', fin, { once: true }); pf.addEventListener('keydown', fin, { once: true });
+    demo(pf, function () { setTimeout(fin, 1300); }, 300);
   },
   // Non-Fuel: choose the stop, toggle the services it has
   stop: function (pf) {
     var S = [['Harrismith, N3', ['Overnight parking', 'Shower', 'Canteen', 'AdBlue', 'Truck wash']], ['Kroonstad, N1', ['Overnight parking', 'Shower', 'Laundry', 'AdBlue']], ['Middelburg, N4', ['Overnight parking', 'AdBlue', 'Truck wash', 'Shop']]];
-    var ALL = ['Overnight parking', 'Shower', 'Canteen', 'Laundry', 'AdBlue', 'Truck wash', 'Shop'], cur = 0, on = { 'Overnight parking': 1, 'Shower': 1 };
+    var ALL = ['Overnight parking', 'Shower', 'Canteen', 'Laundry', 'AdBlue', 'Truck wash', 'Shop'], cur = 0, on = REDUCE ? { 'Overnight parking': 1, 'Shower': 1 } : { 'Overnight parking': 1 }, had = [];
     var sb = pf.querySelector('[data-stops]'), sv = pf.querySelector('[data-svc]'), bk = pf.querySelector('[data-booked]');
     sb.innerHTML = S.map(function (x, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + x[0] + '</button>'; }).join('');
     function draw() {
       var has = S[cur][1];
       sv.innerHTML = ALL.map(function (x) { var a = has.indexOf(x) > -1; return '<button type="button" ' + (a ? '' : 'disabled style="opacity:.35;cursor:not-allowed" ') + 'aria-pressed="' + (a && !!on[x]) + '">' + x + '</button>'; }).join('');
       var list = has.filter(function (x) { return on[x]; });
-      bk.innerHTML = list.length ? list.map(function (x) { return '<li><i></i><span><b>' + x + '</b><small>' + S[cur][0] + ' · tonight</small></span><span>✓</span></li>'; }).join('') : '<li><span></span><span><small>Nothing booked yet</small></span><span></span></li>';
-      pf.querySelector('[data-count]').textContent = list.length;
+      bk.innerHTML = list.length ? list.map(function (x) { return '<li' + (had.indexOf(x) > -1 ? ' style="animation:none"' : '') + '><span><b>' + x + '</b><small>' + S[cur][0] + ' · tonight</small></span><span class="bk-ok" aria-label="Booked">✓</span></li>'; }).join('') : '<li><span><small>Nothing booked yet</small></span><span></span></li>';
+      pf.querySelector('[data-count]').textContent = list.length; had = list;
     }
     sb.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cur = [].indexOf.call(sb.children, b); [].forEach.call(sb.children, function (x, i) { x.setAttribute('aria-pressed', i === cur); }); draw(); });
     sv.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b || b.disabled) return; on[b.textContent] = !on[b.textContent]; draw(); });
     draw();
+    demo(pf, function (off) { if (off() || cur) return; on['Shower'] = 1; draw(); }, 900);
   },
   // Network: pick a route, see the stops, the best price and the trip saving
   route: function (pf) {
@@ -143,12 +166,16 @@ var MODS = {
     function calc() { var r = R[cur], c = +cons.value, l = r[2] * c / 100; pf.querySelector('[data-o="cons"]').textContent = c + ' L/100 km'; k('dist').textContent = SP(r[2]) + ' km'; k('lit').textContent = SP(l) + ' L'; k('save').textContent = 'R ' + SP(l * .55); }
     function draw() {
       var r = R[cur], best = r[3].reduce(function (a, b) { return b[1] < a[1] ? b : a; });
-      baseMap(map, r[0]); k('rname').textContent = r[1];
-      list.innerHTML = r[3].map(function (s) { var b = s === best; return '<li' + (b ? ' class="new"' : '') + '><i></i><span><b>' + s[0] + '</b><small>' + (b ? 'Best price on this route' : 'TFN truck stop') + '</small></span><span><b' + (b ? ' style="color:var(--spark)"' : '') + '>R ' + s[1].toFixed(2) + '</b></span></li>'; }).join('');
+      var g = baseMap(map, r[0]); k('rname').textContent = r[1];
+      var STOPXY = { Heidelberg: [414, 169], Harrismith: CITY.har, Pietermaritzburg: CITY.pmb, Kroonstad: CITY.kro, Colesberg: CITY.col, 'Beaufort West': CITY.bfw, Middelburg: CITY.mid, Mbombela: CITY.mbo };
+      g.innerHTML = r[3].map(function (st, i) { var c = STOPXY[st[0]], b = st === best, tx = 'R ' + st[1].toFixed(2), w = tx.length * 6.6 + 16;
+        return '<g class="stopm' + (b ? ' best' : '') + '" style="--dl:' + (1.25 + i * .18).toFixed(2) + 's"><circle class="ping" cx="' + c[0] + '" cy="' + c[1] + '" r="5"/><rect class="lblbg" x="' + (c[0] - 10 - w) + '" y="' + (c[1] - 9) + '" width="' + w + '" height="18" rx="9"/><text class="lbl" x="' + (c[0] - 10 - w / 2) + '" y="' + (c[1] + 3.5) + '" text-anchor="middle">' + tx + '</text></g>'; }).join('');
+      list.innerHTML = r[3].map(function (s) { var b = s === best; return '<li' + (b ? ' class="new"' : '') + '><i></i><span><b>' + s[0] + '</b><small>' + (b ? 'Best price on this route' : 'TFN truck stop') + '</small></span><span><b' + (b ? ' style="color:var(--acc)"' : '') + '>R ' + s[1].toFixed(2) + '</b></span></li>'; }).join('');
       calc();
     }
     sb.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cur = [].indexOf.call(sb.children, b); [].forEach.call(sb.children, function (x, i) { x.setAttribute('aria-pressed', i === cur); }); draw(); });
     cons.addEventListener('input', calc); draw();
+    demo(pf, function () { ['dist', 'lit', 'save'].forEach(function (n) { roll(k(n), 0, 1400); }); }, 0);
   },
   // Homebase: the tank goes down with every fill and up with every delivery
   tank: function (pf) {
@@ -162,6 +189,10 @@ var MODS = {
       draw();
     });
     log('TFN 311 GP', 'Driver: Thabo M. · 07:12', '−380 L'); log('Delivery from TFN', 'Monday', '+8 000 L'); draw();
+    demo(pf, function (off) {
+      var b = pf.querySelector('[data-act="fill"]'), was = lvl; b.classList.add('press');
+      setTimeout(function () { b.classList.remove('press'); if (off()) return; b.click(); roll(pf.querySelector('[data-k="lvl"]'), was, 1200); }, 260);
+    }, 800);
   },
   // TFN Africa: follow the truck along a corridor, every fill in rand
   corridor: function (pf) {
@@ -192,18 +223,29 @@ var MODS = {
     sb.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cur = [].indexOf.call(sb.children, b); [].forEach.call(sb.children, function (x, i) { x.setAttribute('aria-pressed', i === cur); }); draw(); });
     pf.addEventListener('pfin', draw, { once: true }); if (pf.classList.contains('in')) draw();
   },
-  // Credit: share the facility; anything over it shows in orange
+  // Credit: share the facility; going over it says so in words
   limits: function (pf) {
     var L = [['TFN 204 GP', 'Truck', 12000], ['TFN 311 GP', 'Truck', 9000], ['Sipho K.', 'Driver', 3000], ['Mokoena Haulage', 'Subcontractor', 15000]], fac = 250000;
     var host = pf.querySelector('[data-limits]');
-    host.innerHTML = L.map(function (l, i) { return '<div><label>' + ESC(l[0]) + ' <small style="color:#8e8e93">' + l[1] + '</small><b data-o="l' + i + '">R ' + SP(l[2]) + '</b></label><input type="range" data-i="' + i + '" min="0" max="40000" step="500" value="' + l[2] + '" aria-label="Weekly limit for ' + ESC(l[0]) + '"></div>'; }).join('');
+    host.innerHTML = L.map(function (l, i) { return '<div><label>' + ESC(l[0]) + ' <small>' + l[1] + '</small><b data-o="l' + i + '">R ' + SP(l[2]) + '</b></label><input type="range" data-i="' + i + '" min="0" max="40000" step="500" value="' + l[2] + '" aria-label="Weekly limit for ' + ESC(l[0]) + '"></div>'; }).join('');
     function run() {
       var sum = 0; host.querySelectorAll('[data-i]').forEach(function (i) { sum += +i.value * 4; pf.querySelector('[data-o="l' + i.dataset.i + '"]').textContent = 'R ' + SP(+i.value); });
       pf.querySelector('[data-k="alloc"]').textContent = 'R ' + SP(sum) + ' a month';
       var free = fac - sum, f = pf.querySelector('[data-k="free"]'); f.textContent = (free < 0 ? 'Over by R ' : 'R ') + SP(Math.abs(free)); f.previousElementSibling.textContent = free < 0 ? 'Over your facility' : 'Not allocated';
       var u = Math.min(100, Math.round(sum / fac * 100)); pf.querySelector('[data-k="usedp"]').textContent = u + '%'; pf.querySelector('[data-b="used"]').style.setProperty('--v', u + '%');
     }
-    host.addEventListener('input', run); run();
+    host.addEventListener('input', run);
+    if (REDUCE) { run(); return; }
+    var ins = [].slice.call(host.querySelectorAll('[data-i]')), want = ins.map(function (i) { return +i.value; });
+    ins.forEach(function (i) { i.value = i.min || 0; }); run();
+    var settle = function () { ins.forEach(function (i, j) { if (i !== document.activeElement && +i.value < want[j]) i.value = want[j]; }); run(); };
+    pf.addEventListener('pointerdown', settle, { once: true }); pf.addEventListener('keydown', settle, { once: true });
+    demo(pf, function (off) {
+      var t0 = performance.now();
+      (function f(now) { if (off()) return; var k = Math.min(1, (now - t0) / 1300);
+        ins.forEach(function (i, j) { var q = Math.max(0, Math.min(1, k * 1.3 - j * .1)), e = 1 - Math.pow(1 - q, 3); i.value = Math.round(((+i.min || 0) + (want[j] - (+i.min || 0)) * e) / (+i.step || 1)) * (+i.step || 1); });
+        run(); if (k < 1) requestAnimationFrame(f); else settle(); })(t0);
+    }, 150);
   }
 };
 document.querySelectorAll('.pf[data-mod]').forEach(function (pf) { var m = MODS[pf.dataset.mod]; if (m) m(pf); });

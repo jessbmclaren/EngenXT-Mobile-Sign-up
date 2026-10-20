@@ -49,17 +49,17 @@ two differ.
 - **Colour says which product, the finish says your tier.** Product pages are
   white, told apart by a faint gradient wash and one muted accent: On-Road blue
   `#2a6fd0`, LCV cyan `#0e8fb3`, Non-Fuel slate `#4f6b8a`, Network indigo `#3346a8`,
-  Homebase teal `#138a85`, TFN Africa violet `#6b62c9` (accent only), Credit rose
-  `#b0436e` (accent only). No pastel toys, neon, coins or glows: it must never look
+  Homebase teal `#138a85`, TFN Africa violet `#6b62c9` (accent only), Credit plum
+  `#a2468e` (accent only). No pastel toys, neon, coins or glows: it must never look
   childish. **Black is for premium** (the tiers page). Tiers are materials, never
   hues: brushed bronze, silver, pale gold, clear prismatic glass (Diamond) and
   brushed platinum on black, shown as a squircle badge, not a card. TFN's own volume
   ladder (tfn.co.za/price-list).
 - **One app.** Every product shows the same neutral phone; only the accent changes.
   The TFN wordmark sits top-left of every screen and the portal sidebar.
-- **A little orange.** `#f2761d` is the one warm spark: live dots, savings, the best
-  price, a low-tank or over-limit warning. Small, on white or dark grey, never a
-  fill and never orange on black.
+- **TFN orange, a tiny flash.** `#f2761d` is only a small live or new dot on light screens.
+  On dark screens live uses the product colour; warnings (low tank, over limit) use red.
+  Never a fill, never a big number, never on black.
 - **Orange is never a call to action.** No orange buttons, links, selected tabs, pills,
   toggles or route lines. Orange means status (live, new, saving, warning), so an
   orange button would read as an alert, not an action. Calls to action stay ink on
@@ -72,9 +72,11 @@ two differ.
   as it arrives, phones lean toward the pointer.
 - **Dark mode.** Product pages and app screens follow the visitor's setting, with a
   toggle in the nav.
-- **Photos: real, with a brand-hue background.** Real photography only, never AI-generated
-  people, trucks or places. The signature treatment cuts the subject out and sets the
-  background to one product hue; people keep their natural colour. Light is cool, never orange.
+- **Photos: real, coloured by real light.** Real photography first. AI only if no one could tell
+  (no uncanny eyes, odd hands, waxy skin or melted text); almost real reads as fake. Colour comes from the light in the scene: deep navy, teal, graphite, white
+  and grey, low saturation, soft contrast. Pink or violet only when really in the scene (a dusk
+  sky, a screen's glow), never painted on. Never a cut-out person on a flat colour: people stay in
+  a real place; studio backdrops are for products only. Light is cool, never orange.
 - **Maps are dark by default.**
 - **Coins are silver.**
 - **State:** green means fine, red means it needs you, grey means coming up.
@@ -152,6 +154,15 @@ Short, warm, confident and plain, with a little playfulness. It says what you ge
 Things arrive, they do not bounce: content rises and fades in once, devices
 fan out, numbers count up, colour drifts slowly. Everything stops when the
 viewer has reduced motion switched on.
+
+- **Orbs breathe like clouds.** The colour inside an orb gathers, thins and rolls
+  on like cloud, slowly and never repeating, never in step with its neighbours;
+  the circle and its grain stay still.
+  Small orbs (24 px and under) and map pins do not move.
+- **Product screens show themselves working, once.** Each portal plays one short
+  moment as it scrolls into view (a request approved, a service booked, a route
+  drawn with its stops, a fill from the yard tank, limits filling up), then
+  hands over at the first touch. No loops.
 
 ## Tokens (as implemented in `tfn-page-examples.html`)
 

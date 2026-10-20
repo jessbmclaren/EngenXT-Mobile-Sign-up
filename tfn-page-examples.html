@@ -289,33 +289,33 @@
   .pmain { position: relative; }
   .ptop { height: 60px; display: flex; align-items: center; gap: 14px; padding: 0 24px; border-bottom: 1px solid #e6e6ea; background: #fff; }
   .ptop b { font-size: 17px; font-weight: 700; margin-right: auto; }
-  .psearch { display: flex; align-items: center; gap: 8px; width: 230px; padding: 8px 12px; border-radius: 10px; background: #f1f1f4; color: #8e8e93; } .psearch svg { width: 15px; height: 15px; }
+  .psearch { display: flex; align-items: center; gap: 8px; width: 230px; padding: 8px 12px; border-radius: 10px; background: #f1f1f4; color: #6e6e73; } .psearch svg { width: 15px; height: 15px; }
   .pbell { width: 19px; height: 19px; color: #444; } .pav { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #ffd6ea, #c23d86); }
   .pv { position: absolute; inset: 60px 0 0; padding: 20px 24px; opacity: 0; transform: translateY(12px); transition: opacity .45s, transform .6s var(--ease); }
   .pv.on { opacity: 1; transform: none; }
   .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .kpi, .pcard { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-  .kpi small { color: #8e8e93; } .kpi b { display: block; font-size: 26px; letter-spacing: -.02em; margin: 6px 0 2px; } .kpi em { font-style: normal; color: #1a9b55; font-weight: 600; font-size: 12px; }
+  .kpi small { color: #6e6e73; } .kpi b { display: block; font-size: 26px; letter-spacing: -.02em; margin: 6px 0 2px; } .kpi em { font-style: normal; color: #157a43; font-weight: 600; font-size: 12px; }
   .pv.on .kpi { animation: up .6s var(--ease) both; } .pv.on .kpi:nth-child(2) { animation-delay: .08s; } .pv.on .kpi:nth-child(3) { animation-delay: .16s; }
   .prow { display: grid; grid-template-columns: 1.7fr 1fr; gap: 14px; margin-top: 14px; }
-  .pch { display: flex; justify-content: space-between; margin-bottom: 10px; } .pch span { color: #8e8e93; }
+  .pch { display: flex; justify-content: space-between; margin-bottom: 10px; } .pch span { color: #6e6e73; }
   .pchart svg { width: 100%; height: 300px; display: block; overflow: visible; }
-  .pchart .line { fill: none; stroke: #6b3cc0; stroke-width: 2.5; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .pchart .line { fill: none; stroke: #2c56b8; stroke-width: 2.5; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
   .pv.on .pchart .line { stroke-dashoffset: 0; transition: stroke-dashoffset 1.8s var(--ease) .2s; }
   .pchart .area { fill: url(#pgrad); opacity: 0; } .pv.on .pchart .area { opacity: 1; transition: opacity 1s .9s; }
-  .pchart .pdot { fill: #6b3cc0; stroke: #fff; stroke-width: 3; opacity: 0; } .pv.on .pchart .pdot { opacity: 1; transition: opacity .4s 1.9s; animation: pulse 1.6s ease-in-out 2s infinite; transform-box: fill-box; transform-origin: center; }
+  .pchart .pdot { fill: #2c56b8; stroke: #fff; stroke-width: 3; opacity: 0; } .pv.on .pchart .pdot { opacity: 1; transition: opacity .4s 1.9s; animation: pulse 1.6s ease-in-out 2s infinite; transform-box: fill-box; transform-origin: center; }
   @keyframes pulse { 50% { transform: scale(1.35); } }
-  .plist2 li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid #f0f0f2; } .plist2 li span { margin-left: auto; color: #8e8e93; }
+  .plist2 li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid #f0f0f2; } .plist2 li span { margin-left: auto; color: #6e6e73; }
   .pv.on .plist2 li { animation: up .5s var(--ease) both; animation-delay: calc(var(--r) * 90ms + .3s); }
   .sd { width: 8px; height: 8px; border-radius: 50%; flex: none; } .sd.ok { background: #30c26b; } .sd.bad { background: #ff3b30; } .sd.wait { background: #c7c7cc; }
   .ptable { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
   .ptr { display: grid; grid-template-columns: .8fr 1.2fr .8fr 1fr .8fr; padding: 13px 18px; border-top: 1px solid #f0f0f2; align-items: center; gap: 8px; }
-  .ptr.h { color: #8e8e93; font-size: 12px; border-top: 0; background: #fafafb; } .ptr span:last-child { display: flex; align-items: center; gap: 8px; }
+  .ptr.h { color: #6e6e73; font-size: 12px; border-top: 0; background: #fafafb; } .ptr span:last-child { display: flex; align-items: center; gap: 8px; }
   .pv.on .ptr:not(.h) { animation: up .5s var(--ease) both; animation-delay: calc(var(--r) * 70ms); }
   .pmapc { position: relative; height: 500px; padding: 0; overflow: hidden; }
   .pmapc .amap, .pic .amap { position: absolute; inset: 0; }
   .plist { position: absolute; z-index: 3; left: 14px; top: 14px; width: 236px; border-radius: 16px; padding: 6px 14px; }
-  .plist div { display: flex; gap: 10px; align-items: center; padding: 9px 0; } .plist div + div { border-top: 1px solid rgba(0,0,0,.07); } .plist small { display: block; color: #8e8e93; font-size: 11px; }
+  .plist div { display: flex; gap: 10px; align-items: center; padding: 9px 0; } .plist div + div { border-top: 1px solid rgba(0,0,0,.07); } .plist small { display: block; color: #6e6e73; font-size: 11px; }
   .pv.on .plist { animation: up .6s var(--ease) .3s both; }
   .prep { display: grid; grid-template-columns: 1.7fr 1fr; gap: 14px; }
   .pbars { display: flex; align-items: flex-end; gap: 10px; height: 380px; padding-top: 12px; }
@@ -335,37 +335,37 @@
   .isl { position: absolute; left: 50%; top: 11px; width: 122px; height: 36px; margin-left: -61px; border-radius: 20px; background: #000; z-index: 7; }
   .pscr { position: absolute; inset: 0; padding: 62px 20px 100px; background: #f2f2f7; transition: transform .55s cubic-bezier(.32,.72,0,1), opacity .35s, filter .55s; }
   .pscr.hide { opacity: 0; } .pscr.right { transform: translateX(100%); } .pscr.left { transform: translateX(-30%); filter: brightness(.8); } .pscr.on { transform: none; opacity: 1; z-index: 2; }
-  .ah { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 18px; } .ah small { display: block; color: #8e8e93; font-size: 14px; } .ah b { font-size: 28px; letter-spacing: -.02em; } .ah i { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8fc0f5, #1f4fa8); }
+  .ah { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 18px; } .ah small { display: block; color: #6e6e73; font-size: 14px; } .ah b { font-size: 28px; letter-spacing: -.02em; } .ah i { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8fc0f5, #1f4fa8); }
   .abal { border-radius: 24px; padding: 22px; height: 184px; display: flex; flex-direction: column; }
   .abal small { opacity: .85; } .abal b { font-size: 38px; letter-spacing: -.03em; font-weight: 700; margin-top: 4px; }
   .abal .ch { margin-top: auto; display: flex; gap: 8px; } .abal .ch span { padding: 7px 13px; border-radius: 99px; font-size: 13px; font-weight: 600; }
   .aqa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 22px 0; text-align: center; font-size: 13px; font-weight: 500; }
   .aqa i { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 8px; border-radius: 50%; background: #fff; } .aqa svg { width: 24px; height: 24px; }
-  .ahd { display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; margin-bottom: 10px; } .ahd span { font-weight: 500; font-size: 14px; color: #8e8e93; }
+  .ahd { display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; margin-bottom: 10px; } .ahd span { font-weight: 500; font-size: 14px; color: #6e6e73; }
   .alist { background: #fff; border-radius: 20px; padding: 2px 16px; } .alist > div { display: flex; align-items: center; gap: 12px; padding: 13px 0; } .alist > div + div { border-top: 1px solid #f0f0f2; }
-  .alist .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; } .alist small { display: block; color: #8e8e93; font-size: 13px; } .alist b { margin-left: auto; }
+  .alist .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; } .alist small { display: block; color: #6e6e73; font-size: 13px; } .alist b { margin-left: auto; }
   .pscr.on .alist > div { animation: up .5s var(--ease) both; } .pscr.on .alist > div:nth-child(2) { animation-delay: .08s; } .pscr.on .alist > div:nth-child(3) { animation-delay: .16s; } .pscr.on .alist > div:nth-child(4) { animation-delay: .24s; }
   .anav { display: flex; align-items: center; justify-content: space-between; margin: 6px 0 18px; font-weight: 600; } .anav .back { font-size: 16px; } .anav b { font-size: 17px; } .anav span:last-child { width: 50px; }
   .aqr { background: #fff; border-radius: 26px; padding: 24px; text-align: center; }
   .aqr .q { width: 230px; height: 230px; margin: 4px auto 16px; } .aqr .q svg { width: 100%; height: 100%; display: block; } .aqr .q path { fill: #111; }
   .pscr.on .aqr .q { animation: qin .7s var(--ease) .15s both; } @keyframes qin { from { opacity: 0; transform: scale(.86); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
-  .aqr b { font-size: 30px; letter-spacing: -.02em; display: block; } .aqr small { color: #8e8e93; }
+  .aqr b { font-size: 30px; letter-spacing: -.02em; display: block; } .aqr small { color: #6e6e73; }
   .atimer { height: 6px; border-radius: 99px; background: #eee; margin-top: 18px; overflow: hidden; } .atimer i { display: block; height: 100%; background: #111; transform-origin: left; }
   .pscr.on .atimer i { animation: tmr 9s linear forwards; } @keyframes tmr { to { transform: scaleX(0); } }
   .aorder { text-align: left; } .aorder .aph { height: 130px; border-radius: 16px; margin: 14px 0 6px; background: #333 url(img/pay-nozzle.jpg) 50% 45% / cover; }
   .aok { list-style: none; } .aok li { padding: 10px 0; border-top: 1px solid #eee; font-size: 15px; font-weight: 500; } .aok li::before { content: "✓"; color: #1a9b55; font-weight: 700; margin-right: 10px; }
-  .anote { text-align: center; color: #8e8e93; margin-top: 16px; font-size: 14px; }
+  .anote { text-align: center; color: #6e6e73; margin-top: 16px; font-size: 14px; }
   .pscr.amapscr { padding: 0; } .pscr.amapscr .amap { position: absolute; inset: 0; }
   .asearch { position: absolute; z-index: 3; left: 14px; right: 14px; top: 58px; border-radius: 14px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; color: #6b6b6b; } .asearch svg { width: 18px; height: 18px; }
   .asheet { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 96px; border-radius: 26px; padding: 18px 18px 18px 20px; display: flex; align-items: center; gap: 12px; }
-  .asheet b { font-size: 19px; display: block; } .asheet small { color: #8e8e93; } .asheet .go { margin-left: auto; padding: 11px 20px; border-radius: 999px; background: #111; color: #fff; font-weight: 600; }
+  .asheet b { font-size: 19px; display: block; } .asheet small { color: #6e6e73; } .asheet .go { margin-left: auto; padding: 11px 20px; border-radius: 999px; background: #111; color: #fff; font-weight: 600; }
   .pscr.on .asheet { animation: sheet .7s var(--ease) .2s both; } @keyframes sheet { from { transform: translateY(140%); } to { transform: none; } }
   .ains h3 { font-size: 28px; letter-spacing: -.02em; margin: 8px 0 16px; font-weight: 700; }
   .adonut { position: relative; background: #fff; border-radius: 24px; padding: 22px; display: grid; place-items: center; margin-bottom: 14px; }
   .adonut svg { width: 196px; height: 196px; transform: rotate(-90deg); } .adonut circle { fill: none; stroke-width: 22; stroke-dasharray: 0 377; transition: stroke-dasharray 1.1s var(--ease); }
   .pscr.on .adonut circle { stroke-dasharray: var(--l) 377; } .pscr.on .adonut circle:nth-child(2) { transition-delay: .12s; } .pscr.on .adonut circle:nth-child(3) { transition-delay: .24s; } .pscr.on .adonut circle:nth-child(4) { transition-delay: .36s; }
-  .adonut .c { position: absolute; text-align: center; } .adonut .c b { display: block; font-size: 26px; letter-spacing: -.02em; } .adonut .c small { color: #8e8e93; }
-  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 86px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 10px 0; background: rgba(250,250,252,.88); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,.06); z-index: 5; font-size: 11px; text-align: center; color: #9a9aa0; font-weight: 500; }
+  .adonut .c { position: absolute; text-align: center; } .adonut .c b { display: block; font-size: 26px; letter-spacing: -.02em; } .adonut .c small { color: #6e6e73; }
+  .tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 86px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 10px 0; background: rgba(250,250,252,.88); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,.06); z-index: 5; font-size: 11px; text-align: center; color: #6e6e73; font-weight: 500; }
   .tb svg { display: block; width: 25px; height: 25px; margin: 0 auto 4px; } .tb { transition: color .3s; } .tb.on { color: #111; }
   .hbar { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #111; z-index: 7; }
   .tapdot { position: absolute; z-index: 8; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: rgba(0,0,0,.2); opacity: 0; pointer-events: none; }
@@ -379,7 +379,7 @@
   .ps { position: absolute; inset: 0; padding: 26px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0; transform: translateY(18px); transition: opacity .4s, transform .5s var(--ease); }
   .ps.on { opacity: 1; transform: none; }
   .ps .hd { width: calc(100% + 44px); margin: -26px -22px 18px; padding: 16px 22px; color: #fff; font-weight: 600; font-size: 14px; text-align: left; display: flex; justify-content: space-between; }
-  .ps small { color: #8e8e93; } .amt { font-size: 44px; font-weight: 700; letter-spacing: -.03em; margin: 2px 0 16px; }
+  .ps small { color: #6e6e73; } .amt { font-size: 44px; font-weight: 700; letter-spacing: -.03em; margin: 2px 0 16px; }
   .kp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; } .kp i { font-style: normal; height: 46px; border-radius: 12px; background: #f2f2f5; display: grid; place-items: center; font-size: 21px; font-weight: 600; transition: background .15s, transform .15s; }
   .kp i.press { background: #cfd0d6; transform: scale(.92); }
   .pnext { margin-top: 12px; width: 100%; padding: 13px; border-radius: 999px; background: #111; color: #fff; font-weight: 600; font-size: 16px; transition: transform .15s, background .15s; } .pnext.press { transform: scale(.95); background: #333; }
@@ -389,7 +389,7 @@
   .vq svg { width: 100%; height: 100%; display: block; } .vq path { fill: #111; }
   .laser { position: absolute; left: 18px; right: 18px; top: 20px; height: 2px; background: #ff3b30; box-shadow: 0 0 12px 2px rgba(255,59,48,.7); animation: scan 1.3s ease-in-out infinite alternate; } @keyframes scan { to { top: 198px; } }
   .spin { width: 66px; height: 66px; margin: 30px 0 22px; border-radius: 50%; border: 5px solid #eee; border-top-color: #111; animation: rot .8s linear infinite; } @keyframes rot { to { transform: rotate(360deg); } }
-  .chk { margin-top: 18px; width: 100%; text-align: left; } .chk li { display: flex; justify-content: space-between; padding: 12px 4px; border-top: 1px solid #f0f0f2; color: #8e8e93; transition: color .3s; }
+  .chk { margin-top: 18px; width: 100%; text-align: left; } .chk li { display: flex; justify-content: space-between; padding: 12px 4px; border-top: 1px solid #f0f0f2; color: #6e6e73; transition: color .3s; }
   .chk li::after { content: "…"; } .chk li.ok2 { color: #111; } .chk li.ok2::after { content: "✓"; color: #1a9b55; font-weight: 700; }
   .okc { width: 112px; height: 112px; margin: 26px 0 16px; } .okc circle { fill: #e6f6ee; transform-box: fill-box; transform-origin: center; } .ps.on .okc circle { animation: pop .5s var(--ease); } @keyframes pop { from { transform: scale(.4); } }
   .okc path { fill: none; stroke: #1a9b55; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; } .ps.on .okc path { stroke-dashoffset: 0; transition: stroke-dashoffset .6s var(--ease) .3s; }
@@ -405,7 +405,7 @@
 
   /* ---------- Apple-Maps-style map, drawn here, driving itself ---------- */
   .amap { position: relative; overflow: hidden; isolation: isolate; background: var(--land); transition: background .8s;
-    --land: #f4f2ee; --bld: #e7e3dc; --park: #cdeac0; --water: #a3d2f5; --minor: #fff; --minorc: #e0dcd3; --major: #fff; --majorc: #d2cdc2; --hw: #fdd77f; --hwc: #e7b04d; --label: #55585e; --halo: #fff; --wl: #3a7fc4; --pl: #3d7a35; --route: #0a84ff; --routec: #0062cc; }
+    --land: #eef0f3; --bld: #e5e8ed; --park: #e3efe6; --water: #dce6f1; --minor: #fff; --minorc: #e2e5ea; --major: #fff; --majorc: #d9dde4; --hw: #fff; --hwc: #cfd4dc; --label: #7c7f86; --halo: #fff; --wl: #8aa3bd; --pl: #6f9a7c; --route: #5c6fcf; --routec: #5c6fcf; }
   .amap.dark { --land: #1f2023; --bld: #2a2c30; --park: #1d3324; --water: #16304a; --minor: #3d3f44; --minorc: #2c2e32; --major: #55575d; --majorc: #34363b; --hw: #5d6e86; --hwc: #3b4757; --label: #d0d0d4; --halo: #1f2023; --wl: #6aa8e6; --pl: #77b56b; --route: #3d9bff; --routec: #0a5fc0; }
   .amap .mv { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 1.2s var(--ease), opacity .4s; transform-origin: 50% 66%; }
   .amap.d3 .mv { transform: perspective(1000px) rotateX(52deg) scale(1.6); }
@@ -441,7 +441,7 @@
   .mctl { position: absolute; z-index: 3; right: 20px; top: 20px; display: grid; border-radius: 14px; overflow: hidden; }
   .mctl button { width: 48px; height: 48px; display: grid; place-items: center; font-weight: 700; font-size: 14px; color: inherit; } .mctl button + button { border-top: 1px solid rgba(128,128,128,.25); } .mctl svg { width: 20px; height: 20px; }
   .msheet { position: absolute; z-index: 3; left: 20px; right: 20px; bottom: 20px; max-width: 520px; margin: 0 auto; display: flex; align-items: center; gap: 16px; padding: 14px 16px 14px 24px; border-radius: 24px; text-align: left; }
-  .msheet b { font-size: 24px; display: block; letter-spacing: -.02em; } .msheet span { color: #8e8e93; } .msheet .fill { flex: 1; }
+  .msheet b { font-size: 24px; display: block; letter-spacing: -.02em; } .msheet span { color: #6e6e73; } .msheet .fill { flex: 1; }
   .mend { padding: 12px 24px; border-radius: 999px; background: #ff3b30; color: #fff; font-weight: 700; }
   .mspd { position: absolute; z-index: 3; left: 20px; bottom: 110px; width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 5px solid #e0262b; display: grid; place-items: center; font-weight: 800; font-size: 19px; color: #111; }
   .mapsec { position: relative; z-index: 1; border-radius: 40px 40px 0 0; margin-top: -40px; overflow: hidden; }
@@ -459,7 +459,7 @@
     /* the orbs' palette: sky, lavender, pink, peach, sea */
     --sky: #7fb4e6; --lav: #a796e0; --pink: #e3a0bd; --peach: #efb79c; --sea: #8fcbc0; --deep: #5c6fcf; --plum: #7b5cc4;
     /* the blue (diesel) orb: sky on top, a deeper blue to the right, lavender below, a breath of sea */
-    --orb: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #22707a, rgba(34,112,122,0) 70%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
+    --orb: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
     --go: linear-gradient(120deg, #2f4fb0, #5a3fb0);
     --w: #e5ebf2; --ld: #eef0f3; --za1: #fdfdfe; --za2: #f4f5f7; --pk: #e5f0ea; --bd: #d5d8de; --hc: #e0e3e8; --hw: #ffffff; --lb: #7c7f86; --halo: #fff; --wl: #9fb2c6;
     --rg0: #9fd3ea; --rg1: #5f8fd6; --rg2: #a796e0; --acc: #5a5fc4; --tx: #1c1c1e; --tx2: #6e6e73; --fld: rgba(118,118,128,.12); --ln: rgba(60,60,67,.1);
@@ -467,7 +467,7 @@
   .nmap.dark { --w: #13283d; --ld: #1a1b1e; --za1: #232428; --za2: #1e1f22; --pk: #1d3326; --bd: #3d3f44; --hc: #2f3540; --hw: #5d6e86; --lb: #c7c7cc; --halo: #1c1c1e; --wl: #6a92b8;
     --acc: #a9a3f5; --tx: #fff; --tx2: #a1a1a6; --fld: rgba(255,255,255,.09); --ln: rgba(255,255,255,.08); --sheet: rgba(28,28,30,.95); --glass: rgba(40,40,44,.88); --chip: rgba(44,44,48,.95); --chiptx: #fff;
     --co: #2c2c2e; --cotx: #fff; --segon: rgba(255,255,255,.18); --fog: #1c1c1e; --fade: #1c1c1e; --ring: #1c1c1e; }
-  .nmap button { font: inherit; color: inherit; }
+  :where(.nmap) button { font: inherit; color: inherit; }
   /* the map itself */
   .nm-view { position: absolute; inset: 0; z-index: 0; background: var(--w); cursor: grab; touch-action: pan-y; outline: none; transform-origin: 50% 62%; transition: transform 1.2s var(--ease), background .6s; }
   .nm-view.drag { cursor: grabbing; } .nm-view:focus-visible { box-shadow: inset 0 0 0 3px var(--acc); }
@@ -479,6 +479,22 @@
   .nm-svg .hc { stroke: var(--hc); stroke-width: calc(var(--hww, 2px) + 2px); } .nm-svg .hw { stroke: var(--hw); stroke-width: var(--hww, 2px); }
   .nm-svg .rc { stroke: url(#nmRg); stroke-width: calc(var(--hww, 2px) + 12px); opacity: 0; transition: opacity .5s; } .nm-svg .rt { stroke: url(#nmRg); stroke-width: calc(var(--hww, 2px) + 2px); opacity: 0; transition: opacity .5s; }
   .routing .nm-svg .rc { opacity: .2; } .routing .nm-svg .rt { opacity: 1; }
+  /* the other two routes: grey under the chosen one, each with a pill on its own line */
+  .nm-svg .ra, .nm-svg .rac { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity .5s; }
+  .nm-svg .rac { stroke: #fff; stroke-width: calc(var(--hww, 2px) + 6px); } .nm-svg .ra { stroke: #a9afba; stroke-width: calc(var(--hww, 2px) + 2px); }
+  .nmap.dark .nm-svg .rac { stroke: #1c1c1e; } .nmap.dark .nm-svg .ra { stroke: #6b6f78; }
+  .routing .nm-svg .ra, .routing .nm-svg .rac { opacity: 1; } .nav .nm-svg .ra, .nav .nm-svg .rac { display: none; }
+  .nm-rpill { display: none; translate: -50% -50%; align-items: center; gap: 6px; padding: 5px 10px 5px 8px; border-radius: 999px; background: var(--chip); color: var(--tx); font-size: 12px; white-space: nowrap;
+    box-shadow: 0 4px 14px -4px rgba(20,20,60,.28), inset 0 0 0 1px var(--ln); pointer-events: auto; cursor: pointer; z-index: 4000; transition: background .3s, color .3s; }
+  .nm-rpill b { font-weight: 700; } .nm-rpill span { color: var(--tx2); } .nm-rpill::after { content: ""; position: absolute; inset: -8px -4px; }
+  .nm-rpill.on { box-shadow: 0 8px 20px -8px rgba(80,70,200,.45), inset 0 0 0 2px var(--rg1); z-index: 4001; } .nm-rpill.on span { color: var(--acc); font-weight: 600; } .nm-rpill:not(.on) b { font-weight: 600; }
+  .nm-rpill i { width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #c9e6f5, #5f8fd6 55%, #4a35a6); box-shadow: inset 0 1px 1.5px rgba(255,255,255,.55), 0 0 0 1px rgba(255,255,255,.5), 0 0 8px 1px rgba(170,190,255,.5); }
+  .routing .nm-rpill:not(.gone) { display: flex; } .nav .nm-rpill { display: none !important; }
+  .nm-alts { margin: 14px 0 0; padding: 0; list-style: none; } .nm-alts > p { margin: 0 0 6px; font-size: 12.5px; color: var(--tx2); }
+  .nm-alts button { display: grid; grid-template-columns: 4px 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 9px 10px 9px 8px; border-radius: 12px; text-align: left; cursor: pointer; }
+  .nm-alts button[aria-checked="true"] { background: var(--fld); }
+  .nm-alts .bar { align-self: stretch; border-radius: 2px; background: #a9afba; } .nm-alts button[aria-checked="true"] .bar { background: linear-gradient(var(--rg0), var(--rg1), var(--rg2)); }
+  .nm-alts b { display: block; font-size: 14px; font-weight: 600; } .nm-alts small { display: block; font-size: 12px; color: var(--tx2); } .nm-alts em { font-style: normal; font-size: 12.5px; font-weight: 600; color: var(--tx2); } .nm-alts .ch em { color: var(--acc); }
   .nm-ov { position: absolute; inset: 0; pointer-events: none; } .nm-ov > * { position: absolute; left: 0; top: 0; will-change: transform; }
   .nm-town { translate: -50% calc(-100% - 9px); white-space: nowrap; font-size: 11px; font-weight: 500; color: var(--lb); text-shadow: 0 0 3px var(--halo), 0 0 3px var(--halo), 0 0 2px var(--halo); }
   .nm-town.r1 { font-size: 13px; font-weight: 600; } .nm-town.r2 { font-size: 12px; } .nm-town.r2, .nm-town.r3 { display: none; } .z2 .nm-town.r2, .z3 .nm-town.r3 { display: block; }
@@ -635,7 +651,7 @@
   .nav .nm-you svg { display: block; transform: rotateZ(calc(var(--brg, 0deg) * -1)); }
   .nmap::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 46%; z-index: 1; pointer-events: none; background: linear-gradient(var(--fog) 35%, transparent); opacity: 0; transition: opacity 1s; } .nmap.nav::after { opacity: 1; }
   /* the app's tab bar, with an orb glow */
-  .nm-tabbar { z-index: 8; background: rgba(255,255,255,.95); transition: opacity .3s; } .nmap.dark .nm-tabbar { background: rgba(28,28,30,.95); color: #8e8e93; } .nmap.dark .nm-tabbar .tb.on { color: #fff; }
+  .nm-tabbar { z-index: 8; background: rgba(255,255,255,.95); transition: opacity .3s; } .nmap.dark .nm-tabbar { background: rgba(28,28,30,.95); color: #6e6e73; } .nmap.dark .nm-tabbar .tb.on { color: #fff; }
   .nm-tabbar .tb.on { color: var(--deep); }
   .nm-tabbar::before { display: none; } .nm-tabbar { border-top: 1px solid var(--ln); box-shadow: none; }
   .nm-tabbar::before { content: ""; position: absolute; left: 50%; bottom: -34px; width: 280px; height: 80px; margin-left: -140px; border-radius: 50%; pointer-events: none;
@@ -682,12 +698,12 @@
 
   /* ---------- the brand guide: a second view of this page, switched with the Site / Brand guide tab (#brand) ---------- */
   .bm-on main, .bm-on footer, .bm-on #nav, .bm-on .mega, .bm-on #sticky { display: none !important; }
-  .bm { --ink: #1f1f1f; --mut: #6e6e73; --line: #e8e8ea; --soft: #f5f5f7; --no: #d93b3b; background: #fff; color: var(--ink); font-size: 16px; line-height: 1.55; }
+  .bm { --ink: #1f1f1f; --mut: #6e6e73; --line: #e8e8ea; --soft: #f5f5f7; --no: #d93b3b; background: var(--bg, #fff); color: var(--ink); font-size: 16px; line-height: 1.55; }
   .bm[hidden] { display: none; }
   .bm code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
-  .bm-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--line); }
+  .bm-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); background: var(--topbg); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--line); }
   .bm-top svg { width: 64px; height: 24px; } .bm-top span { font-size: 15px; font-weight: 500; color: var(--mut); } .bm-top .grow { flex: 1; }
-  .bm-top a { white-space: nowrap; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: #fff; }
+  .bm-top a { white-space: nowrap; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); }
   /* cover */
   .bm-cover { position: relative; overflow: hidden; background: #000; color: #fff; }
   .bm-cover > div { position: relative; z-index: 1; display: grid; align-content: center; min-height: clamp(560px, 84vh, 820px); width: min(1180px, 100% - 48px); margin: 0 auto; padding: 72px 0; }
@@ -706,15 +722,15 @@
   .bm section { padding-top: 160px; scroll-margin-top: 72px; } .bm section:first-child { padding-top: 72px; }
   .bm-ch { display: grid; grid-template-columns: auto 1fr; gap: 6px 40px; align-items: end; padding: 44px 44px 40px; border-radius: 28px; background: var(--soft); margin-bottom: 40px; }
   .bm-ch.dark { background: #000; color: #fff; } .bm-ch.dark p { color: #a8a8a8; }
-  .bm-ch .n { grid-row: span 2; font-size: clamp(4rem, 8vw, 7rem); font-weight: 500; line-height: .8; letter-spacing: -.04em; font-variant-numeric: tabular-nums; opacity: .9; }
+  .bm-ch .n { grid-row: span 2; font-size: clamp(4rem, 8vw, 7rem); font-weight: 500; line-height: .8; letter-spacing: -.04em; opacity: .9; }
   .bm-ch h2 { font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.05; letter-spacing: -.015em; }
-  .bm-ch p { max-width: 36em; color: #3a3a3c; }
+  .bm-ch p { max-width: 36em; color: var(--body); }
   .bm h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -.005em; margin-bottom: 6px; }
   .bm-sub { margin: 48px 0 14px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); } .bm-sub:first-child { margin-top: 0; }
   .bm-note { margin-top: 14px; font-size: 13px; color: var(--mut); }
   .bm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .bm-grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bm-grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .bm-card { padding: 22px; border-radius: 20px; background: var(--soft); }
-  .bm-card p { font-size: 15px; color: #3a3a3c; } .bm-card .why { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,.07); font-size: 13.5px; color: var(--mut); } .bm-card .why b { color: var(--ink); font-weight: 600; }
+  .bm-card p { font-size: 15px; color: var(--body); } .bm-card .why { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,.07); font-size: 13.5px; color: var(--mut); } .bm-card .why b { color: var(--ink); font-weight: 600; }
   .bm-card.dark { background: #000; color: #fff; } .bm-card.dark p { color: #a8a8a8; }
   /* a spec sheet instead of bullets */
   .bm-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 0; }
@@ -725,23 +741,23 @@
   .bm-dd figure { margin: 0; }
   .bm-dd .v { position: relative; display: grid; place-items: center; height: 220px; overflow: hidden; border-radius: 20px; background: var(--soft); }
   .bm-dd .v.dark { background: #000; color: #fff; }
-  .bm-dd figcaption { display: flex; gap: 10px; align-items: baseline; margin-top: 12px; font-size: 14.5px; color: #3a3a3c; }
+  .bm-dd figcaption { display: flex; gap: 10px; align-items: baseline; margin-top: 12px; font-size: 14.5px; color: var(--body); }
   .bm-dd figcaption b { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-  .bm-dd figcaption b::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 11px; }
+  .bm-dd figcaption b::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 11px; }
   .bm-dd .no .v { box-shadow: inset 0 0 0 2px var(--no); } .bm-dd .no figcaption b { color: var(--no); } .bm-dd .no figcaption b::before { content: "✕"; background: var(--no); }
   /* why it works */
   .bm-why { display: grid; gap: 16px; }
   .bm-why article { display: grid; grid-template-columns: 1.05fr 1fr 1fr; border-radius: 20px; overflow: hidden; background: var(--soft); }
-  .bm-why article > div { padding: 20px 22px; } .bm-why article > div + div { border-left: 1px solid #fff; }
+  .bm-why article > div { padding: 20px 22px; } .bm-why article > div + div { border-left: 1px solid var(--sep); }
   .bm-why small { display: block; margin-bottom: 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
-  .bm-why h3 { font-size: 1.05rem; } .bm-why p { font-size: 14.5px; color: #3a3a3c; } .bm-why .bc b { font-weight: 600; color: var(--ink); }
+  .bm-why h3 { font-size: 1.05rem; } .bm-why p { font-size: 14.5px; color: var(--body); } .bm-why .bc b { font-weight: 600; color: var(--ink); }
   /* orbs */
   .bm-orb { position: relative; display: block; width: 112px; height: 112px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255,255,255,.08); overflow: hidden; }
   .bm-orb::after { content: ""; position: absolute; inset: 0; opacity: .32; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
-  .bm-orb.diesel { background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #22707a, rgba(34,112,122,0) 70%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); }
-  .bm-orb.nonfuel { background: radial-gradient(90% 70% at 32% 6%, #d99a82, rgba(217,154,130,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e); }
-  .bm-orb.africa { background: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(70% 70% at 86% 90%, #2f7a72, rgba(47,122,114,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e); }
-  .bm-orb.homebase { background: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2f7fa6, rgba(47,127,166,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(60% 60% at 82% 96%, #a8684a, rgba(168,104,74,0) 70%), linear-gradient(150deg, #2f6d5a, #173d4d); }
+  .bm-orb.diesel { background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); }
+  .bm-orb.nonfuel { background: radial-gradient(90% 70% at 32% 6%, #d98a52, rgba(217,138,82,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e); }
+  .bm-orb.africa { background: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(70% 70% at 86% 90%, #2a8068, rgba(42,128,104,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e); }
+  .bm-orb.homebase { background: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(60% 60% at 82% 96%, #c97a3e, rgba(201,122,62,0) 70%), linear-gradient(150deg, #2f7058, #173f38); }
   .bm-orb.sm { width: 24px; height: 24px; box-shadow: inset 0 0 0 1px rgba(40,70,140,.14), 0 4px 10px -3px rgba(60,100,190,.45); } .bm-orb.sm::after { display: none; }
   .bm-orb.bad { box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(0,0,0,.3); background: radial-gradient(circle at 30% 25%, #fff, rgba(255,255,255,0) 35%), linear-gradient(160deg, #3d8ee0, #0d2a5c); } .bm-orb.bad::after { display: none; }
   .bm-orbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
@@ -764,7 +780,7 @@
   .bm-dont { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .bm-dont figure { margin: 0; } .bm-dont .v { position: relative; display: grid; place-items: center; height: 150px; overflow: hidden; border-radius: 18px; background: var(--soft); box-shadow: inset 0 0 0 2px var(--no); }
   .bm-dont svg.w { width: 120px; height: auto; aspect-ratio: 392 / 148; }
-  .bm-dont figcaption { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: #3a3a3c; }
+  .bm-dont figcaption { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: var(--body); }
   .bm-dont figcaption::before { content: "✕"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--no); color: #fff; font-size: 11px; font-weight: 700; }
   /* colour */
   .bm-ratio { display: flex; height: 54px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid #d8d8dc; }
@@ -777,18 +793,18 @@
   .bm-sw b { display: block; font-size: 15px; } .bm-sw .use { display: block; font-size: 13px; color: var(--mut); margin-bottom: 10px; }
   .bm-sw dl { display: grid; grid-template-columns: 52px 1fr; gap: 3px 8px; margin: 0; font-size: 12.5px; } .bm-sw dt { color: var(--mut); } .bm-sw dd { margin: 0; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
   .bm-cr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .bm-cr span { padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: #fff; box-shadow: inset 0 0 0 1px var(--line); } .bm-cr span.f { color: var(--mut); font-weight: 500; }
+  .bm-cr span { padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); } .bm-cr span.f { color: var(--mut); font-weight: 500; }
   .bm-tblw { overflow-x: auto; border-radius: 20px; background: var(--soft); }
   .bm-tbl { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13.5px; }
-  .bm-tbl th, .bm-tbl td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #fff; white-space: nowrap; } .bm-tbl tr:last-child td { border-bottom: 0; }
+  .bm-tbl th, .bm-tbl td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--sep); white-space: nowrap; } .bm-tbl tr:last-child td { border-bottom: 0; }
   .bm-tbl th { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mut); }
   .bm-tbl td.c i { display: block; width: 40px; height: 28px; border-radius: 8px; } .bm-tbl td code { font-size: 12px; }
-  .bm-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: hidden; border-radius: 20px; }
+  .bm-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); overflow: hidden; border-radius: 20px; }
   .bm-strip > div { display: grid; align-content: end; height: 150px; padding: 12px 14px; font-size: 13px; color: rgba(0,0,0,.72); } .bm-strip b { font-weight: 600; color: #1f1f1f; } .bm-strip code { font-size: 11.5px; }
   .bm-spark { display: grid; grid-template-columns: 200px 1fr; overflow: hidden; border-radius: 20px; background: var(--soft); }
-  .bm-spark > i { display: grid; place-items: center; background: #fff; box-shadow: inset 0 0 0 1px var(--line); } .bm-spark > i span { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .bm-spark > i { display: grid; place-items: center; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); } .bm-spark > i span { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
   .bm-spark > i span::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #f2761d; box-shadow: 0 0 0 5px rgba(242,118,29,.16); }
-  .bm-spark > div { padding: 22px; } .bm-spark p { font-size: 15px; color: #3a3a3c; } .bm-spark p + p { margin-top: 10px; font-size: 14px; color: var(--mut); }
+  .bm-spark > div { padding: 22px; } .bm-spark p { font-size: 15px; color: var(--body); } .bm-spark p + p { margin-top: 10px; font-size: 14px; color: var(--mut); }
   /* type */
   .bm-aa { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: center; padding: 36px 40px; border-radius: 24px; background: var(--soft); }
   .bm-aa > b { font-size: clamp(7rem, 14vw, 12rem); font-weight: 500; line-height: .8; letter-spacing: -.04em; }
@@ -797,12 +813,12 @@
   .bm-wts > div { padding: 22px; border-radius: 20px; background: var(--soft); } .bm-wts span { display: block; font-size: 2.6rem; line-height: 1.1; letter-spacing: -.02em; } .bm-wts small { font-size: 13px; color: var(--mut); }
   .bm-wts > div.serif { background: #000; color: #fff; } .bm-wts > div.serif svg { width: 110px; height: auto; aspect-ratio: 392 / 148; display: block; margin: 6px 0 9px; } .bm-wts > div.serif small { color: #a8a8a8; }
   .bm-type { display: grid; overflow: hidden; border-radius: 20px; background: var(--soft); }
-  .bm-type > div { display: grid; grid-template-columns: 170px 1fr; align-items: baseline; gap: 24px; padding: 22px 24px; } .bm-type > div + div { border-top: 1px solid #fff; }
+  .bm-type > div { display: grid; grid-template-columns: 170px 1fr; align-items: baseline; gap: 24px; padding: 22px 24px; } .bm-type > div + div { border-top: 1px solid var(--sep); }
   .bm-type small { font-size: 12.5px; color: var(--mut); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.5; }
   .bm-type .t1 { font-size: clamp(2.6rem, 5.4vw, 5.3rem); font-weight: 500; line-height: 1; letter-spacing: -.025em; }
   .bm-type .t2 { font-size: clamp(2rem, 3.6vw, 3.15rem); font-weight: 500; line-height: 1; letter-spacing: -.012em; }
-  .bm-type .t3 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; } .bm-type .t4 { font-size: 1.125rem; color: #3a3a3c; } .bm-type .t5 { font-size: 13px; color: var(--mut); }
-  .bm-type .app { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 17px; }
+  .bm-type .t3 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; } .bm-type .t4 { font-size: 1.125rem; color: var(--body); } .bm-type .t5 { font-size: 13px; color: var(--mut); }
+  .bm-type .t6 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 17px; }
   /* icons */
   .bm-icons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .bm-icons figure { margin: 0; display: grid; justify-items: center; gap: 10px; padding: 24px 8px 16px; border-radius: 18px; background: var(--soft); font-size: 12.5px; color: var(--mut); }
@@ -816,7 +832,7 @@
   .bm-comp > div { display: grid; align-content: start; gap: 14px; padding: 22px; border-radius: 20px; background: var(--soft); }
   .bm-comp > div.dark { background: #000; color: #fff; } .bm-comp > div.dark p { color: #a8a8a8; }
   .bm-comp > div.no { box-shadow: inset 0 0 0 2px var(--no); } .bm-comp .tag { justify-self: start; padding: 2px 8px; border-radius: 6px; background: var(--no); color: #fff; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-  .bm-comp p { font-size: 14px; color: #3a3a3c; } .bm-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .bm-comp p { font-size: 14px; color: var(--body); } .bm-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .bm-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 24px; border-radius: 999px; font-weight: 500; background: #1f1f1f; color: #fff; }
   .bm-btn.w { background: #fff; color: #111; } .bm-btn.go { height: 50px; border-radius: 14px; padding: 0 34px; font-weight: 600; background: linear-gradient(120deg, #2f4fb0, #5a3fb0); box-shadow: 0 10px 24px -8px rgba(92,90,200,.55); }
   .bm-btn.or { background: #f2761d; } .bm-btn.ghost { background: #fff; color: #1f1f1f; box-shadow: inset 0 0 0 1px var(--line); height: 50px; border-radius: 14px; font-weight: 600; }
@@ -851,6 +867,13 @@
   /* imagery */
   .bm-hero-img { position: relative; height: 420px; border-radius: 24px; background: var(--img) center 40% / cover no-repeat; overflow: hidden; }
   .bm-hero-img span { position: absolute; left: 20px; bottom: 18px; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 13px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .bm-anat { display: grid; gap: 16px; }
+  .bm-anat .ph { position: relative; aspect-ratio: 21 / 9; border-radius: 20px; background: var(--img) center / cover no-repeat; }
+  .bm-anat .cl { position: absolute; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #1f1f1f; font-size: 14px; font-weight: 700; box-shadow: 0 0 0 6px rgba(255,255,255,.25), 0 4px 12px rgba(0,0,0,.35); }
+  .bm-anat ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin: 0; padding: 22px; border-radius: 20px; background: var(--soft); list-style: none; counter-reset: an; }
+  @media (max-width: 900px) { .bm-anat ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-anat .ph { aspect-ratio: 4 / 3; background-position: 70% center; } }
+  .bm-anat li { position: relative; padding-left: 40px; font-size: 14.5px; color: var(--body); counter-increment: an; } .bm-anat li b { display: block; color: var(--ink); font-weight: 600; }
+  .bm-anat li::before { content: counter(an); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 700; }
   .bm-dd .v.ph { background: var(--img) var(--pos, center) / cover no-repeat; }
   .bm-dd .v .cp { position: absolute; left: 22px; top: 50%; translate: 0 -50%; max-width: 46%; color: #fff; font-size: 20px; font-weight: 500; line-height: 1.15; }
   .bm-dd .v .cp.ctr { left: 50%; translate: -50% -50%; text-align: center; max-width: 70%; }
@@ -859,7 +882,7 @@
   .bm-voice > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .bm-voice p { display: flex; gap: 12px; align-items: baseline; padding: 16px 18px; border-radius: 16px; background: var(--soft); font-size: 15px; }
   .bm-voice p::before { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: 700; color: #fff; translate: 0 3px; }
-  .bm-voice p.y::before { content: "✓"; background: var(--ink); } .bm-voice p.n { color: var(--mut); } .bm-voice p.n::before { content: "✕"; background: #b4b4b9; }
+  .bm-voice p.y::before { content: "✓"; background: var(--ink); color: var(--bg); } .bm-voice p.n { color: var(--mut); } .bm-voice p.n::before { content: "✕"; background: #b4b4b9; }
   /* motion */
   .bm-motion { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
   .bm-motion > div { padding: 24px; border-radius: 20px; background: var(--soft); }
@@ -867,7 +890,7 @@
   .bm-dur { display: grid; gap: 14px; } .bm-dur div { display: grid; grid-template-columns: 150px 1fr 64px; gap: 14px; align-items: center; font-size: 14px; }
   .bm-dur i { display: block; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #3d68c0, #2a1f6e); } .bm-dur span { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--mut); text-align: right; }
   .bm-play { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
-  .bm-play button { flex: none; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13.5px; font-weight: 500; }
+  .bm-play button { flex: none; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 13.5px; font-weight: 500; }
   .bm-play .tr { position: relative; flex: 1; height: 34px; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
   .bm-play .tr i { position: absolute; left: 3px; top: 3px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); transition: left .9s cubic-bezier(.2,.7,.2,1); }
   .bm-play .tr.go i { left: calc(100% - 31px); }
@@ -875,13 +898,13 @@
   .bm-cp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .bm-cp > div { overflow: hidden; border-radius: 20px; box-shadow: inset 0 0 0 1px var(--line); }
   .bm-cp .s { display: grid; place-items: center; height: 110px; font-size: 22px; font-weight: 600; }
-  .bm-cp .k { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; font-size: 13px; background: #fff; }
-  .bm-cp .k b { padding: 2px 8px; border-radius: 6px; font-size: 11.5px; background: var(--ink); color: #fff; } .bm-cp .k b.f { background: #e8e8ea; color: var(--mut); }
+  .bm-cp .k { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; font-size: 13px; background: var(--bg); }
+  .bm-cp .k b { padding: 2px 8px; border-radius: 6px; font-size: 11.5px; background: var(--ink); color: var(--bg); } .bm-cp .k b.f { background: #e8e8ea; color: var(--mut); }
   /* applications */
   .bm-apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .bm-apps figure { margin: 0; display: grid; grid-template-rows: 1fr auto; overflow: hidden; border-radius: 22px; background: var(--soft); }
   .bm-apps figure > div { position: relative; display: grid; place-items: center; min-height: 280px; padding: 24px; }
-  .bm-apps figcaption { padding: 14px 18px 16px; border-top: 1px solid #fff; font-size: 13.5px; color: var(--mut); } .bm-apps figcaption b { color: var(--ink); font-weight: 600; }
+  .bm-apps figcaption { padding: 14px 18px 16px; border-top: 1px solid var(--sep); font-size: 13.5px; color: var(--mut); } .bm-apps figcaption b { color: var(--ink); font-weight: 600; }
   .bm-apps .tall { grid-row: span 2; } .bm-apps .wide { grid-column: span 2; }
   .bm-icn { position: relative; width: 112px; height: 112px; border-radius: 26px; background: #000; display: grid; place-items: center; box-shadow: 0 16px 30px -12px rgba(0,0,0,.45); }
   .bm-icn .bm-orb { width: 74%; height: 74%; box-shadow: none; }
@@ -916,8 +939,8 @@
   .bm-portal .o { position: relative; overflow: hidden; background: #000; } .bm-portal .o .bm-orb { position: absolute; left: 50%; top: 50%; width: 76%; height: auto; aspect-ratio: 1; translate: -50% -50%; box-shadow: none; }
   /* downloads */
   .bm-dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-  .bm-dl a { display: grid; gap: 6px; align-content: space-between; min-height: 170px; padding: 22px; border-radius: 20px; background: var(--soft); transition: background .2s; } .bm-dl a:hover { background: #ececef; }
-  .bm-dl b { font-size: 16px; } .bm-dl small { font-size: 13px; color: var(--mut); } .bm-dl span { justify-self: start; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; }
+  .bm-dl a { display: grid; gap: 6px; align-content: space-between; min-height: 170px; padding: 22px; border-radius: 20px; background: var(--soft); transition: background .2s; } 
+  .bm-dl b { font-size: 16px; } .bm-dl small { font-size: 13px; color: var(--mut); } .bm-dl span { justify-self: start; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 500; }
   .bm-tok { width: 100%; border-collapse: collapse; font-size: 14px; }
   .bm-tok th, .bm-tok td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } .bm-tok th { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mut); }
   .bm-src { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; color: var(--mut); }
@@ -928,11 +951,11 @@
   @media (max-width: 1100px) { .bm-comp, .bm-apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-apps .tall { grid-row: auto; } .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 900px) {
     .bm-wrap { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
-    .bm-toc { position: sticky; top: 64px; z-index: 20; display: flex; gap: 2px; overflow-x: auto; margin: 0 -24px; padding: 10px 24px; background: rgba(255,255,255,.94); scrollbar-width: none; } .bm-toc b { display: none; } .bm-toc a { flex: none; }
+    .bm-toc { position: sticky; top: 64px; z-index: 20; display: flex; gap: 2px; overflow-x: auto; margin: 0 -24px; padding: 10px 24px; background: var(--topbg); scrollbar-width: none; } .bm-toc b { display: none; } .bm-toc a { flex: none; }
     .bm section { padding-top: 112px; } .bm section:first-child { padding-top: 40px; }
     .bm-ch { grid-template-columns: 1fr; padding: 30px 26px; } .bm-ch .n { grid-row: auto; margin-bottom: 18px; }
-    .bm-why article { grid-template-columns: 1fr; } .bm-why article > div + div { border-left: 0; border-top: 1px solid #fff; }
-    .bm-igrow, .bm-grid, .bm-grid.c3, .bm-specs, .bm-dd, .bm-pair, .bm-voice > div, .bm-motion, .bm-spark, .bm-aa, .bm-portal .bd { grid-template-columns: 1fr; }
+    .bm-why article { grid-template-columns: 1fr; } .bm-why article > div + div { border-left: 0; border-top: 1px solid var(--sep); }
+    .bm-anat, .bm-igrow, .bm-grid, .bm-grid.c3, .bm-specs, .bm-dd, .bm-pair, .bm-voice > div, .bm-motion, .bm-spark, .bm-aa, .bm-portal .bd { grid-template-columns: 1fr; }
     .bm-grid.c4, .bm-orbs, .bm-sw, .bm-dont, .bm-cp, .bm-dl, .bm-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bm-strip > div { height: 96px; } .bm-portal .o { min-height: 160px; }
     .bm-cover .bm-orb.xl { top: 6%; right: -30%; width: 90vw; translate: none; opacity: .9; } .bm-cover > div { align-content: end; }
@@ -943,6 +966,222 @@
   @media (max-width: 560px) { .bm-top > span:not(.grow) { display: none; } .bm-comp, .bm-icons, .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-comp { grid-template-columns: 1fr; } }
   @media (prefers-reduced-motion: reduce) { .bm-play .tr i { transition: none; } }
 
+  /* ---------- the guide, alive: lit chapters, a cover moment, 3D renders, one depth system, live demos, dark mode ---------- */
+  @property --en { syntax: '<number>'; inherits: true; initial-value: 0; }
+  .bm { --bg: #fff; --body: #3a3a3c; --sep: #fff; --soft2: #ececef; --topbg: rgba(255,255,255,.88);
+        --el1: 0 1px 2px rgba(20,20,40,.06), 0 8px 24px -12px rgba(20,20,40,.2); --el2: 0 2px 6px rgba(20,20,40,.06), 0 28px 56px -22px rgba(20,20,40,.4); --ease: cubic-bezier(.2,.7,.2,1); transition: background .5s, color .5s; }
+  .bm.dark { --ink: #f2f2f4; --mut: #9a9aa0; --line: #2a2a2e; --soft: #151517; --soft2: #1d1d20; --bg: #0b0b0c; --body: #c7c7cc; --sep: #0b0b0c; --topbg: rgba(11,11,12,.86);
+             --el1: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6); --el2: 0 2px 6px rgba(0,0,0,.4), 0 28px 56px -22px rgba(0,0,0,.8); color-scheme: dark; }
+  .bm.dark .bm-pair > div:not(.dark), .bm.dark .bm-dont .v, .bm.dark .bm-ramp { background: #f5f5f7; color: #1f1f1f; }
+  .bm-sheet, .bm-mail, .bm-portal, .bm-chip, .bm-pill { color: #1f1f1f; } .bm-chip.on, .bm-pill.best { color: #fff; } .bm-pill.gr { color: #6e6e73; } .bm-pill.lo { color: #5a5fc4; }
+  .bm-dm { display: grid; place-items: center; width: 36px; height: 36px; margin-right: 6px; border-radius: 50%; color: var(--ink); background: var(--soft); } .bm-dm svg { width: 18px; height: 18px; }
+  /* one depth system */
+  .bm-chip, .bm-pill { box-shadow: var(--el1); } .bm-sheet, .bm-mail, .bm-portal, .bm-post, .bm-tab { box-shadow: var(--el2); }
+  .bm-elev { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 26px; border-radius: 20px; background: var(--soft); }
+  .bm-elev > div { display: grid; gap: 4px; padding: 22px; border-radius: 18px; background: var(--bg); } .bm-elev small { color: var(--mut); font-size: 13px; }
+  .bm-elev .e0 { background: transparent; box-shadow: inset 0 0 0 1px var(--line); } .bm-elev .e1 { box-shadow: var(--el1); } .bm-elev .e2 { box-shadow: var(--el2); transform: translateY(-6px); }
+  /* lit chapters: a light source in the chapter's colour, grain on the dark ones; a small orb settles into the number */
+  .bm-ch { position: relative; overflow: hidden; isolation: isolate; }
+  .bm-ch::before { content: ""; position: absolute; inset: -40% -20% -40% 35%; z-index: -1; pointer-events: none; background: radial-gradient(50% 50% at 70% 50%, color-mix(in srgb, var(--lc) 18%, transparent), transparent 72%); }
+  .bm-ch.dark::before { background: radial-gradient(52% 58% at 82% 40%, color-mix(in srgb, var(--lc) 75%, transparent), transparent 72%); opacity: .8; }
+  .bm-ch.dark::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .05; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .bm-ch .n { display: flex; align-items: flex-start; gap: 10px; }
+  .bm-ch .mo { flex: none; width: 18px; height: 18px; margin-top: .06em; box-shadow: none; transform: scale(0); transition: transform .7s cubic-bezier(.3,1.5,.5,1) .15s; } .bm-ch .mo::after { display: none; }
+  .bm-ch.in .mo { transform: none; }
+  /* moment chapters: a big visual instead of a text panel */
+  .bm-ch.moment { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); align-items: center; min-height: 400px; }
+  .bm-ch.moment h2, .bm-ch.moment > p { grid-column: 2; } .bm-ch.moment h2 { align-self: end; } .bm-ch.moment > p { align-self: start; }
+  .bm-ch.moment .vis { grid-column: 3; grid-row: 1 / span 2; position: relative; align-self: stretch; min-height: 320px; }
+  .bm-ch.photo { grid-template-columns: auto minmax(0, 1fr) minmax(0, .9fr); min-height: 420px; background: linear-gradient(90deg, #000 0%, rgba(0,0,0,.85) 40%, rgba(0,0,0,.1) 80%), url(img/k-night-truck.jpg) 70% center / cover no-repeat; }
+  .bm-ch.photo::before { display: none; }
+  .orbs3 .bm-orb { position: absolute; box-shadow: none; }
+  .orbs3 .a { right: 6%; top: 4%; width: 220px; height: 220px; animation: bmFloat 11s ease-in-out infinite alternate; }
+  .orbs3 .b { left: 4%; bottom: 4%; width: 130px; height: 130px; animation: bmFloat 9s ease-in-out -3s infinite alternate-reverse; }
+  .orbs3 .c { right: 0; bottom: 0; width: 86px; height: 86px; animation: bmFloat 8s ease-in-out -5s infinite alternate; }
+  @keyframes bmFloat { from { translate: 0 0; } to { translate: 6px -16px; } }
+  /* the cover moment: the orb rises and lights the wordmark, then breathes and follows the light */
+  .bm-cover { --en: 1; --sc: 0; } .bm-cover.go { --en: 0; transition: --en 1.8s var(--ease); }
+  .bm-cover .bm-orb.xl { opacity: calc(1 - var(--en)); transform: translateY(calc(var(--en) * 34% - var(--sc) * 16%)) scale(calc(1 - var(--sc) * .22)); animation: bmBreathe 9s ease-in-out infinite alternate; }
+  @keyframes bmBreathe { from { scale: 1; } to { scale: 1.035; } }
+  .bm-cover .bm-orb.xl::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; background: radial-gradient(34% 34% at var(--lx, 32%) var(--ly, 20%), rgba(255,255,255,.4), transparent 70%); mix-blend-mode: soft-light; }
+  .bm-cover svg.wm { color: #2a2a2e; transition: color 1.4s ease .55s; } .bm-cover.go svg.wm { color: #fff; }
+  .bm-cover > div > :not(svg) { transition: opacity .9s var(--ease), transform 1s var(--ease); }
+  .bm-cover:not(.go) > div > :not(svg) { opacity: 0; transform: translateY(18px); }
+  .bm-cover.go > div > p:nth-of-type(2) { transition-delay: .7s; } .bm-cover.go > div > .meta { transition-delay: .85s; } .bm-cover.go > div > .lbl { transition-delay: .35s; }
+  /* 3D: the app in hand, the price board standing */
+  .bm-3d { display: grid; place-items: center; align-content: center; gap: 0; perspective: 1400px; }
+  .bm-ph3 { position: relative; width: 196px; height: 402px; padding: 7px; border-radius: 34px; background: #0b0b0c; transform: rotateY(-24deg) rotateX(10deg) rotateZ(3deg); transform-style: preserve-3d;
+    box-shadow: inset 0 0 0 1.5px #3b3b3f, 1px 0 0 #2a2a2e, 2px 1px 0 #26262a, 3px 2px 0 #222226, 4px 3px 0 #1e1e22, 5px 4px 0 #1a1a1e, 6px 5px 0 #161619, 40px 50px 70px -20px rgba(0,0,0,.75); animation: bmPh3 9s ease-in-out infinite alternate; }
+  @keyframes bmPh3 { to { transform: rotateY(-15deg) rotateX(6deg) rotateZ(1deg) translateY(-10px); } }
+  .bm-ph3 .scr { position: relative; height: 100%; overflow: hidden; border-radius: 28px; background: #eef0f3; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
+  .bm-ph3 .bm-pill { position: absolute; height: 26px; font-size: 11px; white-space: nowrap; } .bm-ph3 .bm-pill .bm-orb.sm { width: 20px; height: 20px; } .bm-ph3 .p1 { left: 12%; top: 22%; } .bm-ph3 .p2 { left: 18%; top: 42%; }
+  .bm-ph3 .you { position: absolute; left: 46%; top: 60%; width: 12px; height: 12px; border-radius: 50%; background: #2f4fb0; box-shadow: 0 0 0 3px #fff, 0 0 0 11px rgba(47,79,176,.18); }
+  .bm-ph3 .sh { position: absolute; left: 6px; right: 6px; bottom: 6px; padding: 10px 12px; border-radius: 18px; background: #fff; color: #1f1f1f; box-shadow: 0 10px 24px -10px rgba(0,0,0,.35); }
+  .bm-ph3 .sh b { display: block; font-size: 12.5px; } .bm-ph3 .sh small { display: block; font-size: 10.5px; color: #6e6e73; } .bm-ph3 .sh i { display: block; margin-top: 4px; font-style: normal; font-size: 15px; font-weight: 700; }
+  .bm-ph3 .sh .go { position: absolute; right: 10px; bottom: 10px; padding: 6px 14px; border-radius: 10px; background: linear-gradient(120deg, #2f4fb0, #5a3fb0); color: #fff; font-size: 11px; font-weight: 600; }
+  .bm-3d .flr { width: 170px; height: 24px; margin-top: 18px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--lc, #3d68c0) 70%, transparent), transparent); filter: blur(4px); }
+  .bm-pylon.p3 { perspective: 900px; } .bm-pylon.p3 .sign { transform: rotateY(18deg); box-shadow: -1px 0 0 #2a2a2e, -2px 0 0 #242427, -3px 0 0 #1f1f22, -4px 0 0 #1b1b1e, -5px 1px 0 #17171a, -30px 30px 50px -20px rgba(0,0,0,.45); }
+  .bm-pylon.p3 .base { box-shadow: 0 12px 20px -4px rgba(0,0,0,.3); }
+  /* colour as light */
+  .bm-lights { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); height: 230px; padding: 0 10px; overflow: hidden; border-radius: 20px; background: #050507; }
+  .bm-lights span { position: relative; display: grid; align-items: end; justify-items: center; padding-bottom: 16px; font-size: 12px; color: rgba(255,255,255,.72); }
+  .bm-lights span::before { content: ""; position: absolute; left: 50%; top: 44%; width: 160%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, var(--c), transparent); filter: blur(6px); mix-blend-mode: screen; }
+  /* type that moves */
+  .bm-aa b { transition: opacity .35s; } .bm-aa b.sw0 { opacity: .25; }
+  .bm-ramp { position: relative; display: grid; place-items: center; height: 230px; overflow: hidden; border-radius: 20px; background: var(--soft); }
+  .bm-ramp span { font-weight: 500; line-height: 1; letter-spacing: -.02em; white-space: nowrap; transition: font-size .8s var(--ease), letter-spacing .8s var(--ease); }
+  .bm-ramp small { position: absolute; left: 18px; bottom: 14px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--mut); }
+  /* motion, live */
+  .bm-demos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-demos > div { padding: 18px; border-radius: 20px; background: var(--soft); } .bm-demos b { display: block; font-size: 15px; } .bm-demos small { font-size: 13px; color: var(--mut); }
+  .bm-demos .st { position: relative; height: 130px; margin-bottom: 14px; overflow: hidden; border-radius: 14px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
+  .st.rise i { display: block; height: 14px; margin: 18px 18px 0; border-radius: 7px; background: #c9cbd1; opacity: 0; transform: translateY(18px); }
+  .st.rise i:nth-child(1) { width: 70%; height: 22px; background: var(--ink); } .st.rise i:nth-child(2) { width: 58%; } .st.rise i:nth-child(3) { width: 40%; }
+  .st.rise.go i { animation: bmRise .7s var(--ease) forwards; } .st.rise.go i:nth-child(2) { animation-delay: .08s; } .st.rise.go i:nth-child(3) { animation-delay: .16s; }
+  @keyframes bmRise { to { opacity: 1; transform: none; } }
+  .st.roll { display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .st.roll .col { display: inline-block; height: 1.1em; overflow: hidden; line-height: 1.1; vertical-align: top; } .st.roll .col > span { display: flex; flex-direction: column; transition: transform 1.1s var(--ease); }
+  .st.tilt { display: grid; place-items: center; perspective: 520px; }
+  .st.tilt .pl { position: relative; width: 70%; height: 82%; border-radius: 12px; background: #eef0f3; background-image: linear-gradient(100deg, transparent 46%, #fff 46%, #fff 54%, transparent 54%), linear-gradient(10deg, transparent 60%, #fff 60%, #fff 64%, transparent 64%); transition: transform 1.2s var(--ease); }
+  .st.tilt.go .pl { transform: rotateX(52deg) scale(1.15) translateY(-6px); }
+  .st.tilt .rt { position: absolute; left: 47%; top: 6%; bottom: 18%; width: 6px; border-radius: 3px; background: linear-gradient(#5a3fb0, #2f4fb0); }
+  .st.tilt .ar { position: absolute; left: 50%; bottom: 8%; translate: -50% 0; width: 0; height: 0; border: 9px solid transparent; border-top: 0; border-bottom: 16px solid #2f4fb0; }
+  /* imagery as cinema */
+  .bm-anat .ph { background-position: center calc(50% + var(--py, 0px)); }
+  .bm-anat .cl { transition: transform .55s cubic-bezier(.3,1.6,.5,1) var(--d, 0s), opacity .3s var(--d, 0s); } .js .bm-anat:not(.in) .cl { transform: scale(0); opacity: 0; }
+  /* micro-interactions */
+  .bm-dd figure { transition: opacity .3s; } .bm-dd:hover figure:not(:hover) { opacity: .5; }
+  .bm-dl a { transition: background .2s, transform .35s var(--ease), box-shadow .35s; } .bm-dl a:hover { transform: translateY(-4px); box-shadow: var(--el2); background: var(--soft); }
+  .bm-sw .sw, .bm-tbl tr[data-hex], .bm-strip > div, .bm-lights span { cursor: copy; }
+  .bm-toast { position: fixed; left: 50%; bottom: 28px; z-index: 97; padding: 10px 18px; border-radius: 999px; background: #1f1f1f; color: #fff; font-size: 13.5px; opacity: 0; translate: -50% 20px; pointer-events: none;
+    box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); transition: opacity .25s, translate .35s cubic-bezier(.2,.7,.2,1); } .bm-toast.on { opacity: 1; translate: -50% 0; }
+  @media (max-width: 900px) {
+    .bm-ch.moment { grid-template-columns: 1fr; } .bm-ch.moment .vis { grid-column: auto; grid-row: auto; min-height: 280px; margin-top: 18px; }
+    .bm-ch.photo { background: linear-gradient(0deg, #000 30%, rgba(0,0,0,.4) 70%), url(img/k-night-truck.jpg) 60% center / cover no-repeat; }
+    .orbs3 .a { width: 170px; height: 170px; } .bm-elev, .bm-demos { grid-template-columns: 1fr; } .bm-lights { height: 170px; } .bm-lights span { font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bm-cover { --en: 0; } .bm-cover .bm-orb.xl, .orbs3 .bm-orb, .bm-ph3 { animation: none; } .bm-cover svg.wm { color: #fff; transition: none; }
+    .bm-cover:not(.go) > div > :not(svg) { opacity: 1; transform: none; } .bm-ch .mo { transform: none; transition: none; } .js .bm-anat:not(.in) .cl { transform: none; opacity: 1; }
+    .bm-ramp span, .st.tilt .pl, .st.roll .col > span { transition: none; }
+  }
+
+  /* ---------- the site, in the brand guide's terms ---------- */
+  :root { --orb-diesel: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
+    --orb-rose: radial-gradient(90% 70% at 32% 6%, #d98a52, rgba(217,138,82,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e);
+    --orb-violet: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e);
+    --orb-teal: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), linear-gradient(150deg, #2f7058, #173f38);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .ob { display: inline-block; border-radius: 50%; } .ob-blue { background: var(--orb-diesel); } .ob-teal { background: var(--orb-teal); } .ob-rose { background: var(--orb-rose); } .ob-violet { background: var(--orb-violet); }
+  /* the hero: black, the deep orb breathing behind the phone and catching the light */
+  .hero { background: #050608; }
+  .horb { position: absolute; left: 58%; top: 52%; z-index: -1; width: min(820px, 76vw); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: var(--orb-diesel); opacity: 0;
+    animation: horbIn 1.6s var(--ease) .2s forwards, horbBreathe 9s ease-in-out 1.8s infinite alternate; }
+  .horb::after { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: .3; mix-blend-mode: overlay; background-image: var(--grain); }
+  .horb::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; background: radial-gradient(34% 34% at var(--lx, 32%) var(--ly, 22%), rgba(255,255,255,.35), transparent 70%); mix-blend-mode: soft-light; }
+  @keyframes horbIn { from { opacity: 0; transform: translateY(10%) scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes horbBreathe { from { scale: 1; } to { scale: 1.035; } }
+  .hcopy .btn { background: #fff; color: #000; } .hcopy p { max-width: 24em; }
+  .hbadges span { box-shadow: 0 1px 2px rgba(20,20,40,.08), 0 14px 30px -12px rgba(0,0,0,.5); } .hbadges i { border-radius: 50%; }
+  @media (max-width: 960px) { .horb { left: 50%; top: 72%; width: 120vw; } }
+  /* the app screens in the deep palette */
+  .phs .mesh::before, .phs .mesh::after, .pic .mesh::before, .pic .mesh::after { display: none; }
+  .phs .mesh.h-blue, .pic .mesh.h-blue { background: var(--orb-diesel); } .phs .mesh.h-pink { background: var(--orb-rose); } .phs .mesh.h-teal { background: var(--orb-teal); } .phs .mesh.h-violet { background: var(--orb-violet); }
+  .phs .alist .ic.mesh { border-radius: 50%; } .ah i { background: var(--orb-diesel) !important; }
+  /* one map language: the route card is the light app map */
+  .amap.lite { --land: #eef0f3; --bld: #e6e9ee; --park: #e3efe6; --water: #d4e3f1; --minor: #fff; --minorc: #e2e5ea; --major: #fff; --majorc: #d9dde4; --hw: #fff; --hwc: #cfd4dc; --label: #7c7f86; --halo: #fff; --route: #3d4fb8; --routec: #26348f; }
+  .pic .mgl { background: rgba(255,255,255,.9); color: #1f1f1f; box-shadow: 0 8px 24px -10px rgba(40,40,80,.3); } .pic .asearch { color: #6e6e73; }
+  .pic .chip i { border-radius: 50%; }
+  .plow { position: absolute; z-index: 3; right: 18%; top: 34%; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 4px; border-radius: 16px; color: #fff; font-size: .82rem; font-weight: 600;
+    background: linear-gradient(120deg, #2f4fb0, #5a3fb0); box-shadow: 0 10px 22px -8px rgba(47,79,176,.6); }
+  .plow::after { content: ""; position: absolute; left: 11px; bottom: -4px; z-index: -1; width: 10px; height: 10px; border-radius: 2px; background: #2f4fb0; transform: rotate(45deg); }
+  .plow i { width: 24px; height: 24px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+  /* the fill scene: calmer, and a card that shows a real fill */
+  #b .veil { background: radial-gradient(55% 45% at 50% 30%, rgba(4,6,12,.6), transparent 72%), linear-gradient(180deg, rgba(4,6,12,.62), rgba(4,6,12,.35) 45%, rgba(4,6,12,.78)); }
+  #b .sub { color: rgba(255,255,255,.92); }
+  .gphone { width: 300px; height: auto; padding: 20px 20px 44px; text-align: left; }
+  .gtop { display: flex; align-items: center; gap: 14px; } .gth { flex: none; width: 58px; height: 58px; border-radius: 16px; background: url(img/pay-nozzle.jpg) center / cover; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+  .gphone strong { margin: 2px 0 0; font-size: 2.1rem; } .gphone .pill { margin-top: 16px; }
+  .gck { display: grid; gap: 8px; margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid rgba(255,255,255,.18); list-style: none; font-size: .86rem; }
+  .gck li { display: flex; align-items: center; gap: 10px; } .gck li::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #fff; color: #111; font-size: 11px; font-weight: 700; }
+  /* depth: the calculator is raised over a soft light; the light bands get one too */
+  #calc .calc { position: relative; isolation: isolate; box-shadow: 0 2px 6px rgba(20,20,40,.08), 0 40px 80px -30px rgba(20,30,90,.55); }
+  #calc .calc::before { content: ""; position: absolute; inset: -16% -12%; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, rgba(44,86,184,.22), transparent); filter: blur(24px); }
+  #a .pic { box-shadow: 0 2px 6px rgba(20,20,40,.06), 0 30px 60px -28px rgba(20,30,90,.4); }
+  /* nav: Log in was white on the solid bar */
+  .nav:not(.clear) .btn.ghost { color: #1f1f1f; }
+  /* the figures rise in as the close arrives, then count up */
+  .js #f .fstats > div { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--ease), transform 1s var(--ease); }
+  .js #f.in .fstats > div { opacity: 1; transform: none; } .js #f.in .fstats > div:nth-child(2) { transition-delay: .1s; } .js #f.in .fstats > div:nth-child(3) { transition-delay: .2s; }
+  @media (prefers-reduced-motion: reduce) { .js #f .fstats > div { opacity: 1; transform: none; transition: none; } }
+  /* the close: figures, then one call to action */
+  .fstats { display: flex; justify-content: center; gap: clamp(28px, 6vw, 72px); margin: 22px 0 6px; }
+  .fstats div { display: grid; font-size: .9rem; color: rgba(255,255,255,.75); }
+  .fstats b, .fstats b * { font-variant-numeric: proportional-nums; line-height: 1.05; } .fstats b { margin-bottom: 2px; } .fstats b { font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 500; letter-spacing: -.02em; color: #fff; }
+  /* the footer signs off with the orb, set apart from the wordmark */
+  .fbrand { display: flex; align-items: center; justify-content: space-between; } .forb { width: 44px; height: 44px; border-radius: 50%; background: var(--orb-diesel); }
+  @media (prefers-reduced-motion: reduce) { .horb { animation: none; opacity: 1; } }
+
+  /* every street map is the network map's style: the gradient route, a soft casing, orb pins */
+  .amap .m-r { stroke: url(#mRg); } .amap .m-rc { stroke: rgba(95,143,214,.22); }
+  .m-ac { fill: none; stroke: #fff; stroke-width: 15; stroke-linejoin: round; } .m-a { fill: none; stroke: #a9afba; stroke-width: 9; stroke-linejoin: round; } .amap.dark .m-ac { stroke: #1f2023; } .amap.dark .m-a { stroke: #6b6f78; }
+  .m-rp .bx { fill: #fff; filter: drop-shadow(0 5px 10px rgba(40,60,120,.22)); } .m-rp.on .bx { stroke: #5f8fd6; stroke-width: 3; } .m-rp text { font: 600 14px var(--sans); fill: #1f1f1f; dominant-baseline: central; } .m-rp text tspan { fill: #6e6e73; font-weight: 500; } .m-rp.on text tspan { fill: #5a5fc4; font-weight: 600; }
+  .amap .m-call rect { filter: drop-shadow(0 4px 10px rgba(40,60,120,.22)); stroke: rgba(40,60,120,.06); } .amap .m-call text { font-weight: 600; fill: #1f1f1f; }
+  .amap .m-halo { fill: #5c6fcf; }
+  .amapscr .asheet .go, .amap ~ .asheet .go { background: linear-gradient(120deg, #2f4fb0, #5a3fb0); color: #fff; }
+  /* the guide's little maps: the same streets, water, park and route */
+  .bm-mapv { background-color: #eef0f3;
+    background-image: linear-gradient(172deg, transparent 58%, #dce6f1 58%, #dce6f1 68%, transparent 68%), radial-gradient(18% 22% at 82% 82%, #e3efe6 99%, transparent 100%),
+      repeating-linear-gradient(0deg, transparent 0 52px, #fff 52px 58px), repeating-linear-gradient(90deg, transparent 0 68px, #fff 68px 74px),
+      repeating-linear-gradient(0deg, #e5e8ed 0 6px, transparent 6px 58px), repeating-linear-gradient(90deg, #e5e8ed 0 6px, transparent 6px 74px); }
+  .bm-mapv::after { content: ""; position: absolute; left: 34%; top: 40%; width: 30%; height: 46%; border-left: 5px solid #5f8fd6; border-bottom: 5px solid #a796e0; border-radius: 0 0 0 6px; }
+  .bm-mapv .p { z-index: 1; }
+  /* the cheapest tag is the same marker, filled: the same orb, with a thin white ring so it separates from the blue */
+  /* lit, not outlined: a fine glass rim, a soft glow, light from above and shade below */
+  .nm-pin.best i, .pm .nm-pin.best:not(.on):not(.nc) i, .plow i, .bm-pill.best .bm-orb.sm {
+    box-shadow: inset 0 1px 1.5px rgba(255,255,255,.55), inset 0 -3px 5px rgba(12,10,50,.45), 0 0 0 1px rgba(255,255,255,.42), 0 0 12px 1px rgba(170,190,255,.45) !important; }
+  /* one map family: the street maps draw the app's price pill and use its search bar and sheet */
+  .amap .m-pin .bx { fill: #fff; filter: drop-shadow(0 5px 10px rgba(40,60,120,.28)); } .amap .m-pin .tl { fill: #fff; }
+  .amap .m-pin text { font: 600 14px var(--sans); fill: #1f1f1f; dominant-baseline: central; }
+  .amap .m-pin.best .bx, .amap .m-pin.best .tl { fill: url(#mGo); } .amap .m-pin.best text { fill: #fff; }
+  .pic .asearch, .amapscr .asearch { height: 46px; padding: 0 14px; align-items: center; border-radius: 14px; color: #6e6e73; background: rgba(255,255,255,.92); box-shadow: 0 8px 24px -10px rgba(40,40,80,.28); }
+  .pic .chip { left: 12px; right: 12px; bottom: 12px; padding: 12px 16px 12px 12px; border-radius: 22px; background: rgba(255,255,255,.95); box-shadow: 0 16px 40px -14px rgba(40,40,80,.35); font-weight: 600; }
+  .pic .chip i { width: 40px; height: 40px; } .pic .chip b { color: #3d4fb8; font-size: 1rem; }
+  .amapscr .asheet { border-radius: 22px; background: rgba(255,255,255,.95); box-shadow: 0 16px 40px -14px rgba(40,40,80,.35); }
+  /* accessibility: meaning never by colour alone; graphics 3:1; 44px targets; 13px minimum */
+  .nm-pin.bl:not(.best) .co::before { content: "↓ "; }
+  .nm-pin.gr i { background: linear-gradient(150deg, #a1a1a6, #86868b) !important; }
+  .nm-pin::after { content: ""; position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; }
+  .nm-pin .co, .pm .nm-pin:not(.on):not(.nc) .co { font-size: 13px; }
+  .bm-pill.gr .bm-orb.sm { background: linear-gradient(150deg, #a1a1a6, #86868b) !important; } .bm-pill { font-size: 13px; }
+  .nmap { --wl: #4f6b86; --lb: #636368; } .nm-shd { color: #636368; }
+  .plist small { color: #636368 !important; } .puser small { font-size: 12px; }
+  .amap { --label: #636368; --wl: #4f6b86; --pl: #4d7a5c; }
+  footer .legal, footer .legal p { color: #b4b4b9; }
+  /* brand audit fixes: contrast, no italics, minimum sizes */
+  .psearch { color: #6e6e73 !important; } .ptr { color: #3a3a3c; }
+  .nm-sea { font-style: normal; }
+  .nm-cty { font-size: 11px; } .nm-shd { font-size: 11px; }
+  .kpi small, .pv small { font-size: 12px !important; }
+  .tabbar { color: #6e6e73; }
+  /* ---------- the dock: arrives once the hero has finished, follows the section you're reading ---------- */
+  .sticky { display: none !important; }
+  .dock { position: fixed; left: 50%; bottom: 20px; z-index: 80; display: flex; align-items: stretch; gap: 8px; padding: 8px; border-radius: 22px; background: rgba(40,40,44,.86);
+    -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%); box-shadow: 0 24px 48px -18px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);
+    transform: translate(-50%, 140%); opacity: 0; transition: transform .7s cubic-bezier(.2,.7,.2,1), opacity .4s; pointer-events: none; }
+  .dock.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+  .dock.away { transform: translate(-50%, 140%); opacity: 0; pointer-events: none; }
+  .dk-logo { display: grid; place-items: center; width: 64px; border-radius: 16px; background: #141416; color: #fff; }
+  .dk-logo svg { width: 42px; height: 16px; }
+  .dk-tabs { display: flex; gap: 6px; padding: 6px; border-radius: 16px; background: rgba(255,255,255,.06); }
+  .dk-tabs a { display: grid; place-items: center; padding: 0 16px; height: 44px; border-radius: 12px; color: rgba(255,255,255,.82); font-size: .95rem; font-weight: 500; white-space: nowrap;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: color .25s, box-shadow .25s, background .25s; }
+  .dk-tabs a:hover { color: #fff; background: rgba(255,255,255,.06); }
+  .dk-tabs a[aria-current="true"] { color: #fff; box-shadow: inset 0 0 0 1.5px #fff; }
+  .dk-cta { display: grid; place-items: center; padding: 0 22px; border-radius: 16px; background: #fff; color: #111; font-weight: 600; white-space: nowrap; transition: transform .2s; }
+  .dk-cta:hover { transform: translateY(-1px); }
+  @media (max-width: 720px) { .dk-tabs { display: none; } .dock { bottom: 14px; } .dk-cta { padding: 0 20px; min-height: 48px; } }
+  @media (prefers-reduced-motion: reduce) { .dock { transition: opacity .2s; } }
   /* ---------- calculators ---------- */
   .calc { border-radius: 32px; padding: 26px; background: #0a0a0a; color: #fff; }
   .cpanel { border-radius: 24px; padding: 24px 26px 26px; }
@@ -976,7 +1215,12 @@
   .coins { position: absolute; inset: 0; z-index: 3; transform-style: preserve-3d; transform: rotateX(var(--ty, 0deg)) rotateY(var(--tx, 0deg)); transition: transform .8s var(--ease); pointer-events: none; }
   .ocar { position: absolute; left: 0; right: 0; top: 0; height: 74%; z-index: 2; }
   .orb { position: absolute; left: 50%; top: 50%; width: var(--ow); height: var(--ow); margin: calc(var(--ow) / -2) 0 0 calc(var(--ow) / -2); padding: 5px; border-radius: 50%; background: rgba(255,255,255,.1); cursor: pointer;
-    z-index: var(--zi, 1); opacity: var(--o, 0); transform: translateX(calc(var(--d, 0) * var(--og))) scale(var(--k, .4)); transition: transform 1s var(--ease), opacity 1s var(--ease); }
+    z-index: var(--zi, 1); opacity: var(--o, 0); transform: translateX(calc(var(--d, 0) * var(--og) + var(--dx, 0px))) scale(var(--k, .4)); transition: transform 1s var(--ease), opacity 1s var(--ease); }
+  .ocar { cursor: grab; touch-action: pan-y; outline: none; } .ocar.drag { cursor: grabbing; } .ocar.drag .orb { transition: none; }
+  .ocar:focus-visible .orb[style*="--d: 0"], .ocar:focus-visible .orb[style*="--d:0"] { outline: 2px solid #fff; outline-offset: 4px; }
+  .odots { display: flex; justify-content: center; gap: 8px; margin-top: 4px; } .ometa .odots button { width: 7px; height: 7px; padding: 0; border-radius: 4px; background: rgba(255,255,255,.3); transition: width .4s var(--ease), background .3s; }
+  .ometa .odots button[aria-current="true"] { width: 22px; background: #fff; } .ometa .odots button:hover { background: rgba(255,255,255,.6); }
+  .ometa .odots button::after { content: ""; position: absolute; inset: -18px -6px; } .ometa .odots button { position: relative; }
   .orb.now { transition: none; }
   .orb canvas { display: block; width: 100%; height: 100%; border-radius: 50%; }
   .oplay { position: absolute; left: 50%; top: 50%; z-index: 5; display: grid; place-items: center; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: #fff; color: #000; box-shadow: 0 10px 26px -10px rgba(0,0,0,.45); transition: transform .35s var(--ease); }
@@ -1034,6 +1278,18 @@
     *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
     .hbg { opacity: 1; transform: none; } .frame rect { stroke-dashoffset: 0; } .fui, .badges span, .hcopy > * { opacity: 1; } .js .rise { opacity: 1; transform: none; }
   }
+  /* the orbs breathe inside like clouds: two soft copies of the orb's own colour drift past each other at different speeds,
+     so the colour gathers, thins and rolls on without ever repeating; the circle and its grain stay still; small orbs and map pins stay still */
+  :is(.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob) { position: relative; overflow: hidden; isolation: isolate; animation: odrift 22s ease-in-out infinite alternate; background-size: 140% 140% !important; }
+  .bm-cover .bm-orb.xl { animation: bmBreathe 9s ease-in-out infinite alternate, odrift 22s ease-in-out infinite alternate; }
+  @keyframes odrift { 0% { background-position: 10% 20%; } 50% { background-position: 80% 40%; } 100% { background-position: 40% 90%; } }
+  .ocl { position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; background: inherit; background-size: 100% 100% !important; animation: none; }
+  .ocl.a { opacity: .55; filter: blur(8px); animation: cla 13s ease-in-out infinite alternate; }
+  .ocl.b { opacity: .38; filter: blur(14px); animation: clb 19s ease-in-out infinite alternate; }
+  @keyframes cla { 0% { transform: translate(-14%, 8%) rotate(-12deg) scale(1.1); } 33% { transform: translate(10%, -6%) rotate(20deg) scale(.95); } 66% { transform: translate(-4%, -14%) rotate(55deg) scale(1.15); } 100% { transform: translate(14%, 10%) rotate(80deg) scale(1); } }
+  @keyframes clb { 0% { transform: translate(12%, -10%) rotate(150deg) scale(1.25); } 40% { transform: translate(-12%, 4%) rotate(110deg) scale(1.05); } 75% { transform: translate(6%, 14%) rotate(70deg) scale(1.3); } 100% { transform: translate(-10%, -8%) rotate(40deg) scale(1.1); } }
+  .bm-orb:nth-of-type(2n) .ocl, .bm-orb:nth-of-type(2n) { animation-delay: -5s; } .bm-orb:nth-of-type(3n) .ocl, .bm-orb:nth-of-type(3n) { animation-delay: -11s; }
+  @media (prefers-reduced-motion: reduce) { :is(.bm-orb, .forb, .nm-peek .ob), .ocl { animation: none !important; } .ocl { display: none; } }
 </style>
 </head>
 <body>
@@ -1080,7 +1336,7 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="pgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f55d6" stop-opacity=".28"/><stop offset="1" stop-color="#8f55d6" stop-opacity="0"/></linearGradient>
+    <linearGradient id="pgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c56b8" stop-opacity=".24"/><stop offset="1" stop-color="#2c56b8" stop-opacity="0"/></linearGradient>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20v-8M11 20V5M17 20v-5M3 20h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.500 4.500" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -1101,7 +1357,7 @@
     <a class="brand" href="#top" aria-label="TFN home"><svg aria-hidden="true"><use href="#logo"/></svg></a>
     <nav class="links" aria-label="Main"><a href="tfn-products.html" data-m="0">Products</a><a href="tfn-network.html" data-m="1">Network</a><a href="tfn-credit.html" data-m="2">Credit</a><a href="https://tfn.co.za/about-us/" data-m="3">Company</a></nav>
     <span class="grow"></span>
-    <a class="btn ghost sm" href="https://app.tfn.co.za/">Log in</a><a class="btn sm" href="#f">Get a quote</a>
+    <a class="btn ghost sm" href="https://app.tfn.co.za/">Log in</a><a class="btn sm" href="#f">Get a fuel quote</a>
   </div>
 </header>
 <div class="mega" id="mega" aria-hidden="true"></div>
@@ -1113,7 +1369,7 @@
     <div class="hin">
       <div class="hcopy">
         <h1>Fuel management, sorted</h1>
-        <p>TFN gets your trucks diesel at negotiated prices at 270+ truck stops across Southern Africa, and handles the payment and the paperwork. Your drivers fill up through the TFN Pay app, and you see every litre live in your dashboard.</p>
+        <p>Negotiated diesel at 270+ truck stops across Southern Africa. Every fill paid, logged and live.</p>
         <a class="btn" href="#f">Get a fuel quote</a>
       </div>
       <div class="hphone" aria-hidden="true"><div class="hp"><i class="hbtn"></i><div class="phs"><div class="app" data-fit="375">
@@ -1133,7 +1389,7 @@
           <div class="tabbar"><div class="tb on"><svg><use href="#i-home"/></svg>Home</div><div class="tb"><svg><use href="#i-pin"/></svg>Map</div><div class="tb"><svg><use href="#i-chart"/></svg>Insights</div><div class="tb"><svg><use href="#i-people"/></svg>Account</div></div>
           <span class="hbar"></span>
         </div></div></div></div>
-        <div class="hbadges" aria-hidden="true"><span><i class="mesh h-blue"></i>Fill recorded · 420 L</span><span><i class="mesh h-teal"></i>Diesel R 20.19/L · Harrismith</span></div>
+        <div class="hbadges" aria-hidden="true"><span><i class="ob ob-blue"></i>Fill recorded · 420 L</span><span><i class="ob ob-teal"></i>Diesel R 20.19/L · Harrismith</span></div>
     </div>
   </section>
 
@@ -1147,7 +1403,7 @@
   <!-- 3. white split: a portrait whose background is our blue -->
   <section class="sec" id="a">
     <div class="wrap split">
-      <div class="pic rise" aria-hidden="true"><div class="amap dark" data-s="1.15" data-t0=".12" data-dur="56000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg></div><div class="asearch mgl" style="top:14px"><svg><use href="#i-search"/></svg>Truck stops near you</div><div class="chip mgl" style="z-index:3"><i class="mesh h-blue"></i><span>Saved this month</span><b data-roll>R 4,210</b></div></div>
+      <div class="pic rise" aria-hidden="true"><div class="amap" data-s="1.15" data-t0=".12" data-dur="56000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg></div><div class="asearch mgl" style="top:14px"><svg><use href="#i-search"/></svg>Search TFN truck stops</div><div class="chip mgl" style="z-index:3"><i class="ob ob-blue"></i><span>Saved this month</span><b data-roll>R 4,210</b></div></div>
       <div>
         <h2>Your route, refuelled</h2>
         <p>Your drivers fill up at any of 270+ TFN truck stops at prices below the grid price, and every litre is logged against the truck and driver.</p>
@@ -1162,13 +1418,13 @@
   <section class="scene" id="b">
     <div class="bg on" style="--img:url(img/pay-nozzle.jpg)" aria-hidden="true"></div>
     <div class="bg" style="--img:url(img/save-desk.jpg); background-position: 70% 40%" aria-hidden="true"></div>
-    <div class="bg" style="--img:url(img/track-trucks.jpg); background-position: 50% 50%" aria-hidden="true"></div>
+    <div class="bg" style="--img:url(img/k-night-truck.jpg); background-position: 50% 50%" aria-hidden="true"></div>
     <div class="veil" aria-hidden="true"></div>
     <div class="wrap">
       <h2>No cards, no cash, no slips</h2>
       <p class="sub">You place the order, your driver fills up, and TFN Pay checks the location and photographs the pump. The fill is in your dashboard before the truck pulls away.</p>
       <a class="btn light" href="tfn-on-road.html">See how it works</a>
-      <div class="gphone gl" id="gp"><small class="val" id="gpl">Fill recorded</small><strong id="gpv">420 L</strong><span class="pill">TFN 204 GP</span><div class="dots"><i class="on"></i><i></i><i></i></div></div>
+      <div class="gphone gl" id="gp"><div class="gtop"><i class="gth" aria-hidden="true"></i><div><small class="val" id="gpl">Fill recorded</small><strong id="gpv">420 L</strong></div></div><span class="pill">TFN 204 GP · Harrismith</span><ul class="gck"><li>Location checked</li><li>Truck matched</li><li>Pump photo saved</li></ul><div class="dots"><i class="on"></i><i></i><i></i></div></div>
       <div class="pills" id="pills"><button class="gl" aria-pressed="true">Order</button><button class="gl" aria-pressed="false">Save</button><button class="gl" aria-pressed="false">Track</button></div>
     </div>
   </section>
@@ -1210,7 +1466,7 @@
               </div>
             </div>
             <div class="pv" data-v="1"><div class="ptable" id="ptable"></div></div>
-            <div class="pv" data-v="2"><div class="pcard pmapc"><div class="amap dark" data-s=".95" data-t0=".25" data-dur="44000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg>
+            <div class="pv" data-v="2"><div class="pcard pmapc"><div class="amap" data-s=".95" data-t0=".25" data-dur="44000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg>
               <div class="plist mgl"><div><i class="sd ok"></i><span>TFN 204 GP<small>Main Road · 42 km/h</small></span></div><div><i class="sd bad"></i><span>CXR 552 GP<small>Station Road · stopped</small></span></div><div><i class="sd ok"></i><span>BHJ 118 GP<small>Church Street · 36 km/h</small></span></div></div>
             </div></div></div>
             <div class="pv" data-v="3"><div class="prep"><div class="pcard"><div class="pch"><b>Spend by month</b><span>Last 12 months</span></div><div class="pbars" id="pbars"></div></div>
@@ -1244,12 +1500,12 @@
           </div>
           <div class="pscr hide amapscr" data-s="2">
             <div class="amap" data-s=".85" data-t0=".55" data-dur="40000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg></div>
-            <div class="asearch mgl"><svg><use href="#i-search"/></svg>TFN depots near you</div>
+            <div class="asearch mgl"><svg><use href="#i-search"/></svg>Search TFN truck stops</div>
             <div class="asheet mgl"><span><b>TFN depot</b><small>1.2 km · 4 min</small></span><span class="go">Go</span></div>
           </div>
           <div class="pscr hide ains" data-s="3">
             <h3>Insights</h3>
-            <div class="adonut"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="60" style="--l:154;stroke:#3d8ee0"/><circle cx="80" cy="80" r="60" style="--l:86;stroke:#e0559a;stroke-dashoffset:-158"/><circle cx="80" cy="80" r="60" style="--l:71;stroke:#8f55d6;stroke-dashoffset:-248"/><circle cx="80" cy="80" r="60" style="--l:50;stroke:#2fb5b0;stroke-dashoffset:-323"/></svg><div class="c"><b>R 3,120</b><small>saved this month</small></div></div>
+            <div class="adonut"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="60" style="--l:154;stroke:#2c56b8"/><circle cx="80" cy="80" r="60" style="--l:86;stroke:#a8447a;stroke-dashoffset:-158"/><circle cx="80" cy="80" r="60" style="--l:71;stroke:#4a35a6;stroke-dashoffset:-248"/><circle cx="80" cy="80" r="60" style="--l:50;stroke:#2fb5b0;stroke-dashoffset:-323"/></svg><div class="c"><b>R 3,120</b><small>saved this month</small></div></div>
             <div class="alist">
               <div><span class="dot h-blue"></span><span>Diesel price</span><b>R 1,310</b></div>
               <div><span class="dot h-pink"></span><span>Better routes</span><b>R 720</b></div>
@@ -1290,13 +1546,14 @@
     </div>
     <div class="orbstage" id="orbstage">
       <div class="coins" id="coins" aria-hidden="true"></div>
-      <div class="ocar" id="ocar" role="group" aria-roledescription="carousel" aria-label="What credit covers">
+      <div class="ocar" id="ocar" role="group" tabindex="0" aria-roledescription="carousel" aria-label="What credit covers. Drag, swipe or use the arrow keys">
         <div class="orb" aria-hidden="true"><canvas></canvas></div><div class="orb" aria-hidden="true"><canvas></canvas></div><div class="orb" aria-hidden="true"><canvas></canvas></div><div class="orb" aria-hidden="true"><canvas></canvas></div>
         <a class="oplay" id="oplay" href="tfn-on-road.html" aria-label="Diesel on credit"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
       <div class="ometa">
         <button type="button" id="oprev" aria-label="Previous"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="olab" id="olab" aria-live="polite"><b>Diesel <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></b><span>Fill up on credit at every TFN truck stop.</span></div>
+        <div class="odots" id="odots" style="grid-column:1/-1;grid-row:2"><button type="button" aria-label="Diesel"></button><button type="button" aria-label="Non-fuel"></button><button type="button" aria-label="Cross-border"></button><button type="button" aria-label="Homebase"></button></div>
         <button type="button" id="onext" aria-label="Next"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
@@ -1346,6 +1603,7 @@
                 <p class="f" id="nmFuel"></p>
                 <div class="nm-row"><span>Tank range</span><span class="nm-seg" id="nmRange"><button type="button" data-r="600" aria-pressed="false">600 km</button><button type="button" data-r="800" aria-pressed="true">800 km</button><button type="button" data-r="1000" aria-pressed="false">1,000 km</button></span></div>
                 <button type="button" class="nm-start" id="nmStart">Start</button>
+                <div class="nm-alts" id="nmAlts" role="radiogroup" aria-label="Routes, cheapest first"></div>
                 <ol class="nm-itin" id="nmItin"></ol>
               </div>
             </div>
@@ -1410,9 +1668,9 @@
   <section class="stack" id="k">
     <div class="wrap center"><h2 class="title">Join the transporters fuelling 44M+ litres a month</h2><p class="sub" style="margin-bottom:64px">Pick the set-up that fits how you move freight.</p></div>
     <div class="wrap scs">
-      <article class="sc"><div class="im" style="--img:url(img/k-night-truck.jpg); background-position: 45% 50%" aria-hidden="true"><div class="gl"><span class="dot h-blue"></span>270+ truck stops</div></div><div class="tx"><h3>Transporters</h3><p>For your own fleet: refuel on the road, pay from one account and see every truck live.</p><a class="btn light" href="tfn-on-road.html">Fuel for transporters</a></div></article>
-      <article class="sc"><div class="im" style="--img:url(img/k-warehouse.jpg); background-position: 50% 30%" aria-hidden="true"><div class="gl"><span class="dot h-pink"></span>One account for every contractor</div></div><div class="tx"><h3>Service providers</h3><p>For companies that use subcontractors: add each one to your account, set their limits and add your own markup.</p><a class="btn light" href="tfn-on-road.html">Fuel for service providers</a></div></article>
+      <article class="sc"><div class="im" style="--img:url(img/driver-truck.jpg); background-position: 55% 46%" aria-hidden="true"><div class="gl"><span class="dot h-blue"></span>270+ truck stops</div></div><div class="tx"><h3>Transporters</h3><p>For your own fleet: refuel on the road, pay from one account and see every truck live.</p><a class="btn light" href="tfn-on-road.html">Fuel for transporters</a></div></article>
       <article class="sc"><div class="im" style="--img:url(img/k-namibia.jpg); background-position: 50% 55%" aria-hidden="true"><div class="gl"><span class="dot h-violet"></span>5 countries beyond South Africa</div></div><div class="tx"><h3>Cross-border</h3><p>For routes beyond South Africa: refuel in five neighbouring countries and pay in rand.</p><a class="btn light" href="tfn-africa.html">Fuel across borders</a></div></article>
+      <article class="sc"><div class="im" style="--img:url(img/manager-tablet.jpg); background-position: 50% 25%" aria-hidden="true"><div class="gl"><span class="dot h-pink"></span>One account for every contractor</div></div><div class="tx"><h3>Service providers</h3><p>For companies that use subcontractors: add each one to your account, set their limits and add your own markup.</p><a class="btn light" href="tfn-on-road.html">Fuel for service providers</a></div></article>
     </div>
   </section>
 
@@ -1435,8 +1693,9 @@
     <div class="veil" style="background:linear-gradient(rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 35%, rgba(5,12,28,.55) 62%, rgba(5,12,28,.85) 100%)" aria-hidden="true"></div>
     <div class="wrap">
       <h2>Join 168K+ transactions a month on TFN</h2>
-      <p class="sub">270+ truck stops. Six countries. One account. Tell us about your operation and get a personalised fuel quote.</p>
-      <a class="btn light" href="https://tfn.co.za/your-fuel-quote/">Get your fuel quote</a>
+      <div class="fstats"><div><b data-roll>270+</b>truck stops</div><div><b data-roll>6</b>countries</div><div><b data-roll>1</b>account</div></div>
+      <p class="sub">Tell us about your operation and get a personalised fuel quote.</p>
+      <a class="btn light" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a>
     </div>
   </section>
 </main>
@@ -1450,16 +1709,21 @@
       <div><h4>Company</h4><ul><li><a href="https://tfn.co.za/about-us/">About TFN</a></li><li><a href="https://tfn.co.za/">News</a></li><li><a href="https://tfn.co.za/contact-us/">Contact us</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="https://tfn.co.za/tfn-support/">Contact support</a></li><li><a href="https://tfn.co.za/terms-conditions/">Terms and conditions</a></li><li><a href="https://app.tfn.co.za/">Log in</a></li></ul></div>
     </div>
-    <div class="fbrand"><svg aria-label="TFN"><use href="#logo"/></svg></div>
+    <div class="fbrand"><svg aria-label="TFN"><use href="#logo"/></svg><span class="forb" aria-hidden="true"></span></div>
     <div class="legal"><p>© 2026 TFN. Design concept. Figures and customer quotes are from tfn.co.za. Photographs are Unsplash stock used as placeholders and do not show TFN customers. Screens, plates, prices and savings in the product mock-ups are illustrative.</p><p><sup>1</sup> Credit is subject to approval by the credit provider. <sup>2</sup> Estimate only. Your saving depends on route, volume and depot pricing. <sup>3</sup> Homebase fees are tiered by monthly on-road volume and shown for guidance.</p></div>
   </div>
 </footer>
 
-<a class="btn sticky" id="sticky" href="#f">Get a fuel quote</a>
+<a class="btn sticky" id="sticky" href="#f" aria-hidden="true" tabindex="-1">Get a fuel quote</a>
+<nav class="dock" id="dock" aria-label="Jump to a section">
+  <a class="dk-logo" href="#top" aria-label="TFN, back to the top"><svg aria-hidden="true"><use href="#logo"/></svg></a>
+  <div class="dk-tabs"><a href="#b">How it works</a><a href="#d">Credit</a><a href="#m">Map</a><a href="#calc">Savings</a></div>
+  <a class="dk-cta" href="#f">Get a fuel quote</a>
+</nav>
 <!-- the brand guide: a second view of this page (the Site / Brand guide tab, or #brand) -->
 <div class="bm" id="bmGuide" hidden>
-  <div class="bm-top"><svg aria-label="TFN"><use href="#logo"/></svg><span>Brand guidelines</span><span class="grow"></span><a href="#bm-downloads">Download assets</a></div>
-  <header class="bm-cover">
+  <div class="bm-top"><svg aria-label="TFN"><use href="#logo"/></svg><span>Brand guidelines</span><span class="grow"></span><button type="button" class="bm-dm" id="bmDm" aria-label="Switch the guide to dark" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><a href="#bm-downloads">Download assets</a></div>
+  <header class="bm-cover" id="bmCover">
     <span class="bm-orb diesel xl" aria-hidden="true"></span>
     <div>
       <p class="lbl">Brand guidelines · 2026</p>
@@ -1478,7 +1742,7 @@
     </nav>
     <div>
       <section id="bm-why">
-        <div class="bm-ch dark"><span class="n">01</span><h2>Why it works</h2><p>Every choice has a reason grounded in how people read, trust and decide. When something new comes up, decide it the same way.</p></div>
+        <div class="bm-ch dark" style="--lc:#3d68c0"><span class="n">01</span><h2>Why it works</h2><p>Every choice has a reason grounded in how people read, trust and decide. When something new comes up, decide it the same way.</p></div>
         <div class="bm-why">
           <article><div><small>Principle</small><h3>Black and white, colour only in the product</h3><p>The structure stays quiet so the product can speak.</p></div>
             <div><small>How TFN does it</small><p>Sections are white or black. Colour lives in things: the orbs, the app, the maps, the photos. Buttons and type stay ink or white.</p></div>
@@ -1496,7 +1760,7 @@
             <div><small>How TFN does it</small><p>The app, the portal and the map are the hero. Claims are numbers we can stand behind: 270+ truck stops, 44M+ litres a month, 168K+ transactions.</p></div>
             <div class="bc"><small>Why it works</small><p><b>Specificity and social proof.</b> An exact number is believed more than "many". Volume from other transporters says "people like you already trust this".</p></div></article>
           <article><div><small>Principle</small><h3>Colour tells products apart</h3><p>Each product keeps one accent, everywhere.</p></div>
-            <div><small>How TFN does it</small><p>On-Road blue, LCV cyan, Non-Fuel slate, Network indigo, Homebase teal, Africa violet, Credit rose.</p></div>
+            <div><small>How TFN does it</small><p>On-Road blue, LCV cyan, Non-Fuel slate, Network indigo, Homebase teal, Africa violet, Credit plum.</p></div>
             <div class="bc"><small>Why it works</small><p><b>Recognition over recall.</b> When colour always means the same product, people stop reading labels and just know.</p></div></article>
           <article><div><small>Principle</small><h3>The logo never changes</h3><p>One wordmark, two colours, fixed space around it.</p></div>
             <div><small>How TFN does it</small><p>The TFN wordmark is black on light or white on dark, nothing else, with clear space equal to the height of the T.</p></div>
@@ -1505,12 +1769,12 @@
         <p class="bm-sub">Two more, for a price-led product</p>
         <div class="bm-grid">
           <div class="bm-card"><h3>Price first</h3><p>On the map, the price is the marker. The cheapest in view says "Lowest". Savings are shown against the regional average.</p><p class="why"><b>Anchoring.</b> A price only means something next to a reference. The average is a fair anchor; the priciest stop would flatter us and erode trust.</p></div>
-          <div class="bm-card"><h3>The odd one out</h3><p>Colour is used so rarely that when it appears it means something: the Lowest pill, your fuel stops, a warning spark.</p><p class="why"><b>Von Restorff (isolation) effect.</b> The one item that differs is the one remembered. Spend colour on what you want noticed.</p></div>
+          <div class="bm-card"><h3>The odd one out</h3><p>Colour is used so rarely that when it appears it means something: the Lowest pill, your fuel stops, a warning.</p><p class="why"><b>Von Restorff (isolation) effect.</b> The one item that differs is the one remembered. Spend colour on what you want noticed.</p></div>
         </div>
       </section>
 
       <section id="bm-idea">
-        <div class="bm-ch"><span class="n">02</span><h2>The idea</h2><p>Fuel management, sorted. Negotiated diesel at 270+ truck stops, the payment and paperwork handled, every litre live.</p></div>
+        <div class="bm-ch" style="--lc:#1f7a62"><span class="n">02</span><h2>The idea</h2><p>Fuel management, sorted. Negotiated diesel at 270+ truck stops, the payment and paperwork handled, every litre live.</p></div>
         <div class="bm-card dark" style="padding:32px 30px;margin-bottom:16px"><p class="bm-sub" style="color:#a8a8a8;margin:0 0 10px">Look and feel</p><h3 style="font-size:1.9rem;line-height:1.15;letter-spacing:-.015em;max-width:18em">Premium fintech, built for transport. Upmarket and exact, never glossy, never cheap.</h3><p style="margin-top:12px;max-width:40em">The calm of a private bank, the clarity of a live dashboard, the honesty of the road. Restraint is the luxury: few colours, real photos, exact numbers.</p></div>
         <div class="bm-grid">
           <div class="bm-card"><h3>Who it's for</h3><p>Transport owners and their operations and fleet managers, who buy the fuel. Drivers, who use the app at the pump. Service providers running subcontractors.</p></div>
@@ -1521,7 +1785,7 @@
       </section>
 
       <section id="bm-logo">
-        <div class="bm-ch dark"><span class="n">03</span><h2>Logo</h2><p>The TFN wordmark in a heavy, soft, high-contrast serif: the only serif in the brand. Black on light, white on dark, nothing else.</p></div>
+        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">03</span><h2>Logo</h2><p>The TFN wordmark in a heavy, soft, high-contrast serif: the only serif in the brand. Black on light, white on dark, nothing else.</p></div>
         <p class="bm-sub">Construction and clear space</p>
         <div class="bm-cons"><div class="box"><svg aria-label="TFN"><use href="#logo"/></svg><span class="x t">x</span><span class="x b">x</span><span class="x l">x</span><span class="x r">x</span></div><span class="lg">x = cap height of the T · keep this space clear on every side</span></div>
         <div class="bm-pair"><div><svg aria-label="TFN"><use href="#logo"/></svg></div><div class="dark"><svg aria-label="TFN"><use href="#logo"/></svg></div></div>
@@ -1547,10 +1811,10 @@
       </section>
 
       <section id="bm-colour">
-        <div class="bm-ch"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A warm spark marks status, and nothing else.</p></div>
+        <div class="bm-ch" style="--lc:#2c56b8"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A tiny flash of TFN orange marks something live, and nothing else.</p></div>
         <p class="bm-sub">Proportion</p>
-        <div class="bm-ratio" role="img" aria-label="Roughly: white 56%, black and ink 34%, product and orb colour 9%, spark 1%"><i style="flex:56;background:#fafafa"></i><i style="flex:34;background:#000"></i><i style="flex:9;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
-        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 56%</li><li><i style="background:#000"></i>Black and ink · 34%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i>Product and orb colour · 9%</li><li><i style="background:#f2761d"></i>Spark · 1%</li></ul>
+        <div class="bm-ratio" role="img" aria-label="Roughly: white 56%, black and ink 34%, product and orb colour 9%, TFN orange 1%"><i style="flex:56;background:#fafafa"></i><i style="flex:34;background:#000"></i><i style="flex:9;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
+        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 56%</li><li><i style="background:#000"></i>Black and ink · 34%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i>Product and orb colour · 9%</li><li><i style="background:#f2761d"></i>TFN orange · 1%</li></ul>
         <p class="bm-sub">Structure</p>
         <div class="bm-sw">
           <div class="sw" data-hex="#FFFFFF" data-pms="—"><i style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"></i><div><b>White</b><span class="use">Grounds, type on black</span></div></div>
@@ -1568,27 +1832,32 @@
           <tr data-hex="#3346A8" data-pms="2728 C"><td class="c"><i></i></td><td>Network</td></tr>
           <tr data-hex="#138A85" data-pms="7716 C"><td class="c"><i></i></td><td>Homebase</td></tr>
           <tr data-hex="#6B62C9" data-pms="2725 C"><td class="c"><i></i></td><td>TFN Africa · accent only</td></tr>
-          <tr data-hex="#B0436E" data-pms="7432 C"><td class="c"><i></i></td><td>Credit · accent only</td></tr>
+          <tr data-hex="#A2468E" data-pms="248 C"><td class="c"><i></i></td><td>Credit · accent only</td></tr>
         </tbody></table></div>
         <p class="bm-note">* Nearest Pantone matches. Confirm against a printed swatch book before production. CMYK is a starting point for coated stock.</p>
+        <p class="bm-sub">The same colours, as light</p>
+        <div class="bm-lights" aria-hidden="true"><span style="--c:#2a6fd0">On-Road</span><span style="--c:#0e8fb3">LCV</span><span style="--c:#4f6b8a">Non-Fuel</span><span style="--c:#3346a8">Network</span><span style="--c:#138a85">Homebase</span><span style="--c:#6b62c9">Africa</span><span style="--c:#a2468e">Credit</span></div>
+        <p class="bm-note">Orange belongs to TFN too, but only as a breath: an ember inside an orb, a live dot. Never a fill, never an action. On dark app screens the product colours glow rather than fill. Use them as light: soft, from one source, never as a flat block.</p>
         <p class="bm-sub">Orb palette · inside orbs only</p>
         <div class="bm-strip">
-          <div style="background:#a6d4ec"><b>Sky</b><code>#A6D4EC</code></div><div style="background:#5f8fd6;color:rgba(255,255,255,.85)"><b style="color:#fff">Blue</b><code>#5F8FD6</code></div><div style="background:#a796e0"><b>Lavender</b><code>#A796E0</code></div>
-          <div style="background:#8ccdb2"><b>Sea</b><code>#8CCDB2</code></div><div style="background:#e3a0bd"><b>Pink</b><code>#E3A0BD</code></div><div style="background:#efb79c"><b>Peach</b><code>#EFB79C</code></div>
+          <div style="background:#8db8e6"><b>Sky</b><code>#8DB8E6</code></div><div style="background:#2c56b8;color:rgba(255,255,255,.8)"><b style="color:#fff">Blue</b><code>#2C56B8</code></div><div style="background:#1f2f80;color:rgba(255,255,255,.8)"><b style="color:#fff">Navy</b><code>#1F2F80</code></div>
+          <div style="background:#4a35a6;color:rgba(255,255,255,.8)"><b style="color:#fff">Violet</b><code>#4A35A6</code></div><div style="background:#1f7a62;color:rgba(255,255,255,.8)"><b style="color:#fff">Teal</b><code>#1F7A62</code></div><div style="background:#a8447a;color:rgba(255,255,255,.8)"><b style="color:#fff">Rose</b><code>#A8447A</code></div><div style="background:#d0763a;color:rgba(255,255,255,.85)"><b style="color:#fff">Ember</b><code>#D0763A · a breath</code></div>
         </div>
-        <p class="bm-sub">The spark</p>
-        <div class="bm-spark"><i><span>Live</span></i><div><p><b>#F2761D</b> marks status: live, new, a saving, a low tank. A small dot or a short label, on white or dark grey.</p><p>Never a call to action, never a fill, never on black. Orange reads as an alert, so an orange button reads as a warning, not an action.</p></div></div>
+        <p class="bm-sub">TFN orange</p>
+        <div class="bm-spark"><i><span>Live</span></i><div><p><b>#F2761D</b> is a tiny flash for something live or new: a small dot, on light screens only. On dark screens, live uses the product colour; warnings use red.</p><p>Never a call to action, never a fill, never a big number, never on black. Orange reads as an alert, so an orange button reads as a warning, not an action.</p></div></div>
       </section>
 
       <section id="bm-type">
-        <div class="bm-ch dark"><span class="n">05</span><h2>Type</h2><p>One geometric sans, said plainly. Aeonik Pro is the face; Satoshi stands in until it is licensed. App screens use the system font.</p></div>
-        <div class="bm-aa"><b>Aa</b><div><p>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 R % + / · ¹ ² ³</p><small>Aeonik Pro · stand-in Satoshi</small></div></div>
+        <div class="bm-ch" style="--lc:#1f7a62"><span class="n">05</span><h2>Type</h2><p>One geometric sans, said plainly. Aeonik Pro is the face; Satoshi stands in until it is licensed. App screens use the system font.</p></div>
+        <div class="bm-aa"><b id="bmAa">Aa</b><div><p>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 R % + / · ¹ ² ³</p><small>Aeonik Pro · stand-in Satoshi</small></div></div>
         <div class="bm-wts">
           <div><span style="font-weight:400">Regular</span><small>400 · body</small></div>
           <div><span style="font-weight:500">Medium</span><small>500 · headlines, buttons</small></div>
           <div><span style="font-weight:700">Bold</span><small>700 · prices, sparingly</small></div>
           <div class="serif"><svg><use href="#logo"/></svg><small>Serif · the wordmark only</small></div>
         </div>
+        <p class="bm-sub">Scale, live</p>
+        <div class="bm-ramp"><span id="bmRampT">Fill up here now?</span><small id="bmRampL">Footnote · 13px</small></div>
         <p class="bm-sub">Scale</p>
         <div class="bm-type">
           <div><small>Display · h1<br>85 / 1.0 · 500 · −2.5%</small><span class="t1">Fuel, sorted</span></div>
@@ -1596,7 +1865,7 @@
           <div><small>Title · h3<br>22 / 1.2 · 600</small><span class="t3">Pick your set-up</span></div>
           <div><small>Body<br>18 / 1.5 · 400</small><span class="t4">Your drivers fill up at any of 270+ TFN truck stops, and every litre is logged against the truck.</span></div>
           <div><small>Footnote<br>13 / 1.5 · 400</small><span class="t5">¹ Credit is subject to approval by the credit provider.</span></div>
-          <div><small>App · system font<br>17 / 1.3</small><span class="app">Fill up here now?</span></div>
+          <div><small>App · system font<br>17 / 1.3</small><span class="t6">Fill up here now?</span></div>
         </div>
         <p class="bm-sub">Rules</p>
         <dl class="bm-specs">
@@ -1607,7 +1876,7 @@
       </section>
 
       <section id="bm-orbs">
-        <div class="bm-ch"><span class="n">06</span><h2>Orbs and gradients</h2><p>The orb is TFN's icon and its colour: deep, matte colour fields under a fine grain, like light through frosted glass at night. One orb per product family.</p></div>
+        <div class="bm-ch dark moment" style="--lc:#4a35a6"><span class="n">06</span><h2>Orbs and gradients</h2><p>The orb is TFN's icon and its colour: deep, matte colour fields under a fine grain, like light through frosted glass at night. One orb per product family.</p><div class="vis orbs3" aria-hidden="true"><span class="bm-orb diesel a"></span><span class="bm-orb nonfuel b"></span><span class="bm-orb homebase c"></span></div></div>
         <div class="bm-orbs">
           <figure><span class="bm-orb diesel"></span><figcaption>Diesel<span>the app, the map, On-Road</span></figcaption></figure>
           <figure><span class="bm-orb nonfuel"></span><figcaption>Non-fuel<span>services on the network</span></figcaption></figure>
@@ -1632,7 +1901,7 @@
       </section>
 
       <section id="bm-icons">
-        <div class="bm-ch dark"><span class="n">07</span><h2>Iconography</h2><p>Plain outline icons on a 24px grid. They label things; they never decorate.</p></div>
+        <div class="bm-ch" style="--lc:#3d68c0"><span class="n">07</span><h2>Iconography</h2><p>Plain outline icons on a 24px grid. They label things; they never decorate.</p></div>
         <div class="bm-igrow">
           <div class="bm-ig"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pump"/></svg></div>
           <dl class="bm-specs" style="grid-template-columns:1fr">
@@ -1651,13 +1920,15 @@
       </section>
 
       <section id="bm-layout">
-        <div class="bm-ch"><span class="n">08</span><h2>Layout</h2><p>One 1000px column on the web, a 16px margin in the app, spacing in steps of 8. Generous space is part of the premium feel.</p></div>
+        <div class="bm-ch" style="--lc:#1f7a62"><span class="n">08</span><h2>Layout</h2><p>One 1000px column on the web, a 16px margin in the app, spacing in steps of 8. Generous space is part of the premium feel.</p></div>
         <p class="bm-sub">Web · 12 columns</p>
         <div class="bm-cols"><div class="g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="c" aria-hidden="true"><i class="h"></i><i></i><i></i><i class="p"></i></div></div>
         <dl class="bm-specs" style="margin-top:20px">
           <div><dt>Column</dt><dd>1000px, centred; 24px minimum margin.</dd></div><div><dt>Grid</dt><dd>12 columns, 24px gutters.</dd></div>
           <div><dt>Sections</dt><dd>110px apart; full-screen scenes on the home page.</dd></div><div><dt>Radius</dt><dd>Cards 20–28px, buttons full pills.</dd></div>
         </dl>
+        <p class="bm-sub">Depth · three levels, nothing else</p>
+        <div class="bm-elev"><div class="e0"><b>Flat</b><small>Grounds, tiles, tables</small></div><div class="e1"><b>Raised</b><small>Cards, chips, pills</small></div><div class="e2"><b>Floating</b><small>Sheets, the map card, menus</small></div></div>
         <p class="bm-sub">App · 8-point spacing</p>
         <div class="bm-grid" style="align-items:center">
           <div class="bm-phone" aria-hidden="true"><div><span class="m l"></span><span class="m r"></span><span class="s" style="top:28px"></span><span class="blk" style="top:40px;height:34px;border-radius:12px"></span><span class="blk" style="top:84px;height:24px;width:50%;border-radius:999px"></span><span class="blk" style="top:120px;height:150px"></span><span class="blk" style="bottom:56px;height:90px;border-radius:20px;background:#dfe2e8"></span><span class="s" style="bottom:46px"></span></div></div>
@@ -1669,21 +1940,21 @@
       </section>
 
       <section id="bm-ui">
-        <div class="bm-ch dark"><span class="n">09</span><h2>Components</h2><p>Pills mean action. Cards are calm, rounded surfaces. One primary action per view.</p></div>
+        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">09</span><h2>Components</h2><p>Pills mean action. Cards are calm, rounded surfaces. One primary action per view.</p></div>
         <div class="bm-comp">
           <div><h3>Site button</h3><div class="bm-row"><span class="bm-btn">Get a fuel quote</span></div><p>Full pill, 44px, ink on white, weight 500.</p></div>
           <div class="dark"><h3>On dark</h3><div class="bm-row"><span class="bm-btn w">How credit works</span></div><p>White pill on black. Same size and weight.</p></div>
           <div><h3>App main action</h3><div class="bm-row"><span class="bm-btn go">Go</span><span class="bm-btn ghost">Later</span></div><p>The deep gradient, 50px, 14px radius. Only Go and Start get it.</p></div>
           <div><h3>Filter chips</h3><div class="bm-row"><span class="bm-chip on">Diesel 50ppm</span><span class="bm-chip">AdBlue <small>34</small></span><span class="bm-chip">Overnight <small>31</small></span></div><p>White on the map, the gradient when chosen. Counts are for what's in view.</p></div>
           <div><h3>Sheet</h3><div class="bm-sheet"><b>Villiers Truck Inn</b><small>Truck stop · 2 h 05 min away</small><p class="pr">R 18.73</p><span class="pd">R1.68 below the Free State average</span><div class="two"><span>Later</span><span class="go">Go</span></div></div><p>24px radius, price before the question, two actions.</p></div>
-          <div class="no"><span class="tag">Don't</span><div class="bm-row"><span class="bm-btn or">Get a quote</span></div><p>An orange button. Orange is status, never action.</p></div>
+          <div class="no"><span class="tag">Don't</span><div class="bm-row"><span class="bm-btn or">Get a fuel quote</span></div><p>An orange button. Orange is status, never action.</p></div>
         </div>
       </section>
 
       <section id="bm-maps">
-        <div class="bm-ch"><span class="n">10</span><h2>Maps</h2><p>Compare, plan and refuel: price first, one colour, nothing hidden. Light by default, in the diesel orb's colours.</p></div>
+        <div class="bm-ch" style="--lc:#2c56b8"><span class="n">10</span><h2>Maps</h2><p>Compare, plan and refuel: price first, one colour, nothing hidden. Light by default, in the diesel orb's colours.</p></div>
         <div class="bm-comp">
-          <div><h3>The marker</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span><span class="bm-pill lo"><span class="bm-orb diesel sm"></span>R 19.40</span></div><p>The price is the marker: orb, price, a tail at the spot. Below average in accent, above in ink.</p></div>
+          <div><h3>The marker</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span><span class="bm-pill lo"><span class="bm-orb diesel sm"></span>↓ R 19.40</span></div><p>The price is the marker: orb, price, a tail at the spot. Below average gets ↓ and the accent, so it never relies on colour alone.</p></div>
           <div><h3>The cheapest</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span></div><p>Only the cheapest open stop in view gets the gradient.</p></div>
           <div><h3>Not for you now</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill gr"><span class="bm-orb sm"></span>Opens 10:00</span><span class="bm-pill gr"><span class="bm-orb sm"></span>No petrol</span></div><p>Closed, or not selling what you chose: grey, and it says why.</p></div>
         </div>
@@ -1698,35 +1969,64 @@
       </section>
 
       <section id="bm-img">
-        <div class="bm-ch dark"><span class="n">11</span><h2>Imagery</h2><p>Real people and real trucks, never AI. The signature: the subject keeps its natural colour and the background takes a product hue.</p></div>
-        <div class="bm-hero-img" style="--img:url(img/hero-blue.jpg);background-position:right center"><span>Real photograph · background set in On-Road blue</span></div>
+        <div class="bm-ch dark moment photo" style="--lc:#1f6e5c"><span class="n">11</span><h2>Imagery</h2><p>Real people and real places. Colour comes from the light in the scene, not from editing: night offices, blue-hour roads, grey daylight.</p></div>
+        <div class="bm-card dark bm-photo-desc" style="padding:30px 30px 28px;margin-bottom:16px"><p class="bm-sub" style="color:#a8a8a8;margin:0 0 10px">Our photography, in one line</p>
+          <h3 style="font-size:1.6rem;line-height:1.25;letter-spacing:-.01em;max-width:22em">Real people doing real work, caught in the light they work in.</h3>
+          <p style="margin-top:12px;max-width:44em">We show the people who keep trucks moving: fleet managers, drivers and operations teams, at the depot, in the cab and in the office at night. Nothing is staged and nothing is painted on. The colour comes from the place itself: cool daylight in a warehouse, the navy and teal of an office after dark, blue hour on the N1. The grade is soft and quiet, so the photo feels calm and trustworthy, and there is always room beside the subject for a headline.</p>
+          <p style="margin-top:10px;max-width:44em;color:#c7c7cc"><b style="color:#fff">In three words:</b> real, calm, at work.</p></div>
+        <div class="bm-hero-img" style="--img:url(img/hero-manager.jpg);background-position:right center"><span>The colour is the room's own light · navy and teal</span></div>
         <div class="bm-grid" style="margin-top:16px">
-          <div class="bm-hero-img" style="--img:url(img/save-violet.jpg);height:260px"><span>Background in Africa violet</span></div>
-          <div class="bm-hero-img" style="--img:url(img/meeting-pink.jpg);height:260px"><span>Background in Credit rose</span></div>
+          <div class="bm-hero-img" style="--img:url(img/manager-warehouse.jpg);height:260px;background-position:center 30%"><span>The fleet manager at work, candid</span></div>
+          <div class="bm-hero-img" style="--img:url(img/plan-onroad.jpg);height:260px;background-position:center 52%"><span>A truck at blue hour, in its own light</span></div>
+        </div>
+        <p class="bm-sub">Drivers</p>
+        <div class="bm-grid c3">
+          <div class="bm-hero-img" role="img" aria-label="A driver checks his paperwork at the wheel of a blue truck" style="--img:url(img/driver-docs.jpg);height:300px;background-position:72% 40%"><span>Checking the load sheet</span></div>
+          <div class="bm-hero-img" role="img" aria-label="A driver looks down from the cab of a blue truck" style="--img:url(img/driver-portrait.jpg);height:300px;background-position:center 38%"><span>In the cab, unposed</span></div>
+          <div class="bm-hero-img" role="img" aria-label="A driver leans out of the window of a blue truck" style="--img:url(img/driver-window.jpg);height:300px;background-position:70% 40%"><span>The truck's own colour, no grade</span></div>
+        </div>
+        <p class="bm-sub">Anatomy of a TFN photo</p>
+        <div class="bm-anat" id="bmAnat">
+          <div class="ph" style="--img:url(img/hero-manager.jpg)">
+            <span class="cl" style="left:18%;top:42%">1</span><span class="cl" style="left:58%;top:14%">2</span><span class="cl" style="left:80%;top:52%">3</span><span class="cl" style="left:40%;top:80%">4</span>
+          </div>
+          <ol>
+            <li><b>Room for words.</b> The left half is calm and dark, so a headline can sit there without a box.</li>
+            <li><b>Colour from the light.</b> Navy and teal from the office at night; nothing painted on.</li>
+            <li><b>A real person at work.</b> Candid, looking at the job, natural skin. Off-centre, to the right.</li>
+            <li><b>A soft grade.</b> Low saturation, gentle contrast, a little grain. No orange, no glow.</li>
+          </ol>
+        </div>
+        <p class="bm-sub">Studio backdrops · products only, never people</p>
+        <div class="bm-strip" style="grid-template-columns:repeat(5,minmax(0,1fr))">
+          <div style="background:linear-gradient(160deg,#5d7593,#0b1626);color:rgba(255,255,255,.8)"><b style="color:#fff">Deep navy</b><code>#0B1626 → #5D7593</code></div>
+          <div style="background:linear-gradient(160deg,#5e9480,#0a2420);color:rgba(255,255,255,.8)"><b style="color:#fff">Teal</b><code>#0A2420 → #5E9480</code></div>
+          <div style="background:linear-gradient(160deg,#8a919a,#101216);color:rgba(255,255,255,.8)"><b style="color:#fff">Graphite</b><code>#101216 → #8A919A</code></div>
+          <div style="background:linear-gradient(160deg,#eceef1,#7a8088)"><b>Studio grey</b><code>#7A8088 → #ECEEF1</code></div>
+          <div style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"><b>White</b><code>#FFFFFF</code></div>
         </div>
         <dl class="bm-specs" style="margin-top:28px">
-          <div><dt>Source</dt><dd><b>Real photography only.</b> Never AI-generated people, trucks, places or products.</dd></div>
-          <div><dt>Treatment</dt><dd>Cut the subject out; set the background to one product hue, deep and slightly textured.</dd></div>
-          <div><dt>People</dt><dd>Keep natural skin and clothing colour. Candid, at work, never staged.</dd></div>
+          <div><dt>Source</dt><dd><b>Real photography first.</b> AI only if no one could tell: no uncanny eyes, odd hands, waxy skin or melted text. Almost real reads as fake; if in doubt, don’t.</dd></div>
+          <div><dt>Colour</dt><dd>From real light: deep navy, teal, graphite, white and grey. Low saturation, soft contrast.</dd></div>
+          <div><dt>Pink and violet</dt><dd>Only when they are really in the scene, like a dusk sky or a screen's glow. Never painted on.</dd></div>
+          <div><dt>Cut-outs</dt><dd>Never a person on a flat colour. People stay in a real place; studio backdrops are for products only.</dd></div>
+          <div><dt>People</dt><dd>Natural skin and clothing colour. Candid, at work, never staged.</dd></div>
           <div><dt>Context</dt><dd>Southern Africa: left-hand traffic, European cab-over trucks, no visible brands.</dd></div>
         </dl>
         <p class="bm-sub">Do and don't</p>
         <div class="bm-dd">
-          <figure><div class="v ph" style="--img:url(img/hero-blue.jpg);--pos:85% center"></div><figcaption><b>Do</b>Background in a product hue, the person untouched.</figcaption></figure>
-          <figure class="no"><div class="v ph" style="--img:url(img/save-desk.jpg);filter:grayscale(1) sepia(1) hue-rotate(250deg) saturate(3.2) brightness(.85)"></div><figcaption><b>Don't</b>Tint the whole photo, faces and all.</figcaption></figure>
+          <figure><div class="v ph" style="--img:url(img/hero-manager.jpg);--pos:right center"></div><figcaption><b>Do</b>Colour that comes from the light in the room.</figcaption></figure>
+          <figure class="no"><div class="v ph" style="--img:url(img/meeting-pink.jpg)"></div><figcaption><b>Don't</b>A bright painted backdrop. It looks edited and cheap.</figcaption></figure>
         </div>
         <div class="bm-dd">
           <figure><div class="v ph" style="--img:url(img/close-highway.jpg)"></div><figcaption><b>Do</b>Cool light: blue hour, night or clear daylight.</figcaption></figure>
-          <figure class="no"><div class="v ph" style="--img:url(img/close-highway.jpg);filter:sepia(.9) saturate(2.6) hue-rotate(-12deg) brightness(.95)"></div><figcaption><b>Don't</b>Orange sunsets: they fight the spark and read as cheap.</figcaption></figure>
+          <figure class="no"><div class="v ph" style="--img:url(img/close-highway.jpg);filter:sepia(.9) saturate(2.6) hue-rotate(-12deg) brightness(.95)"></div><figcaption><b>Don't</b>Orange sunsets: they fight TFN orange and read as cheap.</figcaption></figure>
         </div>
-        <div class="bm-dd">
-          <figure><div class="v ph" style="--img:url(img/k-night-truck.jpg)"></div><figcaption><b>Do</b>A real truck on a real road, shot well.</figcaption></figure>
-          <figure class="no"><div class="v" style="background:linear-gradient(135deg,#e9e3f7,#cfe2f6)"><span style="display:grid;justify-items:center;gap:8px;color:#6e6e73;font-size:14px;font-weight:500"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.6L12 15l-1.8-4.4L5.5 9l4.7-1.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8Z" fill="currentColor"/></svg>AI-generated image</span></div><figcaption><b>Don't</b>Use AI imagery. It looks fake and breaks trust.</figcaption></figure>
-        </div>
+      
       </section>
 
       <section id="bm-voice">
-        <div class="bm-ch"><span class="n">12</span><h2>Voice</h2><p>Short, exact, on your side. Say what you get, then stop. Many readers use English as a second language, so plain words beat clever ones.</p></div>
+        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">12</span><h2>Voice</h2><p>Short, exact, on your side. Say what you get, then stop. Many readers use English as a second language, so plain words beat clever ones.</p></div>
         <div class="bm-voice">
           <div><p class="y">Fuel now, settle later.</p><p class="n">Unlock seamless fuel financing solutions.</p></div>
           <div><p class="y">No cards, no cash, no slips.</p><p class="n">A frictionless, paperless fuelling experience.</p></div>
@@ -1740,7 +2040,7 @@
       </section>
 
       <section id="bm-motion">
-        <div class="bm-ch dark"><span class="n">13</span><h2>Motion</h2><p>Things arrive, they don't bounce. One ease for everything, and nothing moves when the viewer asks for reduced motion.</p></div>
+        <div class="bm-ch" style="--lc:#3d68c0"><span class="n">13</span><h2>Motion</h2><p>Things arrive, they don't bounce. One ease for everything, and nothing moves when the viewer asks for reduced motion. Orbs breathe like clouds: the colour inside gathers and rolls on slowly while the circle stays still. Product screens show themselves working once as they arrive, then wait for you.</p></div>
         <div class="bm-motion">
           <div><svg class="bm-curve" viewBox="-10 -10 220 220" aria-label="The TFN ease curve"><rect x="0" y="0" width="200" height="200" fill="none" stroke="#d8d8dc"/><line x1="0" y1="200" x2="40" y2="60" stroke="#b9b9bf" stroke-dasharray="3 3"/><line x1="200" y1="0" x2="40" y2="0" stroke="#b9b9bf" stroke-dasharray="3 3"/><path d="M0 200 C40 60, 40 0, 200 0" fill="none" stroke="#1f1f1f" stroke-width="3"/><circle cx="40" cy="60" r="4" fill="#5f8fd6"/><circle cx="40" cy="0" r="4" fill="#5f8fd6"/></svg><p class="bm-note" style="margin-top:8px"><code>cubic-bezier(.2, .7, .2, 1)</code></p></div>
           <div>
@@ -1748,17 +2048,24 @@
             <div class="bm-play"><button type="button" id="bmPlay">Play the ease</button><span class="tr" id="bmTrack"><i></i></span></div>
           </div>
         </div>
+              <p class="bm-sub">The three signature moves</p>
+        <div class="bm-demos">
+          <div><div class="st rise" id="bmD1"><i></i><i></i><i></i></div><b>Content rises</b><small>Once, 700ms, staggered 80ms.</small></div>
+          <div><div class="st roll" id="bmD2"><span>R&nbsp;</span><span class="d" data-v="18.73"></span></div><b>Numbers roll</b><small>Digit by digit into place.</small></div>
+          <div><div class="st tilt" id="bmD3"><div class="pl"><i class="rt"></i><i class="ar"></i></div></div><b>The map tilts</b><small>Into the heading-up driving view, 1200ms.</small></div>
+        </div>
+        <div class="bm-play" style="margin-top:14px"><button type="button" id="bmReplay">Replay the moves</button></div>
       </section>
 
       <section id="bm-access">
-        <div class="bm-ch"><span class="n">14</span><h2>Accessibility</h2><p>Readable by everyone, in a cab, in sunlight, with gloves on. Contrast is measured, not guessed.</p></div>
+        <div class="bm-ch" style="--lc:#1f7a62"><span class="n">14</span><h2>Accessibility</h2><p>Readable by everyone, in a cab, in sunlight, with gloves on. Contrast is measured, not guessed.</p></div>
         <div class="bm-cp">
           <div data-fg="#1F1F1F" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#1f1f1f">Ink on white</div><div class="k"><span></span><b></b></div></div>
           <div data-fg="#6E6E73" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#6e6e73">Muted on white</div><div class="k"><span></span><b></b></div></div>
           <div data-fg="#FFFFFF" data-bg="#000000"><div class="s" style="background:#000;color:#fff">White on black</div><div class="k"><span></span><b></b></div></div>
           <div data-fg="#A8A8A8" data-bg="#000000"><div class="s" style="background:#000;color:#a8a8a8">Muted on black</div><div class="k"><span></span><b></b></div></div>
           <div data-fg="#FFFFFF" data-bg="#3A47A8"><div class="s" style="background:linear-gradient(120deg,#2f4fb0,#5a3fb0);color:#fff">White on the go gradient</div><div class="k"><span></span><b></b></div></div>
-          <div data-fg="#F2761D" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#f2761d">Spark as text</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#F2761D" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#f2761d">Orange as text</div><div class="k"><span></span><b></b></div></div>
         </div>
         <dl class="bm-specs" style="margin-top:28px">
           <div><dt>Contrast</dt><dd>4.5:1 for text, 3:1 for icons and large type.</dd></div><div><dt>Colour</dt><dd>Never the only signal: grey stops say "Opens 10:00".</dd></div>
@@ -1767,10 +2074,10 @@
       </section>
 
       <section id="bm-apps">
-        <div class="bm-ch dark"><span class="n">15</span><h2>Applications</h2><p>The brand in the places it lives: on the phone, at the pump, on the truck, in the inbox. Always the same few parts, always calm.</p></div>
+        <div class="bm-ch dark moment" style="--lc:#2c56b8"><span class="n">15</span><h2>Applications</h2><p>The brand in the places it lives: on the phone, at the pump, on the truck, in the inbox. Always the same few parts, always calm.</p><div class="vis bm-3d" aria-hidden="true"><div class="bm-ph3"><div class="scr"><div class="bm-mapv"></div><span class="p1 bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span><span class="p2 bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span><span class="you"></span><div class="sh"><b>Villiers Truck Inn</b><small>2 h 05 min away</small><i>R 18.73</i><span class="go">Go</span></div></div></div><span class="flr"></span></div></div>
         <div class="bm-apps">
           <figure><div><div style="display:grid;justify-items:center"><div class="bm-home"><figure><span class="o"></span>Maps</figure><figure><span class="bm-icn"><span class="bm-orb diesel"></span></span>TFN Pay</figure><figure><span class="o"></span>Mail</figure></div><div class="bm-fav"><span class="bm-orb diesel" style="width:32px;height:32px"></span>32px<span class="bm-orb diesel" style="width:16px;height:16px"></span>16px favicon</div></div></div><figcaption><b>App icon.</b> The orb on black, 74% of the tile. Never the wordmark.</figcaption></figure>
-          <figure class="tall"><div><div class="bm-pylon"><div class="sign"><svg aria-label="TFN"><use href="#logo"/></svg><div class="row">Diesel 50ppm<b>20.48</b></div><div class="row">Petrol 95<b>21.84</b></div><div class="pay"><i></i>Pay with TFN Pay</div></div><span class="leg"></span><span class="base"></span></div></div><figcaption><b>Truck-stop price board.</b> Black, white numerals, rand per litre. The live dot is the only colour.</figcaption></figure>
+          <figure class="tall"><div><div class="bm-pylon p3"><div class="sign"><svg aria-label="TFN"><use href="#logo"/></svg><div class="row">Diesel 50ppm<b>20.48</b></div><div class="row">Petrol 95<b>21.84</b></div><div class="pay"><i></i>Pay with TFN Pay</div></div><span class="leg"></span><span class="base"></span></div></div><figcaption><b>Truck-stop price board.</b> Black, white numerals, rand per litre. The live dot is the only colour.</figcaption></figure>
           <figure><div class="bm-door"><svg viewBox="0 0 300 220" aria-label="A truck cab door with the TFN wordmark"><rect x="10" y="10" width="280" height="200" rx="18" fill="#eceef1" stroke="#d5d8de" stroke-width="2"/><path d="M28 28H196L250 92H28Z" fill="#c9d3de"/><path d="M28 28H196L250 92H28Z" fill="url(#bmGl)" opacity=".6"/><defs><linearGradient id="bmGl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="226" y="118" width="40" height="9" rx="4.5" fill="#b9bdc4"/><use href="#logo" x="40" y="122" width="132" height="50" style="color:#1f1f1f"/><text x="42" y="190" font-size="11" fill="#6e6e73" font-family="sans-serif">tfn.co.za</text></svg></div><figcaption><b>Cab door.</b> The wordmark in ink, low on the door, with the web address. No orb, no slogan.</figcaption></figure>
           <figure><div class="bm-shirt"><svg viewBox="0 0 240 230" aria-label="A dark driver's shirt with a small TFN wordmark"><path d="M70 22 L100 10 Q120 34 140 10 L170 22 L222 62 L198 98 L176 84 L176 222 L64 222 L64 84 L42 98 L18 62 Z" fill="#1f1f1f"/><path d="M100 10 Q120 34 140 10" fill="none" stroke="#3a3a3e" stroke-width="3"/><line x1="120" y1="30" x2="120" y2="70" stroke="#3a3a3e" stroke-width="2"/><use href="#logo" x="138" y="56" width="30" height="12" style="color:#fff"/></svg></div><figcaption><b>Driver's shirt.</b> Charcoal, a small white wordmark on the chest.</figcaption></figure>
           <figure><div><div class="bm-mail"><div class="h"><i></i><i></i><i></i></div><p style="margin-bottom:12px;color:#3a3a3c">Your fuel statement for October is attached.</p><b>Name Surname</b><span>Fleet accounts · TFN</span><span>name@tfn.co.za</span><div class="sig"><svg aria-label="TFN"><use href="#logo"/></svg><small>Fuel management, sorted.</small></div></div></div><figcaption><b>Email signature.</b> Text first, the wordmark small, no banners.</figcaption></figure>
@@ -1780,12 +2087,12 @@
       </section>
 
       <section id="bm-tokens">
-        <div class="bm-ch"><span class="n">16</span><h2>Tokens</h2><p>The numbers behind everything above, for design and code.</p></div>
+        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">16</span><h2>Tokens</h2><p>The numbers behind everything above, for design and code.</p></div>
         <table class="bm-tok">
           <tr><th>Token</th><th>Value</th><th>Use</th></tr>
           <tr><td>ink</td><td><code>#1F1F1F</code></td><td>Text and site buttons</td></tr>
           <tr><td>muted</td><td><code>#6E6E73</code></td><td>Secondary text</td></tr>
-          <tr><td>spark</td><td><code>#F2761D</code></td><td>Status only, never an action</td></tr>
+          <tr><td>orange</td><td><code>#F2761D</code></td><td>A tiny live dot on light screens; never an action</td></tr>
           <tr><td>go</td><td><code>linear-gradient(120deg, #2F4FB0, #5A3FB0)</code></td><td>App main action, Lowest pill</td></tr>
           <tr><td>font</td><td><code>"Aeonik Pro", "Satoshi", system-ui</code></td><td>Everything but the wordmark</td></tr>
           <tr><td>h1 / h2 / body</td><td><code>85 / 50 / 18px</code></td><td>At 1280px wide</td></tr>
@@ -1796,7 +2103,7 @@
       </section>
 
       <section id="bm-downloads">
-        <div class="bm-ch dark"><span class="n">17</span><h2>Downloads</h2><p>The master files. Use these; never redraw the logo or eyedrop colours from a screenshot.</p></div>
+        <div class="bm-ch" style="--lc:#3d68c0"><span class="n">17</span><h2>Downloads</h2><p>The master files. Use these; never redraw the logo or eyedrop colours from a screenshot.</p></div>
         <div class="bm-dl">
           <a href="logo-wordmark.svg" download><b>Wordmark</b><small>SVG · black on white</small><span>Download</span></a>
           <a href="logo-mark.svg" download><b>Orb</b><small>SVG · the app icon mark</small><span>Download</span></a>
@@ -1808,6 +2115,7 @@
     </div>
   </div>
 </div>
+<div class="bm-toast" id="bmToast" role="status" aria-live="polite"></div>
 <div class="bm-tab" role="group" aria-label="View"><button type="button" data-v="site" aria-pressed="true">Site</button><button type="button" data-v="guide" aria-pressed="false">Brand guide</button></div>
 <script>
 /* Site / Brand guide: one page, two views; #brand (or any #bm- address) opens the guide; the site keeps its scroll position */
@@ -1850,8 +2158,8 @@
   /* design tokens as a file */
   document.getElementById('bmTok').addEventListener('click', function (e) {
     e.preventDefault();
-    var css = ':root {\n  /* TFN design tokens */\n  --tfn-ink: #1f1f1f;\n  --tfn-muted: #6e6e73;\n  --tfn-white: #ffffff;\n  --tfn-black: #000000;\n  --tfn-charcoal: #191c1f;\n  --tfn-mist: #f4f4f6;\n  --tfn-spark: #f2761d; /* status only, never an action */\n' +
-      '  --tfn-on-road: #2a6fd0;\n  --tfn-lcv: #0e8fb3;\n  --tfn-non-fuel: #4f6b8a;\n  --tfn-network: #3346a8;\n  --tfn-homebase: #138a85;\n  --tfn-africa: #6b62c9;\n  --tfn-credit: #b0436e;\n' +
+    var css = ':root {\n  /* TFN design tokens */\n  --tfn-ink: #1f1f1f;\n  --tfn-muted: #6e6e73;\n  --tfn-white: #ffffff;\n  --tfn-black: #000000;\n  --tfn-charcoal: #191c1f;\n  --tfn-mist: #f4f4f6;\n  --tfn-orange: #f2761d; /* a tiny live dot on light screens, never an action */\n' +
+      '  --tfn-on-road: #2a6fd0;\n  --tfn-lcv: #0e8fb3;\n  --tfn-non-fuel: #4f6b8a;\n  --tfn-network: #3346a8;\n  --tfn-homebase: #138a85;\n  --tfn-africa: #6b62c9;\n  --tfn-credit: #a2468e;\n' +
       '  --tfn-go: linear-gradient(120deg, #2f4fb0, #5a3fb0);\n  --tfn-font: "Aeonik Pro", "Satoshi", system-ui, sans-serif;\n  --tfn-h1: 85px;\n  --tfn-h2: 50px;\n  --tfn-body: 18px;\n  --tfn-radius-card: 24px;\n  --tfn-radius-pill: 999px;\n  --tfn-ease: cubic-bezier(.2, .7, .2, 1);\n}\n';
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([css], { type: 'text/css' })); a.download = 'tfn-tokens.css'; document.body.appendChild(a); a.click(); a.remove();
   });
@@ -1860,6 +2168,95 @@
   var links = [].slice.call(document.querySelectorAll('.bm-toc a')), toc = document.querySelector('.bm-toc');
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return; links.forEach(function (a) { var on = a.getAttribute('href') === '#' + e.target.id; a.classList.toggle('on', on); if (on && innerWidth <= 900) toc.scrollTo({ left: a.offsetLeft - 24, behavior: 'smooth' }); }); }); }, { rootMargin: '-30% 0px -60% 0px' });
   [].forEach.call(g.querySelectorAll('section[id]'), function (s) { io.observe(s); });
+})();
+</script>
+<script>
+/* the dock: waits for the hero to finish, lights the tab for the section in view, steps aside over the map, the carousel and the devices, and at the footer */
+(function () {
+  var dock = document.getElementById('dock'); if (!dock) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches, tabs = [].slice.call(dock.querySelectorAll('.dk-tabs a')), foot = document.querySelector('footer');
+  setTimeout(function () { dock.classList.add('show'); }, reduce ? 300 : 3200);
+  /* the close tells its figures it has arrived */
+  var fin = document.getElementById('f'); if (fin) new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { fin.classList.add('in'); o.disconnect(); } }, { threshold: .35 }).observe(fin);
+  var secs = tabs.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function upd() {
+    var mid = innerHeight * .45, cur = -1;
+    secs.forEach(function (sec, i) { if (!sec) return; var r = sec.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) cur = i; });
+    tabs.forEach(function (a, i) { a.setAttribute('aria-current', i === cur ? 'true' : 'false'); });
+    var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 50).filter(function (n) { return !dock.contains(n); });
+    var busy = under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .ometa, .techbox, .pills'); }) || foot.getBoundingClientRect().top < innerHeight - 20 || document.documentElement.classList.contains('bm-on');
+    dock.classList.toggle('away', busy);
+  }
+  var t = false; addEventListener('scroll', function () { if (!t) { t = true; requestAnimationFrame(function () { upd(); t = false; }); } }, { passive: true }); upd();
+})();
+/* the hero orb catches the light from the pointer */
+(function () { var o = document.getElementById('horb'), h = document.getElementById('hero'); if (!o || !h) return;
+  h.addEventListener('pointermove', function (e) { var r = o.getBoundingClientRect(); o.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%'); o.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%'); }); })();
+/* the guide, alive: the cover moment, the orb that follows the light, lit chapters, type and motion that run, copy on click, dark mode */
+(function () {
+  var g = document.getElementById('bmGuide'); if (!g) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cover = document.getElementById('bmCover'), orb = cover.querySelector('.bm-orb.xl');
+  function opened() {
+    if (g.hidden) { cover.classList.remove('go'); return; }
+    requestAnimationFrame(function () { requestAnimationFrame(function () { cover.classList.add('go'); }); });
+  }
+  new MutationObserver(opened).observe(g, { attributes: true, attributeFilter: ['hidden'] }); opened();
+
+  /* the orb catches the light from the pointer, and recedes as the cover scrolls away */
+  cover.addEventListener('pointermove', function (e) { var r = orb.getBoundingClientRect(); orb.style.setProperty('--lx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%'); orb.style.setProperty('--ly', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%'); });
+  function scrub() {
+    if (g.hidden) return;
+    var h = cover.offsetHeight, k = Math.max(0, Math.min(1, scrollY / h)); cover.style.setProperty('--sc', k.toFixed(3));
+    var a = document.getElementById('bmAnat'); if (a) { var r = a.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) a.querySelector('.ph').style.setProperty('--py', ((r.top + r.height / 2 - innerHeight / 2) * -0.06).toFixed(1) + 'px'); }
+  }
+  if (!reduce) addEventListener('scroll', function () { requestAnimationFrame(scrub); }, { passive: true });
+
+  /* chapters light up as they arrive; the anatomy callouts draw in one by one */
+  [].forEach.call(g.querySelectorAll('#bmAnat .cl'), function (c, i) { c.style.setProperty('--d', (i * .18 + .1) + 's'); });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .35 });
+  [].forEach.call(g.querySelectorAll('.bm-ch, #bmAnat'), function (el) { reduce ? el.classList.add('in') : io.observe(el); });
+
+  /* things that run only while you can see them */
+  function whenSeen(el, start) { var on = false, t; new IntersectionObserver(function (es) { var v = es[0].isIntersecting && !g.hidden; if (v && !on) { on = true; t = start(); } else if (!v && on) { on = false; clearInterval(t); } }).observe(el); }
+  var aa = document.getElementById('bmAa'), W = [400, 500, 700], wi = 1;
+  if (!reduce) whenSeen(aa, function () { return setInterval(function () { aa.classList.add('sw0'); setTimeout(function () { aa.style.fontWeight = W[wi = (wi + 1) % 3]; aa.classList.remove('sw0'); }, 350); }, 1800); });
+  var rt = document.getElementById('bmRampT'), rl = document.getElementById('bmRampL'), R = [[13, 'Footnote · 13px'], [17, 'App · 17px'], [22, 'Title · 22px'], [50, 'Section · 50px'], [85, 'Display · 85px']], ri = 0;
+  function ramp() { var x = R[ri]; rt.style.fontSize = 'min(' + x[0] + 'px, ' + (x[0] / 85 * 10.5).toFixed(2) + 'vw)'; rt.style.letterSpacing = x[0] > 40 ? '-.025em' : '0'; rl.textContent = x[1]; }
+  ramp(); if (!reduce) whenSeen(rt, function () { return setInterval(function () { ri = (ri + 1) % R.length; ramp(); }, 1700); });
+
+  /* the three signature moves */
+  var d1 = document.getElementById('bmD1'), d2 = document.getElementById('bmD2'), d3 = document.getElementById('bmD3'), dig = d2.querySelector('.d');
+  dig.innerHTML = dig.dataset.v.split('').map(function (c) { return /\d/.test(c) ? '<span class="col"><span>' + '0123456789'.split('').map(function (n) { return '<span>' + n + '</span>'; }).join('') + '</span></span>' : '<span>' + c + '</span>'; }).join('');
+  function moves() {
+    d1.classList.remove('go'); d3.classList.remove('go'); void d1.offsetWidth;
+    var cols = [].slice.call(dig.querySelectorAll('.col > span')), digits = dig.dataset.v.replace(/\D/g, '').split('');
+    cols.forEach(function (c) { c.style.transition = 'none'; c.style.transform = 'translateY(0)'; }); void dig.offsetWidth;
+    setTimeout(function () {
+      d1.classList.add('go'); d3.classList.add('go');
+      cols.forEach(function (c, i) { c.style.transition = ''; c.style.transitionDelay = (i * .08) + 's'; c.style.transform = 'translateY(-' + (+digits[i] * 10) + '%)'; });
+    }, 60);
+  }
+  document.getElementById('bmReplay').addEventListener('click', moves);
+  new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { o.disconnect(); moves(); } }, { threshold: .5 }).observe(d1);
+
+  /* copy a colour by clicking it */
+  var toast = document.getElementById('bmToast'), tt;
+  function copy(hex) {
+    var done = function () { toast.textContent = 'Copied ' + hex; toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('on'); }, 1400); };
+    if (navigator.clipboard) navigator.clipboard.writeText(hex).then(done, done); else done();
+  }
+  g.addEventListener('click', function (e) {
+    var t = e.target.closest('.sw[data-hex], .bm-tbl tr[data-hex], .bm-strip > div, .bm-lights span'); if (!t) return;
+    var hex = t.dataset.hex || (t.querySelector('code') && t.querySelector('code').textContent.split(' ')[0]) || (t.style.getPropertyValue('--c') || '').trim().toUpperCase();
+    if (hex) copy(hex.toUpperCase());
+  });
+
+  /* dark mode for the guide, remembered on this device */
+  var dm = document.getElementById('bmDm');
+  function setDark(on) { g.classList.toggle('dark', on); dm.setAttribute('aria-pressed', on ? 'true' : 'false'); dm.setAttribute('aria-label', on ? 'Switch the guide to light' : 'Switch the guide to dark'); try { localStorage.setItem('tfn-guide-dark', on ? '1' : '0'); } catch (e) {} }
+  dm.addEventListener('click', function () { setDark(!g.classList.contains('dark')); });
+  try { if (localStorage.getItem('tfn-guide-dark') === '1') setDark(true); } catch (e) {}
 })();
 </script>
 
@@ -1901,10 +2298,14 @@
 
   /* nav: clear over the hero, solid after; sticky pill after the hero, white over dark */
   var nav = document.getElementById('nav'), hero = document.getElementById('hero'), sticky = document.getElementById('sticky'), foot = document.querySelector('footer'), tick = false;
+  /* the page's own calls to action in view: while any is on screen the sticky pill stays away */
+  var ctaSeen = new Set(), ctaIO = new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? ctaSeen.add(e.target) : ctaSeen.delete(e.target); }); onScroll(); });
+  [].forEach.call(document.querySelectorAll('main .btn'), function (b) { ctaIO.observe(b); });
   function onScroll() {
     nav.classList.toggle('clear', scrollY < hero.offsetHeight - 110);
-    sticky.classList.toggle('show', scrollY > 560 && foot.getBoundingClientRect().top > innerHeight - 40);
     var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 40).filter(function (n) { return n !== sticky; });
+    var busy = ctaSeen.size > 0 || under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .techbox, .ometa, .pills'); });
+    sticky.classList.toggle('show', scrollY > 560 && !busy && foot.getBoundingClientRect().top > innerHeight - 40);
     sticky.classList.toggle('dark', under.some(function (n) { return n.matches && n.matches('.black, .scene, .cscene, .mapsec, footer'); }));
     tick = false;
   }
@@ -1920,7 +2321,8 @@
     dots.forEach(function (d, i) { d.classList.toggle('on', i === cur); });
     gp.classList.add('swap'); setTimeout(function () { document.getElementById('gpl').textContent = DATA[cur][0]; TFNroll(document.getElementById('gpv'), DATA[cur][1]); gp.classList.remove('swap'); }, 300);
   }
-  function play() { if (reduce) return; clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 4200); }
+  /* one moment per scene: the photos change only when you choose */
+  function play() { clearInterval(timer); }
   pills.forEach(function (p, i) { p.addEventListener('click', function () { show(i); play(); }); }); play();
 
 
@@ -2053,11 +2455,25 @@
     [[1000, 512, 0, 'Main Road'], [700, 700, -90, 'Station Road'], [420, 128, 0, 'Church Street'], [560, 832, 0, 'Depot Lane'], [280, 220, -90, 'Market Street'], [1120, 660, -90, 'Industrial Road'], [1300, 832, 0, 'Depot Lane'], [-20, 512, 0, 'Main Road']].forEach(function (l) {
       s += '<text class="m-lbl" transform="translate(' + l[0] + ' ' + l[1] + ') rotate(' + l[2] + ')">' + l[3] + '</text>'; });
     s += '<text class="m-lbl w" x="1010" y="372">Klip River</text><text class="m-lbl p" x="455" y="672">Town Park</text><text class="m-lbl p" x="910" y="1024">Botanical Gardens</text><text class="m-lbl p" x="70" y="-64">Commonage</text>';
+    s += '<defs><linearGradient id="mRg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#9fd3ea"/><stop offset=".5" stop-color="#5f8fd6"/><stop offset="1" stop-color="#a796e0"/></linearGradient>' +
+      '<filter id="mGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feFlood flood-color="#aabeff" flood-opacity=".55"/><feComposite operator="in" in2=""/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="mGo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f4fb0"/><stop offset="1" stop-color="#5a3fb0"/></linearGradient><radialGradient id="mOrb" cx=".3" cy=".2" r="1"><stop offset="0" stop-color="#8db8e6"/><stop offset=".45" stop-color="#2c56b8"/><stop offset="1" stop-color="#2a1f6e"/></radialGradient></defs>';
+    /* the two other ways to the depot, grey under the chosen one, each with a pill on its own stretch */
+    var ALTS = 'M280 832H1120V128H980M280 512H-140V128H700';
+    s += '<path class="m-ac" d="' + ALTS + '"/><path class="m-a" d="' + ALTS + '"/>';
     s += '<path class="m-rc" d="' + ROUTE + '"/><path class="m-r" d="' + ROUTE + '"/>';
+    [[490, 512, 'R 84', 'Cheapest', 1], [1120, 470, '+R 9', '+4 min'], [-140, 320, '+R 14', '+6 min']].forEach(function (q) {
+      var w = Math.round((q[2].length + q[3].length) * 8 + (q[4] ? 48 : 30));
+      s += '<g class="m-rp' + (q[4] ? ' on' : '') + '" transform="translate(' + q[0] + ' ' + q[1] + ')"><g class="m-rot"><rect class="bx" x="' + (-w / 2) + '" y="-17" width="' + w + '" height="34" rx="17"/>' +
+        (q[4] ? '<circle cx="' + (-w / 2 + 19) + '" cy="0" r="7" fill="url(#mOrb)" stroke="rgba(255,255,255,.6)" stroke-width="1"/>' : '') +
+        '<text x="' + (-w / 2 + (q[4] ? 32 : 14)) + '" y="1">' + q[2] + ' <tspan>' + q[3] + '</tspan></text></g></g>'; });
     s += '<g class="m-shield" transform="translate(560 640)"><g class="m-rot"><rect x="-15" y="-11" width="30" height="22" rx="6"/><text>L1</text></g></g>';
-    [[455, 480, '#2f7cf6', 'i-pump', 'TFN depot'], [245, 672, '#8e8e93', 'i-wrench', 'Truck service'], [805, 224, '#ff375f', 'i-shield', 'Insurance'], [1085, 608, '#2f7cf6', 'i-pump', 'TFN depot'], [175, 416, '#8e8e93', 'i-chat', 'Café'], [595, 928, '#30b0c7', 'i-truck', 'Truck parking'], [-35, 672, '#2f7cf6', 'i-pump', 'TFN depot']].forEach(function (p, i) {
-      s += '<g class="m-poi" transform="translate(' + p[0] + ' ' + p[1] + ')"><g class="m-rot"><circle r="13" fill="' + p[2] + '" stroke="#fff" stroke-width="2"/><use href="#' + p[3] + '" x="-8" y="-8" width="16" height="16" style="color:#fff"/><text x="19" style="fill:' + p[2] + '">' + p[4] + '</text>' + (PRICE[i] ? '<g class="m-call" transform="translate(0 -36)"><rect x="-38" y="-14" width="76" height="28" rx="14"/><text y="1">' + PRICE[i] + '</text></g>' : '') + '</g></g>'; });
-    s += '<g transform="translate(980 128)"><g class="m-rot"><path d="M0 0C-4-10-15-17-15-30a15 15 0 1 1 30 0C15-17 4-10 0 0Z" fill="#ff3b30" stroke="#fff" stroke-width="2.5"/><circle cy="-30" r="5.5" fill="#fff"/></g></g>';
+    /* TFN stops only, drawn as the app's price pill: orb, price, a tail at the spot; the cheapest is filled */
+    [[455, 480, 'R 20.19'], [175, 416, 'R 18.73', 1], [1085, 608, 'R 19.84'], [-35, 672, 'R 20.42'], [760, 300, 'R 21.04']].forEach(function (p) {
+      var best = p[3], label = (best ? 'Lowest · ' : '') + p[2], w = Math.round(label.length * 8.4 + 46);
+      s += '<g class="m-pin' + (best ? ' best' : '') + '" transform="translate(' + p[0] + ' ' + p[1] + ')"><g class="m-rot">' +
+        '<path class="tl" d="M-9 -12 0 -1 9 -12Z"/><rect class="bx" x="-17" y="-46" width="' + w + '" height="34" rx="17"/>' +
+        '<circle cx="0" cy="-29" r="13" fill="url(#mOrb)"' + (best ? ' stroke="rgba(255,255,255,.45)" stroke-width="1.2" filter="url(#mGlow)"' : '') + '/><use href="#i-pump" x="-7" y="-36" width="14" height="14" style="color:#fff"/><text x="20" y="-28">' + label + '</text></g></g>'; });
+    s += '<g transform="translate(980 128)"><g class="m-rot"><path d="M0 0C-4-10-15-17-15-30a15 15 0 1 1 30 0C15-17 4-10 0 0Z" fill="url(#mOrb)"/><circle cy="-30" r="5.5" fill="#fff"/></g></g>';
     s += '<g class="m-puck"><circle class="m-halo" r="36"/><circle r="17" fill="#fff"/><circle r="14" style="fill:var(--route)"/><path d="M0-8 6.500 6 0 2.500-6.500 6Z" fill="#fff"/></g></g>';
     return s;
   })();
@@ -2229,26 +2645,29 @@
   }).join(''));
   var coins = [].slice.call(coinsEl.querySelectorAll('.coin'));
 
+  /* cloud layers inside the big CSS orbs (see .ocl) */
+  document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
   /* the orbs: each a smooth blend of five soft colours drifting slowly under a light grain, with only a hint of shading */
   var ITEMS = [
-    ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#5f8fd6', '#7fbfdc', '#a796e0', '#8ccdb2', '#cfdcee']],
-    ['Non-fuel', 'Non-fuel services on the network, on the same facility.', 'tfn-non-fuel.html', ['#de88ae', '#e8a582', '#e9c98c', '#ad96dc', '#eccad8']],
-    ['Cross-border', 'Use your facility at cross-border stops and pay in rand.', 'tfn-africa.html', ['#8a74d4', '#dc8fb4', '#7fa6de', '#e3bd80', '#8fcbc0']],
-    ['Homebase', 'Diesel delivered to your own yard tank, on the same facility.', 'tfn-homebase.html', ['#78bf86', '#e3c66e', '#7fc2db', '#e2a585', '#cfe5c2']]
+    ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#1f7a62', '#8db8e6']],
+    ['Non-fuel', 'Non-fuel services on the network, on the same facility.', 'tfn-non-fuel.html', ['#a8447a', '#4b2c78', '#d98a52', '#4b3399', '#9a5070']],
+    ['Cross-border', 'Use your facility at cross-border stops and pay in rand.', 'tfn-africa.html', ['#5a43a8', '#b25a86', '#3b62b0', '#b8894a', '#2a8068']],
+    ['Homebase', 'Diesel delivered to your own yard tank, on the same facility.', 'tfn-homebase.html', ['#2f8050', '#c9883e', '#2a8f78', '#173f38', '#5fae86']]
   ];
   var FS = [
     'precision highp float;uniform vec2 u_res;uniform float u_t,u_s;uniform vec3 u_c[5];',
     'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
     'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
-    'float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<2;i++){s+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}',
+    'float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}',
     'void main(){',
     ' vec2 uv=(gl_FragCoord.xy*2.-u_res)/u_res.y;float r=length(uv);float aa=2./u_res.y;',
     ' float al=1.-smoothstep(1.-aa,1.,r);if(al<=0.){gl_FragColor=vec4(0.);return;}',
-    ' float t=u_t*.12+u_s*10.;',
-    ' vec2 p=uv+.4*vec2(fbm(uv*.9+vec2(t*.6,u_s)),fbm(uv*.9+vec2(u_s*3.,-t*.5)))-.15;',
+    ' float t=u_t*.45+u_s*10.;',
+    ' vec2 q=vec2(fbm(uv*1.1+vec2(t*.35,u_s)),fbm(uv*1.1+vec2(u_s*3.,-t*.3)));',
+    ' vec2 p=uv+.75*vec2(fbm(uv*1.4+q*1.7+vec2(t*.22,0.)),fbm(uv*1.4+q*1.7+vec2(0.,-t*.2)))-.38;',
     ' vec3 col=vec3(0.);float ws=0.;',
     ' for(int i=0;i<5;i++){float fi=float(i);vec2 b=.62*vec2(sin(t*(.7+fi*.13)+fi*2.4+u_s),cos(t*(.6+fi*.11)+fi*1.7+u_s*2.));float w=exp(-dot(p-b,p-b)*3.);col+=u_c[i]*w;ws+=w;}',
-    ' col/=max(ws,1e-4);float lm=dot(col,vec3(.299,.587,.114));col=mix(vec3(lm),col,.96);col=mix(col,vec3(1.),.05);',
+    ' col/=max(ws,1e-4);float lm=dot(col,vec3(.299,.587,.114));col=mix(vec3(lm),col,1.05);',
     ' float z=sqrt(max(0.,1.-r*r));col*=mix(.9,1.02,z);vec2 hp=uv-vec2(-.35,.4);col+=exp(-dot(hp,hp)*3.)*.05;',
     ' col+=(h(gl_FragCoord.xy*.73+u_s)-.5)*.05;',
     ' gl_FragColor=vec4(clamp(col,0.,1.)*al,al);}'
@@ -2277,7 +2696,7 @@
   if (!reduce) (function loop(now) { if (vis) R.forEach(function (r) { if (r && r.o.style.getPropertyValue('--o') !== '0') draw(r, now); }); requestAnimationFrame(loop); })(performance.now());
 
   /* the carousel: the middle orb is large, its neighbours small and dim; the hidden fourth slips round behind */
-  var cur = 0, pos = [0, 1, 2, -1], play = document.getElementById('oplay'), lab = document.getElementById('olab'), timer, auto = !reduce;
+  var cur = 0, pos = [0, 1, 2, -1], play = document.getElementById('oplay'), lab = document.getElementById('olab'), timer, auto = !reduce, idle = 0, car = document.getElementById('ocar'), dots = [].slice.call(document.querySelectorAll('#odots button'));
   var UP = play.innerHTML;
   function place(i, d, now) {
     var o = orbs[i]; o.classList.toggle('now', !!now);
@@ -2292,13 +2711,31 @@
       if (Math.abs(nd - pos[i]) > 1) { place(i, nd + (nd > pos[i] ? 1 : -1), true); o.classList.remove('now'); }
       place(i, nd); pos[i] = nd;
     });
+    dots.forEach(function (b, i) { b.setAttribute('aria-current', i === cur ? 'true' : 'false'); });
     var it = ITEMS[cur]; play.href = it[2]; play.setAttribute('aria-label', it[0] + ' on credit');
     lab.classList.add('swap'); setTimeout(function () { lab.innerHTML = '<b>' + it[0] + ' ' + UP + '</b><span>' + it[1] + '</span>'; lab.classList.remove('swap'); }, 300);
   }
-  orbs.forEach(function (o, i) { place(i, pos[i], true); o.classList.remove('now'); o.addEventListener('click', function () { if (pos[i] !== 0) { auto = false; go(i, pos[i]); } }); });
-  document.getElementById('oprev').addEventListener('click', function () { auto = false; go(cur - 1, -1); });
-  document.getElementById('onext').addEventListener('click', function () { auto = false; go(cur + 1, 1); });
-  timer = setInterval(function () { if (auto && vis && !stage.matches(':hover, :focus-within')) go(cur + 1, 1); }, 5000);
+  /* a slider: drag or swipe and the orbs follow, then glide to the next; arrows, dots and keys too; it drifts on by itself and rests for a while after you touch it */
+  function touched() { idle = Date.now(); }
+  var drag = null, dragged = false;
+  orbs.forEach(function (o, i) { place(i, pos[i], true); o.classList.remove('now'); o.addEventListener('click', function () { if (dragged) return; if (pos[i] !== 0) { touched(); go(i, pos[i]); } }); });
+  car.addEventListener('pointerdown', function (e) { if (e.target.closest('#oplay')) return; drag = { x: e.clientX, id: e.pointerId }; dragged = false; });
+  car.addEventListener('pointermove', function (e) {
+    if (!drag) return; var dx = e.clientX - drag.x;
+    if (!dragged) { if (Math.abs(dx) < 6) return; dragged = true; car.setPointerCapture(drag.id); car.classList.add('drag'); touched(); }
+    car.style.setProperty('--dx', (dx * .85).toFixed(1) + 'px');
+  });
+  function endDrag(e) {
+    if (!drag) return; var dx = e.clientX - drag.x; drag = null; car.classList.remove('drag'); car.style.setProperty('--dx', '0px');
+    if (dragged) { if (dx < -50) go(cur + 1, 1); else if (dx > 50) go(cur - 1, -1); setTimeout(function () { dragged = false; }, 0); }
+  }
+  car.addEventListener('pointerup', endDrag); car.addEventListener('pointercancel', endDrag);
+  car.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { touched(); go(cur + 1, 1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { touched(); go(cur - 1, -1); e.preventDefault(); } });
+  dots.forEach(function (b, i) { b.addEventListener('click', function () { touched(); if (i !== cur) go(i, i > cur ? 1 : -1); }); });
+  document.getElementById('oprev').addEventListener('click', function () { touched(); go(cur - 1, -1); });
+  document.getElementById('onext').addEventListener('click', function () { touched(); go(cur + 1, 1); });
+  timer = setInterval(function () { if (auto && vis && !drag && Date.now() - idle > 9000 && !stage.matches(':hover, :focus-within')) go(cur + 1, 1); }, 4500);
+  dots.forEach(function (b, i) { b.setAttribute('aria-current', i === cur ? 'true' : 'false'); });
 
   /* the pointer tilts the coins */
   stage.addEventListener('pointermove', function (e) {
@@ -2421,10 +2858,10 @@
   function vsAvg(d) { var diff = (fuel === 'petrol' ? AVG95 : AVG)[d.town.pv] - price(d); return Math.abs(diff) < .01 ? 'Average price' : 'R' + Math.abs(diff).toFixed(2) + (diff > 0 ? ' below avg' : ' above avg'); }
 
   /* road distance from your truck, along the highway graph */
-  function dijkstra(a, b) {
-    var dist = {}, prev = {}, Q = Object.keys(T); Q.forEach(function (n) { dist[n] = Infinity; }); dist[a] = 0;
+  function dijkstra(a, b, g) {
+    g = g || G; var dist = {}, prev = {}, Q = Object.keys(T); Q.forEach(function (n) { dist[n] = Infinity; }); dist[a] = 0;
     while (Q.length) { Q.sort(function (x, y) { return dist[x] - dist[y]; }); var u = Q.shift(); if (u === b || dist[u] === Infinity) break;
-      (G[u] || []).forEach(function (e) { var nd = dist[u] + e[1]; if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; } }); }
+      (g[u] || []).forEach(function (e) { var nd = dist[u] + e[1]; if (nd < dist[e[0]]) { dist[e[0]] = nd; prev[e[0]] = u; } }); }
     if (dist[b] === Infinity) return null; var p = [b]; while (p[0] !== a) p.unshift(prev[p[0]]); return p;
   }
   function pathKm(nodes) { var k = 0; for (var i = 1; i < nodes.length; i++) k += hav(T[nodes[i - 1]], T[nodes[i]]) * 1.12; return k; }
@@ -2437,8 +2874,8 @@
     '<path class="ld" d="' + path(LAND, 1) + '"/><path class="za" d="' + path(BORDER.concat(COAST.slice(1)), 1) + path(LES, 1) + '"/><path class="pk" d="' + path(KNP, 1) + '"/>' +
     ell(28.1, -26.9, 7, 2.6) + ell(25.6, -30.62, 9, 2.6) + ell(32.45, -28.15, 2.6, 9) +
     '<path class="bd" d="' + path(BORDER) + path(LES, 1) + path(SWZ, 1) + OTHER.map(function (o) { return path(o); }).join('') + '"/>' +
-    '<path class="hc" d="' + hwd + '"/><path class="hw" d="' + hwd + '"/><path class="rc" id="nmRc" d=""/><path class="rt" id="nmRt" d=""/>';
-  var rc = $('nmRc'), rt = $('nmRt');
+    '<path class="hc" d="' + hwd + '"/><path class="hw" d="' + hwd + '"/><path class="rac" id="nmRac" d=""/><path class="ra" id="nmRa" d=""/><path class="rc" id="nmRc" d=""/><path class="rt" id="nmRt" d=""/>';
+  var rc = $('nmRc'), rt = $('nmRt'), ra = $('nmRa'), rac = $('nmRac');
 
   /* ---- labels and pins, laid over the map ---- */
   var items = [];
@@ -2453,10 +2890,11 @@
     d.pin.style.setProperty('--pd', (i % 24) * 30 + 'ms'); d.pin.style.zIndex = 10 + Math.round(d.p[1]);
     d.pin.addEventListener('click', function (e) { e.stopPropagation(); if (!moved) select(d); });
   });
-  function chipText() { D.forEach(function (d) { var st = status(d); d.pin.classList.toggle('gr', grey(d)); d.co.textContent = st || money(price(d)); d.co._w = d.co._wp = 0; d.pin.classList.toggle('bl', !st && aboveAvg(d) < 0); d.pin.setAttribute('aria-label', d.n + ', ' + (st || money(price(d)) + ' a litre')); }); }
+  function chipText() { D.forEach(function (d) { var st = status(d); d.pin.classList.toggle('gr', grey(d)); d.co.textContent = st || money(price(d)); d.co._w = d.co._wp = 0; d.pin.classList.toggle('bl', !st && aboveAvg(d) < 0); d.pin.setAttribute('aria-label', d.n + ', ' + (st || money(price(d)) + ' a litre' + (aboveAvg(d) < 0 ? ', below the regional average' : ''))); }); }
   chipText();
   var youEl = add('div', 'nm-you', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 21l-8-4.5L4 21Z" fill="currentColor"/></svg>', youP[0], youP[1]).el; youEl.setAttribute('aria-label', 'Your truck'); youEl.style.zIndex = 5000;
   var endA = add('div', 'nm-end', '', 0, 0), endB = add('div', 'nm-end b', '', 0, 0);
+  var PILLS = [0, 1, 2].map(function (i) { var it = add('button', 'nm-rpill gone', '', 0, 0); it.el.type = 'button'; it.el.addEventListener('click', function (e) { e.stopPropagation(); if (!moved) useRoute(i); }); return it; });
 
   /* ---- camera ---- */
   var W = 0, H = 0, cam = { x: 0, y: 0, z: 1 }, zFit = 1, anim = 0, touched = false, lt, flying = false;
@@ -2496,7 +2934,7 @@
     if (best) best.pin.classList.remove('best'); best = null;
     if (!has('z2') && !srch) return;
     D.forEach(function (d) { if (shown(d) && !grey(d) && !d.pin.classList.contains('cl') && inView(d) && (!best || price(d) < price(best))) best = d; });
-    if (best) best.pin.classList.add('best');
+    if (best) { best.pin.classList.add('best'); best.pin.setAttribute('aria-label', best.n + ', lowest price in view, ' + money(price(best)) + ' a litre'); }
   }
   /* labels and price chips that would overlap give way: the chosen stop, the cheapest, the fills, then lower prices win; towns last */
   function declutter() {
@@ -2507,6 +2945,7 @@
       var s = scr(d.p[0], d.p[1]); boxes.push(d === sel ? [s[0] - 22, s[1] - 52, s[0] + 22, s[1] + 4] : [s[0] - 13, s[1] - 13, s[0] + 13, s[1] + 13]);
       if (chips || d === sel || (route && d.pin.classList.contains('rt'))) cand.push({ d: d, x: s[0], y: s[1] });
     });
+    if (route && PILLS) PILLS.forEach(function (it) { if (it.el.classList.contains('gone')) return; var s = scr(it.x, it.y), w = (it.el.offsetWidth || 120) / 2 + 4; boxes.push([s[0] - w, s[1] - 17, s[0] + w, s[1] + 17]); });
     cand.sort(function (a, b) { return (b.d === sel) - (a.d === sel) || (b.d === best) - (a.d === best) || (b.d.fill > 0) - (a.d.fill > 0) || grey(a.d) - grey(b.d) || price(a.d) - price(b.d); });
     cand.forEach(function (c) {
       var d = c.d, wk = pm ? '_wp' : '_w', cw = d.co[wk] || (d.co[wk] = d.co.offsetWidth) || (pm ? 96 : 64), lw = d.lb._w || (d.lb._w = d.lb.offsetWidth) || d.n.length * 6.4;
@@ -2658,29 +3097,96 @@
   function closeRoute() { $('nmRphT').textContent = 'Directions'; setOpen(false); clearRoute(); root.classList.remove('rmode'); $('nmRoute').setAttribute('aria-pressed', 'false'); from = to = null; fin.value = tin.value = ''; render(); }
   $('nmRoute').addEventListener('click', function () { if (has('rmode')) closeRoute(); else { openRoute(); setTimeout(function () { tin.focus(); }, 350); } });
   $('nmRclose').addEventListener('click', closeRoute);
+  /* up to three ways there: the shortest, then the best road that avoids most of each one before it */
+  function altPaths(a, b) {
+    var out = [], used = {}, g = G;
+    for (var k = 0; k < 6 && out.length < 3; k++) {
+      var p = dijkstra(a, b, g); if (!p) break;
+      var key = p.join('>');
+      if (!out.some(function (o) { return o.join('>') === key; }) && (!out.length || pathKm(p) < pathKm(out[0]) * 1.45)) out.push(p);
+      for (var i = 1; i < p.length; i++) used[p[i - 1] + '>' + p[i]] = used[p[i] + '>' + p[i - 1]] = 1;
+      g = {}; Object.keys(G).forEach(function (u) { g[u] = G[u].map(function (e) { return [e[0], used[u + '>' + e[0]] ? e[1] * 2.6 : e[1]]; }); });
+    }
+    return out;
+  }
+  function buildRoute(nodes) {
+    var cum = {}, acc = 0; nodes.forEach(function (n, i) { if (i) acc += hav(T[nodes[i - 1]], T[n]) * 1.12; cum[n] = acc; });
+    var lead = from === YOU ? hav(youLL, YOU) * 1.2 : 0, k = {};
+    var stops = D.filter(function (d) { return d.town.n in cum; }).map(function (d) { k[d.i] = cum[d.town.n] + lead; return d; }).sort(function (a, b) { return k[a.i] - k[b.i] || price(a) - price(b); });
+    var pts = nodes.map(function (n) { return [T[n].lon, T[n].lat]; }); if (from === YOU) pts.unshift([youLL.lon, youLL.lat]);
+    return { nodes: nodes, km: acc + lead, stops: stops, k: k, d: path(pts), cost: 0 };
+  }
+  function useKm(r) { r.stops.forEach(function (d) { d.km = r.k[d.i]; }); }
+  var ROUTES = [];
   function plan() {
     if (!from || !to || from === to) return;
-    var nodes = dijkstra(from.n, to.n); if (!nodes) return;
-    var cum = {}, acc = 0; nodes.forEach(function (n, i) { if (i) acc += hav(T[nodes[i - 1]], T[n]) * 1.12; cum[n] = acc; });
-    var lead = from === YOU ? hav(youLL, YOU) * 1.2 : 0;
-    route = { nodes: nodes, km: acc + lead, stops: D.filter(function (d) { return d.town.n in cum; }).map(function (d) { d.km = cum[d.town.n] + lead; return d; }).sort(function (a, b) { return a.km - b.km || price(a) - price(b); }) };
-    D.forEach(function (d) { var o = d.town.n in cum; d.pin.classList.toggle('off', !o); d.pin.classList.toggle('rt', o); });
-    var pts = nodes.map(function (n) { return [T[n].lon, T[n].lat]; }); if (from === YOU) pts.unshift([youLL.lon, youLL.lat]);
-    var dd = path(pts); rc.setAttribute('d', dd); rt.setAttribute('d', dd);
+    var paths = altPaths(from.n, to.n); if (!paths.length) return;
+    D.forEach(function (d) { d.userFill = false; });
+    ROUTES = paths.map(buildRoute); ROUTES.forEach(function (r) { useKm(r); r.cost = fillsFor(r).cost; });
+    ROUTES.sort(function (a, b) { return a.cost - b.cost; });
     var a0 = from === YOU ? youP : from.p, rg = $('nmRg'); rg.setAttribute('x1', a0[0]); rg.setAttribute('y1', a0[1]); rg.setAttribute('x2', to.p[0]); rg.setAttribute('y2', to.p[1]);
     endA.x = a0[0]; endA.y = a0[1]; endB.x = to.p[0]; endB.y = to.p[1]; endA.el.innerHTML = '<em>' + (from === YOU ? 'My location' : from.n) + '</em>'; endB.el.innerHTML = '<em>' + to.n + '</em>';
     root.classList.add('routing'); if (!has('nav')) { root.classList.add('rmode'); $('nmRoute').setAttribute('aria-pressed', 'true'); }
     $('nmRphT').textContent = (from === YOU ? 'My location' : from.n) + ' → ' + to.n; panel.classList.remove('open');
-    select(null); planFills(); if (!has('nav')) { fitRoute(); setTimeout(function () { if (route && !has('nav')) fitRoute(); }, reduce ? 0 : 480); }
+    useRoute(0, true);
+    if (!has('nav')) { fitRoute(); setTimeout(function () { if (route && !has('nav')) fitRoute(); }, reduce ? 0 : 480); }
   }
+  /* choose one of the routes: it turns blue, the others go grey */
+  function useRoute(i, quiet) {
+    if (!ROUTES[i]) return; route = ROUTES[i]; useKm(route);
+    rc.setAttribute('d', route.d); rt.setAttribute('d', route.d);
+    var others = ROUTES.filter(function (r) { return r !== route; }).map(function (r) { return r.d; }).join(''); ra.setAttribute('d', others); rac.setAttribute('d', others);
+    D.forEach(function (d) { var o = d.i in route.k; d.pin.classList.toggle('off', !o); d.pin.classList.toggle('rt', o); if (!o) d.userFill = false; });
+    select(null); planFills();
+    if (!quiet) { var b = $('nmAlts').querySelector('[aria-checked="true"]'); if (b && document.activeElement && document.activeElement.closest && document.activeElement.closest('#nmAlts')) b.focus(); }
+  }
+  /* each pill sits on a stretch of road only its route uses, as far from the other pills as that stretch allows */
+  function pillSpots() {
+    var all = [].concat.apply([], ROUTES.map(function (r) { return r.nodes; })), xs = all.map(function (n) { return T[n].p[0]; }), ys = all.map(function (n) { return T[n].p[1]; });
+    var zz = W ? fitCam(Math.min.apply(0, xs) - 20, Math.min.apply(0, ys) - 20, Math.max.apply(0, xs) + 20, Math.max.apply(0, ys) + 20, zFit * 6).z : 1;
+    var C = ROUTES.map(function (r) {
+      var mine = r.nodes.filter(function (n) { return ROUTES.every(function (o) { return o === r || o.nodes.indexOf(n) < 0; }); });
+      var run = mine.length >= 2 ? mine : r.nodes, cand = [];
+      for (var j = 0; j < run.length - 1; j++) { var a = T[run[j]].p, b = T[run[j + 1]].p; if (r.nodes.indexOf(run[j + 1]) - r.nodes.indexOf(run[j]) !== 1) continue; for (var f = .3; f < .8; f += .2) cand.push([a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, Math.abs(j + f - (run.length - 1) / 2) / run.length]); }
+      if (!cand.length) { var m = T[run[Math.floor(run.length / 2)]].p; cand.push([m[0], m[1], 0]); }
+      return cand;
+    });
+    /* try every combination: no two pills may touch, and each stays near the middle of its stretch */
+    var sep = function (c, q) { return Math.max(Math.abs(c[0] - q[0]) * zz / 128, Math.abs(c[1] - q[1]) * zz / 38); };
+    var spots = [], bs = -Infinity;
+    (function walk(i, pick, sc) {
+      if (i === C.length) { if (sc > bs) { bs = sc; spots = pick.slice(); } return; }
+      C[i].forEach(function (c) { var s2 = sc - c[2] * 40; for (var k = 0; k < i; k++) { var d = sep(c, pick[k]); s2 += d < 1 ? -1000 : Math.min(d, 2) * 10; } pick[i] = c; walk(i + 1, pick, s2); });
+    })(0, [], 0);
+    return spots;
+  }
+  function mins(m) { return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); }
+  function drawRoutes() {
+    var cheap = ROUTES.reduce(function (a, b) { return b.cost < a.cost ? b : a; }, ROUTES[0]);
+    var spots = pillSpots();
+    PILLS.forEach(function (it, i) {
+      var r = ROUTES[i]; it.el.classList.toggle('gone', !r || ROUTES.length < 2); if (!r) return;
+      var at = spots[i], dc = r.cost - cheap.cost, dm = Math.round((r.km - cheap.km) / 72 * 60), on = r === route;
+      it.x = at[0]; it.y = at[1]; it.el.classList.toggle('on', on);
+      it.el.innerHTML = r === cheap ? '<i aria-hidden="true"></i><b>R ' + thou(r.cost) + '</b><span>Cheapest</span>'
+        : '<b>+R ' + thou(dc) + '</b><span>' + (dm > 2 ? '+' + mins(dm) : dm < -2 ? mins(-dm) + ' faster' : 'same time') + '</span>';
+      it.el.setAttribute('aria-label', (r === cheap ? 'Cheapest route' : 'Route ' + (i + 1)) + ', fuel about R ' + thou(r.cost) + ', ' + hm(r.km) + (on ? ', chosen' : ''));
+      it.el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    $('nmAlts').innerHTML = ROUTES.length < 2 ? '' : '<p>' + ROUTES.length + ' routes, cheapest first</p>' + ROUTES.map(function (r, i) {
+      var via = []; for (var j = 1; j < r.nodes.length; j++) { var h = hwOf(r.nodes[j - 1], r.nodes[j]); if (h && via.indexOf(h) < 0) via.push(h); }
+      return '<button type="button" role="radio" data-r="' + i + '" class="' + (r === cheap ? 'ch' : '') + '" aria-checked="' + (r === route) + '"><span class="bar" aria-hidden="true"></span><span><b>R ' + thou(r.cost) + ' fuel</b><small>' + hm(r.km) + ' · ' + thou(r.km) + ' km' + (via.length ? ' · via ' + via.slice(0, 2).join(', ') : '') + '</small></span><em>' + (r === cheap ? 'Cheapest' : '+R ' + thou(r.cost - cheap.cost)) + '</em></button>';
+    }).join('');
+  }
+  $('nmAlts').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) useRoute(+b.dataset.r); });
+  $('nmAlts').addEventListener('keydown', function (e) { if (!/^Arrow/.test(e.key) || !route) return; var i = ROUTES.indexOf(route), n = (i + (/Down|Right/.test(e.key) ? 1 : -1) + ROUTES.length) % ROUTES.length; e.preventDefault(); useRoute(n); var b = this.querySelector('[data-r="' + n + '"]'); if (b) b.focus(); });
   function fitRoute() {
-    var xs = route.nodes.map(function (n) { return T[n].p[0]; }).concat(from === YOU ? [youP[0]] : []), ys = route.nodes.map(function (n) { return T[n].p[1]; }).concat(from === YOU ? [youP[1]] : []);
+    var all = [].concat.apply([], (ROUTES.length ? ROUTES : [route]).map(function (r) { return r.nodes; })), xs = all.map(function (n) { return T[n].p[0]; }).concat(from === YOU ? [youP[0]] : []), ys = all.map(function (n) { return T[n].p[1]; }).concat(from === YOU ? [youP[1]] : []);
     touched = true; flyTo(fitCam(Math.min.apply(0, xs) - 20, Math.min.apply(0, ys) - 20, Math.max.apply(0, xs) + 20, Math.max.apply(0, ys) + 20, zFit * 6), 1000);
   }
-  function planFills() {
-    D.forEach(function (d) { d.fill = 0; d.pin.querySelector('.fl').textContent = ''; d.pin.classList.remove('isfill'); });
-    var st = route.stops.filter(pass), pos = 0, fills = [], short = false;
-    while (route.km - pos > range * .9) {
+  function fillsFor(r) {
+    var st = r.stops.filter(pass), pos = 0, fills = [], short = false;
+    while (r.km - pos > range * .9) {
       var win = st.filter(function (d) { return d.km > pos + 5 && d.km <= pos + range * .9; }); if (!win.length) { short = true; break; }
       var u = win.filter(function (d) { return d.userFill; }), pick;
       if (u.length) pick = u[0];
@@ -2690,10 +3196,16 @@
     }
     st.forEach(function (d) { if (d.userFill && fills.indexOf(d) < 0) fills.push(d); });
     fills.sort(function (a, b) { return a.km - b.km; });
-    fills.forEach(function (f, i) { f.fill = i + 1; f.pin.querySelector('.fl').textContent = i + 1; f.pin.classList.add('isfill'); });
-    var litres = route.km * .36, cost = 0, saving = 0, last = 0;
+    var cost = 0, saving = 0, last = 0;
     fills.forEach(function (f) { var l = (f.km - last) * .36; cost += l * price(f); saving += l * ((fuel === 'petrol' ? AVG95 : AVG)[f.town.pv] - price(f)); last = f.km; });
-    var rest = Math.max(0, route.km - last) * .36, avgP = mean(route.stops.map(price)) || 21.5; cost += rest * avgP;
+    cost += Math.max(0, r.km - last) * .36 * (mean(r.stops.map(price)) || 21.5);
+    return { fills: fills, cost: cost, saving: saving, short: short };
+  }
+  function planFills() {
+    D.forEach(function (d) { d.fill = 0; d.pin.querySelector('.fl').textContent = ''; d.pin.classList.remove('isfill'); });
+    ROUTES.forEach(function (r) { if (r !== route) { useKm(r); r.cost = fillsFor(r).cost; } }); useKm(route);
+    var F = fillsFor(route), fills = F.fills, short = F.short, cost = F.cost, saving = F.saving; route.cost = cost;
+    fills.forEach(function (f, i) { f.fill = i + 1; f.pin.querySelector('.fl').textContent = i + 1; f.pin.classList.add('isfill'); });
     var via = []; for (var i = 1; i < route.nodes.length; i++) { var h = hwOf(route.nodes[i - 1], route.nodes[i]); if (h && via.indexOf(h) < 0) via.push(h); }
     $('nmTime').textContent = hm(route.km); $('nmArr').textContent = 'arrive ' + clock(route.km);
     $('nmKm').textContent = thou(route.km) + ' km' + (via.length ? ' · via ' + via.slice(0, 3).join(', ') : '');
@@ -2703,11 +3215,11 @@
     fills.forEach(function (f) { it += '<li><button type="button" data-i="' + f.i + '"><span class="dot">' + f.fill + '</span><span><b>' + f.n + '</b><small>km ' + thou(f.km) + ' · ' + f.town.n + (f.userFill ? ' · your stop' : '') + '</small></span><em>' + money(price(f)) + '</em></button></li>'; });
     it += '<li><span class="dot e"></span><span><b>' + to.n + '</b><small>Arrive · km ' + thou(route.km) + '</small></span><em></em></li>';
     $('nmItin').innerHTML = it;
-    render();
+    drawRoutes(); render();
   }
   $('nmItin').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) select(D[+b.dataset.i]); });
   function clearRoute() {
-    root.classList.remove('nav', 'routing'); route = null; rc.setAttribute('d', ''); rt.setAttribute('d', '');
+    root.classList.remove('nav', 'routing'); route = null; ROUTES = []; rc.setAttribute('d', ''); rt.setAttribute('d', ''); ra.setAttribute('d', ''); rac.setAttribute('d', ''); PILLS.forEach(function (it) { it.el.classList.add('gone'); }); $('nmAlts').innerHTML = '';
     D.forEach(function (d) { d.pin.classList.remove('off', 'rt', 'isfill', 'dest'); d.fill = 0; d.userFill = false; d.pin.querySelector('.fl').textContent = ''; });
   }
   $('nmSwap').addEventListener('click', function () { var t = from; from = to; to = t; fin.value = from ? (from === YOU ? 'My location' : from.n) : ''; tin.value = to ? to.n : ''; plan(); });
