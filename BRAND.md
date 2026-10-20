@@ -1,5 +1,8 @@
 # TFN brand rules
 
+The full, visual brand guide is the **Brand guide** tab on `tfn-page-examples.html` (or `#brand`).
+Look and feel: premium fintech, built for transport. Upmarket and exact, never glossy, never cheap.
+
 What makes a brand easy to recognise is a small set of rules applied without
 exception. These are tfn's. They are written for the marketing page
 (`tfn-page-examples.html`) and apply to anything else that carries the tfn
@@ -53,8 +56,7 @@ two differ.
   brushed platinum on black, shown as a squircle badge, not a card. TFN's own volume
   ladder (tfn.co.za/price-list).
 - **One app.** Every product shows the same neutral phone; only the accent changes.
-  The TFN wordmark sits top-left of every screen and the portal sidebar, the way
-  Revolut places its mark.
+  The TFN wordmark sits top-left of every screen and the portal sidebar.
 - **A little orange.** `#f2761d` is the one warm spark: live dots, savings, the best
   price, a low-tank or over-limit warning. Small, on white or dark grey, never a
   fill and never orange on black.
@@ -70,8 +72,9 @@ two differ.
   as it arrives, phones lean toward the pointer.
 - **Dark mode.** Product pages and app screens follow the visitor's setting, with a
   toggle in the nav.
-- **Photos stay natural.** No duotones or cut-outs: colour in a photo comes
-  from real light (a blue office at night, blue hour, daylight), never orange.
+- **Photos: real, with a brand-hue background.** Real photography only, never AI-generated
+  people, trucks or places. The signature treatment cuts the subject out and sets the
+  background to one product hue; people keep their natural colour. Light is cool, never orange.
 - **Maps are dark by default.**
 - **Coins are silver.**
 - **State:** green means fine, red means it needs you, grey means coming up.
@@ -136,8 +139,7 @@ Buttons are always full pills, black on light and white on black.
 
 ## 7. Voice
 
-Borrowed from how Wealthsimple writes: short, warm, confident and plain, with
-a little playfulness. It says what you get and then stops.
+Short, warm, confident and plain, with a little playfulness. It says what you get and then stops.
 
 - "The simplest way to run every vehicle."
 - "Three tools. One quiet system."
@@ -180,7 +182,7 @@ vehicle sheet with its grabber, the map controls, the vehicle labels and a
 small monospace live readout. It is always dark, in Driver mode and Business
 mode alike. It is our own drawing and uses no third-party map data or marks.
 
-## 10. Page rhythm and motion, as Revolut's home page
+## 10. Page rhythm and motion
 
 The home page is a run of **full-screen scenes**, one screen tall each, with
 the colour ground changing from scene to scene: blue hero, white, photo

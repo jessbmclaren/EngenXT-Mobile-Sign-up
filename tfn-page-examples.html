@@ -18,7 +18,7 @@
 <style>
   :root {
     --ob-base: #2f78bd; --ob-top: #10346f; --ob-bot: #1b4a92; --ob-light: #9fd6fa; --ob-mid: #4a9be0; --ob-hi: #dcf2ff; --ob-left: #2a6fb8;
-    /* type, as on Revolut: one geometric grotesk for everything. Aeonik Pro there; Satoshi here until TFN licenses it */
+    /* type: one geometric grotesk for everything. Aeonik Pro there; Satoshi here until TFN licenses it */
     --sans: "Aeonik Pro", "Satoshi", "Hanken Grotesk", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: "Fraunces", Georgia, "Times New Roman", serif;
     --text: #1f1f1f; --muted: #717173; --grey: #f4f4f4; --line: #e6e6e6; --ink: #000; --navy: #080f16;
@@ -96,7 +96,7 @@
   .badges span { background: #fff; color: #111; border-radius: 14px; padding: 10px 14px; font-size: .78rem; font-weight: 600; opacity: 0; animation: up .8s var(--ease) 2.4s forwards; box-shadow: 0 14px 30px -14px rgba(10,30,70,.5); }
   .badges span:nth-child(2) { animation-delay: 2.6s; }
 
-  /* ---------- sections: Revolut rhythm, static text, the media moves ---------- */
+  /* ---------- sections: the page rhythm, static text, the media moves ---------- */
   .sec { padding: 110px 0; } .sec.grey { background: var(--grey); } .sec.black { background: #000; color: #fff; } .sec.black .sub, .sec.black .kicker { color: #a8a8a8; }
   h2.title { font-size: clamp(2.1rem, 4vw, 3.15rem); max-width: 14em; margin-inline: auto; }
   .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 40px 0; border-bottom: 1px solid var(--line); }
@@ -186,7 +186,7 @@
   .tile { transition: transform .35s var(--ease), background .35s; } .tile:hover { background: #ececec; }
   @media (prefers-reduced-motion: reduce) { .curtain, .wipe { display: none !important; } .wd > span { transform: none; } .js .clipr:not(.in) { clip-path: none; } .scene > .wrap, .sec.black > *, .cscene > * { transform: none; opacity: 1; } }
 
-  /* ---------- scroll-driven scenes, as on Revolut's home page ---------- */
+  /* ---------- scroll-driven scenes ---------- */
   /* a statement whose words light up as you scroll */
   .lit { height: 190vh; position: relative; }
   .lit .pin { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; }
@@ -426,7 +426,7 @@
   .pic .asearch { color: rgba(255,255,255,.72); }
   /* the app's own Map screen is light, like the network map below */
   .amapscr .mgl { background: rgba(255,255,255,.9); color: #1c1c1e; } .amapscr .asearch { color: #6e6e73; }
-  .amapscr .asheet small { color: #6e6e73; } .amapscr .asheet .go { background: linear-gradient(120deg, #4f6bd0, #7a5cc8); color: #fff; }
+  .amapscr .asheet small { color: #6e6e73; } .amapscr .asheet .go { background: linear-gradient(120deg, #2f4fb0, #5a3fb0); color: #fff; }
   .m-call rect { fill: #fff; stroke: rgba(0,0,0,.08); stroke-width: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,.18)); }
   .m-call text { font: 700 13px var(--sans); fill: #111; text-anchor: middle; dominant-baseline: central; stroke: none; }
   .amap.dark .m-call rect { fill: #2c2c2e; stroke: rgba(255,255,255,.08); } .amap.dark .m-call text { fill: #fff; }
@@ -449,7 +449,7 @@
   .amap.big { height: min(80vh, 720px); border-radius: 32px; margin-top: 44px; box-shadow: 0 50px 100px -40px rgba(10,5,40,.7); }
 
   /* ---------- the network map, inside the TFN app ----------
-     Kakao's hierarchy (price first, search on top, filters as chips, a slim sheet), Apple's controls, our orb colours.
+     Price first, search on top, filters as chips, a slim sheet, our orb colours.
      Light by default; the layers button switches to dark. Depots, prices and savings are illustrative. */
   .nm-stage { display: grid; justify-items: center; gap: 28px; margin-top: 52px; }
   .nm-phone { position: relative; width: min(380px, calc(100vw - 40px)); aspect-ratio: 397 / 834; padding: 11px; border-radius: 54px; background: #0b0b0c; box-shadow: inset 0 0 0 2px #3b3b3f, inset 0 0 0 4px #111, 0 50px 90px -24px rgba(0,0,0,.85); }
@@ -459,8 +459,8 @@
     /* the orbs' palette: sky, lavender, pink, peach, sea */
     --sky: #7fb4e6; --lav: #a796e0; --pink: #e3a0bd; --peach: #efb79c; --sea: #8fcbc0; --deep: #5c6fcf; --plum: #7b5cc4;
     /* the blue (diesel) orb: sky on top, a deeper blue to the right, lavender below, a breath of sea */
-    --orb: radial-gradient(110% 80% at 35% 5%, #a6d4ec 0%, rgba(166,212,236,0) 60%), radial-gradient(80% 90% at 95% 50%, #5f8fd6 0%, rgba(95,143,214,0) 62%), radial-gradient(95% 95% at 12% 100%, #a796e0 0%, rgba(167,150,224,0) 64%), radial-gradient(60% 60% at 75% 100%, #8ccdb2 0%, rgba(140,205,178,0) 70%), linear-gradient(150deg, #a3c8ea, #7698dc 60%, #958edd);
-    --go: linear-gradient(120deg, #4f6bd0, #7a5cc8);
+    --orb: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #22707a, rgba(34,112,122,0) 70%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
+    --go: linear-gradient(120deg, #2f4fb0, #5a3fb0);
     --w: #e5ebf2; --ld: #eef0f3; --za1: #fdfdfe; --za2: #f4f5f7; --pk: #e5f0ea; --bd: #d5d8de; --hc: #e0e3e8; --hw: #ffffff; --lb: #7c7f86; --halo: #fff; --wl: #9fb2c6;
     --rg0: #9fd3ea; --rg1: #5f8fd6; --rg2: #a796e0; --acc: #5a5fc4; --tx: #1c1c1e; --tx2: #6e6e73; --fld: rgba(118,118,128,.12); --ln: rgba(60,60,67,.1);
     --sheet: rgba(255,255,255,.95); --glass: rgba(255,255,255,.9); --chip: #fff; --chiptx: #1c1c1e; --co: #fff; --cotx: #1c1c1e; --segon: #fff; --fog: #f3f4f7; --fade: #fff; --ring: #fff; }
@@ -649,7 +649,7 @@
 
 
   /* ---------- round two ---------- */
-  /* the price is the marker: one pill, the orb at its start, a tail at the spot (Kakao's petrol layer) */
+  /* the price is the marker: one pill, the orb at its start, a tail at the spot  */
   .pm .nm-pin:not(.on):not(.nc) i { left: -13px; top: -35px; z-index: 2; box-shadow: none; }
   .pm .nm-pin:not(.on):not(.nc) .co { display: block; z-index: 1; left: -16px; top: -38px; bottom: auto; translate: none; height: 30px; padding: 0 11px 0 32px; line-height: 30px; border-radius: 15px; font-size: 12.5px;
     box-shadow: 0 6px 16px -6px rgba(40,60,120,.35), inset 0 0 0 1px rgba(40,60,120,.06); }
@@ -680,6 +680,269 @@
   /* route end tags sit beside their dots, clear of the pins */
   .nm-end em { left: 14px; bottom: auto; top: 50%; translate: 0 -50%; }
 
+  /* ---------- the brand guide: a second view of this page, switched with the Site / Brand guide tab (#brand) ---------- */
+  .bm-on main, .bm-on footer, .bm-on #nav, .bm-on .mega, .bm-on #sticky { display: none !important; }
+  .bm { --ink: #1f1f1f; --mut: #6e6e73; --line: #e8e8ea; --soft: #f5f5f7; --no: #d93b3b; background: #fff; color: var(--ink); font-size: 16px; line-height: 1.55; }
+  .bm[hidden] { display: none; }
+  .bm code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
+  .bm-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--line); }
+  .bm-top svg { width: 64px; height: 24px; } .bm-top span { font-size: 15px; font-weight: 500; color: var(--mut); } .bm-top .grow { flex: 1; }
+  .bm-top a { white-space: nowrap; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: #fff; }
+  /* cover */
+  .bm-cover { position: relative; overflow: hidden; background: #000; color: #fff; }
+  .bm-cover > div { position: relative; z-index: 1; display: grid; align-content: center; min-height: clamp(560px, 84vh, 820px); width: min(1180px, 100% - 48px); margin: 0 auto; padding: 72px 0; }
+  .bm-cover .lbl { font-size: 14px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #a8a8a8; }
+  .bm-cover svg.wm { width: min(420px, 70vw); height: auto; aspect-ratio: 392 / 148; margin: 22px 0 26px; color: #fff; }
+  .bm-cover p { max-width: 26em; font-size: 1.25rem; color: #c7c7cc; }
+  .bm-cover .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; } .bm-cover .meta span { padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); font-size: 13px; color: #c7c7cc; }
+  .bm-cover .bm-orb.xl { position: absolute; right: max(-140px, calc((100vw - 1180px) / 2 - 140px)); top: 50%; width: min(640px, 70vw); height: auto; aspect-ratio: 1; translate: 0 -50%; box-shadow: none; }
+  /* the frame: contents and chapters */
+  .bm-wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; width: min(1180px, 100% - 48px); margin: 0 auto; padding: 24px 0 140px; }
+  .bm-wrap > * { min-width: 0; }
+  .bm-toc { position: sticky; top: 88px; align-self: start; display: grid; gap: 1px; margin-top: 72px; font-size: 14px; }
+  .bm-toc a { display: flex; gap: 10px; padding: 6px 12px; border-radius: 8px; color: var(--mut); transition: background .2s, color .2s; } .bm-toc a:hover, .bm-toc a.on { background: var(--soft); color: var(--ink); }
+  .bm-toc a i { font-style: normal; font-size: 12px; font-variant-numeric: tabular-nums; opacity: .6; padding-top: 1px; }
+  .bm-toc b { margin: 0 12px 8px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+  .bm section { padding-top: 160px; scroll-margin-top: 72px; } .bm section:first-child { padding-top: 72px; }
+  .bm-ch { display: grid; grid-template-columns: auto 1fr; gap: 6px 40px; align-items: end; padding: 44px 44px 40px; border-radius: 28px; background: var(--soft); margin-bottom: 40px; }
+  .bm-ch.dark { background: #000; color: #fff; } .bm-ch.dark p { color: #a8a8a8; }
+  .bm-ch .n { grid-row: span 2; font-size: clamp(4rem, 8vw, 7rem); font-weight: 500; line-height: .8; letter-spacing: -.04em; font-variant-numeric: tabular-nums; opacity: .9; }
+  .bm-ch h2 { font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.05; letter-spacing: -.015em; }
+  .bm-ch p { max-width: 36em; color: #3a3a3c; }
+  .bm h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -.005em; margin-bottom: 6px; }
+  .bm-sub { margin: 48px 0 14px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); } .bm-sub:first-child { margin-top: 0; }
+  .bm-note { margin-top: 14px; font-size: 13px; color: var(--mut); }
+  .bm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .bm-grid.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bm-grid.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .bm-card { padding: 22px; border-radius: 20px; background: var(--soft); }
+  .bm-card p { font-size: 15px; color: #3a3a3c; } .bm-card .why { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,.07); font-size: 13.5px; color: var(--mut); } .bm-card .why b { color: var(--ink); font-weight: 600; }
+  .bm-card.dark { background: #000; color: #fff; } .bm-card.dark p { color: #a8a8a8; }
+  /* a spec sheet instead of bullets */
+  .bm-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 0; }
+  .bm-specs > div { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .bm-specs dt { font-size: 13px; font-weight: 600; color: var(--mut); } .bm-specs dd { margin: 0; font-size: 15px; }
+  /* do and don't */
+  .bm-dd { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .bm-dd + .bm-dd { margin-top: 16px; }
+  .bm-dd figure { margin: 0; }
+  .bm-dd .v { position: relative; display: grid; place-items: center; height: 220px; overflow: hidden; border-radius: 20px; background: var(--soft); }
+  .bm-dd .v.dark { background: #000; color: #fff; }
+  .bm-dd figcaption { display: flex; gap: 10px; align-items: baseline; margin-top: 12px; font-size: 14.5px; color: #3a3a3c; }
+  .bm-dd figcaption b { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .bm-dd figcaption b::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 11px; }
+  .bm-dd .no .v { box-shadow: inset 0 0 0 2px var(--no); } .bm-dd .no figcaption b { color: var(--no); } .bm-dd .no figcaption b::before { content: "✕"; background: var(--no); }
+  /* why it works */
+  .bm-why { display: grid; gap: 16px; }
+  .bm-why article { display: grid; grid-template-columns: 1.05fr 1fr 1fr; border-radius: 20px; overflow: hidden; background: var(--soft); }
+  .bm-why article > div { padding: 20px 22px; } .bm-why article > div + div { border-left: 1px solid #fff; }
+  .bm-why small { display: block; margin-bottom: 6px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+  .bm-why h3 { font-size: 1.05rem; } .bm-why p { font-size: 14.5px; color: #3a3a3c; } .bm-why .bc b { font-weight: 600; color: var(--ink); }
+  /* orbs */
+  .bm-orb { position: relative; display: block; width: 112px; height: 112px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255,255,255,.08); overflow: hidden; }
+  .bm-orb::after { content: ""; position: absolute; inset: 0; opacity: .32; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .bm-orb.diesel { background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #22707a, rgba(34,112,122,0) 70%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); }
+  .bm-orb.nonfuel { background: radial-gradient(90% 70% at 32% 6%, #d99a82, rgba(217,154,130,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e); }
+  .bm-orb.africa { background: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(70% 70% at 86% 90%, #2f7a72, rgba(47,122,114,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e); }
+  .bm-orb.homebase { background: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2f7fa6, rgba(47,127,166,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(60% 60% at 82% 96%, #a8684a, rgba(168,104,74,0) 70%), linear-gradient(150deg, #2f6d5a, #173d4d); }
+  .bm-orb.sm { width: 24px; height: 24px; box-shadow: inset 0 0 0 1px rgba(40,70,140,.14), 0 4px 10px -3px rgba(60,100,190,.45); } .bm-orb.sm::after { display: none; }
+  .bm-orb.bad { box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(0,0,0,.3); background: radial-gradient(circle at 30% 25%, #fff, rgba(255,255,255,0) 35%), linear-gradient(160deg, #3d8ee0, #0d2a5c); } .bm-orb.bad::after { display: none; }
+  .bm-orbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .bm-orbs figure { margin: 0; display: grid; justify-items: center; gap: 12px; padding: 30px 12px 20px; border-radius: 20px; background: #0b0b0c; color: #fff; font-size: 13.5px; text-align: center; }
+  .bm-orbs figcaption span { display: block; color: #a8a8a8; font-size: 12px; }
+  /* logo */
+  .bm-cons { position: relative; display: grid; place-items: center; height: 340px; border-radius: 24px; background-color: var(--soft);
+    background-image: linear-gradient(rgba(95,143,214,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(95,143,214,.12) 1px, transparent 1px); background-size: 20px 20px; background-position: center; }
+  .bm-cons .box { position: relative; padding: 46px; outline: 1.5px dashed #8a8fa0; }
+  .bm-cons .box > svg { display: block; width: 260px; height: auto; aspect-ratio: 392 / 148; outline: 1px solid rgba(95,143,214,.6); }
+  .bm-cons .x { position: absolute; display: grid; place-items: center; width: 46px; height: 46px; background: rgba(95,143,214,.16); color: #3c5fa8; font: 600 13px/1 ui-monospace, Menlo, monospace; }
+  .bm-cons .x.t { top: 0; left: 50%; margin-left: -23px; } .bm-cons .x.b { bottom: 0; left: 50%; margin-left: -23px; } .bm-cons .x.l { left: 0; top: 50%; margin-top: -23px; } .bm-cons .x.r { right: 0; top: 50%; margin-top: -23px; }
+  .bm-cons .lg { position: absolute; left: 20px; bottom: 16px; font-size: 12.5px; color: var(--mut); }
+  .bm-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .bm-pair > div { display: grid; place-items: center; height: 200px; border-radius: 20px; background: var(--soft); } .bm-pair > div.dark { background: #000; color: #fff; }
+  .bm-pair svg { width: 170px; height: auto; aspect-ratio: 392 / 148; }
+  .bm-min { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 36px; padding: 28px; border-radius: 20px; background: var(--soft); }
+  .bm-min figure { margin: 0; display: grid; justify-items: start; gap: 8px; font-size: 12.5px; color: var(--mut); } .bm-min svg { display: block; height: auto; aspect-ratio: 392 / 148; }
+  .bm-min .sep { align-self: stretch; width: 1px; background: var(--line); }
+  .bm-dont { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-dont figure { margin: 0; } .bm-dont .v { position: relative; display: grid; place-items: center; height: 150px; overflow: hidden; border-radius: 18px; background: var(--soft); box-shadow: inset 0 0 0 2px var(--no); }
+  .bm-dont svg.w { width: 120px; height: auto; aspect-ratio: 392 / 148; }
+  .bm-dont figcaption { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: #3a3a3c; }
+  .bm-dont figcaption::before { content: "✕"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--no); color: #fff; font-size: 11px; font-weight: 700; }
+  /* colour */
+  .bm-ratio { display: flex; height: 54px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid #d8d8dc; }
+  .bm-ratio i { display: block; } .bm-ratio i + i { border-left: 1px solid rgba(0,0,0,.08); }
+  .bm-ratio-k { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--mut); }
+  .bm-ratio-k li { display: flex; align-items: center; gap: 8px; } .bm-ratio-k i { width: 14px; height: 14px; border-radius: 4px; }
+  .bm-sw { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-sw .sw { overflow: hidden; border-radius: 20px; background: var(--soft); }
+  .bm-sw .sw > i { display: block; height: 120px; } .bm-sw .sw > div { padding: 14px 16px 16px; }
+  .bm-sw b { display: block; font-size: 15px; } .bm-sw .use { display: block; font-size: 13px; color: var(--mut); margin-bottom: 10px; }
+  .bm-sw dl { display: grid; grid-template-columns: 52px 1fr; gap: 3px 8px; margin: 0; font-size: 12.5px; } .bm-sw dt { color: var(--mut); } .bm-sw dd { margin: 0; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .bm-cr { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .bm-cr span { padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: #fff; box-shadow: inset 0 0 0 1px var(--line); } .bm-cr span.f { color: var(--mut); font-weight: 500; }
+  .bm-tblw { overflow-x: auto; border-radius: 20px; background: var(--soft); }
+  .bm-tbl { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13.5px; }
+  .bm-tbl th, .bm-tbl td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #fff; white-space: nowrap; } .bm-tbl tr:last-child td { border-bottom: 0; }
+  .bm-tbl th { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mut); }
+  .bm-tbl td.c i { display: block; width: 40px; height: 28px; border-radius: 8px; } .bm-tbl td code { font-size: 12px; }
+  .bm-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: hidden; border-radius: 20px; }
+  .bm-strip > div { display: grid; align-content: end; height: 150px; padding: 12px 14px; font-size: 13px; color: rgba(0,0,0,.72); } .bm-strip b { font-weight: 600; color: #1f1f1f; } .bm-strip code { font-size: 11.5px; }
+  .bm-spark { display: grid; grid-template-columns: 200px 1fr; overflow: hidden; border-radius: 20px; background: var(--soft); }
+  .bm-spark > i { display: grid; place-items: center; background: #fff; box-shadow: inset 0 0 0 1px var(--line); } .bm-spark > i span { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .bm-spark > i span::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #f2761d; box-shadow: 0 0 0 5px rgba(242,118,29,.16); }
+  .bm-spark > div { padding: 22px; } .bm-spark p { font-size: 15px; color: #3a3a3c; } .bm-spark p + p { margin-top: 10px; font-size: 14px; color: var(--mut); }
+  /* type */
+  .bm-aa { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: center; padding: 36px 40px; border-radius: 24px; background: var(--soft); }
+  .bm-aa > b { font-size: clamp(7rem, 14vw, 12rem); font-weight: 500; line-height: .8; letter-spacing: -.04em; }
+  .bm-aa p { font-size: 1.35rem; line-height: 1.5; letter-spacing: .01em; word-break: break-all; } .bm-aa small { display: block; margin-top: 14px; font-size: 13px; color: var(--mut); }
+  .bm-wts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .bm-wts > div { padding: 22px; border-radius: 20px; background: var(--soft); } .bm-wts span { display: block; font-size: 2.6rem; line-height: 1.1; letter-spacing: -.02em; } .bm-wts small { font-size: 13px; color: var(--mut); }
+  .bm-wts > div.serif { background: #000; color: #fff; } .bm-wts > div.serif svg { width: 110px; height: auto; aspect-ratio: 392 / 148; display: block; margin: 6px 0 9px; } .bm-wts > div.serif small { color: #a8a8a8; }
+  .bm-type { display: grid; overflow: hidden; border-radius: 20px; background: var(--soft); }
+  .bm-type > div { display: grid; grid-template-columns: 170px 1fr; align-items: baseline; gap: 24px; padding: 22px 24px; } .bm-type > div + div { border-top: 1px solid #fff; }
+  .bm-type small { font-size: 12.5px; color: var(--mut); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.5; }
+  .bm-type .t1 { font-size: clamp(2.6rem, 5.4vw, 5.3rem); font-weight: 500; line-height: 1; letter-spacing: -.025em; }
+  .bm-type .t2 { font-size: clamp(2rem, 3.6vw, 3.15rem); font-weight: 500; line-height: 1; letter-spacing: -.012em; }
+  .bm-type .t3 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; } .bm-type .t4 { font-size: 1.125rem; color: #3a3a3c; } .bm-type .t5 { font-size: 13px; color: var(--mut); }
+  .bm-type .app { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 17px; }
+  /* icons */
+  .bm-icons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .bm-icons figure { margin: 0; display: grid; justify-items: center; gap: 10px; padding: 24px 8px 16px; border-radius: 18px; background: var(--soft); font-size: 12.5px; color: var(--mut); }
+  .bm-icons svg { width: 32px; height: 32px; color: var(--ink); }
+  .bm-igrow { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: start; }
+  .bm-ig { position: relative; width: 168px; height: 168px; border-radius: 12px; background-color: #fff; background-image: linear-gradient(rgba(95,143,214,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(95,143,214,.18) 1px, transparent 1px); background-size: 7px 7px; box-shadow: inset 0 0 0 1px var(--line); }
+  .bm-ig::before { content: ""; position: absolute; inset: 14px; border: 1px dashed rgba(60,95,168,.5); border-radius: 4px; }
+  .bm-ig svg { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ink); }
+  /* components */
+  .bm-comp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-comp > div { display: grid; align-content: start; gap: 14px; padding: 22px; border-radius: 20px; background: var(--soft); }
+  .bm-comp > div.dark { background: #000; color: #fff; } .bm-comp > div.dark p { color: #a8a8a8; }
+  .bm-comp > div.no { box-shadow: inset 0 0 0 2px var(--no); } .bm-comp .tag { justify-self: start; padding: 2px 8px; border-radius: 6px; background: var(--no); color: #fff; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .bm-comp p { font-size: 14px; color: #3a3a3c; } .bm-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .bm-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 24px; border-radius: 999px; font-weight: 500; background: #1f1f1f; color: #fff; }
+  .bm-btn.w { background: #fff; color: #111; } .bm-btn.go { height: 50px; border-radius: 14px; padding: 0 34px; font-weight: 600; background: linear-gradient(120deg, #2f4fb0, #5a3fb0); box-shadow: 0 10px 24px -8px rgba(92,90,200,.55); }
+  .bm-btn.or { background: #f2761d; } .bm-btn.ghost { background: #fff; color: #1f1f1f; box-shadow: inset 0 0 0 1px var(--line); height: 50px; border-radius: 14px; font-weight: 600; }
+  .bm-chip { display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; background: #fff; box-shadow: 0 4px 12px -6px rgba(40,40,80,.3); }
+  .bm-chip.on { background: linear-gradient(120deg, #2f4fb0, #5a3fb0); color: #fff; } .bm-chip small { opacity: .55; }
+  .bm-sheet { padding: 16px; border-radius: 22px; background: #fff; box-shadow: 0 16px 40px -14px rgba(40,40,80,.35); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
+  .bm-sheet b { display: block; font-size: 15px; } .bm-sheet small { display: block; font-size: 12.5px; color: var(--mut); }
+  .bm-sheet .pr { margin: 10px 0 2px; font-size: 20px; font-weight: 700; } .bm-sheet .pd { font-size: 12.5px; font-weight: 600; color: #5a5fc4; }
+  .bm-sheet .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .bm-sheet .two span { display: grid; place-items: center; height: 38px; border-radius: 11px; font-size: 13.5px; font-weight: 600; box-shadow: inset 0 0 0 1px var(--line); }
+  .bm-sheet .two span.go { color: #fff; background: linear-gradient(120deg, #2f4fb0, #5a3fb0); box-shadow: none; }
+  /* maps */
+  .bm-pill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 11px 0 3px; border-radius: 15px; background: #fff; font-size: 12.5px; font-weight: 600; box-shadow: 0 6px 16px -6px rgba(40,60,120,.35); }
+  .bm-pill::after { content: ""; position: absolute; left: 9px; bottom: -4px; width: 10px; height: 10px; border-radius: 2px; background: inherit; transform: rotate(45deg); z-index: -1; }
+  .bm-pill .bm-orb.sm { width: 24px; height: 24px; } .bm-pill.best { background: linear-gradient(120deg, #2f4fb0, #5a3fb0); color: #fff; } .bm-pill.best em { font-style: normal; font-weight: 500; opacity: .9; }
+  .bm-pill.gr { color: #6e6e73; } .bm-pill.gr .bm-orb.sm { background: linear-gradient(150deg, #d9dade, #b9bbc2); box-shadow: none; } .bm-pill.lo { color: #5a5fc4; }
+  .bm-mapv { position: absolute; inset: 0; background: #eef0f3; background-image: linear-gradient(115deg, transparent 47%, #fff 47%, #fff 50.5%, transparent 50.5%), linear-gradient(20deg, transparent 58%, #fff 58%, #fff 61%, transparent 61%); }
+  .bm-mapv .p { position: absolute; } .bm-dotc { display: block; width: 18px; height: 18px; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 2px 5px rgba(0,0,0,.3); }
+  .bm-cnt { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: #2a6fd0; color: #fff; font-weight: 700; font-size: 17px; box-shadow: 0 0 0 3px #fff, 0 4px 10px rgba(0,0,0,.3); }
+  /* layout */
+  .bm-cols { position: relative; height: 260px; padding: 28px 24px; border-radius: 20px; background: var(--soft); overflow: hidden; }
+  .bm-cols .g { position: absolute; inset: 0 24px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 2.4%; } .bm-cols .g i { background: rgba(95,143,214,.12); }
+  .bm-cols .c { position: relative; display: grid; gap: 12px; align-content: start; }
+  .bm-cols .c i { display: block; height: 14px; border-radius: 7px; background: #c9cbd1; } .bm-cols .c i.h { width: 58%; height: 34px; border-radius: 8px; background: #1f1f1f; } .bm-cols .c i.p { width: 16%; height: 30px; border-radius: 999px; background: #1f1f1f; margin-top: 8px; }
+  .bm-cols .c i:nth-child(2) { width: 66%; } .bm-cols .c i:nth-child(3) { width: 50%; }
+  .bm-phone { position: relative; width: 210px; height: 430px; margin: 0 auto; border-radius: 36px; background: #0b0b0c; padding: 8px; }
+  .bm-phone > div { position: relative; height: 100%; border-radius: 29px; background: #fff; overflow: hidden; }
+  .bm-phone .m { position: absolute; top: 0; bottom: 0; width: 9px; background: rgba(95,143,214,.18); } .bm-phone .m.l { left: 0; } .bm-phone .m.r { right: 0; }
+  .bm-phone .s { position: absolute; left: 9px; right: 9px; height: 1px; border-top: 1px dashed rgba(60,95,168,.55); }
+  .bm-phone .blk { position: absolute; left: 9px; right: 9px; border-radius: 10px; background: #eceef1; }
+  .bm-scale { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; }
+  .bm-scale div { display: grid; justify-items: center; gap: 6px; font-size: 12px; color: var(--mut); } .bm-scale i { display: block; background: rgba(95,143,214,.35); border-radius: 3px; }
+  /* imagery */
+  .bm-hero-img { position: relative; height: 420px; border-radius: 24px; background: var(--img) center 40% / cover no-repeat; overflow: hidden; }
+  .bm-hero-img span { position: absolute; left: 20px; bottom: 18px; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 13px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .bm-dd .v.ph { background: var(--img) var(--pos, center) / cover no-repeat; }
+  .bm-dd .v .cp { position: absolute; left: 22px; top: 50%; translate: 0 -50%; max-width: 46%; color: #fff; font-size: 20px; font-weight: 500; line-height: 1.15; }
+  .bm-dd .v .cp.ctr { left: 50%; translate: -50% -50%; text-align: center; max-width: 70%; }
+  /* voice */
+  .bm-voice { display: grid; gap: 10px; }
+  .bm-voice > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bm-voice p { display: flex; gap: 12px; align-items: baseline; padding: 16px 18px; border-radius: 16px; background: var(--soft); font-size: 15px; }
+  .bm-voice p::before { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: 700; color: #fff; translate: 0 3px; }
+  .bm-voice p.y::before { content: "✓"; background: var(--ink); } .bm-voice p.n { color: var(--mut); } .bm-voice p.n::before { content: "✕"; background: #b4b4b9; }
+  /* motion */
+  .bm-motion { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+  .bm-motion > div { padding: 24px; border-radius: 20px; background: var(--soft); }
+  .bm-curve { width: 100%; height: auto; aspect-ratio: 1; }
+  .bm-dur { display: grid; gap: 14px; } .bm-dur div { display: grid; grid-template-columns: 150px 1fr 64px; gap: 14px; align-items: center; font-size: 14px; }
+  .bm-dur i { display: block; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #3d68c0, #2a1f6e); } .bm-dur span { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--mut); text-align: right; }
+  .bm-play { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+  .bm-play button { flex: none; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13.5px; font-weight: 500; }
+  .bm-play .tr { position: relative; flex: 1; height: 34px; border-radius: 17px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+  .bm-play .tr i { position: absolute; left: 3px; top: 3px; width: 28px; height: 28px; border-radius: 50%; background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); transition: left .9s cubic-bezier(.2,.7,.2,1); }
+  .bm-play .tr.go i { left: calc(100% - 31px); }
+  /* accessibility */
+  .bm-cp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-cp > div { overflow: hidden; border-radius: 20px; box-shadow: inset 0 0 0 1px var(--line); }
+  .bm-cp .s { display: grid; place-items: center; height: 110px; font-size: 22px; font-weight: 600; }
+  .bm-cp .k { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; font-size: 13px; background: #fff; }
+  .bm-cp .k b { padding: 2px 8px; border-radius: 6px; font-size: 11.5px; background: var(--ink); color: #fff; } .bm-cp .k b.f { background: #e8e8ea; color: var(--mut); }
+  /* applications */
+  .bm-apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-apps figure { margin: 0; display: grid; grid-template-rows: 1fr auto; overflow: hidden; border-radius: 22px; background: var(--soft); }
+  .bm-apps figure > div { position: relative; display: grid; place-items: center; min-height: 280px; padding: 24px; }
+  .bm-apps figcaption { padding: 14px 18px 16px; border-top: 1px solid #fff; font-size: 13.5px; color: var(--mut); } .bm-apps figcaption b { color: var(--ink); font-weight: 600; }
+  .bm-apps .tall { grid-row: span 2; } .bm-apps .wide { grid-column: span 2; }
+  .bm-icn { position: relative; width: 112px; height: 112px; border-radius: 26px; background: #000; display: grid; place-items: center; box-shadow: 0 16px 30px -12px rgba(0,0,0,.45); }
+  .bm-icn .bm-orb { width: 74%; height: 74%; box-shadow: none; }
+  .bm-home { display: flex; gap: 18px; align-items: flex-start; } .bm-home figure { margin: 0; display: grid; justify-items: center; gap: 8px; font-size: 12px; color: var(--ink); background: none; overflow: visible; }
+  .bm-home .o { width: 64px; height: 64px; border-radius: 15px; background: #d9dbe0; } .bm-home .bm-icn { width: 64px; height: 64px; border-radius: 15px; box-shadow: none; }
+  .bm-fav { display: flex; gap: 12px; align-items: center; margin-top: 18px; font-size: 12px; color: var(--mut); } .bm-fav .bm-orb { box-shadow: none; } .bm-fav .bm-orb::after { display: none; }
+  .bm-pylon { display: grid; justify-items: center; }
+  .bm-pylon .sign { width: 200px; padding: 22px 18px 18px; border-radius: 18px 18px 6px 6px; background: #0b0b0c; color: #fff; }
+  .bm-pylon .sign svg { display: block; width: 92px; height: auto; aspect-ratio: 392 / 148; margin: 0 auto 18px; }
+  .bm-pylon .row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 2px; border-top: 1px solid rgba(255,255,255,.12); font-size: 12.5px; color: #c7c7cc; }
+  .bm-pylon .row b { font-size: 24px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .bm-pylon .pay { margin-top: 12px; padding: 9px; border-radius: 10px; background: rgba(255,255,255,.08); text-align: center; font-size: 12px; color: #c7c7cc; }
+  .bm-pylon .pay i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: #1a9b55; }
+  .bm-pylon .leg { width: 22px; height: 120px; background: linear-gradient(90deg, #2a2a2e, #3a3a3e 50%, #2a2a2e); } .bm-pylon .base { width: 120px; height: 10px; border-radius: 5px; background: #c9cbd1; }
+  .bm-door svg, .bm-shirt svg { width: 100%; max-width: 300px; height: auto; }
+  .bm-mail { width: 100%; max-width: 320px; padding: 20px; border-radius: 14px; background: #fff; box-shadow: 0 10px 30px -14px rgba(0,0,0,.25); font-size: 13px; }
+  .bm-mail .h { display: flex; gap: 8px; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--mut); font-size: 12px; } .bm-mail .h i { width: 10px; height: 10px; border-radius: 50%; background: #e3e3e6; }
+  .bm-mail b { display: block; font-size: 14.5px; } .bm-mail span { display: block; color: var(--mut); }
+  .bm-mail .sig { display: flex; justify-content: space-between; align-items: end; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .bm-mail .sig svg { width: 58px; height: auto; aspect-ratio: 392 / 148; } .bm-mail .sig small { color: var(--mut); font-size: 12px; }
+  .bm-post { position: relative; width: 100%; max-width: 260px; aspect-ratio: 1; overflow: hidden; border-radius: 14px; background: #000; color: #fff; box-shadow: 0 16px 30px -14px rgba(0,0,0,.5); }
+  .bm-post .bm-orb { position: absolute; right: -24%; top: -24%; width: 82%; height: 82%; box-shadow: none; }
+  .bm-post p { position: absolute; left: 18px; bottom: 44px; right: 18px; font-size: 21px; font-weight: 500; line-height: 1.12; letter-spacing: -.01em; } .bm-post p span { color: #a8a8a8; }
+  .bm-post svg { position: absolute; left: 18px; bottom: 16px; width: 40px; height: auto; aspect-ratio: 392 / 148; color: #fff; }
+  .bm-portal { width: 100%; max-width: 620px; overflow: hidden; border-radius: 14px; background: #fff; box-shadow: 0 20px 44px -18px rgba(0,0,0,.35); }
+  .bm-portal .bar { display: flex; gap: 6px; align-items: center; height: 30px; padding: 0 12px; background: #eceef1; } .bm-portal .bar i { width: 9px; height: 9px; border-radius: 50%; background: #c9cbd1; }
+  .bm-portal .bar span { margin-left: 12px; padding: 2px 30px; border-radius: 6px; background: #fff; font-size: 11px; color: var(--mut); }
+  .bm-portal .bd { display: grid; grid-template-columns: 1fr 1fr; min-height: 300px; }
+  .bm-portal .f { display: grid; align-content: center; gap: 10px; padding: 28px; } .bm-portal .f svg { width: 54px; height: auto; aspect-ratio: 392 / 148; margin-bottom: 10px; }
+  .bm-portal .f b { font-size: 18px; letter-spacing: -.01em; } .bm-portal .f i { display: block; height: 36px; border-radius: 10px; background: #f2f2f4; box-shadow: inset 0 0 0 1px var(--line); font-style: normal; font-size: 12px; color: var(--mut); line-height: 36px; padding: 0 12px; }
+  .bm-portal .f span { justify-self: start; margin-top: 4px; padding: 9px 22px; border-radius: 999px; background: #1f1f1f; color: #fff; font-size: 13px; font-weight: 500; }
+  .bm-portal .o { position: relative; overflow: hidden; background: #000; } .bm-portal .o .bm-orb { position: absolute; left: 50%; top: 50%; width: 76%; height: auto; aspect-ratio: 1; translate: -50% -50%; box-shadow: none; }
+  /* downloads */
+  .bm-dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .bm-dl a { display: grid; gap: 6px; align-content: space-between; min-height: 170px; padding: 22px; border-radius: 20px; background: var(--soft); transition: background .2s; } .bm-dl a:hover { background: #ececef; }
+  .bm-dl b { font-size: 16px; } .bm-dl small { font-size: 13px; color: var(--mut); } .bm-dl span { justify-self: start; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 500; }
+  .bm-tok { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .bm-tok th, .bm-tok td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } .bm-tok th { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mut); }
+  .bm-src { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; color: var(--mut); }
+  /* the tab that switches between the site and the guide */
+  .bm-tab { position: fixed; left: 20px; bottom: 22px; z-index: 95; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(20,20,22,.82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
+  .bm-tab button { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: background .25s, color .25s; }
+  .bm-tab button[aria-pressed="true"] { background: #fff; color: #111; }
+  @media (max-width: 1100px) { .bm-comp, .bm-apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-apps .tall { grid-row: auto; } .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 900px) {
+    .bm-wrap { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
+    .bm-toc { position: sticky; top: 64px; z-index: 20; display: flex; gap: 2px; overflow-x: auto; margin: 0 -24px; padding: 10px 24px; background: rgba(255,255,255,.94); scrollbar-width: none; } .bm-toc b { display: none; } .bm-toc a { flex: none; }
+    .bm section { padding-top: 112px; } .bm section:first-child { padding-top: 40px; }
+    .bm-ch { grid-template-columns: 1fr; padding: 30px 26px; } .bm-ch .n { grid-row: auto; margin-bottom: 18px; }
+    .bm-why article { grid-template-columns: 1fr; } .bm-why article > div + div { border-left: 0; border-top: 1px solid #fff; }
+    .bm-igrow, .bm-grid, .bm-grid.c3, .bm-specs, .bm-dd, .bm-pair, .bm-voice > div, .bm-motion, .bm-spark, .bm-aa, .bm-portal .bd { grid-template-columns: 1fr; }
+    .bm-grid.c4, .bm-orbs, .bm-sw, .bm-dont, .bm-cp, .bm-dl, .bm-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bm-strip > div { height: 96px; } .bm-portal .o { min-height: 160px; }
+    .bm-cover .bm-orb.xl { top: 6%; right: -30%; width: 90vw; translate: none; opacity: .9; } .bm-cover > div { align-content: end; }
+    .bm-apps { grid-template-columns: 1fr; } .bm-apps .wide { grid-column: auto; }
+    .bm-specs > div { grid-template-columns: 110px 1fr; } .bm-dur div { grid-template-columns: 110px 1fr 54px; }
+    .bm-tab { bottom: 84px; left: 12px; }
+  }
+  @media (max-width: 560px) { .bm-top > span:not(.grow) { display: none; } .bm-comp, .bm-icons, .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-comp { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .bm-play .tr i { transition: none; } }
+
   /* ---------- calculators ---------- */
   .calc { border-radius: 32px; padding: 26px; background: #0a0a0a; color: #fff; }
   .cpanel { border-radius: 24px; padding: 24px 26px 26px; }
@@ -699,7 +962,7 @@
   @media (max-width: 960px) { .mban { padding: 12px 14px; } .mban b { font-size: 22px; } .mban .ar { width: 36px; height: 36px; } .mspd { display: none; } }
   @media (prefers-reduced-motion: reduce) { .dev, .pv, .pscr, .ps { transition: none; } }
 
-  /* ---------- numbers roll into place, digit by digit, as in Revolut's app ---------- */
+  /* ---------- numbers roll into place, digit by digit ---------- */
   .odo { display: inline-flex; vertical-align: top; height: 1.12em; line-height: 1.12em; font-variant-numeric: tabular-nums; }
   .od { display: block; height: 1.12em; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(transparent, #000 10%, #000 90%, transparent); }
   .odc { display: flex; flex-direction: column; transform: translateY(calc(var(--d, 0) * -1.12em)); transition: transform 1.7s cubic-bezier(.16,1,.3,1); transition-delay: calc(var(--i) * 60ms); }
@@ -1193,6 +1456,412 @@
 </footer>
 
 <a class="btn sticky" id="sticky" href="#f">Get a fuel quote</a>
+<!-- the brand guide: a second view of this page (the Site / Brand guide tab, or #brand) -->
+<div class="bm" id="bmGuide" hidden>
+  <div class="bm-top"><svg aria-label="TFN"><use href="#logo"/></svg><span>Brand guidelines</span><span class="grow"></span><a href="#bm-downloads">Download assets</a></div>
+  <header class="bm-cover">
+    <span class="bm-orb diesel xl" aria-hidden="true"></span>
+    <div>
+      <p class="lbl">Brand guidelines · 2026</p>
+      <svg class="wm" aria-label="TFN"><use href="#logo"/></svg>
+      <p>Premium fintech, built for transport. How TFN looks, sounds and moves, and why every rule is there.</p>
+      <div class="meta"><span>Version 1 · October 2026</span><span>Web, app, portal, print, signage</span><span>Design concept</span></div>
+    </div>
+  </header>
+  <div class="bm-wrap">
+    <nav class="bm-toc" aria-label="Brand guide contents">
+      <b>Contents</b>
+      <a href="#bm-why"><i>01</i>Why it works</a><a href="#bm-idea"><i>02</i>The idea</a><a href="#bm-logo"><i>03</i>Logo</a><a href="#bm-colour"><i>04</i>Colour</a><a href="#bm-type"><i>05</i>Type</a>
+      <a href="#bm-orbs"><i>06</i>Orbs</a><a href="#bm-icons"><i>07</i>Iconography</a><a href="#bm-layout"><i>08</i>Layout</a><a href="#bm-ui"><i>09</i>Components</a><a href="#bm-maps"><i>10</i>Maps</a>
+      <a href="#bm-img"><i>11</i>Imagery</a><a href="#bm-voice"><i>12</i>Voice</a><a href="#bm-motion"><i>13</i>Motion</a><a href="#bm-access"><i>14</i>Accessibility</a><a href="#bm-apps"><i>15</i>Applications</a>
+      <a href="#bm-tokens"><i>16</i>Tokens</a><a href="#bm-downloads"><i>17</i>Downloads</a>
+    </nav>
+    <div>
+      <section id="bm-why">
+        <div class="bm-ch dark"><span class="n">01</span><h2>Why it works</h2><p>Every choice has a reason grounded in how people read, trust and decide. When something new comes up, decide it the same way.</p></div>
+        <div class="bm-why">
+          <article><div><small>Principle</small><h3>Black and white, colour only in the product</h3><p>The structure stays quiet so the product can speak.</p></div>
+            <div><small>How TFN does it</small><p>Sections are white or black. Colour lives in things: the orbs, the app, the maps, the photos. Buttons and type stay ink or white.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Processing fluency.</b> Plain, high-contrast surfaces are easier to read, and what feels easy feels trustworthy. With money and fuel, calm reads as safe.</p></div></article>
+          <article><div><small>Principle</small><h3>Textured gradients, not flat colour</h3><p>Soft colour fields with a fine grain, like light through frosted glass.</p></div>
+            <div><small>How TFN does it</small><p>Each product family has a matte orb: diesel blue, non-fuel, cross-border, Homebase. The same texture runs from the site to the map markers. Never behind text.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Texture reads as material.</b> A fine grain makes colour feel tangible and calm rather than digital and glaring, which signals care (the aesthetic-usability effect: what looks considered is trusted to work). It becomes a <b>distinctive asset</b> people recognise without the logo, and the grain stops gradients banding on screens.</p></div></article>
+          <article><div><small>Principle</small><h3>One sans, tight and confident</h3><p>A single geometric grotesk with tight tracking at large sizes, and short headlines.</p></div>
+            <div><small>How TFN does it</small><p>One sans (Aeonik Pro, Satoshi until licensed). Headlines of three to six words. The serif is kept for the wordmark only.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Cognitive load.</b> One typeface and one weight per role means the eye never re-learns the page. Short lines get read; long ones get skimmed.</p></div></article>
+          <article><div><small>Principle</small><h3>Pills mean action</h3><p>You can tell what is clickable from its shape alone.</p></div>
+            <div><small>How TFN does it</small><p>Every call to action is a full pill: ink on light, white on dark. In the app, the main action (Go, Start) is the blue-to-lavender gradient.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Affordance.</b> A consistent shape for "do something" lets people act without hunting. One primary action per view keeps the choice easy (Hick's law).</p></div></article>
+          <article><div><small>Principle</small><h3>Show the product, prove with numbers</h3><p>Real screens carry the story; figures replace adjectives.</p></div>
+            <div><small>How TFN does it</small><p>The app, the portal and the map are the hero. Claims are numbers we can stand behind: 270+ truck stops, 44M+ litres a month, 168K+ transactions.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Specificity and social proof.</b> An exact number is believed more than "many". Volume from other transporters says "people like you already trust this".</p></div></article>
+          <article><div><small>Principle</small><h3>Colour tells products apart</h3><p>Each product keeps one accent, everywhere.</p></div>
+            <div><small>How TFN does it</small><p>On-Road blue, LCV cyan, Non-Fuel slate, Network indigo, Homebase teal, Africa violet, Credit rose.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Recognition over recall.</b> When colour always means the same product, people stop reading labels and just know.</p></div></article>
+          <article><div><small>Principle</small><h3>The logo never changes</h3><p>One wordmark, two colours, fixed space around it.</p></div>
+            <div><small>How TFN does it</small><p>The TFN wordmark is black on light or white on dark, nothing else, with clear space equal to the height of the T.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Mere exposure.</b> We come to like what we see repeatedly, but only if it looks the same each time. A logo that varies resets the clock.</p></div></article>
+        </div>
+        <p class="bm-sub">Two more, for a price-led product</p>
+        <div class="bm-grid">
+          <div class="bm-card"><h3>Price first</h3><p>On the map, the price is the marker. The cheapest in view says "Lowest". Savings are shown against the regional average.</p><p class="why"><b>Anchoring.</b> A price only means something next to a reference. The average is a fair anchor; the priciest stop would flatter us and erode trust.</p></div>
+          <div class="bm-card"><h3>The odd one out</h3><p>Colour is used so rarely that when it appears it means something: the Lowest pill, your fuel stops, a warning spark.</p><p class="why"><b>Von Restorff (isolation) effect.</b> The one item that differs is the one remembered. Spend colour on what you want noticed.</p></div>
+        </div>
+      </section>
+
+      <section id="bm-idea">
+        <div class="bm-ch"><span class="n">02</span><h2>The idea</h2><p>Fuel management, sorted. Negotiated diesel at 270+ truck stops, the payment and paperwork handled, every litre live.</p></div>
+        <div class="bm-card dark" style="padding:32px 30px;margin-bottom:16px"><p class="bm-sub" style="color:#a8a8a8;margin:0 0 10px">Look and feel</p><h3 style="font-size:1.9rem;line-height:1.15;letter-spacing:-.015em;max-width:18em">Premium fintech, built for transport. Upmarket and exact, never glossy, never cheap.</h3><p style="margin-top:12px;max-width:40em">The calm of a private bank, the clarity of a live dashboard, the honesty of the road. Restraint is the luxury: few colours, real photos, exact numbers.</p></div>
+        <div class="bm-grid">
+          <div class="bm-card"><h3>Who it's for</h3><p>Transport owners and their operations and fleet managers, who buy the fuel. Drivers, who use the app at the pump. Service providers running subcontractors.</p></div>
+          <div class="bm-card"><h3>What we promise</h3><p>A lower price, no admin and no surprises. Every fill logged against the truck and driver before it pulls away.</p></div>
+          <div class="bm-card"><h3>What's always true</h3><p>No cards, codes or slips for trucks. The QR at the till is for LCVs only. Credit comes through Standard Bank, Absa or Preference Capital.</p></div>
+          <div class="bm-card"><h3>Personality</h3><p>Calm, exact and on your side. Like a good fleet manager: knows every number, never raises their voice.</p></div>
+        </div>
+      </section>
+
+      <section id="bm-logo">
+        <div class="bm-ch dark"><span class="n">03</span><h2>Logo</h2><p>The TFN wordmark in a heavy, soft, high-contrast serif: the only serif in the brand. Black on light, white on dark, nothing else.</p></div>
+        <p class="bm-sub">Construction and clear space</p>
+        <div class="bm-cons"><div class="box"><svg aria-label="TFN"><use href="#logo"/></svg><span class="x t">x</span><span class="x b">x</span><span class="x l">x</span><span class="x r">x</span></div><span class="lg">x = cap height of the T · keep this space clear on every side</span></div>
+        <div class="bm-pair"><div><svg aria-label="TFN"><use href="#logo"/></svg></div><div class="dark"><svg aria-label="TFN"><use href="#logo"/></svg></div></div>
+        <p class="bm-sub">Minimum sizes</p>
+        <div class="bm-min">
+          <figure><svg style="width:120px"><use href="#logo"/></svg>120px · headers</figure>
+          <figure><svg style="width:72px"><use href="#logo"/></svg>72px · app, portal</figure>
+          <figure><svg style="width:48px"><use href="#logo"/></svg>48px · minimum (15mm print)</figure>
+          <span class="sep"></span>
+          <figure><span class="bm-orb diesel" style="width:64px;height:64px;box-shadow:none"></span>Orb 64px</figure>
+          <figure><span class="bm-orb diesel" style="width:32px;height:32px;box-shadow:none"></span>32px</figure>
+          <figure><span class="bm-orb diesel" style="width:16px;height:16px;box-shadow:none"></span>16px · favicon</figure>
+        </div>
+        <p class="bm-sub">Never</p>
+        <div class="bm-dont">
+          <figure><div class="v"><svg class="w" style="color:#2a6fd0"><use href="#logo"/></svg></div><figcaption>Recolour it</figcaption></figure>
+          <figure><div class="v"><svg class="w" style="transform:scaleX(1.45)"><use href="#logo"/></svg></div><figcaption>Stretch it</figcaption></figure>
+          <figure><div class="v"><svg class="w" style="transform:rotate(-12deg)"><use href="#logo"/></svg></div><figcaption>Rotate it</figcaption></figure>
+          <figure><div class="v" style="background:url(img/track-trucks.jpg) center/cover"><svg class="w" style="color:#fff"><use href="#logo"/></svg></div><figcaption>Set it on a busy photo</figcaption></figure>
+          <figure><div class="v"><svg class="w" style="color:transparent;stroke:#1f1f1f;stroke-width:5px"><use href="#logo"/></svg></div><figcaption>Outline it</figcaption></figure>
+          <figure><div class="v"><span style="display:flex;align-items:center;gap:10px"><span class="bm-orb diesel" style="width:34px;height:34px;box-shadow:none"></span><svg class="w" style="width:90px"><use href="#logo"/></svg></span></div><figcaption>Lock it up with the orb</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="bm-colour">
+        <div class="bm-ch"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A warm spark marks status, and nothing else.</p></div>
+        <p class="bm-sub">Proportion</p>
+        <div class="bm-ratio" role="img" aria-label="Roughly: white 56%, black and ink 34%, product and orb colour 9%, spark 1%"><i style="flex:56;background:#fafafa"></i><i style="flex:34;background:#000"></i><i style="flex:9;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
+        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 56%</li><li><i style="background:#000"></i>Black and ink · 34%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i>Product and orb colour · 9%</li><li><i style="background:#f2761d"></i>Spark · 1%</li></ul>
+        <p class="bm-sub">Structure</p>
+        <div class="bm-sw">
+          <div class="sw" data-hex="#FFFFFF" data-pms="—"><i style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"></i><div><b>White</b><span class="use">Grounds, type on black</span></div></div>
+          <div class="sw" data-hex="#1F1F1F" data-pms="Neutral Black C"><i style="background:#1f1f1f"></i><div><b>Ink</b><span class="use">Text and site buttons</span></div></div>
+          <div class="sw" data-hex="#000000" data-pms="Black 6 C"><i style="background:#000"></i><div><b>Black</b><span class="use">Bands, premium</span></div></div>
+          <div class="sw" data-hex="#191C1F" data-pms="Black 6 C"><i style="background:#191c1f"></i><div><b>Charcoal</b><span class="use">Footer</span></div></div>
+          <div class="sw" data-hex="#6E6E73" data-pms="Cool Gray 10 C"><i style="background:#6e6e73"></i><div><b>Muted</b><span class="use">Secondary text</span></div></div>
+          <div class="sw" data-hex="#F4F4F6" data-pms="Cool Gray 1 C (tint)"><i style="background:#f4f4f6"></i><div><b>Mist</b><span class="use">Tiles and cards</span></div></div>
+        </div>
+        <p class="bm-sub">Products</p>
+        <div class="bm-tblw"><table class="bm-tbl" id="bmProd"><thead><tr><th></th><th>Product</th><th>HEX</th><th>RGB</th><th>CMYK</th><th>Pantone*</th><th>Text on white</th></tr></thead><tbody>
+          <tr data-hex="#2A6FD0" data-pms="2727 C"><td class="c"><i></i></td><td>On-Road</td></tr>
+          <tr data-hex="#0E8FB3" data-pms="7461 C"><td class="c"><i></i></td><td>LCV</td></tr>
+          <tr data-hex="#4F6B8A" data-pms="7699 C"><td class="c"><i></i></td><td>Non-Fuel</td></tr>
+          <tr data-hex="#3346A8" data-pms="2728 C"><td class="c"><i></i></td><td>Network</td></tr>
+          <tr data-hex="#138A85" data-pms="7716 C"><td class="c"><i></i></td><td>Homebase</td></tr>
+          <tr data-hex="#6B62C9" data-pms="2725 C"><td class="c"><i></i></td><td>TFN Africa · accent only</td></tr>
+          <tr data-hex="#B0436E" data-pms="7432 C"><td class="c"><i></i></td><td>Credit · accent only</td></tr>
+        </tbody></table></div>
+        <p class="bm-note">* Nearest Pantone matches. Confirm against a printed swatch book before production. CMYK is a starting point for coated stock.</p>
+        <p class="bm-sub">Orb palette · inside orbs only</p>
+        <div class="bm-strip">
+          <div style="background:#a6d4ec"><b>Sky</b><code>#A6D4EC</code></div><div style="background:#5f8fd6;color:rgba(255,255,255,.85)"><b style="color:#fff">Blue</b><code>#5F8FD6</code></div><div style="background:#a796e0"><b>Lavender</b><code>#A796E0</code></div>
+          <div style="background:#8ccdb2"><b>Sea</b><code>#8CCDB2</code></div><div style="background:#e3a0bd"><b>Pink</b><code>#E3A0BD</code></div><div style="background:#efb79c"><b>Peach</b><code>#EFB79C</code></div>
+        </div>
+        <p class="bm-sub">The spark</p>
+        <div class="bm-spark"><i><span>Live</span></i><div><p><b>#F2761D</b> marks status: live, new, a saving, a low tank. A small dot or a short label, on white or dark grey.</p><p>Never a call to action, never a fill, never on black. Orange reads as an alert, so an orange button reads as a warning, not an action.</p></div></div>
+      </section>
+
+      <section id="bm-type">
+        <div class="bm-ch dark"><span class="n">05</span><h2>Type</h2><p>One geometric sans, said plainly. Aeonik Pro is the face; Satoshi stands in until it is licensed. App screens use the system font.</p></div>
+        <div class="bm-aa"><b>Aa</b><div><p>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 R % + / · ¹ ² ³</p><small>Aeonik Pro · stand-in Satoshi</small></div></div>
+        <div class="bm-wts">
+          <div><span style="font-weight:400">Regular</span><small>400 · body</small></div>
+          <div><span style="font-weight:500">Medium</span><small>500 · headlines, buttons</small></div>
+          <div><span style="font-weight:700">Bold</span><small>700 · prices, sparingly</small></div>
+          <div class="serif"><svg><use href="#logo"/></svg><small>Serif · the wordmark only</small></div>
+        </div>
+        <p class="bm-sub">Scale</p>
+        <div class="bm-type">
+          <div><small>Display · h1<br>85 / 1.0 · 500 · −2.5%</small><span class="t1">Fuel, sorted</span></div>
+          <div><small>Section · h2<br>50 / 1.0 · 500 · −1.2%</small><span class="t2">Cheaper diesel, mapped</span></div>
+          <div><small>Title · h3<br>22 / 1.2 · 600</small><span class="t3">Pick your set-up</span></div>
+          <div><small>Body<br>18 / 1.5 · 400</small><span class="t4">Your drivers fill up at any of 270+ TFN truck stops, and every litre is logged against the truck.</span></div>
+          <div><small>Footnote<br>13 / 1.5 · 400</small><span class="t5">¹ Credit is subject to approval by the credit provider.</span></div>
+          <div><small>App · system font<br>17 / 1.3</small><span class="app">Fill up here now?</span></div>
+        </div>
+        <p class="bm-sub">Rules</p>
+        <dl class="bm-specs">
+          <div><dt>Case</dt><dd>Sentence case. No full stops in headlines.</dd></div><div><dt>Italics</dt><dd>Never.</dd></div>
+          <div><dt>All caps</dt><dd>Small labels only, tracked +6%.</dd></div><div><dt>Prices</dt><dd>R 20.48, with a space; /L on rates.</dd></div>
+          <div><dt>Big numbers</dt><dd>270+, 44M+, 168K+.</dd></div><div><dt>Fine print</dt><dd>Footnotes ¹ ² ³, never in the body.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bm-orbs">
+        <div class="bm-ch"><span class="n">06</span><h2>Orbs and gradients</h2><p>The orb is TFN's icon and its colour: deep, matte colour fields under a fine grain, like light through frosted glass at night. One orb per product family.</p></div>
+        <div class="bm-orbs">
+          <figure><span class="bm-orb diesel"></span><figcaption>Diesel<span>the app, the map, On-Road</span></figcaption></figure>
+          <figure><span class="bm-orb nonfuel"></span><figcaption>Non-fuel<span>services on the network</span></figcaption></figure>
+          <figure><span class="bm-orb africa"></span><figcaption>Cross-border<span>TFN Africa</span></figcaption></figure>
+          <figure><span class="bm-orb homebase"></span><figcaption>Homebase<span>your yard tank</span></figcaption></figure>
+        </div>
+        <p class="bm-sub">Do and don't</p>
+        <div class="bm-dd">
+          <figure><div class="v dark"><span class="bm-orb diesel" style="width:130px;height:130px"></span></div><figcaption><b>Do</b>Deep and matte, a fine grain, a faint edge.</figcaption></figure>
+          <figure class="no"><div class="v"><span class="bm-orb bad" style="width:130px;height:130px"></span></div><figcaption><b>Don't</b>Gloss, a hard highlight, a white sticker ring.</figcaption></figure>
+        </div>
+        <div class="bm-dd">
+          <figure><div class="v dark" style="justify-items:start;padding:0 28px"><span style="display:grid;gap:14px"><span class="bm-orb diesel" style="width:64px;height:64px"></span><span style="font-size:22px;font-weight:500;line-height:1.15">Fuel now,<br>settle later</span></span></div><figcaption><b>Do</b>Orb beside the words, type on a plain ground.</figcaption></figure>
+          <figure class="no"><div class="v bm-orb diesel" style="display:grid;place-items:center;width:auto;height:220px;border-radius:20px;box-shadow:inset 0 0 0 2px var(--no)"><span style="position:relative;z-index:1;font-size:22px;font-weight:500;color:#fff;text-align:center;line-height:1.15">Fuel now,<br>settle later</span></div><figcaption><b>Don't</b>Set text on the gradient.</figcaption></figure>
+        </div>
+        <dl class="bm-specs" style="margin-top:28px">
+          <div><dt>Why texture</dt><dd>Grain makes colour feel like a material, calm rather than glaring, and stops gradients banding.</dd></div>
+          <div><dt>Depth</dt><dd>Deep tones over bright pastels. The orb glows on black; it never shouts on white.</dd></div>
+          <div><dt>Where</dt><dd>Inside things: orbs, product art, the app's one main action. Never behind body text or the wordmark.</dd></div>
+          <div><dt>Coins</dt><dd>Silver, real 3D, floating clear of the orbs.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bm-icons">
+        <div class="bm-ch dark"><span class="n">07</span><h2>Iconography</h2><p>Plain outline icons on a 24px grid. They label things; they never decorate.</p></div>
+        <div class="bm-igrow">
+          <div class="bm-ig"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pump"/></svg></div>
+          <dl class="bm-specs" style="grid-template-columns:1fr">
+            <div><dt>Grid</dt><dd>24 × 24px, 2px safe area.</dd></div><div><dt>Stroke</dt><dd>1.8px (2px at most), round caps and joins.</dd></div>
+            <div><dt>Style</dt><dd>Outline only, one colour: ink, white or the accent.</dd></div><div><dt>Sizes</dt><dd>16, 20, 24px. Never stretched, never filled.</dd></div>
+          </dl>
+        </div>
+        <div class="bm-icons" style="margin-top:16px">
+          <figure><svg><use href="#i-pump"/></svg>Fuel</figure><figure><svg><use href="#i-pin"/></svg>Truck stop</figure><figure><svg><use href="#i-search"/></svg>Search</figure><figure><svg><use href="#i-truck"/></svg>Truck</figure>
+          <figure><svg><use href="#i-chart"/></svg>Insights</figure><figure><svg><use href="#i-people"/></svg>Account</figure><figure><svg><use href="#i-check"/></svg>Done</figure><figure><svg><use href="#i-bell"/></svg>Alerts</figure>
+        </div>
+        <div class="bm-dd" style="margin-top:16px">
+          <figure><div class="v"><span class="bm-row" style="gap:22px"><svg style="width:34px;height:34px"><use href="#i-pump"/></svg><svg style="width:34px;height:34px"><use href="#i-pin"/></svg><svg style="width:34px;height:34px"><use href="#i-truck"/></svg></span></div><figcaption><b>Do</b>One stroke weight, one colour, all outline.</figcaption></figure>
+          <figure class="no"><div class="v"><span class="bm-row" style="gap:22px"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><defs><linearGradient id="bmIg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f8fd6"/><stop offset="1" stop-color="#24307a"/></linearGradient></defs><path d="M12 21s7-6 7-11.500a7 7 0 0 0-14 0C5 15 12 21 12 21Z" fill="url(#bmIg)"/><circle cx="12" cy="9.5" r="2.6" fill="#fff"/></svg><svg style="width:34px;height:34px;color:#1a9b55"><use href="#i-pump"/></svg><svg viewBox="0 0 24 24" style="width:34px;height:34px"><rect x="3" y="7" width="13" height="10" rx="2" fill="#1f1f1f"/><path d="M16 10h3l2 3v4h-5Z" fill="#1f1f1f"/></svg></span></div><figcaption><b>Don't</b>Mix filled, shaded and coloured icons.</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="bm-layout">
+        <div class="bm-ch"><span class="n">08</span><h2>Layout</h2><p>One 1000px column on the web, a 16px margin in the app, spacing in steps of 8. Generous space is part of the premium feel.</p></div>
+        <p class="bm-sub">Web · 12 columns</p>
+        <div class="bm-cols"><div class="g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="c" aria-hidden="true"><i class="h"></i><i></i><i></i><i class="p"></i></div></div>
+        <dl class="bm-specs" style="margin-top:20px">
+          <div><dt>Column</dt><dd>1000px, centred; 24px minimum margin.</dd></div><div><dt>Grid</dt><dd>12 columns, 24px gutters.</dd></div>
+          <div><dt>Sections</dt><dd>110px apart; full-screen scenes on the home page.</dd></div><div><dt>Radius</dt><dd>Cards 20–28px, buttons full pills.</dd></div>
+        </dl>
+        <p class="bm-sub">App · 8-point spacing</p>
+        <div class="bm-grid" style="align-items:center">
+          <div class="bm-phone" aria-hidden="true"><div><span class="m l"></span><span class="m r"></span><span class="s" style="top:28px"></span><span class="blk" style="top:40px;height:34px;border-radius:12px"></span><span class="blk" style="top:84px;height:24px;width:50%;border-radius:999px"></span><span class="blk" style="top:120px;height:150px"></span><span class="blk" style="bottom:56px;height:90px;border-radius:20px;background:#dfe2e8"></span><span class="s" style="bottom:46px"></span></div></div>
+          <div>
+            <div class="bm-scale"><div><i style="width:4px;height:4px"></i>4</div><div><i style="width:8px;height:8px"></i>8</div><div><i style="width:12px;height:12px"></i>12</div><div><i style="width:16px;height:16px"></i>16</div><div><i style="width:24px;height:24px"></i>24</div><div><i style="width:32px;height:32px"></i>32</div><div><i style="width:48px;height:48px"></i>48</div><div><i style="width:64px;height:64px"></i>64</div></div>
+            <dl class="bm-specs" style="grid-template-columns:1fr;margin-top:22px"><div><dt>Margin</dt><dd>16px left and right, safe areas respected.</dd></div><div><dt>Targets</dt><dd>44px minimum, 50px for the main action.</dd></div><div><dt>Sheets</dt><dd>24px radius, a grabber, one line when collapsed.</dd></div></dl>
+          </div>
+        </div>
+      </section>
+
+      <section id="bm-ui">
+        <div class="bm-ch dark"><span class="n">09</span><h2>Components</h2><p>Pills mean action. Cards are calm, rounded surfaces. One primary action per view.</p></div>
+        <div class="bm-comp">
+          <div><h3>Site button</h3><div class="bm-row"><span class="bm-btn">Get a fuel quote</span></div><p>Full pill, 44px, ink on white, weight 500.</p></div>
+          <div class="dark"><h3>On dark</h3><div class="bm-row"><span class="bm-btn w">How credit works</span></div><p>White pill on black. Same size and weight.</p></div>
+          <div><h3>App main action</h3><div class="bm-row"><span class="bm-btn go">Go</span><span class="bm-btn ghost">Later</span></div><p>The deep gradient, 50px, 14px radius. Only Go and Start get it.</p></div>
+          <div><h3>Filter chips</h3><div class="bm-row"><span class="bm-chip on">Diesel 50ppm</span><span class="bm-chip">AdBlue <small>34</small></span><span class="bm-chip">Overnight <small>31</small></span></div><p>White on the map, the gradient when chosen. Counts are for what's in view.</p></div>
+          <div><h3>Sheet</h3><div class="bm-sheet"><b>Villiers Truck Inn</b><small>Truck stop · 2 h 05 min away</small><p class="pr">R 18.73</p><span class="pd">R1.68 below the Free State average</span><div class="two"><span>Later</span><span class="go">Go</span></div></div><p>24px radius, price before the question, two actions.</p></div>
+          <div class="no"><span class="tag">Don't</span><div class="bm-row"><span class="bm-btn or">Get a quote</span></div><p>An orange button. Orange is status, never action.</p></div>
+        </div>
+      </section>
+
+      <section id="bm-maps">
+        <div class="bm-ch"><span class="n">10</span><h2>Maps</h2><p>Compare, plan and refuel: price first, one colour, nothing hidden. Light by default, in the diesel orb's colours.</p></div>
+        <div class="bm-comp">
+          <div><h3>The marker</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span><span class="bm-pill lo"><span class="bm-orb diesel sm"></span>R 19.40</span></div><p>The price is the marker: orb, price, a tail at the spot. Below average in accent, above in ink.</p></div>
+          <div><h3>The cheapest</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span></div><p>Only the cheapest open stop in view gets the gradient.</p></div>
+          <div><h3>Not for you now</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill gr"><span class="bm-orb sm"></span>Opens 10:00</span><span class="bm-pill gr"><span class="bm-orb sm"></span>No petrol</span></div><p>Closed, or not selling what you chose: grey, and it says why.</p></div>
+        </div>
+        <div class="bm-dd" style="margin-top:16px">
+          <figure><div class="v"><div class="bm-mapv" aria-hidden="true"><span class="p" style="left:22%;top:32%"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span></span><span class="p" style="left:52%;top:56%"><span class="bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span></span><span class="p" style="left:60%;top:22%"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 21.04</span></span></div></div><figcaption><b>Do</b>One colour; the price and one Lowest do the talking.</figcaption></figure>
+          <figure class="no"><div class="v"><div class="bm-mapv" aria-hidden="true"><span class="p" style="left:24%;top:30%"><i class="bm-dotc" style="background:#1a9b55"></i></span><span class="p" style="left:40%;top:60%"><i class="bm-dotc" style="background:#f2761d"></i></span><span class="p" style="left:66%;top:28%"><i class="bm-dotc" style="background:#d93b3b"></i></span><span class="p" style="left:54%;top:42%"><span class="bm-cnt">18</span></span></div></div><figcaption><b>Don't</b>Colour-code prices or show count bubbles.</figcaption></figure>
+        </div>
+        <dl class="bm-specs" style="margin-top:28px">
+          <div><dt>You</dt><dd>Always on top: a blue dot, a heading beam only up close.</dd></div><div><dt>Crowds</dt><dd>Give way to the cheapest; the rest return as you zoom.</dd></div>
+          <div><dt>Routes</dt><dd>Sky to blue to lavender, start and end dots, white tags.</dd></div><div><dt>Savings</dt><dd>Against the regional average, never the priciest stop.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bm-img">
+        <div class="bm-ch dark"><span class="n">11</span><h2>Imagery</h2><p>Real people and real trucks, never AI. The signature: the subject keeps its natural colour and the background takes a product hue.</p></div>
+        <div class="bm-hero-img" style="--img:url(img/hero-blue.jpg);background-position:right center"><span>Real photograph · background set in On-Road blue</span></div>
+        <div class="bm-grid" style="margin-top:16px">
+          <div class="bm-hero-img" style="--img:url(img/save-violet.jpg);height:260px"><span>Background in Africa violet</span></div>
+          <div class="bm-hero-img" style="--img:url(img/meeting-pink.jpg);height:260px"><span>Background in Credit rose</span></div>
+        </div>
+        <dl class="bm-specs" style="margin-top:28px">
+          <div><dt>Source</dt><dd><b>Real photography only.</b> Never AI-generated people, trucks, places or products.</dd></div>
+          <div><dt>Treatment</dt><dd>Cut the subject out; set the background to one product hue, deep and slightly textured.</dd></div>
+          <div><dt>People</dt><dd>Keep natural skin and clothing colour. Candid, at work, never staged.</dd></div>
+          <div><dt>Context</dt><dd>Southern Africa: left-hand traffic, European cab-over trucks, no visible brands.</dd></div>
+        </dl>
+        <p class="bm-sub">Do and don't</p>
+        <div class="bm-dd">
+          <figure><div class="v ph" style="--img:url(img/hero-blue.jpg);--pos:85% center"></div><figcaption><b>Do</b>Background in a product hue, the person untouched.</figcaption></figure>
+          <figure class="no"><div class="v ph" style="--img:url(img/save-desk.jpg);filter:grayscale(1) sepia(1) hue-rotate(250deg) saturate(3.2) brightness(.85)"></div><figcaption><b>Don't</b>Tint the whole photo, faces and all.</figcaption></figure>
+        </div>
+        <div class="bm-dd">
+          <figure><div class="v ph" style="--img:url(img/close-highway.jpg)"></div><figcaption><b>Do</b>Cool light: blue hour, night or clear daylight.</figcaption></figure>
+          <figure class="no"><div class="v ph" style="--img:url(img/close-highway.jpg);filter:sepia(.9) saturate(2.6) hue-rotate(-12deg) brightness(.95)"></div><figcaption><b>Don't</b>Orange sunsets: they fight the spark and read as cheap.</figcaption></figure>
+        </div>
+        <div class="bm-dd">
+          <figure><div class="v ph" style="--img:url(img/k-night-truck.jpg)"></div><figcaption><b>Do</b>A real truck on a real road, shot well.</figcaption></figure>
+          <figure class="no"><div class="v" style="background:linear-gradient(135deg,#e9e3f7,#cfe2f6)"><span style="display:grid;justify-items:center;gap:8px;color:#6e6e73;font-size:14px;font-weight:500"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.6L12 15l-1.8-4.4L5.5 9l4.7-1.4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8Z" fill="currentColor"/></svg>AI-generated image</span></div><figcaption><b>Don't</b>Use AI imagery. It looks fake and breaks trust.</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="bm-voice">
+        <div class="bm-ch"><span class="n">12</span><h2>Voice</h2><p>Short, exact, on your side. Say what you get, then stop. Many readers use English as a second language, so plain words beat clever ones.</p></div>
+        <div class="bm-voice">
+          <div><p class="y">Fuel now, settle later.</p><p class="n">Unlock seamless fuel financing solutions.</p></div>
+          <div><p class="y">No cards, no cash, no slips.</p><p class="n">A frictionless, paperless fuelling experience.</p></div>
+          <div><p class="y">R 18.73 · R1.68 below the Free State average</p><p class="n">Massive savings at the best prices!</p></div>
+          <div><p class="y">Fill up here now?</p><p class="n">Would you like to proceed to refuel at this location?</p></div>
+        </div>
+        <dl class="bm-specs" style="margin-top:28px">
+          <div><dt>Numbers</dt><dd>Over adjectives, and only numbers we can prove.</dd></div><div><dt>"Fleet"</dt><dd>Fine for trucks; LCV copy says vehicles.</dd></div>
+          <div><dt>Spelling</dt><dd>South African English: litre, colour, organise.</dd></div><div><dt>Money</dt><dd>Rand as R 20.48; litres as /L on rates.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bm-motion">
+        <div class="bm-ch dark"><span class="n">13</span><h2>Motion</h2><p>Things arrive, they don't bounce. One ease for everything, and nothing moves when the viewer asks for reduced motion.</p></div>
+        <div class="bm-motion">
+          <div><svg class="bm-curve" viewBox="-10 -10 220 220" aria-label="The TFN ease curve"><rect x="0" y="0" width="200" height="200" fill="none" stroke="#d8d8dc"/><line x1="0" y1="200" x2="40" y2="60" stroke="#b9b9bf" stroke-dasharray="3 3"/><line x1="200" y1="0" x2="40" y2="0" stroke="#b9b9bf" stroke-dasharray="3 3"/><path d="M0 200 C40 60, 40 0, 200 0" fill="none" stroke="#1f1f1f" stroke-width="3"/><circle cx="40" cy="60" r="4" fill="#5f8fd6"/><circle cx="40" cy="0" r="4" fill="#5f8fd6"/></svg><p class="bm-note" style="margin-top:8px"><code>cubic-bezier(.2, .7, .2, 1)</code></p></div>
+          <div>
+            <div class="bm-dur"><div>Controls<i style="width:21%"></i><span>250ms</span></div><div>Content rising<i style="width:58%"></i><span>700ms</span></div><div>Map camera<i style="width:75%"></i><span>900ms</span></div><div>Driving tilt<i style="width:100%"></i><span>1200ms</span></div></div>
+            <div class="bm-play"><button type="button" id="bmPlay">Play the ease</button><span class="tr" id="bmTrack"><i></i></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="bm-access">
+        <div class="bm-ch"><span class="n">14</span><h2>Accessibility</h2><p>Readable by everyone, in a cab, in sunlight, with gloves on. Contrast is measured, not guessed.</p></div>
+        <div class="bm-cp">
+          <div data-fg="#1F1F1F" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#1f1f1f">Ink on white</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#6E6E73" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#6e6e73">Muted on white</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#FFFFFF" data-bg="#000000"><div class="s" style="background:#000;color:#fff">White on black</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#A8A8A8" data-bg="#000000"><div class="s" style="background:#000;color:#a8a8a8">Muted on black</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#FFFFFF" data-bg="#3A47A8"><div class="s" style="background:linear-gradient(120deg,#2f4fb0,#5a3fb0);color:#fff">White on the go gradient</div><div class="k"><span></span><b></b></div></div>
+          <div data-fg="#F2761D" data-bg="#FFFFFF"><div class="s" style="background:#fff;color:#f2761d">Spark as text</div><div class="k"><span></span><b></b></div></div>
+        </div>
+        <dl class="bm-specs" style="margin-top:28px">
+          <div><dt>Contrast</dt><dd>4.5:1 for text, 3:1 for icons and large type.</dd></div><div><dt>Colour</dt><dd>Never the only signal: grey stops say "Opens 10:00".</dd></div>
+          <div><dt>Targets</dt><dd>44px minimum; one main action per view.</dd></div><div><dt>In the cab</dt><dd>App type never below 13px; key numbers 17px and up.</dd></div>
+        </dl>
+      </section>
+
+      <section id="bm-apps">
+        <div class="bm-ch dark"><span class="n">15</span><h2>Applications</h2><p>The brand in the places it lives: on the phone, at the pump, on the truck, in the inbox. Always the same few parts, always calm.</p></div>
+        <div class="bm-apps">
+          <figure><div><div style="display:grid;justify-items:center"><div class="bm-home"><figure><span class="o"></span>Maps</figure><figure><span class="bm-icn"><span class="bm-orb diesel"></span></span>TFN Pay</figure><figure><span class="o"></span>Mail</figure></div><div class="bm-fav"><span class="bm-orb diesel" style="width:32px;height:32px"></span>32px<span class="bm-orb diesel" style="width:16px;height:16px"></span>16px favicon</div></div></div><figcaption><b>App icon.</b> The orb on black, 74% of the tile. Never the wordmark.</figcaption></figure>
+          <figure class="tall"><div><div class="bm-pylon"><div class="sign"><svg aria-label="TFN"><use href="#logo"/></svg><div class="row">Diesel 50ppm<b>20.48</b></div><div class="row">Petrol 95<b>21.84</b></div><div class="pay"><i></i>Pay with TFN Pay</div></div><span class="leg"></span><span class="base"></span></div></div><figcaption><b>Truck-stop price board.</b> Black, white numerals, rand per litre. The live dot is the only colour.</figcaption></figure>
+          <figure><div class="bm-door"><svg viewBox="0 0 300 220" aria-label="A truck cab door with the TFN wordmark"><rect x="10" y="10" width="280" height="200" rx="18" fill="#eceef1" stroke="#d5d8de" stroke-width="2"/><path d="M28 28H196L250 92H28Z" fill="#c9d3de"/><path d="M28 28H196L250 92H28Z" fill="url(#bmGl)" opacity=".6"/><defs><linearGradient id="bmGl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="226" y="118" width="40" height="9" rx="4.5" fill="#b9bdc4"/><use href="#logo" x="40" y="122" width="132" height="50" style="color:#1f1f1f"/><text x="42" y="190" font-size="11" fill="#6e6e73" font-family="sans-serif">tfn.co.za</text></svg></div><figcaption><b>Cab door.</b> The wordmark in ink, low on the door, with the web address. No orb, no slogan.</figcaption></figure>
+          <figure><div class="bm-shirt"><svg viewBox="0 0 240 230" aria-label="A dark driver's shirt with a small TFN wordmark"><path d="M70 22 L100 10 Q120 34 140 10 L170 22 L222 62 L198 98 L176 84 L176 222 L64 222 L64 84 L42 98 L18 62 Z" fill="#1f1f1f"/><path d="M100 10 Q120 34 140 10" fill="none" stroke="#3a3a3e" stroke-width="3"/><line x1="120" y1="30" x2="120" y2="70" stroke="#3a3a3e" stroke-width="2"/><use href="#logo" x="138" y="56" width="30" height="12" style="color:#fff"/></svg></div><figcaption><b>Driver's shirt.</b> Charcoal, a small white wordmark on the chest.</figcaption></figure>
+          <figure><div><div class="bm-mail"><div class="h"><i></i><i></i><i></i></div><p style="margin-bottom:12px;color:#3a3a3c">Your fuel statement for October is attached.</p><b>Name Surname</b><span>Fleet accounts · TFN</span><span>name@tfn.co.za</span><div class="sig"><svg aria-label="TFN"><use href="#logo"/></svg><small>Fuel management, sorted.</small></div></div></div><figcaption><b>Email signature.</b> Text first, the wordmark small, no banners.</figcaption></figure>
+          <figure><div><div class="bm-post"><span class="bm-orb diesel"></span><p>Diesel down R1.40/L <span>in Beaufort West this month.</span></p><svg aria-label="TFN"><use href="#logo"/></svg></div></div><figcaption><b>Social post.</b> Black, one orb, one number. Type never on the gradient.</figcaption></figure>
+          <figure class="wide"><div><div class="bm-portal"><div class="bar"><i></i><i></i><i></i><span>app.tfn.co.za</span></div><div class="bd"><div class="f"><svg aria-label="TFN"><use href="#logo"/></svg><b>Log in to your dashboard</b><i>Email</i><i>Password</i><span>Log in</span></div><div class="o"><span class="bm-orb diesel"></span></div></div></div></div><figcaption><b>Portal login.</b> White form, ink pill, the orb on black beside it.</figcaption></figure>
+        </div>
+      </section>
+
+      <section id="bm-tokens">
+        <div class="bm-ch"><span class="n">16</span><h2>Tokens</h2><p>The numbers behind everything above, for design and code.</p></div>
+        <table class="bm-tok">
+          <tr><th>Token</th><th>Value</th><th>Use</th></tr>
+          <tr><td>ink</td><td><code>#1F1F1F</code></td><td>Text and site buttons</td></tr>
+          <tr><td>muted</td><td><code>#6E6E73</code></td><td>Secondary text</td></tr>
+          <tr><td>spark</td><td><code>#F2761D</code></td><td>Status only, never an action</td></tr>
+          <tr><td>go</td><td><code>linear-gradient(120deg, #2F4FB0, #5A3FB0)</code></td><td>App main action, Lowest pill</td></tr>
+          <tr><td>font</td><td><code>"Aeonik Pro", "Satoshi", system-ui</code></td><td>Everything but the wordmark</td></tr>
+          <tr><td>h1 / h2 / body</td><td><code>85 / 50 / 18px</code></td><td>At 1280px wide</td></tr>
+          <tr><td>space</td><td><code>4 8 12 16 24 32 48 64</code></td><td>All spacing</td></tr>
+          <tr><td>radius</td><td><code>999px · 20–28px · 14px</code></td><td>Pills · cards · app buttons</td></tr>
+          <tr><td>ease</td><td><code>cubic-bezier(.2, .7, .2, 1)</code></td><td>All motion</td></tr>
+        </table>
+      </section>
+
+      <section id="bm-downloads">
+        <div class="bm-ch dark"><span class="n">17</span><h2>Downloads</h2><p>The master files. Use these; never redraw the logo or eyedrop colours from a screenshot.</p></div>
+        <div class="bm-dl">
+          <a href="logo-wordmark.svg" download><b>Wordmark</b><small>SVG · black on white</small><span>Download</span></a>
+          <a href="logo-mark.svg" download><b>Orb</b><small>SVG · the app icon mark</small><span>Download</span></a>
+          <a href="#" id="bmTok"><b>Design tokens</b><small>CSS · colours, type, space, motion</small><span>Download</span></a>
+          <a href="https://www.fontshare.com/fonts/satoshi" target="_blank" rel="noopener"><b>Typeface</b><small>Satoshi (free) until Aeonik Pro is licensed</small><span>Get the font</span></a>
+        </div>
+        <p class="bm-src">The reasoning draws on established design and behavioural research (processing fluency, cognitive load, affordance, anchoring, the isolation effect, mere exposure), applied to TFN.</p>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="bm-tab" role="group" aria-label="View"><button type="button" data-v="site" aria-pressed="true">Site</button><button type="button" data-v="guide" aria-pressed="false">Brand guide</button></div>
+<script>
+/* Site / Brand guide: one page, two views; #brand (or any #bm- address) opens the guide; the site keeps its scroll position */
+(function () {
+  var root = document.documentElement, g = document.getElementById('bmGuide'), tabs = [].slice.call(document.querySelectorAll('.bm-tab button')), siteY = 0;
+  function show(on, keepHash) {
+    if (on === root.classList.contains('bm-on')) return;
+    if (on) siteY = scrollY;
+    root.classList.toggle('bm-on', on); g.hidden = !on;
+    tabs.forEach(function (b) { b.setAttribute('aria-pressed', (b.dataset.v === 'guide') === on ? 'true' : 'false'); });
+    if (!keepHash) history.replaceState(null, '', on ? '#brand' : location.pathname + location.search);
+    scrollTo(0, on ? 0 : siteY);
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.v === 'guide'); }); });
+  if (/^#(brand|bm-)/.test(location.hash)) { var h = location.hash; show(true, true); var t = h !== '#brand' && document.querySelector(h); if (t) setTimeout(function () { t.scrollIntoView(); }, 50); }
+
+  /* colour specs are calculated, not typed: RGB, CMYK and WCAG contrast */
+  function rgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function lum(c) { var a = c.map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * a[0] + .7152 * a[1] + .0722 * a[2]; }
+  function ratio(a, b) { var l1 = lum(rgb(a)), l2 = lum(rgb(b)); return (Math.max(l1, l2) + .05) / (Math.min(l1, l2) + .05); }
+  function grade(r) { return r >= 7 ? 'AAA' : r >= 4.5 ? 'AA' : r >= 3 ? 'AA large' : 'Fails'; }
+  function cmyk(h) { var c = rgb(h).map(function (v) { return v / 255; }), k = 1 - Math.max.apply(0, c); if (k >= 1) return '0 0 0 100'; return c.map(function (v) { return Math.round((1 - v - k) / (1 - k) * 100); }).concat([Math.round(k * 100)]).join(' '); }
+  [].forEach.call(g.querySelectorAll('.sw[data-hex]'), function (s) {
+    var h = s.dataset.hex, w = ratio(h, '#FFFFFF'), b = ratio(h, '#000000');
+    s.querySelector('div').insertAdjacentHTML('beforeend', '<dl><dt>HEX</dt><dd>' + h + '</dd><dt>RGB</dt><dd>' + rgb(h).join(' ') + '</dd><dt>CMYK</dt><dd>' + cmyk(h) + '</dd><dt>Pantone</dt><dd>' + s.dataset.pms + '</dd></dl>' +
+      '<div class="bm-cr"><span' + (w < 4.5 ? ' class="f"' : '') + '>Aa on white ' + w.toFixed(1) + ' · ' + grade(w) + '</span><span' + (b < 4.5 ? ' class="f"' : '') + '>Aa on black ' + b.toFixed(1) + ' · ' + grade(b) + '</span></div>');
+  });
+  [].forEach.call(g.querySelectorAll('#bmProd tr[data-hex]'), function (r) {
+    var h = r.dataset.hex, w = ratio(h, '#FFFFFF'); r.querySelector('.c i').style.background = h;
+    r.insertAdjacentHTML('beforeend', '<td><code>' + h + '</code></td><td><code>' + rgb(h).join(' ') + '</code></td><td><code>' + cmyk(h) + '</code></td><td>' + r.dataset.pms + '</td><td>' + w.toFixed(1) + ' · ' + grade(w) + '</td>');
+  });
+  [].forEach.call(g.querySelectorAll('.bm-cp > div'), function (d) {
+    var r = ratio(d.dataset.fg, d.dataset.bg), gr = grade(r), k = d.querySelector('.k');
+    k.querySelector('span').textContent = r.toFixed(1) + ' : 1'; var b = k.querySelector('b'); b.textContent = d.dataset.fg === '#F2761D' ? 'Dots only' : gr; if (r < 4.5) b.className = 'f';
+  });
+
+  /* the ease, played */
+  var tr = document.getElementById('bmTrack'); document.getElementById('bmPlay').addEventListener('click', function () { tr.classList.toggle('go'); });
+
+  /* design tokens as a file */
+  document.getElementById('bmTok').addEventListener('click', function (e) {
+    e.preventDefault();
+    var css = ':root {\n  /* TFN design tokens */\n  --tfn-ink: #1f1f1f;\n  --tfn-muted: #6e6e73;\n  --tfn-white: #ffffff;\n  --tfn-black: #000000;\n  --tfn-charcoal: #191c1f;\n  --tfn-mist: #f4f4f6;\n  --tfn-spark: #f2761d; /* status only, never an action */\n' +
+      '  --tfn-on-road: #2a6fd0;\n  --tfn-lcv: #0e8fb3;\n  --tfn-non-fuel: #4f6b8a;\n  --tfn-network: #3346a8;\n  --tfn-homebase: #138a85;\n  --tfn-africa: #6b62c9;\n  --tfn-credit: #b0436e;\n' +
+      '  --tfn-go: linear-gradient(120deg, #2f4fb0, #5a3fb0);\n  --tfn-font: "Aeonik Pro", "Satoshi", system-ui, sans-serif;\n  --tfn-h1: 85px;\n  --tfn-h2: 50px;\n  --tfn-body: 18px;\n  --tfn-radius-card: 24px;\n  --tfn-radius-pill: 999px;\n  --tfn-ease: cubic-bezier(.2, .7, .2, 1);\n}\n';
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([css], { type: 'text/css' })); a.download = 'tfn-tokens.css'; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  /* the contents follow the chapter you are reading */
+  var links = [].slice.call(document.querySelectorAll('.bm-toc a')), toc = document.querySelector('.bm-toc');
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return; links.forEach(function (a) { var on = a.getAttribute('href') === '#' + e.target.id; a.classList.toggle('on', on); if (on && innerWidth <= 900) toc.scrollTo({ left: a.offsetLeft - 24, behavior: 'smooth' }); }); }); }, { rootMargin: '-30% 0px -60% 0px' });
+  [].forEach.call(g.querySelectorAll('section[id]'), function (s) { io.observe(s); });
+})();
+</script>
 
 <script>
 (function () {
@@ -1647,7 +2316,7 @@
 
 <script>
 /* ---------- the network map, inside the TFN app ----------
-   Kakao's hierarchy: price is the first thing you read (chips from mid zoom, the cheapest in view marked), search turns the map into results,
+   Price is the first thing you read (chips from mid zoom, the cheapest in view marked), search turns the map into results,
    filters float as chips, the sheet stays slim until pulled up. Route plans fills for your tank; Go tilts into a heading-up driving view.
    Land, borders and roads are SVG moved by the viewBox; pins and labels are HTML laid over it, so they keep their size at every zoom. */
 (function () {
@@ -1742,7 +2411,7 @@
   function lacks(d) { return (!!srch && !srch.test(d)) || (fuel === 'petrol' && !d.petrol); }
   function grey(d) { return d.closed || lacks(d); }
   function status(d) { return lacks(d) ? 'No ' + (srch && !srch.test(d) ? srch.short : 'petrol') : d.closed ? 'Opens ' + hh(d.hours[0]) : ''; }
-  /* savings are shown against the regional average, as Kakao does */
+  /* savings are shown against the regional average */
   var AVG = {}, AVG95 = {};
   Object.keys(PV).forEach(function (k) { var a = D.filter(function (d) { return d.town.pv === k; }); AVG[k] = mean(a.map(function (d) { return d.price; }));
     var b = a.filter(function (d) { return d.petrol; }); AVG95[k] = b.length ? mean(b.map(function (d) { return d.p95; })) : AVG[k] + 1.2; });
@@ -1954,7 +2623,7 @@
   list.addEventListener('click', function (e) { var b = e.target.closest('.nm-it'); if (b) select(D[+b.dataset.i]); });
   $('nmPeek').addEventListener('click', function () { if (peekStop) select(peekStop); });
 
-  /* ---- the stop: Kakao's question only when it's close; otherwise how far, and add it to the trip ---- */
+  /* ---- the stop: the question only when it's close; otherwise how far, and add it to the trip ---- */
   var sel = null;
   function select(d) {
     if (sel) { sel.pin.classList.remove('on'); sel.town.lbl.classList.remove('hid'); } sel = d || null;
