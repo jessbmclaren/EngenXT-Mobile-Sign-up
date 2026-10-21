@@ -22,7 +22,7 @@ P['road'] = dict(
     file='tfn-on-road.html', name='On-Road', kicker='TFN On-Road', finish='p-road', acc='#2a6fd0', tier='For trucks',
     blurb='Refuel trucks at 270+ truck stops at negotiated prices.',
     title='Diesel for your trucks, at a better price',
-    sub='You order the fuel, your driver fills up at a TFN truck stop, and the fill appears in your dashboard straight away with the litres, the price and a photo from the pump.',
+    sub='You order the fuel and your driver fills up at a TFN truck stop. The fill appears in your dashboard straight away, with the litres, the price and a photo from the pump.',
     cta=('Get a fuel quote', 'tfn-page-examples.html#f'),
     stats=[('270+', 'truck stops'), ('168K+', 'transactions a month'), ('44M+', 'litres a month')],
     screen='''<span class="t">Order</span><span class="h">TFN 204 GP</span>
@@ -50,7 +50,7 @@ P['lcv'] = dict(
     file='tfn-lcv.html', name='LCV', kicker='TFN LCV', soon=True, finish='p-lcv', acc='#0e8fb3', tier='For bakkies and vans · Coming soon',
     blurb='Fuel for bakkies and vans, without a fuel card.',
     title='Fuel for bakkies and vans, without the card',
-    sub='Set the rules for each driver and vehicle. Drivers ask for fuel in the app, every request is checked against your rules before the pump starts, and they pay with a QR code at the till.',
+    sub='Set the rules for each driver and vehicle. Drivers ask for fuel in the app. Every request is checked against your rules before the pump starts. Then they pay with a QR code at the till.',
     cta=('Join the waiting list', 'tfn-page-examples.html#f'),
     chips=['Rules per driver', 'Rules per vehicle', 'Prepaid wallet', 'Daily reports'],
     screen='''<span class="t">Fuel request</span><span class="h">CA 482-913</span>
@@ -59,9 +59,9 @@ P['lcv'] = dict(
 <div class="cta">Done</div>''',
     extra='<div class="gl g1"><i style="background:#0e8fb3"></i><div><b>Checked before it’s paid</b><small>Against your rules</small></div></div>',
     how=('How it works', [
-        ('Set the rules', 'Add your vehicles and drivers, link each driver to a vehicle, and decide how much fuel each one can buy and how often.'),
+        ('Set the rules', 'Add your vehicles and drivers. Link each driver to a vehicle. Then decide how much fuel each one can buy and how often.'),
         ('The driver asks for fuel', 'In the app, before filling up. The request is checked against your rules and comes back approved, with a limit, or declined.'),
-        ('Pay at the till', 'The driver shows a QR code at the till. The money comes from your prepaid wallet, and the purchase is in your report that day.'),
+        ('Pay at the till', 'The driver shows a QR code at the till. The money comes from your prepaid wallet. The purchase is in your report that day.'),
     ]),
     feats=('Why it beats a fuel card', [
         ('Nothing to clone or lose', 'There’s no card to skim or share. Each purchase needs a driver, a vehicle and an approved request.'),
@@ -90,7 +90,7 @@ P['nonfuel'] = dict(
     how=('How it works', [
         ('Find the stop', 'Filter the network map by service: AdBlue, overnight parking, showers, canteen, laundry, truck wash or shop.'),
         ('Book it for your driver', 'Book parking and services along with the fuel, so the whole trip is sorted before the truck leaves.'),
-        ('One statement', 'Services are paid from your TFN account, cash or credit, and listed next to the diesel.'),
+        ('One statement', 'Services are paid from your TFN account, cash or credit. They’re listed next to the diesel.'),
     ]),
     feats=('What’s on the network', [
         ('Secure overnight parking', 'Vetted stops where your driver and load can rest safely.'),
@@ -106,7 +106,7 @@ P['network'] = dict(
     file='tfn-network.html', name='Network', kicker='TFN Network', dark=True, finish='p-net', acc='#3346a8', tier='Planning',
     blurb='Find the best diesel price on your route before you leave.',
     title='The cheapest diesel on your route',
-    sub='See today’s prices at every TFN truck stop, plan where to fill up before the truck leaves, and send the stops to your driver.',
+    sub='See today’s prices at every TFN truck stop. Plan where to fill up before the truck leaves, then send the stops to your driver.',
     cta=('Open the network map', 'https://tfn.co.za/tfn-network-map/'),
     chips=['N3 Joburg → Durban', 'N1 Joburg → Cape Town', 'N4 Gauteng → Mozambique'],
     screen='''<span class="t">Route planner</span><span class="h">Joburg → Durban</span>
@@ -117,11 +117,11 @@ P['network'] = dict(
     extra='<div class="gl g1"><i style="background:#3346a8"></i><div><b>Top 10 prices today</b><small>By region</small></div></div><div class="gl g2"><div><b>Below the grid price</b><small>On every TFN fill</small></div></div>',
     how=('Plan a trip in three steps', [
         ('Pick a route', 'Start from a popular route like the N3 to Durban or the N1 to Cape Town, or plan your own.'),
-        ('Compare the stops', 'See the price at every TFN truck stop on the way, the services each one has, and what you save on the trip.'),
+        ('Compare the stops', 'See the price at every TFN truck stop on the way, the services each one has and what you save on the trip.'),
         ('Send it to the driver', 'Share the stops by WhatsApp or in the app, so the driver knows where to fill up.'),
     ]),
     feats=('What the map shows', [
-        ('Today’s best prices', 'The top 10 prices on the network today, by region, and the prices that have just dropped.'),
+        ('Today’s best prices', 'The top 10 prices on the network today by region, plus the prices that have just dropped.'),
         ('Trip savings', 'What you save on the route by filling up at TFN truck stops.'),
         ('Services at each stop', 'Filter by AdBlue, overnight parking, showers, canteen, laundry, truck wash and shop.'),
         ('Cross-border stops', 'TFN Africa truck stops in five neighbouring countries, on the same map.'),
@@ -142,7 +142,7 @@ P['home'] = dict(
 <div class="card"><div class="row"><span><b>From your tank</b><small>this month</small></span><span><b>62%</b></span></div><div class="row"><span><b>On the road</b><small>this month</small></span><span><b>38%</b></span></div></div>''',
     how=('How Homebase works', [
         ('TFN delivers to your yard', 'Order diesel for your own tank through the TFN Dashboard, on cash or credit.'),
-        ('Every fill is recorded', 'Each fill from your tank is logged against the truck, the driver and the litres, and only drivers you allow can draw fuel.'),
+        ('Every fill is recorded', 'Each fill from your tank is logged against the truck, the driver and the litres. Only drivers you allow can draw fuel.'),
         ('Yard and road, side by side', 'Tank readings, deliveries and on-road fills sit in one set of reports.'),
     ]),
     feats=('What you get', [
@@ -159,7 +159,7 @@ P['africa'] = dict(
     file='tfn-africa.html', name='TFN Africa', kicker='TFN Africa', dark=True, finish='p-africa', acc='#6b62c9', tier='Cross-border',
     blurb='Refuel in five neighbouring countries, paid in rand.',
     title='Across the border, still in rand',
-    sub='Refuel at TFN truck stops in Namibia, Botswana, Zimbabwe, Zambia and Mozambique on your South African account, and see it all in one report.',
+    sub='Refuel at TFN truck stops in Namibia, Botswana, Zimbabwe, Zambia and Mozambique on your South African account. See it all in one report.',
     cta=('Plan a cross-border route', 'https://tfn.co.za/tfn-africa/'),
     screen='''<span class="t">Cross-border</span><span class="h">Joburg → Lusaka</span>
 <div class="card"><div class="row"><i></i><span><b>South Africa</b><small>Fill up before the border</small></span><span><b>420 L</b></span></div><div class="row"><i style="opacity:.6"></i><span><b>Botswana</b><small>TFN Africa</small></span><span><b>260 L</b></span></div><div class="row"><i style="opacity:.4"></i><span><b>Zambia</b><small>TFN Africa</small></span><span><b>310 L</b></span></div></div>
@@ -168,7 +168,7 @@ P['africa'] = dict(
     extra='<div class="gl g2"><div><b>Border permits and tolls</b><small>Coming soon</small></div></div>',
     stage_before='<div class="photo-card" style="background-image:url(img/plan-africa.jpg)"></div>',
     how=('How cross-border works', [
-        ('Plan the route', 'See TFN truck stops along your corridor, and where to fill up in South Africa before the border.'),
+        ('Plan the route', 'See TFN truck stops along your corridor and where to fill up in South Africa before the border.'),
         ('Refuel across the border', 'Drivers fill up at TFN Africa stops the same way as at home: no cash, cards or codes.'),
         ('Pay in rand', 'Every fill, in every country, is paid from your South African account and listed in one report.'),
     ]),
@@ -186,7 +186,7 @@ P['credit'] = dict(
     file='tfn-credit.html', name='Credit', kicker='TFN Credit', dark=True, finish='p-credit', acc='#a2468e', tier='Finance',
     blurb='Fuel now and pay your bank later.',
     title='Fuel now, pay your bank later',
-    sub='Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN, you repay your bank monthly, and you set spending limits per driver and truck.',
+    sub='Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN and you repay your bank monthly. You set spending limits per driver and truck.',
     cta=('Choose a credit provider', 'https://tfn.co.za/select-a-credit-provider/'),
     chips=['Standard Bank', 'Absa', 'Preference Capital'],
     screen='''<span class="t">Credit</span><span class="h">Credit available</span><div class="big">R 184,200</div><div class="bar" style="--v:42%"><i></i></div>
@@ -194,13 +194,13 @@ P['credit'] = dict(
 <div class="card"><div class="row"><span><b>Statement</b><small>Monthly</small></span><span class="ok">Ready</span></div></div>
 <div class="cta">Download statement</div>''',
     how=('How TFN credit works', [
-        ('Apply through your bank', 'Choose Standard Bank, Absa or Preference Capital. They handle the application, and once you’re approved your limit shows in your dashboard.'),
+        ('Apply through your bank', 'Choose Standard Bank, Absa or Preference Capital. They handle the application. Once you’re approved, your limit shows in your dashboard.'),
         ('Fuel anywhere on the network', 'Use it at every TFN truck stop, at cross-border stops, for non-fuel services and for Homebase deliveries.'),
         ('Repay your bank', 'You get a monthly statement and repay your credit provider, usually within 30 days. TFN supplies the fuel and the reports.'),
     ]),
     feats=('What you get', [
         ('Keep cash in the business', 'Your trucks keep moving while you settle later.'),
-        ('Limits per driver and truck', 'Daily, weekly or monthly limits, and orders you approve.'),
+        ('Limits per driver and truck', 'Daily, weekly or monthly limits, plus orders you approve.'),
         ('Credit for subcontractors', 'Share your limit with subcontractors and get one consolidated invoice.'),
         ('Statements that match', 'Export reports to check against your bank’s monthly statement.'),
         ('Fuel and more', 'Covers diesel, overnight parking, truck washes and other services on the network.'),
@@ -212,7 +212,7 @@ LATER = [
     ('Insurance', 'Cover for your trucks, through TFN.', 'p-ins'),
 ]
 Q = {'road': ('For the first time I can see one of my biggest expenses, fuel, live, and there are still significant savings from pricing.', 'GF Terre Blanche, Loutrans'), 'nonfuel': ('Book fuel, parking, and that’s it: the whole trip sorted from my app.', 'LJ and G Logistics'), 'network': ('Since then, planning of diesel and routes has been made easy by TFN.', 'AJ Fourie'), 'home': ('We have been working with TFN for over 10 years now and we have had an excellent relationship with them.', 'Cee Vee Transport'), 'africa': ('TFN is essential in keeping the Summerlane trucks on the road.', 'Summerlane Transport'), 'credit': ('TFN has taken our business to a whole other level.', 'GF Terre Blanche, Loutrans')}
-F = {'road': [('Do my drivers need cash, a card or a code?', 'No. You place the order or pre-approve the driver, the truck’s registration is matched at the truck stop, and TFN Pay checks the location and records a pump photo.'), ('Where can my trucks fill up?', 'At 270+ TFN truck stops across South Africa and on cross-border routes into Namibia, Botswana, Zimbabwe, Zambia and Mozambique.'), ('Can I pay without credit?', 'Yes. Pre-load your TFN account by EFT. TFN is integrated with all major South African banks.'), ('Can the data go into my accounting system?', 'Yes. Export statements to PDF or Excel, or connect TFN to Sage, Xero or your ERP.')], 'lcv': [('When can I sign up?', 'LCV is coming soon. Join the waiting list and we’ll tell you when it opens.'), ('Do my drivers need a fuel card?', 'No. Drivers ask for fuel in the app and pay with a QR code at the till.'), ('Can drivers see my rules or my balance?', 'No. Drivers only see whether a request is approved, and the limit, or declined.')], 'nonfuel': [('Which services can I pay for?', 'AdBlue, secure overnight parking, showers, canteen, laundry, truck wash and shop, where the truck stop offers them.'), ('Does my credit facility cover services?', 'Yes. TFN credit covers non-fuel services on the network as well as diesel.'), ('How do I find stops with the services I need?', 'Filter the network map by service before the trip.')], 'network': [('Where do the prices come from?', 'The map shows the current price at each TFN truck stop, with the top 10 prices by region.'), ('Can I send the plan to my driver?', 'Yes. Share the stops by WhatsApp or in the app.'), ('What is the fuel price outlook?', 'A projection of next month’s diesel price, based on the Central Energy Fund’s daily data. It’s indicative until the official adjustment.')], 'home': [('Who is Homebase for?', 'Transporters with their own diesel tank at a yard or depot who also fill up on the road.'), ('How is the Homebase fee worked out?', 'It’s based on your monthly on-road volume tier. Use the calculator for an estimate.'), ('Can I use credit for Homebase?', 'Yes. One credit facility covers deliveries to your tank, gantry collections and on-road fills.')], 'africa': [('Which countries are covered?', 'Namibia, Botswana, Zimbabwe, Zambia and Mozambique, alongside the South African network.'), ('Do I need foreign currency?', 'No. You pay in rand from your South African account.'), ('Does credit work across the border?', 'Yes. TFN credit works at cross-border truck stops.')], 'credit': [('Who provides the credit?', 'Standard Bank, Absa or Preference Capital. They handle the application and approval.'), ('Who do I repay?', 'Your credit provider, not TFN. TFN supplies the fuel and the reports.'), ('When do I repay?', 'Billing is usually monthly, with 30 days from the statement date. Your provider confirms your terms.'), ('Can I limit what each driver spends?', 'Yes. Set daily, weekly or monthly limits per driver or truck, or approve each order.')]}
+F = {'road': [('Do my drivers need cash, a card or a code?', 'No. You place the order or pre-approve the driver. The truck’s registration is matched at the truck stop. TFN Pay checks the location and records a pump photo.'), ('Where can my trucks fill up?', 'At 270+ TFN truck stops across South Africa and on cross-border routes into Namibia, Botswana, Zimbabwe, Zambia and Mozambique.'), ('Can I pay without credit?', 'Yes. Pre-load your TFN account by EFT. TFN is integrated with all major South African banks.'), ('Can the data go into my accounting system?', 'Yes. Export statements to PDF or Excel, or connect TFN to Sage, Xero or your ERP.')], 'lcv': [('When can I sign up?', 'LCV is coming soon. Join the waiting list and we’ll tell you when it opens.'), ('Do my drivers need a fuel card?', 'No. Drivers ask for fuel in the app and pay with a QR code at the till.'), ('Can drivers see my rules or my balance?', 'No. Drivers only see whether a request is approved (with the limit) or declined.')], 'nonfuel': [('Which services can I pay for?', 'AdBlue, secure overnight parking, showers, canteen, laundry, truck wash and shop, where the truck stop offers them.'), ('Does my credit facility cover services?', 'Yes. TFN credit covers non-fuel services on the network as well as diesel.'), ('How do I find stops with the services I need?', 'Filter the network map by service before the trip.')], 'network': [('Where do the prices come from?', 'The map shows the current price at each TFN truck stop, with the top 10 prices by region.'), ('Can I send the plan to my driver?', 'Yes. Share the stops by WhatsApp or in the app.'), ('What is the fuel price outlook?', 'A projection of next month’s diesel price, based on the Central Energy Fund’s daily data. It’s indicative until the official adjustment.')], 'home': [('Who is Homebase for?', 'Transporters with their own diesel tank at a yard or depot who also fill up on the road.'), ('How is the Homebase fee worked out?', 'It’s based on your monthly on-road volume tier. Use the calculator for an estimate.'), ('Can I use credit for Homebase?', 'Yes. One credit facility covers deliveries to your tank, gantry collections and on-road fills.')], 'africa': [('Which countries are covered?', 'Namibia, Botswana, Zimbabwe, Zambia and Mozambique, alongside the South African network.'), ('Do I need foreign currency?', 'No. You pay in rand from your South African account.'), ('Does credit work across the border?', 'Yes. TFN credit works at cross-border truck stops.')], 'credit': [('Who provides the credit?', 'Standard Bank, Absa or Preference Capital. They handle the application and approval.'), ('Who do I repay?', 'Your credit provider, not TFN. TFN supplies the fuel and the reports.'), ('When do I repay?', 'Billing is usually monthly, with 30 days from the statement date. Your provider confirms your terms.'), ('Can I limit what each driver spends?', 'Yes. Set daily, weekly or monthly limits per driver or truck, or approve each order.')]}
 
 ORDER = ['road', 'lcv', 'nonfuel', 'network', 'home', 'africa', 'credit']
 
@@ -259,7 +259,7 @@ def page(title, desc, body, body_class=''):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tfn-products.css">
-<script>(function(){var t;try{t=localStorage.getItem("tfn-theme")}catch(e){}document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")})()</script>
+<script>(function(){var t;try{t=localStorage.getItem("tfn-theme")}catch(e){}document.documentElement.dataset.theme=t||"light"})()</script>
 </head>
 <body%s>
 <!-- generated by tools/build-product-pages.py: edit the generator, not this file -->
@@ -287,7 +287,7 @@ PORTAL = {
    '<div><label>Fills already today <b data-o="done">0</b></label><input type="range" data-i="done" min="0" max="3" step="1" value="0" aria-label="Fills already today"></div></div>'
    '<div class="outcome" data-out="drv" aria-live="polite"><span class="who">The driver sees</span><b></b><small></small></div>'
    '<div class="outcome" data-out="mgr"><span class="who">You see</span><b></b><small></small></div></div></div>', 'rules'),
- 'nonfuel': ('TFN Dashboard', 'Plan tonight’s stop', 'Pick where the truck stops tonight, see what’s on offer there, and book it on the same account as the diesel.', 'Orders',
+ 'nonfuel': ('TFN Dashboard', 'Plan tonight’s stop', 'Pick where the truck stops tonight and see what’s on offer there. Book it on the same account as the diesel.', 'Orders',
    '<div class="pf-grid"><div class="pf-card"><h4>Tonight’s stop for TFN 204 GP</h4><div class="seg" data-stops role="group" aria-label="Truck stop"></div>'
    '<p class="pfnote" style="font-size:.84rem;margin:16px 0 10px">Services at this stop</p><div class="tog" data-svc role="group" aria-label="Services"></div></div>'
    '<div class="pf-card"><h4>Booked <span data-count>0</span></h4><ul class="feed" data-booked></ul><div class="outcome ok" style="margin-top:12px"><b>On your TFN account</b><small>Paid with the diesel, on one statement</small></div></div></div>', 'stop'),
@@ -305,7 +305,7 @@ PORTAL = {
    '<div class="seg" data-corrs role="group" aria-label="Corridor"></div>'
    '<div class="pf-card"><h4>Corridor <span data-k="cname"></span></h4><div class="corr" data-corr></div></div>'
    '<div class="pf-grid"><div class="pf-card"><h4>Fills on this trip</h4><ul class="feed" data-afeed></ul></div><div class="pf-card"><h4>Paid in</h4><div class="pf-kpis" style="grid-template-columns:1fr"><div><small>Currency</small><b>Rand</b></div><div><small>Total for the trip</small><b class="sp" data-k="atot">R 0</b></div></div></div></div>', 'corridor'),
- 'credit': ('TFN Dashboard', 'Credit, with limits you set', 'Share your facility between trucks, drivers and subcontractors, and see what’s left before you commit.', 'Credit',
+ 'credit': ('TFN Dashboard', 'Credit, with limits you set', 'Share your facility between trucks, drivers and subcontractors. See what’s left before you commit.', 'Credit',
    '<div class="pf-kpis"><div><small>Facility</small><b>R 250 000</b></div><div><small>Allocated</small><b data-k="alloc">R 0</b></div><div><small>Not allocated</small><b class="sp" data-k="free">R 0</b></div></div>'
    '<div class="pf-grid"><div class="pf-card"><h4>Weekly limits</h4><div class="ctl" data-limits></div></div>'
    '<div class="pf-card"><h4>How you repay</h4><div class="tl"><div><b>All month</b>Fuel on credit</div><div><b>1 Nov</b>Statement</div><div><b>1 Dec</b>Repay your bank</div></div>'
@@ -349,7 +349,7 @@ def product_page(k):
         data_dark, p['how'][0], p['acc'], p.get('accink', '#fff'), ''.join('<div><h3>%s</h3><p>%s</p></div>' % s for s in p['how'][1]))
     feats = '<section class="band"%s><div class="wrap"><h2>%s</h2><div class="feats">%s</div></div></section>' % (
         data_dark, p['feats'][0], ''.join('<div><h3>%s</h3><p>%s</p></div>' % f for f in p['feats'][1]))
-    more = '<section class="band grey more"%s><div class="wrap"><h2>More from TFN</h2><p class="sub">Every product runs on one TFN account, and is moving into Truckers Hub, coming soon.</p><div class="range">%s</div></div></section>' % (
+    more = '<section class="band grey more"%s><div class="wrap"><h2>More from TFN</h2><p class="sub">Every product runs on one TFN account. All of them are moving into Truckers Hub, coming soon.</p><div class="range">%s</div></div></section>' % (
         data_dark, ''.join(tile(o) for o in ORDER if o != k))
     close = '<section class="close"%s><div class="wrap"><h2>%s</h2><p class="sub">%s</p><a class="%s" href="%s">%s</a></div></section>' % (
         data_dark, 'Be first in line for LCV' if p.get('soon') else 'See what you’d save',
@@ -366,7 +366,7 @@ def hub():
 <p class="kicker" style="justify-content:center">Truckers Hub <span class="soon">Coming soon</span></p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one place</h1>
 <p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork, with no cards, no cash and no slips. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for your fleet managers.</p>
 <div class="range">%s%s</div><p style="margin-top:40px"><a class="btn" href="tfn-tiers.html">The more you fuel, the less you pay: see the tiers</a></p></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
-    hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one fleet manager portal, and holds the things every product needs, so you set them up once.</p>
+    hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one fleet manager portal. It holds the things every product needs, so you set them up once.</p>
 <div class="steps3" style="--acc:#1f1f1f;grid-template-columns:repeat(2,1fr)">
 <div><h3>The driver app</h3><p>On the driver’s phone: see orders, ask for fuel, fill up and book a stop. Drivers only see what they need to do the job.</p></div>
 <div><h3>The fleet manager portal</h3><p>In the office: set up your company, people, vehicles and rules, top up your wallet, approve orders and see every transaction.</p></div>
@@ -379,7 +379,7 @@ def hub():
 <div><h3>Reports</h3><p>Every transaction from every product, in one set of reports.</p></div>
 </div></div></section>'''
     how = '''<section class="band grey"><div class="wrap"><h2>How TFN works</h2><div class="steps3" style="--acc:#1f1f1f">
-<div><h3>Open an account</h3><p>Sign up online, add your trucks and drivers, and choose cash (pre-loaded by EFT) or credit through your bank.</p></div>
+<div><h3>Open an account</h3><p>Sign up online and add your trucks and drivers. Then choose cash (pre-loaded by EFT) or credit through your bank.</p></div>
 <div><h3>Order and fill up</h3><p>Order fuel in the TFN Dashboard. Your driver fills up at a TFN truck stop, checked by location and photographed at the pump.</p></div>
 <div><h3>See every litre</h3><p>Every fill lands in your dashboard straight away, ready for reports, statements and your accounting system.</p></div>
 </div></div></section>'''
@@ -426,7 +426,7 @@ def tiers_page():
 <div><label for="tlit">Litres a month</label><output id="tout" for="tlit">40 000 L</output><input type="range" id="tlit" min="0" max="200000" step="1000" value="40000"></div>
 <div class="res" aria-live="polite"><div id="tbadge">%s</div><dl><dt>Tier</dt><dd id="tname">Gold</dd><dt>Off every litre</dt><dd id="tdisc">4c</dd><dt>Saving a month</dt><dd id="tsave">R 1 600</dd><dt>To the next tier</dt><dd id="tnext">10 000 L to Diamond</dd></dl></div>
 </div></div></section>""" % (html.escape(__import__('json').dumps([[k, n, lo, hi, d] for k, n, lo, hi, d in TIERS])), badge('gold', 'Gold'))
-    portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal <span class="soon">Coming soon</span></p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one, and what it’s saving you, in the Truckers Hub fleet manager portal.</p>
+    portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal <span class="soon">Coming soon</span></p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one and what it’s saving you in the Truckers Hub fleet manager portal.</p>
 <div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
 <main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
 <div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')

@@ -13,16 +13,16 @@ two differ.
 
 - The logo is the **wordmark** `TFN`, uppercase, set in a heavy, soft,
   high-contrast serif (Fraunces Black stands in for the licensed display
-  serif it is modelled on). Master artwork: `logo-wordmark.svg`, and the
+  serif it is modelled on). Master artwork: `logo-wordmark.svg` and the
   `#logo` symbol in the site, which is live text so it follows the font.
 - It appears in **black on light** or **white on dark**. Nothing else.
 - Never colour it, put a gradient or shadow on it, rotate it, outline it,
   stretch it, crop it or set it on a busy or low-contrast background.
 - The **orb** (`logo-mark.svg`) is the brand's icon: a grainy glass sphere in
   light and dark shades of one hue. Its default is **blue**. On the site it
-  **takes the hue of the product you are in** (blue for Fuel, pink for
-  Insurance, violet for Tracking, teal for Upkeep, the dusk for Complete) and
-  blends between them as you move. It is the tab icon (always blue), the
+  **takes the hue of the product family you are in** (blue for Diesel, warm rose
+  for Non-fuel, violet for Cross-border, teal for Homebase) and blends between
+  them as you move. A small ember of TFN orange glows inside it, never more. It is the tab icon (always blue), the
   assistant button ("Ask tfn") and the announcement bar mark. It is never
   placed beside the wordmark. The wordmark never changes colour.
 - Minimum width 48px on screen. Clear space on every side is the height of
@@ -40,12 +40,12 @@ two differ.
 - **One hue per gradient.** Each gradient is one colour in light and dark
   shades. Each service owns one hue, used the same way everywhere (dots on
   tabs and photo badges, device screens, the orb):
-  - Fuel: **blue**
-  - Insurance: **pink**
-  - Network: **violet**
+  - Diesel (On-Road, the app, the map): **blue**
+  - Non-fuel: **warm rose**
+  - Cross-border (TFN Africa): **violet**
   - Homebase: **teal**
-  The one exception is the orb's **All** state, a soft pastel mix of blue,
-  green and purple taken from the old swirl logo. Never orange, never gold.
+  Product pages use their own accent (below); Credit is **plum**. Inside the
+  orbs, a small ember of TFN orange is allowed. Never gold.
 - **Colour says which product, the finish says your tier.** Product pages are
   white, told apart by a faint gradient wash and one muted accent: On-Road blue
   `#2a6fd0`, LCV cyan `#0e8fb3`, Non-Fuel slate `#4f6b8a`, Network indigo `#3346a8`,
@@ -70,18 +70,26 @@ two differ.
   (Network), a glass tank (Homebase, the one 3D object), a cross-border corridor
   (TFN Africa) and credit limits (Credit). 3D stays restrained: the portal tilts in
   as it arrives, phones lean toward the pointer.
-- **Dark mode.** Product pages and app screens follow the visitor's setting, with a
-  toggle in the nav.
+- **Light by default.** Product pages open white with black type. Dark mode is the
+  visitor's choice. A toggle in the nav sets it and it is remembered.
+- **Texture where things fill.** On product pages the accent becomes a soft gradient
+  with a fine grain only where something fills: progress bars, slider tracks, the
+  route line, step numbers and live dots. Buttons, text and grounds stay flat.
 - **Photos: real, coloured by real light.** Real photography first. AI only if no one could tell
   (no uncanny eyes, odd hands, waxy skin or melted text); almost real reads as fake. Colour comes from the light in the scene: deep navy, teal, graphite, white
   and grey, low saturation, soft contrast. Pink or violet only when really in the scene (a dusk
   sky, a screen's glow), never painted on. Never a cut-out person on a flat colour: people stay in
   a real place; studio backdrops are for products only. Light is cool, never orange.
-- **Maps are dark by default.**
+- **Maps are light by default,** in the diesel orb's colours.
 - **Coins are silver.**
 - **State:** green means fine, red means it needs you, grey means coming up.
   Small dots only, never fills.
 - Glass (frosted translucent white) is only used over colour or photography.
+
+- **Icons: Lucide,** outline only, 1.8px stroke, round caps, one colour (ink, white
+  or the product accent). On product pages they label features (a soft accent
+  tile), the portal menu, chips and the tiles inside the phones. Never filled,
+  never decoration.
 
 ## 3. Type
 
@@ -120,7 +128,7 @@ Buttons are always full pills, black on light and white on black.
 ## 6. Photography
 
 - **The main people are the buyers:** logistics, operations and tech-minded
-  managers at work, at a laptop or on a warehouse floor. Candid, not posed, and
+  managers at work, at a laptop or on a warehouse floor. Candid, not posed and
   never another person-on-a-phone shot.
 - **Supporting scenes:** trucks at night or at blue hour, a hand on the
   nozzle, trucks from above, open southern African roads. Cinematic, no
@@ -183,15 +191,12 @@ viewer has reduced motion switched on.
 
 ## 9. Maps
 
-Where we show a map (the Tracking panel and the live map section) it is
-**black and white and glass**: a dark monochrome map with a faint dot grid,
-dark roads with fine edges, hatched parks, uppercase spaced street labels, a
-glowing white highway and a glowing white route, a white navigation puck with
-a dark label chip, grey parked pins and a single red pin for anything that
-needs attention. Everything that floats over it is frosted dark glass: the
-vehicle sheet with its grabber, the map controls, the vehicle labels and a
-small monospace live readout. It is always dark, in Driver mode and Business
-mode alike. It is our own drawing and uses no third-party map data or marks.
+The brand guide's Maps chapter is the reference. In short: light by default, in
+the diesel orb's colours. The price is the marker (orb, price, a tail at the
+spot); only the cheapest open stop in view says Lowest. Routes show the cheapest
+in the sky-to-lavender gradient and up to two more in grey, each with a price
+pill on its own line. It is our own drawing and uses no third-party map data or
+marks.
 
 ## 10. Page rhythm and motion
 
@@ -199,7 +204,7 @@ The home page is a run of **full-screen scenes**, one screen tall each, with
 the colour ground changing from scene to scene: blue hero, white, photo
 (Fuel), navy (the three tools), pink (Insurance), black (the map), teal
 (Upkeep), then white and cream for the grid, the products, the bundles and
-the TLDR, and navy for the referral and the footer.
+the TLDR. Navy for the referral and the footer.
 
 - **Hero:** a flat colour ground first, the outline of the phone draws itself,
   then the photograph fades in behind it, the number counts up inside the
@@ -211,7 +216,7 @@ the TLDR, and navy for the referral and the footer.
 
 ## 11. Page transitions
 
-- **Scenes overlap** with rounded tops, and the scene underneath recedes and
+- **Scenes overlap** with rounded tops. The scene underneath recedes and
   dims as the next one rises.
 - **Photographs and devices** open from a clipped frame. Numbers roll up.
 - There is no intro curtain, no colour wipe between sections and no
@@ -219,5 +224,5 @@ the TLDR, and navy for the referral and the footer.
 - Everything above is switched off for viewers who ask for reduced motion.
 - **Nav mega menu:** hovering or focusing a nav item drops a frosted glass
   panel under the bar. It opens slightly smaller and settles, the links
-  stagger in, and moving along the nav swaps the panel's content. Escape or
+  stagger in. Moving along the nav swaps the panel's content. Escape or
   scrolling closes it.

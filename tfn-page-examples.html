@@ -26,6 +26,7 @@
   }
   /* one hue per product; each gradient uses only light and dark shades of its hue */
   .h-blue   { --c1: #d4e8fc; --c2: #3d8ee0; --c3: #2a6fd0; --c4: #0d2a5c; --c5: #8fc0f5; --c6: #1f4fa8; --tint: rgba(20,60,140,.35); }
+  .h-plum   { --c1: #f2d9ef; --c2: #c25cb6; --c3: #a64a9e; --c4: #2e0f30; --c5: #dc96d6; --c6: #7b2f78; --tint: rgba(110,30,100,.35); }
   .h-pink   { --c1: #ffd6ea; --c2: #e0559a; --c3: #c23d86; --c4: #3a0f2e; --c5: #f58ab8; --c6: #9b2e78; --tint: rgba(140,30,90,.35); }
   .h-violet { --c1: #e4d8ff; --c2: #8f55d6; --c3: #6b3cc0; --c4: #1c1040; --c5: #b99af0; --c6: #5a2fb0; --tint: rgba(60,30,130,.38); }
   .h-teal   { --c1: #d6fbf3; --c2: #2fb5b0; --c3: #1f9a95; --c4: #0a3a40; --c5: #6fd8cf; --c6: #14776f; --tint: rgba(10,80,80,.35); }
@@ -459,7 +460,7 @@
     /* the orbs' palette: sky, lavender, pink, peach, sea */
     --sky: #7fb4e6; --lav: #a796e0; --pink: #e3a0bd; --peach: #efb79c; --sea: #8fcbc0; --deep: #5c6fcf; --plum: #7b5cc4;
     /* the blue (diesel) orb: sky on top, a deeper blue to the right, lavender below, a breath of sea */
-    --orb: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
+    --orb: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(38% 30% at 86% 86%, rgba(208,112,52,.78), rgba(208,112,52,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
     --go: linear-gradient(120deg, #2f4fb0, #5a3fb0);
     --w: #e5ebf2; --ld: #eef0f3; --za1: #fdfdfe; --za2: #f4f5f7; --pk: #e5f0ea; --bd: #d5d8de; --hc: #e0e3e8; --hw: #ffffff; --lb: #7c7f86; --halo: #fff; --wl: #9fb2c6;
     --rg0: #9fd3ea; --rg1: #5f8fd6; --rg2: #a796e0; --acc: #5a5fc4; --tx: #1c1c1e; --tx2: #6e6e73; --fld: rgba(118,118,128,.12); --ln: rgba(60,60,67,.1);
@@ -746,6 +747,11 @@
   .bm-dd figcaption b::before { content: "✓"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 11px; }
   .bm-dd .no .v { box-shadow: inset 0 0 0 2px var(--no); } .bm-dd .no figcaption b { color: var(--no); } .bm-dd .no figcaption b::before { content: "✕"; background: var(--no); }
   /* why it works */
+  /* the reasons: every chapter ends with why its rules work, named after the law or effect behind them */
+  .bm-reason { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .bm-reason > small { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+  .bm-reason ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px 32px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .bm-reason b { display: block; margin-bottom: 4px; font-size: 14.5px; font-weight: 600; color: var(--ink); } .bm-reason span { display: block; font-size: 14px; line-height: 1.5; color: var(--body, var(--mut)); }
   .bm-why { display: grid; gap: 16px; }
   .bm-why article { display: grid; grid-template-columns: 1.05fr 1fr 1fr; border-radius: 20px; overflow: hidden; background: var(--soft); }
   .bm-why article > div { padding: 20px 22px; } .bm-why article > div + div { border-left: 1px solid var(--sep); }
@@ -754,10 +760,10 @@
   /* orbs */
   .bm-orb { position: relative; display: block; width: 112px; height: 112px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255,255,255,.08); overflow: hidden; }
   .bm-orb::after { content: ""; position: absolute; inset: 0; opacity: .32; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
-  .bm-orb.diesel { background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); }
+  .bm-orb.diesel { background: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(38% 30% at 86% 86%, rgba(208,112,52,.78), rgba(208,112,52,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e); }
   .bm-orb.nonfuel { background: radial-gradient(90% 70% at 32% 6%, #d98a52, rgba(217,138,82,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e); }
-  .bm-orb.africa { background: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(70% 70% at 86% 90%, #2a8068, rgba(42,128,104,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e); }
-  .bm-orb.homebase { background: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(60% 60% at 82% 96%, #c97a3e, rgba(201,122,62,0) 70%), linear-gradient(150deg, #2f7058, #173f38); }
+  .bm-orb.africa { background: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(70% 70% at 86% 90%, #c46f36, rgba(196,111,54,0) 60%), linear-gradient(150deg, #5a43a8, #2b1f6e); }
+  .bm-orb.homebase { background: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(66% 62% at 84% 94%, #cc6f34, rgba(204,111,52,0) 66%), linear-gradient(150deg, #2f7058, #173f38); }
   .bm-orb.sm { width: 24px; height: 24px; box-shadow: inset 0 0 0 1px rgba(40,70,140,.14), 0 4px 10px -3px rgba(60,100,190,.45); } .bm-orb.sm::after { display: none; }
   .bm-orb.bad { box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(0,0,0,.3); background: radial-gradient(circle at 30% 25%, #fff, rgba(255,255,255,0) 35%), linear-gradient(160deg, #3d8ee0, #0d2a5c); } .bm-orb.bad::after { display: none; }
   .bm-orbs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
@@ -783,6 +789,13 @@
   .bm-dont figcaption { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: var(--body); }
   .bm-dont figcaption::before { content: "✕"; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--no); color: #fff; font-size: 11px; font-weight: 700; }
   /* colour */
+  .bm-fill { display: grid; gap: 16px; padding: 14px 0 12px; }
+  .bm-fill .bar, .bm-fill .sl { position: relative; display: block; height: 8px; border-radius: 99px; background: #e4e6ea; }
+  .bm-fill .bar i, .bm-fill .sl i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8db8e6, #2c56b8 62%, #1f2f80); }
+  .bm-fill .sl b { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(20,20,40,.1), 0 2px 6px rgba(20,20,40,.22); }
+  .bm.dark .bm-fill .bar, .bm.dark .bm-fill .sl { background: #2a2a2e; }
+  .bm-rp { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 7px; border-radius: 999px; background: #fff; color: #6e6e73; font-size: 12.5px; box-shadow: 0 4px 14px -4px rgba(20,20,60,.25), inset 0 0 0 1px rgba(60,60,67,.1); }
+  .bm-rp b { color: #1f1f1f; font-weight: 600; } .bm-rp.on { color: #5a5fc4; font-weight: 600; box-shadow: 0 8px 20px -8px rgba(80,70,200,.45), inset 0 0 0 2px #5f8fd6; } .bm-rp .bm-orb.sm { width: 14px; height: 14px; }
   .bm-ratio { display: flex; height: 54px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid #d8d8dc; }
   .bm-ratio i { display: block; } .bm-ratio i + i { border-left: 1px solid rgba(0,0,0,.08); }
   .bm-ratio-k { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--mut); }
@@ -829,6 +842,7 @@
   .bm-ig svg { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ink); }
   /* components */
   .bm-comp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .bm-comp.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } @media (max-width: 560px) { .bm-comp.c2 { grid-template-columns: 1fr; } }
   .bm-comp > div { display: grid; align-content: start; gap: 14px; padding: 22px; border-radius: 20px; background: var(--soft); }
   .bm-comp > div.dark { background: #000; color: #fff; } .bm-comp > div.dark p { color: #a8a8a8; }
   .bm-comp > div.no { box-shadow: inset 0 0 0 2px var(--no); } .bm-comp .tag { justify-self: start; padding: 2px 8px; border-radius: 6px; background: var(--no); color: #fff; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
@@ -1067,10 +1081,10 @@
   }
 
   /* ---------- the site, in the brand guide's terms ---------- */
-  :root { --orb-diesel: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(26% 22% at 92% 88%, rgba(224,122,58,.45), rgba(224,122,58,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
+  :root { --orb-diesel: radial-gradient(90% 70% at 30% 8%, #8db8e6, rgba(141,184,230,0) 58%), radial-gradient(80% 90% at 95% 50%, #2c56b8, rgba(44,86,184,0) 62%), radial-gradient(95% 95% at 10% 100%, #4a35a6, rgba(74,53,166,0) 64%), radial-gradient(60% 60% at 78% 100%, #1f7a62, rgba(31,122,98,0) 70%), radial-gradient(38% 30% at 86% 86%, rgba(208,112,52,.78), rgba(208,112,52,0) 100%), linear-gradient(150deg, #3d68c0, #1f2f80 60%, #2a1f6e);
     --orb-rose: radial-gradient(90% 70% at 32% 6%, #d98a52, rgba(217,138,82,0) 58%), radial-gradient(80% 90% at 95% 55%, #a8447a, rgba(168,68,122,0) 62%), radial-gradient(95% 95% at 12% 100%, #4b3399, rgba(75,51,153,0) 66%), linear-gradient(150deg, #9a5070, #4b2c78 60%, #261d5e);
-    --orb-violet: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), linear-gradient(150deg, #5a43a8, #2b1f6e);
-    --orb-teal: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), linear-gradient(150deg, #2f7058, #173f38);
+    --orb-violet: radial-gradient(85% 75% at 25% 12%, #b25a86, rgba(178,90,134,0) 60%), radial-gradient(80% 80% at 85% 22%, #b8894a, rgba(184,137,74,0) 58%), radial-gradient(90% 90% at 18% 96%, #3b62b0, rgba(59,98,176,0) 65%), radial-gradient(60% 55% at 88% 92%, #c46f36, rgba(196,111,54,0) 62%), linear-gradient(150deg, #5a43a8, #2b1f6e);
+    --orb-teal: radial-gradient(85% 75% at 30% 8%, #b89640, rgba(184,150,64,0) 58%), radial-gradient(80% 90% at 92% 45%, #2a8f78, rgba(42,143,120,0) 62%), radial-gradient(95% 95% at 14% 96%, #2f8050, rgba(47,128,80,0) 65%), radial-gradient(60% 56% at 86% 94%, #cc6f34, rgba(204,111,52,0) 64%), linear-gradient(150deg, #2f7058, #173f38);
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); }
   .ob { display: inline-block; border-radius: 50%; } .ob-blue { background: var(--orb-diesel); } .ob-teal { background: var(--orb-teal); } .ob-rose { background: var(--orb-rose); } .ob-violet { background: var(--orb-violet); }
   /* the hero: black, the deep orb breathing behind the phone and catching the light */
@@ -1280,12 +1294,13 @@
   }
   /* the orbs breathe inside like clouds: two soft copies of the orb's own colour drift past each other at different speeds,
      so the colour gathers, thins and rolls on without ever repeating; the circle and its grain stay still; small orbs and map pins stay still */
-  :is(.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob) { position: relative; overflow: hidden; isolation: isolate; animation: odrift 22s ease-in-out infinite alternate; background-size: 140% 140% !important; }
+  :where(.forb, .nm-peek .ob) { position: relative; } :where(.bm-orb, .forb, .nm-peek .ob) { overflow: hidden; isolation: isolate; }
+  :is(.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob) { animation: odrift 22s ease-in-out infinite alternate; background-size: 125% 125% !important; }
   .bm-cover .bm-orb.xl { animation: bmBreathe 9s ease-in-out infinite alternate, odrift 22s ease-in-out infinite alternate; }
   @keyframes odrift { 0% { background-position: 10% 20%; } 50% { background-position: 80% 40%; } 100% { background-position: 40% 90%; } }
-  .ocl { position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; background: inherit; background-size: 100% 100% !important; animation: none; }
-  .ocl.a { opacity: .55; filter: blur(8px); animation: cla 13s ease-in-out infinite alternate; }
-  .ocl.b { opacity: .38; filter: blur(14px); animation: clb 19s ease-in-out infinite alternate; }
+  .ocl { position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; mix-blend-mode: soft-light; }
+  .ocl.a { background: radial-gradient(34% 26% at 32% 38%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%), radial-gradient(26% 20% at 68% 62%, rgba(255,255,255,.4), rgba(255,255,255,0) 70%), radial-gradient(22% 30% at 55% 22%, rgba(255,255,255,.3), rgba(255,255,255,0) 70%); filter: blur(6px); animation: cla 13s ease-in-out infinite alternate; }
+  .ocl.b { background: radial-gradient(38% 28% at 60% 34%, rgba(8,10,40,.6), rgba(8,10,40,0) 70%), radial-gradient(30% 34% at 30% 70%, rgba(8,10,40,.45), rgba(8,10,40,0) 70%); filter: blur(10px); animation: clb 19s ease-in-out infinite alternate; }
   @keyframes cla { 0% { transform: translate(-14%, 8%) rotate(-12deg) scale(1.1); } 33% { transform: translate(10%, -6%) rotate(20deg) scale(.95); } 66% { transform: translate(-4%, -14%) rotate(55deg) scale(1.15); } 100% { transform: translate(14%, 10%) rotate(80deg) scale(1); } }
   @keyframes clb { 0% { transform: translate(12%, -10%) rotate(150deg) scale(1.25); } 40% { transform: translate(-12%, 4%) rotate(110deg) scale(1.05); } 75% { transform: translate(6%, 14%) rotate(70deg) scale(1.3); } 100% { transform: translate(-10%, -8%) rotate(40deg) scale(1.1); } }
   .bm-orb:nth-of-type(2n) .ocl, .bm-orb:nth-of-type(2n) { animation-delay: -5s; } .bm-orb:nth-of-type(3n) .ocl, .bm-orb:nth-of-type(3n) { animation-delay: -11s; }
@@ -1406,7 +1421,7 @@
       <div class="pic rise" aria-hidden="true"><div class="amap" data-s="1.15" data-t0=".12" data-dur="56000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg></div><div class="asearch mgl" style="top:14px"><svg><use href="#i-search"/></svg>Search TFN truck stops</div><div class="chip mgl" style="z-index:3"><i class="ob ob-blue"></i><span>Saved this month</span><b data-roll>R 4,210</b></div></div>
       <div>
         <h2>Your route, refuelled</h2>
-        <p>Your drivers fill up at any of 270+ TFN truck stops at prices below the grid price, and every litre is logged against the truck and driver.</p>
+        <p>Your drivers fill up at any of 270+ TFN truck stops at prices below the grid price. Every litre is logged against the truck and driver.</p>
         <a class="btn" href="tfn-network.html">Find a truck stop</a>
       </div>
     </div>
@@ -1422,7 +1437,7 @@
     <div class="veil" aria-hidden="true"></div>
     <div class="wrap">
       <h2>No cards, no cash, no slips</h2>
-      <p class="sub">You place the order, your driver fills up, and TFN Pay checks the location and photographs the pump. The fill is in your dashboard before the truck pulls away.</p>
+      <p class="sub">You place the order and your driver fills up. TFN Pay checks the location and photographs the pump. The fill is in your dashboard before the truck pulls away.</p>
       <a class="btn light" href="tfn-on-road.html">See how it works</a>
       <div class="gphone gl" id="gp"><div class="gtop"><i class="gth" aria-hidden="true"></i><div><small class="val" id="gpl">Fill recorded</small><strong id="gpv">420 L</strong></div></div><span class="pill">TFN 204 GP · Harrismith</span><ul class="gck"><li>Location checked</li><li>Truck matched</li><li>Pump photo saved</li></ul><div class="dots"><i class="on"></i><i></i><i></i></div></div>
       <div class="pills" id="pills"><button class="gl" aria-pressed="true">Order</button><button class="gl" aria-pressed="false">Save</button><button class="gl" aria-pressed="false">Track</button></div>
@@ -1542,7 +1557,7 @@
   <section class="sec black center" id="d">
     <div class="wrap">
       <h2 class="title">Fuel now, settle later</h2>
-      <p class="sub">Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN, and you repay your bank monthly.<sup>1</sup></p>
+      <p class="sub">Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN. You repay your bank monthly.<sup>1</sup></p>
     </div>
     <div class="orbstage" id="orbstage">
       <div class="coins" id="coins" aria-hidden="true"></div>
@@ -1728,7 +1743,7 @@
     <div>
       <p class="lbl">Brand guidelines · 2026</p>
       <svg class="wm" aria-label="TFN"><use href="#logo"/></svg>
-      <p>Premium fintech, built for transport. How TFN looks, sounds and moves, and why every rule is there.</p>
+      <p>Premium fintech, built for transport. How TFN looks, sounds and moves. And why every rule is there.</p>
       <div class="meta"><span>Version 1 · October 2026</span><span>Web, app, portal, print, signage</span><span>Design concept</span></div>
     </div>
   </header>
@@ -1746,11 +1761,11 @@
         <div class="bm-why">
           <article><div><small>Principle</small><h3>Black and white, colour only in the product</h3><p>The structure stays quiet so the product can speak.</p></div>
             <div><small>How TFN does it</small><p>Sections are white or black. Colour lives in things: the orbs, the app, the maps, the photos. Buttons and type stay ink or white.</p></div>
-            <div class="bc"><small>Why it works</small><p><b>Processing fluency.</b> Plain, high-contrast surfaces are easier to read, and what feels easy feels trustworthy. With money and fuel, calm reads as safe.</p></div></article>
+            <div class="bc"><small>Why it works</small><p><b>Processing fluency.</b> Plain, high-contrast surfaces are easier to read. What feels easy feels trustworthy. With money and fuel, calm reads as safe.</p></div></article>
           <article><div><small>Principle</small><h3>Textured gradients, not flat colour</h3><p>Soft colour fields with a fine grain, like light through frosted glass.</p></div>
             <div><small>How TFN does it</small><p>Each product family has a matte orb: diesel blue, non-fuel, cross-border, Homebase. The same texture runs from the site to the map markers. Never behind text.</p></div>
-            <div class="bc"><small>Why it works</small><p><b>Texture reads as material.</b> A fine grain makes colour feel tangible and calm rather than digital and glaring, which signals care (the aesthetic-usability effect: what looks considered is trusted to work). It becomes a <b>distinctive asset</b> people recognise without the logo, and the grain stops gradients banding on screens.</p></div></article>
-          <article><div><small>Principle</small><h3>One sans, tight and confident</h3><p>A single geometric grotesk with tight tracking at large sizes, and short headlines.</p></div>
+            <div class="bc"><small>Why it works</small><p><b>Texture reads as material.</b> A fine grain makes colour feel tangible and calm rather than digital and glaring, which signals care (the aesthetic-usability effect: what looks considered is trusted to work). It becomes a <b>distinctive asset</b> people recognise without the logo. The grain also stops gradients banding on screens.</p></div></article>
+          <article><div><small>Principle</small><h3>One sans, tight and confident</h3><p>A single geometric grotesk, tightly tracked at large sizes. Headlines stay short.</p></div>
             <div><small>How TFN does it</small><p>One sans (Aeonik Pro, Satoshi until licensed). Headlines of three to six words. The serif is kept for the wordmark only.</p></div>
             <div class="bc"><small>Why it works</small><p><b>Cognitive load.</b> One typeface and one weight per role means the eye never re-learns the page. Short lines get read; long ones get skimmed.</p></div></article>
           <article><div><small>Principle</small><h3>Pills mean action</h3><p>You can tell what is clickable from its shape alone.</p></div>
@@ -1777,11 +1792,13 @@
         <div class="bm-ch" style="--lc:#1f7a62"><span class="n">02</span><h2>The idea</h2><p>Fuel management, sorted. Negotiated diesel at 270+ truck stops, the payment and paperwork handled, every litre live.</p></div>
         <div class="bm-card dark" style="padding:32px 30px;margin-bottom:16px"><p class="bm-sub" style="color:#a8a8a8;margin:0 0 10px">Look and feel</p><h3 style="font-size:1.9rem;line-height:1.15;letter-spacing:-.015em;max-width:18em">Premium fintech, built for transport. Upmarket and exact, never glossy, never cheap.</h3><p style="margin-top:12px;max-width:40em">The calm of a private bank, the clarity of a live dashboard, the honesty of the road. Restraint is the luxury: few colours, real photos, exact numbers.</p></div>
         <div class="bm-grid">
-          <div class="bm-card"><h3>Who it's for</h3><p>Transport owners and their operations and fleet managers, who buy the fuel. Drivers, who use the app at the pump. Service providers running subcontractors.</p></div>
+          <div class="bm-card"><h3>Who it's for</h3><p>Owners, operations managers and fleet managers: they buy the fuel. Drivers: they use the app at the pump. Service providers: they run subcontractors.</p></div>
           <div class="bm-card"><h3>What we promise</h3><p>A lower price, no admin and no surprises. Every fill logged against the truck and driver before it pulls away.</p></div>
-          <div class="bm-card"><h3>What's always true</h3><p>No cards, codes or slips for trucks. The QR at the till is for LCVs only. Credit comes through Standard Bank, Absa or Preference Capital.</p></div>
+          <div class="bm-card"><h3>What's always true</h3><p>The QR at the till is for LCVs only. Credit comes through Standard Bank, Absa or Preference Capital.</p></div>
           <div class="bm-card"><h3>Personality</h3><p>Calm, exact and on your side. Like a good fleet manager: knows every number, never raises their voice.</p></div>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Serial position effect</b><span>People remember the first and last thing best. Lead with the price; end with no surprises.</span></li><li><b>Jobs to be done</b><span>Owners hire TFN for cheaper diesel with no admin. Say that outcome before any feature.</span></li><li><b>Liking</b><span>A brand with a clear personality is easier to trust. Calm and exact is the one we keep.</span></li></ul></div>
       </section>
 
       <section id="bm-logo">
@@ -1808,16 +1825,19 @@
           <figure><div class="v"><svg class="w" style="color:transparent;stroke:#1f1f1f;stroke-width:5px"><use href="#logo"/></svg></div><figcaption>Outline it</figcaption></figure>
           <figure><div class="v"><span style="display:flex;align-items:center;gap:10px"><span class="bm-orb diesel" style="width:34px;height:34px;box-shadow:none"></span><svg class="w" style="width:90px"><use href="#logo"/></svg></span></div><figcaption>Lock it up with the orb</figcaption></figure>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Mere exposure</b><span>A mark becomes familiar only if it looks the same every time. Every variation starts recognition again.</span></li><li><b>Figure and ground</b><span>Black on light or white on dark gives the strongest outline. A busy photo dissolves it.</span></li></ul></div>
       </section>
 
       <section id="bm-colour">
-        <div class="bm-ch" style="--lc:#2c56b8"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A tiny flash of TFN orange marks something live, and nothing else.</p></div>
+        <div class="bm-ch" style="--lc:#2c56b8"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A tiny flash of TFN orange marks something live. Nothing else.</p></div>
         <p class="bm-sub">Proportion</p>
-        <div class="bm-ratio" role="img" aria-label="Roughly: white 56%, black and ink 34%, product and orb colour 9%, TFN orange 1%"><i style="flex:56;background:#fafafa"></i><i style="flex:34;background:#000"></i><i style="flex:9;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
-        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 56%</li><li><i style="background:#000"></i>Black and ink · 34%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a8447a)"></i>Product and orb colour · 9%</li><li><i style="background:#f2761d"></i>TFN orange · 1%</li></ul>
+        <div class="bm-ratio" role="img" aria-label="Measured across the site: white 75%, black and ink 22%, product and orb colour 2%, TFN orange under 1%"><i style="flex:75;background:#fafafa"></i><i style="flex:22;background:#000"></i><i style="flex:2;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
+        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 75%</li><li><i style="background:#000"></i>Black and ink · 22%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i>Product and orb colour · 2%</li><li><i style="background:#f2761d"></i>TFN orange · under 1%</li></ul>
+        <p class="bm-note">Measured across the site in light mode. Product pages are white with black type. The home page leans black so the orbs, the map and the photos can glow. Black is for premium: Tiers is black.</p>
         <p class="bm-sub">Structure</p>
         <div class="bm-sw">
-          <div class="sw" data-hex="#FFFFFF" data-pms="—"><i style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"></i><div><b>White</b><span class="use">Grounds, type on black</span></div></div>
+          <div class="sw" data-hex="#FFFFFF" data-pms="None"><i style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"></i><div><b>White</b><span class="use">Grounds, type on black</span></div></div>
           <div class="sw" data-hex="#1F1F1F" data-pms="Neutral Black C"><i style="background:#1f1f1f"></i><div><b>Ink</b><span class="use">Text and site buttons</span></div></div>
           <div class="sw" data-hex="#000000" data-pms="Black 6 C"><i style="background:#000"></i><div><b>Black</b><span class="use">Bands, premium</span></div></div>
           <div class="sw" data-hex="#191C1F" data-pms="Black 6 C"><i style="background:#191c1f"></i><div><b>Charcoal</b><span class="use">Footer</span></div></div>
@@ -1845,6 +1865,8 @@
         </div>
         <p class="bm-sub">TFN orange</p>
         <div class="bm-spark"><i><span>Live</span></i><div><p><b>#F2761D</b> is a tiny flash for something live or new: a small dot, on light screens only. On dark screens, live uses the product colour; warnings use red.</p><p>Never a call to action, never a fill, never a big number, never on black. Orange reads as an alert, so an orange button reads as a warning, not an action.</p></div></div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Von Restorff effect</b><span>The one thing that differs is the one noticed. At 1% orange and 9% product colour, colour always means something.</span></li><li><b>Jakob's law</b><span>People bring meaning from every other app: red needs you, green is fine. We use it the same way.</span></li><li><b>Colour is never alone</b><span>About 1 in 12 men see colour differently. Every state also has a word, a shape or an arrow.</span></li></ul></div>
       </section>
 
       <section id="bm-type">
@@ -1863,7 +1885,7 @@
           <div><small>Display · h1<br>85 / 1.0 · 500 · −2.5%</small><span class="t1">Fuel, sorted</span></div>
           <div><small>Section · h2<br>50 / 1.0 · 500 · −1.2%</small><span class="t2">Cheaper diesel, mapped</span></div>
           <div><small>Title · h3<br>22 / 1.2 · 600</small><span class="t3">Pick your set-up</span></div>
-          <div><small>Body<br>18 / 1.5 · 400</small><span class="t4">Your drivers fill up at any of 270+ TFN truck stops, and every litre is logged against the truck.</span></div>
+          <div><small>Body<br>18 / 1.5 · 400</small><span class="t4">Your drivers fill up at any of 270+ TFN truck stops. Every litre is logged against the truck.</span></div>
           <div><small>Footnote<br>13 / 1.5 · 400</small><span class="t5">¹ Credit is subject to approval by the credit provider.</span></div>
           <div><small>App · system font<br>17 / 1.3</small><span class="t6">Fill up here now?</span></div>
         </div>
@@ -1873,6 +1895,8 @@
           <div><dt>All caps</dt><dd>Small labels only, tracked +6%.</dd></div><div><dt>Prices</dt><dd>R 20.48, with a space; /L on rates.</dd></div>
           <div><dt>Big numbers</dt><dd>270+, 44M+, 168K+.</dd></div><div><dt>Fine print</dt><dd>Footnotes ¹ ² ³, never in the body.</dd></div>
         </dl>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Cognitive load</b><span>One family and a fixed scale means the reader never relearns the page.</span></li><li><b>Word shape</b><span>Sentence case keeps the outline of each word. All caps and italics slow reading, most of all in a second language.</span></li><li><b>Chunking</b><span>Short headlines are read whole. A long one is skimmed, so the point gets lost.</span></li></ul></div>
       </section>
 
       <section id="bm-orbs">
@@ -1893,11 +1917,13 @@
           <figure class="no"><div class="v bm-orb diesel" style="display:grid;place-items:center;width:auto;height:220px;border-radius:20px;box-shadow:inset 0 0 0 2px var(--no)"><span style="position:relative;z-index:1;font-size:22px;font-weight:500;color:#fff;text-align:center;line-height:1.15">Fuel now,<br>settle later</span></div><figcaption><b>Don't</b>Set text on the gradient.</figcaption></figure>
         </div>
         <dl class="bm-specs" style="margin-top:28px">
-          <div><dt>Why texture</dt><dd>Grain makes colour feel like a material, calm rather than glaring, and stops gradients banding.</dd></div>
+          <div><dt>Why texture</dt><dd>Grain makes colour feel like a material, calm rather than glaring. It also stops gradients banding.</dd></div>
           <div><dt>Depth</dt><dd>Deep tones over bright pastels. The orb glows on black; it never shouts on white.</dd></div>
-          <div><dt>Where</dt><dd>Inside things: orbs, product art, the app's one main action. Never behind body text or the wordmark.</dd></div>
+          <div><dt>Where</dt><dd>Inside things: orbs, product art, the app's one main action. On product pages, only where something fills: progress bars, sliders, the route line. Never behind body text or the wordmark.</dd></div>
           <div><dt>Coins</dt><dd>Silver, real 3D, floating clear of the orbs.</dd></div>
         </dl>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Aesthetic-usability effect</b><span>What looks considered is trusted to work. A calm, matte orb says care before a word is read.</span></li><li><b>Figure and ground</b><span>Text never sits on a gradient. The eye needs a flat ground to read quickly.</span></li></ul></div>
       </section>
 
       <section id="bm-icons">
@@ -1905,7 +1931,7 @@
         <div class="bm-igrow">
           <div class="bm-ig"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pump"/></svg></div>
           <dl class="bm-specs" style="grid-template-columns:1fr">
-            <div><dt>Grid</dt><dd>24 × 24px, 2px safe area.</dd></div><div><dt>Stroke</dt><dd>1.8px (2px at most), round caps and joins.</dd></div>
+            <div><dt>Set</dt><dd>Lucide, open source (ISC licence). Pick the plainest symbol for the job.</dd></div><div><dt>Grid</dt><dd>24 × 24px, 2px safe area.</dd></div><div><dt>Stroke</dt><dd>1.8px (2px at most), round caps and joins.</dd></div>
             <div><dt>Style</dt><dd>Outline only, one colour: ink, white or the accent.</dd></div><div><dt>Sizes</dt><dd>16, 20, 24px. Never stretched, never filled.</dd></div>
           </dl>
         </div>
@@ -1917,6 +1943,8 @@
           <figure><div class="v"><span class="bm-row" style="gap:22px"><svg style="width:34px;height:34px"><use href="#i-pump"/></svg><svg style="width:34px;height:34px"><use href="#i-pin"/></svg><svg style="width:34px;height:34px"><use href="#i-truck"/></svg></span></div><figcaption><b>Do</b>One stroke weight, one colour, all outline.</figcaption></figure>
           <figure class="no"><div class="v"><span class="bm-row" style="gap:22px"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><defs><linearGradient id="bmIg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f8fd6"/><stop offset="1" stop-color="#24307a"/></linearGradient></defs><path d="M12 21s7-6 7-11.500a7 7 0 0 0-14 0C5 15 12 21 12 21Z" fill="url(#bmIg)"/><circle cx="12" cy="9.5" r="2.6" fill="#fff"/></svg><svg style="width:34px;height:34px;color:#1a9b55"><use href="#i-pump"/></svg><svg viewBox="0 0 24 24" style="width:34px;height:34px"><rect x="3" y="7" width="13" height="10" rx="2" fill="#1f1f1f"/><path d="M16 10h3l2 3v4h-5Z" fill="#1f1f1f"/></svg></span></div><figcaption><b>Don't</b>Mix filled, shaded and coloured icons.</figcaption></figure>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Jakob's law</b><span>People expect a magnifier to mean search. Use the familiar symbol, never a clever one.</span></li><li><b>Law of similarity</b><span>One stroke, one colour, one size family. Icons that match read as one set and fade into the task.</span></li></ul></div>
       </section>
 
       <section id="bm-layout">
@@ -1937,6 +1965,8 @@
             <dl class="bm-specs" style="grid-template-columns:1fr;margin-top:22px"><div><dt>Margin</dt><dd>16px left and right, safe areas respected.</dd></div><div><dt>Targets</dt><dd>44px minimum, 50px for the main action.</dd></div><div><dt>Sheets</dt><dd>24px radius, a grabber, one line when collapsed.</dd></div></dl>
           </div>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Law of proximity</b><span>Things close together are read as one group. Spacing in steps of 8 makes the grouping exact.</span></li><li><b>Law of common region</b><span>A card says these belong together without a heading or a line.</span></li><li><b>Fitts's law</b><span>Bigger and closer is faster to hit. 44px is the floor; the main action gets 50px.</span></li></ul></div>
       </section>
 
       <section id="bm-ui">
@@ -1947,16 +1977,20 @@
           <div><h3>App main action</h3><div class="bm-row"><span class="bm-btn go">Go</span><span class="bm-btn ghost">Later</span></div><p>The deep gradient, 50px, 14px radius. Only Go and Start get it.</p></div>
           <div><h3>Filter chips</h3><div class="bm-row"><span class="bm-chip on">Diesel 50ppm</span><span class="bm-chip">AdBlue <small>34</small></span><span class="bm-chip">Overnight <small>31</small></span></div><p>White on the map, the gradient when chosen. Counts are for what's in view.</p></div>
           <div><h3>Sheet</h3><div class="bm-sheet"><b>Villiers Truck Inn</b><small>Truck stop · 2 h 05 min away</small><p class="pr">R 18.73</p><span class="pd">R1.68 below the Free State average</span><div class="two"><span>Later</span><span class="go">Go</span></div></div><p>24px radius, price before the question, two actions.</p></div>
+          <div><h3>Progress and sliders</h3><div class="bm-fill" aria-hidden="true"><span class="bar"><i style="width:62%"></i></span><span class="sl"><i style="width:44%"></i><b style="left:44%"></b></span></div><p>The accent as a soft gradient with a fine grain, light to deep, only where something fills. The handle stays white.</p></div>
           <div class="no"><span class="tag">Don't</span><div class="bm-row"><span class="bm-btn or">Get a fuel quote</span></div><p>An orange button. Orange is status, never action.</p></div>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Hick's law</b><span>Every extra choice adds time. One primary action per view makes the next step obvious.</span></li><li><b>Law of similarity</b><span>If every action is a pill, people learn the shape once and stop hunting.</span></li><li><b>Fitts's law</b><span>The main action is the largest target and sits where the thumb already is.</span></li></ul></div>
       </section>
 
       <section id="bm-maps">
         <div class="bm-ch" style="--lc:#2c56b8"><span class="n">10</span><h2>Maps</h2><p>Compare, plan and refuel: price first, one colour, nothing hidden. Light by default, in the diesel orb's colours.</p></div>
-        <div class="bm-comp">
+        <div class="bm-comp c2">
           <div><h3>The marker</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span><span class="bm-pill lo"><span class="bm-orb diesel sm"></span>↓ R 19.40</span></div><p>The price is the marker: orb, price, a tail at the spot. Below average gets ↓ and the accent, so it never relies on colour alone.</p></div>
+          <div><h3>Route choices</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-rp on"><span class="bm-orb diesel sm"></span><b>R 4,445</b> Cheapest</span><span class="bm-rp"><b>+R 1,708</b> +3 h 25 min</span></div><p>Up to three routes. The chosen one is blue with a ringed pill; the others are grey. Tap a pill to switch.</p></div>
           <div><h3>The cheapest</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span></div><p>Only the cheapest open stop in view gets the gradient.</p></div>
-          <div><h3>Not for you now</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill gr"><span class="bm-orb sm"></span>Opens 10:00</span><span class="bm-pill gr"><span class="bm-orb sm"></span>No petrol</span></div><p>Closed, or not selling what you chose: grey, and it says why.</p></div>
+          <div><h3>Not for you now</h3><div class="bm-row" style="padding:6px 0 10px"><span class="bm-pill gr"><span class="bm-orb sm"></span>Opens 10:00</span><span class="bm-pill gr"><span class="bm-orb sm"></span>No petrol</span></div><p>Closed, or not selling what you chose: grey. It always says why.</p></div>
         </div>
         <div class="bm-dd" style="margin-top:16px">
           <figure><div class="v"><div class="bm-mapv" aria-hidden="true"><span class="p" style="left:22%;top:32%"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 20.82</span></span><span class="p" style="left:52%;top:56%"><span class="bm-pill best"><span class="bm-orb diesel sm"></span><em>Lowest ·</em> R 18.73</span></span><span class="p" style="left:60%;top:22%"><span class="bm-pill"><span class="bm-orb diesel sm"></span>R 21.04</span></span></div></div><figcaption><b>Do</b>One colour; the price and one Lowest do the talking.</figcaption></figure>
@@ -1964,15 +1998,17 @@
         </div>
         <dl class="bm-specs" style="margin-top:28px">
           <div><dt>You</dt><dd>Always on top: a blue dot, a heading beam only up close.</dd></div><div><dt>Crowds</dt><dd>Give way to the cheapest; the rest return as you zoom.</dd></div>
-          <div><dt>Routes</dt><dd>Sky to blue to lavender, start and end dots, white tags.</dd></div><div><dt>Savings</dt><dd>Against the regional average, never the priciest stop.</dd></div>
+          <div><dt>Routes</dt><dd>The cheapest in the sky-to-lavender gradient, up to two more in grey. Each has a price pill on its own line; tap one to choose it.</dd></div><div><dt>Savings</dt><dd>Against the regional average, never the priciest stop.</dd></div>
         </dl>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Anchoring</b><span>A price means something only next to a reference. The regional average is a fair one.</span></li><li><b>Pop-out</b><span>One Lowest is seen before anything else is read. Two would cancel each other out.</span></li><li><b>Choice overload</b><span>Three routes are enough to compare and few enough to choose. Crowded stops give way for the same reason.</span></li></ul></div>
       </section>
 
       <section id="bm-img">
         <div class="bm-ch dark moment photo" style="--lc:#1f6e5c"><span class="n">11</span><h2>Imagery</h2><p>Real people and real places. Colour comes from the light in the scene, not from editing: night offices, blue-hour roads, grey daylight.</p></div>
         <div class="bm-card dark bm-photo-desc" style="padding:30px 30px 28px;margin-bottom:16px"><p class="bm-sub" style="color:#a8a8a8;margin:0 0 10px">Our photography, in one line</p>
           <h3 style="font-size:1.6rem;line-height:1.25;letter-spacing:-.01em;max-width:22em">Real people doing real work, caught in the light they work in.</h3>
-          <p style="margin-top:12px;max-width:44em">We show the people who keep trucks moving: fleet managers, drivers and operations teams, at the depot, in the cab and in the office at night. Nothing is staged and nothing is painted on. The colour comes from the place itself: cool daylight in a warehouse, the navy and teal of an office after dark, blue hour on the N1. The grade is soft and quiet, so the photo feels calm and trustworthy, and there is always room beside the subject for a headline.</p>
+          <p style="margin-top:12px;max-width:44em">We show the people who keep trucks moving: fleet managers, drivers and operations teams, at the depot, in the cab and in the office at night. Nothing is staged and nothing is painted on. The colour comes from the place itself: cool daylight in a warehouse, the navy and teal of an office after dark, blue hour on the N1. The grade is soft and quiet, so the photo feels calm and trustworthy. There is always room beside the subject for a headline.</p>
           <p style="margin-top:10px;max-width:44em;color:#c7c7cc"><b style="color:#fff">In three words:</b> real, calm, at work.</p></div>
         <div class="bm-hero-img" style="--img:url(img/hero-manager.jpg);background-position:right center"><span>The colour is the room's own light · navy and teal</span></div>
         <div class="bm-grid" style="margin-top:16px">
@@ -2023,6 +2059,8 @@
           <figure class="no"><div class="v ph" style="--img:url(img/close-highway.jpg);filter:sepia(.9) saturate(2.6) hue-rotate(-12deg) brightness(.95)"></div><figcaption><b>Don't</b>Orange sunsets: they fight TFN orange and read as cheap.</figcaption></figure>
         </div>
       
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Faces first</b><span>The eye finds a face before anything else. Where the person looks, the reader looks next, so they face the words.</span></li><li><b>Uncanny valley</b><span>Almost real feels wrong. A real photo beats a perfect fake every time.</span></li><li><b>Social proof</b><span>Drivers and managers who look like the reader say people like you already use this.</span></li></ul></div>
       </section>
 
       <section id="bm-voice">
@@ -2034,13 +2072,15 @@
           <div><p class="y">Fill up here now?</p><p class="n">Would you like to proceed to refuel at this location?</p></div>
         </div>
         <dl class="bm-specs" style="margin-top:28px">
-          <div><dt>Numbers</dt><dd>Over adjectives, and only numbers we can prove.</dd></div><div><dt>"Fleet"</dt><dd>Fine for trucks; LCV copy says vehicles.</dd></div>
+          <div><dt>Numbers</dt><dd>Over adjectives. Only numbers we can prove.</dd></div><div><dt>"Fleet"</dt><dd>Fine for trucks; LCV copy says vehicles.</dd></div>
           <div><dt>Spelling</dt><dd>South African English: litre, colour, organise.</dd></div><div><dt>Money</dt><dd>Rand as R 20.48; litres as /L on rates.</dd></div>
         </dl>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Processing fluency</b><span>Plain words are read faster and believed more. Clever copy costs attention we need for the price.</span></li><li><b>Concreteness</b><span>R 18.73 is remembered; massive savings is not. A number is a promise people can check.</span></li><li><b>Plain language</b><span>Many readers use English as a second language. Short sentences and common words travel further.</span></li></ul></div>
       </section>
 
       <section id="bm-motion">
-        <div class="bm-ch" style="--lc:#3d68c0"><span class="n">13</span><h2>Motion</h2><p>Things arrive, they don't bounce. One ease for everything, and nothing moves when the viewer asks for reduced motion. Orbs breathe like clouds: the colour inside gathers and rolls on slowly while the circle stays still. Product screens show themselves working once as they arrive, then wait for you.</p></div>
+        <div class="bm-ch" style="--lc:#3d68c0"><span class="n">13</span><h2>Motion</h2><p>Things arrive, they don't bounce. One ease for everything. Nothing moves when the viewer asks for reduced motion. Orbs breathe like clouds: the colour inside gathers and rolls on slowly while the circle stays still. Product pages build in as they arrive: the phone fills its screen, figures count up, sections rise once. Product screens show themselves working once, then wait for you.</p></div>
         <div class="bm-motion">
           <div><svg class="bm-curve" viewBox="-10 -10 220 220" aria-label="The TFN ease curve"><rect x="0" y="0" width="200" height="200" fill="none" stroke="#d8d8dc"/><line x1="0" y1="200" x2="40" y2="60" stroke="#b9b9bf" stroke-dasharray="3 3"/><line x1="200" y1="0" x2="40" y2="0" stroke="#b9b9bf" stroke-dasharray="3 3"/><path d="M0 200 C40 60, 40 0, 200 0" fill="none" stroke="#1f1f1f" stroke-width="3"/><circle cx="40" cy="60" r="4" fill="#5f8fd6"/><circle cx="40" cy="0" r="4" fill="#5f8fd6"/></svg><p class="bm-note" style="margin-top:8px"><code>cubic-bezier(.2, .7, .2, 1)</code></p></div>
           <div>
@@ -2055,6 +2095,8 @@
           <div><div class="st tilt" id="bmD3"><div class="pl"><i class="rt"></i><i class="ar"></i></div></div><b>The map tilts</b><small>Into the heading-up driving view, 1200ms.</small></div>
         </div>
         <div class="bm-play" style="margin-top:14px"><button type="button" id="bmReplay">Replay the moves</button></div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Doherty threshold</b><span>Feedback under 400ms feels instant. Controls answer in 250ms.</span></li><li><b>Peak-end rule</b><span>People remember the peak and the end. One clear moment per screen, calm everywhere else.</span></li><li><b>Law of common fate</b><span>Things that move together read as one. Orbs drift out of step so each stays its own.</span></li></ul></div>
       </section>
 
       <section id="bm-access">
@@ -2071,6 +2113,8 @@
           <div><dt>Contrast</dt><dd>4.5:1 for text, 3:1 for icons and large type.</dd></div><div><dt>Colour</dt><dd>Never the only signal: grey stops say "Opens 10:00".</dd></div>
           <div><dt>Targets</dt><dd>44px minimum; one main action per view.</dd></div><div><dt>In the cab</dt><dd>App type never below 13px; key numbers 17px and up.</dd></div>
         </dl>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Situational limits</b><span>Sun on the screen, gloves on, a cab that moves. Design for the hardest moment and every other one is easy.</span></li><li><b>Fitts's law</b><span>A gloved thumb needs a bigger target. 44px minimum, 50px for Go.</span></li><li><b>Curb-cut effect</b><span>What helps a few helps everyone. High contrast reads better for all of us in daylight.</span></li></ul></div>
       </section>
 
       <section id="bm-apps">
@@ -2084,6 +2128,8 @@
           <figure><div><div class="bm-post"><span class="bm-orb diesel"></span><p>Diesel down R1.40/L <span>in Beaufort West this month.</span></p><svg aria-label="TFN"><use href="#logo"/></svg></div></div><figcaption><b>Social post.</b> Black, one orb, one number. Type never on the gradient.</figcaption></figure>
           <figure class="wide"><div><div class="bm-portal"><div class="bar"><i></i><i></i><i></i><span>app.tfn.co.za</span></div><div class="bd"><div class="f"><svg aria-label="TFN"><use href="#logo"/></svg><b>Log in to your dashboard</b><i>Email</i><i>Password</i><span>Log in</span></div><div class="o"><span class="bm-orb diesel"></span></div></div></div></div><figcaption><b>Portal login.</b> White form, ink pill, the orb on black beside it.</figcaption></figure>
         </div>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Mere exposure</b><span>The same few parts on the phone, the pump and the truck build recognition with every sighting.</span></li><li><b>Von Restorff effect</b><span>One orb and one number per piece. Anything more competes with the message.</span></li></ul></div>
       </section>
 
       <section id="bm-tokens">
@@ -2100,6 +2146,8 @@
           <tr><td>radius</td><td><code>999px · 20–28px · 14px</code></td><td>Pills · cards · app buttons</td></tr>
           <tr><td>ease</td><td><code>cubic-bezier(.2, .7, .2, 1)</code></td><td>All motion</td></tr>
         </table>
+      
+        <div class="bm-reason"><small>Why it works</small><ul><li><b>Tesler's law</b><span>Some complexity cannot be removed, only moved. Tokens move it into the system so nobody decides a colour twice.</span></li><li><b>One source of truth</b><span>Design and code read the same numbers, so the product never drifts from the guide.</span></li></ul></div>
       </section>
 
       <section id="bm-downloads">
@@ -2378,7 +2426,7 @@
   var MEGA = [
     ['h-blue', 'All products', 'tfn-products.html', [['Fuel', [['On-Road', 'tfn-on-road.html'], ['LCV (coming soon)', 'tfn-lcv.html'], ['Homebase', 'tfn-homebase.html'], ['TFN Africa', 'tfn-africa.html']]], ['On the road', [['Non-Fuel services', 'tfn-non-fuel.html'], ['Network map', 'tfn-network.html']]], ['Pay less', [['Tiers', 'tfn-tiers.html'], ['Credit', 'tfn-credit.html'], ['Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/']]]]],
     ['h-violet', 'Explore the network', 'tfn-network.html', [['Plan', [['Network map', 'tfn-network.html'], ['Fuel prices', 'https://tfn.co.za/price-list/'], ['Fuel price outlook', 'https://tfn.co.za/fuel-insights/']]], ['At the stop', [['Overnight parking', 'tfn-non-fuel.html'], ['AdBlue and services', 'tfn-non-fuel.html']]]]],
-    ['h-pink', 'Explore credit', 'tfn-credit.html', [['Credit providers', [['Standard Bank', 'https://tfn.co.za/standard-bank/'], ['Absa', 'https://tfn.co.za/absa-bank/'], ['Preference Capital', 'https://tfn.co.za/preference-capital/']]], ['How it works', [['TFN Credit', 'tfn-credit.html'], ['Choose a provider', 'https://tfn.co.za/select-a-credit-provider/']]]]],
+    ['h-plum', 'Explore credit', 'tfn-credit.html', [['Credit providers', [['Standard Bank', 'https://tfn.co.za/standard-bank/'], ['Absa', 'https://tfn.co.za/absa-bank/'], ['Preference Capital', 'https://tfn.co.za/preference-capital/']]], ['How it works', [['TFN Credit', 'tfn-credit.html'], ['Choose a provider', 'https://tfn.co.za/select-a-credit-provider/']]]]],
     ['', 'About TFN', 'https://tfn.co.za/about-us/', [['Company', [['About us', 'https://tfn.co.za/about-us/'], ['Contact us', 'https://tfn.co.za/contact-us/']]], ['Help', [['Support', 'https://tfn.co.za/tfn-support/'], ['Terms and conditions', 'https://tfn.co.za/terms-conditions/']]]]]
   ];
   var mega = document.getElementById('mega'), links = $('.links a'), ot, ct, openI = -1;
@@ -2456,7 +2504,7 @@
       s += '<text class="m-lbl" transform="translate(' + l[0] + ' ' + l[1] + ') rotate(' + l[2] + ')">' + l[3] + '</text>'; });
     s += '<text class="m-lbl w" x="1010" y="372">Klip River</text><text class="m-lbl p" x="455" y="672">Town Park</text><text class="m-lbl p" x="910" y="1024">Botanical Gardens</text><text class="m-lbl p" x="70" y="-64">Commonage</text>';
     s += '<defs><linearGradient id="mRg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#9fd3ea"/><stop offset=".5" stop-color="#5f8fd6"/><stop offset="1" stop-color="#a796e0"/></linearGradient>' +
-      '<filter id="mGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feFlood flood-color="#aabeff" flood-opacity=".55"/><feComposite operator="in" in2=""/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="mGo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f4fb0"/><stop offset="1" stop-color="#5a3fb0"/></linearGradient><radialGradient id="mOrb" cx=".3" cy=".2" r="1"><stop offset="0" stop-color="#8db8e6"/><stop offset=".45" stop-color="#2c56b8"/><stop offset="1" stop-color="#2a1f6e"/></radialGradient></defs>';
+      '<filter id="mGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="4" result="gb"/><feFlood flood-color="#aabeff" flood-opacity=".55"/><feComposite operator="in" in2="gb"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="mGo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f4fb0"/><stop offset="1" stop-color="#5a3fb0"/></linearGradient><radialGradient id="mOrb" cx=".3" cy=".2" r="1"><stop offset="0" stop-color="#8db8e6"/><stop offset=".45" stop-color="#2c56b8"/><stop offset="1" stop-color="#2a1f6e"/></radialGradient></defs>';
     /* the two other ways to the depot, grey under the chosen one, each with a pill on its own stretch */
     var ALTS = 'M280 832H1120V128H980M280 512H-140V128H700';
     s += '<path class="m-ac" d="' + ALTS + '"/><path class="m-a" d="' + ALTS + '"/>';
@@ -2649,13 +2697,13 @@
   document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
   /* the orbs: each a smooth blend of five soft colours drifting slowly under a light grain, with only a hint of shading */
   var ITEMS = [
-    ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#1f7a62', '#8db8e6']],
+    ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#b8622e', '#8db8e6']],
     ['Non-fuel', 'Non-fuel services on the network, on the same facility.', 'tfn-non-fuel.html', ['#a8447a', '#4b2c78', '#d98a52', '#4b3399', '#9a5070']],
-    ['Cross-border', 'Use your facility at cross-border stops and pay in rand.', 'tfn-africa.html', ['#5a43a8', '#b25a86', '#3b62b0', '#b8894a', '#2a8068']],
-    ['Homebase', 'Diesel delivered to your own yard tank, on the same facility.', 'tfn-homebase.html', ['#2f8050', '#c9883e', '#2a8f78', '#173f38', '#5fae86']]
+    ['Cross-border', 'Use your facility at cross-border stops and pay in rand.', 'tfn-africa.html', ['#5a43a8', '#b25a86', '#3b62b0', '#c46f36', '#2a8068']],
+    ['Homebase', 'Diesel delivered to your own yard tank, on the same facility.', 'tfn-homebase.html', ['#2f8050', '#173f38', '#2a8f78', '#c4743a', '#5fae86']]
   ];
   var FS = [
-    'precision highp float;uniform vec2 u_res;uniform float u_t,u_s;uniform vec3 u_c[5];',
+    'precision highp float;uniform vec2 u_res;uniform float u_t,u_s,u_k;uniform vec3 u_c[5];',
     'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
     'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
     'float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}',
@@ -2666,7 +2714,7 @@
     ' vec2 q=vec2(fbm(uv*1.1+vec2(t*.35,u_s)),fbm(uv*1.1+vec2(u_s*3.,-t*.3)));',
     ' vec2 p=uv+.75*vec2(fbm(uv*1.4+q*1.7+vec2(t*.22,0.)),fbm(uv*1.4+q*1.7+vec2(0.,-t*.2)))-.38;',
     ' vec3 col=vec3(0.);float ws=0.;',
-    ' for(int i=0;i<5;i++){float fi=float(i);vec2 b=.62*vec2(sin(t*(.7+fi*.13)+fi*2.4+u_s),cos(t*(.6+fi*.11)+fi*1.7+u_s*2.));float w=exp(-dot(p-b,p-b)*3.);col+=u_c[i]*w;ws+=w;}',
+    ' for(int i=0;i<5;i++){float fi=float(i);vec2 b=.62*vec2(sin(t*(.7+fi*.13)+fi*2.4+u_s),cos(t*(.6+fi*.11)+fi*1.7+u_s*2.));float w=exp(-dot(p-b,p-b)*3.)*(i==3?u_k:1.);col+=u_c[i]*w;ws+=w;}',
     ' col/=max(ws,1e-4);float lm=dot(col,vec3(.299,.587,.114));col=mix(vec3(lm),col,1.05);',
     ' float z=sqrt(max(0.,1.-r*r));col*=mix(.9,1.02,z);vec2 hp=uv-vec2(-.35,.4);col+=exp(-dot(hp,hp)*3.)*.05;',
     ' col+=(h(gl_FragCoord.xy*.73+u_s)-.5)*.05;',
@@ -2683,6 +2731,8 @@
     var al = gl.getAttribLocation(pr, 'a'); gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
     gl.uniform3fv(gl.getUniformLocation(pr, 'u_c'), new Float32Array([].concat.apply([], ITEMS[i][3].map(hex))));
     gl.uniform1f(gl.getUniformLocation(pr, 'u_s'), i * 1.37 + .4);
+    /* the fourth colour is the ember: a small warm glint, never a blob (non-fuel is warm by nature) */
+    gl.uniform1f(gl.getUniformLocation(pr, 'u_k'), i === 1 ? 1 : .34);
     R[i] = { o: o, cv: cv, gl: gl, res: gl.getUniformLocation(pr, 'u_res'), t: gl.getUniformLocation(pr, 'u_t') };
   });
   function draw(r, now) {
