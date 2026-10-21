@@ -249,3 +249,17 @@ var MODS = {
   }
 };
 document.querySelectorAll('.pf[data-mod]').forEach(function (pf) { var m = MODS[pf.dataset.mod]; if (m) m(pf); });
+
+// ---------- the page arrives (see "the page arrives" in tfn-products.css) ----------
+(function () {
+  if (REDUCE) return;
+  var ph = document.querySelector('.pp .stage .ph');
+  if (ph) { var s = ph.querySelector('.s'); if (s) [].forEach.call(s.children, function (c, i) { c.style.setProperty('--k', i); [].forEach.call(c.querySelectorAll('.ok'), function (o, j) { o.style.setProperty('--k', i); o.style.setProperty('--j', j); }); }); ph.classList.add('build'); }
+  document.querySelectorAll('.pp .stats b').forEach(function (b, i) { var t = b.textContent; b.textContent = t.replace(/\d[\d\s,]*/, '0'); setTimeout(function () { b.textContent = t; roll(b, 0, 1400); }, 500 + i * 120); });
+  var groups = ['.steps3 > div', '.feats > div', '.range > .tile', '.faq details', '.band > .wrap > h2', '.band > .wrap > .sub', '.quote blockquote', '.quote cite', '.close .wrap > *'];
+  var els = [];
+  groups.forEach(function (sel) { var seen = new Map(); document.querySelectorAll(sel).forEach(function (el) { if (el.closest('.pp') || el.closest('.pf')) return; var p = el.parentNode, k = seen.get(p) || 0; seen.set(p, k + 1); el.style.setProperty('--k', Math.min(k, 6)); el.classList.add('rv'); els.push(el); }); });
+  if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15, rootMargin: '0px 0px -6% 0px' });
+  els.forEach(function (e) { io.observe(e); });
+})();

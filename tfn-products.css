@@ -372,3 +372,21 @@
   .ph.p-nonfuel .s .cta { background: color-mix(in srgb, var(--acc) 82%, #000); }
   /* the best price on a dark screen: the accent, lifted so it reads */
   html[data-theme="dark"] .feed li.new b[style] { color: color-mix(in srgb, var(--acc) 40%, #fff) !important; }
+
+  /* ---------- the page arrives: the hero phone builds its screen, the glass notes slide in and drift, figures count,
+     sections rise once as they come into view, the small phones in the range slide up into their tiles ---------- */
+  .build .s > * { opacity: 0; translate: 0 10px; animation: sb .6s var(--ease) forwards; animation-delay: calc(.35s + var(--k, 0) * 90ms); }
+  @keyframes sb { to { opacity: 1; translate: 0 0; } }
+  .build .s .ok::before { scale: 0; animation: okp .4s var(--ease) forwards; animation-delay: calc(.75s + var(--k, 0) * 90ms + var(--j, 0) * 180ms); }
+  @keyframes okp { to { scale: 1; } }
+  .build .s .cta { animation: sb .6s var(--ease) forwards, done 1.2s var(--ease) forwards; animation-delay: calc(.35s + var(--k, 0) * 90ms), calc(.6s + var(--k, 0) * 90ms); }
+  @keyframes done { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc, #2a6fd0) 55%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  .build ~ .gl { opacity: 0; animation: glin .8s var(--ease) forwards, gbob 6s ease-in-out infinite alternate; }
+  .build ~ .g1 { translate: -18px 0; animation-delay: 1.15s, 2s; } .build ~ .g2 { translate: 18px 0; animation-delay: 1.45s, 3.4s; }
+  @keyframes glin { to { opacity: 1; translate: 0 0; } } @keyframes gbob { from { transform: translateY(0); } to { transform: translateY(-7px); } }
+  .rv { opacity: 0; translate: 0 18px; transition: opacity .7s var(--ease), translate .7s var(--ease), transform .4s var(--ease); transition-delay: calc(var(--k, 0) * 80ms); }
+  .rv.in { opacity: 1; translate: 0 0; }
+  .steps3 .rv::before { scale: .3; opacity: 0; transition: scale .5s var(--ease), opacity .3s; transition-delay: calc(var(--k, 0) * 80ms + .3s); } .steps3 .rv.in::before { scale: 1; opacity: 1; }
+  .tile.rv .ph { translate: 0 70px; transition: transform .5s var(--ease), translate 1s var(--ease); transition-delay: 0s, calc(var(--k, 0) * 80ms + .2s); } .tile.rv.in .ph { translate: 0 0; }
+  .tile .tier { color: #6e6e73; } html[data-theme="dark"] .tile .tier, body.dark-page .tile .tier { color: #a1a1a6; }
+  @media (prefers-reduced-motion: reduce) { .build .s > *, .build .s .ok::before, .build ~ .gl, .rv, .rv::before, .tile.rv .ph { animation: none !important; opacity: 1 !important; translate: none !important; scale: none !important; transition: none !important; } }
