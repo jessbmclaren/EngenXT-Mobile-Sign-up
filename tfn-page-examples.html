@@ -796,6 +796,7 @@
   .bm.dark .bm-fill .bar, .bm.dark .bm-fill .sl { background: #2a2a2e; }
   .bm-rp { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 7px; border-radius: 999px; background: #fff; color: #6e6e73; font-size: 12.5px; box-shadow: 0 4px 14px -4px rgba(20,20,60,.25), inset 0 0 0 1px rgba(60,60,67,.1); }
   .bm-rp b { color: #1f1f1f; font-weight: 600; } .bm-rp.on { color: #5a5fc4; font-weight: 600; box-shadow: 0 8px 20px -8px rgba(80,70,200,.45), inset 0 0 0 2px #5f8fd6; } .bm-rp .bm-orb.sm { width: 14px; height: 14px; }
+  .bm-sw { display: inline-block; width: 12px; height: 12px; margin-right: 8px; border-radius: 4px; vertical-align: -1px; } .bm-tbl td.nw { white-space: nowrap; } .bm-tbl td.nw code { display: inline; } .bm-gr { display: block; width: 72px; height: 6px; margin-top: 7px; border-radius: 99px; }
   .bm-ratio { display: flex; height: 54px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid #d8d8dc; }
   .bm-ratio i { display: block; } .bm-ratio i + i { border-left: 1px solid rgba(0,0,0,.08); }
   .bm-ratio-k { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--mut); }
@@ -1845,7 +1846,7 @@
           <div class="sw" data-hex="#F4F4F6" data-pms="Cool Gray 1 C (tint)"><i style="background:#f4f4f6"></i><div><b>Mist</b><span class="use">Tiles and cards</span></div></div>
         </div>
         <p class="bm-sub">Products</p>
-        <div class="bm-tblw"><table class="bm-tbl" id="bmProd"><thead><tr><th></th><th>Product</th><th>HEX</th><th>RGB</th><th>CMYK</th><th>Pantone*</th><th>Text on white</th></tr></thead><tbody>
+        <div class="bm-tblw"><table class="bm-tbl" id="bmProd"><thead><tr><th></th><th>Product</th><th>HEX</th><th>RGB</th><th>CMYK</th><th>Pantone*</th><th>Text on white</th><th>Button · white text</th></tr></thead><tbody>
           <tr data-hex="#2A6FD0" data-pms="2727 C"><td class="c"><i></i></td><td>On-Road</td></tr>
           <tr data-hex="#0E8FB3" data-pms="7461 C"><td class="c"><i></i></td><td>LCV</td></tr>
           <tr data-hex="#4F6B8A" data-pms="7699 C"><td class="c"><i></i></td><td>Non-Fuel</td></tr>
@@ -1855,6 +1856,7 @@
           <tr data-hex="#A2468E" data-pms="248 C"><td class="c"><i></i></td><td>Credit · accent only</td></tr>
         </tbody></table></div>
         <p class="bm-note">* Nearest Pantone matches. Confirm against a printed swatch book before production. CMYK is a starting point for coated stock.</p>
+        <p class="bm-note">How the product pages use them: the accent marks the product (wash, icons, chips, step numbers). Buttons inside the app screens use the deeper shade so white text passes. Fills (progress bars, sliders, the route line) run light to deep with a fine grain, shown under each name. Where text on white scores AA large only, keep the accent for icons, fills and large type; small text stays ink.</p>
         <p class="bm-sub">The same colours, as light</p>
         <div class="bm-lights" aria-hidden="true"><span style="--c:#2a6fd0">On-Road</span><span style="--c:#0e8fb3">LCV</span><span style="--c:#4f6b8a">Non-Fuel</span><span style="--c:#3346a8">Network</span><span style="--c:#138a85">Homebase</span><span style="--c:#6b62c9">Africa</span><span style="--c:#a2468e">Credit</span></div>
         <p class="bm-note">Orange belongs to TFN too, but only as a breath: an ember inside an orb, a live dot. Never a fill, never an action. On dark app screens the product colours glow rather than fill. Use them as light: soft, from one source, never as a flat block.</p>
@@ -2193,7 +2195,12 @@
   });
   [].forEach.call(g.querySelectorAll('#bmProd tr[data-hex]'), function (r) {
     var h = r.dataset.hex, w = ratio(h, '#FFFFFF'); r.querySelector('.c i').style.background = h;
-    r.insertAdjacentHTML('beforeend', '<td><code>' + h + '</code></td><td><code>' + rgb(h).join(' ') + '</code></td><td><code>' + cmyk(h) + '</code></td><td>' + r.dataset.pms + '</td><td>' + w.toFixed(1) + ' · ' + grade(w) + '</td>');
+    /* as the product pages use them: the button is the accent deepened 18% toward black, fills run light to deep with grain */
+    var c = rgb(h), hx = function (a) { return '#' + a.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join('').toUpperCase(); };
+    var deep = hx(c.map(function (v) { return v * .82; })), lite = hx(c.map(function (v) { return v * .48 + 255 * .52; })), end = hx(c.map(function (v, i) { return v * .72 + [20, 16, 58][i] * .28; })), wb = ratio('#FFFFFF', deep);
+    r.insertAdjacentHTML('beforeend', '<td><code>' + h + '</code></td><td><code>' + c.join(' ') + '</code></td><td><code>' + cmyk(h) + '</code></td><td>' + r.dataset.pms + '</td><td>' + w.toFixed(1) + ' · ' + grade(w) + '</td>' +
+      '<td class="nw"><code style="display:inline-block;padding:2px 7px;border-radius:6px;color:#fff;background:' + deep + '">' + deep + '</code> · ' + wb.toFixed(1) + ' ' + grade(wb) + '</td>');
+    r.cells[1].insertAdjacentHTML('beforeend', '<span class="bm-gr" title="Fills: light to deep" style="background:linear-gradient(90deg,' + lite + ',' + h + ' 62%,' + end + ')"></span>');
   });
   [].forEach.call(g.querySelectorAll('.bm-cp > div'), function (d) {
     var r = ratio(d.dataset.fg, d.dataset.bg), gr = grade(r), k = d.querySelector('.k');
