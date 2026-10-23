@@ -122,6 +122,155 @@ Each heading is the screen the note was written against.
 - And it names who. Otherwise the next thing that happens is a phone call to find out whether anybody answered it.
 - **Figure.** Two managers, one notification, one pump. Break-glass goes to everybody who can answer it, which is the point. Somebody is standing at a forecourt. It also means two people will open the same request, and the second press has to be answered rather than swallowed. It leads with the outcome, not with the refusal. What the second manager needs first is that Thabo can fuel; that their own press did nothing is the second sentence. An error-shaped screen here would read as though the driver were still stuck. And it names who. Otherwise the next thing that happens is a phone call to find out whether anybody answered it.
 
+## policies
+
+- The order of the five steps is the design. A policy answers who it applies to, where those vehicles may fuel, and when, and location is asked second because it is the only answer that can invalidate the others. An area with no station inside it makes every question about a Tuesday moot.
+- Every column answers the same question in every row. `Applies to` used to read "Cape Town Depots" on two rows and "Selected vehicles" on two others, which is a column asking what a policy covers and answering, twice, only that a selection exists. All five name their group now.
+- Priority is a column because five policies over one set of vehicles overlap and nothing said which one wins. **The rule adopted is that the lower priority number wins, stated once under the page title.** This is a product decision taken to close a gap in the design rather than one handed down, and it needs sign-off: the alternative worth considering is that the strictest policy wins regardless of order, which cannot be got wrong by reordering a list but is harder for a person to predict.
+- Which then reordered the list. Under that rule a policy covering all 126 vehicles at priority 1 shadows every policy beneath it, and the other four could never apply to anything. The catch-all is the fallback at priority 5, and the rows are in evaluation order, so the list reads top to bottom as the order it is applied in.
+- The policy name opens the policy, using the affordance this product already has for it: a quiet chevron always on at the end of the first cell, and the word "Open" arriving with the pointer. That pattern was reviewed into its current shape once, against the note "make it more obvious that clicking a vehicle opens it", and a second answer to the same question would have been a worse one. It opens step 1, because editing a policy is that form with answers in it, and the heading no longer assumes it is creating.
+- The name button is `.row-name` and not `.row-open`, which is the mistake that taught it. `.row-open` was already the class of that chevron, `position: absolute; right: 0`, so a bare redefinition sent every policy name to the right-hand edge of the table and left the first column holding only a description. The same failure the token checker guards against, one layer up: a name that already means something, redefined.
+- A row menu is not built. The overflow button renders and does nothing, which is what the Filter and Columns buttons on the other static state screens do. Building it as markup does not work here: a `.pop` inside `.table-wrap` is clipped, the live tables answer that by pinning the menu to the viewport from JavaScript, and a global `closeAllPops` fires on any click and on every resize. An open menu drawn into the page would be a picture of something the product does differently.
+- `Inactive` became `Not enforced`. The status column is the entire reason to scan this table, and "inactive" does not say what happens at a pump at two in the morning. `Draft` stays: a draft reads as not-yet-live by convention.
+- The description is shown under the policy name. It was a field with a character counter helping somebody fill it in and nothing anywhere that displayed what they wrote, which is a cost paid by every user for a value delivered to none.
+- The toolbar is a search box and a status. The vehicles table earns a Filter popover and a Columns picker with nine columns and a hundred rows; five policies with one meaningful facet do not.
+- The value proposition sits under the table and never above it. Somebody holding five policies does not need to be told what a policy is for.
+
+## policies-empty
+
+- It teaches rather than sells. "Smarter refuelling. Stronger control." is a slogan, and a slogan closes nothing at the moment somebody is deciding what a policy can even do. A worked example, Cape Town depots on weekdays between six and six, diesel only, closes the gap in one line. The slogan card still sits under the populated list, where it is aimed at somebody who has already read their five policies.
+
+## policies-failed
+
+- It says what did not happen before it says what to do. Somebody whose policies will not load has a worse question behind the first: whether the rules have stopped applying at the pump. The message answers that nothing has changed, and only then offers the retry.
+
+## policies-loading
+
+- The shape of the answer rather than a spinner. Seven columns at the right widths means the page does not jump when the rows land, and the widths are stated once per column, following the skeleton table that already existed.
+
+## policies-no-results
+
+- It names the search and not the filters. The status is still All statuses, and telling somebody their filters matched nothing sends them to clear a control they never touched.
+
+## policy-area-radius
+
+- A distance around a depot is the default way to set an area, and drawing is the second. The activity is "let the Sunninghill vehicles fuel near Sunninghill"; a polygon editor is a tool borrowed from mapping software to answer that, and the knowledge gap between what a depot manager knows and what a vertex editor demands was the widest thing in the flow. Most areas are a distance from a place. The shape stays for the minority that genuinely are an odd shape.
+- The station count is computed from the circle, not asserted. Sixteen inside twenty kilometres, and the grades are broken out because a diesel vehicle in an area holding one diesel station is a stranded vehicle.
+- The bar's thumbnail is a picture of the area, so it draws a circle here and a polygon on the drawn screen.
+
+## policy-area
+
+- The map is drawn, not fetched. The file has no network and no raster image in it, so the geography is inline SVG like every icon: the suburbs sit where they sit relative to each other, and the N1 and the M1 are the two roads somebody navigating this part of Johannesburg steers by.
+- Every station count on every one of these screens is computed by ray casting against the shape. It is the number the decision is made on, so it is derived from the picture rather than typed beside it, and the two cannot drift apart.
+- The count sits on the map rather than under it, because it is the answer the drawing exists to produce.
+- The area is named in the bar at the bottom, next to its own size and station count, because this is where it gets its name.
+
+## policy-area-denied
+
+- Refused is not broken, and this does not block the step. The map still works, a suburb can still be searched for, and the distance around a depot can still be set. So it explains the one button that stopped working and gets out of the way.
+
+## policy-area-drawing
+
+- The count is the count. It read "12 stations so far" while highlighting twelve pins scattered across the whole map, most of them outside the shape being drawn: the one number the flow is decided on, contradicting the picture directly above it. Both come from ray casting now, and the answer is six.
+- Which then needed the enclosed region drawn. Ray casting counts against the implied closing edge, so six stations were correctly inside a region that nothing on screen showed, and the honest count still looked wrong. The open shape carries a fill as well as its dashed edge.
+- The counts say "so far" while the shape is open, because a number that will change is different in kind from a number that is final.
+- The first point is drawn differently from the other four, because it is the one that closes the shape. Five identical handles and an instruction to click the first is an instruction nobody can follow.
+
+## policy-area-error
+
+- The message holds the height the map would have had. Anything shorter and the page reflows the moment the map recovers, moving the controls somebody is reaching for.
+
+## policy-area-none
+
+- Zero is a different message, not a smaller number. The card turns the count red and the bar replaces the confirm button with a way to draw again, because there is nothing here to confirm. That button goes somewhere: it was the only forward action on a dead end and it did nothing.
+- The polygon takes the error colour, not the pins. The shape is the fault and the shape is what has to move, so the advice is about the area rather than the stations.
+
+## policies-delete
+
+- Deleting asks first and names the consequence, which is not that a record disappears: the 48 vehicles it covered fall to the next policy that covers them. Under a priority model that is a knowable answer and worth printing, because the alternative is a manager discovering it at a pump.
+- Reached from the rail rather than from a row menu, for the reason recorded under `policies`.
+
+## policy-area-confirm
+
+- Stage 3, and where the area is named. The pencil in the map's bottom bar used to send somebody to the policy's own name field, which is a different name for a different thing: a policy is called Johannesburg North and so is the area, and only one of them is what a driver sees on a declined fill.
+- It reads the consequence back before it is saved: authorised at these eighteen, refused everywhere else. The count comes from the same ray casting the map uses.
+
+## policy-area-review
+
+- Stage 2, which the stage bar had been promising with nothing behind it. It matters because an area is a means and the stations are the answer: this is where somebody checks the shape caught what they meant, and unticks what it should not have.
+- The eighteen are named. A count is enough to decide an area is roughly right; it is not enough to notice that the one diesel station in it is a truck stop on the wrong side of the N1.
+
+## policy-days
+
+- Seven days across one row rather than seven checkbox rows down a column. The shape of the answer is the answer: five lit, two not, and "weekdays" is legible without reading a word. A column of seven takes a screenful to say the same thing.
+- The window is "between 06:00 and 18:00" with the word rather than a dash, because the pair is a sentence somebody reads back to check.
+- The times name their clock. A pump runs on South African Standard Time and a manager setting 06:00 from a laptop in another timezone would otherwise be guessing which one wins.
+
+## policy-days-invalid
+
+- A window that ends before it starts is the one mistake this step invites, and refusing it is only half an answer. The shift that genuinely runs 18:00 to 06:00 is real, so the message says what to do about it: set two windows.
+
+## policy-limits
+
+- Every limit says what happens at the pump, because that is where they are checked, and a blank one is not applied rather than being zero.
+- The litres field carries the fact that decides it: the largest tank in this group holds 75 litres, so a fill of more than that is fuel going somewhere other than the vehicle. A cap without that number beside it is a guess.
+- Paraffin and lubricants are a line of their own. They are sold on the same forecourt and are a common way a card leaks, and a policy about diesel that says nothing about them is not the control it looks like.
+
+## policy-review
+
+- Every answer, with the step that owns it one press away. A review that cannot be corrected from is a page somebody reads and then walks backwards through four steps to change one line.
+- It says what is about to happen to how many vehicles, and at what priority, because pressing Create is the moment the policy starts refusing fills. Nothing before this screen is live.
+
+## policy-saved
+
+- The flow used to end by landing on the list with nothing said. A policy going live changes what two dozen vehicles can do at a forecourt, and that deserves to be confirmed in the words of the thing that changed rather than by a row appearing in a table.
+- It answers the question a manager asks next: were the drivers told? Nothing was sent, and a driver meets this policy only if it refuses them. That is worth stating, because the alternative assumption is that everybody got a message.
+- And it says what is reversible, because the receipt is where somebody decides whether they have just done something they cannot undo.
+
+## policy-stations
+
+- The third location option's destination, which it never had: choosing "At specific Engen stations" led nowhere at all.
+- It is a list and a search rather than a map, because naming stations one at a time is the opposite job from drawing a region. The copy says the consequence plainly: nowhere else in the network will authorise them.
+
+## policy-details
+
+- The heading is "Policy details". It was "Let us create a refuelling policy", over a stepper already reading Details and fields already labelled Policy name: three surfaces saying one thing. It was also the heading an edit would land on, and editing is not creating.
+- Step 4 is "Fuel and limits". It was "Rules", which was step four of a flow whose product is a rule, sitting beside "Days and times", which is also a rule. Nobody could predict what was behind it.
+- The help under the policy name is an example rather than a constraint. A name is the field somebody will search on in a year.
+- The five steps keep their numbers when done rather than swapping them for a tick, because a tick and a numeral are different widths and the row shifts as somebody walks it.
+- One column, centred. These steps were measured to a reading width and pinned to the left of a 1440px window, which is the fault `.task-flow` already recorded in this file: "everything crammed into the left half with 640px of nothing beside it". The frame holds the step's whole furniture rather than only its fields, so Save and exit, the stepper and the form share one edge.
+- Applying to everything is worded "All vehicles", matching the `Applies to` column on the list.
+
+## policy-details-duplicate
+
+- The message names the fault and the way out of it in one line. It does not offer to open the existing policy, because somebody naming a new one has not asked to go somewhere else.
+
+## policy-details-missing
+
+- The error replaces the help text and the counter rather than joining them. Three lines under one empty field is a stack in which the important line is not the first.
+
+## policy-groups
+
+- The picker sits outside the form field holding the radio group, which is both the better structure and the fix for a real fault: inside it, `.form-field label` outranks the picker's own rule on specificity and forced every row to `display: block`, putting each vehicle count under its own group name instead of at the end of the row.
+- The rows are the checkbox component the file already had. Its own comment records that this product once styled checkboxes three different ways, and a fourth would have been the same mistake again.
+- Two panes, because the left one scrolls. A selection somebody has to scroll to audit is one they re-read three times before pressing Next.
+
+## policy-location
+
+- The criteria are in the labels. They were in a "Not sure which to choose?" panel underneath, which is an admission that three titles could not be told apart: if somebody needs the panel the labels were doing the wrong job, and if they do not it is three more lines above the buttons. Each option now says who it is for.
+- "Within a selected area" became "Within an area", and its explanation names both ways of setting one. The option is the answer; how the area gets drawn is the next screen's business.
+- "You can change it later" is gone from the lede. It appeared twice and it was not quite true: changing the location type destroys the area and the stations in it. The confirmation dialog does that work honestly.
+- The choice cards are the `.seg` radio group with a modifier, not a new component. The group already draws its own marker and handles checked, hover and focus; `.seg--says` had been sitting in the stylesheet with no caller.
+
+## policy-location-change
+
+- Changing the answer costs the area, so the question is asked first and names what goes. Same shape as the question the Add vehicle sheet asks before discarding what somebody typed, with the destructive option on the right and in red.
+- The dialog is in flow rather than fixed. A fixed overlay inside a screen section takes itself out of that section's height, and a section with no height is a screen that does not render. In flow it also leaves the step legible underneath, which is the more honest picture of what is about to be lost.
+
+## policy-location-none
+
+- The alert sits above the group it is about, and Next stays in place and disabled rather than disappearing. The control that did not work is still where it was pressed.
+
 ## rules
 
 - The last line is the whole screen. The offer came from one driver being refused three times, and accepting it changes the rules for twelve vehicles and nine people. Somebody pressing this from a notification has not thought about the other eleven, and it costs one sentence to make them.
