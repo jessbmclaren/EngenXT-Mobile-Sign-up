@@ -30,7 +30,7 @@ P['road'] = dict(
 <div class="photo"><span>Pump photo</span></div>
 <div class="card"><div class="row"><span class="ok">Location checked</span></div><div class="row"><span class="ok">Truck matched</span></div><div class="row"><span><b>Driver</b><small>Sipho K.</small></span><span><b>09:41</b></span></div></div>
 <div class="cta">Fill recorded</div>''',
-    extra='<div class="gl g1"><i style="background:#2a6fd0"></i><div><b>In your dashboard</b><small>09:41 · TFN 204 GP</small></div></div><div class="gl g2"><div><b>No cards or codes</b><small>No slips to chase</small></div></div>',
+    extra='<div class="gl g1"><i style="background:#2a6fd0"></i><div><b>In your dashboard</b><small>09:41 · TFN 204 GP</small></div></div><div class="gl g2"><div><b>Matched at the pump</b><small>Truck and location checked</small></div></div>',
     how=('How a fill works', [
         ('You place the order', 'Choose the truck, the litres and the truck stop in your TFN Dashboard, or let your driver request it for your approval.'),
         ('Your driver fills up', 'At the truck stop, TFN Pay checks the truck is where it should be and matches its registration. A photo is taken at the pump.'),
@@ -266,6 +266,7 @@ def page(title, desc, body, body_class=''):
 %s
 %s
 <script src="tfn-products.js"></script>
+<script src="tfn-gibberish.js"></script>
 </body>
 </html>
 ''' % (html.escape(title), html.escape(desc), ' class="%s"' % body_class if body_class else '', LOGO, body)
@@ -364,7 +365,7 @@ def product_page(k):
 def hub():
     intro = '''<section class="intro"><div class="wrap">
 <p class="kicker" style="justify-content:center">Truckers Hub <span class="soon">Coming soon</span></p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Everything TFN does, in one place</h1>
-<p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork, with no cards, no cash and no slips. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for your fleet managers.</p>
+<p class="sub">TFN gets your trucks diesel at negotiated prices at 270+ truck stops and handles the payment and the paperwork. Every fill is logged at the pump. Truckers Hub will bring every TFN product into one place: one app for your drivers and one portal for your fleet managers.</p>
 <div class="range">%s%s</div><p style="margin-top:40px"><a class="btn" href="tfn-tiers.html">The more you fuel, the less you pay: see the tiers</a></p></div></section>''' % (''.join(tile(k) for k in ORDER), later_tiles())
     hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. Truckers Hub brings every product into one driver app and one fleet manager portal. It holds the things every product needs, so you set them up once.</p>
 <div class="steps3" style="--acc:#1f1f1f;grid-template-columns:repeat(2,1fr)">

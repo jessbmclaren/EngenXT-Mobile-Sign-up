@@ -169,13 +169,13 @@ var MODS = {
     sb.innerHTML = S.map(function (x, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + x[0] + '</button>'; }).join('');
     function draw() {
       var has = S[cur][1];
-      sv.innerHTML = ALL.map(function (x) { var a = has.indexOf(x) > -1; return '<button type="button" ' + (a ? '' : 'disabled style="opacity:.35;cursor:not-allowed" ') + 'aria-pressed="' + (a && !!on[x]) + '">' + (ICON(x) ? lu(ICON(x)) : '') + x + '</button>'; }).join('');
+      sv.innerHTML = ALL.map(function (x) { var a = has.indexOf(x) > -1; return '<button type="button" ' + (a ? '' : 'disabled style="opacity:.35;cursor:not-allowed" ') + 'aria-pressed="' + (a && !!on[x]) + '" data-s="' + x + '">' + (ICON(x) ? lu(ICON(x)) : '') + x + '</button>'; }).join('');
       var list = has.filter(function (x) { return on[x]; });
       bk.innerHTML = list.length ? list.map(function (x) { return '<li' + (had.indexOf(x) > -1 ? ' style="animation:none"' : '') + '><span><b>' + x + '</b><small>' + S[cur][0] + ' · tonight</small></span><span class="bk-ok" aria-label="Booked">✓</span></li>'; }).join('') : '<li><span><small>Nothing booked yet</small></span><span></span></li>';
       pf.querySelector('[data-count]').textContent = list.length; had = list;
     }
     sb.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cur = [].indexOf.call(sb.children, b); [].forEach.call(sb.children, function (x, i) { x.setAttribute('aria-pressed', i === cur); }); draw(); });
-    sv.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b || b.disabled) return; on[b.textContent] = !on[b.textContent]; draw(); });
+    sv.addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b || b.disabled) return; on[b.dataset.s] = !on[b.dataset.s]; draw(); });
     draw();
     demo(pf, function (off) { if (off() || cur) return; on['Shower'] = 1; draw(); }, 900);
   },

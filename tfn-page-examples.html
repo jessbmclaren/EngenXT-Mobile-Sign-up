@@ -173,8 +173,111 @@
   .wipe.up { transition: transform .62s cubic-bezier(.77,0,.18,1); transform: translateY(0); } .wipe.up .wo { opacity: 1; }
   .wipe.out { transition: transform .62s cubic-bezier(.77,0,.18,1); transform: translateY(-101%); border-radius: 0 0 50% 50% / 0 0 9vh 9vh; }
   /* scenes overlap with rounded tops and the one beneath recedes */
-  .scene, .sec.black, .cscene { position: relative; z-index: 1; border-radius: 40px 40px 0 0; margin-top: -40px; overflow: hidden; }
-  .scene > .wrap, .sec.black > .wrap, .sec.black > .stage, .cscene > * { transform: scale(calc(1 - var(--exit, 0) * .05)); opacity: calc(1 - var(--exit, 0) * .55); transform-origin: 50% 40%; }
+  .scene, .sec.black, .sec.paper, .cscene { position: relative; z-index: 1; border-radius: 40px 40px 0 0; margin-top: -40px; overflow: hidden; }
+  .scene > .wrap, .sec.black > .wrap, .sec.black > .stage, .sec.paper > .wrap, .cscene > * { transform: scale(calc(1 - var(--exit, 0) * .05)); opacity: calc(1 - var(--exit, 0) * .55); transform-origin: 50% 40%; }
+
+  /* ---------- white scenes: the same overlap as the black ones, ink on white, so the page alternates ---------- */
+  .sec.paper { background: #fff; color: #1f1f1f; box-shadow: 0 -30px 60px -40px rgba(0,0,0,.25); }
+  .sec.paper .sub, #c.paper .sub { color: #6e6e73; }
+  .paper .ttabs { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.08); }
+  .paper .ttabs button { color: #3a3a3c; } .paper .ttabs button[aria-selected="true"] { background: #1f1f1f; color: #fff; }
+  .paper .lid { box-shadow: inset 0 0 0 1.5px #3a3a3e, 0 50px 90px -34px rgba(20,30,50,.4); }
+  .paper .plan { color: #1f1f1f; background: #f5f5f7; border-color: #ececef; }
+  .paper .plan.pick { border-color: #1f1f1f; } .paper .plan .pr { color: #6e6e73; } .paper .plan .pr b { color: #1f1f1f; }
+  .paper .plan li { border-top-color: #e3e3e6; color: #55555a; } .paper .plan .btn { background: #1f1f1f; color: #fff; }
+  /* ---------- the app after dark: a lit ribbed wall, a plinth, the phone with a glowing route ---------- */
+  .night { padding-bottom: 0; }
+  .nstage { position: relative; height: 820px; max-width: 1120px; margin: 46px auto 0; border-radius: 32px 32px 0 0; overflow: hidden; background: #03050c; }
+  .nwall { position: absolute; inset: 0 0 150px; background:
+      radial-gradient(42% 60% at 82% 34%, rgba(60,104,214,.55), rgba(60,104,214,0) 70%),
+      radial-gradient(26% 46% at 9% 70%, rgba(208,118,58,.30), rgba(208,118,58,0) 70%),
+      radial-gradient(60% 50% at 50% 0%, rgba(120,150,255,.12), rgba(0,0,0,0) 70%), #050814; }
+  .nwall::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0,0,0,.55) 0 3px, rgba(255,255,255,0) 3px 30px, rgba(170,195,255,.16) 30px 32px, rgba(255,255,255,0) 32px 44px);
+      -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+  .nwall::after { content: ""; position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay; background-image: var(--grain); }
+  .nplinth { position: absolute; left: 50%; bottom: 40px; width: min(760px, 86%); height: 170px; transform: translateX(-50%); border-radius: 18px 18px 0 0;
+      background: linear-gradient(#10162b, #05070f 70%); box-shadow: inset 0 1px 0 rgba(170,195,255,.35), 0 -30px 80px -20px rgba(60,104,214,.45); }
+  .nphone { position: absolute; left: 50%; bottom: 120px; width: 316px; height: 640px; margin-left: -158px; padding: 10px; border-radius: 52px;
+      background: linear-gradient(145deg, #3a3f4c, #0b0d13 45%, #1c2030); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 40px 80px -30px rgba(0,0,0,.9), 0 0 0 1px #000; }
+  .nscr { position: relative; height: 100%; border-radius: 43px; overflow: hidden; background: #0a0d18; color: #fff; text-align: left; }
+  .nnotch { position: absolute; z-index: 3; top: 10px; left: 50%; width: 96px; height: 28px; margin-left: -48px; border-radius: 20px; background: #000; }
+  .nmapw { position: absolute; inset: 0 0 auto; aspect-ratio: 300 / 380; }
+  .nmap2 { display: block; width: 100%; height: 100%; }
+  .nmap2 .blk { fill: #0f1320; stroke: #1c2236; stroke-width: .8; } .nmap2 .st { stroke: #070a12; stroke-width: 7; fill: none; }
+  .nmap2 .rg { fill: none; stroke: url(#nRg); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; opacity: .85; filter: url(#nBlur); }
+  .nmap2 .rc { fill: none; stroke: url(#nRc); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .nmap2 .draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); }
+  .night.in .nmap2 .draw { animation: ndraw 2.2s var(--ease) .5s forwards; } @keyframes ndraw { to { stroke-dashoffset: 0; } }
+  .nmap2 .halo { fill: rgba(170,195,255,.16); transform-box: fill-box; transform-origin: center; animation: nhalo 2.6s ease-in-out infinite; } @keyframes nhalo { 50% { transform: scale(1.35); opacity: .45; } }
+  .nmap2 .dot { fill: #fff; } .nmap2 .stop { fill: #1d2440; stroke: rgba(255,255,255,.75); stroke-width: 1.2; }
+  .nmapw::after { content: ""; position: absolute; inset: auto 0 0; height: 120px; background: linear-gradient(rgba(10,13,24,0), #0a0d18); }
+  .nlabels { position: absolute; inset: 0; pointer-events: none; }
+  .nlabels span { position: absolute; z-index: 2; translate: -50% -100%; padding: 4px 8px; border-radius: 7px; font-size: 11.5px; font-weight: 600; line-height: 1.2; color: #fff; background: rgba(28,32,48,.82); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); white-space: nowrap; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+  .nlabels small { display: block; font-size: 10px; font-weight: 500; color: #a1a1b5; }
+  .ncard { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 22px 26px; }
+  .neta { display: flex; align-items: center; gap: 12px; }
+  .norb { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--orb-diesel); box-shadow: 0 0 0 6px rgba(120,150,255,.08); } .norb svg { width: 18px; height: 18px; color: #fff; }
+  .neta small { display: block; font-size: 12px; color: #a1a1b5; } .neta b { font-size: 15px; font-weight: 600; } .neta s { margin-right: 6px; font-weight: 400; color: #6e6e80; }
+  .nrec { margin: 18px 0 20px; font-size: 21px; line-height: 1.3; letter-spacing: -.01em; color: #d6d8e6; }
+  .nbtn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } .nbtn span { display: grid; place-items: center; height: 50px; border-radius: 14px; font-size: 15px; font-weight: 600; background: #161b2c; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .nbtn .go { background: var(--go, linear-gradient(120deg, #2f4fb0, #5a3fb0)); box-shadow: 0 10px 30px -8px rgba(92,90,200,.7); }
+  @media (max-width: 700px) { .nstage { height: 720px; } .nphone { transform: scale(.86); transform-origin: 50% 100%; } }
+  @media (prefers-reduced-motion: reduce) { .nmap2 .draw { stroke-dashoffset: 0 !important; animation: none !important; } .nmap2 .halo { animation: none; } }
+  /* the scene comes alive: the wall light breathes, the phone floats, the map drifts, a light runs the route, the card rises in after the route */
+  .nwall { animation: nlight 9s ease-in-out infinite alternate; } @keyframes nlight { from { filter: brightness(.88) hue-rotate(-6deg); } to { filter: brightness(1.08) hue-rotate(6deg); } }
+  .nwall::before { animation: nribs 14s ease-in-out infinite alternate; } @keyframes nribs { to { background-position: 44px 0; } }
+  .nphone { animation: nfloat 7s ease-in-out infinite; transition: transform .6s var(--ease); } @keyframes nfloat { 50% { translate: 0 -10px; } }
+  .nmap2 .pan, .nlabels { animation: npan 18s ease-in-out infinite alternate; } @keyframes npan { to { transform: translate(-10px, 8px); } }
+  .nmap2 .run { fill: none; stroke: #fff; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 26 var(--len); stroke-dashoffset: 26; opacity: 0; filter: url(#nBlur2); }
+  .night.in .nmap2 .run { animation: nrun 4.2s cubic-bezier(.45,.05,.35,1) 2.8s infinite; } @keyframes nrun { 0% { stroke-dashoffset: 26; opacity: 0; } 8% { opacity: 1; } 85% { opacity: 1; } 100% { stroke-dashoffset: calc(var(--len) * -1); opacity: 0; } }
+  .nlabels span { opacity: 0; scale: .92; transition: opacity .5s var(--ease), scale .5s var(--ease); } .night.in .nlabels span { opacity: 1; scale: 1; } .night.in .nlabels span:first-child { transition-delay: 1.6s; } .night.in .nlabels span:last-child { transition-delay: .4s; }
+  .ncard > * { opacity: 0; translate: 0 14px; transition: opacity .7s var(--ease), translate .7s var(--ease); } .night.in .ncard > * { opacity: 1; translate: 0 0; }
+  .night.in .ncard > :nth-child(1) { transition-delay: 2.1s; } .night.in .ncard > :nth-child(2) { transition-delay: 2.3s; } .night.in .ncard > :nth-child(3) { transition-delay: 2.5s; }
+  .night.in .nbtn .go { animation: ngo 1.4s var(--ease) 3.3s; } @keyframes ngo { 0% { box-shadow: 0 10px 30px -8px rgba(92,90,200,.7), 0 0 0 0 rgba(140,120,255,.55); } 100% { box-shadow: 0 10px 30px -8px rgba(92,90,200,.7), 0 0 0 16px rgba(140,120,255,0); } }
+  .neta b .t { display: inline-block; min-width: 4.6em; }
+  @media (prefers-reduced-motion: reduce) { .nwall, .nwall::before, .nphone, .nmap2 .pan, .nlabels, .nmap2 .run, .nbtn .go { animation: none !important; } .nmap2 .run { display: none; } .nlabels span, .ncard > * { opacity: 1 !important; translate: none !important; scale: none !important; transition: none !important; } }
+  .hero .hbadges span { background: rgba(18,22,38,.62); color: #fff; -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 14px 30px -12px rgba(0,0,0,.6); }
+  /* ---------- the landing phone in dark mode: it sits into the night-office photo; the route glows on a dark map ---------- */
+  .hphone .phs:has(.app.dk) { background: #0b0e19; }
+  .app.dk { background: #0b0e19; color: #f2f2f7; } .app.dk .pscr { background: #0b0e19; }
+  .app.dk .sbar { color: #fff; } .app.dk .sbar svg g, .app.dk .sbar svg path, .app.dk .sbar svg rect { fill: #fff; } .app.dk .hbar { background: #fff; }
+  .app.dk .ah small { color: #8e8ea3; }
+  .app.dk .abal { box-shadow: 0 20px 40px -24px rgba(80,110,255,.55), inset 0 0 0 1px rgba(255,255,255,.08); }
+  .app.dk .alist { background: #141929; } .app.dk .alist > div + div { border-top-color: #1f2536; } .app.dk .alist small { color: #8e8ea3; }
+  .app.dk .tabbar { background: rgba(14,17,30,.9); border-top-color: rgba(255,255,255,.06); color: #6e6e85; } .app.dk .tb.on { color: #fff; }
+  /* ---------- the landing phone: the night map on top, the money below; no tab bar, one story ---------- */
+  .app.dk:has(.pscr.hn) .tabbar { display: none; }
+  .pscr.hn { padding: 0; background: #0a0d18; }
+  .hnmap { position: absolute; left: 0; right: 0; top: 0; height: 450px; }
+  .hnmap svg { display: block; width: 100%; height: 100%; }
+  .hnmap::after { content: ""; position: absolute; inset: auto 0 0; height: 140px; background: linear-gradient(rgba(10,13,24,0), #0a0d18); }
+  .hnmap .blk { fill: #0f1320; stroke: #1c2236; stroke-width: .8; }
+  .hnmap .rg { fill: none; stroke: url(#hnRg); stroke-width: 14; stroke-linecap: round; stroke-linejoin: round; opacity: .85; filter: url(#hnBlur); }
+  .hnmap .rc { fill: none; stroke: url(#hnRc); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+  .hnmap .draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); } .hnmap.on .draw { animation: ndraw 2s var(--ease) .9s forwards; }
+  .hnmap .run { fill: none; stroke: #fff; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30 var(--len); stroke-dashoffset: 30; opacity: 0; filter: url(#hnBlur2); }
+  .hnmap.on .run { animation: nrun 4.2s cubic-bezier(.45,.05,.35,1) 3.2s infinite; }
+  .hnmap .halo { fill: rgba(170,195,255,.16); transform-box: fill-box; transform-origin: center; animation: nhalo 2.6s ease-in-out infinite; }
+  .hnmap .dot { fill: #fff; } .hnmap .stop { fill: #1d2440; stroke: rgba(255,255,255,.8); stroke-width: 1.4; }
+  .hnmap .pan, .hnlab { animation: npan 18s ease-in-out infinite alternate; }
+  .hnlab { position: absolute; inset: 0; pointer-events: none; }
+  .hnlab span { position: absolute; translate: -50% -100%; padding: 5px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; line-height: 1.2; color: #fff; background: rgba(28,32,48,.82); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); white-space: nowrap; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); opacity: 0; scale: .92; transition: opacity .5s var(--ease), scale .5s var(--ease); }
+  .hnlab small { display: block; font-size: 11px; font-weight: 500; color: #a1a1b5; } .hnmap.on .hnlab span { opacity: 1; scale: 1; } .hnmap.on .hnlab span:first-child { transition-delay: 2.1s; } .hnmap.on .hnlab span:last-child { transition-delay: .7s; }
+  .hnbody { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 22px 54px; color: #fff; }
+  .hnbody > * { opacity: 0; translate: 0 14px; transition: opacity .7s var(--ease), translate .7s var(--ease); } .hnmap.on + .hnbody > * { opacity: 1; translate: 0 0; }
+  .hnmap.on + .hnbody > :nth-child(1) { transition-delay: 1.2s; } .hnmap.on + .hnbody > :nth-child(2) { transition-delay: 2.6s; } .hnmap.on + .hnbody > :nth-child(3) { transition-delay: 2.8s; }
+  .hnmoney { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; background: linear-gradient(150deg, rgba(60,104,214,.28), rgba(74,53,166,.18)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+  .hnmoney .norb { width: 42px; height: 42px; } .hnmoney small { display: block; font-size: 12.5px; color: #a1a1b5; white-space: nowrap; } .hnmoney b { font-size: 25px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+  .hnsave { text-align: right; } .hnsave b { font-size: 17px; color: #bcd2ff; } .hnmoney { gap: 10px; padding: 14px; }
+  .hnrec { margin: 18px 0 20px; font-size: 23px; line-height: 1.28; letter-spacing: -.01em; color: #d6d8e6; }
+  .pscr.hn .nbtn span { height: 56px; border-radius: 16px; font-size: 17px; }
+  @media (prefers-reduced-motion: reduce) { .hnmap .draw { animation: none !important; stroke-dashoffset: 0; } .hnmap .run { display: none; } .hnmap .halo, .hnmap .pan, .hnlab { animation: none; } .hnlab span, .hnbody > * { opacity: 1 !important; translate: none !important; scale: none !important; transition: none !important; } }
+  /* ---------- coins on the road: TFN coins roll along a sweeping metal ribbon ---------- */
+  .coinroad { padding-bottom: 0; overflow: hidden; }
+  .crstage { position: relative; height: 820px; margin-top: -230px; z-index: 0; }
+  .coinroad > .wrap { position: relative; z-index: 2; }
+  .crcv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; -webkit-mask-image: linear-gradient(transparent 0, #000 22%); mask-image: linear-gradient(transparent 0, #000 22%); }
+  @media (max-width: 700px) { .crstage { height: 520px; margin-top: -60px; } }
   /* headlines reveal word by word */
   .wd { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; }
   .wd > span { display: inline-block; transform: translateY(108%); transition: transform .95s var(--ease); transition-delay: calc(var(--wi) * 55ms); }
@@ -185,7 +288,7 @@
   /* the photo scenes drift a little against the scroll */
   .scene .bg { translate: 0 var(--py, 0px); }
   .tile { transition: transform .35s var(--ease), background .35s; } .tile:hover { background: #ececec; }
-  @media (prefers-reduced-motion: reduce) { .curtain, .wipe { display: none !important; } .wd > span { transform: none; } .js .clipr:not(.in) { clip-path: none; } .scene > .wrap, .sec.black > *, .cscene > * { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .curtain, .wipe { display: none !important; } .wd > span { transform: none; } .js .clipr:not(.in) { clip-path: none; } .scene > .wrap, .sec.black > *, .sec.paper > *, .cscene > * { transform: none; opacity: 1; } }
 
   /* ---------- scroll-driven scenes ---------- */
   /* a statement whose words light up as you scroll */
@@ -1269,17 +1372,17 @@
   @media (prefers-reduced-motion: reduce) { .coin .bob, .coin .spin, .coin .f, .coin .f::after { animation: none !important; } .orb { transition: none; } .js .coin .fly { transform: none; } .coin .spin { transform: rotateY(-24deg); } }
 
   /* hero: a real phone, tilted, running the TFN app, with two notifications beside it */
-  .hphone { position: absolute; left: 58%; bottom: -70px; width: 300px; height: 618px; z-index: 1; transform: translateX(-50%) perspective(1800px) rotateY(-14deg) rotateX(5deg) rotateZ(1.5deg); animation: hpin 1.4s var(--ease) .3s both; }
+  .hphone { position: absolute; left: 58%; bottom: 30px; width: clamp(220px, calc((100vh - 360px) * .485), 300px); height: auto; aspect-ratio: 300 / 618; min-width: 0; min-height: 0; z-index: 1; transform: translateX(-50%) perspective(1800px) rotateY(-14deg) rotateX(5deg) rotateZ(1.5deg); animation: hpin 1.4s var(--ease) .3s both; }
   @keyframes hpin { from { opacity: 0; transform: translateX(-50%) translateY(140px) perspective(1800px) rotateY(-26deg) rotateX(14deg) rotateZ(4deg); } }
   .hphone .hp { position: relative; width: 100%; height: 100%; border-radius: 56px; padding: 11px; background: linear-gradient(145deg, #3a3d44, #121316 40%, #26282d);
     box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.22), inset 0 0 0 4px #0b0b0c, 30px 60px 90px -30px rgba(4,16,48,.75), 8px 14px 30px -10px rgba(4,16,48,.5); }
   .hphone .hp::after { content: ""; position: absolute; inset: 11px; z-index: 9; border-radius: 45px; pointer-events: none; background: linear-gradient(118deg, rgba(255,255,255,.2), rgba(255,255,255,.04) 28%, transparent 46%); }
   .hphone .phs { border-radius: 45px; } .hphone .hbtn { position: absolute; right: -3px; top: 150px; width: 3px; height: 78px; border-radius: 2px; background: #2a2c31; }
-  .hbadges { position: absolute; right: calc(42% + 170px); bottom: 110px; z-index: 2; display: grid; gap: 10px; justify-items: end; }
+  .hbadges { position: absolute; right: calc(42% + clamp(120px, calc((100vh - 360px) * .25), 160px)); bottom: 150px; z-index: 2; display: grid; gap: 10px; justify-items: end; }
   .hbadges span { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 16px; background: rgba(255,255,255,.92); color: #111; font-size: .84rem; font-weight: 600;
     -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 18px 40px -16px rgba(5,20,60,.55); opacity: 0; animation: up .8s var(--ease) 1.4s forwards; }
   .hbadges span:nth-child(2) { animation-delay: 1.65s; } .hbadges i { width: 26px; height: 26px; border-radius: 8px; flex: none; }
-  @media (max-width: 960px) { .hero, .hin { min-height: 1010px; } .hbg { background: linear-gradient(#0c1f33 0, #0c1f33 330px, rgba(12,31,51,0) 470px), var(--img) right -130px top 300px / auto 760px no-repeat, #0c1f33 !important; } .hphone { width: 210px; height: 433px; bottom: -50px; } .hphone .hp { border-radius: 40px; padding: 8px; } .hphone .phs, .hphone .hp::after { border-radius: 32px; } .hbadges { display: none; } }
+  @media (max-width: 960px) { .hero, .hin { min-height: 1010px; } .hbg { background: linear-gradient(#0c1f33 0, #0c1f33 330px, rgba(12,31,51,0) 470px), var(--img) right -130px top 300px / auto 760px no-repeat, #0c1f33 !important; } .hphone { width: 210px; height: 433px; bottom: 28px; } .hphone .hp { border-radius: 40px; padding: 8px; } .hphone .phs, .hphone .hp::after { border-radius: 32px; } .hbadges { display: none; } }
   @media (prefers-reduced-motion: reduce) { .hphone { animation: none; } .hbadges span { opacity: 1; animation: none; } }
 
   @media (max-width: 960px) {
@@ -1388,18 +1491,15 @@
         <p>Negotiated diesel at 270+ truck stops across Southern Africa. Every fill paid, logged and live.</p>
         <a class="btn" href="#f">Get a fuel quote</a>
       </div>
-      <div class="hphone" aria-hidden="true"><div class="hp"><i class="hbtn"></i><div class="phs"><div class="app" data-fit="375">
+      <div class="hphone" aria-hidden="true"><div class="hp"><i class="hbtn"></i><div class="phs"><div class="app dk" data-fit="375">
           <div class="sbar"><b>9:41</b><svg viewBox="0 0 70 13" width="70" height="13"><g fill="#111"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 4.500a9 9 0 0 1 12 0l-1.600 1.700a6.600 6.600 0 0 0-8.800 0ZM32.600 7.600a5 5 0 0 1 6.800 0L36 11Z"/><rect x="47" y=".5" width="20" height="12" rx="3.500" fill="none" stroke="#111" opacity=".4"/><rect x="49" y="2.500" width="14" height="8" rx="2"/></g></svg></div>
           <span class="isl"></span>
-          <div class="pscr on">
-            <div class="ah"><div><small>Good morning</small><b>Hi, Thabo</b></div><i></i></div>
-            <div class="abal mesh h-blue"><small>Credit available</small><b class="hcount" data-v="R 24,680.00">R 24,680.00</b><div class="ch"><span class="gl">TFN account</span><span class="gl">62 trucks</span></div></div>
-            <div class="aqa"><div><i><svg><use href="#i-pump"/></svg></i>Fuel</div><div><i><svg><use href="#i-check"/></svg></i>Order</div><div><i><svg><use href="#i-pin"/></svg></i>Map</div><div><i><svg><use href="#i-chart"/></svg></i>Reports</div></div>
-            <div class="ahd">Recent<span>See all</span></div>
-            <div class="alist">
-              <div><span class="ic mesh h-blue"></span><span>TFN depot, Harrismith<small>Today · 420 L</small></span><b>−R 8,480</b></div>
-              <div><span class="ic mesh h-pink"></span><span>AdBlue<small>Yesterday · 40 L</small></span><b>−R 380</b></div>
-              <div><span class="ic mesh h-teal"></span><span>Overnight parking<small>10 Oct</small></span><b>−R 240</b></div>
+          <div class="pscr on hn">
+            <div class="hnmap"><svg viewBox="0 0 375 450" aria-hidden="true"></svg><div class="hnlab"></div></div>
+            <div class="hnbody">
+              <div class="hnmoney"><span class="norb"><svg><use href="#i-pump"/></svg></span><div><small>Credit available</small><b class="hcount" data-v="R 24,680.00">R 24,680.00</b></div><div class="hnsave"><small>Saved this month</small><b>R 1,840</b></div></div>
+              <p class="hnrec">Fill up at Harrismith: R&nbsp;18.73, the lowest on your route.</p>
+              <div class="nbtn"><span>Later</span><span class="go">Go</span></div>
             </div>
           </div>
           <div class="tabbar"><div class="tb on"><svg><use href="#i-home"/></svg>Home</div><div class="tb"><svg><use href="#i-pin"/></svg>Map</div><div class="tb"><svg><use href="#i-chart"/></svg>Insights</div><div class="tb"><svg><use href="#i-people"/></svg>Account</div></div>
@@ -1437,7 +1537,7 @@
     <div class="bg" style="--img:url(img/k-night-truck.jpg); background-position: 50% 50%" aria-hidden="true"></div>
     <div class="veil" aria-hidden="true"></div>
     <div class="wrap">
-      <h2>No cards, no cash, no slips</h2>
+      <h2>Every fill, logged at the pump</h2>
       <p class="sub">You place the order and your driver fills up. TFN Pay checks the location and photographs the pump. The fill is in your dashboard before the truck pulls away.</p>
       <a class="btn light" href="tfn-on-road.html">See how it works</a>
       <div class="gphone gl" id="gp"><div class="gtop"><i class="gth" aria-hidden="true"></i><div><small class="val" id="gpl">Fill recorded</small><strong id="gpv">420 L</strong></div></div><span class="pill">TFN 204 GP · Harrismith</span><ul class="gck"><li>Location checked</li><li>Truck matched</li><li>Pump photo saved</li></ul><div class="dots"><i class="on"></i><i></i><i></i></div></div>
@@ -1446,7 +1546,7 @@
   </section>
 
   <!-- 5. the app, the portal and the POS, each running its own screens; the ground takes the colour of the product in front -->
-  <section class="sec black center" id="c">
+  <section class="sec paper center" id="c">
     <div class="wrap">
       <h2 class="title">One app for drivers, one dashboard for you</h2>
       <p class="sub tcap" id="tcap" aria-live="polite">TFN Pay in the cab and the TFN Dashboard in the office run on the same live data.</p>
@@ -1578,6 +1678,16 @@
 
 
 
+  <!-- 8a. white: TFN coins rolling along a metal ribbon -->
+  <section class="sec paper center coinroad" id="cr">
+    <div class="wrap">
+      <h2 class="title">Savings that roll in</h2>
+      <p class="sub">Negotiated diesel at every TFN stop on the road. Every fill puts money back in the business.</p>
+      <a class="btn" href="#f">Get a fuel quote</a>
+    </div>
+    <div class="crstage" aria-hidden="true"><canvas class="crcv"></canvas></div>
+  </section>
+
   <!-- 8b. the network map: search, plan a route with suggested fills, filter by services, compare prices -->
   <section class="sec mapsec black center" id="m">
     <div class="wrap">
@@ -1646,6 +1756,27 @@
 
 
 
+  <!-- 8c. black: the driver app after dark, on a lit ribbed stage -->
+  <section class="sec black center night" id="n">
+    <div class="wrap">
+      <h2 class="title">Made for the night shift</h2>
+      <p class="sub">After dark the app turns dark, so it never dazzles a driver. The route glows; everything else steps back.</p>
+    </div>
+    <div class="nstage" aria-hidden="true">
+      <div class="nwall"></div><div class="nplinth"></div>
+      <div class="nphone"><div class="nscr">
+        <div class="nnotch"></div>
+        <div class="nmapw"><svg class="nmap2" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"></svg><div class="nlabels"></div></div>
+        <div class="ncard">
+          <div class="neta"><span class="norb"><svg><use href="#i-pump"/></svg></span><div><small>Fill up in</small><b><s>1 h 25 min</s> <span class="t">1 h 10 min</span></b></div></div>
+          <p class="nrec">Fill up at Harrismith: R&nbsp;18.73, the lowest on your route.</p>
+          <div class="nbtn"><span>Later</span><span class="go">Go</span></div>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+
   <!-- 9a. grey: two working calculators, glass on blue -->
   <section class="sec" id="calc">
     <div class="wrap split">
@@ -1691,8 +1822,8 @@
   </section>
 
 
-  <!-- 11. black: plans, one recommended -->
-  <section class="sec black center" id="plans">
+  <!-- 11. white: plans, one recommended -->
+  <section class="sec paper center" id="plans">
     <div class="wrap">
       <h2 class="title">Pick your set-up</h2>
       <div class="plans">
@@ -1833,9 +1964,9 @@
       <section id="bm-colour">
         <div class="bm-ch" style="--lc:#2c56b8"><span class="n">04</span><h2>Colour</h2><p>Structure is black and white. Colour lives in things: products, orbs, the app, photographs. A tiny flash of TFN orange marks something live. Nothing else.</p></div>
         <p class="bm-sub">Proportion</p>
-        <div class="bm-ratio" role="img" aria-label="Measured across the site: white 75%, black and ink 22%, product and orb colour 2%, TFN orange under 1%"><i style="flex:75;background:#fafafa"></i><i style="flex:22;background:#000"></i><i style="flex:2;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
-        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 75%</li><li><i style="background:#000"></i>Black and ink · 22%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i>Product and orb colour · 2%</li><li><i style="background:#f2761d"></i>TFN orange · under 1%</li></ul>
-        <p class="bm-note">Measured across the site in light mode. Product pages are white with black type. The home page leans black so the orbs, the map and the photos can glow. Black is for premium: Tiers is black.</p>
+        <div class="bm-ratio" role="img" aria-label="Measured across the site: white 77%, black and ink 21%, product and orb colour 2%, TFN orange under 1%"><i style="flex:77;background:#fafafa"></i><i style="flex:21;background:#000"></i><i style="flex:2;background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i><i style="flex:1;min-width:4px;background:#f2761d"></i></div>
+        <ul class="bm-ratio-k"><li><i style="background:#fafafa;box-shadow:inset 0 0 0 1px #d8d8dc"></i>White · 77%</li><li><i style="background:#000"></i>Black and ink · 21%</li><li><i style="background:linear-gradient(90deg,#3d68c0,#2c56b8,#4a35a6,#a2468e)"></i>Product and orb colour · 2%</li><li><i style="background:#f2761d"></i>TFN orange · under 1%</li></ul>
+        <p class="bm-note">Measured across the site in light mode. Product pages are white with black type. The home page alternates white and black scenes; the black ones hold the orbs, the map and the photos so they can glow. Black is for premium: Tiers is black.</p>
         <p class="bm-sub">Structure</p>
         <div class="bm-sw">
           <div class="sw" data-hex="#FFFFFF" data-pms="None"><i style="background:#fff;box-shadow:inset 0 0 0 1px #e8e8ea"></i><div><b>White</b><span class="use">Grounds, type on black</span></div></div>
@@ -2069,7 +2200,7 @@
         <div class="bm-ch" style="--lc:#5a43a8"><span class="n">12</span><h2>Voice</h2><p>Short, exact, on your side. Say what you get, then stop. Many readers use English as a second language, so plain words beat clever ones.</p></div>
         <div class="bm-voice">
           <div><p class="y">Fuel now, settle later.</p><p class="n">Unlock seamless fuel financing solutions.</p></div>
-          <div><p class="y">No cards, no cash, no slips.</p><p class="n">A frictionless, paperless fuelling experience.</p></div>
+          <div><p class="y">Every fill, logged at the pump.</p><p class="n">A frictionless, paperless fuelling experience.</p></div>
           <div><p class="y">R 18.73 · R1.68 below the Free State average</p><p class="n">Massive savings at the best prices!</p></div>
           <div><p class="y">Fill up here now?</p><p class="n">Would you like to proceed to refuel at this location?</p></div>
         </div>
@@ -2230,7 +2361,8 @@
 (function () {
   var dock = document.getElementById('dock'); if (!dock) return;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches, tabs = [].slice.call(dock.querySelectorAll('.dk-tabs a')), foot = document.querySelector('footer');
-  setTimeout(function () { dock.classList.add('show'); }, reduce ? 300 : 3200);
+  var hero = document.getElementById('hero');
+  setTimeout(function () { dock.classList.add('show'); upd(); }, reduce ? 300 : 3200);
   /* the close tells its figures it has arrived */
   var fin = document.getElementById('f'); if (fin) new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { fin.classList.add('in'); o.disconnect(); } }, { threshold: .35 }).observe(fin);
   var secs = tabs.map(function (a) { return document.querySelector(a.getAttribute('href')); });
@@ -2239,7 +2371,7 @@
     secs.forEach(function (sec, i) { if (!sec) return; var r = sec.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) cur = i; });
     tabs.forEach(function (a, i) { a.setAttribute('aria-current', i === cur ? 'true' : 'false'); });
     var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 50).filter(function (n) { return !dock.contains(n); });
-    var busy = under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .ometa, .techbox, .pills'); }) || foot.getBoundingClientRect().top < innerHeight - 20 || document.documentElement.classList.contains('bm-on');
+    var busy = under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .ometa, .techbox, .pills, .nstage, .hphone, .hbadges'); }) || (hero && hero.getBoundingClientRect().bottom > innerHeight * .55) || foot.getBoundingClientRect().top < innerHeight - 20 || document.documentElement.classList.contains('bm-on');
     dock.classList.toggle('away', busy);
   }
   var t = false; addEventListener('scroll', function () { if (!t) { t = true; requestAnimationFrame(function () { upd(); t = false; }); } }, { passive: true }); upd();
@@ -2359,7 +2491,7 @@
   function onScroll() {
     nav.classList.toggle('clear', scrollY < hero.offsetHeight - 110);
     var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 40).filter(function (n) { return n !== sticky; });
-    var busy = ctaSeen.size > 0 || under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .techbox, .ometa, .pills'); });
+    var busy = ctaSeen.size > 0 || under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .techbox, .ometa, .pills, .nstage, .hphone, .hbadges'); });
     sticky.classList.toggle('show', scrollY > 560 && !busy && foot.getBoundingClientRect().top > innerHeight - 40);
     sticky.classList.toggle('dark', under.some(function (n) { return n.matches && n.matches('.black, .scene, .cscene, .mapsec, footer'); }));
     tick = false;
@@ -2397,7 +2529,7 @@
   }
 
   /* ---- scenes recede as the next rises; photo scenes drift against the scroll ---- */
-  var scenes = $('.scene, .sec.black, .cscene'), photos = $('.scene .bg');
+  var scenes = $('.scene, .sec.black, .sec.paper, .cscene'), photos = $('.scene .bg');
   function motion() {
     for (var k = 0; k < scenes.length - 1; k++) {
       var cur = scenes[k], nxt = scenes[k + 1];
@@ -3394,5 +3526,163 @@
 })();
 </script>
 
+<script>
+/* the app after dark: an angled street grid, the route from the truck to the cheapest stop, glowing; it draws itself once in view */
+(function () {
+  var sec = document.getElementById('n'); if (!sec) return;
+  var svg = sec.querySelector('.nmap2'), labs = sec.querySelector('.nlabels');
+  var cx = 150, cy = 210, A = -28 * Math.PI / 180, SY = .74, S = 1;
+  function T(x, y) { var rx = x * Math.cos(A) - y * Math.sin(A), ry = x * Math.sin(A) + y * Math.cos(A); return [cx + rx * S, cy + ry * SY * S]; }
+  var g = '', step = 46, i, j;
+  for (i = -6; i <= 6; i++) for (j = -6; j <= 6; j++) { if ((i * 7 + j * 3) % 9 === 0) continue; var x = i * step + 3, y = j * step + 3, w = step - 6 - ((i * 3 + j) % 4 === 0 ? 14 : 0), h = step - 6;
+    g += '<rect class="blk" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="3"/>'; }
+  var R = [[23, 160], [23, 69], [-115, 69], [-115, -23], [69, -23], [69, -260]];
+  var d = 'M' + R.map(function (p) { return p.join(' '); }).join('L');
+  var tf = 'translate(' + cx + ' ' + cy + ') scale(1 ' + SY + ') rotate(' + (-28) + ')';
+  var a0 = T(R[0][0], R[0][1]), a1 = T(R[R.length - 1][0], R[R.length - 1][1]), st = T(69, -23), me = T(23, 160);
+  svg.innerHTML = '<defs><filter id="nBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter><filter id="nBlur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>' +
+    '<linearGradient id="nRg" gradientUnits="userSpaceOnUse" x1="' + R[0][0] + '" y1="' + R[0][1] + '" x2="' + R[R.length - 1][0] + '" y2="' + R[R.length - 1][1] + '"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".45" stop-color="#4f7ff0"/><stop offset="1" stop-color="#9fd3ea"/></linearGradient>' +
+    '<linearGradient id="nRc" gradientUnits="userSpaceOnUse" x1="' + R[0][0] + '" y1="' + R[0][1] + '" x2="' + R[R.length - 1][0] + '" y2="' + R[R.length - 1][1] + '"><stop offset="0" stop-color="#c3a6ff"/><stop offset=".5" stop-color="#8fb4ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>' +
+    '<g class="pan"><g transform="' + tf + '">' + g + '</g>' +
+    '<g transform="' + tf + '"><path class="rg draw" d="' + d + '"/><path class="rc draw" d="' + d + '"/><path class="run" d="' + d + '"/></g>' +
+    '<circle class="halo" cx="' + st[0] + '" cy="' + st[1] + '" r="17"/><circle class="stop" cx="' + st[0] + '" cy="' + st[1] + '" r="8"/>' +
+    '<circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="22"/><circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="13" style="animation-delay:-1.3s"/><circle class="dot" cx="' + me[0] + '" cy="' + me[1] + '" r="6"/></g>';
+  [].forEach.call(svg.querySelectorAll('.draw, .run'), function (p) { p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); });
+  /* the labels sit upright over the tilted map, placed from the same projection */
+  var box = function (p) { return { l: p[0] / 300 * 100, t: p[1] / 380 * 100 }; };
+  var bs = box(st), bm = box(me);
+  labs.innerHTML = '<span style="left:' + bs.l + '%;top:calc(' + bs.t + '% - 14px)">Harrismith<small>R 18.73 · Lowest</small></span><span style="left:' + bm.l + '%;top:calc(' + bm.t + '% - 18px)">You</span>';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, ph = sec.querySelector('.nphone'), stage = sec.querySelector('.nstage'), tEl = sec.querySelector('.neta .t'), mins = 70;
+  if (!reduce) {
+    stage.addEventListener('pointermove', function (e) { var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; ph.style.transform = 'perspective(1400px) rotateY(' + (x * 12).toFixed(2) + 'deg) rotateX(' + (-y * 8).toFixed(2) + 'deg)'; });
+    stage.addEventListener('pointerleave', function () { ph.style.transform = ''; });
+    setInterval(function () { if (!sec.classList.contains('in') || document.hidden || mins <= 52) return; mins--; tEl.textContent = Math.floor(mins / 60) + ' h ' + (mins % 60 < 10 ? '0' : '') + (mins % 60) + ' min'; }, 4200);
+  }
+  if (!('IntersectionObserver' in window)) { sec.classList.add('in'); return; }
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sec.classList.add('in'); io.disconnect(); } }); }, { threshold: .3 });
+  io.observe(sec);
+})();
+</script>
+<script>
+/* the landing phone: the same night map as the night-shift scene, sized for the hero; route from you to the cheapest stop and on to work */
+(function () {
+  var wrap = document.querySelector('.pscr.hn .hnmap'); if (!wrap) return;
+  var svg = wrap.querySelector('svg'), labs = wrap.querySelector('.hnlab'), W = 375, H = 450;
+  var cx = 192, cy = 236, A = -28 * Math.PI / 180, SY = .74, D = -28;
+  function T(x, y) { var rx = x * Math.cos(A) - y * Math.sin(A), ry = x * Math.sin(A) + y * Math.cos(A); return [cx + rx, cy + ry * SY]; }
+  var g = '', step = 52, i, j;
+  for (i = -7; i <= 7; i++) for (j = -7; j <= 7; j++) { if ((i * 7 + j * 3) % 9 === 0) continue; var x = i * step + 3, y = j * step + 3, w = step - 6 - ((i * 3 + j) % 4 === 0 ? 16 : 0), h = step - 6;
+    g += '<rect class="blk" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="3"/>'; }
+  var R = [[26, 186], [26, 78], [-130, 78], [-130, -26], [78, -26], [78, -320]];
+  var d = 'M' + R.map(function (p) { return p.join(' '); }).join('L'), tf = 'translate(' + cx + ' ' + cy + ') scale(1 ' + SY + ') rotate(' + D + ')';
+  var st = T(78, -26), me = T(26, 186);
+  svg.innerHTML = '<defs><filter id="hnBlur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter><filter id="hnBlur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>' +
+    '<linearGradient id="hnRg" gradientUnits="userSpaceOnUse" x1="' + R[0][0] + '" y1="' + R[0][1] + '" x2="' + R[5][0] + '" y2="' + R[5][1] + '"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".45" stop-color="#4f7ff0"/><stop offset="1" stop-color="#9fd3ea"/></linearGradient>' +
+    '<linearGradient id="hnRc" gradientUnits="userSpaceOnUse" x1="' + R[0][0] + '" y1="' + R[0][1] + '" x2="' + R[5][0] + '" y2="' + R[5][1] + '"><stop offset="0" stop-color="#c3a6ff"/><stop offset=".5" stop-color="#8fb4ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>' +
+    '<g class="pan"><g transform="' + tf + '">' + g + '</g><g transform="' + tf + '"><path class="rg draw" d="' + d + '"/><path class="rc draw" d="' + d + '"/><path class="run" d="' + d + '"/></g>' +
+    '<circle class="halo" cx="' + st[0] + '" cy="' + st[1] + '" r="19"/><circle class="stop" cx="' + st[0] + '" cy="' + st[1] + '" r="9"/>' +
+    '<circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="26"/><circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="15" style="animation-delay:-1.3s"/><circle class="dot" cx="' + me[0] + '" cy="' + me[1] + '" r="7"/></g>';
+  [].forEach.call(svg.querySelectorAll('.draw, .run'), function (p) { p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); });
+  labs.innerHTML = '<span style="left:' + (st[0] / W * 100) + '%;top:calc(' + (st[1] / H * 100) + '% - 16px)">Harrismith<small>R 18.73 · Lowest</small></span><span style="left:' + (me[0] / W * 100) + '%;top:calc(' + (me[1] / H * 100) + '% - 20px)">You</span>';
+  requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('on'); }); });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* coins on the road: a wide perforated-metal ribbon with dark edges sweeps in from the left, dips, banks and climbs past the
+   headline; big metal coins with halftone TFN symbols roll along it. Renders only while in view. */
+(function () {
+  var sec = document.getElementById('cr'); if (!sec || !window.THREE) return;
+  var stage = sec.querySelector('.crstage'), cv = sec.querySelector('.crcv');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, T3 = THREE;
+  var renderer; try { renderer = new T3.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { return; }
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); renderer.outputEncoding = T3.sRGBEncoding; renderer.toneMapping = T3.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T3.PCFSoftShadowMap;
+  var scene = new T3.Scene(), cam = new T3.PerspectiveCamera(34, 2, .1, 100);
+  function cvTex(w, h, draw, srgb) { var c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); var t = new T3.CanvasTexture(c); if (srgb !== false) t.encoding = T3.sRGBEncoding; t.anisotropy = 8; return t; }
+  var envTex = cvTex(512, 256, function (g, w, h) { var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.4, '#eef0f4'); gr.addColorStop(.48, '#c3c8d2'); gr.addColorStop(.52, '#5b6170'); gr.addColorStop(.58, '#d6d9df'); gr.addColorStop(1, '#a9aeb9'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#fff'; g.fillRect(40, 30, 150, 34); g.fillRect(300, 56, 170, 26); g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(200, 150, 90, 16); });
+  envTex.mapping = T3.EquirectangularReflectionMapping;
+  scene.environment = new T3.PMREMGenerator(renderer).fromEquirectangular(envTex).texture;
+  scene.add(new T3.HemisphereLight(0xffffff, 0xd2d8e4, .65));
+  var sun = new T3.DirectionalLight(0xffffff, 1.2); sun.position.set(-3, 12, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  var sc = sun.shadow.camera; sc.left = -12; sc.right = 12; sc.top = 10; sc.bottom = -10; sc.near = 1; sc.far = 40; sun.shadow.radius = 6; sun.shadow.bias = -.0006; scene.add(sun);
+  /* the ribbon: in from the left, down to the bottom, banking up to the top right */
+  var curve = new T3.CatmullRomCurve3([new T3.Vector3(-12, -.4, .6), new T3.Vector3(-7.5, -1.4, 1.4), new T3.Vector3(-3.4, -3, 1.6), new T3.Vector3(.6, -3.1, .9), new T3.Vector3(3.6, -1.7, -.1), new T3.Vector3(5.3, .9, -1.1), new T3.Vector3(6.2, 4.2, -2.1), new T3.Vector3(6.8, 8.2, -3.1)], false, 'catmullrom', .5);
+  var L = curve.getLength(), N = 600, RW = 3.4, UP = new T3.Vector3(0, 1, 0), WD = .34;
+  function bank(u) { var k = Math.min(1, Math.max(0, (u - .5) / .4)); return -k * k * (3 - 2 * k) * 1.05 + Math.sin(u * 6.28) * .08; }
+  function frame(u) { var p = curve.getPointAt(u), tg = curve.getTangentAt(u), side = new T3.Vector3().crossVectors(tg, UP).normalize(); side.applyAxisAngle(tg, bank(u)); var nrm = new T3.Vector3().crossVectors(side, tg).normalize(); return { p: p, t: tg, s: side, n: nrm }; }
+  var top = [], uv = [], wall = [], wuv = [];
+  for (var i = 0; i <= N; i++) {
+    var u = i / N, f = frame(u), a = f.p.clone().addScaledVector(f.s, -RW / 2), b = f.p.clone().addScaledVector(f.s, RW / 2), v = u * L / 3.2;
+    top.push(a.x, a.y, a.z, b.x, b.y, b.z); uv.push(0, v, 1, v);
+    var ad = a.clone().addScaledVector(f.n, -WD), bd = b.clone().addScaledVector(f.n, -WD), ao = a.clone().addScaledVector(f.s, -.02), bo = b.clone().addScaledVector(f.s, .02);
+    wall.push(ao.x, ao.y, ao.z, ad.x, ad.y, ad.z, bo.x, bo.y, bo.z, bd.x, bd.y, bd.z); wuv.push(v * 3, 1, v * 3, 0, v * 3, 1, v * 3, 0);
+  }
+  var idx = []; for (var k = 0; k < N; k++) { var q = k * 2; idx.push(q, q + 1, q + 2, q + 1, q + 3, q + 2); }
+  var roadG = new T3.BufferGeometry(); roadG.setAttribute('position', new T3.Float32BufferAttribute(top, 3)); roadG.setAttribute('uv', new T3.Float32BufferAttribute(uv, 2)); roadG.setIndex(idx); roadG.computeVertexNormals();
+  /* perforated panels laid like bricks, dots in each */
+  var panel = cvTex(512, 512, function (g, w, h) { g.fillStyle = '#e7ebf2'; g.fillRect(0, 0, w, h);
+    var rows = 4, cols = 3, ph = h / rows, pw = w / cols;
+    for (var r = 0; r < rows; r++) for (var c = -1; c <= cols; c++) { var x0 = c * pw + (r % 2) * pw / 2, y0 = r * ph, sh = g.createLinearGradient(x0, y0, x0 + pw, y0 + ph); sh.addColorStop(0, 'rgba(255,255,255,.45)'); sh.addColorStop(1, 'rgba(120,135,165,.12)'); g.fillStyle = sh; g.fillRect(x0 + 3, y0 + 3, pw - 6, ph - 6);
+      g.fillStyle = 'rgba(60,72,100,.30)'; for (var yy = y0 + 14; yy < y0 + ph - 8; yy += 11) for (var xx = x0 + 14; xx < x0 + pw - 8; xx += 11) { g.beginPath(); g.arc(xx, yy, 1.5, 0, 7); g.fill(); } }
+    g.strokeStyle = 'rgba(40,52,80,.45)'; g.lineWidth = 3; for (r = 0; r <= rows; r++) { g.beginPath(); g.moveTo(0, r * ph); g.lineTo(w, r * ph); g.stroke(); }
+    for (r = 0; r < rows; r++) for (c = -1; c <= cols; c++) { var xs = c * pw + (r % 2) * pw / 2; g.beginPath(); g.moveTo(xs, r * ph); g.lineTo(xs, (r + 1) * ph); g.stroke(); } });
+  panel.wrapS = panel.wrapT = T3.RepeatWrapping;
+  var road = new T3.Mesh(roadG, new T3.MeshStandardMaterial({ map: panel, metalness: .62, roughness: .36, side: T3.DoubleSide })); road.receiveShadow = true; scene.add(road);
+  var rim = cvTex(256, 64, function (g, w, h) { var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5d6a8f'); gr.addColorStop(.18, '#1c2540'); gr.addColorStop(1, '#0d1326'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(190,205,235,.55)'; for (var x = 4; x < w; x += 9) { g.beginPath(); g.arc(x, 14, 1.6, 0, 7); g.fill(); } });
+  rim.wrapS = T3.RepeatWrapping;
+  var wi = []; for (k = 0; k < N; k++) { q = k * 4; wi.push(q, q + 1, q + 4, q + 1, q + 5, q + 4, q + 2, q + 6, q + 3, q + 3, q + 6, q + 7); }
+  var wallG = new T3.BufferGeometry(); wallG.setAttribute('position', new T3.Float32BufferAttribute(wall, 3)); wallG.setAttribute('uv', new T3.Float32BufferAttribute(wuv, 2)); wallG.setIndex(wi); wallG.computeVertexNormals();
+  scene.add(new T3.Mesh(wallG, new T3.MeshStandardMaterial({ map: rim, metalness: .55, roughness: .4, side: T3.DoubleSide })));
+  /* the coins: metal finishes, a milled edge, a big halftone symbol on each face */
+  var SYM = ['R', 'pump', 'TFN', 'pin', 'R'], FIN = [0xe9ecf1, 0xe9dcbd, 0xe6bfae, 0x9fb3e6, 0xdfe3ea];
+  function sym(g, kind, c, size) {
+    g.beginPath();
+    if (kind === 'R') { g.font = '800 ' + size + 'px Satoshi, "Aeonik Pro", Arial, sans-serif'; return 'text'; }
+    if (kind === 'TFN') { g.font = '900 ' + (size * .62) + 'px Fraunces, Georgia, serif'; return 'text'; }
+    var s = size / 24; g.save(); g.translate(c - 12 * s, c - 12 * s); g.scale(s, s);
+    if (kind === 'pump') { g.rect(5, 3.5, 10, 17); g.rect(16, 8, 3, 9); g.rect(3, 19, 14, 2.4); }
+    else { g.moveTo(12, 22.5); g.bezierCurveTo(5, 15, 4.5, 11.5, 4.5, 9.5); g.arc(12, 9.5, 7.5, Math.PI, 0); g.bezierCurveTo(19.5, 11.5, 19, 15, 12, 22.5); g.closePath(); }
+    g.restore(); return 'path';
+  }
+  function face(kind) { return cvTex(512, 512, function (g, w, h) { var c = w / 2;
+    var gr = g.createRadialGradient(c * .7, c * .62, 10, c, c, c); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.7, '#e9ecf1'); gr.addColorStop(1, '#b4bccb'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.lineWidth = 16; g.strokeStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(c, c, c * .86, 0, 7); g.stroke(); g.lineWidth = 5; g.strokeStyle = 'rgba(60,70,90,.3)'; g.beginPath(); g.arc(c, c, c * .79, 0, 7); g.stroke();
+    var dot = document.createElement('canvas'); dot.width = dot.height = 10; var dg = dot.getContext('2d'); dg.fillStyle = 'rgba(70,82,106,.9)'; dg.beginPath(); dg.arc(5, 5, 2.4, 0, 7); dg.fill();
+    var pat = g.createPattern(dot, 'repeat'), size = kind === 'TFN' ? 300 : 300, mode = sym(g, kind, c, size);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    function paint(fill, dx, dy) { g.save(); g.translate(dx, dy); g.fillStyle = fill; if (mode === 'text') g.fillText(kind === 'R' ? 'R' : 'TFN', c, c + 6); else { sym(g, kind, c, size); g.fill(); } g.restore(); }
+    paint('rgba(255,255,255,.95)', -5, -5); paint('rgba(60,70,92,.55)', 6, 7); paint('#dfe3ea', 0, 0); paint(pat, 0, 0); }); }
+  var edge = cvTex(512, 32, function (g, w, h) { g.fillStyle = '#d4d9e2'; g.fillRect(0, 0, w, h); for (var x = 0; x < w; x += 4) { g.fillStyle = 'rgba(50,60,85,.38)'; g.fillRect(x, 0, 2, h); } }); edge.wrapS = T3.RepeatWrapping; edge.repeat.set(8, 1);
+  var coins = [], NC = 5;
+  for (var ci = 0; ci < NC; ci++) {
+    var rr = [1.15, 1, 1.25, 1.05, 1.12][ci], th = rr * .19, ft = face(SYM[ci]), bt = ft.clone(); bt.needsUpdate = true; bt.wrapS = T3.RepeatWrapping; bt.repeat.x = -1;
+    var col = new T3.Color(FIN[ci]), fm = new T3.MeshStandardMaterial({ map: ft, color: col, metalness: .85, roughness: .22 }), bm = new T3.MeshStandardMaterial({ map: bt, color: col, metalness: .85, roughness: .22 });
+    var mesh = new T3.Mesh(new T3.CylinderGeometry(rr, rr, th, 128, 1), [new T3.MeshStandardMaterial({ map: edge, color: col, metalness: 1, roughness: .22 }), fm, bm]); mesh.castShadow = true;
+    var grp = new T3.Group(); grp.add(mesh); scene.add(grp); coins.push({ g: grp, r: rr, s: ci * L / NC, ph: ci * 1.7, kind: SYM[ci] });
+  }
+  var M = new T3.Matrix4(), R = new T3.Matrix4();
+  function place(c, time) {
+    var u = ((c.s % L) + L) % L / L, f = frame(u), x = f.t.clone(), y = f.s.clone(), z = new T3.Vector3().crossVectors(x, y);
+    M.makeBasis(x, y, z); R.makeRotationY(-c.s / c.r); M.multiply(R); c.g.quaternion.setFromRotationMatrix(M);
+    c.g.rotateOnWorldAxis(f.t, Math.sin(time * 1.2 + c.ph) * .04);
+    c.g.position.copy(f.p).addScaledVector(f.n, c.r + .01); c.g.visible = u > .005 && u < .995;
+  }
+  var W = 0, H = 0;
+  function size() { W = stage.clientWidth; H = stage.clientHeight; renderer.setSize(W, H, false); cam.aspect = W / H; var narrow = W < 700;
+    cam.fov = narrow ? 52 : 34; cam.position.set(narrow ? 1 : .4, narrow ? 1.8 : 1.4, narrow ? 17 : 13.5); cam.lookAt(narrow ? 1 : .6, -.6, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld(); }
+  size(); addEventListener('resize', size);
+  var run = false, last = 0, time = 0;
+  function tick(now) { if (!run) return; var dt = Math.min(.05, (now - last) / 1000 || 0); last = now; time += dt; coins.forEach(function (c) { c.s += dt * 1.25; place(c, time); }); renderer.render(scene, cam); requestAnimationFrame(tick); }
+  coins.forEach(function (c) { place(c, 0); }); renderer.render(scene, cam);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { coins.forEach(function (c) { var m = c.g.children[0].material, nf = face(c.kind), nb = nf.clone(); nb.needsUpdate = true; nb.wrapS = T3.RepeatWrapping; nb.repeat.x = -1; m[1].map = nf; m[2].map = nb; m[1].needsUpdate = m[2].needsUpdate = true; }); renderer.render(scene, cam); });
+  if (reduce) { sec.classList.add('in'); return; }
+  new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sec.classList.add('in'); if (!run) { run = true; last = performance.now(); requestAnimationFrame(tick); } } else run = false; }); }, { threshold: .05 }).observe(stage);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) run = false; else { var r = stage.getBoundingClientRect(); if (!run && r.bottom > 0 && r.top < innerHeight) { run = true; last = performance.now(); requestAnimationFrame(tick); } } });
+})();
+</script>
+<script src="tfn-gibberish.js"></script>
 </body>
 </html>
