@@ -1491,6 +1491,16 @@
   .rw-steps { display: grid; gap: 22px; margin: 26px 0 32px; }
   .rw-steps h3 { font-size: 1.1rem; margin-bottom: 4px; } .split .rw-steps p { margin: 0; font-size: 1rem; }
   @media (max-width: 900px) { .sec.rw .split { grid-template-columns: 1fr; gap: 48px; } .sec.rw .split > :first-child { order: 2; } }
+  /* technology and people: the AI answer floats at the top of the photo, the account manager sits at the bottom */
+  .hp .hp-ai { position: absolute; z-index: 2; left: 16px; right: 16px; top: 16px; border-radius: 18px; padding: 12px 14px; display: grid; gap: 10px; font-size: .86rem; }
+  .hp-q { justify-self: end; max-width: 85%; padding: 8px 12px; border-radius: 14px 14px 4px 14px; background: #1f1f1f; color: #fff; font-weight: 500; }
+  .hp-a { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; } .hp-a .ob { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+  .hp .hp-am span { display: grid; line-height: 1.3; } .hp-am small { font-weight: 500; color: #6e6e73; }
+  .pic .chip i.hp-av { display: grid; place-items: center; border-radius: 50%; background: #1f1f1f; color: #fff; font-style: normal; font-size: .78rem; letter-spacing: .02em; }
+  .pic .chip b.hp-call { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #1f1f1f; color: #fff; } .hp-call svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+  .hp-two { display: grid; gap: 22px; margin: 26px 0 32px; } .hp-two h3 { font-size: 1.1rem; margin-bottom: 4px; } .split .hp-two p { margin: 0; font-size: 1rem; }
+  @media (max-width: 900px) { .hp .split { grid-template-columns: 1fr; gap: 48px; } .hp .pic { margin-inline: auto; width: 100%; } }
+  @media (max-width: 560px) { .hp .pic { aspect-ratio: 1 / 1.2; } .hp .hp-ai { top: auto; bottom: 90px; } }
   .split > * { min-width: 0; } #calc { overflow-x: clip; } @media (max-width: 560px) { .calc { padding: 18px; } .cpanel { padding: 20px; } .cres b { font-size: 1.6rem; } }
   .cbars { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 8px; font-size: .8rem; } .cbars div { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; }
   .cbars i { height: 12px; border-radius: 99px; background: rgba(255,255,255,.35); width: var(--w, 0%); transition: width .5s var(--ease); } .cbars div:last-child i { background: #fff; }
@@ -1981,6 +1991,25 @@
   </section>
 
 
+
+  <!-- 5b. grey: technology when you want it, people when you need it. The account manager's photo with the AI answer above and the person below (the question and answer are illustrative) -->
+  <section class="sec grey hp" id="people" aria-labelledby="hpH">
+    <div class="wrap split">
+      <div class="pic rise" aria-hidden="true">
+        <div class="img" style="--img:url(img/manager-office.jpg); background-position: 50% 30%"></div>
+        <div class="hp-ai mgl"><span class="hp-q">Which trucks filled more than usual this week?</span><span class="hp-a"><i class="ob ob-blue"></i><span>Truck 07 and Truck 12. Both filled 18% above their average.</span></span></div>
+        <div class="chip mgl hp-am"><i class="hp-av">AM</i><span>Your account manager<small>Knows your trucks and routes</small></span><b class="hp-call"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></b></div>
+      </div>
+      <div>
+        <h2 id="hpH">Technology when you want it. People when you need it.</h2>
+        <div class="hp-two">
+          <div><h3>Ask TFN's AI</h3><p>Ask about your fills, trucks and drivers. The answer comes back in seconds, day or night.</p></div>
+          <div><h3>Call your account manager</h3><p>A real person at TFN who knows your business. For a new route, a new contract or a bad day on the road.</p></div>
+        </div>
+        <a class="btn" href="#f">Contact us</a>
+      </div>
+    </div>
+  </section>
 
   <!-- 6. black: a carousel of soft grainy orbs, one per thing credit covers, with silver coins floating round them -->
   <section class="sec black center" id="d">
