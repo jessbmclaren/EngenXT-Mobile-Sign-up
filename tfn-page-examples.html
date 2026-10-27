@@ -71,10 +71,11 @@
           border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); opacity: 0; visibility: hidden; clip-path: inset(0 0 100% 0 round 24px);
           transition: opacity .25s, transform .3s var(--ease), clip-path .42s var(--ease), visibility 0s .42s; }
   .mega.open { opacity: 1; visibility: visible; transform: translate(-50%, 0) scale(1); clip-path: inset(0 round 24px); transition: opacity .28s, transform .42s var(--ease), clip-path .5s var(--ease), visibility 0s; }
-  .mega .mh { display: inline-flex; gap: 8px; font-weight: 600; margin-bottom: 20px; } .mega .mcols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 30px; }
-  .mega h5 { font-size: .74rem; font-weight: 500; color: rgba(255,255,255,.55); margin-bottom: 8px; }
-  .mega a.ml { display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: .95rem; opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s var(--ease); }
-  .mega.open a.ml { opacity: 1; transform: none; transition: opacity .4s calc(var(--n) * 26ms + 140ms), transform .5s var(--ease) calc(var(--n) * 26ms + 140ms); }
+  .mega .mh { display: inline-flex; gap: 8px; font-weight: 600; margin-bottom: 20px; } .mega .mcols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 30px; }
+  .mega h5 { font-size: .74rem; font-weight: 500; color: rgba(255,255,255,.55); margin-bottom: 8px; } .mega .mcols > div > .ml + h5 { margin-top: 22px; }
+  .mega .ml.off { color: rgba(255,255,255,.42); }
+  .mega .ml { display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: .95rem; opacity: 0; transform: translateY(8px); transition: opacity .3s, transform .3s var(--ease); }
+  .mega.open .ml { opacity: 1; transform: none; transition: opacity .4s calc(var(--n) * 26ms + 140ms), transform .5s var(--ease) calc(var(--n) * 26ms + 140ms); }
   .mega a.ml:hover { color: rgba(255,255,255,.65); }
   .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: radial-gradient(circle at 30% 28%, var(--c1), var(--c2) 52%, var(--c4)); }
 
@@ -1493,7 +1494,7 @@
 <header class="nav clear" id="nav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>
-    <nav class="links" aria-label="Main"><a href="tfn-products.html" data-m="0">Products</a><a href="tfn-network.html" data-m="1">Network</a><a href="tfn-credit.html" data-m="2">Treasury</a><a href="https://tfn.co.za/about-us/" data-m="3">Company</a></nav>
+    <nav class="links" aria-label="Main"><a href="tfn-products.html" data-m="0">Products</a><a href="tfn-network.html" data-m="1">Network</a><a href="tfn-tiers.html" data-m="2">Pricing</a><a href="https://tfn.co.za/about-us/" data-m="3">Company</a></nav>
     <span class="grow"></span>
     <a class="btn ghost sm" href="https://app.tfn.co.za/">Log in</a><a class="btn sm" href="#f">Get a fuel quote</a>
   </div>
@@ -2592,17 +2593,13 @@
   sts.forEach(function (s) { sio.observe(s); });
 
   /* the glass mega menu */
-  var MEGA = [
-    ['h-blue', 'All products', 'tfn-products.html', [['Treasury', [['Credit products', 'tfn-credit.html'], ['Tiers', 'tfn-tiers.html']]], ['Fuel & Technology', [['CRT – Onroad', 'tfn-on-road.html'], ['EngenXT (coming soon)', 'tfn-lcv.html'], ['Homebase management', 'tfn-homebase.html']]], ['Cross Border', [['Fuel, tolls and parking', 'tfn-africa.html'], ['Forwarding and clearing', 'tfn-africa.html']]], ['Risk management', [['Fines', 'tfn-risk.html'], ['Vehicle and GIT insurance', 'tfn-risk.html']]], ['Fleet management', [['Licensing', 'tfn-fleet-management.html']]], ['Onroad non-fuel', [['Oil and road assist', 'tfn-non-fuel.html'], ['Overnight and truckwash', 'tfn-non-fuel.html']]], ['Vehicle support services', [['Tyres and servicing', 'tfn-vehicle-support.html'], ['Telematics', 'tfn-vehicle-support.html']]]]],
-    ['h-violet', 'Explore the network', 'tfn-network.html', [['Plan', [['Network map', 'tfn-network.html'], ['Fuel prices', 'https://tfn.co.za/price-list/'], ['Fuel price outlook', 'https://tfn.co.za/fuel-insights/']]], ['At the stop', [['Overnight parking', 'tfn-non-fuel.html'], ['AdBlue and services', 'tfn-non-fuel.html']]]]],
-    ['h-plum', 'Explore Treasury', 'tfn-credit.html', [['Credit providers', [['Standard Bank', 'https://tfn.co.za/standard-bank/'], ['Absa', 'https://tfn.co.za/absa-bank/'], ['Preference Capital', 'https://tfn.co.za/preference-capital/']]], ['How it works', [['TFN Credit', 'tfn-credit.html'], ['Choose a provider', 'https://tfn.co.za/select-a-credit-provider/']]]]],
-    ['', 'About TFN', 'https://tfn.co.za/about-us/', [['Company', [['About us', 'https://tfn.co.za/about-us/'], ['Contact us', 'https://tfn.co.za/contact-us/']]], ['Help', [['Support', 'https://tfn.co.za/tfn-support/'], ['Terms and conditions', 'https://tfn.co.za/terms-conditions/']]]]]
-  ];
+  /* the same panels as the product pages (MENU in tools/build-product-pages.py): columns of grouped plain links */
+  var MEGA = [["", "Discover TruckersHub", "tfn-products.html", [[["Treasury", [["Credit products", "tfn-credit.html"], ["Smart Factoring", null]]], ["Fuel & Technology", [["CRT – Onroad", "tfn-on-road.html"], ["EngenXT", "tfn-lcv.html"], ["TFN – Wholesale", null], ["Homebase management", "tfn-homebase.html"]]]], [["Cross Border", [["Fuel", "tfn-africa.html"], ["Tolls and parking", "tfn-africa.html"], ["Forwarding and clearing", "tfn-africa.html"], ["Cash", "tfn-africa.html"]]], ["Risk management", [["Fines", "tfn-risk.html"], ["Vehicle insurance", "tfn-risk.html"], ["GIT insurance", "tfn-risk.html"]]]], [["Fleet management", [["Licensing", "tfn-fleet-management.html"]]], ["Onroad non-fuel", [["Oil", "tfn-non-fuel.html"], ["Road assist", "tfn-non-fuel.html"], ["Overnight", "tfn-non-fuel.html"], ["Truckwash", "tfn-non-fuel.html"]]]], [["Vehicle support services", [["Tyres", "tfn-vehicle-support.html"], ["Servicing", "tfn-vehicle-support.html"], ["Telematics", "tfn-vehicle-support.html"]]], ["Pricing", [["Tiers", "tfn-tiers.html"], ["Get a fuel quote", "https://tfn.co.za/your-fuel-quote/"]]]]]], ["", "Explore the network", "tfn-network.html", [[["Plan", [["Network map", "tfn-network.html"], ["Fuel prices", "https://tfn.co.za/price-list/"], ["Fuel price outlook", "https://tfn.co.za/fuel-insights/"]]]], [["At the stop", [["Overnight parking", "tfn-non-fuel.html"], ["Truckwash", "tfn-non-fuel.html"], ["Oil and road assist", "tfn-non-fuel.html"]]]], [["Past the border", [["Cross Border", "tfn-africa.html"], ["Five countries, paid in rand", "tfn-africa.html"]]]]]], ["", "See the tiers", "tfn-tiers.html", [[["Pay less", [["Tiers", "tfn-tiers.html"], ["Fuel prices", "https://tfn.co.za/price-list/"], ["Homebase fee calculator", "https://tfn.co.za/homebase-calculator/"]]]], [["Credit", [["Credit products", "tfn-credit.html"], ["Choose a credit provider", "https://tfn.co.za/select-a-credit-provider/"]]]], [["Talk to us", [["Get a fuel quote", "https://tfn.co.za/your-fuel-quote/"]]]]]], ["", "About TFN", "https://tfn.co.za/about-us/", [[["Company", [["About us", "https://tfn.co.za/about-us/"], ["Contact us", "https://tfn.co.za/contact-us/"]]]], [["Help", [["Support", "https://tfn.co.za/tfn-support/"], ["Terms and conditions", "https://tfn.co.za/terms-conditions/"]]]], [["Account", [["Log in", "https://app.tfn.co.za/"]]]]]]];
   var mega = document.getElementById('mega'), links = $('.links a'), ot, ct, openI = -1;
   function openMega(i) {
     clearTimeout(ct); var d = MEGA[i], n = 0;
     var h = '<a class="ml mh" href="' + d[2] + '" style="--n:0">' + d[1] + ' →</a><div class="mcols">';
-    d[3].forEach(function (c) { h += '<div class="' + d[0] + '"><h5>' + c[0] + '</h5>'; c[1].forEach(function (l) { n++; h += '<a class="ml" style="--n:' + n + '" href="' + l[1] + '">' + (d[0] ? '<span class="dot"></span>' : '') + l[0] + '</a>'; }); h += '</div>'; });
+    d[3].forEach(function (col) { h += '<div>'; col.forEach(function (g) { h += '<h5>' + g[0] + '</h5>'; g[1].forEach(function (l) { n++; h += l[1] ? '<a class="ml" style="--n:' + n + '" href="' + l[1] + '">' + l[0] + '</a>' : '<span class="ml off" style="--n:' + n + '">' + l[0] + '</span>'; }); }); h += '</div>'; });
     if (openI !== i) { mega.classList.remove('open'); void mega.offsetWidth; }
     mega.innerHTML = h + '</div>'; mega.style.top = (nav.getBoundingClientRect().bottom + 8) + 'px'; openI = i;
     links.forEach(function (a, k) { a.classList.toggle('on', k === i); }); mega.setAttribute('aria-hidden', 'false');

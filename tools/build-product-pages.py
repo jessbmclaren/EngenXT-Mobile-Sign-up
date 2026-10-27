@@ -325,12 +325,50 @@ ORDER = [key for f in FAM for key in dict.fromkeys(k for _, k in f['items'] if k
 PAGES = ORDER + ['network']   # the network map is a planning tool, not a product
 
 
+# ---------- the nav: four top items, each opening a glass panel of grouped plain links (no icons, no cards) ----------
+# a panel is (discover label, its link, columns); a column is groups; a group is (heading, [(label, href or None)])
+def fam_group(k):
+    f = FAMK[k]
+    return (f['name'], [(l, P[key]['file'] if key else None) for l, key in f['items']])
+
+
+MENU = [
+    ('products', 'Products', 'tfn-products.html', ('Discover TruckersHub', 'tfn-products.html', [
+        [fam_group('treasury'), fam_group('fueltech')],
+        [fam_group('cross'), fam_group('risk')],
+        [fam_group('fleet'), fam_group('nonfuel')],
+        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/')])],
+    ])),
+    ('network', 'Network', 'tfn-network.html', ('Explore the network', 'tfn-network.html', [
+        [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'https://tfn.co.za/price-list/'), ('Fuel price outlook', 'https://tfn.co.za/fuel-insights/')])],
+        [('At the stop', [('Overnight parking', 'tfn-non-fuel.html'), ('Truckwash', 'tfn-non-fuel.html'), ('Oil and road assist', 'tfn-non-fuel.html')])],
+        [('Past the border', [('Cross Border', 'tfn-africa.html'), ('Five countries, paid in rand', 'tfn-africa.html')])],
+    ])),
+    ('pricing', 'Pricing', 'tfn-tiers.html', ('See the tiers', 'tfn-tiers.html', [
+        [('Pay less', [('Tiers', 'tfn-tiers.html'), ('Fuel prices', 'https://tfn.co.za/price-list/'), ('Homebase fee calculator', 'https://tfn.co.za/homebase-calculator/')])],
+        [('Credit', [('Credit products', 'tfn-credit.html'), ('Choose a credit provider', 'https://tfn.co.za/select-a-credit-provider/')])],
+        [('Talk to us', [('Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/')])],
+    ])),
+    ('company', 'Company', 'https://tfn.co.za/about-us/', ('About TFN', 'https://tfn.co.za/about-us/', [
+        [('Company', [('About us', 'https://tfn.co.za/about-us/'), ('Contact us', 'https://tfn.co.za/contact-us/')])],
+        [('Help', [('Support', 'https://tfn.co.za/tfn-support/'), ('Terms and conditions', 'https://tfn.co.za/terms-conditions/')])],
+        [('Account', [('Log in', 'https://app.tfn.co.za/')])],
+    ])),
+]
+
+
+def panel(p):
+    disc, href, cols = p
+    link = lambda l, h: '<li><a href="%s">%s</a></li>' % (h, l) if h else '<li><span>%s</span></li>' % l
+    return '<div class="mp"><a class="mp-d" href="%s">%s <span aria-hidden="true">→</span></a><div class="mp-c">%s</div></div>' % (href, disc, ''.join(
+        '<div>%s</div>' % ''.join('<h5>%s</h5><ul>%s</ul>' % (h, ''.join(link(l, x) for l, x in items)) for h, items in col) for col in cols))
+
+
 def nav(current=None):
-    fam = family_of(current) if current in ORDER else None
-    links = ''.join('<a href="%s"%s>%s</a>' % (lead(f), ' aria-current="page"' if f is fam else '', f['nav']) for f in FAM)
-    links += '<a href="tfn-network.html"%s>Network</a>' % (' aria-current="page"' if current == 'network' else '')
+    top = 'products' if current in ORDER else ('network' if current == 'network' else ('pricing' if current == 'tiers' else None))
+    links = ''.join('<div class="mi"><a href="%s"%s aria-haspopup="true">%s</a>%s</div>' % (h, ' aria-current="page"' if k == top else '', n, panel(p)) for k, n, h, p in MENU)
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
-            '<nav class="links" aria-label="Products">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="btn" href="tfn-page-examples.html#f">Get a fuel quote</a></div></header>' % links)
+            '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="https://app.tfn.co.za/">Log in</a><a class="btn" href="tfn-page-examples.html#f">Get a fuel quote</a></div></header>' % links)
 
 
 def chip(label, key):
@@ -342,18 +380,6 @@ def fam_list(fams):
     row = lambda f: '<li style="--acc:%s"><a class="fn" href="%s"><i aria-hidden="true"></i>%s</a><p>%s</p><ul class="fp">%s</ul><a class="fgo" href="%s" aria-label="Explore %s">→</a></li>' % (
         f['acc'], lead(f), f['name'], f['line'], ''.join(chip(l, key) for l, key in f['items']), lead(f), f['name'])
     return '<ul class="flist">%s</ul>' % ''.join(row(f) for f in fams)
-
-
-def show(k, i):
-    """One product, one moment: the phone on one side, a headline and one link on the other, alternating."""
-    p, f = P[k], family_of(k)
-    return '<div class="show%s" style="--acc:%s"><div class="tx"><p class="kicker"><i aria-hidden="true"></i>%s%s</p><h3>%s</h3><p>%s</p><a class="tlink" href="%s">Explore %s</a></div><div class="ph %s"><div class="s">%s%s</div></div></div>' % (
-        ' rev' if i % 2 else '', p['acc'], f['name'], ' <span class="soon">Coming soon</span>' if p.get('soon') else '', p['title'], p['sub'], p['file'], p['name'], p['finish'], SH, p['screen'])
-
-
-def partners():
-    rows = ''.join('<li><b>%s</b><p>%s</p><ul>%s</ul></li>' % (n, d, ''.join('<li style="--acc:%s"><a href="%s">%s</a></li>' % (FAMK[k]['acc'], lead(FAMK[k]), FAMK[k]['name']) for k in fs)) for n, d, fs in PARTNERS)
-    return '<section class="band" id="partners"><div class="wrap"><h2>Our partners</h2><p class="sub">The businesses behind your TruckersHub products.</p><ul class="pts">%s</ul></div></section>' % rows
 
 
 def footer():
@@ -505,33 +531,55 @@ def product_page(k):
     return page('TFN %s | %s' % (p['name'], p['title']), p['sub'], body, 'dark-page' if dark else '')
 
 
+# ---------- the products page: one family per full-width screen, a headline, one line, one button and the phone ----------
+# (headline, one line, background: 'white' / 'black' / a photo, the screens to switch between)
+HX = {
+    'treasury': ('Fuel now. Pay later.', 'Credit facilities through Standard Bank and Absa keep your trucks moving. Settle with your bank each month.', 'black', ['credit']),
+    'fueltech': ('Diesel, wherever the truck is', 'At 270+ truck stops, at Engen for your bakkies and in your own yard. Every litre lands in one dashboard.', 'white', ['road', 'lcv', 'home']),
+    'cross': ('Past the border. Still in rand.', 'Fuel in five countries, tolls and parking, forwarding and clearing and cash for the trip. All on your South African account.', 'img/k-namibia.jpg', ['africa']),
+    'risk': ('Covered, on every load', 'Vehicle and goods-in-transit insurance through ONE Insurance. Traffic fines handled by IOX.', 'white', ['risk']),
+    'fleet': ('Road-legal, every day', 'IOX renews your licences. You see what’s due 30 days before it runs out.', 'black', ['fleet']),
+    'nonfuel': ('Looked after on the road', 'Oil, road assist, safe overnight parking and a truck wash. Paid with the diesel.', 'img/k-night-truck.jpg', ['nonfuel']),
+    'support': ('Less downtime. Longer life.', 'Tyres, servicing and telematics for every truck, on one account.', 'white', ['support']),
+}
+
+HOME_SCREEN = '<span class="t">Wednesday, 21 October</span><span class="h">Good morning, Thabo</span><div class="card"><span class="t">Available credit</span><div class="big">R 540 000</div><div class="bar" style="--v:18%;margin-top:.5em"><i></i></div></div><div class="card">' + ''.join(
+    '<div class="row"><i style="background:%s"></i><span><b>%s</b><small>%s</small></span></div>' % (f['acc'], f['name'], f['line']) for f in FAM[:5]) + '</div>'
+
+
+def hx(f):
+    head, line, bg, keys = HX[f['k']]
+    photo = bg.startswith('img/')
+    tone = 'black' if photo else bg
+    phones = ''.join('<div class="ph %s%s" data-scene="%d"%s><div class="s">%s%s</div></div>' % (P[k]['finish'], ' on' if i == 0 else '', i, '' if i == 0 else ' aria-hidden="true"', SH, P[k]['screen']) for i, k in enumerate(keys))
+    if len(keys) > 1:
+        rest = [l for l, key in f['items'] if key is None]
+        pick = '<div class="hx-pick" role="tablist" aria-label="%s products">%s</div>%s' % (f['name'], ''.join(
+            '<button type="button" role="tab" aria-selected="%s" data-scene="%d">%s</button>' % ('true' if i == 0 else 'false', i, next(l for l, key in f['items'] if key == k)) for i, k in enumerate(keys)),
+            '<p class="hx-also">Also %s</p>' % ' and '.join(rest) if rest else '')
+    else:
+        pick = '<p class="hx-also">%s</p>' % ' · '.join(l for l, key in f['items'])
+    return ('<section class="hx hx-%s%s" id="%s" style="--acc:%s%s"%s><div class="wrap"><p class="hx-k"><i aria-hidden="true"></i>%s</p><h2>%s</h2><p class="sub">%s</p>'
+            '<a class="btn%s" href="%s">Explore %s</a>%s</div><div class="hx-stage"><div class="hx-orb" aria-hidden="true"></div>%s</div></section>') % (
+        tone, ' hx-photo' if photo else '', f['k'], f['acc'], ';--photo:url(%s)' % bg if photo else '', ' data-dark' if tone == 'black' else '',
+        f['name'], head, line, ' light' if tone == 'black' else '', lead(f), f['name'], pick, phones)
+
+
 def hub():
-    intro = '''<section class="intro"><div class="wrap">
-<p class="kicker" style="justify-content:center">TruckersHub <span class="soon">Coming soon</span></p><h1 style="font-size:clamp(2.4rem,5vw,3.6rem)">Finally, everything in one place</h1>
-<p class="sub">Fuel, funding, cover, compliance and help on the road. Seven product families on one TFN account. One app for your drivers, one portal for your office.</p>
-%s</div></section>''' % fam_list(FAM)
-    tiles = '''<section class="band"><div class="wrap"><h2>Take a closer look</h2><p class="sub">What your drivers and your office see, product by product.</p><div class="shows">%s</div><p style="margin-top:40px"><a class="btn" href="tfn-tiers.html">The more you fuel, the less you pay: see the tiers</a></p></div></section>''' % ''.join(show(k, i) for i, k in enumerate(ORDER))
-    hubband = '''<section class="band"><div class="wrap"><h2>Two apps, one hub</h2><p class="sub">Today your drivers use TFN Pay and you use the TFN Dashboard. TruckersHub brings every product into one driver app and one fleet manager portal. It holds the things every product needs, so you set them up once.</p>
-<div class="steps3" style="--acc:#1f1f1f;grid-template-columns:repeat(2,1fr)">
-<div><h3>The driver app</h3><p>On the driver’s phone: see orders, ask for fuel, fill up and book a stop. Drivers only see what they need to do the job.</p></div>
-<div><h3>The fleet manager portal</h3><p>In the office: set up your company, people, vehicles and rules, top up your wallet, approve orders and see every transaction.</p></div>
-</div><div class="feats">
-<div><h3>Your company</h3><p>Your company profile and documents, captured once for every product.</p></div>
-<div><h3>Your people</h3><p>Give each person the access their job needs, from owner to driver.</p></div>
-<div><h3>Vehicles and drivers</h3><p>Add them once and use them for fuel, cover, licensing and vehicle support.</p></div>
-<div><h3>Your wallet</h3><p>Top up, see your balance and pay for every product from one place.</p></div>
-<div><h3>Notifications</h3><p>Orders, approvals, low balances and anything unusual, as it happens.</p></div>
-<div><h3>Reports</h3><p>Every transaction from every product, in one set of reports.</p></div>
-</div></div></section>'''
-    how = '''<section class="band grey"><div class="wrap"><h2>How TFN works</h2><div class="steps3" style="--acc:#1f1f1f">
-<div><h3>Open an account</h3><p>Sign up online and add your trucks and drivers. Then choose cash (pre-loaded by EFT) or credit through your bank.</p></div>
-<div><h3>Order and fill up</h3><p>Order fuel in the TFN Dashboard. Your driver fills up at a TFN truck stop, checked by location and photographed at the pump.</p></div>
-<div><h3>See every litre</h3><p>Every fill lands in your dashboard straight away, ready for reports, statements and your accounting system.</p></div>
-</div></div></section>'''
-    close = '<section class="close"><div class="wrap"><h2>Not sure where to start?</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will show you what you’d save, within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
-    body = nav() + '\n<main>\n' + intro + tiles + partners() + hubband + how + close + '\n</main>\n' + footer()
+    hero = ('<section class="hx hx-black hx-photo hx-hero" data-dark style="--photo:url(img/close-highway.jpg);--acc:#3d68c0"><div class="wrap"><p class="hx-k">TruckersHub <span class="soon">Coming soon</span></p>'
+            '<h1>Finally, everything in one place</h1><p class="sub">Seven product families. One TFN account. One app for your drivers, one portal for your office.</p>'
+            '<a class="btn light" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div>'
+            '<div class="hx-stage"><div class="ph p-hub on"><div class="s">%s%s</div></div></div></section>') % (SH, HOME_SCREEN)
+    fams = ''.join(hx(f) for f in FAM)
+    partners = '<section class="hx-partners" data-dark><div class="wrap"><p class="hx-k">Built with partners you know</p><ul>%s</ul></div></section>' % ''.join(
+        '<li><b>%s</b><span>%s</span></li>' % (n, d) for n, d, fs in PARTNERS)
+    apps = ('<section class="hx-apps" data-dark><div class="wrap"><h2>Two apps. One hub.</h2><p class="sub">Your drivers get one app. Your office gets one portal. Set up your company, people and vehicles once, for every product.</p>'
+            '<div class="hx-cards"><a href="tfn-on-road.html"><b>Driver app</b><span>Orders, fuel requests, fills and tonight’s stop. Only what the job needs.</span><i aria-hidden="true">→</i></a>'
+            '<a href="tfn-tiers.html"><b>Fleet manager portal</b><span>People, vehicles, rules, wallet, approvals and every transaction. Plus your tier.</span><i aria-hidden="true">→</i></a></div></div></section>')
+    close = '<section class="close"><div class="wrap"><h2>Join the transporters fuelling 44M+ litres a month</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. We’ll show you what you’d save within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
+    body = nav() + '\n<main>\n' + hero + fams + partners + apps + close + '\n</main>\n' + footer()
     names = ', '.join(f['name'] for f in FAM[:-1]) + ' and ' + FAM[-1]['name']
-    return page('TFN | Products and TruckersHub', 'TFN products in seven families: %s. TruckersHub, coming soon, brings them into one driver app and one fleet manager portal.' % names, body)
+    return page('TFN | Products and TruckersHub', 'TFN products in seven families: %s. TruckersHub, coming soon, brings them into one driver app and one fleet manager portal.' % names, body, 'hub')
 
 
 # ---------- tiers: TFN's own volume ladder from tfn.co.za/price-list (monthly on-road litres, discount per litre) ----------

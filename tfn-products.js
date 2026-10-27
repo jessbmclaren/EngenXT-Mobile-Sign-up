@@ -291,3 +291,20 @@ document.querySelectorAll('.pf[data-mod]').forEach(function (pf) { var m = MODS[
 function fillRange(i) { var a = +i.min || 0, b = +i.max || 100; i.style.setProperty('--p', ((+i.value - a) / (b - a) * 100).toFixed(1) + '%'); }
 document.querySelectorAll('.ctl input[type=range]').forEach(fillRange);
 document.addEventListener('input', function (e) { if (e.target.matches && e.target.matches('.ctl input[type=range]')) fillRange(e.target); });
+
+// ---------- the products page: the pills under a family switch which phone is showing ----------
+document.querySelectorAll('.hx-pick').forEach(function (pick) {
+  var sec = pick.closest('.hx');
+  pick.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    pick.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+    sec.querySelectorAll('.hx-stage .ph').forEach(function (ph) { var on = ph.dataset.scene === b.dataset.scene; ph.classList.toggle('on', on); if (on) ph.removeAttribute('aria-hidden'); else ph.setAttribute('aria-hidden', 'true'); });
+  });
+});
+
+// ---------- the nav panels: Escape closes one opened from the keyboard and hands focus back to its item ----------
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var mi = document.activeElement && document.activeElement.closest('.mi'); if (!mi) return;
+  var top = mi.querySelector(':scope > a'); top.focus(); top.blur();
+});
