@@ -9,7 +9,7 @@
 <meta property="og:description" content="Refuel at 270+ truck stops, pay on credit and see every litre live, from one TFN account.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"TFN","url":"https://tfn.co.za/","foundingDate":"2007-04","description":"South Africa’s largest independent on-road refuelling service provider: fuel, payments and route expenses in one system.","areaServed":["South Africa","Botswana","Eswatini","Mozambique","Namibia","Zambia","Zimbabwe"]}</script>
 <script>document.documentElement.classList.add('js')</script>
-<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="icon" href="tfn-mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,7 +59,7 @@
   /* ---------- nav: clear over the hero with white text, solid after; plain links; glass mega menu ---------- */
   .nav { position: sticky; top: 0; z-index: 70; height: 72px; background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.06); transition: background .3s, color .3s, border-color .3s; }
   .nav .wrap { display: flex; align-items: center; height: 100%; gap: 6px; }
-  .brand { display: flex; color: inherit; margin-right: 22px; } .brand svg { width: 76px; height: 29px; }
+  .brand { display: flex; color: inherit; margin-right: 22px; } .brand svg { width: 98px; height: 29px; }
   .links { display: flex; } .links a { position: relative; padding: 8px 4px; margin: 0 12px; font-weight: 500; font-size: .95rem; color: #3a3a3a; }
   .links a::after { content: ""; position: absolute; left: 4px; right: 4px; bottom: 3px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease); }
   .links a:hover, .links a.on { color: #000; } .links a:hover::after, .links a.on::after { transform: scaleX(1); }
@@ -154,7 +154,7 @@
   .plan li { margin: 0 8px; padding: 10px 0; border-top: 1px solid #262626; color: #a8a8a8; font-size: .88rem; }
   footer { background: #191c1f; color: #a8a8a8; padding: 70px 0 40px; font-size: .86rem; border-top: 1px solid #1a1a1a; }
   .cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; } footer h4 { color: #fff; font-size: .88rem; margin-bottom: 14px; } footer li { margin-bottom: 9px; } footer a:hover { color: #fff; }
-  .fbrand { margin: 56px 0 24px; color: #fff; } .fbrand svg { width: 170px; height: 64px; }
+  .fbrand { margin: 56px 0 24px; color: #fff; } .fbrand svg { width: 216px; height: 64px; }
   .legal { border-top: 1px solid #1f1f1f; padding-top: 24px; font-size: .76rem; line-height: 1.7; color: #7d7d7d; display: grid; gap: 12px; }
   .sticky { position: fixed; z-index: 60; left: 50%; bottom: 22px; transform: translate(-50%, 110px); transition: transform .5s var(--ease), background .3s, color .3s; box-shadow: 0 20px 40px -18px rgba(0,0,0,.5); }
   .sticky.show { transform: translate(-50%, 0); } .sticky.dark { background: #fff; color: #000; }
@@ -183,6 +183,21 @@
   .paper .ttabs button { color: #3a3a3c; } .paper .ttabs button[aria-selected="true"] { background: #1f1f1f; color: #fff; }
   .paper .lid { box-shadow: inset 0 0 0 1.5px #3a3a3e, 0 50px 90px -34px rgba(20,30,50,.4); }
   .paper .plan { color: #1f1f1f; background: #f5f5f7; border-color: #ececef; }
+  /* the product families as an index (shared look with tfn-products.css): one row each, hairlines, no cards */
+  .flist { list-style: none; margin: 48px 0 0; padding: 0; text-align: left; border-top: 1px solid rgba(0,0,0,.1); color: #1f1f1f; }
+  .flist > li { display: grid; grid-template-columns: 280px 1fr auto; grid-template-areas: "n l g" "n p g"; column-gap: 32px; row-gap: 6px; align-items: center; padding: 24px 8px; border-bottom: 1px solid rgba(0,0,0,.1); transition: background .3s var(--ease); }
+  .flist > li:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 7%, transparent), transparent 70%); }
+  .flist .fn { grid-area: n; display: inline-flex; align-items: center; gap: 16px; font-size: 1.4rem; font-weight: 500; letter-spacing: -.015em; color: inherit; }
+  .flist .fn i { width: 36px; height: 36px; border-radius: 12px; flex: none; background: linear-gradient(145deg, color-mix(in srgb, var(--acc) 50%, #fff), var(--acc) 60%, color-mix(in srgb, var(--acc) 70%, #000)); }
+  .flist > li > p { grid-area: l; color: #6e6e73; margin: 0; }
+  .fp { grid-area: p; list-style: none; display: flex; flex-wrap: wrap; margin: 0; padding: 0; font-size: .92rem; font-weight: 500; }
+  .fp li:not(:last-child)::after { content: "·"; margin: 0 10px; color: #b0b0b4; }
+  .fp a { color: #1f1f1f; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--acc) 45%, transparent); text-underline-offset: 4px; text-decoration-thickness: 1.5px; } .fp a:hover { text-decoration-color: var(--acc); }
+  .fp span { color: #6e6e73; }
+  .fgo { grid-area: g; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #1f1f1f; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); transition: background .3s, color .3s, transform .3s var(--ease); }
+  .flist > li:hover .fgo { background: #1f1f1f; color: #fff; transform: translateX(4px); box-shadow: none; }
+  @media (max-width: 960px) { .flist > li { grid-template-columns: 1fr auto; grid-template-areas: "n g" "l g" "p g"; } .flist > li > p, .fp { padding-left: 52px; } }
+  @media (max-width: 560px) { .flist > li > p, .fp { padding-left: 0; } .fgo { display: none; } .flist > li { grid-template-columns: 1fr; grid-template-areas: "n" "l" "p"; } }
   .paper .plan.pick { border-color: #1f1f1f; } .paper .plan .pr { color: #6e6e73; } .paper .plan .pr b { color: #1f1f1f; }
   .paper .plan li { border-top-color: #e3e3e6; color: #55555a; } .paper .plan .btn { background: #1f1f1f; color: #fff; }
   /* ---------- the app after dark: a lit ribbed wall, a plinth, the phone with a glowing route ---------- */
@@ -272,7 +287,7 @@
   .hnrec { margin: 18px 0 20px; font-size: 23px; line-height: 1.28; letter-spacing: -.01em; color: #d6d8e6; }
   .pscr.hn .nbtn span { height: 56px; border-radius: 16px; font-size: 17px; }
   @media (prefers-reduced-motion: reduce) { .hnmap .draw { animation: none !important; stroke-dashoffset: 0; } .hnmap .run { display: none; } .hnmap .halo, .hnmap .pan, .hnlab { animation: none; } .hnlab span, .hnbody > * { opacity: 1 !important; translate: none !important; scale: none !important; transition: none !important; } }
-  /* ---------- coins on the road: TFN coins roll along a sweeping metal ribbon ---------- */
+  /* ---------- the coin road: one silver TFN coin rolls along a sweeping road ---------- */
   .coinroad { padding-bottom: 0; overflow: hidden; }
   .crstage { position: relative; height: 820px; margin-top: -230px; z-index: 0; }
   .coinroad > .wrap { position: relative; z-index: 2; }
@@ -1290,7 +1305,7 @@
   .dock.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
   .dock.away { transform: translate(-50%, 140%); opacity: 0; pointer-events: none; }
   .dk-logo { display: grid; place-items: center; width: 64px; border-radius: 16px; background: #141416; color: #fff; }
-  .dk-logo svg { width: 42px; height: 16px; }
+  .dk-logo svg { width: 24px; height: 24px; }
   .dk-tabs { display: flex; gap: 6px; padding: 6px; border-radius: 16px; background: rgba(255,255,255,.06); }
   .dk-tabs a { display: grid; place-items: center; padding: 0 16px; height: 44px; border-radius: 12px; color: rgba(255,255,255,.82); font-size: .95rem; font-weight: 500; white-space: nowrap;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: color .25s, box-shadow .25s, background .25s; }
@@ -1352,7 +1367,7 @@
   .coin { position: absolute; left: clamp(calc(var(--w) * .6 + 16px + var(--z) * .5), var(--x), calc(100% - var(--w) * .6 - 16px - var(--z) * .5)); top: var(--y); --w: calc(var(--s) * var(--cs)); --t: calc(var(--w) * .11); width: var(--w); height: var(--w); margin: calc(var(--w) / -2) 0 0 calc(var(--w) / -2); transform-style: preserve-3d; transform: translateZ(var(--z)) translateY(var(--py, 0px)); }
   .coin .fly, .coin .bob, .coin .spin { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
   .js .coin .fly { transform: translateY(-95vh) rotateX(80deg) rotateZ(40deg); }
-  .js #d.in .coin .fly { animation: fly 1.7s cubic-bezier(.2,.9,.25,1.05) var(--dl) forwards; } @keyframes fly { to { transform: none; } }
+  .js .coins.drop .coin .fly { animation: fly 1.7s cubic-bezier(.2,.9,.25,1.05) var(--dl) forwards; } @keyframes fly { to { transform: none; } }
   .coin .bob { animation: cbob 5.5s ease-in-out var(--ph) infinite alternate; }
   @keyframes cbob { from { transform: translateY(-12px) rotateX(var(--rx)) rotateZ(-8deg); } to { transform: translateY(12px) rotateX(calc(var(--rx) * .55)) rotateZ(8deg); } }
   .coin .spin { animation: cspin var(--sp) linear var(--ph) infinite; } @keyframes cspin { to { transform: rotateY(360deg); } }
@@ -1368,6 +1383,10 @@
   .coin .f::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 38%, rgba(255,255,255,.75) 50%, transparent 62%) 0 0 / 260% 100% no-repeat; animation: glint var(--sp) linear var(--ph) infinite; }
   @keyframes glint { 0% { background-position: 140% 0; } 45%, 100% { background-position: -40% 0; } }
   .cm-silver { --m1: #f7f8fb; --m2: #c3cad5; --m3: #747f90; --m4: #545e6e; }
+  /* the savings calculator: the same silver coins fall in round it */
+  #calc .wrap { position: relative; } #calc .wrap > :not(.ccoins) { position: relative; z-index: 1; }
+  .ccoins { position: absolute; inset: -40px 0; z-index: 2; perspective: 1400px; --cs: 1.05; pointer-events: none; }
+  @media (max-width: 960px) { .ccoins { --cs: .6; } .ccoins .coin:nth-child(n+5) { display: none; } }
   @media (max-width: 960px) { .orbstage { height: 470px; --cs: .55; --ow: 220px; --og: 205px; } .ocar { height: 72%; } .coins .coin:nth-child(n+7) { display: none; } }
   @media (prefers-reduced-motion: reduce) { .coin .bob, .coin .spin, .coin .f, .coin .f::after { animation: none !important; } .orb { transition: none; } .js .coin .fly { transform: none; } .coin .spin { transform: rotateY(-24deg); } }
 
@@ -1436,7 +1455,7 @@
       <circle cx="50" cy="50" r="48" fill="url(#oShade)" opacity=".5"/>
       <rect x="2" y="2" width="96" height="96" filter="url(#oGrain)" opacity=".62" style="mix-blend-mode:overlay"/>
     </g></symbol>
-    <symbol id="logo" viewBox="0 56 392 148"><text x="0" y="200" fill="currentColor" font-family="Fraunces, Georgia, serif" font-weight="900" font-size="200" letter-spacing="2" style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;font-optical-sizing:none">TFN</text></symbol>
+    <linearGradient id="tfnB1" gradientUnits="userSpaceOnUse" x1="0" y1="10" x2="100" y2="20"><stop offset="0" stop-color="#b9d6f2"/><stop offset="1" stop-color="#5d8fd8"/></linearGradient><linearGradient id="tfnB2" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="100" y2="30"><stop offset="0" stop-color="#3d68c0"/><stop offset="0.55" stop-color="#2c56b8"/><stop offset="1" stop-color="#5a43a8"/></linearGradient><linearGradient id="tfnB3" gradientUnits="userSpaceOnUse" x1="0" y1="70" x2="100" y2="50"><stop offset="0" stop-color="#4a35a6"/><stop offset="0.6" stop-color="#3b4fa8"/><stop offset="1" stop-color="#1f7a62"/></linearGradient><linearGradient id="tfnB4" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="100" y2="70"><stop offset="0" stop-color="#2a1f6e"/><stop offset="0.55" stop-color="#1f2f80"/><stop offset="1" stop-color="#1f6a62"/></linearGradient><radialGradient id="tfnWarm" cx="86" cy="88" r="34" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#d07034" stop-opacity=".85"/><stop offset="1" stop-color="#d07034" stop-opacity="0"/></radialGradient><radialGradient id="tfnHi" cx="30" cy="18" r="70" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="tfnGaps" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><circle cx="50" cy="50" r="50" fill="#fff"/><g fill="none" stroke="#000" stroke-width="5"><path d="M-5 40C26 10 62 34 105 6"/><path d="M-5 60C28 30 64 54 105 30"/><path d="M-5 98C20 60 62 80 105 58"/></g></mask><symbol id="tfn-mark" viewBox="0 0 100 100"><g mask="url(#tfnGaps)"><circle cx="50" cy="50" r="50" fill="url(#tfnB4)"/><path fill="url(#tfnB3)" d="M-5 98C20 60 62 80 105 58V-5H-5Z"/><path fill="url(#tfnB2)" d="M-5 60C28 30 64 54 105 30V-5H-5Z"/><path fill="url(#tfnB1)" d="M-5 40C26 10 62 34 105 6V-5H-5Z"/><circle cx="50" cy="50" r="50" fill="url(#tfnWarm)"/><circle cx="50" cy="50" r="50" fill="url(#tfnHi)"/></g></symbol><symbol id="logo" viewBox="0 56 392 148"><text x="0" y="200" fill="currentColor" font-family="Fraunces, Georgia, serif" font-weight="900" font-size="200" letter-spacing="2" style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;font-optical-sizing:none">TFN</text></symbol><symbol id="lockup" viewBox="0 0 441 128"><use href="#tfn-mark" width="128" height="128"/><use href="#logo" x="150" y="9" width="291" height="110"/></symbol>
     <symbol id="i-pump" viewBox="0 0 24 24"><path d="M5 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15M3 20h14M15 9h2.500a1.500 1.500 0 0 1 1.500 1.500V16a1.500 1.500 0 0 0 3 0V8l-3-3M7.500 8h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3c3 4 6 7 6 10.500a6 6 0 0 1-12 0C6 10 9 7 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.500 20h19ZM12 10v4.500M12 17.500v.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -1473,8 +1492,8 @@
 
 <header class="nav clear" id="nav">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="TFN home"><svg aria-hidden="true"><use href="#logo"/></svg></a>
-    <nav class="links" aria-label="Main"><a href="tfn-products.html" data-m="0">Products</a><a href="tfn-network.html" data-m="1">Network</a><a href="tfn-credit.html" data-m="2">Credit</a><a href="https://tfn.co.za/about-us/" data-m="3">Company</a></nav>
+    <a class="brand" href="#top" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>
+    <nav class="links" aria-label="Main"><a href="tfn-products.html" data-m="0">Products</a><a href="tfn-network.html" data-m="1">Network</a><a href="tfn-credit.html" data-m="2">Treasury</a><a href="https://tfn.co.za/about-us/" data-m="3">Company</a></nav>
     <span class="grow"></span>
     <a class="btn ghost sm" href="https://app.tfn.co.za/">Log in</a><a class="btn sm" href="#f">Get a fuel quote</a>
   </div>
@@ -1678,7 +1697,7 @@
 
 
 
-  <!-- 8a. white: TFN coins rolling along a metal ribbon -->
+  <!-- 8a. white: a silver TFN coin rolling along the road -->
   <section class="sec paper center coinroad" id="cr">
     <div class="wrap">
       <h2 class="title">Savings that roll in</h2>
@@ -1780,6 +1799,7 @@
   <!-- 9a. grey: two working calculators, glass on blue -->
   <section class="sec" id="calc">
     <div class="wrap split">
+      <div class="ccoins" aria-hidden="true"><div class="coins" id="calcCoins"></div></div>
       <div>
         <h2>See what you could save</h2>
         <p>Slide to estimate, then get a quote for your real price.<sup style="font-size:.6em;margin-left:1px">2</sup></p>
@@ -1812,6 +1832,16 @@
   </section>
 
   <!-- 9b. black: who it's for, three cards in a row -->
+  <!-- 10a. white: the seven TruckersHub product families as an index (same rows as tfn-products.html, from tools/build-product-pages.py) -->
+  <section class="sec paper center" id="fam">
+    <div class="wrap">
+      <h2 class="title">Finally, everything in one place</h2>
+      <p class="sub">Seven product families. One TFN account.</p>
+      <ul class="flist"><li style="--acc:#a2468e"><a class="fn" href="tfn-credit.html"><i aria-hidden="true"></i>Treasury</a><p>Funding that keeps you moving</p><ul class="fp"><li><a href="tfn-credit.html">Credit products</a></li><li><span>Smart Factoring</span></li></ul><a class="fgo" href="tfn-credit.html" aria-label="Explore Treasury">→</a></li><li style="--acc:#2a6fd0"><a class="fn" href="tfn-on-road.html"><i aria-hidden="true"></i>Fuel & Technology</a><p>Diesel on the road and in your yard</p><ul class="fp"><li><a href="tfn-on-road.html">CRT – Onroad</a></li><li><a href="tfn-lcv.html">EngenXT</a></li><li><span>TFN – Wholesale</span></li><li><a href="tfn-homebase.html">Homebase management</a></li></ul><a class="fgo" href="tfn-on-road.html" aria-label="Explore Fuel & Technology">→</a></li><li style="--acc:#6b62c9"><a class="fn" href="tfn-africa.html"><i aria-hidden="true"></i>Cross Border</a><p>Everything past the border, paid in rand</p><ul class="fp"><li><a href="tfn-africa.html">Fuel</a></li><li><a href="tfn-africa.html">Tolls and parking</a></li><li><a href="tfn-africa.html">Forwarding and clearing</a></li><li><a href="tfn-africa.html">Cash</a></li></ul><a class="fgo" href="tfn-africa.html" aria-label="Explore Cross Border">→</a></li><li style="--acc:#3f7d4e"><a class="fn" href="tfn-risk.html"><i aria-hidden="true"></i>Risk management</a><p>Cover for your trucks and loads</p><ul class="fp"><li><a href="tfn-risk.html">Fines</a></li><li><a href="tfn-risk.html">Vehicle insurance</a></li><li><a href="tfn-risk.html">GIT insurance</a></li></ul><a class="fgo" href="tfn-risk.html" aria-label="Explore Risk management">→</a></li><li style="--acc:#2d7fa3"><a class="fn" href="tfn-fleet-management.html"><i aria-hidden="true"></i>Fleet management</a><p>Every vehicle road-legal</p><ul class="fp"><li><a href="tfn-fleet-management.html">Licensing</a></li></ul><a class="fgo" href="tfn-fleet-management.html" aria-label="Explore Fleet management">→</a></li><li style="--acc:#4f6b8a"><a class="fn" href="tfn-non-fuel.html"><i aria-hidden="true"></i>Onroad non-fuel</a><p>Looking after drivers on route</p><ul class="fp"><li><a href="tfn-non-fuel.html">Oil</a></li><li><a href="tfn-non-fuel.html">Road assist</a></li><li><a href="tfn-non-fuel.html">Overnight</a></li><li><a href="tfn-non-fuel.html">Truckwash</a></li></ul><a class="fgo" href="tfn-non-fuel.html" aria-label="Explore Onroad non-fuel">→</a></li><li style="--acc:#5c6370"><a class="fn" href="tfn-vehicle-support.html"><i aria-hidden="true"></i>Vehicle support services</a><p>Less downtime, longer life</p><ul class="fp"><li><a href="tfn-vehicle-support.html">Tyres</a></li><li><a href="tfn-vehicle-support.html">Servicing</a></li><li><a href="tfn-vehicle-support.html">Telematics</a></li></ul><a class="fgo" href="tfn-vehicle-support.html" aria-label="Explore Vehicle support services">→</a></li></ul>
+      <p style="margin-top:36px"><a class="btn" href="tfn-products.html">See all products</a></p>
+    </div>
+  </section>
+
   <section class="stack" id="k">
     <div class="wrap center"><h2 class="title">Join the transporters fuelling 44M+ litres a month</h2><p class="sub" style="margin-bottom:64px">Pick the set-up that fits how you move freight.</p></div>
     <div class="wrap scs">
@@ -1850,20 +1880,20 @@
 <footer>
   <div class="wrap">
     <div class="cols">
-      <div><h4>Products</h4><ul><li><a href="tfn-products.html">All products</a></li><li><a href="tfn-on-road.html">On-Road</a></li><li><a href="tfn-lcv.html">LCV</a></li><li><a href="tfn-non-fuel.html">Non-Fuel</a></li><li><a href="tfn-homebase.html">Homebase</a></li><li><a href="tfn-africa.html">TFN Africa</a></li><li><a href="tfn-credit.html">Credit</a></li><li><a href="tfn-tiers.html">Tiers</a></li></ul></div>
+      <div><h4>Products</h4><ul><li><a href="tfn-products.html">All products</a></li><li><a href="tfn-credit.html">Treasury</a></li><li><a href="tfn-on-road.html">Fuel &amp; Technology</a></li><li><a href="tfn-africa.html">Cross Border</a></li><li><a href="tfn-risk.html">Risk management</a></li><li><a href="tfn-fleet-management.html">Fleet management</a></li><li><a href="tfn-non-fuel.html">Onroad non-fuel</a></li><li><a href="tfn-vehicle-support.html">Vehicle support services</a></li><li><a href="tfn-tiers.html">Tiers</a></li></ul></div>
       <div><h4>Network</h4><ul><li><a href="tfn-network.html">Network map</a></li><li><a href="https://tfn.co.za/price-list/">Fuel prices</a></li><li><a href="https://tfn.co.za/our-network/">Route planner</a></li></ul></div>
       <div><h4>Credit and services</h4><ul><li><a href="https://tfn.co.za/select-a-credit-provider/">Apply for credit</a></li><li><a href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></li><li><a href="https://tfn.co.za/fuel-insights/">Fuel insights</a></li></ul></div>
       <div><h4>Company</h4><ul><li><a href="https://tfn.co.za/about-us/">About TFN</a></li><li><a href="https://tfn.co.za/">News</a></li><li><a href="https://tfn.co.za/contact-us/">Contact us</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="https://tfn.co.za/tfn-support/">Contact support</a></li><li><a href="https://tfn.co.za/terms-conditions/">Terms and conditions</a></li><li><a href="https://app.tfn.co.za/">Log in</a></li></ul></div>
     </div>
-    <div class="fbrand"><svg aria-label="TFN"><use href="#logo"/></svg><span class="forb" aria-hidden="true"></span></div>
+    <div class="fbrand"><svg aria-label="TFN"><use href="#lockup"/></svg><span class="forb" aria-hidden="true"></span></div>
     <div class="legal"><p>© 2026 TFN. Design concept. Figures and customer quotes are from tfn.co.za. Photographs are Unsplash stock used as placeholders and do not show TFN customers. Screens, plates, prices and savings in the product mock-ups are illustrative.</p><p><sup>1</sup> Credit is subject to approval by the credit provider. <sup>2</sup> Estimate only. Your saving depends on route, volume and depot pricing. <sup>3</sup> Homebase fees are tiered by monthly on-road volume and shown for guidance.</p></div>
   </div>
 </footer>
 
 <a class="btn sticky" id="sticky" href="#f" aria-hidden="true" tabindex="-1">Get a fuel quote</a>
 <nav class="dock" id="dock" aria-label="Jump to a section">
-  <a class="dk-logo" href="#top" aria-label="TFN, back to the top"><svg aria-hidden="true"><use href="#logo"/></svg></a>
+  <a class="dk-logo" href="#top" aria-label="TFN, back to the top"><svg aria-hidden="true"><use href="#tfn-mark"/></svg></a>
   <div class="dk-tabs"><a href="#b">How it works</a><a href="#d">Credit</a><a href="#m">Map</a><a href="#calc">Savings</a></div>
   <a class="dk-cta" href="#f">Get a fuel quote</a>
 </nav>
@@ -1934,10 +1964,10 @@
       </section>
 
       <section id="bm-logo">
-        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">03</span><h2>Logo</h2><p>The TFN wordmark in a heavy, soft, high-contrast serif: the only serif in the brand. Black on light, white on dark, nothing else.</p></div>
+        <div class="bm-ch" style="--lc:#5a43a8"><span class="n">03</span><h2>Logo</h2><p>Four bands in the orb’s colours, set in a circle, next to the TFN wordmark in a heavy, soft, high-contrast serif: the only serif in the brand. The mark keeps its colours. The wordmark is black on light and white on dark, nothing else.</p></div>
         <p class="bm-sub">Construction and clear space</p>
-        <div class="bm-cons"><div class="box"><svg aria-label="TFN"><use href="#logo"/></svg><span class="x t">x</span><span class="x b">x</span><span class="x l">x</span><span class="x r">x</span></div><span class="lg">x = cap height of the T · keep this space clear on every side</span></div>
-        <div class="bm-pair"><div><svg aria-label="TFN"><use href="#logo"/></svg></div><div class="dark"><svg aria-label="TFN"><use href="#logo"/></svg></div></div>
+        <div class="bm-cons"><div class="box"><svg aria-label="TFN"><use href="#lockup"/></svg><span class="x t">x</span><span class="x b">x</span><span class="x l">x</span><span class="x r">x</span></div><span class="lg">x = cap height of the T · keep this space clear on every side</span></div>
+        <div class="bm-pair"><div><svg aria-label="TFN"><use href="#lockup"/></svg></div><div class="dark"><svg aria-label="TFN"><use href="#lockup"/></svg></div></div>
         <p class="bm-sub">Minimum sizes</p>
         <div class="bm-min">
           <figure><svg style="width:120px"><use href="#logo"/></svg>120px · headers</figure>
@@ -2563,9 +2593,9 @@
 
   /* the glass mega menu */
   var MEGA = [
-    ['h-blue', 'All products', 'tfn-products.html', [['Fuel', [['On-Road', 'tfn-on-road.html'], ['LCV (coming soon)', 'tfn-lcv.html'], ['Homebase', 'tfn-homebase.html'], ['TFN Africa', 'tfn-africa.html']]], ['On the road', [['Non-Fuel services', 'tfn-non-fuel.html'], ['Network map', 'tfn-network.html']]], ['Pay less', [['Tiers', 'tfn-tiers.html'], ['Credit', 'tfn-credit.html'], ['Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/']]]]],
+    ['h-blue', 'All products', 'tfn-products.html', [['Treasury', [['Credit products', 'tfn-credit.html'], ['Tiers', 'tfn-tiers.html']]], ['Fuel & Technology', [['CRT – Onroad', 'tfn-on-road.html'], ['EngenXT (coming soon)', 'tfn-lcv.html'], ['Homebase management', 'tfn-homebase.html']]], ['Cross Border', [['Fuel, tolls and parking', 'tfn-africa.html'], ['Forwarding and clearing', 'tfn-africa.html']]], ['Risk management', [['Fines', 'tfn-risk.html'], ['Vehicle and GIT insurance', 'tfn-risk.html']]], ['Fleet management', [['Licensing', 'tfn-fleet-management.html']]], ['Onroad non-fuel', [['Oil and road assist', 'tfn-non-fuel.html'], ['Overnight and truckwash', 'tfn-non-fuel.html']]], ['Vehicle support services', [['Tyres and servicing', 'tfn-vehicle-support.html'], ['Telematics', 'tfn-vehicle-support.html']]]]],
     ['h-violet', 'Explore the network', 'tfn-network.html', [['Plan', [['Network map', 'tfn-network.html'], ['Fuel prices', 'https://tfn.co.za/price-list/'], ['Fuel price outlook', 'https://tfn.co.za/fuel-insights/']]], ['At the stop', [['Overnight parking', 'tfn-non-fuel.html'], ['AdBlue and services', 'tfn-non-fuel.html']]]]],
-    ['h-plum', 'Explore credit', 'tfn-credit.html', [['Credit providers', [['Standard Bank', 'https://tfn.co.za/standard-bank/'], ['Absa', 'https://tfn.co.za/absa-bank/'], ['Preference Capital', 'https://tfn.co.za/preference-capital/']]], ['How it works', [['TFN Credit', 'tfn-credit.html'], ['Choose a provider', 'https://tfn.co.za/select-a-credit-provider/']]]]],
+    ['h-plum', 'Explore Treasury', 'tfn-credit.html', [['Credit providers', [['Standard Bank', 'https://tfn.co.za/standard-bank/'], ['Absa', 'https://tfn.co.za/absa-bank/'], ['Preference Capital', 'https://tfn.co.za/preference-capital/']]], ['How it works', [['TFN Credit', 'tfn-credit.html'], ['Choose a provider', 'https://tfn.co.za/select-a-credit-provider/']]]]],
     ['', 'About TFN', 'https://tfn.co.za/about-us/', [['Company', [['About us', 'https://tfn.co.za/about-us/'], ['Contact us', 'https://tfn.co.za/contact-us/']]], ['Help', [['Support', 'https://tfn.co.za/tfn-support/'], ['Terms and conditions', 'https://tfn.co.za/terms-conditions/']]]]]
   ];
   var mega = document.getElementById('mega'), links = $('.links a'), ot, ct, openI = -1;
@@ -2826,11 +2856,21 @@
   var C = [[8, 7, 92, 40, 'silver', 7, 22, -1.2, .1], [91, 7, 112, 60, 'silver', 9, -16, -3.4, .25], [12, 68, 130, 100, 'silver', 8, -22, -5.6, .3], [88, 69, 150, 70, 'silver', 6, 26, -2.1, .4],
            [30, 73, 64, -120, 'silver', 5.5, 32, -.8, .5], [70, 74, 72, -60, 'silver', 6.5, -28, -4.2, .6], [4, 40, 58, -200, 'silver', 6.2, -18, -1.9, .65], [96, 40, 56, -180, 'silver', 5.8, 20, -3.1, .55]];
   var edges = ''; for (var n = 0; n < 15; n++) edges += '<i class="e" style="--n:' + n + '"></i>';
-  coinsEl.insertAdjacentHTML('beforeend', C.map(function (c) {
-    return '<div class="coin cm-' + c[4] + '" style="--x:' + c[0] + '%;--y:' + c[1] + '%;--s:' + c[2] + 'px;--z:' + c[3] + 'px;--sp:' + c[5] + 's;--rx:' + c[6] + 'deg;--ph:' + c[7] + 's;--dl:' + c[8] + 's"><div class="fly"><div class="bob"><div class="spin">' + edges +
-      '<div class="f a"><svg><use href="#logo"/></svg></div><div class="f b"><svg><use href="#logo"/></svg></div></div></div></div></div>';
-  }).join(''));
+  function mint(el, list) {
+    el.insertAdjacentHTML('beforeend', list.map(function (c) {
+      return '<div class="coin cm-' + c[4] + '" style="--x:' + c[0] + '%;--y:' + c[1] + '%;--s:' + c[2] + 'px;--z:' + c[3] + 'px;--sp:' + c[5] + 's;--rx:' + c[6] + 'deg;--ph:' + c[7] + 's;--dl:' + c[8] + 's"><div class="fly"><div class="bob"><div class="spin">' + edges +
+        '<div class="f a"><svg><use href="#logo"/></svg></div><div class="f b"><svg><use href="#logo"/></svg></div></div></div></div></div>';
+    }).join(''));
+    /* they fall once the stage is well in view, so the drop is seen rather than missed above the fold */
+    if (reduce || !('IntersectionObserver' in window)) { el.classList.add('drop'); return; }
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { el.classList.add('drop'); io.disconnect(); } }, { threshold: .45 }); io.observe(el.parentNode);
+  }
+  mint(coinsEl, C);
   var coins = [].slice.call(coinsEl.querySelectorAll('.coin'));
+  /* the savings calculator: silver coins fall in round it, a few over its corners */
+  var calcCoins = document.getElementById('calcCoins');
+  if (calcCoins) mint(calcCoins, [[50, 10, 78, 60, 'silver', 7, 22, -1.2, .05], [99, 6, 96, 90, 'silver', 8.5, -18, -3.4, .2], [47, 90, 110, 110, 'silver', 7.5, -24, -5.6, .3], [98, 94, 70, 40, 'silver', 6, 26, -2.1, .42],
+    [5, 8, 56, -140, 'silver', 5.8, 30, -.8, .5], [30, 97, 62, -80, 'silver', 6.4, -26, -4.2, .58], [74, -4, 50, -200, 'silver', 6.2, -16, -1.9, .66]]);
 
   /* cloud layers inside the big CSS orbs (see .ocl) */
   document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
@@ -3589,8 +3629,8 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* coins on the road: a wide perforated-metal ribbon with dark edges sweeps in from the left, dips, banks and climbs past the
-   headline; big metal coins with halftone TFN symbols roll along it. Renders only while in view. */
+/* the coin road: a tarred road with yellow edge lines and a broken white centre line sweeps in from the left, dips, banks and
+   climbs past the headline; one silver TFN coin, the same coin that falls round the credit orbs, rolls along it. Renders only while in view. */
 (function () {
   var sec = document.getElementById('cr'); if (!sec || !window.THREE) return;
   var stage = sec.querySelector('.crstage'), cv = sec.querySelector('.crcv');
@@ -3621,68 +3661,66 @@
   }
   var idx = []; for (var k = 0; k < N; k++) { var q = k * 2; idx.push(q, q + 1, q + 2, q + 1, q + 3, q + 2); }
   var roadG = new T3.BufferGeometry(); roadG.setAttribute('position', new T3.Float32BufferAttribute(top, 3)); roadG.setAttribute('uv', new T3.Float32BufferAttribute(uv, 2)); roadG.setIndex(idx); roadG.computeVertexNormals();
-  /* perforated panels laid like bricks, dots in each */
-  var panel = cvTex(512, 512, function (g, w, h) { g.fillStyle = '#e7ebf2'; g.fillRect(0, 0, w, h);
-    var rows = 4, cols = 3, ph = h / rows, pw = w / cols;
-    for (var r = 0; r < rows; r++) for (var c = -1; c <= cols; c++) { var x0 = c * pw + (r % 2) * pw / 2, y0 = r * ph, sh = g.createLinearGradient(x0, y0, x0 + pw, y0 + ph); sh.addColorStop(0, 'rgba(255,255,255,.45)'); sh.addColorStop(1, 'rgba(120,135,165,.12)'); g.fillStyle = sh; g.fillRect(x0 + 3, y0 + 3, pw - 6, ph - 6);
-      g.fillStyle = 'rgba(60,72,100,.30)'; for (var yy = y0 + 14; yy < y0 + ph - 8; yy += 11) for (var xx = x0 + 14; xx < x0 + pw - 8; xx += 11) { g.beginPath(); g.arc(xx, yy, 1.5, 0, 7); g.fill(); } }
-    g.strokeStyle = 'rgba(40,52,80,.45)'; g.lineWidth = 3; for (r = 0; r <= rows; r++) { g.beginPath(); g.moveTo(0, r * ph); g.lineTo(w, r * ph); g.stroke(); }
-    for (r = 0; r < rows; r++) for (c = -1; c <= cols; c++) { var xs = c * pw + (r % 2) * pw / 2; g.beginPath(); g.moveTo(xs, r * ph); g.lineTo(xs, (r + 1) * ph); g.stroke(); } });
+  /* tar: worn asphalt with grain, yellow edge lines, a broken white centre line */
+  var panel = cvTex(512, 1024, function (g, w, h) { g.fillStyle = '#4b4e54'; g.fillRect(0, 0, w, h);
+    for (var n = 0; n < 26000; n++) { var l = Math.random(); g.fillStyle = l < .5 ? 'rgba(20,22,26,' + (.18 + l * .3) + ')' : 'rgba(210,214,220,' + ((l - .5) * .28) + ')'; g.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 2, 1 + Math.random() * 2); }
+    var wear = g.createLinearGradient(0, 0, w, 0); wear.addColorStop(0, 'rgba(0,0,0,.12)'); wear.addColorStop(.28, 'rgba(255,255,255,.05)'); wear.addColorStop(.5, 'rgba(0,0,0,0)'); wear.addColorStop(.72, 'rgba(255,255,255,.05)'); wear.addColorStop(1, 'rgba(0,0,0,.12)'); g.fillStyle = wear; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#e8c547'; g.fillRect(w * .045, 0, 12, h); g.fillRect(w * .955 - 12, 0, 12, h);
+    g.fillStyle = '#f2f2ee'; g.fillRect(w / 2 - 6, h * .08, 12, h * .34); g.fillRect(w / 2 - 6, h * .58, 12, h * .34);
+    g.globalCompositeOperation = 'destination-out'; for (n = 0; n < 2500; n++) { g.fillStyle = 'rgba(0,0,0,.35)'; var x = Math.random() * w; if (Math.abs(x - w / 2) > 10 && Math.abs(x - w * .045 - 6) > 10 && Math.abs(x - w * .955 + 6) > 10) continue; g.fillRect(x, Math.random() * h, 2, 2); }
+    g.globalCompositeOperation = 'source-over'; });
   panel.wrapS = panel.wrapT = T3.RepeatWrapping;
-  var road = new T3.Mesh(roadG, new T3.MeshStandardMaterial({ map: panel, metalness: .62, roughness: .36, side: T3.DoubleSide })); road.receiveShadow = true; scene.add(road);
-  var rim = cvTex(256, 64, function (g, w, h) { var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#5d6a8f'); gr.addColorStop(.18, '#1c2540'); gr.addColorStop(1, '#0d1326'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    g.fillStyle = 'rgba(190,205,235,.55)'; for (var x = 4; x < w; x += 9) { g.beginPath(); g.arc(x, 14, 1.6, 0, 7); g.fill(); } });
+  var road = new T3.Mesh(roadG, new T3.MeshStandardMaterial({ map: panel, metalness: 0, roughness: .88, side: T3.DoubleSide })); road.receiveShadow = true; scene.add(road);
+  /* the slab's edge: a concrete kerb */
+  var rim = cvTex(256, 64, function (g, w, h) { var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#d9dbdf'); gr.addColorStop(.2, '#a9adb4'); gr.addColorStop(1, '#7b8089'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(40,44,52,.35)'; for (var x = 0; x < w; x += 64) g.fillRect(x, 0, 2, h); });
   rim.wrapS = T3.RepeatWrapping;
   var wi = []; for (k = 0; k < N; k++) { q = k * 4; wi.push(q, q + 1, q + 4, q + 1, q + 5, q + 4, q + 2, q + 6, q + 3, q + 3, q + 6, q + 7); }
   var wallG = new T3.BufferGeometry(); wallG.setAttribute('position', new T3.Float32BufferAttribute(wall, 3)); wallG.setAttribute('uv', new T3.Float32BufferAttribute(wuv, 2)); wallG.setIndex(wi); wallG.computeVertexNormals();
-  scene.add(new T3.Mesh(wallG, new T3.MeshStandardMaterial({ map: rim, metalness: .55, roughness: .4, side: T3.DoubleSide })));
-  /* the coins: metal finishes, a milled edge, a big halftone symbol on each face */
-  var SYM = ['R', 'pump', 'TFN', 'pin', 'R'], FIN = [0xe9ecf1, 0xe9dcbd, 0xe6bfae, 0x9fb3e6, 0xdfe3ea];
-  function sym(g, kind, c, size) {
-    g.beginPath();
-    if (kind === 'R') { g.font = '800 ' + size + 'px Satoshi, "Aeonik Pro", Arial, sans-serif'; return 'text'; }
-    if (kind === 'TFN') { g.font = '900 ' + (size * .62) + 'px Fraunces, Georgia, serif'; return 'text'; }
-    var s = size / 24; g.save(); g.translate(c - 12 * s, c - 12 * s); g.scale(s, s);
-    if (kind === 'pump') { g.rect(5, 3.5, 10, 17); g.rect(16, 8, 3, 9); g.rect(3, 19, 14, 2.4); }
-    else { g.moveTo(12, 22.5); g.bezierCurveTo(5, 15, 4.5, 11.5, 4.5, 9.5); g.arc(12, 9.5, 7.5, Math.PI, 0); g.bezierCurveTo(19.5, 11.5, 19, 15, 12, 22.5); g.closePath(); }
-    g.restore(); return 'path';
-  }
-  function face(kind) { return cvTex(512, 512, function (g, w, h) { var c = w / 2;
-    var gr = g.createRadialGradient(c * .7, c * .62, 10, c, c, c); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.7, '#e9ecf1'); gr.addColorStop(1, '#b4bccb'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    g.lineWidth = 16; g.strokeStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(c, c, c * .86, 0, 7); g.stroke(); g.lineWidth = 5; g.strokeStyle = 'rgba(60,70,90,.3)'; g.beginPath(); g.arc(c, c, c * .79, 0, 7); g.stroke();
-    var dot = document.createElement('canvas'); dot.width = dot.height = 10; var dg = dot.getContext('2d'); dg.fillStyle = 'rgba(70,82,106,.9)'; dg.beginPath(); dg.arc(5, 5, 2.4, 0, 7); dg.fill();
-    var pat = g.createPattern(dot, 'repeat'), size = kind === 'TFN' ? 300 : 300, mode = sym(g, kind, c, size);
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    function paint(fill, dx, dy) { g.save(); g.translate(dx, dy); g.fillStyle = fill; if (mode === 'text') g.fillText(kind === 'R' ? 'R' : 'TFN', c, c + 6); else { sym(g, kind, c, size); g.fill(); } g.restore(); }
-    paint('rgba(255,255,255,.95)', -5, -5); paint('rgba(60,70,92,.55)', 6, 7); paint('#dfe3ea', 0, 0); paint(pat, 0, 0); }); }
-  var edge = cvTex(512, 32, function (g, w, h) { g.fillStyle = '#d4d9e2'; g.fillRect(0, 0, w, h); for (var x = 0; x < w; x += 4) { g.fillStyle = 'rgba(50,60,85,.38)'; g.fillRect(x, 0, 2, h); } }); edge.wrapS = T3.RepeatWrapping; edge.repeat.set(8, 1);
-  var coins = [], NC = 5;
-  for (var ci = 0; ci < NC; ci++) {
-    var rr = [1.15, 1, 1.25, 1.05, 1.12][ci], th = rr * .19, ft = face(SYM[ci]), bt = ft.clone(); bt.needsUpdate = true; bt.wrapS = T3.RepeatWrapping; bt.repeat.x = -1;
-    var col = new T3.Color(FIN[ci]), fm = new T3.MeshStandardMaterial({ map: ft, color: col, metalness: .85, roughness: .22 }), bm = new T3.MeshStandardMaterial({ map: bt, color: col, metalness: .85, roughness: .22 });
-    var mesh = new T3.Mesh(new T3.CylinderGeometry(rr, rr, th, 128, 1), [new T3.MeshStandardMaterial({ map: edge, color: col, metalness: 1, roughness: .22 }), fm, bm]); mesh.castShadow = true;
-    var grp = new T3.Group(); grp.add(mesh); scene.add(grp); coins.push({ g: grp, r: rr, s: ci * L / NC, ph: ci * 1.7, kind: SYM[ci] });
-  }
+  scene.add(new T3.Mesh(wallG, new T3.MeshStandardMaterial({ map: rim, metalness: 0, roughness: .8, side: T3.DoubleSide })));
+  /* the coin: the silver coin from the credit section (same metals, rings and TFN mark), with a milled edge */
+  var MET = ['#f7f8fb', '#c3cad5', '#747f90', '#545e6e'];
+  function face() { return cvTex(512, 512, function (g, w, h) { var c = w / 2, sh;
+    if (g.createConicGradient) { sh = g.createConicGradient(200 * Math.PI / 180 - Math.PI / 2, c, c); [[0, 0], [.15, 1], [.3, 0], [.45, 2], [.62, 0], [.8, 1], [1, 0]].forEach(function (s) { sh.addColorStop(s[0], MET[s[1]]); }); }
+    else { sh = g.createRadialGradient(c, c, 0, c, c, c); sh.addColorStop(0, MET[0]); sh.addColorStop(.7, MET[1]); sh.addColorStop(1, MET[2]); }
+    g.fillStyle = sh; g.fillRect(0, 0, w, h);
+    var hl = g.createRadialGradient(w * .3, h * .24, 0, w * .3, h * .24, w * .32); hl.addColorStop(0, 'rgba(255,255,255,.9)'); hl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = hl; g.fillRect(0, 0, w, h);
+    var dk = g.createLinearGradient(0, 0, 0, h); dk.addColorStop(.6, 'rgba(0,0,0,0)'); dk.addColorStop(1, 'rgba(0,0,0,.22)'); g.fillStyle = dk; g.fillRect(0, 0, w, h);
+    [[.04, MET[1]], [.012, MET[0]], [.01, MET[2]]].reduce(function (r, ring) { g.lineWidth = ring[0] * w; g.strokeStyle = ring[1]; g.beginPath(); g.arc(c, c, r - ring[0] * w / 2, 0, 7); g.stroke(); return r - ring[0] * w; }, c);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = '900 118px Fraunces, Georgia, serif';
+    [['rgba(255,255,255,.8)', 0, 2], ['rgba(0,0,0,.35)', 0, -2], [MET[3], 0, 0]].forEach(function (t) { g.fillStyle = t[0]; g.fillText('TFN', c + t[1], c + 41 + t[2]); }); }); }
+  var edge = cvTex(512, 32, function (g, w, h) { g.fillStyle = MET[1]; g.fillRect(0, 0, w, h); for (var x = 0; x < w; x += 4) { g.fillStyle = x % 8 ? MET[0] : MET[2]; g.fillRect(x, 0, 2, h); } }); edge.wrapS = T3.RepeatWrapping; edge.repeat.set(8, 1);
+  var coins = [];
+  function faces(mesh) { var ft = face(), bt = ft.clone(); bt.needsUpdate = true; bt.wrapS = T3.RepeatWrapping; bt.repeat.x = -1; mesh.material[1].map = ft; mesh.material[2].map = bt; mesh.material[1].needsUpdate = mesh.material[2].needsUpdate = true; }
+  (function () {
+    var rr = 1.3, fm = function () { return new T3.MeshStandardMaterial({ metalness: .55, roughness: .3, envMapIntensity: .9 }); };
+    var mesh = new T3.Mesh(new T3.CylinderGeometry(rr, rr, rr * .17, 128, 1), [new T3.MeshStandardMaterial({ map: edge, metalness: .9, roughness: .25 }), fm(), fm()]); mesh.castShadow = true; faces(mesh);
+    var grp = new T3.Group(); grp.add(mesh); scene.add(grp); coins.push({ g: grp, r: rr, s: L * .22, ph: 0 });
+  })();
   var M = new T3.Matrix4(), R = new T3.Matrix4();
   function place(c, time) {
-    var u = ((c.s % L) + L) % L / L, f = frame(u), x = f.t.clone(), y = f.s.clone(), z = new T3.Vector3().crossVectors(x, y);
+    var span = B - A, d = ((c.s - A) % span + span) % span, u = (A + d) / L, f = frame(u), x = f.t.clone(), y = f.s.clone(), z = new T3.Vector3().crossVectors(x, y);
     M.makeBasis(x, y, z); R.makeRotationY(-c.s / c.r); M.multiply(R); c.g.quaternion.setFromRotationMatrix(M);
     c.g.rotateOnWorldAxis(f.t, Math.sin(time * 1.2 + c.ph) * .04);
-    c.g.position.copy(f.p).addScaledVector(f.n, c.r + .01); c.g.visible = u > .005 && u < .995;
+    c.g.position.copy(f.p).addScaledVector(f.n, c.r + .01);
+    /* it fades as it climbs towards the copy, then comes round again from the left */
+    var op = Math.min(1, (span - d) / (span * .14)); c.g.children[0].material.forEach(function (m) { m.opacity = op; m.transparent = op < 1; }); c.g.visible = op > .01;
   }
-  var W = 0, H = 0;
+  var W = 0, H = 0, A = 0, B = L;
   function size() { W = stage.clientWidth; H = stage.clientHeight; renderer.setSize(W, H, false); cam.aspect = W / H; var narrow = W < 700;
-    cam.fov = narrow ? 52 : 34; cam.position.set(narrow ? 1 : .4, narrow ? 1.8 : 1.4, narrow ? 17 : 13.5); cam.lookAt(narrow ? 1 : .6, -.6, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld(); }
+    cam.fov = narrow ? 52 : 34; cam.position.set(narrow ? 1 : .4, narrow ? 1.8 : 1.4, narrow ? 17 : 13.5); cam.lookAt(narrow ? 1 : .6, -.6, 0); cam.updateProjectionMatrix(); cam.updateMatrixWorld();
+    /* the coin only travels the stretch of road in frame, so it is never off rolling where nobody can see it */
+    var a = null, b = null; for (var i = 0; i <= 300; i++) { var pp = frame(i / 300).p.clone().project(cam); if (Math.abs(pp.x) < 1.25 && pp.y > -1.25 && pp.y < .55) { if (a === null) a = i / 300; b = i / 300; } }
+    A = (a === null ? 0 : a) * L; B = (b === null ? 1 : b) * L; }
   size(); addEventListener('resize', size);
   var run = false, last = 0, time = 0;
-  function tick(now) { if (!run) return; var dt = Math.min(.05, (now - last) / 1000 || 0); last = now; time += dt; coins.forEach(function (c) { c.s += dt * 1.25; place(c, time); }); renderer.render(scene, cam); requestAnimationFrame(tick); }
+  function tick(now) { if (!run) return; var dt = Math.min(.05, (now - last) / 1000 || 0); last = now; time += dt; coins.forEach(function (c) { c.s += dt * 1.6; place(c, time); }); renderer.render(scene, cam); requestAnimationFrame(tick); }
   coins.forEach(function (c) { place(c, 0); }); renderer.render(scene, cam);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { coins.forEach(function (c) { var m = c.g.children[0].material, nf = face(c.kind), nb = nf.clone(); nb.needsUpdate = true; nb.wrapS = T3.RepeatWrapping; nb.repeat.x = -1; m[1].map = nf; m[2].map = nb; m[1].needsUpdate = m[2].needsUpdate = true; }); renderer.render(scene, cam); });
+  if (document.fonts && document.fonts.load) document.fonts.load('900 118px Fraunces').then(function () { coins.forEach(function (c) { faces(c.g.children[0]); }); renderer.render(scene, cam); });
   if (reduce) { sec.classList.add('in'); return; }
   new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sec.classList.add('in'); if (!run) { run = true; last = performance.now(); requestAnimationFrame(tick); } } else run = false; }); }, { threshold: .05 }).observe(stage);
   document.addEventListener('visibilitychange', function () { if (document.hidden) run = false; else { var r = stage.getBoundingClientRect(); if (!run && r.bottom > 0 && r.top < innerHeight) { run = true; last = performance.now(); requestAnimationFrame(tick); } } });
 })();
 </script>
-<script src="tfn-gibberish.js"></script>
 </body>
 </html>
