@@ -78,10 +78,10 @@ P['lcv'] = dict(
 P['nonfuel'] = dict(
     file='tfn-non-fuel.html', name='Onroad non-fuel', kicker='TFN Onroad non-fuel', finish='p-nonfuel', acc='#4f6b8a', tier='On the road',
     blurb='Oil, road assist, parking and truck washes. Same account.',
-    title='Everything your driver needs on route',
+    title='Everything your driver needs on the road',
     sub='Oil, road assist, safe overnight parking and a truck wash. Book it with the diesel and pay from one account.',
     cta=('See the services on the map', 'tfn-network.html'),
-    chips=['Oil', 'Road assist', 'Overnight', 'Truckwash', 'AdBlue', 'Shower'],
+    chips=['Oil', 'Road assist', 'Overnight', 'Truck wash', 'AdBlue', 'Shower'],
     screen='''<span class="t">Tonight</span><span class="h">Your stop is booked</span>
 <div class="card">
 <div class="row"><i></i><span><b>Overnight parking</b><small>Secure, 1 night</small></span><span>✓</span></div>
@@ -187,9 +187,9 @@ P['africa'] = dict(
 
 P['credit'] = dict(
     file='tfn-credit.html', name='Credit products', kicker='TFN Treasury', dark=True, finish='p-credit', acc='#a2468e', tier='Finance',
-    blurb='Fuel now. Pay your bank later.',
-    title='Fuel now. Pay your bank later.',
-    sub='Get a fuel facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN and you repay monthly. You set the limits per driver and truck.',
+    blurb='Fuel now. Pay later.',
+    title='Fuel now. Pay later.',
+    sub='Get a fuel facility through Standard Bank, Absa or Preference Capital. Your credit provider pays TFN and you repay them once a month. You set the limits per driver and truck.',
     cta=('Choose a credit provider', 'tfn-credit.html'),
     chips=['Standard Bank', 'Absa', 'Preference Capital'],
     screen='''<span class="t">Credit</span><span class="h">Credit available</span><div class="big">R 184,200</div><div class="bar" style="--v:42%"><i></i></div>
@@ -197,15 +197,15 @@ P['credit'] = dict(
 <div class="card"><div class="row"><span><b>Statement</b><small>Monthly</small></span><span class="ok">Ready</span></div></div>
 <div class="cta">Download statement</div>''',
     how=('How TFN credit works', [
-        ('Apply through your bank', 'Standard Bank, Absa or Preference Capital handle it. Once you’re approved, your limit is in your dashboard.'),
+        ('Apply through a credit provider', 'Standard Bank, Absa or Preference Capital handle it. Once you’re approved, your limit is in your dashboard.'),
         ('Fuel anywhere', 'Truck stops, cross-border stops, services and Homebase deliveries.'),
         ('Repay monthly', 'One statement. Repay your provider, usually within 30 days.'),
     ]),
     feats=('What you get', [
-        ('Keep cash in the business', 'Trucks keep moving. You settle later.'),
+        ('Keep cash in the business', 'Trucks keep moving. You pay later.'),
         ('Limits per driver and truck', 'Daily, weekly or monthly. Or approve every order.'),
         ('Share with subcontractors', 'Split your limit. Get one invoice.'),
-        ('Statements that match', 'Reports that reconcile with your bank statement.'),
+        ('Statements that match', 'Reports that reconcile with your credit provider’s statement.'),
         ('More than diesel', 'Covers overnight parking, truck washes and other services.'),
         ('Across the border', 'Works at TFN Africa truck stops too.'),
     ]),
@@ -276,14 +276,14 @@ P['support'] = dict(
 <div class="card"><div class="row"><i></i><span><b>Tyres</b><small>Steer axle</small></span><span><b>Check due</b></span></div><div class="row"><i style="opacity:.7"></i><span><b>Servicing</b><small>Next service</small></span><span><b>4 200 km</b></span></div><div class="row"><i style="opacity:.45"></i><span><b>Telematics</b><small>ONE Insurance</small></span><span class="ok">Live</span></div></div>
 <div class="cta">Book a service</div>''',
     how=('How it works', [
-        ('Choose what you need', 'Add tyres, servicing or telematics.'),
+        ('Choose what you need', 'Add tyres, servicing or telematics to your account.'),
         ('Track every truck', 'See what each truck needs, in the same portal as your fuel.'),
         ('Stay on the road', 'Sort it before it becomes a breakdown.'),
     ]),
     feats=('What you get', [
-        ('Tyres', 'Arranged through TFN.'),
-        ('Servicing', 'Every truck’s services on schedule.'),
-        ('Telematics', 'By ONE Insurance.'),
+        ('Tyres', 'Fitted and checked through TFN, on the same account.'),
+        ('Servicing', 'Book each truck’s service before it falls due.'),
+        ('Telematics', 'See where every truck is and how it’s driven. Provided by ONE Insurance.'),
         ('Less downtime', 'Know what a truck needs before it stops.'),
         ('One vehicle list', 'Add a vehicle once. Use it everywhere.'),
         ('One account', 'Vehicle support next to your fuel.'),
@@ -298,7 +298,7 @@ FAM = [
     dict(k='cross', nav='Cross Border', name='Cross Border', line='Everything past the border, paid in rand', acc='#6b62c9', items=[('Fuel', 'africa'), ('Tolls and parking', 'africa'), ('Forwarding and clearing', 'africa'), ('Cash', 'africa')]),
     dict(k='risk', nav='Risk', name='Risk management', line='Cover for your trucks and loads', acc='#3f7d4e', items=[('Fines', 'risk'), ('Vehicle insurance', 'risk'), ('GIT insurance', 'risk')]),
     dict(k='fleet', nav='Fleet', name='Fleet management', line='Every vehicle road-legal', acc='#2d7fa3', items=[('Licensing', 'fleet')]),
-    dict(k='nonfuel', nav='On the road', name='Onroad non-fuel', line='Looking after drivers on route', acc='#4f6b8a', items=[('Oil', 'nonfuel'), ('Road assist', 'nonfuel'), ('Overnight', 'nonfuel'), ('Truckwash', 'nonfuel')]),
+    dict(k='nonfuel', nav='On the road', name='Onroad non-fuel', line='Looking after drivers on the road', acc='#4f6b8a', items=[('Oil', 'nonfuel'), ('Road assist', 'nonfuel'), ('Overnight', 'nonfuel'), ('Truck wash', 'nonfuel')]),
     dict(k='support', nav='Vehicles', name='Vehicle support services', line='Less downtime, longer life', acc='#5c6370', items=[('Tyres', 'support'), ('Servicing', 'support'), ('Telematics', 'support')]),
 ]
 
@@ -343,16 +343,16 @@ MENU = [
     ])),
     ('network', 'Network', 'tfn-network.html', ('Explore the network', 'tfn-network.html', [
         [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'tfn-network.html'), ('Fuel price outlook', 'tfn-network.html')])],
-        [('At the stop', [('Overnight parking', 'tfn-non-fuel.html'), ('Truckwash', 'tfn-non-fuel.html'), ('Oil and road assist', 'tfn-non-fuel.html')])],
+        [('At the stop', [('Overnight parking', 'tfn-non-fuel.html'), ('Truck wash', 'tfn-non-fuel.html'), ('Oil and road assist', 'tfn-non-fuel.html')])],
         [('Past the border', [('Cross Border', 'tfn-africa.html'), ('Five countries, paid in rand', 'tfn-africa.html')])],
     ])),
     ('pricing', 'Pricing', 'tfn-tiers.html', ('See the tiers', 'tfn-tiers.html', [
-        [('Pay less', [('Tiers', 'tfn-tiers.html'), ('Fuel prices', 'tfn-network.html'), ('Homebase fee calculator', 'tfn-tiers.html#calc')])],
+        [('Pay less', [('Tiers', 'tfn-tiers.html'), ('TFN Rewards', 'tfn-page-examples.html#rewards'), ('Fuel prices', 'tfn-network.html'), ('Homebase fee calculator', 'tfn-tiers.html#calc')])],
         [('Credit', [('Credit products', 'tfn-credit.html'), ('Choose a credit provider', 'tfn-credit.html')])],
         [('Talk to us', [('Get a fuel quote', 'tfn-page-examples.html#calc')])],
     ])),
     ('company', 'Company', '#', ('About TFN', '#', [
-        [('Company', [('About us', '#'), ('Contact us', '#')])],
+        [('Company', [('About us', '#'), ('Our partners', 'tfn-page-examples.html#partners'), ('Contact us', '#')])],
         [('Help', [('Support', '#'), ('Terms and conditions', '#')])],
         [('Account', [('Log in', '#')])],
     ])),
@@ -405,7 +405,7 @@ def footer():
     return ('<footer data-dark><div class="wrap"><div class="cols">'
             '<div><h4>Products</h4><ul><li><a href="tfn-page-examples.html#fam">All products</a></li>%s</ul></div>'
             '<div><h4>Plan and save</h4><ul><li><a href="tfn-network.html#portal">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></div>'
-            '<div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="#">Contact us</a></li><li><a href="#">Support</a></li></ul></div>'
+            '<div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="tfn-page-examples.html#partners">Our partners</a></li><li><a href="#">Contact us</a></li><li><a href="#">Support</a></li></ul></div>'
             '<div><h4>Account</h4><ul><li><a href="#">Log in</a></li><li><a href="#">Terms and conditions</a></li></ul></div>'
             '</div><svg aria-hidden="true"><use href="#lockup"/></svg><span>TFN, South Africa’s largest independent on-road refuelling service provider, since April 2007. Design concept: screens and figures in the mock-ups are illustrative.</span></div></footer>') % prod
 
@@ -489,7 +489,7 @@ PORTAL = {
  'credit': ('TFN Dashboard', 'Credit, with limits you set', 'Share your facility between trucks, drivers and subcontractors. See what’s left before you commit.', 'Credit',
    '<div class="pf-kpis"><div><small>Facility</small><b>R 250 000</b></div><div><small>Allocated</small><b data-k="alloc">R 0</b></div><div><small>Not allocated</small><b class="sp" data-k="free">R 0</b></div></div>'
    '<div class="pf-grid"><div class="pf-card"><h4>Weekly limits</h4><div class="ctl" data-limits></div></div>'
-   '<div class="pf-card"><h4>How you repay</h4><div class="tl"><div><b>All month</b>Fuel on credit</div><div><b>1 Nov</b>Statement</div><div><b>1 Dec</b>Repay your bank</div></div>'
+   '<div class="pf-card"><h4>How you repay</h4><div class="tl"><div><b>All month</b>Fuel on credit</div><div><b>1 Nov</b>Statement</div><div><b>1 Dec</b>Repay your provider</div></div>'
    '<div class="bars" style="margin-top:22px"><div><span>Allocated of your facility <b data-k="usedp">0%</b></span><i data-b="used" style="--v:26%"></i></div></div>'
    '<p class="pfnote" style="font-size:.8rem;margin-top:14px">Through Standard Bank, Absa or Preference Capital. Terms are set by your credit provider.</p></div></div>', 'limits'),
  'risk': ('TruckersHub', 'Fines and cover, next to your fuel', 'New fines come in as exceptions to act on. Your cover is listed truck by truck.', 'Risk',
@@ -556,7 +556,7 @@ def product_page(k):
         data_dark, fam_list([f for f in FAM if f is not mine]))
     close = '<section class="close"%s><div class="wrap"><h2>%s</h2><p class="sub">%s</p><a class="%s" href="%s">%s</a></div></section>' % (
         data_dark, 'Be first in line for EngenXT' if p.get('soon') else 'See what you’d save',
-        'Leave your details and we’ll tell you when EngenXT opens.' if p.get('soon') else 'Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.', btn,
+        'Leave your details and we’ll tell you when EngenXT opens.' if p.get('soon') else 'Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.', btn,
         p['cta'][1] if p.get('soon') else 'tfn-page-examples.html#calc', p['cta'][0] if p.get('soon') else 'Get a fuel quote')
     quote = '<section class="band quote"><div class="wrap"><blockquote>“%s”</blockquote><cite>%s</cite></div></section>' % Q[k] if k in Q else ''
     faq = '<section class="band faq"><div class="wrap"><h2>Questions</h2><div class="faqs">%s</div></div></section>' % ''.join('<details><summary>%s</summary><p>%s</p></details>' % qa for qa in F[k])
@@ -566,11 +566,11 @@ def product_page(k):
 
 # ---------- tiers: TFN's own volume ladder from tfn.co.za/price-list (monthly on-road litres, discount per litre) ----------
 TIERS = [
-    ('bronze', 'Bronze', 0, 10000, 0),
-    ('silver', 'Silver', 10000, 30000, 2),
-    ('gold', 'Gold', 30000, 50000, 4),
-    ('diamond', 'Diamond', 50000, 150000, 6),
-    ('platinum', 'Platinum', 150000, None, 8),
+    ('bronze', 'Bronze', 0, 10000, 0, 1),
+    ('silver', 'Silver', 10000, 30000, 2, 2),
+    ('gold', 'Gold', 30000, 50000, 4, 3),
+    ('diamond', 'Diamond', 50000, 150000, 6, 4),
+    ('platinum', 'Platinum', 150000, None, 8, 5),
 ]
 
 
@@ -584,29 +584,29 @@ def litres(lo, hi):
 
 
 def tiers_page():
-    fan = ''.join(badge(k, n, ' style="--i:%d;--r:%ddeg"' % (min(i, 4 - i), (i - 2) * 7)) for i, (k, n, lo, hi, d) in enumerate(TIERS))
+    fan = ''.join(badge(k, n, ' style="--i:%d;--r:%ddeg"' % (min(i, 4 - i), (i - 2) * 7)) for i, (k, n, lo, hi, d, pts) in enumerate(TIERS))
     hero = """<section class="tiers-hero" data-dark><div class="wrap">
 <p class="kicker" style="justify-content:center;color:#a8a8a8">TFN tiers</p>
 <h1>The more you fuel, the less you pay</h1>
 <p class="sub">Every TFN account has a tier, set by how much diesel your trucks buy on the road each month. Move up a tier and every litre costs less.</p>
 <a class="btn light" href="#calc">Find my tier</a>
 <div class="fan" aria-hidden="true">%s</div></div></section>""" % fan
-    ladder = ''.join('<div>%s<h3>%s</h3><span class="lit">%s a month</span><span class="disc">%s<small>%s</small></span></div>' % (
-        badge(k, n), n, litres(lo, hi), ('%dc off' % d) if d else 'Network price', 'every litre of diesel' if d else 'below the grid price')
-        for k, n, lo, hi, d in TIERS)
+    ladder = ''.join('<div>%s<h3>%s</h3><span class="lit">%s a month</span><span class="disc">%s<small>%s</small></span><span class="lit">%d point%s a litre in TFN Rewards</span></div>' % (
+        badge(k, n), n, litres(lo, hi), ('%dc off' % d) if d else 'Network price', 'every litre of diesel' if d else 'below the grid price', pts, '' if pts == 1 else 's')
+        for k, n, lo, hi, d, pts in TIERS)
     steps = """<section class="band"><div class="wrap"><h2>Five tiers, the same app</h2><p class="sub">Everyone gets the same TFN app and the same network. Your tier changes what you pay, not how it works.</p>
 <div class="ladder">%s</div>
-<p class="fine">Tiers are based on your monthly on-road diesel volume across your whole account. Your Homebase fee is also set by your on-road tier. Prices and discounts are indicative; final pricing may vary by depot, grid zone and account.</p></div></section>""" % ladder
+<p class="fine">Tiers are based on your monthly on-road diesel volume across your whole account. Your Homebase fee is also set by your on-road tier. Prices and discounts are indicative. Final pricing may vary by depot, grid zone and account. <a href="tfn-page-examples.html#rewards">TFN Rewards</a> is part of this design concept and its points rates are illustrative.</p></div></section>""" % ladder
     calc = """<section class="band grey" id="calc"><div class="wrap"><h2>What tier would you be?</h2><p class="sub">Slide to your monthly on-road diesel.</p>
 <div class="calc2" data-tiers='%s'>
 <div><label for="tlit">Litres a month</label><output id="tout" for="tlit">40 000 L</output><input type="range" id="tlit" min="0" max="200000" step="1000" value="40000"></div>
 <div class="res" aria-live="polite"><div id="tbadge">%s</div><dl><dt>Tier</dt><dd id="tname">Gold</dd><dt>Off every litre</dt><dd id="tdisc">4c</dd><dt>Saving a month</dt><dd id="tsave">R 1 600</dd><dt>To the next tier</dt><dd id="tnext">10 000 L to Diamond</dd></dl></div>
-</div></div></section>""" % (html.escape(__import__('json').dumps([[k, n, lo, hi, d] for k, n, lo, hi, d in TIERS])), badge('gold', 'Gold'))
+</div></div></section>""" % (html.escape(__import__('json').dumps([[k, n, lo, hi, d] for k, n, lo, hi, d, pts in TIERS])), badge('gold', 'Gold'))
     portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal <span class="soon">Coming soon</span></p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one and what it’s saving you in the TruckersHub fleet manager portal.</p>
 <div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
 <main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
-<div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
-    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></section>'
+<div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>TFN Rewards</span><b>3 points a litre</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
+    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></section>'
     body = nav('tiers') + '\n<main>\n' + hero + steps + calc + portal + close + '\n</main>\n' + footer()
     return page('TFN tiers | The more you fuel, the less you pay', 'TFN tiers: Bronze, Silver, Gold, Diamond and Platinum, set by monthly on-road diesel volume. Move up a tier and every litre costs less.', body)
 

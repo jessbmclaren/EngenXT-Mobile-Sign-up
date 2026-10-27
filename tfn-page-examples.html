@@ -1400,6 +1400,36 @@
   .cres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.25); }
   .cres small { display: block; opacity: .82; font-size: .82rem; } .cres b { font-size: 2.1rem; letter-spacing: -.03em; font-weight: 700; display: block; line-height: 1.15; font-variant-numeric: tabular-nums; }
   /* on a phone the calculator's column must be able to shrink, or the two results push the page sideways */
+  /* ---------- partners: the businesses behind the products, each named with what it does for you ---------- */
+  .pt { padding: 56px 0 8px; }
+  .pt-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 48px; align-items: center; padding: 40px 44px; border: 1px solid var(--line); border-radius: 28px; background: #fff; }
+  .pt-copy h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); letter-spacing: -.02em; line-height: 1.15; text-wrap: balance; }
+  .pt-copy p { color: var(--muted); margin-top: 12px; max-width: 24em; }
+  .pt-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .pt-list li { display: flex; } .pt-list a { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-height: 92px; padding: 16px 18px; border-radius: 18px; background: var(--grey); transition: background .2s; }
+  .pt-list a:hover { background: #ececee; }
+  .pt-mk { font-family: var(--sans); font-weight: 700; font-size: 1.05rem; letter-spacing: -.01em; color: var(--text); line-height: 1.2; }
+  .pt-list small { color: var(--muted); font-size: .84rem; }
+  @media (max-width: 900px) { .pt-card { grid-template-columns: 1fr; gap: 28px; padding: 28px 24px; } }
+  @media (max-width: 560px) { .pt-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pt-list a { min-height: 80px; padding: 14px; } }
+
+  /* ---------- TFN Rewards: a points card beside how points are earned and spent ---------- */
+  .rw-soon { display: inline-block; margin-left: 6px; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.06); color: #3a3a3c; font-size: .8rem; vertical-align: 2px; }
+  .sec.rw { padding-top: 40px; }
+  .rw-card { justify-self: center; width: min(100%, 400px); padding: 26px; border-radius: 30px; background: #0b0b0c; color: #fff; box-shadow: 0 50px 90px -40px rgba(20,30,50,.45); }
+  .rw-top { display: flex; align-items: center; justify-content: space-between; color: #a8a8a8; font-size: .86rem; }
+  .rw-badge { padding: 4px 12px; border-radius: 999px; background: linear-gradient(135deg, #e9dcb4, #b89a5a); color: #1f1a10; font-weight: 600; font-size: .8rem; }
+  .rw-pts { display: block; margin-top: 26px; font-family: var(--sans); font-weight: 500; font-size: 3.2rem; letter-spacing: -.035em; line-height: 1; }
+  .rw-unit { color: #a8a8a8; font-size: .95rem; }
+  .rw-val { margin-top: 6px; font-size: .95rem; }
+  .rw-bar { height: 6px; margin: 22px 0 8px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; } .rw-bar i { display: block; width: var(--v); height: 100%; border-radius: inherit; background: #fff; }
+  .rw-next { color: #a8a8a8; font-size: .82rem; }
+  .rw-feed { list-style: none; margin-top: 22px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,.1); }
+  .rw-feed li { display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; font-size: .9rem; }
+  .rw-feed .ob { width: 30px; height: 30px; } .rw-feed b { display: block; font-weight: 500; } .rw-feed small { color: #8e8e93; font-size: .8rem; } .rw-feed em { font-style: normal; font-variant-numeric: tabular-nums; }
+  .rw-steps { display: grid; gap: 22px; margin: 26px 0 32px; }
+  .rw-steps h3 { font-size: 1.1rem; margin-bottom: 4px; } .split .rw-steps p { margin: 0; font-size: 1rem; }
+  @media (max-width: 900px) { .sec.rw .split { grid-template-columns: 1fr; gap: 48px; } .sec.rw .split > :first-child { order: 2; } }
   .split > * { min-width: 0; } #calc { overflow-x: clip; } @media (max-width: 560px) { .calc { padding: 18px; } .cpanel { padding: 20px; } .cres b { font-size: 1.6rem; } }
   .cbars { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 8px; font-size: .8rem; } .cbars div { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; }
   .cbars i { height: 12px; border-radius: 99px; background: rgba(255,255,255,.35); width: var(--w, 0%); transition: width .5s var(--ease); } .cbars div:last-child i { background: #fff; }
@@ -1626,7 +1656,7 @@
     <a class="btn ghost sm login" href="#">Log in</a><a class="btn sm" href="#f">Get a fuel quote</a><button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pmenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </div>
 </header>
-<div class="pmenu" id="pmenu" role="dialog" aria-modal="true" aria-label="Menu" hidden><div class="pm-top"><a class="pm-brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a><button class="pm-x" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="pm-tabs" role="tablist" aria-label="Menu sections"><button type="button" role="tab" aria-selected="true" data-pm="0">Products</button><button type="button" role="tab" aria-selected="false" data-pm="1">Network</button><button type="button" role="tab" aria-selected="false" data-pm="2">Pricing</button><button type="button" role="tab" aria-selected="false" data-pm="3">Company</button></div><div class="pm-body"><div class="pm-p" data-pm="0"><a class="pm-d" href="tfn-page-examples.html#fam">Discover TruckersHub <span aria-hidden="true">→</span></a><details><summary>Treasury</summary><ul><li><a href="tfn-credit.html">Credit products</a></li><li><span>Smart Factoring</span></li></ul></details><details><summary>Fuel & Technology</summary><ul><li><a href="tfn-on-road.html">CRT – Onroad</a></li><li><a href="tfn-lcv.html">EngenXT</a></li><li><span>TFN – Wholesale</span></li><li><a href="tfn-homebase.html">Homebase management</a></li></ul></details><details><summary>Cross Border</summary><ul><li><a href="tfn-africa.html">Fuel</a></li><li><a href="tfn-africa.html">Tolls and parking</a></li><li><a href="tfn-africa.html">Forwarding and clearing</a></li><li><a href="tfn-africa.html">Cash</a></li></ul></details><details><summary>Risk management</summary><ul><li><a href="tfn-risk.html">Fines</a></li><li><a href="tfn-risk.html">Vehicle insurance</a></li><li><a href="tfn-risk.html">GIT insurance</a></li></ul></details><details><summary>Fleet management</summary><ul><li><a href="tfn-fleet-management.html">Licensing</a></li></ul></details><details><summary>Onroad non-fuel</summary><ul><li><a href="tfn-non-fuel.html">Oil</a></li><li><a href="tfn-non-fuel.html">Road assist</a></li><li><a href="tfn-non-fuel.html">Overnight</a></li><li><a href="tfn-non-fuel.html">Truckwash</a></li></ul></details><details><summary>Vehicle support services</summary><ul><li><a href="tfn-vehicle-support.html">Tyres</a></li><li><a href="tfn-vehicle-support.html">Servicing</a></li><li><a href="tfn-vehicle-support.html">Telematics</a></li></ul></details><details><summary>Pricing</summary><ul><li><a href="tfn-tiers.html">Tiers</a></li><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li></ul></details></div><div class="pm-p" data-pm="1" hidden><a class="pm-d" href="tfn-network.html">Explore the network <span aria-hidden="true">→</span></a><details><summary>Plan</summary><ul><li><a href="tfn-network.html">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></details><details><summary>At the stop</summary><ul><li><a href="tfn-non-fuel.html">Overnight parking</a></li><li><a href="tfn-non-fuel.html">Truckwash</a></li><li><a href="tfn-non-fuel.html">Oil and road assist</a></li></ul></details><details><summary>Past the border</summary><ul><li><a href="tfn-africa.html">Cross Border</a></li><li><a href="tfn-africa.html">Five countries, paid in rand</a></li></ul></details></div><div class="pm-p" data-pm="2" hidden><a class="pm-d" href="tfn-tiers.html">See the tiers <span aria-hidden="true">→</span></a><details><summary>Pay less</summary><ul><li><a href="tfn-tiers.html">Tiers</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-tiers.html#calc">Homebase fee calculator</a></li></ul></details><details><summary>Credit</summary><ul><li><a href="tfn-credit.html">Credit products</a></li><li><a href="tfn-credit.html">Choose a credit provider</a></li></ul></details><details><summary>Talk to us</summary><ul><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li></ul></details></div><div class="pm-p" data-pm="3" hidden><a class="pm-d" href="#">About TFN <span aria-hidden="true">→</span></a><details><summary>Company</summary><ul><li><a href="#">About us</a></li><li><a href="#">Contact us</a></li></ul></details><details><summary>Help</summary><ul><li><a href="#">Support</a></li><li><a href="#">Terms and conditions</a></li></ul></details><details><summary>Account</summary><ul><li><a href="#">Log in</a></li></ul></details></div></div><div class="pm-cta"><a class="pm-login" href="#">Log in</a><a class="pm-quote" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></div>
+<div class="pmenu" id="pmenu" role="dialog" aria-modal="true" aria-label="Menu" hidden><div class="pm-top"><a class="pm-brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a><button class="pm-x" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div><div class="pm-tabs" role="tablist" aria-label="Menu sections"><button type="button" role="tab" aria-selected="true" data-pm="0">Products</button><button type="button" role="tab" aria-selected="false" data-pm="1">Network</button><button type="button" role="tab" aria-selected="false" data-pm="2">Pricing</button><button type="button" role="tab" aria-selected="false" data-pm="3">Company</button></div><div class="pm-body"><div class="pm-p" data-pm="0"><a class="pm-d" href="tfn-page-examples.html#fam">Discover TruckersHub <span aria-hidden="true">→</span></a><details><summary>Treasury</summary><ul><li><a href="tfn-credit.html">Credit products</a></li><li><span>Smart Factoring</span></li></ul></details><details><summary>Fuel & Technology</summary><ul><li><a href="tfn-on-road.html">CRT – Onroad</a></li><li><a href="tfn-lcv.html">EngenXT</a></li><li><span>TFN – Wholesale</span></li><li><a href="tfn-homebase.html">Homebase management</a></li></ul></details><details><summary>Cross Border</summary><ul><li><a href="tfn-africa.html">Fuel</a></li><li><a href="tfn-africa.html">Tolls and parking</a></li><li><a href="tfn-africa.html">Forwarding and clearing</a></li><li><a href="tfn-africa.html">Cash</a></li></ul></details><details><summary>Risk management</summary><ul><li><a href="tfn-risk.html">Fines</a></li><li><a href="tfn-risk.html">Vehicle insurance</a></li><li><a href="tfn-risk.html">GIT insurance</a></li></ul></details><details><summary>Fleet management</summary><ul><li><a href="tfn-fleet-management.html">Licensing</a></li></ul></details><details><summary>Onroad non-fuel</summary><ul><li><a href="tfn-non-fuel.html">Oil</a></li><li><a href="tfn-non-fuel.html">Road assist</a></li><li><a href="tfn-non-fuel.html">Overnight</a></li><li><a href="tfn-non-fuel.html">Truck wash</a></li></ul></details><details><summary>Vehicle support services</summary><ul><li><a href="tfn-vehicle-support.html">Tyres</a></li><li><a href="tfn-vehicle-support.html">Servicing</a></li><li><a href="tfn-vehicle-support.html">Telematics</a></li></ul></details><details><summary>Pricing</summary><ul><li><a href="tfn-tiers.html">Tiers</a></li><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li></ul></details></div><div class="pm-p" data-pm="1" hidden><a class="pm-d" href="tfn-network.html">Explore the network <span aria-hidden="true">→</span></a><details><summary>Plan</summary><ul><li><a href="tfn-network.html">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></details><details><summary>At the stop</summary><ul><li><a href="tfn-non-fuel.html">Overnight parking</a></li><li><a href="tfn-non-fuel.html">Truck wash</a></li><li><a href="tfn-non-fuel.html">Oil and road assist</a></li></ul></details><details><summary>Past the border</summary><ul><li><a href="tfn-africa.html">Cross Border</a></li><li><a href="tfn-africa.html">Five countries, paid in rand</a></li></ul></details></div><div class="pm-p" data-pm="2" hidden><a class="pm-d" href="tfn-tiers.html">See the tiers <span aria-hidden="true">→</span></a><details><summary>Pay less</summary><ul><li><a href="tfn-tiers.html">Tiers</a></li><li><a href="tfn-page-examples.html#rewards">TFN Rewards</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-tiers.html#calc">Homebase fee calculator</a></li></ul></details><details><summary>Credit</summary><ul><li><a href="tfn-credit.html">Credit products</a></li><li><a href="tfn-credit.html">Choose a credit provider</a></li></ul></details><details><summary>Talk to us</summary><ul><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li></ul></details></div><div class="pm-p" data-pm="3" hidden><a class="pm-d" href="#">About TFN <span aria-hidden="true">→</span></a><details><summary>Company</summary><ul><li><a href="#">About us</a></li><li><a href="tfn-page-examples.html#partners">Our partners</a></li><li><a href="#">Contact us</a></li></ul></details><details><summary>Help</summary><ul><li><a href="#">Support</a></li><li><a href="#">Terms and conditions</a></li></ul></details><details><summary>Account</summary><ul><li><a href="#">Log in</a></li></ul></details></div></div><div class="pm-cta"><a class="pm-login" href="#">Log in</a><a class="pm-quote" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></div>
 <div class="mega" id="mega" aria-hidden="true"></div>
 
 <main id="top">
@@ -1637,12 +1667,12 @@
       <div class="zh-sheet" aria-hidden="true"></div>
       <div class="zh-copy hcopy">
         <h1>Fuel &amp; Beyond</h1>
-        <p>This is fleet fuel, redefined. Negotiated diesel at 270+ truck stops, with credit, cover and cross-border in the same account.</p>
+        <p>Negotiated diesel at 270+ truck stops, with every fill logged live. Beyond fuel: credit, cover and rewards on the same account.</p>
         <a class="btn" href="#f">Get a fuel quote</a>
       </div>
       <div class="zh-end">
         <h2 class="title">Everything your trucks run on</h2>
-        <p class="sub">Fuel was the start. Credit, cover, cross-border and vehicle care now sit in the same TFN account.</p>
+        <p class="sub">Fuel was the start. Now credit, cover, cross-border and vehicle care run on one TFN account.</p>
         <a class="btn" href="#fam">See all products</a>
       </div>
       <ul class="zh-row" aria-label="Products">
@@ -1705,9 +1735,27 @@
 
   <!-- 2. white: a quiet strip -->
   <div class="wrap strip">
-    <div><b data-roll>168K+</b>Transactions a month</div><div><b data-roll>44M+</b>Litres a month</div><div><b data-roll>270+</b>Truck stops</div><div><b data-roll>2007</b>Refuelling since</div>
+    <div><b data-roll>168K+</b>Transactions a month</div><div><b data-roll>44M+</b>Litres a month</div><div><b data-roll>270+</b>Truck stops</div><div><b data-roll>2007</b>The year we started</div>
   </div>
 
+
+
+  <!-- 2b. white: the partners behind the products, each named with what it does for you (swap the names for the partners' approved logo files) -->
+  <section class="pt" id="partners" aria-labelledby="ptH">
+    <div class="wrap">
+      <div class="pt-card">
+        <div class="pt-copy"><h2 id="ptH">Beyond fuel, with partners you know</h2><p>The banks and specialists behind each TFN product. You deal with one account.</p></div>
+        <ul class="pt-list">
+          <li><a href="tfn-credit.html"><span class="pt-mk">Standard Bank</span><small>Fuel credit</small></a></li>
+          <li><a href="tfn-credit.html"><span class="pt-mk">Absa</span><small>Fuel credit</small></a></li>
+          <li><a href="tfn-credit.html"><span class="pt-mk">Preference Capital</span><small>Fuel credit</small></a></li>
+          <li><a href="tfn-risk.html"><span class="pt-mk">ONE Insurance</span><small>Cover for trucks and loads</small></a></li>
+          <li><a href="tfn-fleet-management.html"><span class="pt-mk">IOX</span><small>Fines and licensing</small></a></li>
+          <li><a href="tfn-lcv.html"><span class="pt-mk">Engen</span><small>Stations for EngenXT</small></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
 
   <!-- 3. white split: a portrait whose background is our blue -->
@@ -1715,8 +1763,8 @@
     <div class="wrap split">
       <div class="pic rise" aria-hidden="true"><div class="amap" data-s="1.15" data-t0=".12" data-dur="56000"><svg class="mv" viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice"></svg></div><div class="asearch mgl" style="top:14px"><svg><use href="#i-search"/></svg>Search TFN truck stops</div><div class="chip mgl" style="z-index:3"><i class="ob ob-blue"></i><span>Saved this month</span><b data-roll>R 4,210</b></div></div>
       <div>
-        <h2>Your route, refuelled</h2>
-        <p>Your drivers fill up at any of 270+ TFN truck stops at prices below the grid price. Every litre is logged against the truck and driver.</p>
+        <h2>270+ truck stops on your routes</h2>
+        <p>Your drivers fill up below the grid price. Every litre is logged against the truck and the driver.</p>
         <a class="btn" href="tfn-network.html">Find a truck stop</a>
       </div>
     </div>
@@ -1851,8 +1899,8 @@
   <!-- 6. black: a carousel of soft grainy orbs, one per thing credit covers, with silver coins floating round them -->
   <section class="sec black center" id="d">
     <div class="wrap">
-      <h2 class="title">Fuel now, settle later</h2>
-      <p class="sub">Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN. You repay your bank monthly.<sup>1</sup></p>
+      <h2 class="title">Fuel now. Pay later.</h2>
+      <p class="sub">Get a fuel credit facility through Standard Bank, Absa or Preference Capital. Your credit provider pays TFN and you repay them once a month.<sup>1</sup></p>
     </div>
     <div class="orbstage" id="orbstage">
       <div class="coins" id="coins" aria-hidden="true"></div>
@@ -1875,18 +1923,45 @@
   <!-- 8a. white: a silver TFN coin rolling along the road -->
   <section class="sec paper center coinroad" id="cr">
     <div class="wrap">
-      <h2 class="title">Savings that roll in</h2>
-      <p class="sub">Negotiated diesel at every TFN stop on the road. Every fill puts money back in the business.</p>
-      <a class="btn" href="#f">Get a fuel quote</a>
+      <p class="kicker">TFN Rewards <span class="rw-soon">Coming soon</span></p>
+      <h2 class="title">Rewards that roll in</h2>
+      <p class="sub">Every litre you buy on the road earns TFN points. Spend them at the stop on parking, showers and truck washes.<sup>4</sup></p>
+      <a class="btn" href="#rewards">See how rewards work</a>
     </div>
     <div class="crstage" aria-hidden="true"><canvas class="crcv"></canvas></div>
+  </section>
+
+  <!-- 8a2. white: TFN Rewards, a points card beside how points are earned and spent (rates and values illustrative, footnote 4) -->
+  <section class="sec paper rw" id="rewards" aria-labelledby="rwH">
+    <div class="wrap split">
+      <div class="rw-card" aria-hidden="true">
+        <div class="rw-top"><span>TFN Rewards</span><span class="rw-badge">Gold</span></div>
+        <b class="rw-pts">48 260</b><span class="rw-unit">points</span>
+        <p class="rw-val">R 482.60 saved with points this month</p>
+        <div class="rw-bar"><i style="--v:58%"></i></div><small class="rw-next">8 400 L to Diamond and 4 points a litre</small>
+        <ul class="rw-feed">
+          <li><i class="ob ob-blue"></i><span><b>Fill at Harrismith</b><small>420 L · Today</small></span><em>+1 260</em></li>
+          <li><i class="ob ob-teal"></i><span><b>Truck wash</b><small>Villiers Truck Inn · Yesterday</small></span><em>+300</em></li>
+          <li><i class="ob ob-violet"></i><span><b>Overnight parking</b><small>Paid with points · 10 Oct</small></span><em>R 240 saved</em></li>
+        </ul>
+      </div>
+      <div>
+        <h2 id="rwH">Earn on every litre</h2>
+        <div class="rw-steps">
+          <div><h3>Earn as you fill</h3><p>Points land the moment a fill is recorded. Services at the stop earn points too.</p></div>
+          <div><h3>Spend at the stop</h3><p>Pay for parking, showers, truck washes and AdBlue with points. Or take them off your next statement.</p></div>
+          <div><h3>Earn faster as you grow</h3><p>Your tier sets the rate: 1 point a litre on Bronze, up to 5 on Platinum.</p></div>
+        </div>
+        <a class="btn" href="tfn-tiers.html">See the tiers</a>
+      </div>
+    </div>
   </section>
 
   <!-- 8b. the network map: search, plan a route with suggested fills, filter by services, compare prices -->
   <section class="sec mapsec black center" id="m">
     <div class="wrap">
       <h2 class="title">Cheaper diesel, mapped</h2>
-      <p class="sub">Compare prices across 270+ truck stops and plan every fill before your trucks leave the yard.</p>
+      <p class="sub">Compare today’s price at every TFN truck stop. Plan each fill before your trucks leave the yard.</p>
     </div>
     <div class="nm-stage">
       <div class="nm-phone">
@@ -1954,7 +2029,7 @@
   <section class="sec black center night" id="n">
     <div class="wrap">
       <h2 class="title">Made for the night shift</h2>
-      <p class="sub">After dark the app turns dark, so it never dazzles a driver. The route glows; everything else steps back.</p>
+      <p class="sub">After dark the app turns dark too, so the screen never blinds the driver. Only the route and the next fill stay bright.</p>
     </div>
     <div class="nstage" aria-hidden="true">
       <div class="nwall"></div><div class="nplinth"></div>
@@ -1977,7 +2052,7 @@
       <div class="ccoins" aria-hidden="true"><div class="coins" id="calcCoins"></div></div>
       <div>
         <h2>See what you could save</h2>
-        <p>Slide to estimate, then get a quote for your real price.<sup style="font-size:.6em;margin-left:1px">2</sup></p>
+        <p>Move the sliders for an estimate. Then ask us for a quote with your real price.<sup style="font-size:.6em;margin-left:1px">2</sup></p>
         <a class="btn" href="#f">Get a fuel quote</a>
       </div>
       <div class="calc rise">
@@ -1986,7 +2061,7 @@
           <div class="cpanes">
             <div class="cpane" data-c="0">
               <label class="rg"><span>Trucks</span><output></output><input type="range" min="1" max="200" value="25" data-k="v"></label>
-              <label class="rg"><span>Litres per truck, per month</span><output></output><input type="range" min="100" max="3000" step="50" value="900" data-k="l" data-u=" l"></label>
+              <label class="rg"><span>Litres per truck, per month</span><output></output><input type="range" min="100" max="3000" step="50" value="900" data-k="l" data-u=" L"></label>
               <label class="rg"><span>Diesel price per litre</span><output></output><input type="range" min="18" max="28" step=".1" value="22.4" data-k="p" data-pre="R " data-d="2"></label>
               <label class="rg"><span>Saving per litre</span><output></output><input type="range" min=".1" max="1.4" step=".05" value=".55" data-k="s" data-pre="R " data-d="2"></label>
               <div class="cres"><div><small>Saving per month</small><b data-o="m">R 0</b></div><div><small>Saving per year</small><b data-o="y">R 0</b></div>
@@ -2010,8 +2085,8 @@
   <!-- 10a. white: TruckersHub as a desktop app, switching between the seven product families (the families of tools/build-product-pages.py; the screen data is illustrative) -->
   <section class="sec paper center" id="fam">
     <div class="wrap th-wide">
-      <h2 class="title">Finally, everything in one place</h2>
-      <p class="sub">Seven product families. One TFN account. Switch between them in TruckersHub.</p>
+      <h2 class="title">All of TFN in one place</h2>
+      <p class="sub">Seven product families on one TFN account. Switch between them in TruckersHub, coming soon.</p>
       <div class="th" id="th" tabindex="-1" role="region" aria-label="TruckersHub, coming soon">
         <div class="th-bar" aria-hidden="true"><i></i><i></i><i></i><span>TruckersHub<em>Coming soon</em></span></div>
         <div class="th-side">
@@ -2029,7 +2104,7 @@
   </section>
 
   <section class="stack" id="k">
-    <div class="wrap center"><h2 class="title">Join the transporters fuelling 44M+ litres a month</h2><p class="sub" style="margin-bottom:64px">Pick the set-up that fits how you move freight.</p></div>
+    <div class="wrap center"><h2 class="title">Built for how you move freight</h2><p class="sub" style="margin-bottom:64px">Your own trucks, routes past the border or a team of subcontractors. Each has its own set-up.</p></div>
     <div class="wrap scs">
       <article class="sc"><div class="im" style="--img:url(img/driver-truck.jpg); background-position: 55% 46%" aria-hidden="true"><div class="gl"><span class="dot h-blue"></span>270+ truck stops</div></div><div class="tx"><h3>Transporters</h3><p>For your own fleet: refuel on the road, pay from one account and see every truck live.</p><a class="btn light" href="tfn-on-road.html">Fuel for transporters</a></div></article>
       <article class="sc"><div class="im" style="--img:url(img/k-namibia.jpg); background-position: 50% 55%" aria-hidden="true"><div class="gl"><span class="dot h-violet"></span>5 countries beyond South Africa</div></div><div class="tx"><h3>Cross-border</h3><p>For routes beyond South Africa: refuel in five neighbouring countries and pay in rand.</p><a class="btn light" href="tfn-africa.html">Fuel across borders</a></div></article>
@@ -2043,9 +2118,9 @@
     <div class="wrap">
       <h2 class="title">Pick your set-up</h2>
       <div class="plans">
-        <article class="plan rise"><div class="top" style="--img:url(img/plan-onroad.jpg)"></div><h3>On-Road</h3><p class="pr"><b data-roll>270+</b> truck stops</p><a class="btn" href="#f">Get a fuel quote</a><ul><li>For trucks on the move</li><li>Negotiated diesel prices</li><li>Every fill logged live</li></ul></article>
-        <article class="plan pick rise"><div class="top" style="--img:url(img/plan-homebase.jpg); background-position: 50% 62%"><span class="tg">Recommended</span></div><h3>On-Road + Homebase</h3><p class="pr"><b>One account</b> for road and yard</p><a class="btn" href="tfn-tiers.html#calc">Calculate my rate</a><ul><li>For operations with their own tank</li><li>Yard and road diesel together</li><li>Fee set by your on-road volume<sup style="font-size:.6em;margin-left:1px">3</sup></li></ul></article>
-        <article class="plan rise"><div class="top" style="--img:url(img/plan-africa.jpg); background-position: 50% 65%"></div><h3>TFN Africa</h3><p class="pr"><b data-roll>5</b> countries beyond South Africa</p><a class="btn" href="tfn-africa.html">Plan a cross-border route</a><ul><li>For cross-border routes</li><li>Pay in rand</li><li>Border permits and tolls, coming soon</li></ul></article>
+        <article class="plan rise"><div class="top" style="--img:url(img/plan-onroad.jpg)"></div><h3>On-road</h3><p class="pr"><b data-roll>270+</b> truck stops</p><a class="btn" href="#f">Get a fuel quote</a><ul><li>For trucks on the move</li><li>Negotiated diesel prices</li><li>Every fill logged live</li></ul></article>
+        <article class="plan pick rise"><div class="top" style="--img:url(img/plan-homebase.jpg); background-position: 50% 62%"><span class="tg">Recommended</span></div><h3>On-road and Homebase</h3><p class="pr"><b>One account</b> for road and yard</p><a class="btn" href="tfn-tiers.html#calc">Calculate my rate</a><ul><li>For operations with their own tank</li><li>Yard and road diesel together</li><li>Fee set by your on-road volume<sup style="font-size:.6em;margin-left:1px">3</sup></li></ul></article>
+        <article class="plan rise"><div class="top" style="--img:url(img/plan-africa.jpg); background-position: 50% 65%"></div><h3>Cross Border</h3><p class="pr"><b data-roll>5</b> countries beyond South Africa</p><a class="btn" href="tfn-africa.html">Plan a cross-border route</a><ul><li>For cross-border routes</li><li>Pay in rand</li><li>Tolls and parking on the same account</li></ul></article>
       </div>
     </div>
   </section>
@@ -2055,9 +2130,9 @@
     <div class="bg on" style="--img:url(img/close-highway.jpg)" aria-hidden="true"></div>
     <div class="veil" style="background:linear-gradient(rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 35%, rgba(5,12,28,.55) 62%, rgba(5,12,28,.85) 100%)" aria-hidden="true"></div>
     <div class="wrap">
-      <h2>Join 168K+ transactions a month on TFN</h2>
+      <h2>See what TFN would save you</h2>
       <div class="fstats"><div><b data-roll>270+</b>truck stops</div><div><b data-roll>6</b>countries</div><div><b data-roll>1</b>account</div></div>
-      <p class="sub">Tell us about your operation and get a personalised fuel quote.</p>
+      <p class="sub">Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p>
       <a class="btn light" href="#calc">Get a fuel quote</a>
     </div>
   </section>
@@ -2069,11 +2144,11 @@
       <div><h4>Products</h4><ul><li><a href="#fam">All products</a></li><li><a href="tfn-credit.html">Treasury</a></li><li><a href="tfn-on-road.html">Fuel &amp; Technology</a></li><li><a href="tfn-africa.html">Cross Border</a></li><li><a href="tfn-risk.html">Risk management</a></li><li><a href="tfn-fleet-management.html">Fleet management</a></li><li><a href="tfn-non-fuel.html">Onroad non-fuel</a></li><li><a href="tfn-vehicle-support.html">Vehicle support services</a></li><li><a href="tfn-tiers.html">Tiers</a></li></ul></div>
       <div><h4>Network</h4><ul><li><a href="tfn-network.html">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-network.html#portal">Route planner</a></li></ul></div>
       <div><h4>Credit and services</h4><ul><li><a href="tfn-credit.html">Apply for credit</a></li><li><a href="#calc">Get a fuel quote</a></li><li><a href="tfn-network.html">Fuel insights</a></li></ul></div>
-      <div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="#">News</a></li><li><a href="#">Contact us</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="#partners">Our partners</a></li><li><a href="#">News</a></li><li><a href="#">Contact us</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="#">Contact support</a></li><li><a href="#">Terms and conditions</a></li><li><a href="#">Log in</a></li></ul></div>
     </div>
     <div class="fbrand"><svg aria-label="TFN"><use href="#lockup"/></svg><span class="forb" aria-hidden="true"></span></div>
-    <div class="legal"><p>© 2026 TFN. Design concept. Figures and customer quotes are from tfn.co.za. Photographs are Unsplash stock used as placeholders and do not show TFN customers. Screens, plates, prices and savings in the product mock-ups are illustrative.</p><p><sup>1</sup> Credit is subject to approval by the credit provider. <sup>2</sup> Estimate only. Your saving depends on route, volume and depot pricing. <sup>3</sup> Homebase fees are tiered by monthly on-road volume and shown for guidance.</p></div>
+    <div class="legal"><p>© 2026 TFN. Design concept. Figures and customer quotes are from tfn.co.za. Photographs are Unsplash stock used as placeholders and do not show TFN customers. Screens, plates, prices and savings in the product mock-ups are illustrative.</p><p><sup>1</sup> Credit is subject to approval by the credit provider. <sup>2</sup> Estimate only. Your saving depends on route, volume and depot pricing. <sup>3</sup> Homebase fees are tiered by monthly on-road volume and shown for guidance. <sup>4</sup> TFN Rewards is part of this design concept. Points rates and values are illustrative.</p></div>
   </div>
 </footer>
 
@@ -2779,7 +2854,7 @@
 
   /* the glass mega menu */
   /* the same panels as the product pages (MENU in tools/build-product-pages.py): columns of grouped plain links */
-  var MEGA = [["", "Discover TruckersHub", "tfn-page-examples.html#fam", [[["Treasury", [["Credit products", "tfn-credit.html"], ["Smart Factoring", null]]], ["Fuel & Technology", [["CRT – Onroad", "tfn-on-road.html"], ["EngenXT", "tfn-lcv.html"], ["TFN – Wholesale", null], ["Homebase management", "tfn-homebase.html"]]]], [["Cross Border", [["Fuel", "tfn-africa.html"], ["Tolls and parking", "tfn-africa.html"], ["Forwarding and clearing", "tfn-africa.html"], ["Cash", "tfn-africa.html"]]], ["Risk management", [["Fines", "tfn-risk.html"], ["Vehicle insurance", "tfn-risk.html"], ["GIT insurance", "tfn-risk.html"]]]], [["Fleet management", [["Licensing", "tfn-fleet-management.html"]]], ["Onroad non-fuel", [["Oil", "tfn-non-fuel.html"], ["Road assist", "tfn-non-fuel.html"], ["Overnight", "tfn-non-fuel.html"], ["Truckwash", "tfn-non-fuel.html"]]]], [["Vehicle support services", [["Tyres", "tfn-vehicle-support.html"], ["Servicing", "tfn-vehicle-support.html"], ["Telematics", "tfn-vehicle-support.html"]]], ["Pricing", [["Tiers", "tfn-tiers.html"], ["Get a fuel quote", "tfn-page-examples.html#calc"]]]]]], ["", "Explore the network", "tfn-network.html", [[["Plan", [["Network map", "tfn-network.html"], ["Fuel prices", "tfn-network.html"], ["Fuel price outlook", "tfn-network.html"]]]], [["At the stop", [["Overnight parking", "tfn-non-fuel.html"], ["Truckwash", "tfn-non-fuel.html"], ["Oil and road assist", "tfn-non-fuel.html"]]]], [["Past the border", [["Cross Border", "tfn-africa.html"], ["Five countries, paid in rand", "tfn-africa.html"]]]]]], ["", "See the tiers", "tfn-tiers.html", [[["Pay less", [["Tiers", "tfn-tiers.html"], ["Fuel prices", "tfn-network.html"], ["Homebase fee calculator", "tfn-tiers.html#calc"]]]], [["Credit", [["Credit products", "tfn-credit.html"], ["Choose a credit provider", "tfn-credit.html"]]]], [["Talk to us", [["Get a fuel quote", "tfn-page-examples.html#calc"]]]]]], ["", "About TFN", "#", [[["Company", [["About us", "#"], ["Contact us", "#"]]]], [["Help", [["Support", "#"], ["Terms and conditions", "#"]]]], [["Account", [["Log in", "#"]]]]]]];
+  var MEGA = [["", "Discover TruckersHub", "tfn-page-examples.html#fam", [[["Treasury", [["Credit products", "tfn-credit.html"], ["Smart Factoring", null]]], ["Fuel & Technology", [["CRT – Onroad", "tfn-on-road.html"], ["EngenXT", "tfn-lcv.html"], ["TFN – Wholesale", null], ["Homebase management", "tfn-homebase.html"]]]], [["Cross Border", [["Fuel", "tfn-africa.html"], ["Tolls and parking", "tfn-africa.html"], ["Forwarding and clearing", "tfn-africa.html"], ["Cash", "tfn-africa.html"]]], ["Risk management", [["Fines", "tfn-risk.html"], ["Vehicle insurance", "tfn-risk.html"], ["GIT insurance", "tfn-risk.html"]]]], [["Fleet management", [["Licensing", "tfn-fleet-management.html"]]], ["Onroad non-fuel", [["Oil", "tfn-non-fuel.html"], ["Road assist", "tfn-non-fuel.html"], ["Overnight", "tfn-non-fuel.html"], ["Truck wash", "tfn-non-fuel.html"]]]], [["Vehicle support services", [["Tyres", "tfn-vehicle-support.html"], ["Servicing", "tfn-vehicle-support.html"], ["Telematics", "tfn-vehicle-support.html"]]], ["Pricing", [["Tiers", "tfn-tiers.html"], ["Get a fuel quote", "tfn-page-examples.html#calc"]]]]]], ["", "Explore the network", "tfn-network.html", [[["Plan", [["Network map", "tfn-network.html"], ["Fuel prices", "tfn-network.html"], ["Fuel price outlook", "tfn-network.html"]]]], [["At the stop", [["Overnight parking", "tfn-non-fuel.html"], ["Truck wash", "tfn-non-fuel.html"], ["Oil and road assist", "tfn-non-fuel.html"]]]], [["Past the border", [["Cross Border", "tfn-africa.html"], ["Five countries, paid in rand", "tfn-africa.html"]]]]]], ["", "See the tiers", "tfn-tiers.html", [[["Pay less", [["Tiers", "tfn-tiers.html"], ["TFN Rewards", "tfn-page-examples.html#rewards"], ["Fuel prices", "tfn-network.html"], ["Homebase fee calculator", "tfn-tiers.html#calc"]]]], [["Credit", [["Credit products", "tfn-credit.html"], ["Choose a credit provider", "tfn-credit.html"]]]], [["Talk to us", [["Get a fuel quote", "tfn-page-examples.html#calc"]]]]]], ["", "About TFN", "#", [[["Company", [["About us", "#"], ["Our partners", "tfn-page-examples.html#partners"], ["Contact us", "#"]]]], [["Help", [["Support", "#"], ["Terms and conditions", "#"]]]], [["Account", [["Log in", "#"]]]]]]];
   var mega = document.getElementById('mega'), links = $('.links a'), ot, ct, openI = -1;
   function openMega(i) {
     clearTimeout(ct); var d = MEGA[i], n = 0;
@@ -3059,9 +3134,9 @@
   /* the orbs: each a smooth blend of five soft colours drifting slowly under a light grain, with only a hint of shading */
   var ITEMS = [
     ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#b8622e', '#8db8e6']],
-    ['Non-fuel', 'Non-fuel services on the network, on the same facility.', 'tfn-non-fuel.html', ['#a8447a', '#4b2c78', '#d98a52', '#4b3399', '#9a5070']],
+    ['Non-fuel', 'Parking, truck washes and oil at the stop, on the same facility.', 'tfn-non-fuel.html', ['#a8447a', '#4b2c78', '#d98a52', '#4b3399', '#9a5070']],
     ['Cross-border', 'Use your facility at cross-border stops and pay in rand.', 'tfn-africa.html', ['#5a43a8', '#b25a86', '#3b62b0', '#c46f36', '#2a8068']],
-    ['Homebase', 'Diesel delivered to your own yard tank, on the same facility.', 'tfn-homebase.html', ['#2f8050', '#173f38', '#2a8f78', '#c4743a', '#5fae86']]
+    ['Homebase', 'Diesel delivered to your yard tank, on the same facility.', 'tfn-homebase.html', ['#2f8050', '#173f38', '#2a8f78', '#c4743a', '#5fae86']]
   ];
   var FS = [
     'precision highp float;uniform vec2 u_res;uniform float u_t,u_s,u_k;uniform vec3 u_c[5];',
@@ -3930,7 +4005,7 @@
     { name: 'Fleet management', line: 'Every vehicle road-legal', acc: '#2d7fa3', id: 'FLT', n: 158, href: 'tfn-fleet-management.html', p: ['Licensing'],
       st: [['Road-legal', '28 of 31', 'Licensed and roadworthy'], ['Due in 30 days', '3', 'Licence discs'], ['Renewed this year', '44', 'By IOX']],
       r: [['todo', 'Licence disc due for ND 77 210', 0, 'Due 2 Nov', '20 Oct'], ['todo', 'Licence disc due for GP 482 KLM', 0, 'Due 9 Nov', '20 Oct'], ['prog', 'Roadworthy for trailer TR 19', 0, 'Booked for Thursday', '19 Oct'], ['done', 'Licence renewed for ND 51 880', 0, 'IOX', '17 Oct']] },
-    { name: 'Onroad non-fuel', line: 'Looking after drivers on route', acc: '#4f6b8a', id: 'ONR', n: 640, href: 'tfn-non-fuel.html', p: ['Oil', 'Road assist', 'Overnight', 'Truckwash'],
+    { name: 'Onroad non-fuel', line: 'Looking after drivers on the road', acc: '#4f6b8a', id: 'ONR', n: 640, href: 'tfn-non-fuel.html', p: ['Oil', 'Road assist', 'Overnight', 'Truckwash'],
       st: [['Overnight bookings', '9', 'This week'], ['Truck washes', '14', 'This month'], ['Road assist', '1', 'On the way']],
       r: [['prog', 'Road assist for GP 482 KLM near Colesberg', 1, 'Mechanic 20 min away', '10:12'], ['done', 'Overnight parking at Kroonstad', 2, 'Tonight, bay 14', '09:40'], ['done', 'Truckwash for ND 77 210', 3, 'R 420', 'Yesterday'], ['done', '20 L engine oil', 0, 'Beaufort West', '19 Oct']] },
     { name: 'Vehicle support services', line: 'Less downtime, longer life', acc: '#5c6370', id: 'VSS', n: 233, href: 'tfn-vehicle-support.html', p: ['Tyres', 'Servicing', 'Telematics'],
