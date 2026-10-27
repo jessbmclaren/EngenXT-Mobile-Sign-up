@@ -3328,10 +3328,97 @@
   });
   stage.addEventListener('pointerleave', function () { coinsEl.style.setProperty('--tx', '0deg'); coinsEl.style.setProperty('--ty', '0deg'); });
 
-  /* coins drift against the scroll by their depth */
-  function drift() { var r = stage.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; var o = (r.top + r.height / 2 - innerHeight / 2);
-    coins.forEach(function (c) { var z = parseFloat(c.style.getPropertyValue('--z')); c.style.setProperty('--py', (o * (z + 260) / 6000).toFixed(1) + 'px'); }); }
+  /* coins drift against the scroll by their depth, and stop drifting once the stage's middle leaves the screen */
+  function lift(o) { o = Math.max(-innerHeight / 2, Math.min(innerHeight / 2, o)); coins.forEach(function (c) { var z = parseFloat(c.style.getPropertyValue('--z')); c.style.setProperty('--py', (o * (z + 260) / 6000).toFixed(1) + 'px'); }); }
+  function drift() { var r = stage.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; lift(r.top + r.height / 2 - innerHeight / 2); }
   if (!reduce) { addEventListener('scroll', function () { requestAnimationFrame(drift); }, { passive: true }); drift(); }
+
+  /* at rest no coin covers anything. Each coin's resting place is measured across every pose it can hold still in (its bob, and
+     round the orbs the pointer tilt and the scroll drift); where that touches a line of text, a button, the calculator, an orb or
+     another coin, the coin moves to the nearest clear spot inside its section, smaller if it must. On the way down they may cross
+     anything. The dock floats over the page, so it may pass over a coin; a coin never sits over it */
+  function boxes(sel, text) {
+    var out = [];
+    document.querySelectorAll(sel).forEach(function (el) {
+      var up = el.closest('.rise'), m = up ? new DOMMatrix(getComputedStyle(up).transform) : { m41: 0, m42: 0 }, rs;
+      if (text) { var g = document.createRange(); g.selectNodeContents(el); rs = [].slice.call(g.getClientRects()); } else rs = [el.getBoundingClientRect()];
+      rs.forEach(function (r) { if (r.width && r.height) out.push({ l: r.left - m.m41, t: r.top - m.m42, r: r.right - m.m41, b: r.bottom - m.m42 }); });
+    });
+    return out;
+  }
+  function settle(layer, sec, things, poses) {
+    var cs = [].slice.call(layer.querySelectorAll('.coin')), G = 14;
+    cs.forEach(function (c) { c.dataset.s = c.dataset.s || c.style.getPropertyValue('--s'); c.style.setProperty('--s', c.dataset.s); c.style.left = c.style.top = c.style.visibility = ''; });
+    cs = cs.filter(function (c) { return c.offsetWidth; });
+    var s = sec.getBoundingClientRect(), W = document.documentElement.clientWidth, ob = things();
+    var lo = { l: Math.max(s.left, 0) + G, t: s.top + G, r: Math.min(s.right, W) - G, b: s.bottom - G };
+    function hits(e, more) {
+      if (e.l < lo.l || e.r > lo.r || e.t < lo.t || e.b > lo.b) return true;
+      return ob.concat(more).some(function (o) {
+        if (o.c) { var x = Math.max(e.l, Math.min(o.c[0], e.r)) - o.c[0], y = Math.max(e.t, Math.min(o.c[1], e.b)) - o.c[1]; return x * x + y * y < (o.c[2] + G) * (o.c[2] + G); }
+        return e.l < o.r + G && e.r > o.l - G && e.t < o.b + G && e.b > o.t - G;
+      });
+    }
+    /* the box each coin can fill while it holds still: every pose, with the bob's 12px each way scaled by its depth */
+    function measure() {
+      var keep = [layer.style.cssText].concat(cs.map(function (c) { return c.style.cssText; })), env = [];
+      layer.style.transition = 'none';
+      (poses || [function () {}]).forEach(function (p) {
+        p();
+        cs.forEach(function (c, i) {
+          var r = c.getBoundingClientRect(), k = r.width / c.offsetWidth, y = 12 * k, e = env[i];
+          env[i] = e ? { l: Math.min(e.l, r.left), t: Math.min(e.t, r.top - y), r: Math.max(e.r, r.right), b: Math.max(e.b, r.bottom + y), k: k, d: r.width } : { l: r.left, t: r.top - y, r: r.right, b: r.bottom + y, k: k, d: r.width };
+        });
+      });
+      cs.forEach(function (c, i) { c.style.cssText = keep[i + 1]; });
+      layer.style.cssText = keep[0].replace(/transition[^;]*;?/, '') + ';transition:none'; layer.getBoundingClientRect(); layer.style.cssText = keep[0];
+      return env;
+    }
+    /* the nearest clear spot for a coin drawn at f of its size, its box shrunk round its own middle */
+    function spot(e, f, placed) {
+      var t = (1 - f) * e.d / 2, b = { l: e.l + t, t: e.t + t, r: e.r - t, b: e.b - t };
+      for (var d = 0; d <= 480; d += 6) for (var n = d ? Math.max(8, Math.round(d)) : 1, a = 0; a < n; a++) {
+        var dx = d * Math.cos(a / n * 2 * Math.PI), dy = d * Math.sin(a / n * 2 * Math.PI), g = { l: b.l + dx, t: b.t + dy, r: b.r + dx, b: b.b + dy };
+        if (!hits(g, placed)) return [dx, dy, g];
+      }
+    }
+    /* depth makes a step on the page and a step on screen differ, so place, measure again, and stop once nothing moves. A coin
+       with no room at its own size is drawn smaller, down to half; only one with no room even then is left out */
+    for (var round = 0; round < 4; round++) {
+      var env = measure(), placed = [], moved = false;
+      cs.forEach(function (c, i) {
+        if (c.style.visibility) return;
+        var e = env[i], s0 = parseFloat(c.dataset.s), now = parseFloat(c.style.getPropertyValue('--s')), hit, f;
+        [1, .85, .7, .55].some(function (x) { f = x; return x * now >= s0 * .5 - .5 && (hit = spot(e, x, placed)); });
+        if (!hit) { c.style.visibility = 'hidden'; return; }
+        placed.push(hit[2]);
+        if (f < 1) { moved = true; c.style.setProperty('--s', (now * f).toFixed(1) + 'px'); }
+        if (hit[0] || hit[1] || f < 1) { moved = true; c.style.left = (c.offsetLeft + c.offsetWidth / 2 + hit[0] / e.k) + 'px'; c.style.top = (c.offsetTop + c.offsetHeight / 2 + hit[1] / e.k) + 'px'; }
+      });
+      if (!moved) break;
+    }
+    /* the last word is a measurement, not the estimate: anything still touching after the rounds stays out */
+    env = measure(); placed = [];
+    cs.forEach(function (c, i) { if (c.style.visibility) return; if (hits(env[i], placed)) c.style.visibility = 'hidden'; else placed.push(env[i]); });
+  }
+  function rings() {
+    var a = stage.querySelector('.ocar').getBoundingClientRect(), st = getComputedStyle(stage), og = parseFloat(st.getPropertyValue('--og')), ow = parseFloat(st.getPropertyValue('--ow'));
+    return [].slice.call(stage.querySelectorAll('.orb')).filter(function (o) { return parseFloat(o.style.getPropertyValue('--o')) > 0; }).map(function (o) {
+      return { c: [a.left + a.width / 2 + parseFloat(o.style.getPropertyValue('--d')) * og, a.top + a.height / 2, ow * parseFloat(o.style.getPropertyValue('--k')) / 2] };
+    });
+  }
+  var tilts = [];
+  if (!reduce) [-1, 1].forEach(function (x) { [-1, 1].forEach(function (y) { [-1, 1].forEach(function (o) {
+    tilts.push(function () { coinsEl.style.setProperty('--tx', x * 7 + 'deg'); coinsEl.style.setProperty('--ty', y * 5 + 'deg'); lift(o * innerHeight); });
+  }); }); });
+  function rest() {
+    settle(coinsEl, document.getElementById('d'), function () { return boxes('#d h2, #d .sub, #olab', true).concat(boxes('#oprev, #onext, #odots, #d > .btn'), rings()); }, tilts.length ? tilts : null);
+    if (calcCoins) settle(calcCoins, document.getElementById('calc'), function () { return boxes('#calc h2, #calc p', true).concat(boxes('#calc .btn, #calc .calc')); });
+  }
+  /* and again whenever either section changes size: a new width, the fonts arriving, a picture loading */
+  var rt; function soon() { clearTimeout(rt); rt = setTimeout(rest, 150); }
+  rest(); addEventListener('load', rest); if (document.fonts) document.fonts.ready.then(soon);
+  if ('ResizeObserver' in window) { var ro = new ResizeObserver(soon); ro.observe(document.getElementById('d')); ro.observe(document.getElementById('calc')); } else addEventListener('resize', soon);
 })();
 </script>
 
