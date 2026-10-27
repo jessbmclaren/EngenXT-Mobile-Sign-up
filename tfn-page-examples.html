@@ -101,13 +101,13 @@
   /* ---------- sections: the page rhythm, static text, the media moves ---------- */
   .sec { padding: 110px 0; } .sec.grey { background: var(--grey); } .sec.black { background: #000; color: #fff; } .sec.black .sub, .sec.black .kicker { color: #a8a8a8; }
   h2.title { font-size: clamp(2.1rem, 4vw, 3.15rem); max-width: 14em; margin-inline: auto; }
-  /* proof: a lead line, then four marks over three, each with its caption under it. The marks are TFN's own; the facts are the page's */
+  /* proof: a lead line, then four marks over three, each with its caption under it. Every mark sits in the same 172px band and every caption breaks to two lines; the wide 44M+ mark takes the middle of the second row, the two badges flank it under the outer columns. The marks are TFN's own; the facts are the page's */
   .aw { padding: 72px 0 120px; text-align: center; } .aw .wrap { width: min(1240px, 100% - 48px); }
   .aw-lead { margin: 0 auto 64px; font-size: 1.25rem; color: var(--muted); }
   .aw-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 96px 24px; margin: 0; padding: 0; list-style: none; }
-  .aw-grid > li { grid-column: span 3; min-width: 0; display: grid; grid-template: 140px auto / minmax(0, 1fr); justify-items: center; align-items: center; gap: 26px; }
-  .aw-grid > li:nth-child(n+5) { grid-column: span 4; grid-template-rows: 172px auto; }
-  .aw-grid p { align-self: start; margin: 0; font-size: 1.3rem; font-weight: 500; line-height: 1.35; letter-spacing: -.01em; color: #3a3a3c; }
+  .aw-grid > li { grid-column: span 3; min-width: 0; display: grid; grid-template: 172px auto / minmax(0, 1fr); justify-items: center; align-items: center; gap: 26px; }
+  .aw-grid > li:nth-child(6) { grid-column: span 6; }
+  .aw-grid p { align-self: start; max-width: 12em; margin: 0; text-wrap: balance; font-size: 1.3rem; font-weight: 500; line-height: 1.35; letter-spacing: -.01em; color: #3a3a3c; }
   .aw-stores { display: flex; align-items: center; gap: 44px; } .aw-stores svg { width: 44px; height: 46px; }
   .aw-net { display: flex; align-items: center; gap: 12px; font: 600 2.15rem/1 var(--sans); letter-spacing: -.035em; color: #111; white-space: nowrap; } .aw-net svg { width: 38px; height: 38px; }
   .aw-seal { position: relative; display: grid; justify-items: start; padding-right: 50px; text-align: left; line-height: .95; color: #111; }
@@ -663,7 +663,7 @@
   .mend { padding: 12px 24px; border-radius: 999px; background: #ff3b30; color: #fff; font-weight: 700; }
   .mspd { position: absolute; z-index: 3; left: 20px; bottom: 110px; width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 5px solid #e0262b; display: grid; place-items: center; font-weight: 800; font-size: 19px; color: #111; }
   .mapsec { position: relative; z-index: 1; border-radius: 40px 40px 0 0; margin-top: -40px; overflow: hidden; }
-  .mapsec .wrap { position: relative; } .mapsec .sub { color: rgba(255,255,255,.8); }
+  .mapsec .wrap { position: relative; } .mapsec.black .sub { color: rgba(255,255,255,.8); }
   .amap.big { height: min(80vh, 720px); border-radius: 32px; margin-top: 44px; box-shadow: 0 50px 100px -40px rgba(10,5,40,.7); }
 
   /* ---------- the network map, inside the TFN app ----------
@@ -879,6 +879,9 @@
   .nm-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .nm-pills button { padding: 10px 18px; border-radius: 999px; font-size: .9rem; font-weight: 500; color: #fff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); transition: background .25s, color .25s; }
   .nm-pills button:hover { background: rgba(255,255,255,.16); } .nm-pills button[aria-pressed="true"] { background: #fff; color: #111; }
+  /* on a white band the pills turn grey and the phone casts a softer shadow */
+  .paper .nm-pills button { color: #1f1f1f; background: var(--grey); border-color: var(--line); } .paper .nm-pills button:hover { background: #ececee; } .paper .nm-pills button[aria-pressed="true"] { background: #1f1f1f; color: #fff; border-color: #1f1f1f; }
+  .paper .nm-phone { box-shadow: inset 0 0 0 2px #3b3b3f, inset 0 0 0 4px #111, 0 50px 90px -30px rgba(20,30,50,.45); }
   @media (prefers-reduced-motion: reduce) { .nm-pin i, .nm-view, .nm-panel, .nm-card { transition: none; } .js .nmap:not(.in) .nm-pin i { transform: none; } .nm-you::before { animation: none; } .nm-pin.on i { animation: none; } }
 
 
@@ -1428,19 +1431,32 @@
   .cres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.25); }
   .cres small { display: block; opacity: .82; font-size: .82rem; } .cres b { font-size: 2.1rem; letter-spacing: -.03em; font-weight: 700; display: block; line-height: 1.15; font-variant-numeric: tabular-nums; }
   /* on a phone the calculator's column must be able to shrink, or the two results push the page sideways */
-  /* ---------- partners: the businesses behind the products, each named with what it does for you ---------- */
-  .pt h2.title { max-width: 16em; text-wrap: balance; }
-  .pt-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
-  .pt-list li { display: flex; } .pt-list a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; min-height: 210px; padding: 32px 24px; border-radius: 28px; background: var(--grey); transition: background .2s; }
-  .pt-list a:hover { background: #ececee; }
+  /* ---------- partners: a dark band where the partners' tiles drift past, each named with what it does for you ---------- */
+  .pt h2.title { max-width: 16em; margin-inline: auto; text-wrap: balance; }
+  .pt-run { margin-top: 56px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
+  .pt-track { display: flex; width: max-content; }
+  .pt-list { list-style: none; display: flex; gap: 16px; padding-right: 16px; }
+  .pt-list li { display: flex; flex: none; width: 264px; }
+  .pt-list a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; min-height: 200px; padding: 30px 22px; border-radius: 28px; background: #141416; transition: background .2s; }
+  .pt-list a:hover, .pt-list a:focus-visible { background: #1f1f22; }
   .pt-mk { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 100%; height: 78px; padding: 0 20px; border-radius: 16px; background: var(--pb, #fff); }
   .pt-mk img { display: block; min-width: 0; width: auto; max-width: 100%; object-fit: contain; }
-  .pt-list small { color: var(--muted); font-size: .95rem; }
-  @media (max-width: 760px) { .pt-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 40px; } .pt-list a { min-height: 164px; gap: 14px; padding: 22px 12px; border-radius: 22px; } .pt-mk { height: 62px; padding: 0 12px; } .pt-mk img { scale: .8; } .pt-list small { font-size: .86rem; text-align: center; } }
+  .pt-list small { color: #a8a8a8; font-size: .95rem; }
+  /* the script copies the row until it overfills the screen, then slides it one row's width and starts again, so the loop never shows a seam */
+  .pt-run.go .pt-track { animation: ptRun var(--dur, 40s) linear infinite; }
+  .pt-run.go:hover .pt-track, .pt-run.go:focus-within .pt-track, .pt-run.go.held .pt-track { animation-play-state: paused; }
+  @keyframes ptRun { to { transform: translateX(calc(var(--row) * -1)); } }
+  .pt-stop { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; padding: 8px 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: none; color: #a8a8a8; font: inherit; font-size: .82rem; cursor: pointer; }
+  .pt-stop:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+  .pt-stop svg { width: 12px; height: 12px; } .pt-stop .ps-play, .pt-stop.held .ps-pause { display: none; } .pt-stop.held .ps-play { display: inline; }
+  @media (max-width: 760px) { .pt-run { margin-top: 40px; } .pt-list { gap: 12px; padding-right: 12px; } .pt-list li { width: 200px; } .pt-list a { min-height: 164px; gap: 14px; padding: 22px 12px; border-radius: 22px; } .pt-mk { height: 62px; padding: 0 12px; } .pt-mk img { scale: .8; } .pt-list small { font-size: .86rem; text-align: center; } }
+  /* with motion turned down the tiles wrap into a still grid, no copies */
+  @media (prefers-reduced-motion: reduce) { .pt-run { -webkit-mask-image: none; mask-image: none; } .pt-track { width: auto; } .pt-list { flex-wrap: wrap; justify-content: center; padding: 0 20px; } }
 
   /* ---------- TFN Rewards: a points card beside how points are earned and spent ---------- */
   .rw-soon { display: inline-block; margin-left: 6px; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.06); color: #3a3a3c; font-size: .8rem; vertical-align: 2px; }
-  .sec.rw { padding-top: 40px; }
+  /* on the black band the card lifts a step off the background so it still reads as a card */
+  .black .rw-card { background: #161618; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 50px 90px -40px rgba(0,0,0,.9); }
   .rw-card { justify-self: center; width: min(100%, 400px); padding: 26px; border-radius: 30px; background: #0b0b0c; color: #fff; box-shadow: 0 50px 90px -40px rgba(20,30,50,.45); }
   .rw-top { display: flex; align-items: center; justify-content: space-between; color: #a8a8a8; font-size: .86rem; }
   .rw-badge { padding: 4px 12px; border-radius: 999px; background: linear-gradient(135deg, #e9dcb4, #b89a5a); color: #1f1a10; font-weight: 600; font-size: .8rem; }
@@ -1541,11 +1557,11 @@
   @media (max-width: 560px) { .tiles, .plans { grid-template-columns: 1fr; } }
   @media (max-width: 900px) {
     .aw { padding: 56px 0 88px; } .aw-lead { margin-bottom: 48px; font-size: 1.1rem; } .aw-grid { row-gap: 64px; }
-    .aw-grid > li, .aw-grid > li:nth-child(n+5) { grid-column: span 6; } .aw-grid > li:nth-child(5) { grid-column: 1 / -1; }
+    .aw-grid > li { grid-column: span 6; } .aw-grid > li:nth-child(6) { grid-column: 1 / -1; } .aw-grid > li:nth-child(5), .aw-grid > li:nth-child(7) { order: 1; }
   }
   @media (max-width: 560px) {
-    .aw-grid { column-gap: 12px; row-gap: 48px; } .aw-grid > li, .aw-grid > li:nth-child(n+5) { grid-template-rows: 116px auto; gap: 16px; } .aw-grid p { font-size: 1rem; }
-    .aw-grid > li > span { scale: .72; } .aw-grid > li:nth-child(5) > span { scale: 1; font-size: 12px; } .aw-net { font-size: 1.6rem; } .aw-net svg { width: 30px; height: 30px; }
+    .aw-grid { column-gap: 12px; row-gap: 48px; } .aw-grid > li { grid-template-rows: 116px auto; gap: 16px; } .aw-grid p { font-size: 1rem; }
+    .aw-grid > li > span { scale: .72; } .aw-grid > li:nth-child(6) > span { scale: 1; font-size: 12px; } .aw-net { font-size: 1.6rem; } .aw-net svg { width: 30px; height: 30px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
@@ -1790,7 +1806,7 @@
 })();
 </script>
 
-  <!-- 2. white: proof, four marks over three with a caption under each (TFN's own figures; the store marks say where the app is) -->
+  <!-- 2. white: proof, four marks over three (badge, 44M+, badge) with a caption under each (TFN's own figures; the store marks say where the app is) -->
   <section class="aw" aria-labelledby="awH">
     <div class="wrap">
       <h2 class="aw-lead" id="awH">Join the transporters filling 44M+ litres a month at 270+ TFN truck stops</h2>
@@ -1799,8 +1815,8 @@
         <li><span class="aw-net" aria-hidden="true"><svg><use href="#tfn-mark"/></svg>TFN Network</span><p>270+ truck stops on your routes</p></li>
         <li><span class="aw-seal" aria-hidden="true"><span class="aw-coin"><svg><use href="#tfn-mark"/></svg></span><b>168K+</b><span>Transactions</span><small>Every month · 2026</small></span><p>168K+ transactions every month</p></li>
         <li><span class="aw-boxes" aria-hidden="true"><span class="aw-b1"><svg><use href="#logo"/></svg><i></i><span><small>ON THE ROAD</small><b>SINCE 2007</b></span></span><span class="aw-b2"><svg><use href="#lockup"/></svg></span></span><p>Moving South Africa’s trucks since 2007</p></li>
-        <li><span class="aw-win" aria-hidden="true"><span class="ob ob-blue"><b>44M+</b><small>litres</small></span><span class="aw-wt">Litres filled at<br>TFN truck stops<b>Every month</b></span><i></i><span class="aw-dots"><i class="ob ob-blue"></i><i class="ob ob-teal"></i><i class="ob ob-violet"></i><svg><use href="#logo"/></svg></span></span><p>44M+ litres filled every month</p></li>
         <li><span class="aw-badge" aria-hidden="true"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4.5l3.4 7.3 7.9.9-5.9 5.4 1.6 7.8L16 22l-7 3.9 1.6-7.8-5.9-5.4 7.9-.9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 4v4M3 6h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Below the<br>pump price</span><b>Diesel</b><small>2026<svg><use href="#logo"/></svg></small></span><p>Diesel below the pump price</p></li>
+        <li><span class="aw-win" aria-hidden="true"><span class="ob ob-blue"><b>44M+</b><small>litres</small></span><span class="aw-wt">Litres filled at<br>TFN truck stops<b>Every month</b></span><i></i><span class="aw-dots"><i class="ob ob-blue"></i><i class="ob ob-teal"></i><i class="ob ob-violet"></i><svg><use href="#logo"/></svg></span></span><p>44M+ litres filled every month</p></li>
         <li><span class="aw-badge" aria-hidden="true"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 6 7.5v7.2c0 6.2 4.2 11.4 10 13 5.8-1.6 10-6.8 10-13V7.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m11.5 16 3.2 3.2 6-6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Every litre<br>logged</span><b>Per truck</b><small>2026<svg><use href="#logo"/></svg></small></span><p>Every litre logged against the truck</p></li>
       </ul>
     </div>
@@ -1981,8 +1997,8 @@
     <div class="crstage" aria-hidden="true"><canvas class="crcv"></canvas></div>
   </section>
 
-  <!-- 8a2. white: TFN Rewards, a points card beside how points are earned and spent (rates and values illustrative, footnote 4) -->
-  <section class="sec paper rw" id="rewards" aria-labelledby="rwH">
+  <!-- 8a2. black: TFN Rewards, a points card beside how points are earned and spent (rates and values illustrative, footnote 4) -->
+  <section class="sec black rw" id="rewards" aria-labelledby="rwH">
     <div class="wrap split">
       <div class="rw-card" aria-hidden="true">
         <div class="rw-top"><span>TFN Rewards</span><span class="rw-badge">Gold</span></div>
@@ -2002,13 +2018,13 @@
           <div><h3>Spend at the stop</h3><p>Pay for parking, showers, truck washes and AdBlue with points. Or take them off your next statement.</p></div>
           <div><h3>Earn faster as you grow</h3><p>Your tier sets the rate: 1 point a litre on Bronze, up to 5 on Platinum.</p></div>
         </div>
-        <a class="btn" href="tfn-tiers.html">See the tiers</a>
+        <a class="btn light" href="tfn-tiers.html">See the tiers</a>
       </div>
     </div>
   </section>
 
-  <!-- 8b. the network map: search, plan a route with suggested fills, filter by services, compare prices -->
-  <section class="sec mapsec black center" id="m">
+  <!-- 8b. white: the network map: search, plan a route with suggested fills, filter by services, compare prices -->
+  <section class="sec mapsec paper center" id="m">
     <div class="wrap">
       <h2 class="title">Cheaper diesel, mapped</h2>
       <p class="sub">Compare today’s price at every TFN truck stop. Plan each fill before your trucks leave the yard.</p>
@@ -2131,6 +2147,27 @@
     </div>
   </section>
 
+  <!-- 9a. black: the partners behind the products, a slow row of logo tiles between the calculator and TruckersHub. Logos are from each partner's own website; the ones drawn white sit on that site's header colour -->
+  <section class="sec black center pt" id="partners" aria-labelledby="ptH">
+    <div class="wrap">
+      <h2 class="title" id="ptH">Beyond fuel, with partners you know</h2>
+      <p class="sub">The banks and specialists behind each TFN product. You deal with one account.</p>
+    </div>
+    <div class="pt-run" id="ptRun">
+      <div class="pt-track">
+      <ul class="pt-list">
+        <li><a href="tfn-credit.html"><span class="pt-mk" style="--pb:#0033aa"><img src="img/partner-standard-bank.svg" alt="Standard Bank" width="143" height="36"></span><small>Fuel credit</small></a></li>
+        <li><a href="tfn-credit.html"><span class="pt-mk"><img src="img/partner-absa.png" alt="Absa" width="89" height="42"></span><small>Fuel credit</small></a></li>
+        <li><a href="tfn-credit.html"><span class="pt-mk" style="--pb:#16233d"><img src="img/partner-prefcap-icon.svg" alt="" width="23" height="27"><img src="img/partner-prefcap.svg" alt="Preference Capital" width="108" height="19"></span><small>Fuel credit</small></a></li>
+        <li><a href="tfn-risk.html"><span class="pt-mk"><img src="img/partner-one.png" alt="ONE Insurance" width="130" height="20"></span><small>Cover for trucks and loads</small></a></li>
+        <li><a href="tfn-fleet-management.html"><span class="pt-mk"><img src="img/partner-iox.png" alt="IOX" width="94" height="42"></span><small>Fines and licensing</small></a></li>
+        <li><a href="tfn-lcv.html"><span class="pt-mk" style="--pb:#002c90"><img src="img/partner-engen.svg" alt="Engen" width="80" height="40"></span><small>Stations for EngenXT</small></a></li>
+      </ul>
+      </div>
+    </div>
+    <button type="button" class="pt-stop" id="ptStop" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path class="ps-pause" d="M5 3.5v9M11 3.5v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="ps-play" d="M5 3.2v9.6L13 8z" fill="currentColor"/></svg><span>Pause logos</span></button>
+  </section>
+
   <!-- 9b. black: who it's for, three cards in a row -->
   <!-- 10a. white: TruckersHub as a desktop app, switching between the seven product families (the families of tools/build-product-pages.py; the screen data is illustrative) -->
   <section class="sec paper center" id="fam">
@@ -2162,22 +2199,6 @@
     </div>
   </section>
 
-
-  <!-- 10b. white: the partners behind the products, each logo on a tile of its own with what it does for you. Logos are from each partner's own website; the ones drawn white sit on that site's header colour -->
-  <section class="sec paper center pt" id="partners" aria-labelledby="ptH">
-    <div class="wrap">
-      <h2 class="title" id="ptH">Beyond fuel, with partners you know</h2>
-      <p class="sub">The banks and specialists behind each TFN product. You deal with one account.</p>
-      <ul class="pt-list">
-        <li><a href="tfn-credit.html"><span class="pt-mk" style="--pb:#0033aa"><img src="img/partner-standard-bank.svg" alt="Standard Bank" width="143" height="36"></span><small>Fuel credit</small></a></li>
-        <li><a href="tfn-credit.html"><span class="pt-mk"><img src="img/partner-absa.png" alt="Absa" width="89" height="42"></span><small>Fuel credit</small></a></li>
-        <li><a href="tfn-credit.html"><span class="pt-mk" style="--pb:#16233d"><img src="img/partner-prefcap-icon.svg" alt="" width="23" height="27"><img src="img/partner-prefcap.svg" alt="Preference Capital" width="108" height="19"></span><small>Fuel credit</small></a></li>
-        <li><a href="tfn-risk.html"><span class="pt-mk"><img src="img/partner-one.png" alt="ONE Insurance" width="130" height="20"></span><small>Cover for trucks and loads</small></a></li>
-        <li><a href="tfn-fleet-management.html"><span class="pt-mk"><img src="img/partner-iox.png" alt="IOX" width="94" height="42"></span><small>Fines and licensing</small></a></li>
-        <li><a href="tfn-lcv.html"><span class="pt-mk" style="--pb:#002c90"><img src="img/partner-engen.svg" alt="Engen" width="80" height="40"></span><small>Stations for EngenXT</small></a></li>
-      </ul>
-    </div>
-  </section>
 
   <!-- 11. white: plans, one recommended -->
   <section class="sec paper center" id="plans">
@@ -2850,7 +2871,7 @@
     var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 40).filter(function (n) { return n !== sticky; });
     var busy = ctaSeen.size > 0 || under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .techbox, .ometa, .pills, .nstage, .hphone, .hbadges'); });
     sticky.classList.toggle('show', scrollY > 560 && !busy && foot.getBoundingClientRect().top > innerHeight - 40);
-    sticky.classList.toggle('dark', under.some(function (n) { return n.matches && n.matches('.black, .scene, .cscene, .mapsec, footer'); }));
+    sticky.classList.toggle('dark', under.some(function (n) { return n.matches && n.matches('.black, .scene, .cscene, footer'); }));
     tick = false;
   }
   addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(onScroll); } }, { passive: true }); onScroll();
@@ -4036,6 +4057,34 @@ addEventListener('load', function () {
   [].forEach.call(svg.querySelectorAll('.draw, .run'), function (p) { p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); });
   labs.innerHTML = '<span style="left:' + (st[0] / W * 100) + '%;top:calc(' + (st[1] / H * 100) + '% - 16px)">Harrismith<small>Saves R 1.46/L</small></span>';
   requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('on'); }); });
+})();
+/* ---- partners: copy the row of tiles until it overfills the screen, then let it drift. Copies are hidden from screen readers and the keyboard ---- */
+(function () {
+  var run = document.getElementById('ptRun'), stop = document.getElementById('ptStop');
+  if (!run || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var track = run.querySelector('.pt-track'), list = track.querySelector('.pt-list');
+  function fill() {
+    [].slice.call(track.children, 1).forEach(function (c) { c.remove(); });
+    var row = list.getBoundingClientRect().width;
+    if (!row) return;
+    for (var n = Math.ceil(run.clientWidth / row) + 1; n > 0; n--) {
+      var c = list.cloneNode(true); c.setAttribute('aria-hidden', 'true'); c.setAttribute('inert', '');
+      [].forEach.call(c.querySelectorAll('a'), function (a) { a.tabIndex = -1; });
+      track.appendChild(c);
+    }
+    run.style.setProperty('--row', row + 'px');
+    run.style.setProperty('--dur', Math.round(row / 38) + 's');
+    run.classList.add('go');
+  }
+  fill();
+  var w = window.innerWidth;
+  window.addEventListener('resize', function () { if (window.innerWidth !== w) { w = window.innerWidth; fill(); } });
+  stop.hidden = false;
+  stop.addEventListener('click', function () {
+    var held = run.classList.toggle('held');
+    stop.classList.toggle('held', held);
+    stop.lastChild.textContent = held ? 'Play logos' : 'Pause logos';
+  });
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
