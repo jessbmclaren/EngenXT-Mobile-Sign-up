@@ -59,7 +59,7 @@
   .p-africa { --frame: linear-gradient(145deg, #6b4fb0, #2a1a5c); --scr: #151026; --ink: #efe9ff; --sub: #9d8fc4; --card: #221a3c; --rule: #2e2550; --acc: #8f55d6; --okc: #b99af0; }
   .p-credit { --frame: linear-gradient(145deg, #dc96d6, #a64a9e 50%, #561f5c); --scr: #110a12; --ink: #fbf2fb; --sub: #ad8cae; --card: #1c111e; --rule: #2a1a2c; --acc: #c25cb6; --okc: #e0a2da; }
   .p-ins    { --frame: linear-gradient(145deg, #f7f8fa, #d9dce2); --acc: #8e8e93; }
-  .p-risk   { --frame: linear-gradient(145deg, #cfe6c9, #6fa36a 50%, #2d5a37); --acc: #3f7d4e; }
+  .p-risk   { --frame: linear-gradient(145deg, #f6d2de, #d97a9b 50%, #7a2442); --acc: #c0466f; }
   .p-fleet  { --frame: linear-gradient(145deg, #d4ecf6, #78b8d4 50%, #2d6f8f); --acc: #2d7fa3; }
   .p-support{ --frame: linear-gradient(145deg, #e6e8ec, #9aa0aa 50%, #474c55); --acc: #5c6370; }
   .p-hub    { --frame: linear-gradient(145deg, #3a3a3e, #111113); --scr: #0f0f10; --ink: #f2f2f7; --sub: #a1a1a6; --card: #1c1c1f; --rule: #28282c; --acc: #f2f2f7; --ctac: #000; }
@@ -227,7 +227,7 @@
   .ph.ph { --frame: linear-gradient(145deg, #f7f8fa, #d3d7dd); --scr: #fff; --ink: #1f1f1f; --sub: #6e6e73; --card: #f4f5f7; --rule: #ececef; --ctac: #fff; --okc: #1a9b55; }
   .ph.p-road { --acc: #2a6fd0; } .ph.p-lcv { --acc: #0e8fb3; } .ph.p-nonfuel { --acc: #4f6b8a; } .ph.p-net { --acc: #3346a8; }
   .ph.p-home { --acc: #138a85; } .ph.p-africa { --acc: #6b62c9; } .ph.p-credit { --acc: #a2468e; } .ph.p-ins { --acc: #8e8e93; }
-  .ph.p-risk { --acc: #3f7d4e; } .ph.p-fleet { --acc: #2d7fa3; } .ph.p-support { --acc: #5c6370; }
+  .ph.p-risk { --acc: #c0466f; } .ph.p-fleet { --acc: #2d7fa3; } .ph.p-support { --acc: #5c6370; }
   .ph.p-nonfuel .s .cta { background: var(--acc); }
   .s .sh { display: flex; justify-content: space-between; align-items: center; margin-top: -.5em; }
   .s .sh svg { width: 2.7em; height: 1.05em; color: var(--ink); } .s .sh i { width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--card); box-shadow: inset 0 0 0 1px var(--rule); }

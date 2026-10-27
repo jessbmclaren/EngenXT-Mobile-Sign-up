@@ -212,7 +212,7 @@ P['credit'] = dict(
 )
 
 P['risk'] = dict(
-    file='tfn-risk.html', name='Risk management', kicker='TFN Risk management', finish='p-risk', acc='#3f7d4e', tier='Cover',
+    file='tfn-risk.html', name='Risk management', kicker='TFN Risk management', finish='p-risk', acc='#c0466f', tier='Cover',
     blurb='Insure trucks and loads. Get fines handled.',
     title='Cover for your trucks and loads',
     sub='Vehicle and goods-in-transit insurance through ONE Insurance. Traffic fines managed by IOX. All next to your fuel, on one account.',
@@ -222,7 +222,7 @@ P['risk'] = dict(
 <div class="card"><div class="row"><i></i><span><b>Vehicle insurance</b><small>ONE Insurance</small></span><span class="ok">Covered</span></div><div class="row"><i style="opacity:.6"></i><span><b>GIT insurance</b><small>Goods in transit</small></span><span class="ok">Covered</span></div></div>
 <div class="card"><div class="row"><i style="opacity:.4"></i><span><b>Fines</b><small>Managed by IOX</small></span><span><b>2 new</b></span></div></div>
 <div class="cta">Review fines</div>''',
-    extra='<div class="gl g1"><i style="background:#3f7d4e"></i><div><b>2 new fines</b><small>Flagged by IOX</small></div></div>',
+    extra='<div class="gl g1"><i style="background:#c0466f"></i><div><b>2 new fines</b><small>Flagged by IOX</small></div></div>',
     how=('How it works', [
         ('Add it', 'Pick the cover you need, next to your fuel.'),
         ('Partners handle it', 'ONE Insurance covers trucks and loads. IOX manages fines.'),
@@ -296,7 +296,7 @@ FAM = [
     dict(k='treasury', nav='Treasury', name='Treasury', line='Funding that keeps you moving', acc='#a2468e', items=[('Credit products', 'credit'), ('Smart Factoring', None)]),
     dict(k='fueltech', nav='Fuel', name='Fuel & Technology', line='Diesel on the road and in your yard', acc='#2a6fd0', items=[('CRT – Onroad', 'road'), ('EngenXT', 'lcv'), ('TFN – Wholesale', None), ('Homebase management', 'home')]),
     dict(k='cross', nav='Cross Border', name='Cross Border', line='Everything past the border, paid in rand', acc='#6b62c9', items=[('Fuel', 'africa'), ('Tolls and parking', 'africa'), ('Forwarding and clearing', 'africa'), ('Cash', 'africa')]),
-    dict(k='risk', nav='Risk', name='Risk management', line='Cover for your trucks and loads', acc='#3f7d4e', items=[('Fines', 'risk'), ('Vehicle insurance', 'risk'), ('GIT insurance', 'risk')]),
+    dict(k='risk', nav='Risk', name='Risk management', line='Cover for your trucks and loads', acc='#c0466f', items=[('Fines', 'risk'), ('Vehicle insurance', 'risk'), ('GIT insurance', 'risk')]),
     dict(k='fleet', nav='Fleet', name='Fleet management', line='Every vehicle road-legal', acc='#2d7fa3', items=[('Licensing', 'fleet')]),
     dict(k='nonfuel', nav='On the road', name='Onroad non-fuel', line='Looking after drivers on the road', acc='#4f6b8a', items=[('Oil', 'nonfuel'), ('Road assist', 'nonfuel'), ('Overnight', 'nonfuel'), ('Truck wash', 'nonfuel')]),
     dict(k='support', nav='Vehicles', name='Vehicle support services', line='Less downtime, longer life', acc='#5c6370', items=[('Tyres', 'support'), ('Servicing', 'support'), ('Telematics', 'support')]),

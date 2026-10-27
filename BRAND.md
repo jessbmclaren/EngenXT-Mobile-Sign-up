@@ -50,7 +50,8 @@ two differ.
   white, told apart by a faint gradient wash and one muted accent: On-Road blue
   `#2a6fd0`, LCV cyan `#0e8fb3`, Non-Fuel slate `#4f6b8a`, Network indigo `#3346a8`,
   Homebase teal `#138a85`, TFN Africa violet `#6b62c9` (accent only), Credit plum
-  `#a2468e` (accent only). No pastel toys, neon, coins or glows: it must never look
+  `#a2468e` (accent only), Risk management rose `#c0466f` (it was green, but green
+  means fine, so a new fine would read as good news). No pastel toys, neon, coins or glows: it must never look
   childish. **Black is for premium** (the tiers page). Tiers are materials, never
   hues: brushed bronze, silver, pale gold, clear prismatic glass (Diamond) and
   brushed platinum on black, shown as a squircle badge, not a card. TFN's own volume

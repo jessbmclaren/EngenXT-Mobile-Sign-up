@@ -241,8 +241,6 @@
     background: var(--thgrain), radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--acc) 45%, #fff), var(--acc) 58%, color-mix(in srgb, var(--acc) 70%, #10102e)); }
   .th-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; padding: 12px 16px; background: #f4f5f7; border-bottom: 1px solid #e8e9ec; }
   .th-bar i { width: 11px; height: 11px; border-radius: 50%; background: #d9dbe0; }
-  .th-bar span { margin: 0 auto; padding: 4px 40px; border-radius: 8px; font-size: 12px; color: var(--mu); background: #fff; }
-  .th-bar em { margin-left: 8px; font-style: normal; color: var(--dim); }
   .th-side { display: flex; flex-direction: column; min-height: 0; padding: 14px 10px; overflow-y: auto; scrollbar-width: none; color: #5e5e63; background: #fafafb; border-right: 1px solid var(--line); }
   .th-side svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .th-brand { display: flex; align-items: center; gap: 8px; padding: 0 2px 10px 4px; color: var(--tx); font-weight: 600; }
@@ -259,8 +257,12 @@
   button.th-it:hover, .th-fam:hover { color: var(--tx); background: rgba(0,0,0,.03); }
   .th-n { margin-left: auto; min-width: 18px; padding: 1px 5px; border-radius: 5px; font-size: 11px; text-align: center; color: var(--mu); background: #eceef1; font-variant-numeric: tabular-nums; }
   .th-lbl { padding: 12px 9px 5px; font-size: 11.5px; color: var(--dim); }
-  .th-fam[aria-selected="true"] { color: var(--tx); font-weight: 600; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.04), inset 0 0 0 1px #ececef; }
-  .th-fam[aria-selected="true"] svg { color: var(--acc); }
+  .th-fam[aria-current="page"] { color: var(--tx); font-weight: 600; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.04), inset 0 0 0 1px #ececef; }
+  .th-fam[aria-current="page"] svg { color: var(--acc); }
+  /* the open product shows its active products under it, like pages under a team */
+  .th-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 5px 16px; padding-left: 10px; border-left: 1px solid #e6e7ea; }
+  .th-sub button { min-height: 26px; padding: 4px 9px; border-radius: 7px; font-size: 12.5px; text-align: left; color: #6e6e73; transition: background .2s, color .2s; } .th-sub button:hover { color: var(--tx); background: rgba(0,0,0,.03); } .th-sub button[aria-current="true"] { color: var(--tx); font-weight: 500; background: rgba(0,0,0,.04); }
+  .th-more .th-fam svg { color: #b1b3b8; }
   .th-it[aria-current="page"] { color: var(--tx); font-weight: 600; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.04), inset 0 0 0 1px #ececef; } .th-it[aria-current="page"] svg { color: var(--tx); }
   .th-foot { margin-top: auto; padding-top: 10px; }
   .th-me { display: flex; align-items: center; gap: 9px; margin-top: 8px; padding: 10px 9px 0; border-top: 1px solid var(--line); line-height: 1.3; }
@@ -283,45 +285,6 @@
   .th-stat small { display: block; font-size: 12px; color: var(--mu); }
   .th-stat b { display: block; margin-top: 6px; font-size: 22px; font-weight: 500; letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .th-stat em { display: block; margin-top: 2px; font-style: normal; font-size: 12px; color: var(--mu); }
-  /* the live moment on a white clay map: blocks of white buildings, one thin route in the family's accent between two pinned chips,
-     the truck's heading arrow driving it, and a sheet that asks one question with Later and a yes */
-  .th-hero { display: grid; grid-template-columns: minmax(0, 1fr) 216px; gap: 12px; margin-bottom: 16px; }
-  .th-hero .th-stats { grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 0; } .th-hero .th-stat { padding: 10px 14px; } .th-hero .th-stat b { margin-top: 3px; font-size: 19px; }
-  .th-map { position: relative; height: 240px; border-radius: 16px; overflow: hidden; isolation: isolate; background: #f7f8fa; }
-  .th-map::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: linear-gradient(#f7f8fa 0, rgba(247,248,250,.6) 14%, rgba(247,248,250,0) 34%), radial-gradient(70% 80% at 0% 100%, color-mix(in srgb, var(--acc) 16%, transparent), transparent 70%); }
-  .th-mapv { position: absolute; inset: -34% -14% -6%; transform: translate(var(--mx, 0), var(--my, 0)) perspective(760px) rotateX(32deg); transform-origin: 50% 100%; }
-  .th-msvg { display: block; width: 100%; height: 100%; overflow: visible; }
-  .th-msvg .st { fill: #f7f8fa; } .th-msvg .bk { fill: #eceef2; } .th-msvg .pz { fill: #f2f4f6; } .th-msvg .sh rect, .th-msvg .sh circle { fill: rgba(40,50,72,.22); }
-  .th-msvg .sd { fill: #d6dae1; } .th-msvg .tp { fill: #fff; } .th-msvg .tr { fill: #fff; }
-  .th-msvg .rg, .th-msvg .rt { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .th-msvg .rg { stroke: var(--acc); stroke-width: 12; opacity: .2; } .th-msvg .rt { stroke: url(#thRg); stroke-width: 3.5; }
-  .th-body.sw .th-msvg .rg, .th-body.sw .th-msvg .rt { stroke-dasharray: var(--len); animation: thrt 1.3s var(--ease) both; } @keyframes thrt { from { stroke-dashoffset: var(--len); } }
-  .th-msvg .pa { fill: #fff; stroke: var(--acc); stroke-width: 2.5; } .th-msvg .pb { fill: var(--acc); stroke: #fff; stroke-width: 2.5; }
-  .th-msvg .lc rect { fill: #fff; } .th-msvg .lc text { font-weight: 500; fill: #1f1f1f; }
-  .th-msvg .car path { fill: url(#thAr); stroke: #fff; stroke-width: 1.6; stroke-linejoin: round; }
-  .th-sheet { position: absolute; left: 12px; bottom: 12px; z-index: 2; width: min(292px, 100% - 24px); padding: 13px 14px 14px; border-radius: 16px;
-    background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
-    box-shadow: 0 0 0 1px rgba(0,0,0,.04), 0 20px 40px -20px rgba(20,30,50,.35); }
-  .th-sh-h { display: flex; align-items: center; gap: 10px; line-height: 1.25; }
-  .th-sh-h > svg { width: 14px; height: 14px; flex: none; fill: var(--acc); }
-  .th-sh-h b { display: block; font-size: 12.5px; font-weight: 600; } .th-sh-h small { display: block; font-size: 11.5px; color: var(--dim); }
-  .th-sh-x { display: none; margin-left: auto; width: 26px; height: 26px; place-items: center; border-radius: 8px; color: var(--mu); } .th-sh-x:hover { background: rgba(0,0,0,.04); }
-  .th-sh-x svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .th-sh-q { margin: 10px 0 12px; font-size: 17px; line-height: 1.28; letter-spacing: -.015em; color: var(--mu); } .th-sh-q b { font-weight: 600; color: var(--tx); }
-  .th-sh-a { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .th-sh-a button { padding: 9px 12px; border-radius: 999px; font-weight: 500; color: var(--tx); background: #eff0f3; transition: background .2s; } .th-sh-a button:hover { background: #e6e8ec; }
-  .th-sh-a button + button { color: #fff; background: #1f1f1f; } .th-sh-a button + button:hover { background: #3a3a3c; }
-  .th-sh-ok { display: none; align-items: center; gap: 8px; margin-top: 10px; color: var(--tx); } .th-sh-ok svg { width: 16px; height: 16px; flex: none; color: var(--acc); }
-  .th-sheet.min .th-sh-q, .th-sheet.min .th-sh-a, .th-sheet.ok .th-sh-q, .th-sheet.ok .th-sh-a { display: none; }
-  /* Home: every product's route on one map, faint in its own colour; the one the sheet is asking about lights up, draws in and the map glides to it */
-  .th-mapv.glide { transition: transform 1.1s var(--ease); }
-  .th-msvg .hr .rt { stroke: var(--racc); stroke-width: 3.5; opacity: .42; transition: opacity .5s, stroke-width .5s; } .th-msvg .hr.on .rt { stroke: url(#thRg); stroke-width: 5; opacity: 1; } .th-msvg .hr .rg { stroke-width: 17; }
-  .th-msvg .hr .rg, .th-msvg .hr .lc, .th-msvg .hr .car { opacity: 0; transition: opacity .5s; } .th-msvg .hr.on .rg { opacity: .2; } .th-msvg .hr.on .lc, .th-msvg .hr.on .car { opacity: 1; }
-  .th-msvg .hr .pa { stroke: var(--racc); } .th-msvg .hr .pb { fill: var(--racc); } .th-msvg .hr .pa, .th-msvg .hr .pb { opacity: .5; transition: opacity .5s; } .th-msvg .hr.on .pa, .th-msvg .hr.on .pb { opacity: 1; }
-  .th-sh-f { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; font-size: 11.5px; font-weight: 500; color: var(--mu); } .th-sh-f em { margin-left: auto; font-style: normal; font-weight: 400; color: var(--dim); font-variant-numeric: tabular-nums; }
-  .th-sheet.nx > * { animation: thsw .4s var(--ease); } .th-sh-ok:focus { outline: 0; }
-  .th-sheet.min .th-sh-x { display: grid; } .th-sheet.ok .th-sh-ok { display: flex; animation: thsw .4s var(--ease); }
   .th-lh { display: flex; justify-content: space-between; padding: 0 8px 6px; font-size: 12px; font-weight: 500; color: var(--mu); } .th-lh span { font-weight: 400; color: var(--dim); }
   .th-row { display: grid; grid-template-columns: 14px 66px minmax(0, 1fr) auto auto 54px; align-items: center; gap: 12px; padding: 9px 8px; border-top: 1px solid #e9eaed; transition: background .2s; }
   .th-lh + .th-row { border-top: 0; }
@@ -331,6 +294,109 @@
   .th-row .tg { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; color: #55585e; white-space: nowrap; background: #fff; box-shadow: inset 0 0 0 1px #e1e2e6; }
   .th-row .tg::before { content: ""; width: 6px; height: 6px; }
   .th-row .mt { color: var(--mu); white-space: nowrap; } .th-row time { text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* Home, from the owner's content: what needs you first (the money tiles, open exceptions, quick actions), then your products and the partners behind them.
+     White cards on the app's tiles; a product's colour only on its icon and dots; orange only as the small warning spark. The body scrolls inside the app */
+  .th-body.hm { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #d9dbe0 transparent; }
+  .hm-top { display: flex; align-items: flex-end; gap: 12px; margin: 12px 0 16px; }
+  .hm-top h3 { font-size: 24px; font-weight: 500; letter-spacing: -.02em; } .hm-top p { margin-top: 2px; color: var(--mu); }
+  .hm-cta { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px; font-weight: 500; color: #fff; background: #1f1f1f; transition: background .2s; } .hm-cta:hover { background: #3a3a3c; }
+  .hm-cta svg, .hm-ic svg, .hm-q svg, .hm-r > i svg, .hm-x > svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .hm-cta svg { width: 15px; height: 15px; }
+  .hm-sp { width: 6px; height: 6px; flex: none; border-radius: 50%; background: #f2761d; }
+  .hm-kpis { display: grid; grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .hm-k { display: flex; flex-direction: column; min-width: 0; padding: 13px 14px; border-radius: 14px; background: var(--tile); }
+  .hm-k small { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--mu); }
+  .hm-k b { margin-top: 6px; font-size: 22px; font-weight: 500; letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hm-k p { margin-top: 3px; font-size: 12px; line-height: 1.35; color: var(--mu); }
+  .hm-k.warn { background: #fff; box-shadow: inset 0 0 0 1px #ececef; }
+  .hm-lk { align-self: flex-start; margin-top: auto; padding-top: 10px; font-size: 12px; font-weight: 500; color: var(--tx); text-align: left; } .hm-lk span, .hm-go span { display: inline-block; transition: transform .2s; } .hm-lk:hover span, .hm-p:hover .hm-go span { transform: translateX(3px); }
+  .hm-meter { position: relative; height: 5px; margin-top: 9px; border-radius: 3px; background: #e3e4e8; overflow: hidden; }
+  .hm-meter i { position: absolute; top: 0; bottom: 0; left: 0; width: 80%; border-radius: 3px; background: var(--thgrain), linear-gradient(90deg, color-mix(in srgb, #a2468e 45%, #fff), #a2468e); } .hm-meter i + i { left: 80.5%; width: 1.5%; background: #f2761d; }
+  .hm-grid { display: grid; grid-template-columns: minmax(0, 1fr) 268px; gap: 16px; align-items: start; }
+  .hm-col { display: grid; gap: 18px; min-width: 0; } .hm-rail { grid-column: 2; grid-row: 1; position: sticky; top: 0; } .hm-rail + .hm-col { grid-column: 1; grid-row: 1; }
+  .hm-sh { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 2px 10px; } .hm-sh h4 { font-size: 15px; font-weight: 600; letter-spacing: -.01em; } .hm-sh > span { font-size: 12px; color: var(--dim); text-align: right; }
+  .hm-leg { display: flex; gap: 12px; } .hm-leg span { display: inline-flex; align-items: center; gap: 6px; } .hm-leg i { width: 8px; height: 8px; border-radius: 50%; border: 1px dashed #b9bbc1; } .hm-leg i.on { border: 0; background: #1f1f1f; }
+  .hm-prods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .hm-p { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px #ececef; transition: box-shadow .25s; }
+  .hm-p:hover { box-shadow: inset 0 0 0 1px #dcdde1, 0 12px 26px -18px rgba(20,30,50,.4); }
+  .hm-ph { display: flex; align-items: flex-start; gap: 10px; line-height: 1.3; } .hm-ph > span:not(.hm-n) { flex: 1; min-width: 0; } .hm-ph b { display: block; font-weight: 600; } .hm-ph small { display: block; margin-top: 1px; font-size: 12px; color: var(--mu); }
+  .hm-ic { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 9px; color: var(--acc); background: color-mix(in srgb, var(--acc) 11%, #fff); } .hm-ic svg { width: 16px; height: 16px; }
+  .hm-n { margin-left: auto; flex: none; display: flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--mu); white-space: nowrap; }
+  .hm-n i { width: 6px; height: 6px; border-radius: 50%; background: #e1e2e6; } .hm-n i.on { background: var(--acc); } .hm-n i:last-of-type { margin-right: 5px; }
+  .hm-ch { display: flex; flex-wrap: wrap; gap: 6px; }
+  .hm-c { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; white-space: nowrap; }
+  .hm-c.on { color: var(--tx); background: var(--tile); } .hm-c.on::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--acc); }
+  .hm-c.off { padding: 2px 8px; color: var(--dim); border: 1px dashed #d3d5da; } .hm-c small { font-size: 10.5px; color: var(--dim); }
+  .hm-c em { padding: 1px 6px; border-radius: 99px; font-style: normal; font-size: 10.5px; font-weight: 600; color: #a4480b; background: #fff; box-shadow: inset 0 0 0 1px #f4cfb3; }
+  .hm-go { align-self: flex-start; margin-top: auto; font-size: 12px; font-weight: 500; color: var(--tx); } .hm-go::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+  .hm-p.na { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; background: transparent; box-shadow: none; border: 1px dashed #d3d5da; }
+  .hm-p.na .hm-go { margin: 0 0 0 auto; }
+  .hm-pts, .hm-card { border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px #ececef; }
+  .hm-pt { display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 10px 12px; border-top: 1px solid var(--line); line-height: 1.3; } .hm-pt:first-child { border-top: 0; }
+  .hm-pt b { display: block; font-weight: 600; } .hm-pt small { display: block; margin-top: 1px; font-size: 12px; color: var(--mu); }
+  .hm-lg { display: flex; gap: 4px; height: 40px; } .hm-lg span { flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0 8px; border-radius: 10px; background: var(--pb, #f6f7f9); }
+  .hm-lg img { display: block; width: auto; max-width: 100%; max-height: 20px; } .hm-lg svg { width: 64px; height: 19px; color: #1f1f1f; }
+  .hm-tgs { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+  .hm-tg { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; color: #55585e; white-space: nowrap; box-shadow: inset 0 0 0 1px #e1e2e6; }
+  .hm-tg::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--acc); }
+  .hm-card { padding: 14px 12px 10px; } .hm-card .hm-sh { margin: 0 4px 6px; }
+  .hm-cnt { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; color: var(--tx) !important; font-variant-numeric: tabular-nums; }
+  .hm-x { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 6px; border-radius: 9px; text-align: left; color: var(--tx); transition: background .2s; } .hm-x:hover { background: var(--tile); }
+  .hm-x > i { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--acc); } .hm-x .th-n { margin-left: auto; } .hm-x > svg { width: 14px; height: 14px; flex: none; color: var(--dim); }
+  .hm-qs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 2px 2px 4px; }
+  .hm-q { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 11px 12px; border-radius: 12px; font-weight: 500; line-height: 1.25; text-align: left; color: var(--tx); background: var(--tile); transition: background .2s; } .hm-q:hover { background: #eef0f3; }
+  .hm-q i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); } .hm-q svg { width: 15px; height: 15px; }
+  .hm-r { display: flex; align-items: center; gap: 10px; padding: 7px 4px; line-height: 1.3; } .hm-r + .hm-r { border-top: 1px solid var(--line); }
+  .hm-r > i { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; color: #55585e; background: var(--tile); } .hm-r > i svg { width: 14px; height: 14px; }
+  .hm-r small { margin-left: auto; font-size: 11.5px; color: var(--dim); white-space: nowrap; }
+  .th-fam.na { color: var(--dim); }
+  /* the soft look, inside the brand: a white room with one faint wash in the product's hue (TFN blue on Home), white cards that float
+     on long neutral shadows, one-hue grainy orbs for the products and a two-tone greeting. No glows; ink is the only button, orange only a dot */
+  .th { --glass: #fff; --glass-edge: inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.75); --float: 0 22px 44px -30px rgba(52,62,110,.42), 0 2px 6px -3px rgba(52,62,110,.12); background: #f6f7fa; }
+  .th-bar { background: rgba(244,245,248,.9); border-bottom-color: rgba(220,222,230,.7); }
+  .th-side { background: rgba(255,255,255,.5); border-right-color: rgba(225,227,234,.8); }
+  .th-fam[aria-current="page"], .th-it[aria-current="page"] { background: rgba(255,255,255,.85); box-shadow: var(--glass-edge), 0 6px 16px -10px rgba(52,62,110,.4); }
+  .th-main { background: radial-gradient(56% 64% at 96% 0%, color-mix(in srgb, var(--thwash) 13%, transparent), transparent 72%), radial-gradient(46% 52% at 70% 104%, color-mix(in srgb, var(--thwash) 7%, transparent), transparent 70%), linear-gradient(180deg, #fafbfc, #f3f4f7); }
+  .th-stat { background: var(--glass); box-shadow: inset 0 0 0 1px rgba(232,234,240,.9), var(--float); }
+  .th-stat { border-radius: 18px; }
+  .hm-c.on { background: #f2f3f6; }
+  .th-n { background: #fff; box-shadow: inset 0 0 0 1px #dfe1e6; }
+  .hm-lg span { background: var(--pb, #f5f6f9); }
+  /* each product is a small glossy orb in its own colour, lit from the top left, with a fine grain */
+  .hm-ic { border-radius: 50%; color: #fff; background: var(--thgrain), radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--acc) 38%, #fff), var(--acc) 58%, color-mix(in srgb, var(--acc) 72%, #10102e));
+    box-shadow: inset 0 1px 1.5px rgba(255,255,255,.6), 0 6px 12px -8px rgba(20,24,40,.45); } .hm-ic svg { stroke-width: 1.8; }
+  .hm-x > i { width: 8px; height: 8px; background: radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--acc) 40%, #fff), var(--acc) 62%); }
+  .hm-cta { box-shadow: 0 12px 26px -12px rgba(20,22,40,.65), inset 0 1px 0 rgba(255,255,255,.14); }
+  /* the greeting reads in two tones: the quiet part grey, the part that matters in ink */
+  .hm-top .hm-d { margin: 0 0 6px; font-size: 12.5px; color: var(--dim); } .hm-top h3 { font-size: 27px; } .hm-top h3 span { color: #86868c; font-weight: 400; }
+  .hm-top .hm-say { margin-top: 6px; font-size: 15px; color: #717173; } .hm-say b { font-weight: 500; color: var(--tx); }
+  /* coming back to Home, the cards rise in one after another */
+  .th-body.sw.hm { animation: none; } .th-body.sw .hm-kpis > *, .th-body.sw .hm-card, .th-body.sw .hm-p, .th-body.sw .hm-pt { animation: hmrise .6s var(--ease) both; }
+  .th-body.sw .hm-kpis > :nth-child(2), .th-body.sw .hm-p:nth-child(2) { animation-delay: .05s; } .th-body.sw .hm-kpis > :nth-child(3), .th-body.sw .hm-p:nth-child(3) { animation-delay: .1s; }
+  .th-body.sw .hm-kpis > :nth-child(4), .th-body.sw .hm-p:nth-child(4) { animation-delay: .15s; } .th-body.sw .hm-kpis > :nth-child(5), .th-body.sw .hm-p:nth-child(n+5) { animation-delay: .2s; } .th-body.sw .hm-card + .hm-card { animation-delay: .12s; }
+  @keyframes hmrise { from { opacity: 0; transform: translateY(8px); } }
+  /* Home as one sheet: no boxes. Type, space and hairlines do the grouping: the figures in one strip, the products and partners
+     as rows, and the right-hand column as plain lists split from the rest by one rule */
+  .th { --hl: #e7e8ed; }
+  .hm-kpis { gap: 0; margin-bottom: 28px; padding: 16px 0; border-top: 1px solid var(--hl); border-bottom: 1px solid var(--hl); }
+  .hm-k, .hm-k.warn { padding: 0 20px; border-radius: 0; background: none; box-shadow: none; } .hm-k:first-child { padding-left: 2px; } .hm-k + .hm-k { border-left: 1px solid var(--hl); }
+  .hm-lk { padding-top: 12px; white-space: nowrap; }
+  .hm-grid { gap: 0; grid-template-columns: minmax(0, 1fr) 292px; } .hm-rail + .hm-col { padding-right: 28px; } .hm-rail { padding-left: 24px; border-left: 1px solid var(--hl); }
+  .hm-col { gap: 30px; } .hm-sh { margin: 0 2px 6px; }
+  .hm-prods { display: block; }
+  .hm-p, .hm-p.na { display: grid; grid-template-columns: minmax(0, 1fr) 76px; align-items: center; gap: 8px 16px; padding: 13px 4px; border: 0; border-top: 1px solid var(--hl); border-radius: 0; background: none; box-shadow: none; transition: background .2s; }
+  .hm-p:hover { background: rgba(30,40,80,.025); } .hm-ch { grid-column: 1 / -1; grid-row: 2; padding-left: 38px; }
+  .hm-ph { align-items: center; } .hm-ic { width: 28px; height: 28px; } .hm-ic svg { width: 14px; height: 14px; }
+  .hm-t { display: flex; align-items: center; gap: 10px; } .hm-n { margin: 0; } .hm-p.na .hm-ph b { color: var(--mu); font-weight: 500; }
+  .hm-go, .hm-p.na .hm-go { justify-self: end; margin: 0; white-space: nowrap; color: var(--mu); } .hm-p:hover .hm-go { color: var(--tx); } .hm-go::after { border-radius: 0; }
+  .hm-pts { background: none; box-shadow: none; border-radius: 0; } .hm-pt, .hm-pt:first-child { padding: 12px 4px; border-top: 1px solid var(--hl); }
+  .hm-lg { height: 34px; } .hm-lg span { border-radius: 8px; }
+  .hm-card { padding: 0; background: none; box-shadow: none; border-radius: 0; } .hm-card .hm-sh { margin: 0 2px 6px; }
+  .hm-x, .hm-q, .hm-r { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 2px; border-radius: 0; border-top: 1px solid var(--hl); background: none; text-align: left; line-height: 1.3; color: var(--tx); }
+  .hm-x:hover, .hm-q:hover { background: none; color: #000; } .hm-x:hover > svg, .hm-q:hover::after { color: var(--tx); transform: translateX(2px); }
+  .hm-qs { display: block; padding: 0; }
+  .hm-q { flex-direction: row; font-weight: 400; } .hm-q i, .hm-r > i { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 8px; color: #55585e; background: #f2f3f6; box-shadow: none; } .hm-q svg { width: 14px; height: 14px; }
+  .hm-q::after { content: "→"; margin-left: auto; color: var(--dim); transition: transform .2s, color .2s; } .hm-x > svg { transition: transform .2s, color .2s; }
+  .hm-r + .hm-r { border-top: 1px solid var(--hl); }
   .th-cmd { position: absolute; inset: 0; z-index: 3; display: flex; justify-content: center; align-items: flex-start; padding-top: 110px; background: rgba(20,24,32,.16); }
   .th-cmd[hidden] { display: none; }
   .th-cmd > div { width: min(520px, 100% - 32px); border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 40px 90px -20px rgba(20,30,50,.4); overflow: hidden; animation: thcmd .22s var(--ease); }
@@ -341,27 +407,35 @@
   .th-cmd button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 9px; text-align: left; color: #5e5e63; }
   .th-cmd button.on { color: var(--tx); background: var(--tile); } .th-cmd button span { margin-left: auto; color: var(--dim); }
   .th-cmd p { padding: 14px 18px; color: var(--mu); }
-  .th-hint { margin-top: 20px; font-size: .9rem; color: #8a8a8e; }
-  .th-hint kbd { font: inherit; font-size: .8rem; padding: 2px 7px; border-radius: 6px; color: #1f1f1f; background: #f2f2f4; box-shadow: inset 0 -1px 0 #dcdce0; }
-  @media (max-width: 1120px) { .th-hero { grid-template-columns: minmax(0, 1fr); } .th-hero .th-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .th-map { height: 196px; } .th-hero .th-stat { padding: 9px 12px; } .th-hero .th-stat b { font-size: 17px; } .th-hero { margin-bottom: 12px; } }
+  @media (max-width: 1120px) { .hm-pt { grid-template-columns: 96px minmax(0, 1fr); } .hm-tgs { grid-column: 2; justify-content: flex-start; } }
   @media (max-width: 820px) {
     .th { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; margin-top: 40px; }
-    .th-bar span { padding: 4px 18px; }
     .th-side { padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); }
     .th-brand, .th-ws, .th-nav, .th-lbl, .th-foot { display: none; }
     .th-side { flex-direction: row; align-items: center; gap: 2px; } .th-nav.th-tn { display: flex; flex: none; } .th-tn > :not([data-home]) { display: none; } .th-tn .th-it { width: auto; } .th-list { min-width: 0; }
     .th-list { flex-direction: row; gap: 2px; overflow-x: auto; scrollbar-width: none; } .th-list::-webkit-scrollbar { display: none; }
-    .th-fam { width: auto; flex: none; }
+    .th-fam { width: auto; flex: none; } .th-sub, .th-more { display: none; }
     .th-top { padding: 14px 16px 10px; } .th-crumb { overflow: hidden; } .th-tabs { max-width: calc(100% - 32px); margin: 0 16px 6px; } .th-body { padding: 6px 16px 16px; }
     .th-stats { gap: 8px; } .th-stat { padding: 12px; }
-    .th-hero { grid-template-columns: minmax(0, 1fr); } .th-hero .th-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .th-hero .th-stat { padding: 12px; }
-    .th-map { height: auto; padding: 196px 10px 10px; } .th-mapv { inset: auto -14%; top: -64px; height: 300px; }
-    .th-sheet { position: relative; left: auto; bottom: auto; width: auto; } .th-sh-q { font-size: 16px; }
+    .th-body.hm { overflow: visible; } .hm-rail { position: static; }
+    /* on a phone what needs you comes first: exceptions and quick actions, then products, partners and reports */
+    .hm-grid { display: flex; flex-direction: column; align-items: stretch; gap: 28px; } .hm-col { display: contents; } .hm-grid section { min-width: 0; }
+    .hm-grid [aria-labelledby="hmX"] { order: 1; } .hm-grid [aria-labelledby="hmQ"] { order: 2; } .hm-grid [aria-labelledby="hmP"] { order: 3; } .hm-grid [aria-labelledby="hmT"] { order: 4; } .hm-grid [aria-labelledby="hmR"] { order: 5; } .hm-top h3 { font-size: 21px; } .hm-grid, .hm-prods { grid-template-columns: minmax(0, 1fr); }
     .th-row { grid-template-columns: 14px minmax(0, 1fr) auto; } .th-row code, .th-row .tg, .th-row .mt { display: none; }
-    .th-stat b { font-size: 17px; } .th-h span, .th-hint { display: none; }
+    .th-stat b { font-size: 17px; } .th-h span { display: none; }
   }
-  @media (max-width: 480px) { .th-stats, .th-hero .th-stats { grid-template-columns: 1fr 1fr; } .th-stat:nth-child(3) { display: none; } .th-go { font-size: 12px; } }
-  @media (prefers-reduced-motion: reduce) { .th { transform: none; opacity: 1; transition: none; } .th-body.sw, .th-cmd > div, .th-body.sw .th-msvg .rg, .th-body.sw .th-msvg .rt, .th-sheet.ok .th-sh-ok, .th-sheet.nx > * { animation: none; } .th-mapv.glide { transition: none; } }
+  @media (max-width: 480px) { .th-stats { grid-template-columns: 1fr 1fr; } .hm-top { flex-wrap: wrap; } .hm-cta { margin-left: 0; } .hm-pt { grid-template-columns: 1fr; } .hm-tgs { grid-column: auto; } .th-stat:nth-child(3) { display: none; } .th-go { font-size: 12px; } }
+  /* the sheet at laptop and phone widths: the strip tightens, then becomes a list; product rows put their chips on a second line */
+  @media (max-width: 1120px) {
+    .hm-k { padding: 0 12px; } .hm-k b { font-size: 19px; } .hm-grid { grid-template-columns: minmax(0, 1fr) 244px; } .hm-rail + .hm-col { padding-right: 22px; } .hm-rail { padding-left: 20px; }
+  }
+  @media (max-width: 820px) {
+    .hm-kpis { display: block; padding: 0; }
+    .hm-k { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; padding: 12px 2px !important; } .hm-k > * { grid-column: 1; } .hm-k b { grid-column: 2; grid-row: 1 / span 2; margin: 0; align-self: center; }
+    .hm-k + .hm-k { border-left: 0; border-top: 1px solid var(--hl); } .hm-lk { padding-top: 6px; }
+    .hm-rail { padding-left: 0; border-left: 0; } .hm-rail + .hm-col { padding-right: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .th { transform: none; opacity: 1; transition: none; } .th-body.sw, .th-cmd > div, .th-body.sw .hm-kpis > *, .th-body.sw .hm-card, .th-body.sw .hm-p, .th-body.sw .hm-pt { animation: none; } }
   .paper .plan.pick { border-color: #1f1f1f; } .paper .plan .pr { color: #6e6e73; } .paper .plan .pr b { color: #1f1f1f; }
   .paper .plan li { border-top-color: #e3e3e6; color: #55555a; } .paper .plan .btn { background: #1f1f1f; color: #fff; }
   /* ---------- the app after dark: a lit ribbed wall, a plinth, the phone with a glowing route ---------- */
@@ -2268,23 +2342,22 @@
     <div class="wrap th-wide">
       <h2 class="title">All of TFN in one place</h2>
       <p class="sub">Seven product families on one TFN account. Switch between them in TruckersHub, coming soon.</p>
-      <div class="th" id="th" tabindex="-1" role="region" aria-label="TruckersHub, coming soon">
-        <div class="th-bar" aria-hidden="true"><i></i><i></i><i></i><span>TruckersHub<em>Coming soon</em></span></div>
+      <div class="th" id="th" tabindex="-1" role="region" aria-label="TruckersHub">
+        <div class="th-bar" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="th-side">
           <div class="th-brand"><i aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v11H3zM14 10h4l3 4v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></i>TruckersHub<button type="button" class="th-k" data-cmd aria-label="Switch product"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg></button></div>
           <div class="th-ws"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 5-10 5L2 8zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>All fleets<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8 4-4 4 4m-8 8 4 4 4-4"/></svg></div>
-          <div class="th-nav th-tn"><button type="button" class="th-it" id="thHome" data-home aria-controls="thPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H6V10m3 10v-6h6v6"/></svg>Home</button><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 4-3 10v6h20v-6L19 4zM2 14h6l2 3h4l2-3h6"/></svg>Needs your attention<span class="th-n">7</span></span><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v11H3zM14 10h4l3 4v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>Vehicles</span><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3v18h17M9 15v-4m5 4V7m5 8V4"/></svg>Reports</span></div>
-          <p class="th-lbl">Shortcuts</p>
-          <div class="th-nav"><button type="button" class="th-it" data-go="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V4h9v17M3 21h12M6 7h5v5H6zm7 6h2c2 0 1 6 3 6h1V8l-3-3m3 3h2v4h-2"/></svg>Order fuel</button><button type="button" class="th-it" data-go="4" data-t="0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5zM15 3v5h4M8 12h8m-8 4h6"/></svg>Licences due</button></div>
-          <p class="th-lbl" id="thLbl">Your products</p>
-          <div class="th-list" role="tablist" aria-orientation="vertical" aria-labelledby="thLbl"></div>
-          <div class="th-foot"><div class="th-nav"><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="5" rx="1"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/><path d="M12 8v4m-7 4v-4h14v4"/></svg>Platform partners</span><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 5m0 3h.01"/></svg>Help &amp; support</span></div>
+          <div class="th-nav th-tn"><button type="button" class="th-it" id="thHome" data-home aria-controls="thPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H6V10m3 10v-6h6v6"/></svg>Home</button><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4m0 3h.01"/></svg>Exception report<span class="th-n">7</span></span><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3v18h17M9 15v-4m5 4V7m5 8V4"/></svg>Reports</span></div>
+          <p class="th-lbl" id="thLbl">My products</p>
+          <div class="th-list" role="group" aria-labelledby="thLbl"></div>
+          <p class="th-lbl" id="thAddL">Add products</p>
+          <div class="th-list th-more" role="group" aria-labelledby="thAddL"></div>
+          <div class="th-foot"><div class="th-nav"><span class="th-it"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 5m0 3h.01"/></svg>Help &amp; support</span></div>
             <div class="th-me"><b aria-hidden="true">FM</b><span><strong>Fleet manager</strong><small>Ndlovu Haulage</small></span></div></div>
         </div>
-        <div class="th-main" role="tabpanel" id="thPanel"></div>
+        <div class="th-main" role="region" id="thPanel"></div>
         <div class="th-cmd" hidden><div role="dialog" aria-label="Switch product"><input type="text" placeholder="Switch to a product family" aria-label="Switch to a product family" autocomplete="off"><ul role="listbox" aria-label="Product families"></ul></div></div>
       </div>
-      <p class="th-hint">Press <kbd>0</kbd> for Home, <kbd>1</kbd> to <kbd>7</kbd> or <kbd data-mod>⌘K</kbd> to switch</p>
     </div>
   </section>
 
@@ -4369,8 +4442,8 @@ addEventListener('load', function () {
 })();
 </script>
 <script>
-/* TruckersHub, the product switcher: the sidebar copies the portal's (workspace, shortcuts, your products) and the seven families are a tablist; 0 for Home, 1 to 7 or ⌘K (Ctrl K) switch while the pointer or
-   focus is on the app; product tabs filter the activity. It opens on Home, one map with every product's route, and until someone touches it the sheet steps through each product's question on its own. */
+/* TruckersHub: Home, then each product family's page. The sidebar lists the products you have, with the open one's products under it, then the ones you can add;
+   0 for Home, 1 to 7 or ⌘K (Ctrl K) switch while the pointer or focus is on the app; product tabs filter the activity. It opens on Home, built from the owner's home page content. */
 (function () {
   var th = document.getElementById('th'); if (!th) return;
   var S = { done: '<svg viewBox="0 0 14 14" role="img" aria-label="Done"><circle cx="7" cy="7" r="6" fill="currentColor"/><path d="M4.4 7.2l1.8 1.8 3.4-3.6" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -4378,138 +4451,93 @@ addEventListener('load', function () {
     todo: '<svg viewBox="0 0 14 14" role="img" aria-label="To do"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#a1a1a6" stroke-width="1.5" stroke-dasharray="2.2 2"/></svg>' };
   // rows: [status, title, product, detail, when]
   var F = [
-    { name: 'Treasury', ic: '<path d="M3 6h17v14H3zM3 6V4h14v2m-3 5h7v5h-7z"/>', line: 'Funding that keeps you moving', acc: '#a2468e', id: 'TRS', n: 214, href: 'tfn-credit.html', p: ['Credit products', 'Smart Factoring*'],
-      m: { a: 'Pick-up', b: 'Durban port', h: 'Load 4468 delivered', t: 'Durban port at 08:40', q: ['Ready to ', 'settle October early', ' and save on it?'], y: 'Settle', ok: 'Settled. The discount shows on your statement.', r: [[4, 1], [5, 1], [5, 2], [6, 2], [6, 3]] },
+    { name: 'Treasury', ic: '<path d="M3 6h17v14H3zM3 6V4h14v2m-3 5h7v5h-7z"/>', line: 'Funding that keeps you moving', acc: '#a2468e', id: 'TRS', n: 214, href: 'tfn-credit.html', p: ['Credit products', 'Smart Factoring*'], on: [0],
       st: [['Saved this year', 'R 48 200', 'On credit and factoring'], ['Saved this month', 'R 6 400', 'Early settlement discount'], ['Next statement', '31 Oct', 'Standard Bank']],
       r: [['prog', 'Lower rate on your facility', 0, 'Saves R 2 100 a month', '19 Oct'], ['done', 'Weekly limit set for GP 482 KLM', 0, 'Resets every Monday', '18 Oct'], ['done', 'September statement settled early', 0, 'Saved R 6 400', '1 Oct'], ['todo', 'October statement', 0, 'Settle by 25 Oct to save', '31 Oct'], ['todo', 'Get paid for delivered loads sooner', 1, 'Coming soon', '']] },
-    { name: 'Fuel & Technology', ic: '<path d="M4 21V4h9v17M3 21h12M6 7h5v5H6zm7 6h2c2 0 1 6 3 6h1V8l-3-3m3 3h2v4h-2"/>', line: 'Diesel on the road and in your yard', acc: '#2a6fd0', id: 'FUE', n: 1082, href: 'tfn-on-road.html', p: ['CRT – Onroad', 'EngenXT', 'TFN – Wholesale', 'Homebase management'],
-      m: { a: 'GP 482 KLM', b: 'TFN Kroonstad', h: 'GP 482 KLM', t: '40 min to Kroonstad', q: ['Ready to ', 'fill 400 L at Kroonstad', ' for R 0.51 less a litre?'], y: 'Approve', ok: 'Approved. The driver can fill at Kroonstad.', r: [[4, 3], [4, 2], [5, 2], [5, 1], [6, 1]] },
+    { name: 'Fuel & Technology', ic: '<path d="M4 21V4h9v17M3 21h12M6 7h5v5H6zm7 6h2c2 0 1 6 3 6h1V8l-3-3m3 3h2v4h-2"/>', line: 'Diesel on the road and in your yard', acc: '#2a6fd0', id: 'FUE', n: 1082, href: 'tfn-on-road.html', p: ['CRT – Onroad', 'EngenXT', 'TFN – Wholesale', 'Homebase management'], on: [0, 1],
       st: [['Litres this month', '48 210 L', '23 trucks fuelling'], ['Saved on pump price', 'R 24 680', 'This month'], ['Saved per litre', 'R 0.51', 'Against the pump price']],
       r: [['done', 'GP 482 KLM filled 412 L at Kroonstad', 0, 'Saved R 210', '08:14'], ['done', 'ND 77 210 filled 386 L at Beaufort West', 0, 'Saved R 197', '07:52'], ['prog', 'Bakkie CA 129 004 asked for 60 L', 1, 'Approved for 60 L', '07:40'], ['done', 'Bulk order of 20 000 L for the depot', 2, 'Delivered', '20 Oct'], ['prog', 'Yard tank at 34%', 3, 'Top-up booked for Friday', '20 Oct']] },
-    { name: 'Cross Border', ic: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18"/>', line: 'Everything past the border, paid in rand', acc: '#6b62c9', id: 'XBR', n: 377, href: 'tfn-africa.html', p: ['Fuel', 'Tolls and parking', 'Forwarding and clearing', 'Cash'],
-      m: { a: 'Musina', b: 'Beitbridge', h: 'Load 4471', t: 'At the Beitbridge border', q: ['Ready to ', 'send the clearing papers', ' for load 4471?'], y: 'Send', ok: 'Sent. Your clearing agent has the papers.', r: [[6, 3], [6, 2], [5, 2], [5, 1], [4, 1]] },
+    { name: 'Cross Border', ic: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18"/>', line: 'Everything past the border, paid in rand', acc: '#6b62c9', id: 'XBR', n: 377, href: 'tfn-africa.html', p: ['Fuel', 'Tolls and parking', 'Forwarding and clearing', 'Cash'], on: [0, 1],
       st: [['Trucks across the border', '6', 'Right now'], ['Countries this month', '4', 'Namibia, Botswana, Zambia, Zimbabwe'], ['Saved across the border', 'R 12 840', 'This month']],
       r: [['done', 'Filled 520 L in Gaborone', 0, 'Saved R 265', '09:02'], ['prog', 'Beitbridge clearing for load 4471', 2, 'At the border', '08:30'], ['done', 'Trans-Kalahari tolls', 1, 'Saved R 160 in fees', 'Yesterday'], ['todo', 'Trip cash for the Lusaka run', 3, 'Ready at Kazungula', '22 Oct'], ['done', 'Secure parking in Windhoek', 1, 'One night', '19 Oct']] },
-    { name: 'Risk management', ic: '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8 12 3 3 5-6"/>', c: 2, line: 'Cover for your trucks and loads', acc: '#3f7d4e', id: 'RSK', n: 96, href: 'tfn-risk.html', p: ['Fines', 'Vehicle insurance', 'GIT insurance'],
-      m: { a: 'Polokwane', b: 'Musina', h: 'Load 4471 in transit', t: 'Covered all the way to Lusaka', q: ['Ready to ', 'cover the return load', ' as well?'], y: 'Cover', ok: 'Covered. The return load is insured in transit.', r: [[4, 3], [4, 2], [6, 2], [6, 1]] },
+    { name: 'Risk management', ic: '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8 12 3 3 5-6"/>', c: 2, line: 'Cover for your trucks and loads', acc: '#c0466f', id: 'RSK', n: 96, href: 'tfn-risk.html', p: ['Fines', 'Vehicle insurance', 'GIT insurance'], on: [0], bd: ['2 new'],
       st: [['Open fines', '2', 'Due in November'], ['Vehicles insured', '31 of 31', 'ONE Insurance'], ['Saved on cover', 'R 18 600', 'This year']],
       r: [['todo', 'Speeding fine for ND 77 210', 0, 'Due 4 Nov', '20 Oct'], ['done', 'Load 4471 covered in transit', 2, 'Saved R 640 on cover', 'Today'], ['prog', 'Fine for GP 482 KLM sent to the driver', 0, 'With IOX', '18 Oct'], ['todo', 'Renew cover for 4 trailers', 1, 'ONE Insurance', '1 Nov']] },
-    { name: 'Fleet management', ic: '<path d="M5 3h10l4 4v14H5zM15 3v5h4M8 12h8m-8 4h6"/>', c: 3, line: 'Every vehicle road-legal', acc: '#2d7fa3', id: 'FLT', n: 158, href: 'tfn-fleet-management.html', p: ['Licensing'],
-      m: { a: 'ND 77 210', b: 'Licensing office', h: 'ND 77 210', t: 'Licence disc due 2 Nov', q: ['Ready to ', 'renew the licence disc', ' for ND 77 210?'], y: 'Renew', ok: 'Sent to IOX. The new disc comes to your depot.', r: [[6, 3], [6, 1], [4, 1], [4, 2]] },
+    { name: 'Fleet management', ic: '<path d="M5 3h10l4 4v14H5zM15 3v5h4M8 12h8m-8 4h6"/>', c: 3, line: 'Every vehicle road-legal', acc: '#2d7fa3', id: 'FLT', n: 158, href: 'tfn-fleet-management.html', p: ['Licensing'], on: [0], bd: ['3 due'],
       st: [['Road-legal', '28 of 31', 'Licensed and roadworthy'], ['Due in 30 days', '3', 'Licence discs'], ['Renewed this year', '44', 'By IOX']],
       r: [['todo', 'Licence disc due for ND 77 210', 0, 'Due 2 Nov', '20 Oct'], ['todo', 'Licence disc due for GP 482 KLM', 0, 'Due 9 Nov', '20 Oct'], ['prog', 'Roadworthy for trailer TR 19', 0, 'Booked for Thursday', '19 Oct'], ['done', 'Licence renewed for ND 51 880', 0, 'IOX', '17 Oct']] },
-    { name: 'Onroad non-fuel', ic: '<path d="m6 3-3 18m15-18 3 18M12 3v3m0 4v4m0 4v3"/>', line: 'Looking after drivers on the road', acc: '#4f6b8a', id: 'ONR', n: 640, href: 'tfn-non-fuel.html', p: ['Oil', 'Road assist', 'Overnight', 'Truckwash'],
-      m: { a: 'Mechanic', b: 'GP 482 KLM', h: 'Road assist near Colesberg', t: 'Mechanic 20 min away', q: ['Ready to ', 'share the truck’s location', ' with the mechanic?'], y: 'Share', ok: 'Shared. The mechanic can see the truck live.', r: [[4, 1], [5, 1], [5, 3], [6, 3]] },
+    { name: 'Onroad non-fuel', ic: '<path d="m6 3-3 18m15-18 3 18M12 3v3m0 4v4m0 4v3"/>', line: 'Looking after drivers on the road', acc: '#4f6b8a', id: 'ONR', n: 640, href: 'tfn-non-fuel.html', p: ['Oil', 'Road assist', 'Overnight', 'Truckwash'], on: [0, 1],
       st: [['Overnight bookings', '9', 'This week'], ['Truck washes', '14', 'This month'], ['Road assist', '1', 'On the way']],
       r: [['prog', 'Road assist for GP 482 KLM near Colesberg', 1, 'Mechanic 20 min away', '10:12'], ['done', 'Overnight parking at Kroonstad', 2, 'Tonight, bay 14', '09:40'], ['done', 'Truckwash for ND 77 210', 3, 'Saved R 60', 'Yesterday'], ['done', '20 L engine oil', 0, 'Beaufort West', '19 Oct']] },
-    { name: 'Vehicle support services', ic: '<path d="M14 5a5 5 0 0 0-6 7l-5 5a2 2 0 0 0 4 4l5-5a5 5 0 0 0 7-6l-4 3-3-3 3-4z"/>', line: 'Less downtime, longer life', acc: '#5c6370', id: 'VSS', n: 233, href: 'tfn-vehicle-support.html', p: ['Tyres', 'Servicing', 'Telematics'],
-      m: { a: 'GP 482 KLM', b: 'Tyre fitment', h: 'Steer tyres for GP 482 KLM', t: 'Fitting in Bloemfontein today', q: ['Ready to ', 'send GP 482 KLM', ' to the fitment centre?'], y: 'Send', ok: 'Sent. The fitment centre expects the truck at 14:00.', r: [[6, 1], [6, 2], [5, 2], [5, 3], [4, 3]] },
+    { name: 'Vehicle support services', ic: '<path d="M14 5a5 5 0 0 0-6 7l-5 5a2 2 0 0 0 4 4l5-5a5 5 0 0 0 7-6l-4 3-3-3 3-4z"/>', line: 'Less downtime, longer life', acc: '#5c6370', id: 'VSS', n: 233, href: 'tfn-vehicle-support.html', p: ['Tyres', 'Servicing', 'Telematics'], on: [],
       st: [['Services due', '3', 'In the next 30 days'], ['Tyres replaced', '12', 'This quarter'], ['Trucks tracked', '31', 'ONE Insurance telematics']],
       r: [['prog', 'Steer tyres for GP 482 KLM', 0, 'Fitting in Bloemfontein', 'Today'], ['todo', 'Service due for ND 51 880', 1, 'At 300 000 km', '28 Oct'], ['done', 'Telematics alerts on for 31 trucks', 2, 'ONE Insurance', '15 Oct']] }
   ];
-  // Home: where each product's route sits on the shared city (indices into CX and CY), the totals, and the latest row from five of the products ([family, row])
-  var HR = [[[3, 3], [5, 3], [5, 4], [6, 4]], [[7, 2], [7, 3], [9, 3], [9, 4]], [[11, 2], [13, 2], [13, 4]], [[3, 6], [3, 5], [5, 5], [5, 7]], [[7, 7], [7, 6], [9, 6], [9, 5]], [[10, 4], [11, 4], [11, 6], [12, 6]], [[14, 5], [14, 7], [12, 7]]];
-  var HS = [['Saved this month', 'R 43 920', 'Across all your products'], ['Trucks on the road', '23', '6 across the border'], ['Needs your attention', '7', 'In 4 products']], HA = [[5, 0], [2, 0], [1, 0], [3, 1], [0, 0]];
-  var list = th.querySelector('.th-list'), main = document.getElementById('thPanel'), homeB = document.getElementById('thHome'), cmd = th.querySelector('.th-cmd'), q = cmd.querySelector('input'), ul = cmd.querySelector('ul');
-  var cur = -1, hm = 0, OFF = [], tab = -1, sel = 0, auto = null, touched = false, seen = false, hover = false;
+  // Home: the open exceptions ([label, count, family, product tab]), quick actions ([label, family or link, icon]), reports and the partners behind the products
+  var EX = [['Licences due within 30 days', 3, 4, 0], ['New fines received', 2, 3, 0], ['Fuel transaction declined', 1, 1, null], ['Credit limit above 80%', 1, 0, 0]];
+  var IC = { pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>', doc: '<path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h7m-7 4h5"/>', arr: '<path d="m9 6 6 6-6 6"/>' };
+  var QA = [['Order fuel', 1], ['Find a truck stop', '#m', IC.pin], ['Request funds', 0], ['Renew a licence', 4]];
+  var RP = [['Exception report', 'Today'], ['Monthly fuel statement', 'September'], ['Credit and payments', 'September']];
+  var PT = [
+    { n: 'ONE Insurance', l: '<span><img src="img/partner-one.png" alt="" width="130" height="20"></span>', d: 'Vehicle and GIT insurance, plus vehicle telematics', f: [3, 6] },
+    { n: 'IOX', l: '<span><img src="img/partner-iox.png" alt="" width="94" height="42"></span>', d: 'Fines management and vehicle licensing', f: [3, 4] },
+    { n: 'TFN', l: '<span><svg aria-hidden="true"><use href="#lockup"/></svg></span>', d: 'On-road refuelling with truck wash, overnight parking and oil. Homebase fuel delivery.', f: [1, 5] },
+    { n: 'EngenXT', l: '<span style="--pb:#002c90"><img src="img/partner-engen.svg" alt="" width="80" height="40"></span>', d: 'Fuel for light commercial vehicles across the Engen network', f: [1] },
+    { n: 'Standard Bank and Absa', l: '<span style="--pb:#0033aa"><img src="img/partner-standard-bank.svg" alt="" width="143" height="36"></span><span><img src="img/partner-absa.png" alt="" width="89" height="42"></span>', d: 'Fuel credit facilities', f: [0] }
+  ];
+  var list = th.querySelector('.th-list'), more = th.querySelector('.th-more'), main = document.getElementById('thPanel'), homeB = document.getElementById('thHome'), cmd = th.querySelector('.th-cmd'), q = cmd.querySelector('input'), ul = cmd.querySelector('ul');
+  var cur = -1, tab = -1, sel = 0, hover = false;
   var esc = function (s) { return s.replace(/&/g, '&amp;'); }, pn = function (p) { return p.replace('*', ''); };
-  if (!/Mac|iP/.test(navigator.platform)) [].forEach.call(document.querySelectorAll('#fam [data-mod]'), function (k) { k.textContent = 'Ctrl K'; });
-  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches, sh = F.map(function () { return ''; });
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ico = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>'; }, arrow = ' <span aria-hidden="true">→</span>';
 
-  // the white map: a street grid, each block filled with white buildings drawn back to front (shadow, south face, roof), two small squares with trees
-  // the city runs past the frame on every side, so the map can slide its route clear of the sheet at any width (see place)
-  var MX = [30, 120, 200, 290, 370, 460, 540, 620], MY = [24, 92, 160, 228, 296], CX = [-430, -340, -250, -160, -70].concat(MX, [710, 800, 880, 970, 1060]), CY = [-180, -112, -44].concat(MY, [364, 432]);
-  var CITY = (function () {
-    var seed = 17, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    var bk = '', shd = '', bd = '';
-    for (var j = 0; j < CY.length - 1; j++) for (var i = 0; i < CX.length - 1; i++) {
-      var x0 = CX[i] + 9, y0 = CY[j] + 9, w = CX[i + 1] - CX[i] - 18, h = CY[j + 1] - CY[j] - 18;
-      if ((i === 6 && j === 5) || (i === 10 && j === 3) || (i === 3 && j === 6) || (i === 13 && j === 2) || (i === 1 && j === 1)) {
-        bk += '<rect class="pz" x="' + x0 + '" y="' + y0 + '" width="' + w + '" height="' + h + '" rx="5"/>';
-        for (var t = 0; t < 5; t++) { var tx = (x0 + 10 + rnd() * (w - 20)).toFixed(1), ty = (y0 + 10 + rnd() * (h - 20)).toFixed(1), tr = (3 + rnd() * 3).toFixed(1);
-          shd += '<circle cx="' + (+tx + 2) + '" cy="' + (+ty + 1.5) + '" r="' + tr + '"/>'; bd += '<circle class="tr" cx="' + tx + '" cy="' + (ty - 3) + '" r="' + tr + '"/>'; }
-        continue;
-      }
-      bk += '<rect class="bk" x="' + x0 + '" y="' + y0 + '" width="' + w + '" height="' + h + '" rx="4"/>';
-      var cols = 1 + Math.floor(rnd() * 3), rows = 1 + Math.floor(rnd() * 2), cw = (w - 6 - 4 * (cols - 1)) / cols, rh = (h - 6 - 4 * (rows - 1)) / rows;
-      for (var rr = 0; rr < rows; rr++) for (var cc = 0; cc < cols; cc++) {
-        if (rnd() < .12) continue;
-        var bx = (x0 + 3 + cc * (cw + 4)).toFixed(1), by = y0 + 3 + rr * (rh + 4), e = 5 + rnd() * 11, f = ' width="' + cw.toFixed(1) + '" height="';
-        shd += '<rect x="' + (+bx + e * .7).toFixed(1) + '" y="' + (by + e * .2).toFixed(1) + '"' + f + rh.toFixed(1) + '" rx="2"/>';
-        bd += '<rect class="sd" x="' + bx + '" y="' + (by + rh - e).toFixed(1) + '"' + f + e.toFixed(1) + '" rx="1.5"/><rect class="tp" x="' + bx + '" y="' + (by - e).toFixed(1) + '"' + f + rh.toFixed(1) + '" rx="2"/>';
-      }
-    }
-    return '<defs><filter id="thBl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter><filter id="thGl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>'
-      + '<filter id="thCh" x="-30%" y="-50%" width="160%" height="220%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#283248" flood-opacity=".16"/></filter>'
-      + '<linearGradient id="thRg" x1="0" x2="1"><stop offset="0" style="stop-color:color-mix(in srgb, var(--acc) 45%, #a9c4ff)"/><stop offset="1" style="stop-color:var(--acc)"/></linearGradient>'
-      + '<linearGradient id="thAr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb, var(--acc) 40%, #fff)"/><stop offset="1" style="stop-color:var(--acc)"/></linearGradient></defs>'
-      + '<rect class="st" x="-430" y="-180" width="1490" height="612"/>' + bk + '<g class="sh" filter="url(#thBl)">' + shd + '</g>' + bd;
-  })();
-  function chip(x, y, s, z) {
-    z = z || 1; var w = Math.round((s.length * 6 + 16) * z), h = 18 * z, cy = y > 60 ? y - 26 * z : y + 10 * z;
-    return '<g class="lc" filter="url(#thCh)"><rect x="' + (x - w / 2) + '" y="' + cy + '" width="' + w + '" height="' + h + '" rx="' + h / 2 + '"/><text x="' + x + '" y="' + (cy + 12.5 * z) + '" text-anchor="middle" font-size="' + 11 * z + '">' + esc(s) + '</text></g>';
+  // the sidebar: active products, then the ones you can add; the open product lists its active products under it
+  function side() {
+    var row = function (f, i) {
+      var b = '<button type="button" class="th-fam" id="thTab' + i + '" data-f="' + i + '" aria-controls="thPanel"' + (i === cur ? ' aria-current="page"' : '') + ' style="--acc:' + f.acc + '">' + ico(f.ic) + esc(f.name)
+        + (f.c ? '<span class="th-n">' + f.c + '</span>' : '') + '</button>';
+      if (i !== cur || !f.on.length) return b;
+      return b + '<div class="th-sub">' + f.on.map(function (j) { return '<button type="button" data-f="' + i + '" data-t="' + j + '"' + (tab === j ? ' aria-current="true"' : '') + '>' + esc(pn(f.p[j])) + '</button>'; }).join('') + '</div>';
+    };
+    list.innerHTML = F.map(function (f, i) { return f.on.length ? row(f, i) : ''; }).join('');
+    more.innerHTML = F.map(function (f, i) { return f.on.length ? '' : row(f, i); }).join('');
+    if (cur < 0) homeB.setAttribute('aria-current', 'page'); else homeB.removeAttribute('aria-current');
   }
-  function map(f, anim) {
-    var pts = f.m.r.map(function (p) { return [MX[p[0]], MY[p[1]]]; }), d = 'M' + pts.map(function (p) { return p.join(' '); }).join('L'), a = pts[0], b = pts[pts.length - 1];
-    return '<div class="th-mapv"><svg class="th-msvg" viewBox="0 0 640 300" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">' + CITY
-      + '<g class="rte"><path class="rg" filter="url(#thGl)" d="' + d + '"/><path class="rt" id="thRt" d="' + d + '"/>'
-      + '<circle class="pa" cx="' + a[0] + '" cy="' + a[1] + '" r="5"/><circle class="pb" cx="' + b[0] + '" cy="' + b[1] + '" r="6"/>' + chip(a[0], a[1], f.m.a) + chip(b[0], b[1], f.m.b) + '</g>'
-      + '<g class="car" filter="url(#thCh)"><path d="M11 0-8 9-3.5 0-8-9Z"/><animateMotion begin="indefinite" dur="' + (anim && !still ? 3.8 : .001) + 's" fill="freeze" rotate="auto" keyPoints="0;.78" keyTimes="0;1" calcMode="spline" keySplines=".4 0 .2 1"><mpath href="#thRt" xlink:href="#thRt"/></animateMotion></g>'
-      + '</svg></div>'
-      + '<div class="th-sheet' + (sh[cur] ? ' ' + sh[cur] : '') + '"><div class="th-sh-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 3 10.5l7.5 3L14 21z"/></svg><span><b>' + esc(f.m.h) + '</b><small>' + esc(f.m.t) + '</small></span>'
-      + '<button type="button" class="th-sh-x" data-sh="" aria-label="Show the request"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button></div>'
-      + '<p class="th-sh-q">' + esc(f.m.q[0]) + '<b>' + esc(f.m.q[1]) + '</b>' + esc(f.m.q[2]) + '</p>'
-      + '<div class="th-sh-a"><button type="button" data-sh="min">Later</button><button type="button" data-sh="ok">' + esc(f.m.y) + '</button></div>'
-      + '<p class="th-sh-ok" role="status" tabindex="-1">' + S.done.replace('role="img" aria-label="Done"', 'aria-hidden="true"') + esc(f.m.ok) + '</p></div>';
-  }
-
-  function homeMap() {
-    return '<div class="th-mapv"><svg class="th-msvg home" viewBox="-180 -80 960 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + CITY + F.map(function (f, i) {
-      var pts = HR[i].map(function (p) { return [CX[p[0]], CY[p[1]]]; }), d = 'M' + pts.map(function (p) { return p.join(' '); }).join('L'), a = pts[0], b = pts[pts.length - 1];
-      return '<g class="hr" data-i="' + i + '" style="--racc:' + f.acc + '"><g class="rte"><path class="rg" filter="url(#thGl)" d="' + d + '"/><path class="rt" id="thHr' + i + '" d="' + d + '"/>'
-        + '<circle class="pa" cx="' + a[0] + '" cy="' + a[1] + '" r="7"/><circle class="pb" cx="' + b[0] + '" cy="' + b[1] + '" r="8.5"/>' + chip(a[0], a[1], f.m.a, 1.45) + chip(b[0], b[1], f.m.b, 1.45) + '</g>'
-        + '<g class="car" filter="url(#thCh)"><path d="M16 0-12 13-5 0-12-13Z"/><animateMotion begin="indefinite" dur="' + (still ? .001 : 3.8) + 's" fill="freeze" rotate="auto" keyPoints="0;.78" keyTimes="0;1" calcMode="spline" keySplines=".4 0 .2 1"><mpath href="#thHr' + i + '" xlink:href="#thHr' + i + '"/></animateMotion></g></g>';
-    }).join('') + '</svg></div><div class="th-sheet"></div>';
-  }
-  function homeSheet(anim) {
-    var p = main.querySelector('.th-sheet'), f = F[hm];
-    p.className = 'th-sheet' + (sh[hm] === 'ok' ? ' ok' : '');
-    p.innerHTML = '<p class="th-sh-f"><i class="th-dot" aria-hidden="true"></i>' + esc(f.name) + '<em>' + (hm + 1) + ' of ' + F.length + '</em></p>'
-      + '<div class="th-sh-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 3 10.5l7.5 3L14 21z"/></svg><span><b>' + esc(f.m.h) + '</b><small>' + esc(f.m.t) + '</small></span></div>'
-      + '<p class="th-sh-q">' + esc(f.m.q[0]) + '<b>' + esc(f.m.q[1]) + '</b>' + esc(f.m.q[2]) + '</p>'
-      + '<div class="th-sh-a"><button type="button" data-hm="next">Later</button><button type="button" data-hm="ok">' + esc(f.m.y) + '</button></div>'
-      + '<p class="th-sh-ok" role="status" tabindex="-1">' + S.done.replace('role="img" aria-label="Done"', 'aria-hidden="true"') + esc(f.m.ok) + '</p>';
-    if (anim && !still) { void p.offsetWidth; p.classList.add('nx'); }
-  }
-  // light the moment the sheet is on: its route comes to the front and draws in, its truck drives, the map glides to it and the wash takes its colour
-  function light(draw) {
-    main.style.setProperty('--acc', F[hm].acc);
-    [].forEach.call(main.querySelectorAll('.hr'), function (g) { g.classList.toggle('on', +g.dataset.i === hm); });
-    var g = main.querySelector('.hr.on'); g.parentNode.appendChild(g);
-    if (draw && !still) [].forEach.call(g.querySelectorAll('.rt, .rg'), function (r) { var l = r.getTotalLength(); r.animate([{ strokeDasharray: l, strokeDashoffset: l }, { strokeDasharray: l, strokeDashoffset: 0 }], { duration: 1100, easing: 'cubic-bezier(.2,.7,.2,1)' }); });
-    var mo = g.querySelector('animateMotion'); if (mo && mo.beginElement) mo.beginElement();
-    var v = main.querySelector('.th-mapv'), o = OFF[hm]; if (o) { v.style.setProperty('--mx', o[0] + 'px'); v.style.setProperty('--my', o[1] + 'px'); }
-  }
-  function step(d) { if (cur >= 0) return; hm = (hm + d + F.length) % F.length; light(true); homeSheet(true); }
   function renderHome(anim) {
-    main.setAttribute('aria-labelledby', 'thHome');
-    main.innerHTML = '<div class="th-top"><span class="th-crumb"><b>Home</b><em aria-hidden="true">/</em>All fleets</span></div>'
-      + '<div class="th-body' + (anim ? ' sw' : '') + '"><div class="th-h"><h3>Good morning</h3><span>What needs you today, across your products</span></div>'
-      + '<div class="th-hero"><div class="th-map">' + homeMap() + '</div>'
-      + '<div class="th-stats">' + HS.map(function (s) { return '<div class="th-stat"><small>' + s[0] + '</small><b>' + s[1] + '</b><em>' + s[2] + '</em></div>'; }).join('') + '</div></div>'
-      + '<div class="th-lh">Latest from your products<span>' + HA.length + ' items</span></div>'
-      + HA.map(function (h) { var f = F[h[0]], r = f.r[h[1]]; return '<div class="th-row" style="--acc:' + f.acc + '">' + S[r[0]] + '<code>' + f.id + '-' + (f.n - h[1]) + '</code><span class="tt">' + esc(r[1]) + '</span><span class="tg">' + esc(f.name) + '</span><span class="mt">' + esc(r[3]) + '</span><time>' + r[4] + '</time></div>'; }).join('')
+    main.setAttribute('aria-labelledby', 'thHome'); main.style.setProperty('--acc', '#2a6fd0');
+    var card = function (f, i) {
+      var na = !f.on.length;
+      return '<article class="hm-p' + (na ? ' na' : '') + '" style="--acc:' + f.acc + '"><div class="hm-ph"><i class="hm-ic" aria-hidden="true">' + ico(f.ic) + '</i><span><span class="hm-t"><b>' + esc(f.name) + '</b>' + (na ? '' : '<span class="hm-n">' + f.p.map(function (p, j) { return '<i class="' + (f.on.indexOf(j) > -1 ? 'on' : '') + '"></i>'; }).join('') + f.on.length + ' of ' + f.p.length + '</span>') + '</span><small>' + (na ? 'Not active yet. ' : '') + f.line + '</small></span></div>'
+        + '<div class="hm-ch">' + f.p.map(function (p, j) { var k = f.on.indexOf(j), on = k > -1;
+          return '<span class="hm-c ' + (on ? 'on' : 'off') + '">' + (on ? '' : '+ ') + esc(pn(p)) + (p.slice(-1) === '*' ? '<small>Soon</small>' : '') + (on && f.bd && f.bd[k] ? '<em>' + f.bd[k] + '</em>' : '') + '</span>'; }).join('') + '</div>'
+        + '<button type="button" class="hm-go" data-f="' + i + '" aria-label="' + (na ? 'Explore ' : 'Open ') + esc(f.name) + '">' + (na ? 'Explore' : 'Open') + arrow + '</button></article>';
+    };
+    // what needs you first comes first in the page too, so keys and screen readers meet it before the products; on wide screens the grid puts it on the right
+    var rail = '<div class="hm-col hm-rail">'
+      + '<section class="hm-card" aria-labelledby="hmX"><div class="hm-sh"><h4 id="hmX">Open exceptions</h4><span class="hm-cnt"><i class="hm-sp" aria-hidden="true"></i>7</span></div>'
+      + EX.map(function (x) { return '<button type="button" class="hm-x" data-f="' + x[2] + '"' + (x[3] == null ? '' : ' data-t="' + x[3] + '"') + ' style="--acc:' + F[x[2]].acc + '"><i aria-hidden="true"></i><span>' + x[0] + '</span><span class="th-n">' + x[1] + '</span>' + ico(IC.arr) + '</button>'; }).join('') + '</section>'
+      + '<section class="hm-card" aria-labelledby="hmQ"><div class="hm-sh"><h4 id="hmQ">Quick actions</h4></div><div class="hm-qs">'
+      + QA.map(function (a) { var i = '<i aria-hidden="true">' + ico(a[2] || F[a[1]].ic) + '</i>' + a[0]; return typeof a[1] === 'string' ? '<a class="hm-q" href="' + a[1] + '">' + i + '</a>' : '<button type="button" class="hm-q" data-f="' + a[1] + '">' + i + '</button>'; }).join('') + '</div></section>'
+      + '<section class="hm-card" aria-labelledby="hmR"><div class="hm-sh"><h4 id="hmR">Reports</h4></div>'
+      + RP.map(function (r) { return '<div class="hm-r"><i aria-hidden="true">' + ico(IC.doc) + '</i>' + r[0] + '<small>' + r[1] + '</small></div>'; }).join('') + '</section>'
       + '</div>';
-    homeSheet(false); lens(); place(); light(false);
+    main.innerHTML = '<div class="th-body hm' + (anim ? ' sw' : '') + '">'
+      + '<div class="hm-top"><div><p class="hm-d">Wednesday, 21 October · Month to date</p><h3><span>Good morning,</span> Thandi</h3><p class="hm-say"><b>7 things</b> need you today and you could still save <b>R 18 400</b> this month.</p></div><button type="button" class="hm-cta" data-f="1">' + ico(F[1].ic) + 'Order fuel</button></div>'
+      + '<div class="hm-kpis">'
+      + '<div class="hm-k warn"><small><i class="hm-sp" aria-hidden="true"></i>Cash-flow projection</small><b>5 days left</b><p>At your current rate, your balance runs out on 26 Oct.</p><button type="button" class="hm-lk" data-f="0" data-t="0">Request funds' + arrow + '</button></div>'
+      + '<div class="hm-k"><small>You could still save</small><b>R 18 400</b><p>This month, with THOMAS spend suggestions</p><button type="button" class="hm-lk" data-f="1">See the suggestions' + arrow + '</button></div>'
+      + '<div class="hm-k"><small>Saved this month</small><b>R 43 920</b><p>On fuel and non-fuel services</p></div>'
+      + '<div class="hm-k"><small>Credit used</small><b>82%</b><span class="hm-meter" aria-hidden="true"><i></i><i></i></span><p>Of your Standard Bank facility</p></div>'
+      + '<div class="hm-k"><small>Open exceptions</small><b>7</b><p>In 4 products</p></div></div>'
+      + '<div class="hm-grid">' + rail + '<div class="hm-col">'
+      + '<section aria-labelledby="hmP"><div class="hm-sh"><h4 id="hmP">Your products</h4><span class="hm-leg"><span><i class="on"></i>Active</span><span><i></i>Available to add</span></span></div><div class="hm-prods">' + F.map(card).join('') + '</div></section>'
+      + '<section aria-labelledby="hmT"><div class="hm-sh"><h4 id="hmT">Platform partners</h4><span>The businesses behind your products</span></div><div class="hm-pts">'
+      + PT.map(function (t) { return '<div class="hm-pt"><div class="hm-lg">' + t.l + '</div><span><b>' + esc(t.n) + '</b><small>' + t.d + '</small></span><span class="hm-tgs">' + t.f.map(function (i) { return '<span class="hm-tg" style="--acc:' + F[i].acc + '">' + esc(F[i].name) + '</span>'; }).join('') + '</span></div>'; }).join('')
+      + '</div></section></div></div></div>';
   }
-  function lens() { [].forEach.call(main.querySelectorAll('.th-msvg .rt, .th-msvg .rg'), function (r) { r.style.setProperty('--len', r.getTotalLength().toFixed(1)); }); }
-
-  list.innerHTML = F.map(function (f, i) {
-    return '<button type="button" class="th-fam" role="tab" id="thTab' + i + '" aria-controls="thPanel" style="--acc:' + f.acc + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + f.ic + '</svg>' + esc(f.name) + (f.c ? '<span class="th-n">' + f.c + '</span>' : '') + '</button>';
-  }).join('');
-  var tabs = [].slice.call(list.children);
 
   function render(anim) {
+    side();
     if (cur < 0) return renderHome(anim);
     var f = F[cur];
     main.setAttribute('aria-labelledby', 'thTab' + cur); main.style.setProperty('--acc', f.acc);
@@ -4518,68 +4546,32 @@ addEventListener('load', function () {
       + '<div class="th-tabs" role="group" aria-label="' + esc(f.name) + ' products">' + ['Overview'].concat(f.p).map(function (p, i) {
         return '<button type="button" class="th-tab" data-t="' + (i - 1) + '" aria-pressed="' + (i - 1 === tab) + '">' + esc(pn(p)) + (p.slice(-1) === '*' ? '<small>Soon</small>' : '') + '</button>'; }).join('') + '</div>'
       + '<div class="th-body' + (anim ? ' sw' : '') + '"><div class="th-h"><h3>' + esc(f.name) + '</h3><span>' + f.line + '</span></div>'
-      + '<div class="th-hero"><div class="th-map">' + map(f, anim) + '</div>'
-      + '<div class="th-stats">' + f.st.map(function (s) { return '<div class="th-stat"><small>' + s[0] + '</small><b>' + s[1] + '</b><em>' + s[2] + '</em></div>'; }).join('') + '</div></div>'
+      + '<div class="th-stats">' + f.st.map(function (s) { return '<div class="th-stat"><small>' + s[0] + '</small><b>' + s[1] + '</b><em>' + s[2] + '</em></div>'; }).join('') + '</div>'
       + '<div class="th-lh">Activity<span>' + rows.length + (rows.length === 1 ? ' item' : ' items') + '</span></div>'
       + rows.map(function (r) { return '<div class="th-row">' + S[r[0]] + '<code>' + f.id + '-' + (f.n - f.r.indexOf(r)) + '</code><span class="tt">' + esc(r[1]) + '</span><span class="tg">' + esc(pn(f.p[r[2]])) + '</span><span class="mt">' + esc(r[3]) + '</span><time>' + r[4] + '</time></div>'; }).join('')
       + '</div>';
-    lens();
-    var mo = main.querySelector('animateMotion'); if (mo && mo.beginElement) mo.beginElement();
-    place();
   }
-  // slide the map so the route and its two chips sit in the clear part of the card: beside the sheet, or above it when the sheet fills the width
-  function place() {
-    var v = main.querySelector('.th-mapv'), p = main.querySelector('.th-sheet'), c = main.querySelector('.th-map'); if (!v || !c.offsetWidth) return;
-    v.classList.remove('glide'); v.style.setProperty('--mx', '0px'); v.style.setProperty('--my', '0px');
-    var C = c.getBoundingClientRect(), P = p.getBoundingClientRect(), k = C.width / c.offsetWidth, beside = C.right - P.right > C.width * .38;
-    var tx = beside ? (P.right + C.right) / 2 : (C.left + C.right) / 2, ty = beside ? C.top + C.height * .52 : (C.top + 24 + P.top) / 2;
-    OFF = [].map.call(main.querySelectorAll('.rte'), function (g) { var R = g.getBoundingClientRect(); return [((tx - (R.left + R.right) / 2) / k).toFixed(1), ((ty - (R.top + R.bottom) / 2) / k).toFixed(1)]; });
-    var o = OFF[cur < 0 ? hm : 0]; v.style.setProperty('--mx', o[0] + 'px'); v.style.setProperty('--my', o[1] + 'px');
-    if (cur < 0) { void v.offsetWidth; v.classList.add('glide'); }
-  }
-  var pr = 0; addEventListener('resize', function () { cancelAnimationFrame(pr); pr = requestAnimationFrame(place); });
   function go(i, focus, t) {
     i = (i + F.length) % F.length; var anim = i !== cur; cur = i; tab = t == null ? -1 : t;
-    tabs.forEach(function (b, j) { b.setAttribute('aria-selected', j === i); b.tabIndex = j === i ? 0 : -1; }); homeB.removeAttribute('aria-current');
-    if (focus) tabs[i].focus();
-    render(anim);
+    render(anim); if (focus) document.getElementById('thTab' + i).focus();
   }
-  function home(focus) {
-    var anim = cur !== -1; cur = -1; tab = -1;
-    tabs.forEach(function (b, j) { b.setAttribute('aria-selected', false); b.tabIndex = j ? -1 : 0; }); homeB.setAttribute('aria-current', 'page');
-    if (focus) homeB.focus();
-    renderHome(anim);
-  }
+  function home(focus) { var anim = cur !== -1; cur = -1; tab = -1; render(anim); if (focus) homeB.focus(); }
   function pick(i, focus) { if (i < 0) home(focus); else go(i, focus); }
-  function stop() { touched = true; clearInterval(auto); auto = null; }
-  function run() { clearInterval(auto); auto = null; if (!touched && seen && !hover && cmd.hidden) auto = setInterval(function () { if (cur < 0) step(1); else go(cur + 1); }, 4200); }
 
   function fill() {
     var t = q.value.trim().toLowerCase(), hits = [-1].concat(F.map(function (f, i) { return i; })).filter(function (i) { return !t || (i < 0 ? 'home' : F[i].name + ' ' + F[i].p.join(' ')).toLowerCase().indexOf(t) > -1; });
     sel = Math.min(sel, Math.max(hits.length - 1, 0));
     ul.innerHTML = hits.length ? hits.map(function (i, k) { return '<li role="option" aria-selected="' + (k === sel) + '"><button type="button" tabindex="-1" data-i="' + i + '" class="' + (k === sel ? 'on' : '') + '" style="--acc:' + (i < 0 ? '#8e8e93' : F[i].acc) + '"><i class="th-dot" aria-hidden="true"></i>' + (i < 0 ? 'Home' : esc(F[i].name)) + '<span>' + (i + 1) + '</span></button></li>'; }).join('') : '<p>No product family called that</p>';
   }
-  function open() { stop(); cmd.hidden = false; q.value = ''; sel = 0; fill(); q.focus(); }
-  function close(i) { cmd.hidden = true; if (i != null) pick(i, true); else (cur < 0 ? homeB : tabs[cur]).focus(); }
+  function open() { cmd.hidden = false; q.value = ''; sel = 0; fill(); q.focus(); }
+  function close(i) { cmd.hidden = true; if (i != null) pick(i, true); else (cur < 0 ? homeB : document.getElementById('thTab' + cur)).focus(); }
 
-  list.addEventListener('click', function (e) { var b = e.target.closest('.th-fam'); if (b) { stop(); go(tabs.indexOf(b)); } });
-  list.addEventListener('keydown', function (e) {
-    var d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (d) { e.preventDefault(); stop(); go(cur < 0 ? (d > 0 ? 0 : F.length - 1) : cur + d, true); }
-    if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); stop(); go(e.key === 'Home' ? 0 : F.length - 1, true); }
+  // every jump in the app is a data-f (product) with an optional data-t (one of its products), from the sidebar or from Home
+  th.addEventListener('click', function (e) {
+    if (e.target.closest('[data-home]')) { home(); return; }
+    var b = e.target.closest('[data-f]'); if (b) { go(+b.dataset.f, b.closest('.th-side') !== null, b.dataset.t == null ? null : +b.dataset.t); return; }
+    b = e.target.closest('.th-tab'); if (b) { tab = +b.dataset.t; render(false); main.querySelector('.th-tab[data-t="' + tab + '"]').focus(); }
   });
-  th.querySelector('.th-side').addEventListener('click', function (e) { if (e.target.closest('[data-home]')) { stop(); home(); return; } var b = e.target.closest('[data-go]'); if (b) { stop(); go(+b.dataset.go, false, b.dataset.t == null ? null : +b.dataset.t); } });
-  main.addEventListener('click', function (e) {
-    var h = e.target.closest('[data-hm]');
-    if (h) {
-      stop();
-      if (h.dataset.hm === 'next') step(1);
-      else { var at = hm; sh[hm] = 'ok'; main.querySelector('.th-sheet').classList.add('ok'); main.querySelector('.th-sh-ok').focus();
-        setTimeout(function () { if (cur < 0 && hm === at) { var inside = main.querySelector('.th-sheet').contains(document.activeElement); step(1); if (inside) main.querySelector('.th-sh-a button').focus(); } }, 2600); return; }
-      main.querySelector('.th-sh-a button').focus(); return;
-    }
-    var k = e.target.closest('[data-sh]');
-    if (k) { stop(); var p = k.closest('.th-sheet'); sh[cur] = k.dataset.sh; p.className = 'th-sheet' + (sh[cur] ? ' ' + sh[cur] : ''); var n = p.querySelector(sh[cur] === 'min' ? '.th-sh-x' : sh[cur] ? '.th-sh-ok' : '.th-sh-a button + button'); if (n) n.focus(); return; }
-    var b = e.target.closest('.th-tab'); if (!b) return; stop(); tab = +b.dataset.t; render(false); main.querySelector('.th-tab[data-t="' + tab + '"]').focus(); });
   th.querySelector('[data-cmd]').addEventListener('click', open);
   cmd.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) close(+b.dataset.i); else if (e.target === cmd) close(); });
   q.addEventListener('input', function () { sel = 0; fill(); });
@@ -4595,16 +4587,14 @@ addEventListener('load', function () {
     if (!(hover || th.contains(document.activeElement)) || !cmd.hidden) return;
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); open(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
-    var i = parseInt(e.key, 10); if (i >= 0 && i <= F.length) { e.preventDefault(); stop(); pick(i - 1, th.contains(document.activeElement)); }
+    var i = parseInt(e.key, 10); if (i >= 0 && i <= F.length) { e.preventDefault(); pick(i - 1, th.contains(document.activeElement)); }
   });
-  th.addEventListener('pointerenter', function () { hover = true; run(); });
-  th.addEventListener('pointerleave', function () { hover = false; run(); });
-  th.addEventListener('pointerdown', stop);
-  th.addEventListener('focusin', function (e) { if (e.target !== th) stop(); });
+  th.addEventListener('pointerenter', function () { hover = true; });
+  th.addEventListener('pointerleave', function () { hover = false; });
 
   home();
   if (still) th.classList.add('in');
-  new IntersectionObserver(function (es) { var e = es[0]; if (e.isIntersecting && e.intersectionRatio > .3) th.classList.add('in'); seen = e.isIntersecting && !still; run(); }, { threshold: [0, .3] }).observe(th);
+  new IntersectionObserver(function (es) { var e = es[0]; if (e.isIntersecting && e.intersectionRatio > .3) th.classList.add('in'); }, { threshold: [0, .3] }).observe(th);
 })();
 </script>
 </body>
