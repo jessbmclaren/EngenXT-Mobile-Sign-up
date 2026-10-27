@@ -384,7 +384,7 @@ def products_panel():
         f['acc'], lead(f), f['name'], ''.join(item(l, key) for l, key in f['items']))
     mini = ''.join('<i style="--acc:%s"></i>' % FAMK[k]['acc'] for k in ('treasury', 'fueltech', 'cross'))
     return ('<div class="px"><div class="px-c">%s</div><div class="px-r">'
-            '<a class="px-card" href="tfn-page-examples.html#fam"><em class="px-tag">Coming soon</em><span class="px-mini" aria-hidden="true">%s</span>'
+            '<a class="px-card" href="tfn-page-examples.html#fam"><em class="px-tag">Live now</em><span class="px-mini" aria-hidden="true">%s</span>'
             '<b>TruckersHub</b><small>Every product on one screen: what needs you, what you saved and what to add.</small><span class="px-go">See it <i aria-hidden="true">→</i></span></a>'
             '<a class="px-all" href="tfn-page-examples.html#fam">See all products <i aria-hidden="true">→</i></a></div>'
             '<p class="px-new"><b>New</b><span>EngenXT: fuel for bakkies and vans, paid with a QR code at the till. Coming soon.</span><a href="tfn-lcv.html">Learn more <i aria-hidden="true">→</i></a></p></div>') % (
@@ -634,7 +634,7 @@ def tiers_page():
 <div><label for="tlit">Litres a month</label><output id="tout" for="tlit">40 000 L</output><input type="range" id="tlit" min="0" max="200000" step="1000" value="40000"></div>
 <div class="res" aria-live="polite"><div id="tbadge">%s</div><dl><dt>Tier</dt><dd id="tname">Gold</dd><dt>Off every litre</dt><dd id="tdisc">4c</dd><dt>Saving a month</dt><dd id="tsave">R 1 600</dd><dt>To the next tier</dt><dd id="tnext">10 000 L to Diamond</dd></dl></div>
 </div></div></section>""" % (html.escape(__import__('json').dumps([[k, n, lo, hi, d] for k, n, lo, hi, d, pts in TIERS])), badge('gold', 'Gold'))
-    portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal <span class="soon">Coming soon</span></p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one and what it’s saving you in the TruckersHub fleet manager portal.</p>
+    portal = """<section class="band" data-dark style="background:#000;color:#fff"><div class="wrap"><p class="kicker" style="color:#a8a8a8">Fleet manager portal</p><h2>Your tier, always in view</h2><p class="sub" style="color:#a8a8a8">See your tier, how far you are from the next one and what it’s saving you in the TruckersHub fleet manager portal.</p>
 <div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
 <main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
 <div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>TFN Rewards</span><b>3 points a litre</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
