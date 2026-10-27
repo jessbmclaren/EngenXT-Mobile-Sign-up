@@ -1360,8 +1360,8 @@
   .fstats { display: flex; justify-content: center; gap: clamp(28px, 6vw, 72px); margin: 22px 0 6px; }
   .fstats div { display: grid; font-size: .9rem; color: rgba(255,255,255,.75); }
   .fstats b, .fstats b * { font-variant-numeric: proportional-nums; line-height: 1.05; } .fstats b { margin-bottom: 2px; } .fstats b { font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 500; letter-spacing: -.02em; color: #fff; }
-  /* the footer signs off with the orb, set apart from the wordmark */
-  .fbrand { display: flex; align-items: center; justify-content: space-between; } .forb { width: 44px; height: 44px; border-radius: 50%; background: var(--orb-diesel); }
+  /* the footer signs off with the wordmark */
+  .fbrand { display: flex; align-items: center; }
   @media (prefers-reduced-motion: reduce) { .horb { animation: none; opacity: 1; } }
 
   /* every street map is the network map's style: the gradient route, a soft casing, orb pins */
@@ -1576,8 +1576,8 @@
   }
   /* the orbs breathe inside like clouds: two soft copies of the orb's own colour drift past each other at different speeds,
      so the colour gathers, thins and rolls on without ever repeating; the circle and its grain stay still; small orbs and map pins stay still */
-  :where(.forb, .nm-peek .ob) { position: relative; } :where(.bm-orb, .forb, .nm-peek .ob) { overflow: hidden; isolation: isolate; }
-  :is(.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob) { animation: odrift 22s ease-in-out infinite alternate; background-size: 125% 125% !important; }
+  :where(.nm-peek .ob) { position: relative; } :where(.bm-orb, .nm-peek .ob) { overflow: hidden; isolation: isolate; }
+  :is(.bm-orb:not(.sm):not(.bad), .nm-peek .ob) { animation: odrift 22s ease-in-out infinite alternate; background-size: 125% 125% !important; }
   .bm-cover .bm-orb.xl { animation: bmBreathe 9s ease-in-out infinite alternate, odrift 22s ease-in-out infinite alternate; }
   @keyframes odrift { 0% { background-position: 10% 20%; } 50% { background-position: 80% 40%; } 100% { background-position: 40% 90%; } }
   .ocl { position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; mix-blend-mode: soft-light; }
@@ -1586,7 +1586,7 @@
   @keyframes cla { 0% { transform: translate(-14%, 8%) rotate(-12deg) scale(1.1); } 33% { transform: translate(10%, -6%) rotate(20deg) scale(.95); } 66% { transform: translate(-4%, -14%) rotate(55deg) scale(1.15); } 100% { transform: translate(14%, 10%) rotate(80deg) scale(1); } }
   @keyframes clb { 0% { transform: translate(12%, -10%) rotate(150deg) scale(1.25); } 40% { transform: translate(-12%, 4%) rotate(110deg) scale(1.05); } 75% { transform: translate(6%, 14%) rotate(70deg) scale(1.3); } 100% { transform: translate(-10%, -8%) rotate(40deg) scale(1.1); } }
   .bm-orb:nth-of-type(2n) .ocl, .bm-orb:nth-of-type(2n) { animation-delay: -5s; } .bm-orb:nth-of-type(3n) .ocl, .bm-orb:nth-of-type(3n) { animation-delay: -11s; }
-  @media (prefers-reduced-motion: reduce) { :is(.bm-orb, .forb, .nm-peek .ob), .ocl { animation: none !important; } .ocl { display: none; } }
+  @media (prefers-reduced-motion: reduce) { :is(.bm-orb, .nm-peek .ob), .ocl { animation: none !important; } .ocl { display: none; } }
 
   /* ---------- 1. hero: the night map card over the photograph becomes the middle product card; the scroll drives it (script: "the hero zoom") ---------- */
   .zh { position: relative; height: 260vh; margin-top: -72px; background: #fff; }
@@ -2241,7 +2241,7 @@
       <div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="#partners">Our partners</a></li><li><a href="#">News</a></li><li><a href="#">Contact us</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="#">Contact support</a></li><li><a href="#">Terms and conditions</a></li><li><a href="#">Log in</a></li></ul></div>
     </div>
-    <div class="fbrand"><svg aria-label="TFN"><use href="#lockup"/></svg><span class="forb" aria-hidden="true"></span></div>
+    <div class="fbrand"><svg aria-label="TFN"><use href="#lockup"/></svg></div>
     <div class="legal"><p>© 2026 TFN. Design concept. Figures and customer quotes are from tfn.co.za. Photographs are Unsplash stock used as placeholders and do not show TFN customers. Screens, plates, prices and savings in the product mock-ups are illustrative.</p><p><sup>1</sup> Credit is subject to approval by the credit provider. <sup>2</sup> Estimate only. Your saving depends on route, volume and depot pricing. <sup>3</sup> Homebase fees are tiered by monthly on-road volume and shown for guidance. <sup>4</sup> TFN Rewards is part of this design concept. Points rates and values are illustrative.</p></div>
   </div>
 </footer>
@@ -3224,7 +3224,7 @@
     [5, 8, 56, -140, 'silver', 5.8, 30, -.8, .5], [30, 97, 62, -80, 'silver', 6.4, -26, -4.2, .58], [74, -4, 50, -200, 'silver', 6.2, -16, -1.9, .66]]);
 
   /* cloud layers inside the big CSS orbs (see .ocl) */
-  document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .forb, .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
+  document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
   /* the orbs: each a smooth blend of five soft colours drifting slowly under a light grain, with only a hint of shading */
   var ITEMS = [
     ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#b8622e', '#8db8e6']],
