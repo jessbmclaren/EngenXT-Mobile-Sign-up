@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tfn: fuel, cover and control for every vehicle</title>
+<meta name="description" content="Fuel, insurance, tracking and upkeep for every vehicle and driver, in one place.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* One line swaps the headline face: use var(--serif) for the Fraunces look */
+    --display: "Hanken Grotesk", "Aeonik Pro", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --ink:    #000000;
+    --ink-2:  #111111;
+    --paper:  #ffffff;
+    --grey:   #f4f4f4;
+    --grey-2: #e4e4e4;
+    --text:   #0a0a0a;
+    --muted:  #6a6a6a;
+    --blue:   #3a7bd5;
+    --blue-d: #2557b8;
+    --green:  #3fb28a;
+    --purple: #7a4bc0;
+    --purple-l: #b79be0;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "Hanken Grotesk", "Aeonik Pro", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text); background: var(--paper); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; border: 0; cursor: pointer; color: inherit; background: none; }
+  ul { list-style: none; padding: 0; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+  .wrap { width: min(1160px, 100% - 48px); margin-inline: auto; }
+
+  /* ---------- shared ---------- */
+  .btn { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px; border-radius: 999px; font-weight: 600; font-size: .95rem; background: var(--ink); color: #fff; transition: transform .15s, opacity .15s; }
+  .btn:hover { transform: translateY(-1px); opacity: .9; }
+  .btn.light { background: #fff; color: var(--ink); }
+  .btn.sm { padding: 10px 20px; font-size: .88rem; }
+  .btn.ghost { background: transparent; color: inherit; }
+  .glass { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); }
+  .glass.light { background: rgba(255,255,255,.6); border-color: rgba(255,255,255,.8); }
+  .sec { padding: 110px 0; }
+  .sec.dark { background: var(--ink); color: #fff; }
+  .sec.grey { background: var(--grey); }
+  .center { text-align: center; }
+  h1, h2 { font-family: var(--display); }
+  h3 { font-family: var(--display); }
+  h2.title { font-size: clamp(1.9rem, 3.8vw, 3rem); font-weight: 600; letter-spacing: -.035em; line-height: 1.08; }
+  .sub { color: var(--muted); max-width: 40em; margin: 18px auto 30px; }
+  .dark .sub { color: #bdbdbd; }
+  .kicker { font-size: .8rem; font-weight: 600; color: var(--muted); margin-bottom: 14px; }
+  .mark { display: block; }
+
+  /* mesh fills (stand in for photography) */
+  .mesh { position: relative; isolation: isolate; overflow: hidden; }
+  .mesh::before { content: ""; position: absolute; inset: -25%; z-index: -1; filter: blur(40px) saturate(125%); background: var(--m, radial-gradient(40% 40% at 20% 25%, #3a7bd5, transparent 70%), radial-gradient(40% 40% at 80% 30%, #3fb28a, transparent 70%), radial-gradient(50% 50% at 60% 90%, #7a4bc0, transparent 70%)); }
+  .mesh::after { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .25; mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  /* ---------- nav ---------- */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.78); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.06); }
+  .nav .wrap { display: flex; align-items: center; height: 64px; gap: 8px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.02em; margin-right: 18px; }
+  .brand svg { width: 50px; height: 28px; }
+  .links { display: flex; gap: 2px; }
+  .links a { padding: 8px 14px; font-size: .9rem; font-weight: 500; border-radius: 999px; color: #3a3a3a; }
+  .links a:hover { background: var(--grey); }
+  .nav .grow { flex: 1; }
+
+  /* ---------- hero ---------- */
+  .hero { background: var(--grey); padding: 70px 0 0; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 20px; min-height: 560px; }
+  .hero .copy { align-self: center; padding-bottom: 70px; }
+  .hero h1 { font-size: clamp(2.4rem, 4.6vw, 3.8rem); font-weight: 600; letter-spacing: -.04em; line-height: 1.04; margin: 6px 0 20px; max-width: 11em; }
+  .hero p { color: var(--muted); max-width: 30em; margin-bottom: 28px; }
+  .stage { position: relative; height: 520px; }
+  .block { position: absolute; left: 50%; bottom: 0; width: 330px; height: 150px; transform: translateX(-50%); background: linear-gradient(#262626, #000000); border-radius: 18px 18px 0 0; }
+  .phone { position: absolute; left: 50%; bottom: 100px; width: 250px; height: 460px; transform: translateX(-50%) rotate(-5deg); background: #000000; border-radius: 40px; padding: 9px; box-shadow: 0 30px 60px -20px rgba(31,20,70,.5); }
+  .phone .scr { height: 100%; border-radius: 32px; color: #fff; padding: 22px 16px; position: relative; overflow: hidden; }
+  .phone small { display: block; opacity: .8; font-size: .7rem; font-weight: 500; margin-top: 26px; text-align: center; }
+  .phone strong { display: block; text-align: center; font-size: 2rem; letter-spacing: -.04em; font-weight: 600; }
+  .phone .row { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+  .phone .row i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .85rem; }
+  .phone .list { position: absolute; left: 14px; right: 14px; bottom: 14px; border-radius: 20px; padding: 10px 12px; display: grid; gap: 8px; font-size: .72rem; }
+  .phone .list div { display: flex; justify-content: space-between; }
+  .ccard { position: absolute; right: 2%; bottom: 120px; width: 230px; height: 144px; border-radius: 16px; transform: rotate(14deg); color: #fff; padding: 14px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 24px 40px -18px rgba(20,10,60,.6); }
+  .ccard svg { width: 42px; height: 23px; }
+
+  /* ---------- split ---------- */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .split h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-weight: 600; letter-spacing: -.035em; line-height: 1.08; }
+  .split p { color: var(--muted); margin: 18px 0 28px; max-width: 28em; }
+  .photo { border-radius: 24px; aspect-ratio: 1 / 1.05; max-width: 440px; position: relative; display: grid; align-items: end; padding: 18px; color: #fff; }
+  .photo .chip { border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; font-size: .85rem; font-weight: 600; }
+  .photo .chip i { width: 34px; height: 34px; border-radius: 10px; background: var(--blue-d); display: grid; place-items: center; font-style: normal; }
+  .photo .chip span:last-child { margin-left: auto; }
+
+  /* ---------- big bands ---------- */
+  .band { position: relative; color: #fff; padding: 100px 0 80px; text-align: center; overflow: hidden; }
+  .band h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); font-weight: 600; letter-spacing: -.035em; max-width: 14em; margin-inline: auto; }
+  .band .sub { color: rgba(255,255,255,.82); }
+  .gphone { position: relative; width: 250px; height: 300px; margin: 48px auto 0; border-radius: 34px 34px 0 0; padding: 22px; text-align: center; }
+  .gphone small { font-size: .72rem; opacity: .85; }
+  .gphone strong { display: block; font-size: 2.2rem; letter-spacing: -.04em; font-weight: 600; margin: 6px 0 14px; }
+  .dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.4); } .dots i:first-child { background: #fff; }
+  .tabs { display: flex; justify-content: center; gap: 10px; margin-top: 36px; flex-wrap: wrap; }
+  .tabs .glass { padding: 9px 18px; border-radius: 999px; font-size: .85rem; font-weight: 600; color: #fff; }
+
+  .cards-sec { background: #000; color: #fff; padding: 100px 0 0; text-align: center; overflow: hidden; }
+  .cards-sec h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); font-weight: 600; letter-spacing: -.035em; }
+  .cards-stage { position: relative; height: 380px; margin-top: 40px; }
+  .cc { position: absolute; width: 380px; height: 236px; border-radius: 22px; padding: 20px; text-align: left; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); }
+  .cc svg { width: 56px; height: 31px; }
+  .cc.one { left: 50%; top: 40px; transform: translateX(-62%) rotate(-14deg) skewX(8deg); }
+  .cc.two { left: 50%; top: 80px; transform: translateX(-8%) rotate(-14deg) skewX(8deg); background: linear-gradient(135deg, #2557b8, #7a4bc0 70%, #3fb28a); }
+  .cc.three { left: 50%; top: 20px; transform: translateX(-150%) rotate(-14deg) skewX(8deg); background: linear-gradient(135deg, #2a2a2a, #000000); border: 1px solid #3a3648; }
+  .cc.one { background: linear-gradient(135deg, #3a7bd5, #5b3bb0 55%, #7a4bc0); }
+  .pillrow { display: flex; justify-content: center; gap: 10px; margin: 28px 0 0; flex-wrap: wrap; }
+  .pillrow .glass { padding: 9px 18px; border-radius: 999px; font-size: .85rem; font-weight: 600; }
+
+  /* ---------- feature grid ---------- */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
+  .f { background: var(--grey); border-radius: 20px; padding: 28px; text-align: left; }
+  .f svg { width: 22px; height: 22px; margin-bottom: 40px; }
+  .f h3 { font-size: 1.05rem; font-weight: 600; letter-spacing: -.01em; margin-bottom: 8px; }
+  .f p { color: var(--muted); font-size: .92rem; }
+
+  /* ---------- split bills ---------- */
+  .bills { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .billcard { border-radius: 28px; min-height: 380px; position: relative; display: grid; place-items: center; padding: 30px; }
+  .billui { width: 250px; border-radius: 22px; background: var(--ink); color: #fff; padding: 18px; box-shadow: 0 30px 50px -22px rgba(0,0,0,.6); }
+  .billui .a { font-size: .75rem; opacity: .7; } .billui .b { font-size: 1.5rem; font-weight: 600; letter-spacing: -.03em; margin: 2px 0 14px; }
+  .billui .c { border-radius: 14px; padding: 12px; background: linear-gradient(135deg, #2557b8, #7a4bc0); font-size: .8rem; display: grid; gap: 8px; }
+  .billui .c b { font-size: 1.4rem; letter-spacing: -.03em; }
+  .billui .c span { background: var(--green); color: #0a0a0a; border-radius: 999px; padding: 6px; text-align: center; font-weight: 700; font-size: .75rem; }
+  .bills .pillrow { justify-content: flex-start; }
+  .bills .pillrow .glass { background: var(--grey); border-color: var(--grey-2); color: var(--text); backdrop-filter: none; }
+
+  /* ---------- protected ---------- */
+  .prot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 50px; }
+  .pc { border-radius: 24px; min-height: 380px; padding: 26px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; text-align: left; }
+  .pc h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.015em; max-width: 12em; }
+  .pc .ui { border-radius: 18px; padding: 14px; font-size: .8rem; }
+  .pc .ui b { display: block; font-size: 1.5rem; letter-spacing: -.03em; font-weight: 600; margin-top: 4px; }
+  .sw { width: 38px; height: 22px; border-radius: 99px; background: var(--green); position: relative; display: inline-block; vertical-align: middle; }
+  .sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #0a0a0a; }
+
+  /* ---------- refer ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 50px; text-align: left; }
+  .st { background: var(--ink-2); border: 1px solid #2a2a2a; border-radius: 22px; padding: 28px; }
+  .st svg { width: 22px; height: 22px; margin-bottom: 44px; color: var(--green); }
+  .st h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+  .st p { color: #a8a8a8; font-size: .9rem; }
+
+  /* ---------- plans ---------- */
+  .plans { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 48px; text-align: left; }
+  .pl { grid-column: span 2; background: var(--ink-2); border-radius: 22px; padding: 26px; display: flex; flex-direction: column; gap: 6px; min-height: 260px; border: 1px solid #262626; }
+  .pl:nth-child(n+4) { grid-column: span 3; }
+  .pl h3 { font-size: 1.05rem; font-weight: 600; }
+  .pl .pr { color: #bdbdbd; font-size: .9rem; margin-bottom: 14px; }
+  .pl li { color: #d4d4d4; font-size: .88rem; padding: 7px 0; border-top: 1px solid #2a2a2a; }
+  .pl:hover { border-color: #555555; }
+
+  /* ---------- footer ---------- */
+  footer { background: var(--ink); color: #a8a8a8; padding: 70px 0 40px; font-size: .84rem; border-top: 1px solid #222222; }
+  .cols { display: grid; grid-template-columns: repeat(6, 1fr); gap: 28px; }
+  footer h4 { color: #fff; font-size: .85rem; font-weight: 600; margin-bottom: 14px; }
+  footer li { margin-bottom: 9px; } footer a:hover { color: #fff; }
+  .fbrand { display: flex; align-items: center; justify-content: space-between; margin: 60px 0 28px; color: #fff; }
+  .fbrand svg { width: 96px; height: 53px; }
+  .soc { display: flex; gap: 14px; } .soc i { width: 22px; height: 22px; border-radius: 50%; background: #2a2a2a; }
+  .legal { border-top: 1px solid #262626; padding-top: 26px; display: grid; gap: 14px; font-size: .74rem; line-height: 1.6; color: #858585; }
+
+  /* ---------- motion ---------- */
+  /* scroll reveal: only hidden when JS is running, so the page still reads without it */
+  .js .rv { opacity: 0; transform: translateY(36px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  .js .rv.in { opacity: 1; transform: none; }
+
+  /* nav gains a hairline and a little weight once you scroll */
+  .nav { transition: box-shadow .3s, background .3s; }
+  .nav.scrolled { box-shadow: 0 8px 30px -18px rgba(0,0,0,.3); background: rgba(255,255,255,.92); }
+
+  /* hero: copy staggers up, the phone rises and then bobs, the card slides in */
+  @keyframes up      { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+  @keyframes rise    { from { opacity: 0; transform: translateX(-50%) translateY(140px) rotate(-14deg); } to { opacity: 1; transform: translateX(-50%) rotate(-5deg); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(160px) rotate(24deg); } to { opacity: 1; transform: rotate(14deg); } }
+  @keyframes pedestal{ from { transform: translateX(-50%) translateY(100%); } to { transform: translateX(-50%); } }
+  @keyframes bob     { to { translate: 0 -14px; } }
+  @keyframes drift   { to { scale: 1.12; rotate: 6deg; } }
+  @keyframes rowIn   { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .hero .copy > * { animation: up .9s cubic-bezier(.2,.7,.2,1) both; }
+  .hero .copy > :nth-child(2) { animation-delay: .08s; } .hero .copy > :nth-child(3) { animation-delay: .16s; } .hero .copy > :nth-child(4) { animation-delay: .24s; }
+  .block { animation: pedestal 1s cubic-bezier(.2,.8,.2,1) both; }
+  .phone { animation: rise 1.3s cubic-bezier(.2,.8,.2,1) .15s both, bob 6s ease-in-out 1.5s infinite alternate; }
+  .ccard { animation: slideIn 1.2s cubic-bezier(.2,.8,.2,1) .5s both, bob 7s ease-in-out 1.8s infinite alternate-reverse; }
+  .phone .list div { animation: rowIn .6s ease both; }
+  .phone .list div:nth-child(1) { animation-delay: 1.1s; } .phone .list div:nth-child(2) { animation-delay: 1.35s; } .phone .list div:nth-child(3) { animation-delay: 1.6s; }
+
+  /* slow colour drift inside every mesh, plus scroll parallax via --py */
+  .mesh::before { animation: drift 22s ease-in-out infinite alternate; transform: translate3d(0, var(--py, 0px), 0); }
+
+  /* savings carousel */
+  .gphone .slide { position: absolute; inset: 24px 22px 56px; opacity: 0; transform: translateY(16px); transition: opacity .6s, transform .6s; }
+  .gphone .slide.on { opacity: 1; transform: none; }
+  .gphone .slide .pill { border-radius: 999px; padding: 8px; font-size: .78rem; font-weight: 600; margin-top: 10px; }
+  .gphone .dots { position: absolute; left: 0; right: 0; bottom: 22px; margin: 0; }
+  .dots i { transition: background .3s, width .3s; } .dots i.on { background: #fff; width: 22px; border-radius: 99px; }
+  .gphone .bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.3); overflow: hidden; margin: 4px 0 8px; }
+  .gphone .bar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 99px; transition: width 1.2s .3s cubic-bezier(.2,.8,.2,1); }
+  .gphone .slide.on .bar i { width: var(--w); }
+  .tabs button, .pillrow button { transition: background .25s, transform .2s; }
+  .tabs button:hover, .pillrow button:hover { transform: translateY(-2px); }
+  .tabs button[aria-pressed="true"], .pillrow button[aria-pressed="true"] { background: rgba(255,255,255,.34); }
+  .tabs button, .pillrow button { color: #fff; font: inherit; font-size: .85rem; font-weight: 600; padding: 9px 18px; border-radius: 999px; }
+
+  /* cards: stacked at first, then fan out as they scroll into view; the buttons pull one forward */
+  .cc { transition: transform 1.3s cubic-bezier(.2,.8,.2,1), translate .6s cubic-bezier(.2,.8,.2,1), box-shadow .6s; }
+  .js .cards-stage:not(.in) .cc { transform: translateX(-50%) rotate(-14deg) skewX(8deg); }
+  .cards-stage[data-front="one"]   .cc.one,
+  .cards-stage[data-front="two"]   .cc.two,
+  .cards-stage[data-front="three"] .cc.three { z-index: 3; translate: 0 -28px; }
+  .cc.one { z-index: 2; } .cc.two { z-index: 1; }
+
+  /* hover lift */
+  .f, .pl, .st, .pc { transition: transform .35s cubic-bezier(.2,.7,.2,1), background .3s, border-color .3s, box-shadow .3s; }
+  .f:hover, .st:hover { transform: translateY(-6px); }
+  .f:hover { background: var(--grey-2); }
+  .f svg { transition: transform .35s cubic-bezier(.2,.7,.2,1); } .f:hover svg { transform: translateX(6px) scale(1.12); }
+  .pl:hover { transform: translateY(-6px); box-shadow: 0 24px 50px -28px rgba(63,178,138,.5); }
+  .pc:hover { transform: translateY(-6px); }
+  .pc .ui { transition: transform .4s cubic-bezier(.2,.7,.2,1); } .pc:hover .ui { transform: translateY(-8px); }
+
+  /* the little switch in the card-controls tile flips itself */
+  @keyframes knob { 0%, 40% { transform: none; } 50%, 90% { transform: translateX(-16px); } 100% { transform: none; } }
+  @keyframes swbg { 0%, 40% { background: var(--green); } 50%, 90% { background: #6b6b6b; } 100% { background: var(--green); } }
+  .sw { animation: swbg 5s ease-in-out infinite; } .sw::after { animation: knob 5s ease-in-out infinite; transition: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .rv { opacity: 1; transform: none; transition: none; }
+    .hero .copy > *, .block, .phone, .ccard, .phone .list div, .mesh::before, .sw, .sw::after { animation: none !important; }
+    .phone { transform: translateX(-50%) rotate(-5deg); } .ccard { transform: rotate(14deg); } .block { transform: translateX(-50%); }
+    .cc, .f, .pl, .st, .pc, .nav { transition: none; }
+    .js .cards-stage:not(.in) .cc { transform: none; }
+  }
+
+  /* ---------- emphasis ---------- */
+  em.accent { font-style: italic; font-weight: 600; }
+  h1, h2, h2.title, .split h2, .band h2, .cards-sec h2 { letter-spacing: -.025em; }
+  .hero .kicker { color: var(--muted); letter-spacing: .02em; }
+
+  /* ---------- trust strip, phone row, faq ---------- */
+  .trust { border-bottom: 1px solid var(--grey-2); }
+  .trust .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 34px 0; }
+  .trust .t { display: flex; gap: 14px; align-items: center; font-size: .86rem; color: var(--muted); line-height: 1.35; }
+  .trust .t svg { width: 26px; height: 26px; color: var(--blue-d); flex: none; }
+  .trust .t b { display: block; color: var(--text); font-weight: 600; font-size: .92rem; }
+
+  .org { display: grid; grid-template-columns: .9fr 1.1fr; gap: 60px; align-items: center; }
+  .org h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-weight: 600; line-height: 1.08; }
+  .org p { color: var(--muted); margin: 18px 0 28px; max-width: 28em; }
+  .minis { display: flex; gap: 16px; justify-content: center; align-items: flex-end; padding: 40px 10px; border-radius: 28px; background: var(--grey); }
+  .mini { width: 172px; height: 340px; border-radius: 30px; background: var(--ink); padding: 8px; box-shadow: 0 30px 50px -26px rgba(15,10,60,.55); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .mini:nth-child(2) { transform: translateY(-26px); }
+  .minis:hover .mini { transform: translateY(-8px); } .minis:hover .mini:nth-child(2) { transform: translateY(-34px); }
+  .mini .s { height: 100%; border-radius: 23px; padding: 18px 13px; color: #fff; font-size: .7rem; }
+  .mini .s small { opacity: .8; font-weight: 500; }
+  .mini .s b.n { display: block; font-size: 1.4rem; letter-spacing: -.03em; font-weight: 600; margin: 4px 0 14px; }
+  .mini .r { display: flex; justify-content: space-between; gap: 8px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.2); }
+  .mini .r span:last-child { font-weight: 600; text-align: right; }
+
+  .faq { max-width: 860px; margin-inline: auto; }
+  .faq details { border-bottom: 1px solid var(--grey-2); }
+  .faq summary { cursor: pointer; list-style: none; padding: 22px 4px; font-weight: 600; font-size: 1.02rem; display: flex; justify-content: space-between; gap: 20px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-size: 1.5rem; line-height: 1; flex: none; transition: transform .3s; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq summary:hover { color: var(--blue-d); }
+  .faq .a { color: var(--muted); padding: 0 4px 24px; max-width: 46em; }
+  @media (max-width: 960px) { .trust .wrap { grid-template-columns: 1fr 1fr; } .org { grid-template-columns: 1fr; gap: 36px; } .mini { width: 31%; min-width: 0; height: 300px; } }
+
+  /* ---------- product colour: each product owns a hue, used the same way everywhere ---------- */
+  .p-fuel  { --p: #3a7bd5; --p2: #3fb28a; --pd: #12194a; }
+  .p-cover { --p: #7a4bc0; --p2: #3a7bd5; --pd: #1c1040; }
+  .p-care  { --p: #3fb28a; --p2: #3a7bd5; --pd: #0c2a26; }
+  .pm { --m: radial-gradient(50% 50% at 15% 20%, var(--p), transparent 70%), radial-gradient(50% 50% at 90% 30%, var(--p2), transparent 70%), radial-gradient(60% 60% at 50% 100%, var(--p), transparent 70%); background: var(--pd); }
+  .f .tag { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--p); margin-bottom: 6px; }
+  .f svg { color: var(--p); }
+  .split-band .billcard { background: none; min-height: 0; }
+  .split-band .wrap { text-align: left; }
+  .split-band h2 { text-align: left; max-width: 12em; }
+
+  /* ---------- audience: drivers read light, businesses read black ---------- */
+  .seg { display: flex; padding: 3px; border-radius: 999px; background: #f0f0f0; margin-right: 6px; }
+  .seg button { padding: 7px 14px; border-radius: 999px; font-size: .8rem; font-weight: 600; color: #6a6a6a; transition: background .3s, color .3s; }
+  .seg button[aria-pressed="true"] { background: #000; color: #fff; }
+  body, .nav, .hero, .sec, .f, .minis, .btn { transition: background .5s, color .5s, border-color .5s; }
+  body[data-client="business"] { background: #000; color: #fff; }
+  body[data-client="business"] .nav { background: rgba(0,0,0,.72); border-color: rgba(255,255,255,.1); }
+  body[data-client="business"] .nav.scrolled { background: rgba(0,0,0,.92); box-shadow: 0 8px 30px -18px #000; }
+  body[data-client="business"] .brand { color: #fff; }
+  body[data-client="business"] .links a { color: #d0d0d0; }
+  body[data-client="business"] .links a:hover { background: #1a1a1a; }
+  body[data-client="business"] .seg { background: #1a1a1a; }
+  body[data-client="business"] .seg button { color: #a8a8a8; }
+  body[data-client="business"] .seg button[aria-pressed="true"] { background: #fff; color: #000; }
+  body[data-client="business"] .btn { background: #fff; color: #000; }
+  body[data-client="business"] .btn.ghost { background: transparent; color: #fff; }
+  body[data-client="business"] .hero { background: #0a0a0a; }
+  body[data-client="business"] .hero p, body[data-client="business"] .kicker { color: #a8a8a8; }
+  body[data-client="business"] .sec { background: #000; color: #fff; }
+  body[data-client="business"] .sec.grey { background: #0b0b0b; }
+  body[data-client="business"] .sub, body[data-client="business"] .split p, body[data-client="business"] .org p { color: #a8a8a8; }
+  body[data-client="business"] .f { background: #121212; }
+  body[data-client="business"] .f:hover { background: #1a1a1a; }
+  body[data-client="business"] .f p { color: #a8a8a8; }
+  body[data-client="business"] .minis { background: #121212; }
+  @media (max-width: 960px) { .seg { display: none; } }
+
+  /* ---------- type: medium-weight grotesque headlines, as on the reference ---------- */
+  .hero h1, h1, h2, h2.title, .split h2, .band h2, .cards-sec h2, .org h2 { font-weight: 500; letter-spacing: -.03em; }
+  .f h3, .pc h3, .st h3, .pl h3 { font-weight: 600; }
+  em.accent { font-style: normal; font-weight: inherit; }
+
+  /* ---------- photography: people, tinted by the product colour ---------- */
+  .ph { position: relative; isolation: isolate; background: #0a0a0a var(--img) center / cover no-repeat; overflow: hidden; }
+  .ph::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--pd, #000) 55%, transparent) 0%, transparent 42%, color-mix(in srgb, var(--pd, #000) 82%, transparent) 100%); }
+  .ph > * { position: relative; z-index: 1; }
+  .photo.ph::after { background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.5) 100%); }
+  .bgph { position: absolute; inset: 0; z-index: -1; background:
+      linear-gradient(180deg, color-mix(in srgb, var(--pd) 58%, transparent), color-mix(in srgb, var(--pd) 84%, transparent)),
+      var(--img) center / cover no-repeat; }
+  .pc.ph { background-color: var(--pd); }
+
+  /* ---------- colour like ElevenLabs: near-white and black chrome, colour lives in soft luminous gradients ---------- */
+  .p-fuel  { --p: #7db8f7; --p2: #8fe3c2; --pd: #eaf3ff; --pk: #0f2a52; }
+  .p-cover { --p: #b9a6f5; --p2: #8fc3f7; --pd: #f1ecff; --pk: #24124a; }
+  .p-care  { --p: #8fe3c2; --p2: #8fc3f7; --pd: #e9f9f2; --pk: #0a3a33; }
+  .pm { --m: radial-gradient(45% 45% at 14% 22%, var(--p), transparent 70%), radial-gradient(45% 45% at 88% 26%, var(--p2), transparent 70%),
+              radial-gradient(55% 55% at 56% 108%, var(--p), transparent 70%), radial-gradient(34% 34% at 52% 38%, rgba(255,255,255,.95), transparent 70%);
+        background: var(--pd); color: #0a0a0a; }
+  .ph::after { background: linear-gradient(180deg, color-mix(in srgb, var(--pk, #000) 50%, transparent) 0%, rgba(0,0,0,.08) 45%, color-mix(in srgb, var(--pk, #000) 80%, transparent) 100%); }
+  .photo.ph::after { background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.5) 100%); }
+  .band { color: #0a0a0a; padding-bottom: 90px; }
+  .band .sub { color: #4a4a4a; }
+  .band .btn.light { background: #000; color: #fff; }
+  .band h2 { color: #0a0a0a; }
+  /* glass reads as frosted white on the light fields */
+  .pm .glass, .band .tabs .glass, .band .pillrow .glass { background: rgba(255,255,255,.55); border-color: rgba(255,255,255,.85); color: #0a0a0a; box-shadow: 0 10px 30px -18px rgba(30,40,90,.35); }
+  .band .tabs button[aria-pressed="true"], .band .pillrow button[aria-pressed="true"] { background: rgba(255,255,255,.95); }
+  .band .tabs button { color: #0a0a0a; }
+  .phone .scr, .mini .s, .ccard { color: #0a0a0a; }
+  .phone .scr small, .mini .s small { opacity: .7; }
+  .mini .r { border-top-color: rgba(0,0,0,.12); }
+  .ccard small { color: #0a0a0a; }
+  /* framed photo that carries the glass phone, like a product shot */
+  .frame { position: relative; border-radius: 28px; overflow: hidden; margin: 46px auto 0; max-width: 900px; height: 440px; display: grid; place-items: center; box-shadow: 0 40px 70px -40px rgba(20,30,80,.5); }
+  .frame .gphone { margin: 0; border-radius: 30px; height: 300px; color: #0a0a0a; background: rgba(255,255,255,.58); border-color: rgba(255,255,255,.85); }
+  .frame .gphone .bar { background: rgba(0,0,0,.12); }
+  .frame .dots i { background: rgba(0,0,0,.25); } .frame .dots i.on { background: #000; }
+  .frame .gphone .slide .pill { background: rgba(255,255,255,.7); }
+  .split-band .billcard.ph { background: #0a0a0a var(--img) center / cover no-repeat; min-height: 420px; border-radius: 28px; box-shadow: 0 40px 70px -40px rgba(30,20,80,.55); }
+  .split-band .billui { background: rgba(255,255,255,.62); color: #0a0a0a; -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,.85); }
+  .split-band .billui .a { opacity: .65; }
+  .split-band .billui .c { background: rgba(255,255,255,.7); color: #0a0a0a; }
+  .split-band .billui .c span { background: #000; color: #fff; }
+  .split-band .pillrow .glass { color: #0a0a0a; }
+  .sw::after { background: #fff; }
+  @media (max-width: 960px) { .frame { height: 380px; border-radius: 22px; } }
+
+  /* ---------- logo lockup: swirl mark + wordmark ---------- */
+  .brand { gap: 10px; }
+  .brand .mi { width: 32px; height: 32px; } .brand .wm { width: 48px; height: 28px; }
+  .flock { display: flex; align-items: center; gap: 16px; }
+  .flock .mi { width: 56px; height: 56px; } .flock .wm { width: 90px; height: 52px; }
+  .fbrand .flock svg { width: auto; }
+  .fbrand .flock .mi { width: 56px; height: 56px; } .fbrand .flock .wm { width: 90px; height: 52px; }
+
+  /* ---------- mix: Pomo-style grey-lilac studio + glass chrome, over Revolut's section order ---------- */
+  :root { --grey: #e7e6ee; --grey-2: #d7d5e0; }
+  body { background: linear-gradient(160deg, #c9c7d6 0%, #dedce7 48%, #cfcddb 100%) fixed; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(55% 45% at 72% 0%, rgba(255,255,255,.75), transparent 70%); }
+  body[data-client="business"]::before { display: none; }
+  .nav { top: 12px; margin: 12px auto 0; width: min(1240px, 100% - 32px); border-radius: 999px; border: 1px solid rgba(255,255,255,.85);
+         background: rgba(255,255,255,.58); box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 24px 60px -34px rgba(40,40,90,.4); }
+  .nav .wrap { width: auto; padding: 0 12px 0 22px; height: 60px; }
+  .nav.scrolled { background: rgba(255,255,255,.82); }
+  .links a, .btn.sm { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+  .links a { color: #a3a2b2; } .links a:hover { color: #0a0a0c; background: rgba(255,255,255,.8); }
+  .kicker { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+  .hero { background: transparent; padding: 48px 0 40px; overflow: visible; }
+  .hero .wrap { align-items: center; }
+  .hero .copy { padding-bottom: 0; }
+  .sec { background: transparent; }
+  .sec.grey { background: rgba(255,255,255,.32); }
+  .f { background: rgba(255,255,255,.58); border: 1px solid rgba(255,255,255,.85); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); box-shadow: 0 24px 50px -34px rgba(40,40,90,.35); }
+  .f:hover { background: rgba(255,255,255,.8); }
+  .minis { background: rgba(255,255,255,.4); border: 1px solid rgba(255,255,255,.7); }
+  .org .minis, .photo { box-shadow: 0 30px 60px -36px rgba(40,40,90,.45); }
+
+  /* hero: dashboard cards */
+  .stage.dash { height: 540px; }
+  .dc { position: absolute; border-radius: 28px; padding: 22px; background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.88);
+        box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 28px 60px -34px rgba(40,40,90,.45); -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%);
+        animation: up .9s cubic-bezier(.2,.7,.2,1) both, bob 7s ease-in-out 1.4s infinite alternate; }
+  .dc strong { display: block; font-weight: 500; letter-spacing: -.03em; }
+  .dc span, .dc small { color: #6a697a; }
+  .tg { display: flex; gap: 8px; font-size: .62rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6a697a; } .tg b { color: #0a0a0c; font-weight: 600; } .tg i { font-style: normal; }
+  .d1 { left: 0; top: 10px; width: 290px; animation-delay: .1s, 1.5s; } .d1 strong { font-size: 1.9rem; line-height: 1.04; margin: 14px 0 16px; }
+  .stk { display: flex; } .stk i { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff; margin-left: -9px; display: grid; place-items: center; font-style: normal; font-size: .6rem; font-weight: 700; color: #0a0a0c; }
+  .stk i:first-child { margin-left: 0; background: linear-gradient(135deg, #e3ebf7, #b9cdee); } .stk i:nth-child(2) { background: linear-gradient(135deg, #e2f1ea, #b6dccb); } .stk i:nth-child(3) { background: linear-gradient(135deg, #ebe5f7, #c8bbe6); }
+  .d2 { right: 0; top: 120px; width: 370px; height: 210px; animation-delay: .25s, 1.8s; }
+  .sls { position: relative; padding-right: 108px; height: 120px; }
+  .sl { position: absolute; inset: 0 108px 0 0; opacity: 0; transform: translateY(12px); transition: opacity .6s, transform .6s; }
+  .sl.on { opacity: 1; transform: none; } .sl strong { font-size: 1.15rem; line-height: 1.15; margin: 12px 0 6px; } .sl span { font-size: .78rem; line-height: 1.4; display: block; }
+  .th { position: absolute; right: 18px; top: 18px; width: 96px; height: 96px; border-radius: 20px; }
+  .dots2 { position: absolute; left: 22px; bottom: 20px; display: flex; gap: 6px; } .dots2 i { width: 6px; height: 6px; border-radius: 99px; background: #a9a8b8; transition: width .3s, background .3s; } .dots2 i.on { width: 20px; background: #0a0a0c; }
+  .d3 { left: 40px; bottom: 20px; width: 250px; height: 150px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; isolation: isolate; animation-delay: .4s, 2.1s; }
+  .d3::before { content: ""; position: absolute; inset: -20%; z-index: -1; filter: blur(22px); background: radial-gradient(45% 45% at 18% 24%, #d6e4f7, transparent 70%), radial-gradient(45% 45% at 84% 22%, #e5dcf5, transparent 70%), radial-gradient(55% 55% at 50% 100%, #dbeee6, transparent 70%), radial-gradient(30% 30% at 55% 40%, #fff, transparent 70%); }
+  .d3 .orb { position: absolute; left: 20px; top: 18px; width: 30px; height: 30px; } .d3 strong { font-size: 1.2rem; } .d3 span { font-size: .72rem; margin-top: 4px; color: #3a3a46; }
+  .d4, .d5 { padding: 8px 14px 8px 8px; border-radius: 18px; display: flex; align-items: center; gap: 9px; font-size: .74rem; font-weight: 600; }
+  .d4 { right: 40px; top: 20px; animation-delay: .5s, 2.4s; } .d5 { right: 20px; bottom: 60px; animation-delay: .6s, 2.7s; }
+  .d4 i, .d5 i { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-style: normal; font-size: .62rem; } .d4 i { background: #dde8f7; } .d5 i { background: #dcefe6; }
+  .d4 small, .d5 small { display: block; font-weight: 500; font-size: .64rem; }
+  @media (max-width: 960px) { .stage.dash { height: 520px; } .d1 { left: 0; } .d2 { right: 0; width: min(370px, 92%); } .d3 { left: 0; } }
+  @media (prefers-reduced-motion: reduce) { .dc { animation: none; } .sl { transition: none; } }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .links { display: none; } .nav .grow { flex: 1; }
+    .hero .wrap, .split, .bills { grid-template-columns: 1fr; }
+    .hero .copy { padding-bottom: 10px; } .stage { height: 500px; }
+    .split { gap: 40px; } .photo { max-width: none; aspect-ratio: 4/3; }
+    .grid3, .prot, .steps { grid-template-columns: 1fr; }
+    .plans { grid-template-columns: 1fr; } .pl, .pl:nth-child(n+4) { grid-column: auto; }
+    .cols { grid-template-columns: repeat(2, 1fr); }
+    .cards-stage { height: 300px; } .cc { width: 270px; height: 170px; }
+    .sec { padding: 72px 0; }
+    .ccard { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- tfn wordmark, redrawn as strokes: lowercase, heavy, flat terminals -->
+    <clipPath id="mclip"><circle cx="50" cy="50" r="48"/></clipPath>
+    <linearGradient id="gSky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b4dcff"/><stop offset="1" stop-color="#5aa6f2"/></linearGradient>
+    <linearGradient id="gMint" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6fd6aa"/><stop offset="1" stop-color="#c2f4dc"/></linearGradient>
+    <linearGradient id="gLilac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dccfff"/><stop offset="1" stop-color="#9a86ee"/></linearGradient>
+    <linearGradient id="gViolet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b79af2"/><stop offset="1" stop-color="#6f4bd0"/></linearGradient>
+    <radialGradient id="gGlow" cx=".3" cy=".22" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <symbol id="mark" viewBox="-4 -4 108 108"><g clip-path="url(#mclip)" fill="none" stroke-linecap="butt">
+      <path d="M-6 14C20 28 40 0 60 12S92 24 106 10" stroke="url(#gSky)" stroke-width="27"/>
+      <path d="M-6 40C20 54 40 26 60 38S92 50 106 36" stroke="url(#gMint)" stroke-width="16"/>
+      <path d="M-6 60C20 74 40 46 60 58S92 70 106 56" stroke="url(#gLilac)" stroke-width="18"/>
+      <path d="M-6 90C20 104 40 76 60 88S92 100 106 86" stroke="url(#gViolet)" stroke-width="32"/>
+      <circle cx="50" cy="50" r="48" fill="url(#gGlow)" stroke="none"/>
+    </g></symbol>
+    <symbol id="logo" viewBox="120 50 440 260"><g fill="none" stroke="currentColor" stroke-width="50" stroke-linejoin="round">
+      <path d="M145 75V245Q145 285 185 285H222M120 155H222"/>
+      <path d="M275 310V105Q275 75 305 75H365M250 155H350"/>
+      <path d="M405 310V145M405 210C405 175 430 160 470 160C510 160 535 178 535 215V310"/>
+    </g></symbol>
+    <symbol id="i-pump" viewBox="0 0 24 24"><path d="M5 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15M3 20h14M15 9h2.500a1.500 1.500 0 0 1 1.500 1.500V16a1.500 1.500 0 0 0 3 0V8l-3-3M7.500 8h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3c3 4 6 7 6 10.500a6 6 0 0 1-12 0C6 10 9 7 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.500 20h19ZM12 10v4.500M12 17.500v.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.500 2.900 8.300 7 10 4.100-1.700 7-5.500 7-10V6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2.200 2.200L15.500 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-claim" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6ZM14 3v4h4M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11.500a7 7 0 0 0-14 0C5 15 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="9.500" r="2.500" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.500 6a4 4 0 0 0 5 5L21 12.500 12.500 21a2.100 2.100 0 0 1-3-3L18 9.500A4 4 0 0 0 14.500 6ZM15 3l-2.500 2.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-disc" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.500" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8.500V4M12 20v-3.500" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.500" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 20c0-3.500 2.700-6 6-6s6 2.500 6 6M16 5a3.500 3.500 0 0 1 0 6.500M18 14c2 .6 3 2.700 3 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2ZM13 9h4.500L21 12.500V16h-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7" cy="17.500" r="2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="17.500" r="2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8 12.300 2.700 2.700L16 9.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="tfn home"><svg class="mi" aria-hidden="true"><use href="#mark"/></svg><svg class="wm" aria-hidden="true"><use href="#logo"/></svg></a>
+    <nav class="links" aria-label="Main">
+      <a href="#fuel">Fuel</a><a href="#cover">Insurance</a><a href="#services">Services</a><a href="#company">Company</a>
+    </nav>
+    <span class="grow"></span>
+    <div class="seg" id="seg" role="group" aria-label="Who is this for"><button aria-pressed="true" data-client="drivers">Drivers</button><button aria-pressed="false" data-client="business">Business</button></div>
+    <a class="btn ghost sm" href="#">Log in</a>
+    <a class="btn sm" href="#refer">Sign up</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO: white, light grey for drivers, black for business -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="copy">
+        <p class="kicker" data-d="For drivers" data-b="For businesses">For drivers</p>
+        <h1 data-d="Fuel up and go, <em class='accent'>without the paperwork</em>" data-b="Total control for <em class='accent'>every vehicle</em> you run">Fuel up and go, <em class="accent">without the paperwork</em></h1>
+        <p data-d="Authorise fuel at the pump, see what you have used and report a problem in a few taps. Everything for the vehicle you drive, in one app." data-b="One account for fuel, insurance and upkeep that puts you in control of your costs. Track every litre, cover every vehicle and see it all in one place.">Authorise fuel at the pump, see what you have used and report a problem in a few taps. Everything for the vehicle you drive, in one app.</p>
+        <a class="btn" href="#refer">Open an account</a>
+      </div>
+      <div class="stage dash" aria-hidden="true">
+        <div class="dc d1"><small class="tg">This week <i>·</i> <b>24 vehicles</b></small><strong>Fuel spend is down 6%</strong><span class="stk"><i>CA</i><i>GP</i><i>WC</i></span></div>
+        <div class="dc d2">
+          <div class="sls">
+            <div class="sl on"><small class="tg">Alert <i>·</i> <b>Fuel</b></small><strong>A fill-up at Engen Sandton looks wrong</strong><span>R2,100 for 118 L on CA 482 193</span></div>
+            <div class="sl"><small class="tg">Alert <i>·</i> <b>Licence</b></small><strong>Disc for GP 301 884 expires in 14 days</strong><span>Renew it from the vehicle page</span></div>
+            <div class="sl"><small class="tg">Alert <i>·</i> <b>Service</b></small><strong>Three vehicles are due for a service</strong><span>Book them together and save a trip</span></div>
+          </div>
+          <div class="th ph" style="--img:url(https://images.unsplash.com/photo-1771340012319-0b4fca008b54?auto=format&fit=crop&w=400&q=75)"></div>
+          <div class="dots2"><i class="on"></i><i></i><i></i></div>
+        </div>
+        <div class="dc d3"><svg class="orb"><use href="#mark"/></svg><strong>Plan a service route</strong><span>Ask tfn to group the three due vehicles</span></div>
+        <div class="dc d4"><i>CA</i><span>CA 482 193<small>R142 / 100 km</small></span></div>
+        <div class="dc d5"><i>WC</i><span>WC 77 120<small>R138 / 100 km</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- YOUR ACCOUNT: white, colour used only inside the product picture -->
+  <section class="sec" id="account">
+    <div class="wrap split">
+      <div class="photo ph p-fuel" style="--img:url(https://images.unsplash.com/photo-1762095996527-126e49ef9d72?auto=format&fit=crop&w=900&q=75)" aria-hidden="true">
+        <div class="chip glass"><i><svg width="18" height="18"><use href="#i-pump"/></svg></i><span>Fuel authorised · Engen Rivonia</span><span>62 L</span></div>
+      </div>
+      <div>
+        <h2>One record for every vehicle</h2>
+        <p>Register a vehicle once. Its fuel card, insurance, service history and licence disc all follow it, so nothing depends on someone remembering a slip.</p>
+        <a class="btn" href="#refer">Add your vehicles</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUEL: full-bleed product colour with glass -->
+  <section class="band mesh pm p-fuel" id="fuel">
+    <div class="wrap">
+      <h2>Know where every <em class="accent">litre</em> goes</h2>
+      <p class="sub">Authorise fuel at the pump, count the litres, and get an alert when a fill-up does not add up.</p>
+      <a class="btn light" href="#refer">See fuel management</a>
+      <div class="frame ph p-fuel" style="--img:url(https://images.unsplash.com/photo-1790291349013-f286ed48a659?auto=format&fit=crop&w=1200&q=75)" aria-hidden="true"><div class="gphone glass" id="carousel">
+        <div class="slide on"><small>Litres this month</small><strong data-count="18420" data-suffix=" L">18,420 L</strong><div class="bar"><i style="--w:72%"></i></div><div class="glass pill">72% of monthly budget</div></div>
+        <div class="slide"><small>Cost per 100 km</small><strong>R142.30</strong><div class="glass pill">Best vehicle: CA 482 193</div></div>
+        <div class="slide"><small>Fill-ups flagged this week</small><strong>2</strong><div class="glass pill">Review now</div></div>
+        <div class="dots"><i class="on"></i><i></i><i></i></div>
+      </div></div>
+      <div class="tabs" id="tabs"><button class="glass" aria-pressed="true">Fuel</button><button class="glass" aria-pressed="false">Efficiency</button><button class="glass" aria-pressed="false">Alerts</button></div>
+    </div>
+  </section>
+
+  <!-- CARDS: black, the premium surface -->
+  <section class="cards-sec" id="cards">
+    <div class="wrap">
+      <h2>Fuel cards that follow <em class="accent">your rules</em></h2>
+      <p class="sub">Give every driver a card. Limit it by vehicle, fuel type or day, and freeze it from the app in seconds.</p>
+      <a class="btn light" href="#refer">Choose your cards</a>
+      <div class="cards-stage" id="stage" data-front="one" aria-hidden="true">
+        <div class="cc three"><svg><use href="#logo"/></svg><small>Driver card</small></div>
+        <div class="cc one"><svg><use href="#logo"/></svg><small>Fuel card</small></div>
+        <div class="cc two"><svg><use href="#logo"/></svg><small>Premium card</small></div>
+      </div>
+      <div class="pillrow" id="cardbtns" style="padding-bottom:50px"><button class="glass" aria-pressed="true" data-front="one">Fuel card</button><button class="glass" aria-pressed="false" data-front="three">Driver card</button><button class="glass" aria-pressed="false" data-front="two">Premium card</button></div>
+    </div>
+  </section>
+
+  <!-- EVERYTHING: white, each tile coded by product colour -->
+  <section class="sec" id="services">
+    <div class="wrap center">
+      <h2 class="title">Everything you need in <em class="accent">one spot</em></h2>
+      <p class="sub">Fuel, insurance, tracking and upkeep, run from one account instead of five suppliers.</p>
+      <a class="btn" href="#refer">Open an account</a>
+      <div class="grid3">
+        <div class="f p-fuel"><svg><use href="#i-pump"/></svg><span class="tag">Fuel</span><h3>Fuel authorisation</h3><p>Approve a fill-up at the pump, with the vehicle and driver checked first.</p></div>
+        <div class="f p-fuel"><svg><use href="#i-drop"/></svg><span class="tag">Fuel</span><h3>Litre counting</h3><p>Every litre recorded against a vehicle, so the numbers add up at month end.</p></div>
+        <div class="f p-fuel"><svg><use href="#i-alert"/></svg><span class="tag">Fuel</span><h3>Fuel alerts</h3><p>Get flagged when a fill-up looks wrong, before it becomes a loss.</p></div>
+        <div class="f p-cover"><svg><use href="#i-shield"/></svg><span class="tag">Insurance</span><h3>One policy</h3><p>Cover for every vehicle together, with one number to call.</p></div>
+        <div class="f p-cover"><svg><use href="#i-claim"/></svg><span class="tag">Insurance</span><h3>Claims support</h3><p>Report an incident in the app and follow the claim to the end.</p></div>
+        <div class="f p-cover"><svg><use href="#i-pin"/></svg><span class="tag">Tracking</span><h3>Vehicle tracking</h3><p>See where every vehicle is, and where it has been.</p></div>
+        <div class="f p-care"><svg><use href="#i-wrench"/></svg><span class="tag">Upkeep</span><h3>Maintenance</h3><p>Services, tyres and repairs booked before they become breakdowns.</p></div>
+        <div class="f p-care"><svg><use href="#i-people"/></svg><span class="tag">Upkeep</span><h3>Driver management</h3><p>Register drivers, link them to vehicles and set what each may do.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSURANCE: violet product colour, text left, glass phone right -->
+  <section class="band mesh pm p-cover split-band" id="cover">
+    <div class="wrap bills">
+      <div>
+        <h2 style="margin-inline:0">From incident to claim in a few taps</h2>
+        <p class="sub" style="margin-left:0">Log what happened, add photos and send it straight to your insurer. You see every step, from first report to payout.</p>
+        <div class="pillrow"><span class="glass">Report</span><span class="glass">Photos</span><span class="glass">Claim status</span></div>
+      </div>
+      <div class="billcard ph p-cover" style="--img:url(https://images.unsplash.com/photo-1770927423643-286433cb4c63?auto=format&fit=crop&w=1200&q=75)" aria-hidden="true">
+        <div class="billui">
+          <div class="a">CA 482 193 · Claim TFN-2048</div><div class="b">Claim opened</div>
+          <div class="c"><div>Reported · Assessed · Paid</div><div class="track"><i style="--w:38%"></i></div><span>View claim</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONE VIEW: light grey -->
+  <section class="sec grey">
+    <div class="wrap org">
+      <div>
+        <h2>One view for every vehicle</h2>
+        <p>See everything at a glance, then open any vehicle to find its fuel, cover, location and licence disc in the same place.</p>
+        <a class="btn" href="#refer">See the app</a>
+      </div>
+      <div class="minis" aria-hidden="true">
+        <div class="mini"><div class="s mesh pm p-fuel">
+          <small>All vehicles</small><b class="n">24 vehicles</b>
+          <div class="r"><span>Fuel</span><span>18,420 L</span></div><div class="r"><span>Insured</span><span>24 of 24</span></div><div class="r"><span>Service due</span><span>3</span></div></div></div>
+        <div class="mini"><div class="s mesh pm p-care">
+          <small>CA 482 193</small><b class="n">62 km/h</b>
+          <div class="r"><span>Fuel level</span><span>64%</span></div><div class="r"><span>Last fill-up</span><span>Today</span></div><div class="r"><span>Disc valid to</span><span>Mar</span></div></div></div>
+        <div class="mini"><div class="s mesh pm p-cover">
+          <small>Alerts</small><b class="n">2 new</b>
+          <div class="r"><span>Fill-up flagged</span><span>R2,100</span></div><div class="r"><span>Disc expires</span><span>14 days</span></div><div class="r"><span>Service due</span><span>3 vehicles</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AWAY: white with a colour panel -->
+  <section class="sec">
+    <div class="wrap split">
+      <div>
+        <h2>Simple fuelling, wherever you drive</h2>
+        <p>Fill up at partner stations across the country with the same limits, alerts and receipts everywhere.</p>
+        <a class="btn" href="#refer">See partner stations</a>
+      </div>
+      <div class="photo ph p-care" aria-hidden="true" style="--img:url(https://images.unsplash.com/photo-1688619101875-0528b48b68e7?auto=format&fit=crop&w=900&q=75);margin-left:auto;align-content:end;gap:10px">
+        <div class="chip glass"><i><svg width="18" height="18"><use href="#i-pin"/></svg></i><span>Gauteng</span><span>62 L</span></div>
+        <div class="chip glass"><i><svg width="18" height="18"><use href="#i-pin"/></svg></i><span>Western Cape</span><span>48 L</span></div>
+        <div class="chip glass"><i><svg width="18" height="18"><use href="#i-pin"/></svg></i><span>KwaZulu-Natal</span><span>55 L</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROTECTED: black with product-colour cards -->
+  <section class="sec dark" id="protected">
+    <div class="wrap center">
+      <h2 class="title">Your vehicles, <em class="accent">protected</em></h2>
+      <p class="sub">Cover, tracking and alerts work together, so a theft, a crash or a lapsed licence never goes unnoticed.</p>
+      <a class="btn light" href="#refer">Learn more</a>
+      <div class="prot">
+        <div class="pc ph p-cover" style="--img:url(https://images.unsplash.com/photo-1760944016370-0490373446f7?auto=format&fit=crop&w=800&q=75)">
+          <h3>Cover for every vehicle, on one policy</h3>
+          <div class="ui glass">Theft alerts <span class="sw" style="float:right"></span><b>24 vehicles</b></div>
+        </div>
+        <div class="pc ph p-fuel" style="--img:url(https://images.unsplash.com/photo-1644458728342-44ca76238e2c?auto=format&fit=crop&w=800&q=75)">
+          <h3>Track and recover, around the clock</h3>
+          <div class="ui glass">CA 482 193 · moving<b>62 km/h</b></div>
+        </div>
+        <div class="pc ph p-care" style="--img:url(https://images.unsplash.com/photo-1771340012319-0b4fca008b54?auto=format&fit=crop&w=800&q=75)">
+          <h3>Instant alerts when something looks wrong</h3>
+          <div class="ui glass">Fill-up flagged<b>R2,100</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFER: black -->
+  <section class="sec dark" id="refer" style="padding-top:0">
+    <div class="wrap center">
+      <h2 class="title">Refer and earn <em class="accent">R500</em></h2>
+      <p class="sub">Know a business that runs vehicles? Share your link and you both get rewarded when they start.</p>
+      <a class="btn light" href="#">Refer a business</a>
+      <div class="steps">
+        <div class="st"><svg><use href="#i-link"/></svg><h3>Share your link</h3><p>Send your personal link by message or email.</p></div>
+        <div class="st"><svg><use href="#i-check"/></svg><h3>They get started</h3><p>They open an account and add their first vehicle.</p></div>
+        <div class="st"><svg><use href="#i-gift"/></svg><h3>You both earn</h3><p>The reward lands in your account within a few days.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="company">
+  <div class="wrap">
+    <div class="cols">
+      <div><h4>Fuel</h4><ul><li><a href="#">Fuel cards</a></li><li><a href="#">Authorisation</a></li><li><a href="#">Litre counting</a></li><li><a href="#">Alerts</a></li></ul></div>
+      <div><h4>Insurance</h4><ul><li><a href="#">One policy</a></li><li><a href="#">Report an incident</a></li><li><a href="#">Claims</a></li></ul></div>
+      <div><h4>Tracking</h4><ul><li><a href="#">Live location</a></li><li><a href="#">Trip history</a></li><li><a href="#">Recovery</a></li></ul></div>
+      <div><h4>Services</h4><ul><li><a href="#">Maintenance</a></li><li><a href="#">Licence discs</a></li><li><a href="#">Roadside help</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About tfn</a></li><li><a href="#">Careers</a></li><li><a href="#">Partners</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Contact us</a></li><li><a href="#">Help centre</a></li><li><a href="#">Security</a></li></ul></div>
+    </div>
+    <div class="fbrand"><div class="flock" aria-label="tfn"><svg class="mi" aria-hidden="true"><use href="#mark"/></svg><svg class="wm" aria-hidden="true"><use href="#logo"/></svg></div><div class="soc" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
+    <div class="legal">
+      <p>© 2026 tfn. All rights reserved. This is a design prototype: names, figures and offers shown are placeholders. Photographs are stock images from Unsplash, used as placeholders, and do not show tfn customers.</p>
+      <p>Insurance products would be underwritten by a licensed insurer. Fuel is supplied through partner stations. Terms and conditions apply to every service shown.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* 1. scroll reveal, staggered within each group */
+  var groups = ['.sec .wrap > *', '.band .wrap > *', '.cards-sec .wrap > *', '.grid3 > *', '.prot > *', '.steps > *', '.plans > *', '.split > *', '.bills > *', '.cols > *'];
+  var seen = [];
+  groups.forEach(function (g) {
+    $(g).forEach(function (el, i) {
+      if (seen.indexOf(el) > -1 || el.classList.contains('grid3') || el.classList.contains('prot') || el.classList.contains('steps') || el.classList.contains('plans') || el.classList.contains('cols') || el.classList.contains('split') || el.classList.contains('bills')) return;
+      seen.push(el); el.classList.add('rv');
+      var sibling = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.style.setProperty('--d', (el.parentNode.matches('.grid3, .prot, .steps, .plans, .cols, .split, .bills') ? (sibling % 3) * 0.1 : Math.min(sibling, 4) * 0.08) + 's');
+    });
+  });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in'); io.unobserve(e.target);
+      $('[data-count]', e.target).forEach(count);
+      if (e.target.matches('[data-count]')) count(e.target);
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
+  $('.rv, #stage').forEach(function (el) { reduce ? el.classList.add('in') : io.observe(el); });
+
+  /* 2. numbers count up once */
+  function count(el) {
+    if (el.dataset.done) return; el.dataset.done = 1;
+    var to = +el.dataset.count, suf = el.dataset.suffix || '', pre = el.dataset.prefix || '';
+    if (reduce) return;
+    var t0 = null;
+    (function step(t) {
+      t0 = t0 || t; var p = Math.min((t - t0) / 1400, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = pre + Math.round(to * e).toLocaleString('en-US') + suf;
+      if (p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  $('.hero [data-count]').forEach(function (el) { setTimeout(function () { count(el); }, 700); });
+
+  /* 3. nav gets a shadow after the first scroll, meshes drift against the scroll */
+  var nav = document.getElementById('nav'), movers = $('.band, .photo, .billcard, .pc'), ticking = false;
+  function onScroll() {
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+    if (!reduce) movers.forEach(function (m) {
+      var r = m.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > innerHeight + 200) return;
+      m.style.setProperty('--py', ((r.top + r.height / 2 - innerHeight / 2) * -0.1).toFixed(1) + 'px');
+    });
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+
+  /* 4. fuel carousel: auto-advances, tabs jump to a slide */
+  var slides = $('#carousel .slide'), dots = $('#carousel .dots i'), tabs = $('#tabs button'), cur = 0, timer;
+  function show(n) {
+    cur = (n + slides.length) % slides.length;
+    slides.forEach(function (s, i) { s.classList.toggle('on', i === cur); });
+    dots.forEach(function (d, i) { d.classList.toggle('on', i === cur); });
+    tabs.forEach(function (t, i) { t.setAttribute('aria-pressed', i === cur ? 'true' : 'false'); });
+  }
+  function play() { if (reduce) return; clearInterval(timer); timer = setInterval(function () { show(cur + 1); }, 3800); }
+  tabs.forEach(function (t, i) { t.addEventListener('click', function () { show(i); play(); }); });
+  var band = document.getElementById('fuel');
+  band.addEventListener('mouseenter', function () { clearInterval(timer); });
+  band.addEventListener('mouseleave', play);
+  play();
+
+  /* 5. card buttons pull a card forward */
+  var stage = document.getElementById('stage'), cbtns = $('#cardbtns button');
+  cbtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      stage.dataset.front = b.dataset.front;
+      cbtns.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+    });
+  });
+})();
+</script>
+
+<script>
+/* audience switch: the page changes tone, the product colours stay put */
+(function () {
+  var seg = document.getElementById('seg'); if (!seg) return;
+  var btns = Array.prototype.slice.call(seg.querySelectorAll('button'));
+  var swaps = Array.prototype.slice.call(document.querySelectorAll('[data-d][data-b]'));
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var biz = b.dataset.client === 'business';
+      document.body.dataset.client = b.dataset.client;
+      btns.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      swaps.forEach(function (el) { el.innerHTML = biz ? el.dataset.b : el.dataset.d; });
+    });
+  });
+})();
+</script>
+<script>
+/* hero dashboard: the alert card rotates through its three alerts */
+(function () {
+  var sl = [].slice.call(document.querySelectorAll('.d2 .sl')), dt = [].slice.call(document.querySelectorAll('.dots2 i')), n = 0;
+  if (!sl.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  setInterval(function () {
+    n = (n + 1) % sl.length;
+    sl.forEach(function (e, i) { e.classList.toggle('on', i === n); });
+    dt.forEach(function (e, i) { e.classList.toggle('on', i === n); });
+  }, 4200);
+})();
+</script>
+</body>
+</html>
