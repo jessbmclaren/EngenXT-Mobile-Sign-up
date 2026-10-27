@@ -339,7 +339,7 @@ MENU = [
         [fam_group('treasury'), fam_group('fueltech')],
         [fam_group('cross'), fam_group('risk')],
         [fam_group('fleet'), fam_group('nonfuel')],
-        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Contact us', 'tfn-page-examples.html#calc')])],
+        [fam_group('support')],
     ])),
     ('network', 'Network', 'tfn-network.html', ('Explore the network', 'tfn-network.html', [
         [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'tfn-network.html'), ('Fuel price outlook', 'tfn-network.html')])],
@@ -357,6 +357,38 @@ MENU = [
         [('Account', [('Log in', '#')])],
     ])),
 ]
+
+
+# ---------- the Products panel: the families as coloured headings in four columns, each product with one plain line, a TruckersHub card
+# on the right and one New line at the foot. The home page carries the same markup in a <template> (see products_panel) ----------
+DESC = {
+    'Credit products': 'Fuel on credit, paid back each month', 'Smart Factoring': 'Get paid sooner for delivered loads',
+    'CRT – Onroad': 'Cheaper diesel at 270+ truck stops', 'EngenXT': 'Fuel for bakkies and vans at Engen', 'TFN – Wholesale': 'Bulk diesel for your depot',
+    'Homebase management': 'Diesel delivered to your own tank',
+    'Fuel': 'Fill up in five countries, paid in rand', 'Tolls and parking': 'Paid from your TFN account on the way',
+    'Forwarding and clearing': 'Border papers sorted for your loads', 'Cash': 'Trip cash for your drivers',
+    'Fines': 'Traffic fines managed by IOX', 'Vehicle insurance': 'Cover for your trucks with ONE Insurance', 'GIT insurance': 'Cover for the loads you carry',
+    'Licensing': 'Licence discs renewed on time',
+    'Oil': 'Engine oil at the truck stop', 'Road assist': 'Help when a truck breaks down', 'Overnight': 'Safe parking for the night', 'Truck wash': 'A clean truck on the same account',
+    'Tyres': 'Fitted and checked through TFN', 'Servicing': 'Each service booked before it is due', 'Telematics': 'See where every truck is',
+}
+SOON = {'Smart Factoring', 'EngenXT'}
+PANEL_COLS = [['fueltech'], ['treasury', 'risk'], ['cross', 'fleet'], ['nonfuel', 'support']]
+
+
+def products_panel():
+    def item(l, key):
+        inner = '<b>%s%s</b><small>%s</small>' % (l, '<em>Soon</em>' if l in SOON else '', DESC[l])
+        return '<li><a href="%s">%s</a></li>' % (P[key]['file'], inner) if key else '<li><span>%s</span></li>' % inner
+    group = lambda f: '<div class="px-g" style="--acc:%s"><a class="px-h" href="%s"><i aria-hidden="true"></i>%s</a><ul>%s</ul></div>' % (
+        f['acc'], lead(f), f['name'], ''.join(item(l, key) for l, key in f['items']))
+    mini = ''.join('<i style="--acc:%s"></i>' % FAMK[k]['acc'] for k in ('treasury', 'fueltech', 'cross'))
+    return ('<div class="px"><div class="px-c">%s</div><div class="px-r">'
+            '<a class="px-card" href="tfn-page-examples.html#fam"><em class="px-tag">Coming soon</em><span class="px-mini" aria-hidden="true">%s</span>'
+            '<b>TruckersHub</b><small>Every product on one screen: what needs you, what you saved and what to add.</small><span class="px-go">See it <i aria-hidden="true">→</i></span></a>'
+            '<a class="px-all" href="tfn-page-examples.html#fam">See all products <i aria-hidden="true">→</i></a></div>'
+            '<p class="px-new"><b>New</b><span>EngenXT: fuel for bakkies and vans, paid with a QR code at the till. Coming soon.</span><a href="tfn-lcv.html">Learn more <i aria-hidden="true">→</i></a></p></div>') % (
+        ''.join('<div>%s</div>' % ''.join(group(FAMK[k]) for k in col) for col in PANEL_COLS), mini)
 
 
 def panel(p):
@@ -384,7 +416,7 @@ def pmenu(home=''):
 
 def nav(current=None):
     top = 'products' if current in ORDER else ('network' if current == 'network' else ('pricing' if current == 'tiers' else None))
-    links = ''.join('<div class="mi"><a href="%s"%s aria-haspopup="true">%s</a>%s</div>' % (h, ' aria-current="page"' if k == top else '', n, panel(p)) for k, n, h, p in MENU)
+    links = ''.join('<div class="mi"><a href="%s"%s aria-haspopup="true">%s</a>%s</div>' % (h, ' aria-current="page"' if k == top else '', n, '<div class="mp mp-x">%s</div>' % products_panel() if k == 'products' else panel(p)) for k, n, h, p in MENU)
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
             '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="#">Log in</a><a class="btn" href="tfn-page-examples.html#calc">Book a demo</a>%s</div></header>' % (links, BURGER)) + pmenu()
 

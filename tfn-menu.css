@@ -31,6 +31,41 @@
 .pm-login { background: #000; color: #fff; } .pm-quote { background: #fff; color: #000; }
 body.pm-lock { overflow: hidden; }
 
+/* the desktop Products panel, the same on every page (products_panel in tools/build-product-pages.py): the families as coloured headings in
+   four columns, each product with one plain line, a TruckersHub card on the right and one New line at the foot. Links stay white; the
+   doubled class keeps these rules ahead of each page's own nav link styles */
+.links .mp.mp-x, .mega:has(.px) { width: min(1120px, calc(100vw - 48px)); }
+.px { display: grid; grid-template-columns: minmax(0, 1fr) 232px; gap: 30px; text-align: left; }
+.px-c { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 26px; }
+.px-g + .px-g { margin-top: 24px; }
+.px.px.px .px-h { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 0 0 9px; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .82rem; font-weight: 600; color: #fff; text-decoration: none; white-space: normal; }
+.px-h i { width: 8px; height: 8px; flex: none; border-radius: 50%; background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--acc) 45%, #fff), var(--acc) 62%); }
+.px.px.px .px-h:hover { color: rgba(255,255,255,.72); }
+.px.px.px .px-g ul { list-style: none; margin: 0; padding: 0; }
+.px.px.px .px-g li > a, .px.px.px .px-g li > span { display: block; margin: 0; padding: 7px 0; color: #fff; font-weight: 400; text-decoration: none; white-space: normal; }
+.px-g b { display: flex; align-items: center; gap: 7px; font-size: .9rem; font-weight: 500; }
+.px-g small { display: block; margin-top: 2px; font-size: .78rem; line-height: 1.35; color: rgba(255,255,255,.56); }
+.px.px.px .px-g li > a:hover b { color: rgba(255,255,255,.7); }
+.px-g em { font-style: normal; font-size: .64rem; font-weight: 500; letter-spacing: .02em; padding: 1px 6px; border-radius: 99px; color: rgba(255,255,255,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
+.px-r { display: flex; flex-direction: column; gap: 16px; padding-left: 28px; border-left: 1px solid rgba(255,255,255,.1); }
+.px.px.px .px-card { display: flex; flex-direction: column; gap: 5px; margin: 0; padding: 14px; border-radius: 16px; color: #fff; text-decoration: none; white-space: normal; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); transition: background .2s; }
+.px.px.px .px-card:hover { background: rgba(255,255,255,.1); color: #fff; }
+.px-tag { align-self: flex-start; font-style: normal; font-size: .66rem; font-weight: 500; padding: 2px 8px; border-radius: 99px; color: rgba(255,255,255,.82); box-shadow: inset 0 0 0 1px rgba(255,255,255,.26); }
+/* a tiny TruckersHub Home: the greeting as a dark bar, then three product rows, each a one-hue orb and a grey line */
+.px-mini { display: grid; gap: 7px; margin: 6px 0 8px; padding: 12px; border-radius: 12px; background: #f6f7fa; }
+.px-mini::before { content: ""; width: 58%; height: 7px; margin-bottom: 3px; border-radius: 4px; background: #1f1f1f; }
+.px-mini i { display: flex; align-items: center; gap: 7px; }
+.px-mini i::before { content: ""; width: 10px; height: 10px; flex: none; border-radius: 50%; background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--acc) 40%, #fff), var(--acc) 62%); }
+.px-mini i::after { content: ""; height: 5px; flex: 1; border-radius: 3px; background: #e2e4e9; } .px-mini i + i::after { flex: none; width: 70%; } .px-mini i + i + i::after { width: 52%; }
+.px-card b { font-size: .95rem; font-weight: 600; } .px-card small { font-size: .78rem; line-height: 1.35; color: rgba(255,255,255,.62); }
+.px-go { margin-top: 4px; font-size: .82rem; font-weight: 500; } .px-go i, .px-all i, .px-new a i { font-style: normal; display: inline-block; transition: transform .2s; }
+.px-card:hover .px-go i, .px-all:hover i, .px-new a:hover i { transform: translateX(3px); }
+.px.px.px .px-all { margin: 0; padding: 0; font-size: .85rem; font-weight: 500; color: #fff; text-decoration: none; }
+.px-new { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; margin: -4px -30px -30px; padding: 14px 30px; border-top: 1px solid rgba(255,255,255,.1); font-size: .85rem; color: rgba(255,255,255,.68); text-align: left; }
+.px-new b { font-weight: 600; color: #fff; }
+.px.px.px .px-new a { margin: 0 0 0 auto; padding: 0; font-weight: 500; color: #fff; text-decoration: none; white-space: nowrap; }
+@media (max-width: 1180px) { .px { grid-template-columns: minmax(0, 1fr); } .px-r { display: none; } }
+
 @media (max-width: 960px) {
   .burger { display: grid; }
   .nav .links, .nav .login { display: none; }
