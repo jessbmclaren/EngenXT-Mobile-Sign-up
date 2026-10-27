@@ -25,7 +25,7 @@ P['road'] = dict(
     blurb='Negotiated diesel at 270+ truck stops.',
     title='Cheaper diesel. Every litre accounted for.',
     sub='Order the fuel. Your driver fills up at a TFN truck stop. The litres, the price and a pump photo land in your dashboard as it happens.',
-    cta=('Get a fuel quote', 'tfn-page-examples.html#f'),
+    cta=('Book a demo', 'tfn-page-examples.html#f'),
     stats=[('270+', 'truck stops'), ('168K+', 'transactions a month'), ('44M+', 'litres a month')],
     screen='''<span class="t">Order</span><span class="h">TFN 204 GP</span>
 <div class="card"><div class="row"><i></i><span><b>Diesel</b><small>TFN truck stop, N3</small></span><span><b>420 L</b><small>R 20.19/L</small></span></div></div>
@@ -339,7 +339,7 @@ MENU = [
         [fam_group('treasury'), fam_group('fueltech')],
         [fam_group('cross'), fam_group('risk')],
         [fam_group('fleet'), fam_group('nonfuel')],
-        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Get a fuel quote', 'tfn-page-examples.html#calc')])],
+        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Contact us', 'tfn-page-examples.html#calc')])],
     ])),
     ('network', 'Network', 'tfn-network.html', ('Explore the network', 'tfn-network.html', [
         [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'tfn-network.html'), ('Fuel price outlook', 'tfn-network.html')])],
@@ -349,7 +349,7 @@ MENU = [
     ('pricing', 'Pricing', 'tfn-tiers.html', ('See the tiers', 'tfn-tiers.html', [
         [('Pay less', [('Tiers', 'tfn-tiers.html'), ('TFN Rewards', 'tfn-page-examples.html#rewards'), ('Fuel prices', 'tfn-network.html'), ('Homebase fee calculator', 'tfn-tiers.html#calc')])],
         [('Credit', [('Credit products', 'tfn-credit.html'), ('Choose a credit provider', 'tfn-credit.html')])],
-        [('Talk to us', [('Get a fuel quote', 'tfn-page-examples.html#calc')])],
+        [('Talk to us', [('Contact us', 'tfn-page-examples.html#calc')])],
     ])),
     ('company', 'Company', '#', ('About TFN', '#', [
         [('Company', [('About us', '#'), ('Our partners', 'tfn-page-examples.html#partners'), ('Contact us', '#')])],
@@ -379,14 +379,14 @@ def pmenu(home=''):
     return ('<div class="pmenu" id="pmenu" role="dialog" aria-modal="true" aria-label="Menu" hidden><div class="pm-top"><a class="pm-brand" href="%stfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
             '<button class="pm-x" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>'
             '<div class="pm-tabs" role="tablist" aria-label="Menu sections">%s</div><div class="pm-body">%s</div>'
-            '<div class="pm-cta"><a class="pm-login" href="#">Log in</a><a class="pm-quote" href="%stfn-page-examples.html#calc">Get a fuel quote</a></div></div>') % (home, tabs, panes, home)
+            '<div class="pm-cta"><a class="pm-login" href="#">Log in</a><a class="pm-quote" href="%stfn-page-examples.html#calc">Book a demo</a></div></div>') % (home, tabs, panes, home)
 
 
 def nav(current=None):
     top = 'products' if current in ORDER else ('network' if current == 'network' else ('pricing' if current == 'tiers' else None))
     links = ''.join('<div class="mi"><a href="%s"%s aria-haspopup="true">%s</a>%s</div>' % (h, ' aria-current="page"' if k == top else '', n, panel(p)) for k, n, h, p in MENU)
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
-            '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="#">Log in</a><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a>%s</div></header>' % (links, BURGER)) + pmenu()
+            '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="#">Log in</a><a class="btn" href="tfn-page-examples.html#calc">Book a demo</a>%s</div></header>' % (links, BURGER)) + pmenu()
 
 
 def chip(label, key):
@@ -404,7 +404,7 @@ def footer():
     prod = ''.join('<li><a href="%s">%s</a></li>' % (lead(f), f['name']) for f in FAM) + '<li><a href="tfn-network.html">Network</a></li><li><a href="tfn-tiers.html">Tiers</a></li>'
     return ('<footer data-dark><div class="wrap"><div class="cols">'
             '<div><h4>Products</h4><ul><li><a href="tfn-page-examples.html#fam">All products</a></li>%s</ul></div>'
-            '<div><h4>Plan and save</h4><ul><li><a href="tfn-network.html#portal">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></div>'
+            '<div><h4>Plan and save</h4><ul><li><a href="tfn-network.html#portal">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-page-examples.html#calc">Contact us</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></div>'
             '<div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="tfn-page-examples.html#partners">Our partners</a></li><li><a href="#">Contact us</a></li><li><a href="#">Support</a></li></ul></div>'
             '<div><h4>Account</h4><ul><li><a href="#">Log in</a></li><li><a href="#">Terms and conditions</a></li></ul></div>'
             '</div><svg aria-hidden="true"><use href="#lockup"/></svg><span>TFN, South Africa’s largest independent on-road refuelling service provider, since April 2007. Design concept: screens and figures in the mock-ups are illustrative.</span></div></footer>') % prod
@@ -557,7 +557,7 @@ def product_page(k):
     close = '<section class="close"%s><div class="wrap"><h2>%s</h2><p class="sub">%s</p><a class="%s" href="%s">%s</a></div></section>' % (
         data_dark, 'Be first in line for EngenXT' if p.get('soon') else 'See what you’d save',
         'Leave your details and we’ll tell you when EngenXT opens.' if p.get('soon') else 'Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.', btn,
-        p['cta'][1] if p.get('soon') else 'tfn-page-examples.html#calc', p['cta'][0] if p.get('soon') else 'Get a fuel quote')
+        p['cta'][1] if p.get('soon') else 'tfn-page-examples.html#calc', p['cta'][0] if p.get('soon') else 'Book a demo')
     quote = '<section class="band quote"><div class="wrap"><blockquote>“%s”</blockquote><cite>%s</cite></div></section>' % Q[k] if k in Q else ''
     faq = '<section class="band faq"><div class="wrap"><h2>Questions</h2><div class="faqs">%s</div></div></section>' % ''.join('<details><summary>%s</summary><p>%s</p></details>' % qa for qa in F[k])
     body = nav(k) + '\n<main>\n' + '\n'.join([hero, portal(k), how, feats, quote, faq, more, close]) + '\n</main>\n' + footer()
@@ -606,7 +606,7 @@ def tiers_page():
 <div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
 <main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
 <div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>TFN Rewards</span><b>3 points a litre</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
-    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></section>'
+    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you pay for diesel and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Book a demo</a></div></section>'
     body = nav('tiers') + '\n<main>\n' + hero + steps + calc + portal + close + '\n</main>\n' + footer()
     return page('TFN tiers | The more you fuel, the less you pay', 'TFN tiers: Bronze, Silver, Gold, Diamond and Platinum, set by monthly on-road diesel volume. Move up a tier and every litre costs less.', body)
 
