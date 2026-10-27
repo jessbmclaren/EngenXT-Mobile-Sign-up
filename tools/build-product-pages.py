@@ -21,7 +21,7 @@ COIN = '<svg><use href="#logo"/></svg>'
 P = {}
 
 P['road'] = dict(
-    file='tfn-on-road.html', name='CRT – Onroad', kicker='TFN CRT – Onroad', finish='p-road', acc='#2a6fd0', tier='For trucks',
+    file='tfn-on-road.html', name='CRT Onroad', kicker='TFN CRT Onroad', finish='p-road', acc='#2a6fd0', tier='For trucks',
     blurb='Negotiated diesel at 270+ truck stops.',
     title='Cheaper diesel. Every litre accounted for.',
     sub='Order the fuel. Your driver fills up at a TFN truck stop. The litres, the price and a pump photo land in your dashboard as it happens.',
@@ -294,7 +294,7 @@ P['support'] = dict(
 # each product is (label, page key or None when it has no page yet)
 FAM = [
     dict(k='treasury', nav='Treasury', name='Treasury', line='Funding that keeps you moving', acc='#a2468e', items=[('Credit products', 'credit'), ('Smart Factoring', None)]),
-    dict(k='fueltech', nav='Fuel', name='Fuel & Technology', line='Diesel on the road and in your yard', acc='#2a6fd0', items=[('CRT – Onroad', 'road'), ('EngenXT', 'lcv'), ('TFN – Wholesale', None), ('Homebase management', 'home')]),
+    dict(k='fueltech', nav='Fuel', name='Fuel & Technology', line='Diesel on the road and in your yard', acc='#2a6fd0', items=[('CRT Onroad', 'road'), ('EngenXT', 'lcv'), ('TFN Wholesale', None), ('Homebase management', 'home')]),
     dict(k='cross', nav='Cross Border', name='Cross Border', line='Everything past the border, paid in rand', acc='#6b62c9', items=[('Fuel', 'africa'), ('Tolls and parking', 'africa'), ('Forwarding and clearing', 'africa'), ('Cash', 'africa')]),
     dict(k='risk', nav='Risk', name='Risk management', line='Cover for your trucks and loads', acc='#c0466f', items=[('Fines', 'risk'), ('Vehicle insurance', 'risk'), ('GIT insurance', 'risk')]),
     dict(k='fleet', nav='Fleet', name='Fleet management', line='Every vehicle road-legal', acc='#2d7fa3', items=[('Licensing', 'fleet')]),
@@ -363,7 +363,7 @@ MENU = [
 # on the right and one New line at the foot. The home page carries the same markup in a <template> (see products_panel) ----------
 DESC = {
     'Credit products': 'Fuel on credit, paid back each month', 'Smart Factoring': 'Get paid sooner for delivered loads',
-    'CRT – Onroad': 'Cheaper diesel at 270+ truck stops', 'EngenXT': 'Fuel for bakkies and vans at Engen', 'TFN – Wholesale': 'Bulk diesel for your depot',
+    'CRT Onroad': 'Cheaper diesel at 270+ truck stops', 'EngenXT': 'Fuel for bakkies and vans at Engen', 'TFN Wholesale': 'Bulk diesel for your depot',
     'Homebase management': 'Diesel delivered to your own tank',
     'Fuel': 'Fill up in five countries, paid in rand', 'Tolls and parking': 'Paid from your TFN account on the way',
     'Forwarding and clearing': 'Border papers sorted for your loads', 'Cash': 'Trip cash for your drivers',
