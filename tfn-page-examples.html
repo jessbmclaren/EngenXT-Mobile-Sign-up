@@ -320,7 +320,7 @@
   .ncard > * { opacity: 0; translate: 0 14px; transition: opacity .7s var(--ease), translate .7s var(--ease); } .night.in .ncard > * { opacity: 1; translate: 0 0; }
   .night.in .ncard > :nth-child(1) { transition-delay: 2.1s; } .night.in .ncard > :nth-child(2) { transition-delay: 2.3s; } .night.in .ncard > :nth-child(3) { transition-delay: 2.5s; }
   .night.in .nbtn .go { animation: ngo 1.4s var(--ease) 3.3s; } @keyframes ngo { 0% { box-shadow: 0 10px 30px -8px rgba(92,90,200,.7), 0 0 0 0 rgba(140,120,255,.55); } 100% { box-shadow: 0 10px 30px -8px rgba(92,90,200,.7), 0 0 0 16px rgba(140,120,255,0); } }
-  .neta b .t { display: inline-block; min-width: 4.6em; }
+  .neta b .t { display: inline-block; min-width: 3.4em; } .neta b em { font-style: normal; font-weight: 400; color: #6e6e80; }
   @media (prefers-reduced-motion: reduce) { .nwall, .nwall::before, .nphone, .nmap2 .pan, .nlabels, .nmap2 .run, .nbtn .go { animation: none !important; } .nmap2 .run { display: none; } .nlabels span, .ncard > * { opacity: 1 !important; translate: none !important; scale: none !important; transition: none !important; } }
   .hero .hbadges span { background: rgba(18,22,38,.62); color: #fff; -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 14px 30px -12px rgba(0,0,0,.6); }
   /* ---------- the landing phone in dark mode: it sits into the night-office photo; the route glows on a dark map ---------- */
@@ -2037,8 +2037,8 @@
         <div class="nnotch"></div>
         <div class="nmapw"><svg class="nmap2" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"></svg><div class="nlabels"></div></div>
         <div class="ncard">
-          <div class="neta"><span class="norb"><svg><use href="#i-pump"/></svg></span><div><small>Fill up in</small><b><s>1 h 25 min</s> <span class="t">1 h 10 min</span></b></div></div>
-          <p class="nrec">Fill up at Harrismith: R&nbsp;18.73, the lowest on your route.</p>
+          <div class="neta"><span class="norb"><svg><use href="#i-pump"/></svg></span><div><small>Saved on this fill</small><b><span class="t">R 613</span> <em>on 420 L</em></b></div></div>
+          <p class="nrec">Fill up at Harrismith and save R&nbsp;1.46 a litre. The biggest saving on your route.</p>
           <div class="nbtn"><span>Later</span><span class="go">Go</span></div>
         </div>
       </div></div>
@@ -3848,12 +3848,14 @@
   /* the labels sit upright over the tilted map, placed from the same projection */
   var box = function (p) { return { l: p[0] / 300 * 100, t: p[1] / 380 * 100 }; };
   var bs = box(st), bm = box(me);
-  labs.innerHTML = '<span style="left:' + bs.l + '%;top:calc(' + bs.t + '% - 14px)">Harrismith<small>R 18.73 · Lowest</small></span><span style="left:' + bm.l + '%;top:calc(' + bm.t + '% - 18px)">You</span>';
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, ph = sec.querySelector('.nphone'), stage = sec.querySelector('.nstage'), tEl = sec.querySelector('.neta .t'), mins = 70;
+  labs.innerHTML = '<span style="left:' + bs.l + '%;top:calc(' + bs.t + '% - 14px)">Harrismith<small>Saves R 1.46/L</small></span><span style="left:' + bm.l + '%;top:calc(' + bm.t + '% - 18px)">You</span>';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, ph = sec.querySelector('.nphone'), stage = sec.querySelector('.nstage'), tEl = sec.querySelector('.neta .t'), save = 613, t0 = 0;
   if (!reduce) {
     stage.addEventListener('pointermove', function (e) { var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; ph.style.transform = 'perspective(1400px) rotateY(' + (x * 12).toFixed(2) + 'deg) rotateX(' + (-y * 8).toFixed(2) + 'deg)'; });
     stage.addEventListener('pointerleave', function () { ph.style.transform = ''; });
-    setInterval(function () { if (!sec.classList.contains('in') || document.hidden || mins <= 52) return; mins--; tEl.textContent = Math.floor(mins / 60) + ' h ' + (mins % 60 < 10 ? '0' : '') + (mins % 60) + ' min'; }, 4200);
+    /* the saving counts up once the card has faded in (the card's own delay is 2.1s) */
+    tEl.textContent = 'R 0';
+    var tick = setInterval(function () { if (!sec.classList.contains('in') || document.hidden) return; t0 = t0 || Date.now(); var k = Math.min(1, Math.max(0, (Date.now() - t0 - 2200) / 1400)); tEl.textContent = 'R ' + Math.round(save * (1 - Math.pow(1 - k, 3))); if (k === 1) clearInterval(tick); }, 40);
   }
   if (!('IntersectionObserver' in window)) { sec.classList.add('in'); return; }
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sec.classList.add('in'); io.disconnect(); } }); }, { threshold: .3 });
@@ -3880,7 +3882,7 @@
     '<circle class="halo" cx="' + st[0] + '" cy="' + st[1] + '" r="19"/><circle class="stop" cx="' + st[0] + '" cy="' + st[1] + '" r="9"/>' +
     '<circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="26"/><circle class="halo" cx="' + me[0] + '" cy="' + me[1] + '" r="15" style="animation-delay:-1.3s"/><circle class="dot" cx="' + me[0] + '" cy="' + me[1] + '" r="7"/></g>';
   [].forEach.call(svg.querySelectorAll('.draw, .run'), function (p) { p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); });
-  labs.innerHTML = '<span style="left:' + (st[0] / W * 100) + '%;top:calc(' + (st[1] / H * 100) + '% - 16px)">Harrismith<small>R 18.73 · Lowest</small></span><span style="left:' + (me[0] / W * 100) + '%;top:calc(' + (me[1] / H * 100) + '% - 20px)">You</span>';
+  labs.innerHTML = '<span style="left:' + (st[0] / W * 100) + '%;top:calc(' + (st[1] / H * 100) + '% - 16px)">Harrismith<small>Saves R 1.46/L</small></span><span style="left:' + (me[0] / W * 100) + '%;top:calc(' + (me[1] / H * 100) + '% - 20px)">You</span>';
   requestAnimationFrame(function () { requestAnimationFrame(function () { wrap.classList.add('on'); }); });
 })();
 </script>
