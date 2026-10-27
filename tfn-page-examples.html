@@ -1488,6 +1488,60 @@
   @keyframes clb { 0% { transform: translate(12%, -10%) rotate(150deg) scale(1.25); } 40% { transform: translate(-12%, 4%) rotate(110deg) scale(1.05); } 75% { transform: translate(6%, 14%) rotate(70deg) scale(1.3); } 100% { transform: translate(-10%, -8%) rotate(40deg) scale(1.1); } }
   .bm-orb:nth-of-type(2n) .ocl, .bm-orb:nth-of-type(2n) { animation-delay: -5s; } .bm-orb:nth-of-type(3n) .ocl, .bm-orb:nth-of-type(3n) { animation-delay: -11s; }
   @media (prefers-reduced-motion: reduce) { :is(.bm-orb, .forb, .nm-peek .ob), .ocl { animation: none !important; } .ocl { display: none; } }
+
+  /* ---------- 1. hero: the night map card over the photograph becomes the middle product card; the scroll drives it (script: "the hero zoom") ---------- */
+  .zh { position: relative; height: 260vh; margin-top: -72px; background: #fff; }
+  .zh-pin { position: sticky; top: 0; height: 100vh; min-height: 620px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(28px, 4.5vh, 48px); padding: 72px 0 24px; background: #fff; }
+  .zh-bg, .zh-sheet { position: absolute; inset: 0; pointer-events: none; }
+  .zh-bg { z-index: 0; will-change: transform; }
+  .zh-ph { position: absolute; inset: 0; background: var(--img) var(--pos, 50% 30%) / cover no-repeat #6f7d8c; }
+  .zh-tint { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,22,44,.62), rgba(10,22,44,.28) 46%, rgba(10,22,44,.06) 78%); opacity: var(--tint, 1); }
+  .zh-sheet { z-index: 1; background: #fff; clip-path: inset(50%); }
+  .zh-copy { position: absolute; z-index: 3; top: 0; left: 50%; width: min(1200px, 100% - 48px); padding-top: 140px; transform: translateX(-50%); color: #fff; will-change: transform, opacity; }
+  .zh-copy h1 { font-size: clamp(3rem, 8.6vw, 8rem); margin-bottom: clamp(28px, 6vh, 64px); white-space: nowrap; text-shadow: 0 2px 30px rgba(10,22,44,.25); }
+  .zh-copy p { color: rgba(255,255,255,.94); font-size: 1.25rem; max-width: 22em; margin-bottom: 32px; text-shadow: 0 1px 14px rgba(10,22,44,.3); }
+  .zh-copy .btn { background: #fff; color: #000; }
+  .zh-end { position: relative; z-index: 3; text-align: center; padding: 0 24px; will-change: transform, opacity; }
+  .zh-end .sub { max-width: 34em; margin: 16px auto 24px; color: var(--muted); font-size: 1.06rem; }
+  .zh-end h2.title { max-width: none; font-size: clamp(2.3rem, 4.6vw, 4.4rem); }
+
+  /* the row: the middle card a size up, the others step back; the scroll script moves them, the layout here is where they land */
+  .zh-row { --w: clamp(220px, min(19vw, calc((100vh - 400px) / 1.41)), 290px); position: relative; z-index: 2; display: flex; align-items: center; gap: 18px; margin: 0; padding: 0; list-style: none; }
+  .zc { position: relative; flex: none; width: calc(var(--w) * .86); aspect-ratio: 1 / 1.41; will-change: transform, opacity; }
+  .zc-main { width: var(--w); z-index: 2; }
+  .zc > a { position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 22px; color: #fff; isolation: isolate; box-shadow: 0 24px 50px -28px rgba(10,22,44,.55); }
+  .zc > a:focus-visible { outline: 3px solid #2a6fd0; outline-offset: 4px; }
+  .zc-ph { position: absolute; inset: 0; z-index: -1; background: var(--img) var(--pos, 50% 30%) / cover no-repeat #6f7d8c; }
+  .zc:not(.zc-main) .zc-ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,0) 30%, rgba(0,0,0,.08) 55%, rgba(0,0,0,.5)); }
+  .zc-map { position: absolute; inset: 0; z-index: -1; background: #0a0d18; }
+  .zc-map .hnmap { display: block; height: auto; aspect-ratio: 375 / 450; translate: 0 -22%; } .zc-map .hnmap::after { height: 34%; }
+  .zc-main .zc-mid { top: auto; bottom: 74px; }
+  .zc-main > a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px rgba(255,255,255,.9); opacity: var(--line, 0); pointer-events: none; }
+  .zc-main > a { box-shadow: 0 24px 50px -28px rgba(10,22,44, calc(.55 * (1 - var(--line, 0)))); }
+  .zc-mid { position: absolute; left: 0; right: 0; top: 40%; display: grid; justify-items: center; text-align: center; text-shadow: 0 2px 18px rgba(10,22,44,.35); }
+  .zc-mid small { font-size: .8rem; opacity: .92; }
+  .zc-mid b { font-family: var(--sans); font-size: clamp(1.7rem, calc(var(--w) * .12), 2.3rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; margin: 2px 0 10px; }
+  .zc-pill { padding: 6px 14px; border-radius: 999px; background: #fff; color: #111; font-size: .76rem; font-weight: 600; text-shadow: none; }
+  .zc-chip { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: #fff; color: #111; font-size: .76rem; font-weight: 600; line-height: 1.25; }
+  .zc-chip .ob { width: 26px; height: 26px; flex: none; }
+  .zc-chip > span { flex: 1; min-width: 0; } .zc-chip small { display: block; font-weight: 400; color: var(--muted); font-size: .7rem; }
+  .zc-chip em { font-style: normal; white-space: nowrap; }
+  .zc-tags { position: absolute; left: 10px; right: 10px; bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; padding: 10px 6px; border-radius: 14px; background: #fff; color: #111; }
+  .zc-tags span { display: grid; justify-items: center; font-size: .68rem; color: var(--muted); line-height: 1.2; }
+  .zc-tags span + span { border-left: 1px solid var(--line); }
+  .zc-tags b { font-family: var(--sans); font-size: .95rem; font-weight: 700; letter-spacing: -.02em; color: #111; }
+  @media (max-width: 1080px) { .zc[data-at="-2"], .zc[data-at="2"] { display: none; } .zh-row { --w: clamp(220px, min(28vw, calc((100vh - 400px) / 1.41)), 300px); } }
+  @media (max-width: 720px) {
+    .zh-copy { padding-top: 110px; } .zh-copy p { font-size: 1rem; max-width: 20em; margin-bottom: 22px; }
+    .zh-row { --w: min(60vw, calc((100vh - 380px) / 1.41)); gap: 12px; }
+    .zh-end .sub { font-size: .98rem; } .zc-main .zc-pill { display: none; } .zc-main .zc-mid b { margin-bottom: 0; }
+  }
+  .js body:not(.go) .zh * { animation-play-state: paused !important; }
+  /* no motion: the hero sits still, the products wait below it */
+  .zh.still { height: auto; } .zh.still .zh-pin { position: relative; height: auto; min-height: 0; padding: 0 0 80px; gap: 40px; }
+  .zh.still .zh-bg, .zh.still .zh-copy { position: relative; inset: auto; transform: none; }
+  .zh.still .zh-bg { height: max(100vh, 620px); width: 100%; margin-bottom: 40px; } .zh.still .zh-sheet { display: none; }
+  .zh.still .zh-copy { position: absolute; left: 50%; transform: translateX(-50%); }
 </style>
 <link rel="stylesheet" href="tfn-menu.css?v=23794484">
 </head>
@@ -1563,32 +1617,78 @@
 <div class="mega" id="mega" aria-hidden="true"></div>
 
 <main id="top">
-  <!-- 1. hero, blue: the outline draws, the photograph arrives, the number counts -->
-  <section class="hero h-blue" id="hero">
-    <div class="hbg" style="--img:url(img/hero-manager.jpg); background-position: 0 0, 0 0, 100% 20%" aria-hidden="true"></div>
-    <div class="hin">
-      <div class="hcopy">
-        <h1>Fuel management, sorted</h1>
-        <p>Negotiated diesel at 270+ truck stops across Southern Africa. Every fill paid, logged and live.</p>
+  <!-- 1. hero: the night map in its outlined card shrinks into the product row, the page turns white around it and the products line up beside it -->
+  <section class="zh" id="hero" aria-label="TFN">
+    <div class="zh-pin">
+      <div class="zh-bg" aria-hidden="true"><i class="zh-ph" style="--img:url(img/hero-manager.jpg);--pos:100% 20%"><b class="zh-tint"></b></i></div>
+      <div class="zh-sheet" aria-hidden="true"></div>
+      <div class="zh-copy hcopy">
+        <h1>Fuel &amp; Beyond</h1>
+        <p>This is fleet fuel, redefined. Negotiated diesel at 270+ truck stops, with credit, cover and cross-border in the same account.</p>
         <a class="btn" href="#f">Get a fuel quote</a>
       </div>
-      <div class="hphone" aria-hidden="true"><div class="hp"><i class="hbtn"></i><div class="phs"><div class="app dk" data-fit="375">
-          <div class="sbar"><b>9:41</b><svg viewBox="0 0 70 13" width="70" height="13"><g fill="#111"><rect x="0" y="9" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="13" rx="1"/><path d="M30 4.500a9 9 0 0 1 12 0l-1.600 1.700a6.600 6.600 0 0 0-8.800 0ZM32.600 7.600a5 5 0 0 1 6.800 0L36 11Z"/><rect x="47" y=".5" width="20" height="12" rx="3.500" fill="none" stroke="#111" opacity=".4"/><rect x="49" y="2.500" width="14" height="8" rx="2"/></g></svg></div>
-          <span class="isl"></span>
-          <div class="pscr on hn">
-            <div class="hnmap"><svg viewBox="0 0 375 450" aria-hidden="true"></svg><div class="hnlab"></div></div>
-            <div class="hnbody">
-              <div class="hnmoney"><span class="norb"><svg><use href="#i-pump"/></svg></span><div><small>Credit available</small><b class="hcount" data-v="R 24,680.00">R 24,680.00</b></div><div class="hnsave"><small>Saved this month</small><b>R 1,840</b></div></div>
-              <p class="hnrec">Fill up at Harrismith: R&nbsp;18.73, the lowest on your route.</p>
-              <div class="nbtn"><span>Later</span><span class="go">Go</span></div>
-            </div>
-          </div>
-          <div class="tabbar"><div class="tb on"><svg><use href="#i-home"/></svg>Home</div><div class="tb"><svg><use href="#i-pin"/></svg>Map</div><div class="tb"><svg><use href="#i-chart"/></svg>Insights</div><div class="tb"><svg><use href="#i-people"/></svg>Account</div></div>
-          <span class="hbar"></span>
-        </div></div></div></div>
-        <div class="hbadges" aria-hidden="true"><span><i class="ob ob-blue"></i>Fill recorded · 420 L</span><span><i class="ob ob-teal"></i>Diesel R 20.19/L · Harrismith</span></div>
+      <div class="zh-end">
+        <h2 class="title">Everything your trucks run on</h2>
+        <p class="sub">Fuel was the start. Credit, cover, cross-border and vehicle care now sit in the same TFN account.</p>
+        <a class="btn" href="#fam">See all products</a>
+      </div>
+      <ul class="zh-row" aria-label="Products">
+        <li class="zc" data-at="-2"><a href="tfn-credit.html"><i class="zc-ph" style="--img:url(img/save-violet.jpg);--pos:62% 40%" aria-hidden="true"></i><span class="zc-mid"><small>Treasury</small><b>R 250,000</b><span class="zc-pill">Credit products</span></span><span class="zc-chip"><i class="ob ob-violet" aria-hidden="true"></i><span>Invoice factored<small>Paid today</small></span><em>+R 48,200</em></span></a></li>
+        <li class="zc" data-at="-1"><a href="tfn-africa.html"><i class="zc-ph" style="--img:url(img/k-namibia.jpg);--pos:46% 50%" aria-hidden="true"></i><span class="zc-mid"><small>Cross Border</small><b>R 12,840</b><span class="zc-pill">Tolls and parking</span></span><span class="zc-chip"><i class="ob ob-teal" aria-hidden="true"></i><span>Fuel in Windhoek<small>Paid in rand</small></span><em>−R 3,420</em></span></a></li>
+        <li class="zc zc-main" data-at="0"><a href="tfn-on-road.html"><i class="zc-map" aria-hidden="true"><span class="hnmap"><svg viewBox="0 0 375 450"></svg><span class="hnlab"></span></span></i><span class="zc-mid"><small>Credit available</small><b>R 24,680</b><span class="zc-pill">Fill up at Harrismith</span></span><span class="zc-tags"><span><b>270+</b>truck stops</span><span><b>Every fill</b>logged live</span></span></a></li>
+        <li class="zc" data-at="1"><a href="tfn-risk.html"><i class="zc-ph" style="--img:url(img/driver-docs.jpg);--pos:72% 40%" aria-hidden="true"></i><span class="zc-mid"><small>Risk management</small><b>R 1.2M</b><span class="zc-pill">GIT insurance</span></span><span class="zc-chip"><i class="ob ob-blue" aria-hidden="true"></i><span>Load covered<small>Durban to Gauteng</small></span><em>Active</em></span></a></li>
+        <li class="zc" data-at="2"><a href="tfn-vehicle-support.html"><i class="zc-ph" style="--img:url(img/driver-truck.jpg);--pos:50% 30%" aria-hidden="true"></i><span class="zc-mid"><small>Vehicle support</small><b>14 trucks</b><span class="zc-pill">Book a service</span></span><span class="zc-chip"><i class="ob ob-rose" aria-hidden="true"></i><span>Tyres fitted<small>TFN 204 GP · Today</small></span><em>R 9,860</em></span></a></li>
+      </ul>
     </div>
   </section>
+<script>
+/* the hero zoom: the night map in its outlined card shrinks into the middle of the product row, the photograph shrinks with it,
+   a white sheet opens out from behind the card and the products slide in beside it. p runs 0 to 1 over the section's scroll */
+(function () {
+  var sec = document.getElementById('hero'), pin = sec.querySelector('.zh-pin'), bg = sec.querySelector('.zh-bg'), sheet = sec.querySelector('.zh-sheet');
+  var copy = sec.querySelector('.zh-copy'), end = sec.querySelector('.zh-end'), row = sec.querySelector('.zh-row'), main = sec.querySelector('.zc-main');
+  var sides = [].slice.call(sec.querySelectorAll('.zc:not(.zc-main)'));
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { sec.classList.add('still'); pin.style.setProperty('--tint', 0); return; }
+  var g = {}, cur = 0, goal = 0, raf = 0;
+  function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function ease(x) { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+  function measure() {
+    var vw = pin.clientWidth, vh = pin.clientHeight, W = main.offsetWidth, H = main.offsetHeight;
+    var fw, ftop;
+    if (vw < 720) { fw = Math.min(vw * .7, 320); ftop = Math.min(copy.offsetTop + copy.offsetHeight + 24, vh - fw * 1.41 * .6); }
+    else { fw = Math.max(300, Math.min(vw * .25, 400)); ftop = vh * .36; }
+    var k = fw / W;
+    g = { vw: vw, vh: vh, W: W, H: H, k: k, fx: vw >= 1080 ? vw * .56 : vw / 2, fy: ftop + H * k / 2, cx: row.offsetLeft + main.offsetLeft + W / 2, cy: row.offsetTop + main.offsetTop + H / 2,
+          top: sec.offsetTop, range: Math.max(1, sec.offsetHeight - vh) };
+    sec.dataset.solid = Math.round(g.top + g.range * .4);
+    render(cur);
+  }
+  function render(p) {
+    var e = ease(p / .82), s = g.k + (1 - g.k) * e, dx = g.fx + (g.cx - g.fx) * e, dy = g.fy + (g.cy - g.fy) * e;
+    main.style.transform = 'translate(' + (dx - g.cx) + 'px,' + (dy - g.cy) + 'px) scale(' + s + ')';
+    bg.style.transform = 'scale(' + (1 + .08 * e) + ')';
+    pin.style.setProperty('--line', 1 - clamp(e / .35)); pin.style.setProperty('--tint', 1 - clamp(e / .6));
+    var q = ease((p - .04) / .55), w = s * g.W / 2, h = s * g.H / 2;
+    sheet.style.clipPath = 'inset(' + (dy - h) * (1 - q) + 'px ' + (g.vw - dx - w) * (1 - q) + 'px ' + (g.vh - dy - h) * (1 - q) + 'px ' + (dx - w) * (1 - q) + 'px round ' + (22 * s + 60 * q) * (1 - q) + 'px)';
+    var c = clamp(p / .3); copy.style.opacity = 1 - c; copy.style.transform = 'translate(-50%,' + -60 * c + 'px)'; copy.style.pointerEvents = c > .5 ? 'none' : '';
+    var a = ease((p - .35) / .4); end.style.opacity = a; end.style.transform = 'translateY(' + (1 - a) * 40 + 'px)'; end.style.pointerEvents = a < .5 ? 'none' : '';
+    var b = ease((p - .3) / .5);
+    sides.forEach(function (el) { var at = +el.dataset.at, d = at < 0 ? -1 : 1; el.style.opacity = b; el.style.pointerEvents = b < .5 ? 'none' : '';
+      el.style.transform = 'translateX(' + d * (1 - b) * (60 + 50 * Math.abs(at)) + 'px) scale(' + (.88 + .12 * b) + ')'; });
+  }
+  function target() { return clamp((scrollY - g.top) / g.range); }
+  function loop() { cur += (goal - cur) * .14; if (Math.abs(goal - cur) < .0005) { cur = goal; raf = 0; } else raf = requestAnimationFrame(loop); render(cur); }
+  function onScroll() { goal = target(); if (!raf) raf = requestAnimationFrame(loop); }
+  /* the keyboard never lands on a card that is still out of sight: tabbing into the products finishes the move, tabbing back to the copy undoes it */
+  sec.addEventListener('focusin', function (ev) {
+    var toEnd = !copy.contains(ev.target); if ((toEnd && cur > .9) || (!toEnd && cur < .1)) return;
+    scrollTo(0, toEnd ? g.top + g.range : g.top); cur = goal = toEnd ? 1 : 0; render(cur);
+  });
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', measure); addEventListener('load', measure);
+  measure(); cur = goal = target(); render(cur);
+})();
+</script>
 
   <!-- 2. white: a quiet strip -->
   <div class="wrap strip">
@@ -2591,7 +2691,7 @@
   var ctaSeen = new Set(), ctaIO = new IntersectionObserver(function (es) { es.forEach(function (e) { e.isIntersecting ? ctaSeen.add(e.target) : ctaSeen.delete(e.target); }); onScroll(); });
   [].forEach.call(document.querySelectorAll('main .btn'), function (b) { ctaIO.observe(b); });
   function onScroll() {
-    nav.classList.toggle('clear', scrollY < hero.offsetHeight - 110);
+    nav.classList.toggle('clear', scrollY < (+hero.dataset.solid || hero.offsetHeight - 110));
     var under = document.elementsFromPoint(innerWidth / 2, innerHeight - 40).filter(function (n) { return n !== sticky; });
     var busy = ctaSeen.size > 0 || under.some(function (n) { return n.closest && n.closest('.nm-stage, .orbstage, .techbox, .ometa, .pills, .nstage, .hphone, .hbadges'); });
     sticky.classList.toggle('show', scrollY > 560 && !busy && foot.getBoundingClientRect().top > innerHeight - 40);
@@ -3672,9 +3772,9 @@
 })();
 </script>
 <script>
-/* the landing phone: the same night map as the night-shift scene, sized for the hero; route from you to the cheapest stop and on to work */
+/* the hero card: the same night map as the night-shift scene, sized for the hero; route from you to the cheapest stop and on to work */
 (function () {
-  var wrap = document.querySelector('.pscr.hn .hnmap'); if (!wrap) return;
+  var wrap = document.querySelector('.zc-map .hnmap'); if (!wrap) return;
   var svg = wrap.querySelector('svg'), labs = wrap.querySelector('.hnlab'), W = 375, H = 450;
   var cx = 192, cy = 236, A = -28 * Math.PI / 180, SY = .74, D = -28;
   function T(x, y) { var rx = x * Math.cos(A) - y * Math.sin(A), ry = x * Math.sin(A) + y * Math.cos(A); return [cx + rx, cy + ry * SY]; }
