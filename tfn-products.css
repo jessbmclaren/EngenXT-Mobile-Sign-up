@@ -514,5 +514,5 @@
   .links:hover .mi:not(:hover) .mp { opacity: 0; visibility: hidden; transition: opacity .15s, visibility 0s .15s; }
   .links:hover .mi:not(:hover) > a { background: none; }
   .links .mi > a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-  @media (max-width: 960px) { .mp { display: none; } .nav .login { display: none; } .links { overflow-x: auto; } .links .mi > a { padding: 0 8px; } }
-  @media (max-width: 560px) { .nav .btn, .nav .grow { display: none; } .links { flex: 1; min-width: 0; } .links .mi > a { padding: 0 6px; font-size: .9rem; } .brand svg { width: 84px; margin-right: 4px; } }
+  @media (max-width: 960px) { .mp { display: none; } }
+  @media (max-width: 560px) { .nav .btn { display: none; } }

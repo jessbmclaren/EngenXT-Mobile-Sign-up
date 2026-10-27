@@ -1,0 +1,38 @@
+/* TFN phone menu: the burger and the full-screen glass sheet, shared by the home page and the product pages.
+   The sheet is filled by tools/build-product-pages.py (pmenu) from the same MENU as the desktop panels. */
+.burger { display: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; place-items: center; margin-left: 4px; }
+.burger svg { width: 24px; height: 24px; }
+.burger:hover { background: rgba(127,127,127,.14); }
+
+.pmenu { position: fixed; inset: 0; z-index: 100000; display: flex; flex-direction: column; padding: 14px 20px 22px; overflow-y: auto; overscroll-behavior: contain;
+          color: #fff; background: rgba(26,29,36,.9); -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5);
+          font-family: "Aeonik Pro", "Satoshi", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; opacity: 0; transition: opacity .25s; }
+.pmenu[hidden] { display: none; }
+.pmenu.open { opacity: 1; }
+.pm-top { display: flex; align-items: center; justify-content: space-between; height: 46px; }
+.pm-brand { color: #fff; } .pm-brand svg { width: 98px; height: 29px; display: block; }
+.pm-x { width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: #fff; cursor: pointer; display: grid; place-items: center; margin-right: -10px; }
+.pm-x svg { width: 24px; height: 24px; }
+.pm-tabs { display: flex; gap: 4px; margin: 18px -20px 0; padding: 0 20px; overflow-x: auto; scrollbar-width: none; } .pm-tabs::-webkit-scrollbar { display: none; }
+.pm-tabs button { flex: none; border: 0; font: inherit; font-size: 1rem; font-weight: 500; padding: 10px 18px; border-radius: 999px; background: none; color: #fff; cursor: pointer; }
+.pm-tabs button[aria-selected="true"] { background: rgba(255,255,255,.12); }
+.pm-body { flex: 1; padding-top: 22px; }
+.pm-d { display: inline-flex; gap: 10px; font-size: 1.35rem; font-weight: 500; color: #fff; text-decoration: none; margin-bottom: 18px; }
+.pm-p details { border: 0; }
+.pm-p summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 13px 0; font-size: 1.05rem; font-weight: 500; cursor: pointer; }
+.pm-p summary::-webkit-details-marker { display: none; }
+.pm-p summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .25s; margin-right: 4px; }
+.pm-p details[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+.pm-p ul { list-style: none; margin: 0 0 8px; padding: 0 0 0 2px; }
+.pm-p li a, .pm-p li span { display: block; padding: 9px 0; font-size: .98rem; color: rgba(255,255,255,.82); text-decoration: none; }
+.pm-p li span { color: rgba(255,255,255,.4); }
+.pm-cta { display: flex; justify-content: center; gap: 10px; padding-top: 24px; position: sticky; bottom: 0; }
+.pm-cta a { display: inline-flex; align-items: center; height: 48px; padding: 0 26px; border-radius: 999px; font-weight: 500; text-decoration: none; }
+.pm-login { background: #000; color: #fff; } .pm-quote { background: #fff; color: #000; }
+body.pm-lock { overflow: hidden; }
+
+@media (max-width: 960px) {
+  .burger { display: grid; }
+  .nav .links, .nav .login { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .pmenu { transition: none; } }

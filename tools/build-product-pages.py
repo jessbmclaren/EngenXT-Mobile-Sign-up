@@ -107,7 +107,7 @@ P['network'] = dict(
     blurb='Find the best diesel price on your route before you leave.',
     title='The cheapest diesel on your route',
     sub='Today’s price at every TFN truck stop. Plan your fills before the truck leaves, then send the stops to your driver.',
-    cta=('Open the network map', 'https://tfn.co.za/tfn-network-map/'),
+    cta=('Open the network map', 'tfn-network.html#portal'),
     chips=['N3 Joburg → Durban', 'N1 Joburg → Cape Town', 'N4 Gauteng → Mozambique'],
     screen='''<span class="t">Route planner</span><span class="h">Joburg → Durban</span>
 <div class="map"><svg viewBox="0 0 200 220" aria-hidden="true"><g stroke="#2c2e32" stroke-width="6" fill="none"><path d="M0 40h200M0 110h200M0 180h200M40 0v220M110 0v220M170 0v220"/></g><path d="M20 10C60 50 70 90 100 110S150 170 185 210" stroke="#5d6e86" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M20 10C60 50 70 90 100 110S150 170 185 210" stroke="#3d9bff" stroke-width="4" fill="none" stroke-linecap="round"/><g font-family="Satoshi, sans-serif" font-size="11" font-weight="700"><rect x="52" y="44" width="54" height="20" rx="10" fill="#fff"/><text x="79" y="58" text-anchor="middle" fill="#111">R 20.19</text><rect x="118" y="128" width="54" height="20" rx="10" fill="#3d9bff"/><text x="145" y="142" text-anchor="middle" fill="#fff">R 19.94</text></g><circle cx="100" cy="110" r="6" fill="#fff"/><circle cx="160" cy="176" r="6" fill="#fff"/></svg></div>
@@ -135,7 +135,7 @@ P['home'] = dict(
     blurb='Diesel in your own yard, tracked with the rest.',
     title='Your yard tank, on the same account',
     sub='TFN delivers diesel to your yard tank. Every fill is recorded against the truck and driver, next to what you buy on the road.',
-    cta=('Work out my Homebase fee', 'https://tfn.co.za/homebase-calculator/'),
+    cta=('Work out my Homebase fee', 'tfn-tiers.html#calc'),
     screen='''<span class="t">Homebase</span><span class="h">Yard tank 1</span>
 <div class="card"><span class="t">In the tank</span><div class="big">12,020 L</div><div class="bar" style="--v:60%;margin-top:.5em"><i></i></div></div>
 <div class="card"><div class="row"><i></i><span><b>TFN 311 GP</b><small>Driver: Thabo M.</small></span><span><b>380 L</b><small>07:12</small></span></div><div class="row"><i style="opacity:.5"></i><span><b>Delivery</b><small>From TFN</small></span><span><b>+8,000 L</b><small>Mon</small></span></div></div>
@@ -160,7 +160,7 @@ P['africa'] = dict(
     blurb='Fuel, tolls and more past the border. Paid in rand.',
     title='Across the border. Still in rand.',
     sub='Fill up in Namibia, Botswana, Zimbabwe, Zambia and Mozambique on your South African account. Tolls and parking, forwarding and clearing, even cash for the trip: all on the same account.',
-    cta=('Plan a cross-border route', 'https://tfn.co.za/tfn-africa/'),
+    cta=('Plan a cross-border route', 'tfn-africa.html#portal'),
     chips=['Fuel', 'Tolls and parking', 'Forwarding and clearing', 'Cash'],
     screen='''<span class="t">Cross-border</span><span class="h">Joburg → Lusaka</span>
 <div class="card"><div class="row"><i></i><span><b>South Africa</b><small>Fill up before the border</small></span><span><b>420 L</b></span></div><div class="row"><i style="opacity:.6"></i><span><b>Botswana</b><small>TFN Africa</small></span><span><b>260 L</b></span></div><div class="row"><i style="opacity:.4"></i><span><b>Zambia</b><small>TFN Africa</small></span><span><b>310 L</b></span></div></div>
@@ -188,7 +188,7 @@ P['credit'] = dict(
     blurb='Fuel now. Pay your bank later.',
     title='Fuel now. Pay your bank later.',
     sub='Get a fuel facility through Standard Bank, Absa or Preference Capital. Your bank pays TFN and you repay monthly. You set the limits per driver and truck.',
-    cta=('Choose a credit provider', 'https://tfn.co.za/select-a-credit-provider/'),
+    cta=('Choose a credit provider', 'tfn-credit.html'),
     chips=['Standard Bank', 'Absa', 'Preference Capital'],
     screen='''<span class="t">Credit</span><span class="h">Credit available</span><div class="big">R 184,200</div><div class="bar" style="--v:42%"><i></i></div>
 <div class="card"><div class="row"><i></i><span><b>TFN 204 GP</b><small>Weekly limit</small></span><span><b>R 25,000</b></span></div><div class="row"><i style="opacity:.6"></i><span><b>Sipho K.</b><small>Daily limit</small></span><span><b>R 6,000</b></span></div></div>
@@ -214,7 +214,7 @@ P['risk'] = dict(
     blurb='Insure trucks and loads. Get fines handled.',
     title='Cover for your trucks and loads',
     sub='Vehicle and goods-in-transit insurance through ONE Insurance. Traffic fines managed by IOX. All next to your fuel, on one account.',
-    cta=('Ask about cover', 'https://tfn.co.za/contact-us/'),
+    cta=('Ask about cover', '#'),
     chips=['Vehicle insurance', 'GIT insurance', 'Fines'],
     screen='''<span class="t">Risk management</span><span class="h">TFN 204 GP</span>
 <div class="card"><div class="row"><i></i><span><b>Vehicle insurance</b><small>ONE Insurance</small></span><span class="ok">Covered</span></div><div class="row"><i style="opacity:.6"></i><span><b>GIT insurance</b><small>Goods in transit</small></span><span class="ok">Covered</span></div></div>
@@ -241,7 +241,7 @@ P['fleet'] = dict(
     blurb='Every vehicle road-legal. No lapsed licences.',
     title='Every vehicle road-legal',
     sub='IOX handles licensing for your fleet. See every licence that’s due before it runs out.',
-    cta=('Ask about licensing', 'https://tfn.co.za/contact-us/'),
+    cta=('Ask about licensing', '#'),
     chips=['Licensing'],
     screen='''<span class="t">Licensing</span><span class="h">3 due in 30 days</span>
 <div class="card"><div class="row"><i></i><span><b>TFN 204 GP</b><small>Licence due</small></span><span><b>12 days</b></span></div><div class="row"><i style="opacity:.7"></i><span><b>TFN 311 GP</b><small>Licence due</small></span><span><b>21 days</b></span></div><div class="row"><i style="opacity:.45"></i><span><b>TFN 118 GP</b><small>Licence due</small></span><span><b>28 days</b></span></div></div>
@@ -268,7 +268,7 @@ P['support'] = dict(
     blurb='Tyres, servicing and telematics. Less downtime.',
     title='Less downtime. Longer life.',
     sub='Tyres, servicing and telematics for every truck, on your TFN account. Telematics by ONE Insurance.',
-    cta=('Ask about vehicle support', 'https://tfn.co.za/contact-us/'),
+    cta=('Ask about vehicle support', '#'),
     chips=['Tyres', 'Servicing', 'Telematics'],
     screen='''<span class="t">Vehicle support</span><span class="h">TFN 311 GP</span>
 <div class="card"><div class="row"><i></i><span><b>Tyres</b><small>Steer axle</small></span><span><b>Check due</b></span></div><div class="row"><i style="opacity:.7"></i><span><b>Servicing</b><small>Next service</small></span><span><b>4 200 km</b></span></div><div class="row"><i style="opacity:.45"></i><span><b>Telematics</b><small>ONE Insurance</small></span><span class="ok">Live</span></div></div>
@@ -337,22 +337,22 @@ MENU = [
         [fam_group('treasury'), fam_group('fueltech')],
         [fam_group('cross'), fam_group('risk')],
         [fam_group('fleet'), fam_group('nonfuel')],
-        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/')])],
+        [fam_group('support'), ('Pricing', [('Tiers', 'tfn-tiers.html'), ('Get a fuel quote', 'tfn-page-examples.html#calc')])],
     ])),
     ('network', 'Network', 'tfn-network.html', ('Explore the network', 'tfn-network.html', [
-        [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'https://tfn.co.za/price-list/'), ('Fuel price outlook', 'https://tfn.co.za/fuel-insights/')])],
+        [('Plan', [('Network map', 'tfn-network.html'), ('Fuel prices', 'tfn-network.html'), ('Fuel price outlook', 'tfn-network.html')])],
         [('At the stop', [('Overnight parking', 'tfn-non-fuel.html'), ('Truckwash', 'tfn-non-fuel.html'), ('Oil and road assist', 'tfn-non-fuel.html')])],
         [('Past the border', [('Cross Border', 'tfn-africa.html'), ('Five countries, paid in rand', 'tfn-africa.html')])],
     ])),
     ('pricing', 'Pricing', 'tfn-tiers.html', ('See the tiers', 'tfn-tiers.html', [
-        [('Pay less', [('Tiers', 'tfn-tiers.html'), ('Fuel prices', 'https://tfn.co.za/price-list/'), ('Homebase fee calculator', 'https://tfn.co.za/homebase-calculator/')])],
-        [('Credit', [('Credit products', 'tfn-credit.html'), ('Choose a credit provider', 'https://tfn.co.za/select-a-credit-provider/')])],
-        [('Talk to us', [('Get a fuel quote', 'https://tfn.co.za/your-fuel-quote/')])],
+        [('Pay less', [('Tiers', 'tfn-tiers.html'), ('Fuel prices', 'tfn-network.html'), ('Homebase fee calculator', 'tfn-tiers.html#calc')])],
+        [('Credit', [('Credit products', 'tfn-credit.html'), ('Choose a credit provider', 'tfn-credit.html')])],
+        [('Talk to us', [('Get a fuel quote', 'tfn-page-examples.html#calc')])],
     ])),
-    ('company', 'Company', 'https://tfn.co.za/about-us/', ('About TFN', 'https://tfn.co.za/about-us/', [
-        [('Company', [('About us', 'https://tfn.co.za/about-us/'), ('Contact us', 'https://tfn.co.za/contact-us/')])],
-        [('Help', [('Support', 'https://tfn.co.za/tfn-support/'), ('Terms and conditions', 'https://tfn.co.za/terms-conditions/')])],
-        [('Account', [('Log in', 'https://app.tfn.co.za/')])],
+    ('company', 'Company', '#', ('About TFN', '#', [
+        [('Company', [('About us', '#'), ('Contact us', '#')])],
+        [('Help', [('Support', '#'), ('Terms and conditions', '#')])],
+        [('Account', [('Log in', '#')])],
     ])),
 ]
 
@@ -364,11 +364,27 @@ def panel(p):
         '<div>%s</div>' % ''.join('<h5>%s</h5><ul>%s</ul>' % (h, ''.join(link(l, x) for l, x in items)) for h, items in col) for col in cols))
 
 
+BURGER = '<button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pmenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>'
+
+
+def pmenu(home=''):
+    """The phone menu: a full-screen glass sheet, the four items as pills, each a Discover link and an accordion of its groups."""
+    link = lambda l, h: '<li><a href="%s">%s</a></li>' % (h, l) if h else '<li><span>%s</span></li>' % l
+    tabs = ''.join('<button type="button" role="tab" aria-selected="%s" data-pm="%d">%s</button>' % ('true' if i == 0 else 'false', i, n) for i, (k, n, h, p) in enumerate(MENU))
+    panes = ''.join('<div class="pm-p" data-pm="%d"%s><a class="pm-d" href="%s">%s <span aria-hidden="true">→</span></a>%s</div>' % (
+        i, '' if i == 0 else ' hidden', p[1], p[0], ''.join('<details><summary>%s</summary><ul>%s</ul></details>' % (g, ''.join(link(l, x) for l, x in items)) for col in p[2] for g, items in col))
+        for i, (k, n, h, p) in enumerate(MENU))
+    return ('<div class="pmenu" id="pmenu" role="dialog" aria-modal="true" aria-label="Menu" hidden><div class="pm-top"><a class="pm-brand" href="%stfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
+            '<button class="pm-x" type="button" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>'
+            '<div class="pm-tabs" role="tablist" aria-label="Menu sections">%s</div><div class="pm-body">%s</div>'
+            '<div class="pm-cta"><a class="pm-login" href="#">Log in</a><a class="pm-quote" href="%stfn-page-examples.html#calc">Get a fuel quote</a></div></div>') % (home, tabs, panes, home)
+
+
 def nav(current=None):
     top = 'products' if current in ORDER else ('network' if current == 'network' else ('pricing' if current == 'tiers' else None))
     links = ''.join('<div class="mi"><a href="%s"%s aria-haspopup="true">%s</a>%s</div>' % (h, ' aria-current="page"' if k == top else '', n, panel(p)) for k, n, h, p in MENU)
     return ('<header class="nav"><div class="wrap"><a class="brand" href="tfn-page-examples.html" aria-label="TFN home"><svg aria-hidden="true"><use href="#lockup"/></svg></a>'
-            '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="https://app.tfn.co.za/">Log in</a><a class="btn" href="tfn-page-examples.html#f">Get a fuel quote</a></div></header>' % links)
+            '<nav class="links" aria-label="Main">%s</nav><span class="grow"></span><button class="theme" type="button" aria-label="Dark mode" aria-pressed="false"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><a class="login" href="#">Log in</a><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a>%s</div></header>' % (links, BURGER)) + pmenu()
 
 
 def chip(label, key):
@@ -386,9 +402,9 @@ def footer():
     prod = ''.join('<li><a href="%s">%s</a></li>' % (lead(f), f['name']) for f in FAM) + '<li><a href="tfn-network.html">Network</a></li><li><a href="tfn-tiers.html">Tiers</a></li>'
     return ('<footer data-dark><div class="wrap"><div class="cols">'
             '<div><h4>Products</h4><ul><li><a href="tfn-products.html">All products</a></li>%s</ul></div>'
-            '<div><h4>Plan and save</h4><ul><li><a href="https://tfn.co.za/tfn-network-map/">Network map</a></li><li><a href="https://tfn.co.za/price-list/">Fuel prices</a></li><li><a href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></li><li><a href="https://tfn.co.za/fuel-insights/">Fuel price outlook</a></li></ul></div>'
-            '<div><h4>Company</h4><ul><li><a href="https://tfn.co.za/about-us/">About TFN</a></li><li><a href="https://tfn.co.za/contact-us/">Contact us</a></li><li><a href="https://tfn.co.za/tfn-support/">Support</a></li></ul></div>'
-            '<div><h4>Account</h4><ul><li><a href="https://app.tfn.co.za/">Log in</a></li><li><a href="https://tfn.co.za/terms-conditions/">Terms and conditions</a></li></ul></div>'
+            '<div><h4>Plan and save</h4><ul><li><a href="tfn-network.html#portal">Network map</a></li><li><a href="tfn-network.html">Fuel prices</a></li><li><a href="tfn-page-examples.html#calc">Get a fuel quote</a></li><li><a href="tfn-network.html">Fuel price outlook</a></li></ul></div>'
+            '<div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="#">Contact us</a></li><li><a href="#">Support</a></li></ul></div>'
+            '<div><h4>Account</h4><ul><li><a href="#">Log in</a></li><li><a href="#">Terms and conditions</a></li></ul></div>'
             '</div><svg aria-hidden="true"><use href="#lockup"/></svg><span>TFN, South Africa’s largest independent on-road refuelling service provider, since April 2007. Design concept: screens and figures in the mock-ups are illustrative.</span></div></footer>') % prod
 
 
@@ -407,6 +423,7 @@ def page(title, desc, body, body_class=''):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tfn-products.css">
+<link rel="stylesheet" href="tfn-menu.css">
 <script>(function(){var t;try{t=localStorage.getItem("tfn-theme")}catch(e){}document.documentElement.dataset.theme=t||"light"})()</script>
 </head>
 <body%s>
@@ -414,6 +431,7 @@ def page(title, desc, body, body_class=''):
 %s
 %s
 <script src="tfn-products.js"></script>
+<script src="tfn-menu.js"></script>
 </body>
 </html>
 ''' % (html.escape(title), html.escape(desc), ' class="%s"' % body_class if body_class else '', LOGO, body)
@@ -524,7 +542,7 @@ def product_page(k):
     close = '<section class="close"%s><div class="wrap"><h2>%s</h2><p class="sub">%s</p><a class="%s" href="%s">%s</a></div></section>' % (
         data_dark, 'Be first in line for EngenXT' if p.get('soon') else 'See what you’d save',
         'Leave your details and we’ll tell you when EngenXT opens.' if p.get('soon') else 'Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.', btn,
-        p['cta'][1] if p.get('soon') else 'https://tfn.co.za/your-fuel-quote/', p['cta'][0] if p.get('soon') else 'Get a fuel quote')
+        p['cta'][1] if p.get('soon') else 'tfn-page-examples.html#calc', p['cta'][0] if p.get('soon') else 'Get a fuel quote')
     quote = '<section class="band quote"><div class="wrap"><blockquote>“%s”</blockquote><cite>%s</cite></div></section>' % Q[k] if k in Q else ''
     faq = '<section class="band faq"><div class="wrap"><h2>Questions</h2><div class="faqs">%s</div></div></section>' % ''.join('<details><summary>%s</summary><p>%s</p></details>' % qa for qa in F[k])
     body = nav(k) + '\n<main>\n' + '\n'.join([hero, portal(k), how, feats, quote, faq, more, close]) + '\n</main>\n' + footer()
@@ -568,7 +586,7 @@ def hx(f):
 def hub():
     hero = ('<section class="hx hx-black hx-photo hx-hero" data-dark style="--photo:url(img/close-highway.jpg);--acc:#3d68c0"><div class="wrap"><p class="hx-k">TruckersHub <span class="soon">Coming soon</span></p>'
             '<h1>Finally, everything in one place</h1><p class="sub">Seven product families. One TFN account. One app for your drivers, one portal for your office.</p>'
-            '<a class="btn light" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div>'
+            '<a class="btn light" href="tfn-page-examples.html#calc">Get a fuel quote</a></div>'
             '<div class="hx-stage"><div class="ph p-hub on"><div class="s">%s%s</div></div></div></section>') % (SH, HOME_SCREEN)
     fams = ''.join(hx(f) for f in FAM)
     partners = '<section class="hx-partners" data-dark><div class="wrap"><p class="hx-k">Built with partners you know</p><ul>%s</ul></div></section>' % ''.join(
@@ -576,7 +594,7 @@ def hub():
     apps = ('<section class="hx-apps" data-dark><div class="wrap"><h2>Two apps. One hub.</h2><p class="sub">Your drivers get one app. Your office gets one portal. Set up your company, people and vehicles once, for every product.</p>'
             '<div class="hx-cards"><a href="tfn-on-road.html"><b>Driver app</b><span>Orders, fuel requests, fills and tonight’s stop. Only what the job needs.</span><i aria-hidden="true">→</i></a>'
             '<a href="tfn-tiers.html"><b>Fleet manager portal</b><span>People, vehicles, rules, wallet, approvals and every transaction. Plus your tier.</span><i aria-hidden="true">→</i></a></div></div></section>')
-    close = '<section class="close"><div class="wrap"><h2>Join the transporters fuelling 44M+ litres a month</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. We’ll show you what you’d save within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
+    close = '<section class="close"><div class="wrap"><h2>Join the transporters fuelling 44M+ litres a month</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. We’ll show you what you’d save within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></section>'
     body = nav() + '\n<main>\n' + hero + fams + partners + apps + close + '\n</main>\n' + footer()
     names = ', '.join(f['name'] for f in FAM[:-1]) + ' and ' + FAM[-1]['name']
     return page('TFN | Products and TruckersHub', 'TFN products in seven families: %s. TruckersHub, coming soon, brings them into one driver app and one fleet manager portal.' % names, body, 'hub')
@@ -624,7 +642,7 @@ def tiers_page():
 <div class="portal" aria-hidden="true"><aside><svg><use href="#logo"/></svg><span>Overview</span><span>Orders</span><span>Vehicles</span><span>Drivers</span><span class="on">Your tier</span><span>Reports</span></aside>
 <main><div class="card"><h4>Your tier this month</h4><div class="stat">%s<div><div class="big">41 600 L</div><small>on-road diesel so far</small></div></div><div class="bar" style="--v:58%%"><i></i></div><small>8 400 L to Diamond</small></div>
 <div class="card"><h4>What Gold gets you</h4><ul><li><span>Off every litre</span><b>4c</b></li><li><span>Saved this month</span><b>R 1 664</b></li><li><span>Homebase fee</span><b>Gold rate</b></li><li><span>Next tier</span><b>Diamond, 6c</b></li></ul></div></main></div></div></section>""" % badge('gold', 'Gold')
-    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="https://tfn.co.za/your-fuel-quote/">Get a fuel quote</a></div></section>'
+    close = '<section class="close"><div class="wrap"><h2>See what your tier would save</h2><p class="sub">Tell us what you paid for diesel last time and how much you use. A TFN fuel specialist will send you a comparison within 48 hours.</p><a class="btn" href="tfn-page-examples.html#calc">Get a fuel quote</a></div></section>'
     body = nav('tiers') + '\n<main>\n' + hero + steps + calc + portal + close + '\n</main>\n' + footer()
     return page('TFN tiers | The more you fuel, the less you pay', 'TFN tiers: Bronze, Silver, Gold, Diamond and Platinum, set by monthly on-road diesel volume. Move up a tier and every litre costs less.', body)
 
