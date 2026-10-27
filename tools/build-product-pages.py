@@ -169,7 +169,7 @@ P['africa'] = dict(
 <div class="card"><span class="t">Paid in</span><div class="big">Rand</div><span class="ok">One account, one currency</span></div>
 <div class="cta">Plan the route</div>''',
     extra='<div class="gl g2"><div><b>Tolls and parking</b><small>On the same account</small></div></div>',
-    stage_before='<div class="photo-card" style="background-image:url(img/close-highway.jpg);background-position:85% 50%"></div>',
+    stage_before='<div class="photo-card" style="background-image:url(img/cross-border-truck.jpg);background-position:30% 50%"></div>',
     how=('How cross-border works', [
         ('Plan the route', 'See every TFN stop on your corridor and where to fill up before the border.'),
         ('Fill up abroad', 'Same as at home. No cash, cards or codes.'),
