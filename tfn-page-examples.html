@@ -458,7 +458,8 @@
   .paper .plan.pick { border-color: #1f1f1f; } .paper .plan .pr { color: #6e6e73; } .paper .plan .pr b { color: #1f1f1f; }
   .paper .plan li { border-top-color: #e3e3e6; color: #55555a; } .paper .plan .btn { background: #1f1f1f; color: #fff; }
   /* ---------- the app after dark: a lit ribbed wall, a plinth, the phone with a glowing route ---------- */
-  .night { padding-bottom: 0; }
+  /* above the calculator's coins, which drop in from a screen above their own section: they never cross the phone */
+  .night { padding-bottom: 0; } .sec.black.night { position: relative; z-index: 3; }
   .nstage { position: relative; height: 820px; max-width: 1120px; margin: 46px auto 0; border-radius: 32px 32px 0 0; overflow: hidden; background: #03050c; }
   .nwall { position: absolute; inset: 0 0 150px; background:
       radial-gradient(42% 60% at 82% 34%, rgba(60,104,214,.55), rgba(60,104,214,0) 70%),
@@ -706,6 +707,7 @@
   .dphone { border-radius: 54px; padding: 11px; background: #0b0b0c; box-shadow: inset 0 0 0 2px #3b3b3f, inset 0 0 0 4px #111, 0 50px 90px -24px rgba(0,0,0,.85); }
   .dphone::before { content: ""; position: absolute; right: -3px; top: 150px; width: 3px; height: 74px; border-radius: 2px; background: #2a2a2e; }
   .phs { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #f2f2f7; }
+  .dphone .phs { clip-path: inset(0 round 44px); } /* the tab bar's blur escapes overflow's rounded clip and squares the bottom corners; clip-path holds it */
   .app { position: relative; width: 375px; height: 812px; font-size: 15px; color: #111; background: #f2f2f7; overflow: hidden; line-height: 1.35; }
   .sbar { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 8px 28px 0 40px; z-index: 6; font-weight: 600; font-size: 16px; }
   .isl { position: absolute; left: 50%; top: 11px; width: 122px; height: 36px; margin-left: -61px; border-radius: 20px; background: #000; z-index: 7; }
@@ -1081,8 +1083,11 @@
   .bm[hidden] { display: none; }
   .bm code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
   .bm-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; height: 64px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); background: var(--topbg); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--line); }
-  .bm-top svg { width: 64px; height: 24px; } .bm-top span { font-size: 15px; font-weight: 500; color: var(--mut); } .bm-top .grow { flex: 1; }
+  .bm-top svg.lk { width: 97px; height: 28px; } .bm-top span { font-size: 15px; font-weight: 500; color: var(--mut); } .bm-top .grow { flex: 1; }
   .bm-top a { white-space: nowrap; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+  /* over the black cover the bar goes dark with it, then turns back to the guide's own colours */
+  .bm-top { color: var(--ink); transition: background .35s, border-color .35s, color .35s; } .bm-top a, .bm-dm { transition: background .35s, color .35s; }
+  .bm-top.oc { --ink: #f2f2f4; --mut: #9a9aa0; --line: rgba(255,255,255,.08); --soft: rgba(255,255,255,.1); --bg: #000; --topbg: #000; }
   /* cover */
   .bm-cover { position: relative; overflow: hidden; background: #000; color: #fff; }
   .bm-cover > div { position: relative; z-index: 1; display: grid; align-content: center; min-height: clamp(560px, 84vh, 820px); width: min(1180px, 100% - 48px); margin: 0 auto; padding: 72px 0; }
@@ -1090,7 +1095,17 @@
   .bm-cover svg.wm { width: min(420px, 70vw); height: auto; aspect-ratio: 392 / 148; margin: 22px 0 26px; color: #fff; }
   .bm-cover p { max-width: 26em; font-size: 1.25rem; color: #c7c7cc; }
   .bm-cover .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; } .bm-cover .meta span { padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); font-size: 13px; color: #c7c7cc; }
-  .bm-cover .bm-orb.xl { position: absolute; right: max(-140px, calc((100vw - 1180px) / 2 - 140px)); top: 50%; width: min(640px, 70vw); height: auto; aspect-ratio: 1; translate: 0 -50%; box-shadow: none; }
+  .bm-cover .bm-orb.xl { position: absolute; right: max(24px, calc((100vw - 1180px) / 2)); top: 50%; width: min(340px, 26vw); height: auto; aspect-ratio: 1; translate: 0 -50%; box-shadow: 0 40px 140px -30px rgba(70,100,230,.55); }
+  /* the cover orb is the TFN mark itself: its own colour and grain, so none of the drawn orb's */
+  .bm-orb.mk { overflow: visible; background: none; } .bm-cover .bm-orb.mk { box-shadow: none; } .bm-orb.mk::after, .bm-cover .bm-orb.mk::before { display: none; }
+  .bm-orb.mk svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 20px 40px rgba(70,100,230,.35)); }
+  /* the mark's colours flow inside it like a cloud: a drifting copy of its gradient and the orbs' cloud layers, cut to the four waves */
+  .mkc { position: absolute; inset: 0; overflow: hidden; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-.5 -.5 101 101'%3E%3Cpath d='M10.63 19.03C12.14 19.16 13.32 18.57 14.89 18.35C18 17.91 21.78 17.43 24.94 17.88C26.61 18.11 28.3 18.18 29.97 18.41C30.66 18.51 31.25 18.98 31.95 19.07C40.65 20.3 46.78 24.28 55.49 20.03C58.66 18.48 61.03 15.65 62.52 12.53C63.95 9.55 65.42 5.33 64.32 2.15C62.22 1.37 60.09 1.23 57.91 0.73C43.55 -2.51 28.35 2.79 17.25 11.91C14.82 13.9 12.15 16.39 10.63 19.03Z'/%3E%3Cpath d='M73.18 5.8C72.27 7.37 72.48 8.99 71.9 10.69C70.38 15.14 68.54 19.25 65.15 22.65C58.63 29.16 50.35 30.84 41.45 29.55C40.77 29.45 40.18 28.99 39.47 28.89C34.02 28.12 28.85 26.08 23.27 25.75C19.07 25.5 14.82 26.67 10.93 27.95C8.42 28.78 4.92 30.1 3.57 32.29C5.32 31.94 7.23 31.41 9.04 31.15C17.22 30 26.72 33.12 33.03 38.3C36.59 41.22 40.3 44.9 44.42 47.02C48.4 49.07 52.27 50.54 56.7 51.16C59.3 51.53 62.39 51.18 64.88 50.53C77.14 47.33 85.42 39.95 88.06 27.28C88.66 24.39 89 21.46 87.79 18.63C85.37 12.95 78.5 8.42 73.18 5.8Z'/%3E%3Cpath d='M0.93 42.73C3.1 42.44 5.86 42.15 8.28 42.36C10.43 42.55 12.89 43.96 14.62 45.17C20.72 49.43 23.54 55.46 27.49 61.45C30.09 65.38 31.82 69.99 34.83 73.66C42.25 82.7 51.55 87.19 63.2 87.19C72.58 87.19 81.13 82.98 87.73 76.38C95.57 68.53 101.1 56.93 99.53 45.8C98.95 41.69 98.43 34.58 95.76 31.42C93.8 35.26 92.49 40 89.53 43.68C78.29 57.64 60.97 63.55 44.24 55.97C31.84 50.36 22.82 35.21 7.2 39.89C4.88 40.59 2.74 40.98 0.93 42.73Z'/%3E%3Cpath d='M0.23 52.2C-0.55 56.91 1.18 61.22 2.33 65.64C3.33 69.47 5.24 74 7.81 77.12C9.42 79.08 10.58 81.38 12.38 83.23C20.77 91.83 30.55 97.53 42.39 99.2C46.13 99.73 49.94 100.41 53.76 99.87C54.84 99.71 55.9 99.35 56.98 99.2C61.61 98.55 67.34 97.67 71.02 94.77C68.94 94.6 66.73 95.33 64.5 95.33C55.48 95.33 48.83 93.8 40.9 89.53C35.7 86.73 30.59 82.03 27.41 77.04C22.77 69.79 15.87 53.63 7.84 50.57C5.27 49.59 2.36 50.9 0.23 52.2Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-.5 -.5 101 101'%3E%3Cpath d='M10.63 19.03C12.14 19.16 13.32 18.57 14.89 18.35C18 17.91 21.78 17.43 24.94 17.88C26.61 18.11 28.3 18.18 29.97 18.41C30.66 18.51 31.25 18.98 31.95 19.07C40.65 20.3 46.78 24.28 55.49 20.03C58.66 18.48 61.03 15.65 62.52 12.53C63.95 9.55 65.42 5.33 64.32 2.15C62.22 1.37 60.09 1.23 57.91 0.73C43.55 -2.51 28.35 2.79 17.25 11.91C14.82 13.9 12.15 16.39 10.63 19.03Z'/%3E%3Cpath d='M73.18 5.8C72.27 7.37 72.48 8.99 71.9 10.69C70.38 15.14 68.54 19.25 65.15 22.65C58.63 29.16 50.35 30.84 41.45 29.55C40.77 29.45 40.18 28.99 39.47 28.89C34.02 28.12 28.85 26.08 23.27 25.75C19.07 25.5 14.82 26.67 10.93 27.95C8.42 28.78 4.92 30.1 3.57 32.29C5.32 31.94 7.23 31.41 9.04 31.15C17.22 30 26.72 33.12 33.03 38.3C36.59 41.22 40.3 44.9 44.42 47.02C48.4 49.07 52.27 50.54 56.7 51.16C59.3 51.53 62.39 51.18 64.88 50.53C77.14 47.33 85.42 39.95 88.06 27.28C88.66 24.39 89 21.46 87.79 18.63C85.37 12.95 78.5 8.42 73.18 5.8Z'/%3E%3Cpath d='M0.93 42.73C3.1 42.44 5.86 42.15 8.28 42.36C10.43 42.55 12.89 43.96 14.62 45.17C20.72 49.43 23.54 55.46 27.49 61.45C30.09 65.38 31.82 69.99 34.83 73.66C42.25 82.7 51.55 87.19 63.2 87.19C72.58 87.19 81.13 82.98 87.73 76.38C95.57 68.53 101.1 56.93 99.53 45.8C98.95 41.69 98.43 34.58 95.76 31.42C93.8 35.26 92.49 40 89.53 43.68C78.29 57.64 60.97 63.55 44.24 55.97C31.84 50.36 22.82 35.21 7.2 39.89C4.88 40.59 2.74 40.98 0.93 42.73Z'/%3E%3Cpath d='M0.23 52.2C-0.55 56.91 1.18 61.22 2.33 65.64C3.33 69.47 5.24 74 7.81 77.12C9.42 79.08 10.58 81.38 12.38 83.23C20.77 91.83 30.55 97.53 42.39 99.2C46.13 99.73 49.94 100.41 53.76 99.87C54.84 99.71 55.9 99.35 56.98 99.2C61.61 98.55 67.34 97.67 71.02 94.77C68.94 94.6 66.73 95.33 64.5 95.33C55.48 95.33 48.83 93.8 40.9 89.53C35.7 86.73 30.59 82.03 27.41 77.04C22.77 69.79 15.87 53.63 7.84 50.57C5.27 49.59 2.36 50.9 0.23 52.2Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+  .mkc b { position: absolute; inset: -30%; opacity: .7; animation: mkflow 16s ease-in-out infinite alternate;
+    background: radial-gradient(22% 22% at 35% 22%, #b4d8f7, rgba(180,216,247,0) 70%), radial-gradient(18% 18% at 70% 27%, rgba(217,138,82,.6), rgba(217,138,82,0) 70%), radial-gradient(26% 26% at 80% 45%, #2c56b8, rgba(44,86,184,0) 70%), radial-gradient(22% 22% at 54% 62%, #c25cb6, rgba(194,92,182,0) 70%), radial-gradient(30% 30% at 22% 78%, #3a2a96, rgba(58,42,150,0) 70%), radial-gradient(18% 18% at 70% 78%, rgba(208,112,52,.8), rgba(208,112,52,0) 70%), radial-gradient(16% 16% at 68% 82%, rgba(31,122,98,.6), rgba(31,122,98,0) 70%), linear-gradient(160deg, #9cc6f0 12%, #6f8ae0 34%, #8e48a8 60%, #22185e 88%); }
+  .mkc::after { content: ""; position: absolute; inset: 0; opacity: .3; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  @keyframes mkflow { 0% { transform: translate(-6%, 5%) rotate(-10deg); } 50% { transform: translate(6%, -4%) rotate(12deg) scale(1.06); } 100% { transform: translate(-3%, -7%) rotate(26deg); } }
+  @media (prefers-reduced-motion: reduce) { .mkc { display: none; } }
   /* the frame: contents and chapters */
   .bm-wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; width: min(1180px, 100% - 48px); margin: 0 auto; padding: 24px 0 140px; }
   .bm-wrap > * { min-width: 0; }
@@ -1338,9 +1353,9 @@
   .bm-tok th, .bm-tok td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } .bm-tok th { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mut); }
   .bm-src { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; color: var(--mut); }
   /* the tab that switches between the site and the guide */
-  .bm-tab { position: fixed; left: 20px; bottom: 22px; z-index: 95; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(20,20,22,.82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
-  .bm-tab button { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.8); transition: background .25s, color .25s; }
-  .bm-tab button[aria-pressed="true"] { background: #fff; color: #111; }
+  .bm-tab { position: fixed; left: 20px; bottom: 22px; z-index: 95; display: flex; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(28,28,30,.78); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
+  .bm-tab button { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #fff; transition: background .25s, color .25s; }
+  .bm-tab button[aria-pressed="true"] { background: #fff; color: #111; } .bm-tab button[aria-pressed="false"]:hover { background: rgba(255,255,255,.12); }
   @media (max-width: 1100px) { .bm-comp, .bm-apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-apps .tall { grid-row: auto; } .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 900px) {
     .bm-wrap { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
@@ -1351,7 +1366,7 @@
     .bm-anat, .bm-igrow, .bm-grid, .bm-grid.c3, .bm-specs, .bm-dd, .bm-pair, .bm-voice > div, .bm-motion, .bm-spark, .bm-aa, .bm-portal .bd { grid-template-columns: 1fr; }
     .bm-grid.c4, .bm-orbs, .bm-sw, .bm-dont, .bm-cp, .bm-dl, .bm-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bm-strip > div { height: 96px; } .bm-portal .o { min-height: 160px; }
-    .bm-cover .bm-orb.xl { top: 6%; right: -30%; width: 90vw; translate: none; opacity: .9; } .bm-cover > div { align-content: end; }
+    .bm-cover .bm-orb.xl { top: 8%; right: 24px; width: 34vw; translate: none; } .bm-cover > div { align-content: end; }
     .bm-apps { grid-template-columns: 1fr; } .bm-apps .wide { grid-column: auto; }
     .bm-specs > div { grid-template-columns: 110px 1fr; } .bm-dur div { grid-template-columns: 110px 1fr 54px; }
     .bm-tab { bottom: 84px; left: 12px; }
@@ -1629,7 +1644,7 @@
   .rw-steps { display: grid; gap: 22px; margin: 26px 0 32px; }
   .rw-steps h3 { font-size: 1.1rem; margin-bottom: 4px; } .split .rw-steps p { margin: 0; font-size: 1rem; }
   @media (max-width: 900px) { .sec.rw .split { grid-template-columns: 1fr; gap: 48px; } .sec.rw .split > :first-child { order: 2; } }
-  /* technology and people: the AI answer floats at the top of the photo, the account manager sits at the bottom */
+  /* technology and people: the AI answer and the account manager stack at the foot of the photo, under her face */
   .hp .hp-ai { position: absolute; z-index: 2; left: 16px; right: 16px; top: 16px; border-radius: 18px; padding: 12px 14px; display: grid; gap: 10px; font-size: .86rem; }
   .hp-q { justify-self: end; max-width: 85%; padding: 8px 12px; border-radius: 14px 14px 4px 14px; background: #1f1f1f; color: #fff; font-weight: 500; }
   .hp-a { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; } .hp-a .ob { width: 22px; height: 22px; flex: none; margin-top: 1px; }
@@ -1638,7 +1653,8 @@
   .pic .chip b.hp-call { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #1f1f1f; color: #fff; } .hp-call svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
   .hp-two { display: grid; gap: 22px; margin: 26px 0 32px; } .hp-two h3 { font-size: 1.1rem; margin-bottom: 4px; } .split .hp-two p { margin: 0; font-size: 1rem; }
   @media (max-width: 900px) { .hp .split { grid-template-columns: 1fr; gap: 48px; } .hp .pic { margin-inline: auto; width: 100%; } }
-  @media (max-width: 560px) { .hp .pic { aspect-ratio: 1 / 1.2; } .hp .hp-ai { top: auto; bottom: 90px; } }
+  .hp .pic .img { background-position: 100% 50%; } .hp .hp-ai { top: auto; bottom: 90px; }
+  @media (max-width: 560px) { .hp .pic { aspect-ratio: 1 / 1.2; } }
   .split > * { min-width: 0; } #calc { overflow-x: clip; } @media (max-width: 560px) { .calc { padding: 18px; } .cpanel { padding: 20px; } .cres b { font-size: 1.6rem; } }
   .cbars { grid-column: 1 / -1; display: grid; gap: 8px; margin-top: 8px; font-size: .8rem; } .cbars div { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; }
   .cbars i { height: 12px; border-radius: 99px; background: rgba(255,255,255,.35); width: var(--w, 0%); transition: width .5s var(--ease); } .cbars div:last-child i { background: #fff; }
@@ -2131,11 +2147,11 @@
 
 
 
-  <!-- 5b. grey: technology when you want it, people when you need it. The account manager's photo with the AI answer above and the person below (the question and answer are illustrative) -->
+  <!-- 5b. grey: technology when you want it, people when you need it. An account manager smiling on a call, his team behind him (supplied photo, licence to confirm), her face clear at the top, the AI answer stacked above the account manager chip (the question and answer are illustrative) -->
   <section class="sec grey hp" id="people" aria-labelledby="hpH">
     <div class="wrap split">
       <div class="pic rise" aria-hidden="true">
-        <div class="img" style="--img:url(img/manager-office.jpg); background-position: 50% 30%"></div>
+        <div class="img" style="--img:url(img/people-callcentre.jpg)"></div>
         <div class="hp-ai mgl"><span class="hp-q">Which trucks filled more than usual this week?</span><span class="hp-a"><i class="ob ob-blue"></i><span>Truck 07 and Truck 12. Both filled 18% above their average.</span></span></div>
         <div class="chip mgl hp-am"><i class="hp-av">AM</i><span>Your account manager<small>Knows your trucks and routes</small></span><b class="hp-call"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></b></div>
       </div>
@@ -2442,9 +2458,9 @@
 </nav>
 <!-- the brand guide: a second view of this page (the Site / Brand guide tab, or #brand) -->
 <div class="bm" id="bmGuide" hidden>
-  <div class="bm-top"><svg aria-label="TFN"><use href="#logo"/></svg><span>Brand guidelines</span><span class="grow"></span><button type="button" class="bm-dm" id="bmDm" aria-label="Switch the guide to dark" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><a href="#bm-downloads">Download assets</a></div>
+  <div class="bm-top"><svg class="lk" aria-label="TFN"><use href="#lockup"/></svg><span>Brand guidelines</span><span class="grow"></span><button type="button" class="bm-dm" id="bmDm" aria-label="Switch the guide to dark" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><a href="#bm-downloads">Download assets</a></div>
   <header class="bm-cover" id="bmCover">
-    <span class="bm-orb diesel xl" aria-hidden="true"></span>
+    <span class="bm-orb xl mk" aria-hidden="true"><svg><use href="#tfn-mark"/></svg><i class="mkc"><b></b><i class="ocl a"></i><i class="ocl b"></i></i></span>
     <div>
       <p class="lbl">Brand guidelines · 2026</p>
       <svg class="wm" aria-label="TFN"><use href="#logo"/></svg>
@@ -2971,6 +2987,10 @@
     var a = document.getElementById('bmAnat'); if (a) { var r = a.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) a.querySelector('.ph').style.setProperty('--py', ((r.top + r.height / 2 - innerHeight / 2) * -0.06).toFixed(1) + 'px'); }
   }
   if (!reduce) addEventListener('scroll', function () { requestAnimationFrame(scrub); }, { passive: true });
+  /* the bar is dark while it sits over the cover (unless the whole guide is already dark) */
+  var top = g.querySelector('.bm-top');
+  function bar() { top.classList.toggle('oc', !g.classList.contains('dark') && cover.getBoundingClientRect().bottom > top.offsetHeight); }
+  addEventListener('scroll', bar, { passive: true }); new MutationObserver(bar).observe(g, { attributes: true, attributeFilter: ['hidden', 'class'] }); bar();
 
   /* chapters light up as they arrive; the anatomy callouts draw in one by one */
   [].forEach.call(g.querySelectorAll('#bmAnat .cl'), function (c, i) { c.style.setProperty('--d', (i * .18 + .1) + 's'); });
@@ -3416,7 +3436,7 @@
     [5, 8, 56, -140, 'silver', 5.8, 30, -.8, .5], [30, 97, 62, -80, 'silver', 6.4, -26, -4.2, .58], [74, -4, 50, -200, 'silver', 6.2, -16, -1.9, .66]]);
 
   /* cloud layers inside the big CSS orbs (see .ocl) */
-  document.querySelectorAll('.bm-orb:not(.sm):not(.bad), .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
+  document.querySelectorAll('.bm-orb:not(.sm):not(.bad):not(.mk), .nm-peek .ob').forEach(function (o) { if (!o.querySelector('.ocl')) o.insertAdjacentHTML('afterbegin', '<i class="ocl a" aria-hidden="true"></i><i class="ocl b" aria-hidden="true"></i>'); });
   /* the orbs: each a smooth blend of five soft colours drifting slowly under a light grain, with only a hint of shading */
   var ITEMS = [
     ['Diesel', 'Fill up on credit at every TFN truck stop.', 'tfn-on-road.html', ['#3d68c0', '#1f2f80', '#4a35a6', '#b8622e', '#8db8e6']],
