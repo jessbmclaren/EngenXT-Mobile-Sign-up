@@ -1353,8 +1353,9 @@
   .bm-src { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13px; color: var(--mut); }
   /* the tab that switches between the site and the guide */
   .bm-tab { position: fixed; left: 20px; bottom: 22px; z-index: 95; display: flex; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(28,28,30,.78); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
-  .bm-tab button { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #fff; transition: background .25s, color .25s; }
-  .bm-tab button[aria-pressed="true"] { background: #fff; color: #111; } .bm-tab button[aria-pressed="false"]:hover { background: rgba(255,255,255,.12); }
+  .bm-tab button, .bm-tab a { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #fff; transition: background .25s, color .25s; }
+  .bm-tab button[aria-pressed="true"] { background: #fff; color: #111; } .bm-tab button[aria-pressed="false"]:hover, .bm-tab a:hover { background: rgba(255,255,255,.12); }
+  @media (max-width: 1160px) { .bm-tab { bottom: 84px; } } /* three views make it wide enough to meet the dock */
   @media (max-width: 1100px) { .bm-comp, .bm-apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bm-apps .tall { grid-row: auto; } .bm-wts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 900px) {
     .bm-wrap { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
@@ -1922,7 +1923,7 @@
         <a class="btn" href="#fam">See all products</a>
       </div>
       <ul class="zh-row" aria-label="Products">
-        <li class="zc" data-at="-2"><a href="tfn-credit.html"><i class="zc-ph" style="--img:url(img/save-violet.jpg);--pos:62% 40%" aria-hidden="true"></i><span class="zc-mid"><small>Saved with Treasury</small><b>R 48,200</b><span class="zc-pill">Credit products</span></span><span class="zc-chip"><i class="ob ob-violet" aria-hidden="true"></i><span>Invoice factored<small>Fee saved today</small></span><em>+R 6,400</em></span></a></li>
+        <li class="zc" data-at="-2"><a href="tfn-credit.html"><i class="zc-ph" style="--img:url(img/manager-warehouse.jpg);--pos:50% 100%" aria-hidden="true"></i><span class="zc-mid"><small>Saved with Treasury</small><b>R 48,200</b><span class="zc-pill">Credit products</span></span><span class="zc-chip"><i class="ob ob-violet" aria-hidden="true"></i><span>Invoice factored<small>Fee saved today</small></span><em>+R 6,400</em></span></a></li>
         <li class="zc" data-at="-1"><a href="tfn-africa.html"><i class="zc-ph" style="--img:url(img/k-namibia.jpg);--pos:46% 50%" aria-hidden="true"></i><span class="zc-mid"><small>Saved with Cross Border</small><b>R 12,840</b><span class="zc-pill">Tolls and parking</span></span><span class="zc-chip"><i class="ob ob-teal" aria-hidden="true"></i><span>Fuel in Windhoek<small>Below the pump price</small></span><em>+R 1,120</em></span></a></li>
         <li class="zc zc-main" data-at="0"><a href="tfn-on-road.html"><i class="zc-map" aria-hidden="true"><span class="hnmap"><svg viewBox="0 0 375 450"></svg><span class="hnlab"></span></span></i><span class="zc-mid"><small>Saved on fuel this month</small><b>R 24,680</b><span class="zc-pill">Fill up at Harrismith</span></span><span class="zc-tags"><span><b>270+</b>truck stops</span><span><b>Every fill</b>logged live</span></span></a></li>
         <li class="zc" data-at="1"><a href="tfn-risk.html"><i class="zc-ph" style="--img:url(img/driver-docs.jpg);--pos:72% 40%" aria-hidden="true"></i><span class="zc-mid"><small>Saved on cover this year</small><b>R 18,600</b><span class="zc-pill">GIT insurance</span></span><span class="zc-chip"><i class="ob ob-blue" aria-hidden="true"></i><span>Load covered<small>Durban to Gauteng</small></span><em>Active</em></span></a></li>
@@ -2885,7 +2886,7 @@
   </div>
 </div>
 <div class="bm-toast" id="bmToast" role="status" aria-live="polite"></div>
-<div class="bm-tab" role="group" aria-label="View"><button type="button" data-v="site" aria-pressed="true">Site</button><button type="button" data-v="guide" aria-pressed="false">Brand guide</button></div>
+<div class="bm-tab" role="group" aria-label="View"><button type="button" data-v="site" aria-pressed="true">Site</button><button type="button" data-v="guide" aria-pressed="false">Brand guide</button><a href="lcv-site.html">LCV site</a></div>
 <script>
 /* Site / Brand guide: one page, two views; #brand (or any #bm- address) opens the guide; the site keeps its scroll position */
 (function () {

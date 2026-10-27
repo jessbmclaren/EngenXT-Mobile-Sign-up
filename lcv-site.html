@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en-ZA" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EngenXT by TFN | Rules, not bank cards</title>
+<meta name="description" content="EngenXT is a rules engine with a driver app. Set fuel rules for every driver and vehicle. Drivers ask in the app and pay with a QR code at the Engen till.">
+<link rel="icon" href="tfn-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&display=swap" rel="stylesheet">
+<!-- light by default; dark is the visitor's choice and shares the product pages' key, so the mode follows them between pages -->
+<script>(function(){var t;try{t=localStorage.getItem("tfn-theme")}catch(e){}var r=document.documentElement;r.dataset.theme=t==="dark"?"dark":"light";r.classList.add("js")})()</script>
+<style>
+  /* EngenXT, the LCV site: TFN type and pills, one LCV purple, a studio render in the hero */
+  :root {
+    --sans: "Aeonik Pro", "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bg: #ffffff; --soft: #f7f7f8; --soft-2: #efeff2; --text: #1f1f1f; --muted: rgba(31,31,31,.64); --label: rgba(31,31,31,.8); --line: #e6e6ea;
+    --btn: #1f1f1f; --btn-ink: #ffffff; --off: #d7d7db; --off-ink: #ffffff;
+    /* LCV purple: #8a3a8c, deepening to #5f2766 */
+    --acc: #8a3a8c; --acc-deep: #5f2766; --lilac: #f3e6f5; --lilac-ink: #6d2a70;
+    --hero-wash: radial-gradient(120% 90% at 0% 100%, #eeeef1 0%, rgba(238,238,241,0) 60%);
+    color-scheme: light;
+  }
+  html[data-theme="dark"] {
+    --bg: #0b0a0f; --soft: #16141b; --soft-2: #1e1b24; --text: #f5f5f7; --muted: rgba(245,245,247,.62); --label: rgba(245,245,247,.8); --line: #27242e;
+    --btn: #ffffff; --btn-ink: #111111; --off: #2a2731; --off-ink: #77747f;
+    --acc: #d49ad6; --acc-deep: #a35ba6; --lilac: rgba(212,154,214,.16); --lilac-ink: #f0c9f1;
+    --hero-wash: radial-gradient(120% 90% at 0% 100%, #17151d 0%, rgba(23,21,29,0) 60%);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: var(--sans); color: var(--text); background: var(--bg); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; color: inherit; }
+  button { border: 0; background: none; cursor: pointer; }
+  ul, ol { list-style: none; padding: 0; }
+  img { display: block; max-width: 100%; }
+  svg { flex: none; }
+  :focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: 10px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip { position: absolute; left: 16px; top: -60px; z-index: 100; padding: 10px 16px; border-radius: 999px; background: var(--btn); color: var(--btn-ink); }
+  .skip:focus { top: 12px; }
+  .wrap { width: min(1000px, 100% - 48px); margin-inline: auto; }
+  .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  h1, h2, h3 { font-weight: 500; }
+  h2 { font-size: clamp(2.2rem, 3.6vw, 3.25rem); line-height: 1; letter-spacing: -.6px; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 24px; border-radius: 9999px; background: var(--btn); color: var(--btn-ink); font-weight: 500; white-space: nowrap; transition: opacity .2s; }
+  .pill:hover { opacity: .86; }
+  .pill.inv { background: #fff; color: #1f1f1f; }
+
+  /* ---------- nav ---------- */
+  .nav { position: sticky; top: 0; z-index: 50; background: var(--bg); transition: background .3s; }
+  .nav .wrap { display: flex; align-items: center; height: 72px; gap: 16px; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; margin-right: 34px; }
+  .brand svg { width: 28px; height: 28px; }
+  .brand b { font-size: 1.3rem; font-weight: 700; letter-spacing: -.03em; }
+  .brand b span { color: var(--acc); }
+  .links { display: flex; gap: 2px; }
+  .links a { padding: 8px 20px; border-radius: 50px; font-weight: 500; transition: background .2s; }
+  .links a:hover { background: var(--soft); }
+  .grow { flex: 1; }
+  .tbtn { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; transition: background .2s; }
+  .tbtn:hover { background: var(--soft); }
+  .tbtn .sun, html[data-theme="dark"] .tbtn .moon { display: none; }
+  html[data-theme="dark"] .tbtn .sun { display: block; }
+  .menu-btn { display: none; }
+
+  /* ---------- hero: copy on the left, a studio render on the right ---------- */
+  .hero { position: relative; overflow: hidden; height: 100vh; min-height: 720px; max-height: 1000px; margin-top: -72px; background: var(--hero-wash), var(--bg); }
+  .hero .wrap { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; padding-top: 30px; }
+  .hcopy { max-width: 650px; }
+  .hlabel { font-size: 24px; line-height: 28px; font-weight: 500; letter-spacing: -.24px; color: var(--label); }
+  .hero h1 { margin-top: 24px; font-size: clamp(2.7rem, 4.05vw, 3.65rem); line-height: 1; letter-spacing: -1.2px; }
+  .hbody { margin-top: 42px; font-size: 18px; line-height: 24px; }
+  .hlegal { margin-top: 18px; font-size: 18px; line-height: 24px; }
+  .hlegal a { text-decoration: underline; text-underline-offset: 3px; }
+  .hform { margin-top: 64px; width: 385px; max-width: 100%; }
+  .hrow { display: flex; gap: 8px; }
+  .cc, .num { height: 52px; border-radius: 14px; background: var(--soft-2); display: flex; align-items: center; transition: background .3s, box-shadow .2s; }
+  .cc { flex: none; width: 104px; gap: 10px; padding: 0 14px; }
+  .cc .flag { width: 22px; height: 22px; border-radius: 50%; overflow: hidden; }
+  .num { flex: 1; min-width: 0; }
+  .num input { width: 100%; height: 100%; padding: 0 16px; border: 0; background: transparent; outline: 0; font-size: 16px; }
+  .num input::placeholder { color: var(--muted); }
+  .num:focus-within { box-shadow: 0 0 0 2px var(--acc); }
+  .hgo { width: 100%; height: 48px; margin-top: 24px; border-radius: 9999px; background: var(--btn); color: var(--btn-ink); font-size: 16px; letter-spacing: -.16px; transition: background .25s, color .25s; }
+  .hgo:disabled { background: var(--off); color: var(--off-ink); cursor: default; }
+  .hdone { min-height: 24px; margin-top: 12px; font-size: 15px; color: var(--acc); }
+
+  /* the render: real 3D boxes under a camera that orbits once, then holds */
+  .stage { position: absolute; right: 0; bottom: 0; width: 760px; height: 900px; perspective: 1500px; perspective-origin: 36% 64%; transform-origin: 100% 100%; transform: scale(var(--k, 1)); pointer-events: none; }
+  .world { position: absolute; left: 335px; top: 430px; transform-style: preserve-3d; transform: translate3d(0, 0, 0) rotateY(-22deg); }
+  .bx { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+  .bx > i { position: absolute; display: block; backface-visibility: hidden; }
+  .bx > .fr, .bx > .bk { left: calc(var(--w) / -2); width: var(--w); height: var(--h); }
+  .bx > .fr { transform: translateZ(calc(var(--d) / 2)); }
+  .bx > .bk { transform: rotateY(180deg) translateZ(calc(var(--d) / 2)); }
+  .bx > .rt, .bx > .lt { left: calc(var(--d) / -2); width: var(--d); height: var(--h); }
+  .bx > .rt { transform: rotateY(90deg) translateZ(calc(var(--w) / 2)); }
+  .bx > .lt { transform: rotateY(-90deg) translateZ(calc(var(--w) / 2)); }
+  .bx > .tp { left: calc(var(--w) / -2); top: calc(var(--d) / -2); width: var(--w); height: var(--d); transform: rotateX(90deg); }
+
+  /* the pedestal: a ribbed steel front, a smooth polished side, a bright top edge */
+  .ped { --w: 225px; --h: 760px; --d: 300px; }
+  .ped > i { background: linear-gradient(180deg, #cdcdd1 0%, #b3b3b8 30%, #9a9a9f 62%, #85858a 100%); }
+  .ped > .fr { background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.7) 0 1px, rgba(255,255,255,.12) 1px 3px, rgba(0,0,0,.38) 3px 4px, rgba(0,0,0,.1) 4px 6px),
+      linear-gradient(90deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,0) 45%, rgba(255,255,255,.14) 100%),
+      linear-gradient(180deg, #c6c6ca 0%, #a9a9ae 24%, #87878c 52%, #64646a 82%, #56565b 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.95), inset -2px 0 0 rgba(255,255,255,.85); }
+  .ped > .rt { background:
+      linear-gradient(160deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 58%, rgba(255,255,255,.12) 66%, rgba(255,255,255,0) 76%),
+      linear-gradient(180deg, #dcdcdf 0%, #a4a4a9 12%, #5d5d62 32%, #2f2f33 56%, #18181a 80%, #101012 100%);
+    box-shadow: inset 2px 0 0 rgba(255,255,255,.7), inset 0 2px 0 rgba(255,255,255,.85); }
+  .ped > .lt { background: #5e5e63; }
+  html[data-theme="dark"] .ped > i { filter: brightness(.74); }
+
+  /* the phone with the QR stands in the pedestal, where a card would be */
+  .phn { --w: 214px; --h: 440px; --d: 14px; transform: translate3d(-6px, -196px, -46px) rotateY(16deg) rotateZ(-5deg); }
+  .phn > .fr { border-radius: 30px; padding: 7px; background: #0c0b0f; box-shadow: inset 0 0 0 1.5px #3b3940; }
+  .phn > .rt, .phn > .lt { top: 28px; height: calc(var(--h) - 56px); background: linear-gradient(90deg, #2a282e, #545158 50%, #1b1a1e); }
+  .phn > .bk { border-radius: 30px; background: #1c1b20; }
+  .pscr { position: relative; height: 100%; overflow: hidden; border-radius: 24px; padding: 20px 18px; color: #fff;
+    background: linear-gradient(118deg, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 32%), linear-gradient(142deg, #f3d6f4 0%, #c98bd0 24%, #8a3a8c 56%, #4a1a55 100%); }
+  .pscr::after { content: ""; position: absolute; inset: 0; opacity: .35; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .pscr .pb { display: flex; justify-content: space-between; align-items: baseline; }
+  .pscr .pb b { font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+  .pscr .pb small { font-size: 9.5px; font-weight: 700; letter-spacing: .06em; opacity: .92; }
+  .pscr .pq { width: 128px; height: 128px; margin: 26px auto 0; padding: 9px; border-radius: 14px; background: #fff; color: #1a1220; }
+  .pscr .pq svg { width: 100%; height: 100%; }
+  .pscr .pc { display: block; margin-top: 10px; text-align: center; font-size: 11.5px; font-weight: 500; opacity: .9; }
+
+  /* the wallet tile: a fuel pass lifted out of the phone, in frosted purple glass, standing in the pedestal */
+  .tile { --w: 280px; --h: 176px; --d: 6px; transform: translate3d(-30px, -167px, -30px) rotateY(-20deg) rotateZ(-4deg); }
+  .tile > .fr { overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 18px 20px; border-radius: 18px; color: #fff;
+    border: 1px solid rgba(255,255,255,.75);
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 45%),
+      linear-gradient(118deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 62%, rgba(255,255,255,.18) 63%, rgba(255,255,255,0) 72%),
+      linear-gradient(135deg, rgba(240,201,241,.88) 0%, rgba(194,127,196,.78) 28%, rgba(138,58,140,.84) 62%, rgba(74,26,85,.94) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 1px 0 0 rgba(255,255,255,.6), inset 0 -14px 28px rgba(46,12,54,.3); }
+  .tile > .fr::after { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: .3; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .tile > .bk { border-radius: 18px; background: linear-gradient(135deg, rgba(201,139,208,.55), rgba(74,26,85,.7)); }
+  .tile > .lt, .tile > .rt { top: 14px; height: calc(var(--h) - 28px); background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(214,180,222,.6)); }
+  .tile > .tp { left: calc(var(--w) / -2 + 14px); width: calc(var(--w) - 28px); background: rgba(255,255,255,.9); }
+  .tile .tb { display: flex; justify-content: space-between; align-items: baseline; text-shadow: 0 1px 8px rgba(60,10,70,.25); }
+  .tile .tb b { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
+  .tile .tb small { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; opacity: .9; }
+  .tile .tm { display: flex; justify-content: space-between; align-items: flex-end; }
+  .tile .tw b { display: block; font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+  .tile .tw small { font-size: 10.5px; opacity: .85; }
+  .tile .tq { width: 58px; height: 58px; padding: 5px; border-radius: 10px; background: rgba(255,255,255,.92); color: #1a1220; box-shadow: 0 4px 12px rgba(46,12,54,.25); }
+  .tile .tq svg { display: block; width: 100%; height: 100%; }
+
+  /* the till: a handheld card terminal. Graphite body, three sensor dots, a glossy screen, nav keys, a ribbed key on its side */
+  .trm { --w: 270px; --h: 470px; --d: 34px; transform: translate3d(262px, -227px, -60px) rotateY(24deg) rotateZ(3deg); }
+  .trm > .fr { border-radius: 38px; padding: 44px 14px 58px; background: linear-gradient(160deg, #3c3c41 0%, #252528 26%, #19191b 60%, #121214 100%); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.14), inset 2px 2px 0 rgba(255,255,255,.1); }
+  .trm > .fr::before { content: ""; position: absolute; left: 24px; top: 18px; width: 54px; height: 12px; background:
+      radial-gradient(circle 5.5px at 6px 6px, #0a0a0c 80%, #2c2c30 100%) 0 0 / 12px 12px no-repeat,
+      radial-gradient(circle 3.5px at 4px 4px, #0a0a0c 80%, #2c2c30 100%) 22px 2px / 8px 8px no-repeat,
+      radial-gradient(circle 3.5px at 4px 4px, #0a0a0c 80%, #2c2c30 100%) 38px 2px / 8px 8px no-repeat; }
+  .trm > .lt { top: 34px; height: calc(var(--h) - 68px); background:
+      linear-gradient(#0a0a0c, #0a0a0c) 50% 22px / 9px 96px no-repeat,
+      linear-gradient(#0a0a0c, #0a0a0c) 50% 150px / 11px 7px no-repeat,
+      linear-gradient(#0a0a0c, #0a0a0c) 50% 162px / 11px 7px no-repeat,
+      repeating-linear-gradient(180deg, #55555b 0 2px, #1d1d20 2px 4px) 50% 196px / 14px 74px no-repeat,
+      linear-gradient(90deg, #121214, #3a3a3f 50%, #18181a); border-radius: 6px; }
+  .trm > .rt { top: 34px; height: calc(var(--h) - 68px); background: linear-gradient(90deg, #18181a, #2c2c30); }
+  .trm > .tp { left: calc(var(--w) / -2 + 34px); width: calc(var(--w) - 68px); background: linear-gradient(90deg, #2a2a2e, #444449 50%, #2a2a2e); }
+  .trm > .bk { border-radius: 38px; background: #141416; }
+  .tscr { position: relative; height: 100%; overflow: hidden; border-radius: 22px; color: #fff;
+    background: linear-gradient(118deg, rgba(255,255,255,0) 52%, rgba(255,255,255,.06) 53%, rgba(255,255,255,0) 74%), linear-gradient(160deg, #1d1d23 0%, #0c0c10 45%, #050507 100%); }
+  .tscr .arcs { position: absolute; right: -96px; top: -118px; width: 330px; height: 330px; opacity: 0; filter: blur(3px) drop-shadow(0 0 8px rgba(150,80,175,.7)); }
+  .tscr .th { position: absolute; left: 18px; right: 18px; top: 30px; display: flex; align-items: center; opacity: 0; }
+  .tscr .th .ic { width: 16px; height: 16px; stroke-width: 2.4; }
+  .tscr .th b { margin-left: auto; margin-right: auto; padding-right: 16px; font-size: 19px; font-weight: 700; letter-spacing: -.03em; }
+  .tscr .tv { position: absolute; left: 0; right: 0; top: 46%; text-align: center; opacity: 0; }
+  .tscr .tv b { display: block; font-size: 40px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .tscr .tv small { display: block; margin-top: 10px; font-size: 13px; color: #8e8e95; }
+  .tnav { position: absolute; left: 0; right: 0; bottom: 20px; display: flex; justify-content: space-around; padding: 0 40px; }
+  .tnav svg { width: 16px; height: 16px; fill: none; stroke: #6c6c72; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* frosted acrylic, thick walled and open at the top, tinted purple low on the front; the till stands on a steel base inside */
+  .gls { --w: 420px; --h: 360px; --d: 330px; transform: translate3d(367px, 218px, 30px); }
+  .gls > i { border-radius: 16px; border: 2px solid rgba(255,255,255,.9); border-top: 16px solid rgba(238,238,244,.82);
+    background: linear-gradient(200deg, rgba(228,228,236,.5) 0%, rgba(196,194,210,.36) 45%, rgba(130,100,186,.5) 100%);
+    box-shadow: inset 0 0 0 9px rgba(255,255,255,.3), inset 0 18px 30px -12px rgba(255,255,255,.65), inset 0 -40px 60px -30px rgba(96,64,150,.35); }
+  .gls > .rt { background: linear-gradient(180deg, rgba(214,212,224,.5), rgba(128,112,160,.5)); }
+  .gls > .tp { background: transparent; border: 20px solid rgba(240,240,245,.88); border-radius: 18px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.95), 0 0 0 1.5px rgba(255,255,255,.95), inset 0 0 0 40px rgba(120,120,128,.35); }
+  .dock { --w: 360px; --h: 330px; --d: 270px; transform: translate3d(367px, 248px, 30px); }
+  .dock > i { background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.05) 1px 3px), linear-gradient(180deg, #a9a9ae 0%, #7b7b80 40%, #4a4a4f 100%); }
+  .dock > .tp { background: linear-gradient(180deg, #8d8d92, #6a6a6f); }
+  html[data-theme="dark"] .gls > i { background: linear-gradient(200deg, rgba(150,148,160,.5) 0%, rgba(110,106,124,.45) 45%, rgba(92,64,140,.55) 100%); border-color: rgba(255,255,255,.5); }
+  html[data-theme="dark"] .gls > .tp { background: transparent; border-color: rgba(170,168,182,.6); }
+
+  /* one five-second take: the camera orbits and lifts, the phone settles, the till wakes */
+  .hero.go .world { animation: cam 5s cubic-bezier(.45, 0, .2, 1) both; }
+  .hero.go .tile { animation: sink 5s cubic-bezier(.45, 0, .2, 1) both; }
+  .hero.go .tscr .arcs { animation: lit .65s ease-out .25s both; }
+  .hero.go .tscr .th, .hero.go .tscr .tv { animation: lit .7s ease-out .8s both; }
+  .hero.still .tscr .arcs, .hero.still .tscr .th, .hero.still .tscr .tv { opacity: 1; }
+  @keyframes cam { from { transform: translate3d(-12px, 72px, 0) rotateY(-12deg); } to { transform: translate3d(0, 0, 0) rotateY(-22deg); } }
+  @keyframes sink { from { transform: translate3d(-30px, -209px, -30px) rotateY(-20deg) rotateZ(-4deg); } to { transform: translate3d(-30px, -167px, -30px) rotateY(-20deg) rotateZ(-4deg); } }
+  @keyframes lit { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ---------- three cards ---------- */
+  .sec { padding: 120px 0; }
+  .center { text-align: center; }
+  .lead { max-width: 560px; margin: 24px auto 0; font-size: 16px; color: var(--muted); }
+  .sec .pill { margin-top: 32px; }
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 72px; text-align: left; }
+  .cards3 li { padding: 24px; border-radius: 20px; background: var(--soft); transition: background .3s; }
+  .cards3 .ic { width: 22px; height: 22px; }
+  .cards3 h3 { margin-top: 18px; font-size: 18px; line-height: 24px; }
+  .cards3 p { margin-top: 10px; font-size: 14px; color: var(--muted); }
+
+  /* ---------- full-bleed photo with a floating screen ---------- */
+  .bleed { position: relative; height: 900px; overflow: hidden; color: #fff; background: #111; }
+  .bleed .bg { position: absolute; left: 0; right: 0; top: -150px; height: calc(100% + 300px); will-change: transform; }
+  .bleed .bg img { width: 100%; height: 100%; object-fit: cover; }
+  .bleed::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.28) 42%, rgba(0,0,0,.12) 70%, rgba(0,0,0,.3) 100%); }
+  .bleed .copy { position: relative; z-index: 2; padding-top: 64px; text-align: center; }
+  .fadein { opacity: 0; transition: opacity .3s ease-in-out; }
+  .fadein.on { opacity: 1; }
+  .bleed h2 { max-width: 820px; margin-inline: auto; }
+  .bleed .copy p { max-width: 560px; margin: 24px auto 0; font-size: 16px; color: rgba(255,255,255,.86); }
+  .bleed .copy .fine { margin-top: 14px; font-size: 12px; color: rgba(255,255,255,.62); }
+  .bleed .pill { margin-top: 28px; }
+  .float { position: absolute; z-index: 2; left: 50%; top: 456px; width: 300px; height: 380px; margin-left: -150px; padding: 26px 18px; border-radius: 36px; border: 1.5px solid rgba(255,255,255,.55); background: rgba(14,12,18,.38); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); text-align: center; }
+  .float small { display: block; font-size: 12px; color: rgba(255,255,255,.72); }
+  .float b { display: block; margin-top: 6px; font-size: 40px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .float .chip { display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; padding: 5px 12px; border-radius: 99px; background: #fff; color: #1f1f1f; font-size: 12px; font-weight: 500; }
+  .float .chip .ic { width: 13px; height: 13px; stroke-width: 2.4; }
+  .float .row { position: absolute; left: 14px; right: 14px; bottom: 26px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: #fff; color: #1f1f1f; text-align: left; font-size: 13px; }
+  .float .row svg { width: 28px; height: 28px; }
+  .float .row span { flex: 1; line-height: 1.25; font-weight: 500; }
+  .float .row span small { color: rgba(31,31,31,.6); font-size: 11px; }
+  .float .row em { font-style: normal; font-weight: 500; font-size: 12px; color: rgba(31,31,31,.6); }
+
+  /* ---------- split sections ---------- */
+  .split { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 56px; min-height: 810px; }
+  .split .txt h2 { font-size: clamp(2rem, 3.3vw, 3rem); line-height: 1.05; }
+  .split .txt p { margin-top: 24px; font-size: 16px; color: var(--muted); max-width: 440px; }
+  .split .txt p + p { margin-top: 14px; }
+  .split .txt a.u { text-decoration: underline; text-underline-offset: 3px; color: var(--text); }
+  .split .txt .pill { margin-top: 32px; }
+
+  .stack { width: 350px; margin-inline: auto; display: grid; gap: 10px; }
+  .stack > div { border-radius: 22px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; transition: background .3s, border-color .3s; }
+  .s-head { position: relative; height: 196px; padding: 18px; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; }
+  .s-head img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .s-head::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.6)); }
+  .s-head > * { position: relative; z-index: 2; }
+  .s-head svg.o { position: absolute; left: 16px; top: 16px; width: 30px; height: 30px; }
+  .s-head b { font-size: 24px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+  .s-head small { font-size: 13px; opacity: .85; }
+  .s-row { display: flex; align-items: center; gap: 12px; padding: 16px 18px; }
+  .s-row + .s-row { border-top: 1px solid var(--line); }
+  .s-row span { flex: 1; font-size: 15px; font-weight: 500; line-height: 1.3; }
+  .s-row span small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .s-btn { display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 99px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .s-btn.ink { background: var(--btn); color: var(--btn-ink); }
+  .s-btn.li { background: var(--lilac); color: var(--lilac-ink); }
+
+  /* the till scene: the same render kit, closer in */
+  .till { position: relative; height: 540px; border-radius: 24px; overflow: hidden; perspective: 1300px; perspective-origin: 50% 40%;
+    background: radial-gradient(80% 70% at 30% 20%, #ffffff 0%, #ececf0 55%, #d9d9de 100%); }
+  html[data-theme="dark"] .till { background: radial-gradient(80% 70% at 30% 20%, #26232c 0%, #16141b 60%, #0e0d12 100%); }
+  .till .world { left: 50%; top: 52%; transform: rotateX(8deg) rotateY(-26deg); }
+  .till .trm { transform: translate3d(70px, -300px, -60px) rotateY(18deg) rotateZ(2deg) scale(.86); }
+  .till .trm .tscr .arcs, .till .trm .tscr .th, .till .trm .tscr .tv { opacity: 1; }
+  .till .phn { transform: translate3d(-120px, -190px, 80px) rotateY(34deg) rotateZ(-10deg) rotateX(6deg) scale(.9); }
+  .till .floor { position: absolute; left: -300px; top: 230px; width: 700px; height: 500px; transform: rotateX(90deg); background: radial-gradient(closest-side, rgba(0,0,0,.18), transparent); }
+  .till .beam { position: absolute; left: -140px; top: -30px; width: 230px; height: 4px; border-radius: 4px; background: linear-gradient(90deg, transparent, #c98bd0, transparent); box-shadow: 0 0 18px 4px rgba(201,139,208,.6); transform: translate3d(-10px, 0, 96px) rotateY(34deg); animation: scan 2.6s ease-in-out infinite; }
+  @keyframes scan { 0%, 100% { top: -150px; opacity: 0; } 15% { opacity: 1; } 50% { top: 60px; opacity: 1; } 65% { opacity: 0; } }
+
+  /* ---------- black: the report on a phone lying flat ---------- */
+  .black { position: relative; height: 900px; overflow: hidden; background: #000; color: #fff; }
+  .black .copy { position: relative; z-index: 2; padding-top: 64px; text-align: center; }
+  .black .copy p { max-width: 560px; margin: 24px auto 0; font-size: 16px; color: rgba(255,255,255,.72); }
+  .black .pill { margin-top: 28px; }
+  .lay { position: absolute; left: 0; right: 0; top: -150px; height: calc(100% + 300px); perspective: 1100px; perspective-origin: 50% 0%; will-change: transform; }
+  .slab { position: absolute; left: 50%; top: 640px; width: 600px; height: 1000px; margin-left: -300px; border-radius: 90px; transform: rotateX(58deg); transform-style: preserve-3d; }
+  .slab::before { content: ""; position: absolute; inset: 0; border-radius: inherit; transform: translateZ(-22px); background: linear-gradient(90deg, #6d6d73, #e8e8ec 18%, #9a9aa0 50%, #f2f2f5 82%, #5e5e64); }
+  .slab .face { position: absolute; inset: 0; border-radius: inherit; padding: 16px; background: #1b1b1e; box-shadow: inset 0 0 0 2px #3a3a3f; }
+  .slab .glass { height: 100%; border-radius: 76px; background: #000; display: grid; justify-items: center; align-content: start; padding-top: 70px; }
+  .ring { position: relative; width: 380px; height: 380px; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ring div small { font-size: 22px; color: rgba(255,255,255,.7); }
+  .ring div b { font-size: 76px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+
+  /* ---------- three steps ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 72px; text-align: left; }
+  .steps li { min-height: 190px; padding: 24px; border-radius: 20px; background: var(--soft); transition: background .3s; }
+  .steps .n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.6px solid currentColor; font-size: 12px; font-weight: 600; }
+  .steps h3 { margin-top: 18px; font-size: 22px; line-height: 1.2; letter-spacing: -.01em; }
+  .steps p { margin-top: 16px; font-size: 13px; color: var(--muted); }
+
+  /* ---------- questions ---------- */
+  .faq-k { font-size: 16px; color: var(--muted); }
+  .faq h2 { margin-top: 16px; }
+  .qs { margin-top: 56px; text-align: left; }
+  .q { border-bottom: 1px solid var(--line); }
+  .q button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0; text-align: left; font-size: 16px; font-weight: 500; }
+  .q .qi { position: relative; width: 20px; height: 20px; border-radius: 50%; background: var(--text); flex: none; }
+  .q .qi::before, .q .qi::after { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 2px; margin: -1px 0 0 -5px; border-radius: 1px; background: var(--bg); }
+  .q .qi::after { transform: rotate(90deg); }
+  .q button[aria-expanded="true"] .qi::after { display: none; }
+  .q .a { padding: 0 64px 22px 0; font-size: 14px; color: var(--muted); }
+  .q .a p + p { margin-top: 12px; }
+  .q .a a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- black cards and footer ---------- */
+  .more { background: #000; color: #fff; padding: 96px 0 72px; }
+  .more ul { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .more li { grid-column: span 2; }
+  .more li:nth-child(4), .more li:nth-child(5) { grid-column: span 3; }
+  .more a { position: relative; display: flex; flex-direction: column; min-height: 200px; height: 100%; padding: 24px; border-radius: 24px; background: #161616; transition: background .2s; }
+  .more a:hover { background: #1f1f21; }
+  .more h3 { font-size: 20px; line-height: 1.2; }
+  .more em { margin-top: 4px; font-style: normal; font-size: 14px; color: rgba(255,255,255,.62); }
+  .more p { margin-top: 14px; padding-right: 30px; font-size: 13px; color: rgba(255,255,255,.62); }
+  .more a .ic { position: absolute; right: 22px; bottom: 22px; width: 20px; height: 20px; }
+  footer { background: #000; color: rgba(255,255,255,.62); padding: 24px 0 120px; font-size: 13px; }
+  footer .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; padding-top: 32px; border-top: 1px solid #1d1d1f; }
+  footer h4 { margin-bottom: 14px; color: #fff; font-size: 13px; font-weight: 600; }
+  footer li + li { margin-top: 10px; }
+  footer a:hover { color: #fff; }
+  footer .legal { margin-top: 48px; display: grid; gap: 8px; font-size: 12px; color: rgba(255,255,255,.45); }
+  footer .wm { width: 64px; height: 24px; color: #fff; margin-bottom: 4px; }
+
+  /* ---------- the view switcher, as on the brand site, with this page's place in the story ---------- */
+  .views { position: fixed; left: 20px; bottom: 22px; z-index: 95; display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(28,28,30,.8); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
+  .views a, .views button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #fff; transition: background .25s; }
+  .views a:hover, .views button:hover { background: rgba(255,255,255,.12); }
+  .views a[aria-current="page"] { background: #fff; color: #111; }
+  .views .sep { width: 1px; height: 18px; margin: 0 4px; background: rgba(255,255,255,.18); }
+  .views button .ic { width: 15px; height: 15px; }
+  .views button[aria-expanded="true"] { background: rgba(255,255,255,.16); }
+  .origin { position: fixed; left: 20px; bottom: 74px; z-index: 96; width: min(360px, calc(100vw - 40px)); padding: 22px 22px 20px; border-radius: 24px; color: #fff; background: rgba(22,21,26,.94); border: 1px solid rgba(255,255,255,.12); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 24px 60px -20px rgba(0,0,0,.6); }
+  .origin[hidden] { display: none; }
+  .origin h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.3; }
+  .origin ol { position: relative; margin-top: 18px; display: grid; gap: 18px; }
+  .origin ol::before { content: ""; position: absolute; left: 6px; top: 10px; bottom: 26px; width: 1px; background: linear-gradient(#d49ad6, rgba(255,255,255,.35)); }
+  .origin li { position: relative; padding-left: 26px; font-size: .92rem; color: #b4b3ba; line-height: 1.45; }
+  .origin li::before { content: ""; position: absolute; left: 1px; top: 6px; width: 11px; height: 11px; border-radius: 50%; background: #fff; }
+  .origin li:first-child::before { background: linear-gradient(135deg, #f0c9f1, #8a3a8c); }
+  .origin li b { display: block; color: #fff; font-weight: 600; font-size: .95rem; }
+  .origin li.here b::after { content: "You are here"; margin-left: 8px; padding: 2px 8px; border-radius: 99px; background: rgba(212,154,214,.18); color: #f0c9f1; font-size: .72rem; font-weight: 600; vertical-align: 2px; }
+  .origin .go { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; font-size: .92rem; font-weight: 500; }
+  .origin .go .ic { width: 16px; height: 16px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero.go .world, .hero.go .tile, .hero.go .tscr .arcs, .hero.go .tscr .th, .hero.go .tscr .tv, .till .beam { animation: none; }
+    .hero.go .tscr .arcs, .hero.go .tscr .th, .hero.go .tscr .tv { opacity: 1; }
+    .fadein { opacity: 1; transition: none; }
+  }
+
+  /* ---------- smaller screens: the render moves under the copy ---------- */
+  @media (max-width: 1060px) {
+    .links { display: none; }
+    .menu-btn { display: grid; }
+    .nav .links.open { display: flex; position: absolute; top: 72px; left: 0; right: 0; flex-direction: column; padding: 8px 16px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+    .hero { height: auto; max-height: none; min-height: 0; }
+    .hero .wrap { height: auto; padding-top: 120px; }
+    .hart { position: relative; height: calc(900px * var(--k, .7)); margin-top: 24px; }
+    .stage { right: 50%; margin-right: calc(-760px * var(--k, .7) / 2); }
+    .cards3, .steps { grid-template-columns: 1fr; }
+    .split { grid-template-columns: 1fr; min-height: 0; padding: 96px 0; gap: 48px; }
+    .split.rev .txt { order: -1; }
+    .more ul { grid-template-columns: 1fr 1fr; }
+    .more li, .more li:nth-child(4), .more li:nth-child(5) { grid-column: span 1; }
+    footer .cols { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .wrap { width: calc(100% - 32px); }
+    .brand { margin-right: 0; }
+    .nav .pill { display: none; }
+    .hero .wrap { padding-top: 104px; }
+    .hlabel { font-size: 20px; }
+    .hbody, .hlegal { font-size: 16px; }
+    .hform { margin-top: 36px; width: 100%; }
+    .sec { padding: 88px 0; }
+    .bleed, .black { height: 760px; }
+    .float { top: 430px; }
+    .slab { top: 560px; width: 440px; margin-left: -220px; height: 760px; border-radius: 70px; }
+    .slab .glass { border-radius: 58px; padding-top: 48px; }
+    .ring { width: 280px; height: 280px; } .ring div b { font-size: 56px; } .ring div small { font-size: 17px; }
+    .stack { width: 100%; max-width: 350px; }
+    .till { height: 420px; }
+    .q .a { padding-right: 0; }
+    .more ul { grid-template-columns: 1fr; }
+    .views { left: 12px; bottom: 16px; }
+    .views a, .views button { padding: 7px 11px; }
+    .views button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .origin { left: 12px; bottom: 64px; width: calc(100vw - 24px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- the orb in LCV purple, the TFN wordmark and the icons (Lucide, outline, 1.8 stroke) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="lB1" gradientUnits="userSpaceOnUse" x1="10" y1="20" x2="65" y2="0"><stop offset="0" stop-color="#f3d6f4"/><stop offset="1" stop-color="#b66cb9"/></linearGradient>
+    <linearGradient id="lB2" gradientUnits="userSpaceOnUse" x1="4" y1="32" x2="88" y2="20"><stop offset="0" stop-color="#dcaee0"/><stop offset="1" stop-color="#8a3a8c"/></linearGradient>
+    <linearGradient id="lB3" gradientUnits="userSpaceOnUse" x1="0" y1="42" x2="100" y2="60"><stop offset="0" stop-color="#c98bd0"/><stop offset=".5" stop-color="#9a4a9e"/><stop offset="1" stop-color="#5f2766"/></linearGradient>
+    <linearGradient id="lB4" gradientUnits="userSpaceOnUse" x1="0" y1="52" x2="70" y2="100"><stop offset="0" stop-color="#6a2c72"/><stop offset="1" stop-color="#2a0e30"/></linearGradient>
+    <radialGradient id="lSky" cx="26" cy="4" r="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f7e3f8" stop-opacity=".95"/><stop offset="1" stop-color="#f7e3f8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lDeep" cx="100" cy="42" r="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7b3fa8" stop-opacity=".75"/><stop offset="1" stop-color="#7b3fa8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lPink" cx="56" cy="70" r="32" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#d06bc4" stop-opacity=".75"/><stop offset="1" stop-color="#d06bc4" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lLav" cx="4" cy="98" r="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3a1a5e" stop-opacity=".9"/><stop offset="1" stop-color="#3a1a5e" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lEmber" cx="86" cy="88" r="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2761d" stop-opacity=".5"/><stop offset="1" stop-color="#f2761d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lHi" cx="30" cy="18" r="70" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <path id="lW1" d="M10.63 19.03C12.14 19.16 13.32 18.57 14.89 18.35C18 17.91 21.78 17.43 24.94 17.88C26.61 18.11 28.3 18.18 29.97 18.41C30.66 18.51 31.25 18.98 31.95 19.07C40.65 20.3 46.78 24.28 55.49 20.03C58.66 18.48 61.03 15.65 62.52 12.53C63.95 9.55 65.42 5.33 64.32 2.15C62.22 1.37 60.09 1.23 57.91 0.73C43.55 -2.51 28.35 2.79 17.25 11.91C14.82 13.9 12.15 16.39 10.63 19.03Z"/>
+    <path id="lW2" d="M73.18 5.8C72.27 7.37 72.48 8.99 71.9 10.69C70.38 15.14 68.54 19.25 65.15 22.65C58.63 29.16 50.35 30.84 41.45 29.55C40.77 29.45 40.18 28.99 39.47 28.89C34.02 28.12 28.85 26.08 23.27 25.75C19.07 25.5 14.82 26.67 10.93 27.95C8.42 28.78 4.92 30.1 3.57 32.29C5.32 31.94 7.23 31.41 9.04 31.15C17.22 30 26.72 33.12 33.03 38.3C36.59 41.22 40.3 44.9 44.42 47.02C48.4 49.07 52.27 50.54 56.7 51.16C59.3 51.53 62.39 51.18 64.88 50.53C77.14 47.33 85.42 39.95 88.06 27.28C88.66 24.39 89 21.46 87.79 18.63C85.37 12.95 78.5 8.42 73.18 5.8Z"/>
+    <path id="lW3" d="M0.93 42.73C3.1 42.44 5.86 42.15 8.28 42.36C10.43 42.55 12.89 43.96 14.62 45.17C20.72 49.43 23.54 55.46 27.49 61.45C30.09 65.38 31.82 69.99 34.83 73.66C42.25 82.7 51.55 87.19 63.2 87.19C72.58 87.19 81.13 82.98 87.73 76.38C95.57 68.53 101.1 56.93 99.53 45.8C98.95 41.69 98.43 34.58 95.76 31.42C93.8 35.26 92.49 40 89.53 43.68C78.29 57.64 60.97 63.55 44.24 55.97C31.84 50.36 22.82 35.21 7.2 39.89C4.88 40.59 2.74 40.98 0.93 42.73Z"/>
+    <path id="lW4" d="M0.23 52.2C-0.55 56.91 1.18 61.22 2.33 65.64C3.33 69.47 5.24 74 7.81 77.12C9.42 79.08 10.58 81.38 12.38 83.23C20.77 91.83 30.55 97.53 42.39 99.2C46.13 99.73 49.94 100.41 53.76 99.87C54.84 99.71 55.9 99.35 56.98 99.2C61.61 98.55 67.34 97.67 71.02 94.77C68.94 94.6 66.73 95.33 64.5 95.33C55.48 95.33 48.83 93.8 40.9 89.53C35.7 86.73 30.59 82.03 27.41 77.04C22.77 69.79 15.87 53.63 7.84 50.57C5.27 49.59 2.36 50.9 0.23 52.2Z"/>
+    <clipPath id="lClip"><use href="#lW1"/><use href="#lW2"/><use href="#lW3"/><use href="#lW4"/></clipPath>
+    <filter id="lGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <symbol id="orb" viewBox="-.5 -.5 101 101"><use href="#lW4" fill="url(#lB4)"/><use href="#lW3" fill="url(#lB3)"/><use href="#lW2" fill="url(#lB2)"/><use href="#lW1" fill="url(#lB1)"/><g clip-path="url(#lClip)"><rect width="100" height="100" fill="url(#lSky)"/><rect width="100" height="100" fill="url(#lDeep)"/><rect width="100" height="100" fill="url(#lPink)"/><rect width="100" height="100" fill="url(#lLav)"/><rect width="100" height="100" fill="url(#lEmber)"/><rect width="100" height="100" fill="url(#lHi)"/><rect width="100" height="100" filter="url(#lGrain)" opacity=".32" style="mix-blend-mode:overlay"/></g></symbol>
+  <symbol id="logo" viewBox="0 56 392 148"><text x="0" y="200" fill="currentColor" font-family="Fraunces, Georgia, serif" font-weight="900" font-size="200" letter-spacing="2" style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;font-optical-sizing:none">TFN</text></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="EngenXT by TFN, back to the top"><svg aria-hidden="true"><use href="#orb"/></svg><b>Engen<span>XT</span></b></a>
+    <nav class="links" id="links" aria-label="EngenXT">
+      <a href="#how">How it works</a>
+      <a href="#rules">Rules</a>
+      <a href="#till">At the till</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <span class="grow"></span>
+    <button class="tbtn" id="theme" type="button" aria-pressed="false" aria-label="Switch to dark mode"><svg class="ic moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="ic sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
+    <button class="tbtn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="links" aria-label="Menu"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="pill" href="#top" data-focus="mobile">Join the waiting list</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="hcopy">
+        <p class="hlabel">EngenXT</p>
+        <h1>Rules, not bank cards</h1>
+        <p class="hbody">Set fuel rules for every driver and vehicle. Drivers ask in the app and pay with a QR code at the Engen till. Leave your number to be first in line.</p>
+        <p class="hlegal"><a href="#">Terms</a> and <a href="#">privacy</a> apply.</p>
+        <form class="hform" id="hform" novalidate>
+          <div class="hrow">
+            <span class="cc" aria-hidden="true">
+              <svg class="flag" viewBox="0 0 24 24"><clipPath id="fc"><circle cx="12" cy="12" r="12"/></clipPath><g clip-path="url(#fc)"><rect width="24" height="12" fill="#e03c31"/><rect y="12" width="24" height="12" fill="#001489"/><path d="M-2 3.5 8.5 12-2 20.5V24h3l9.6-8.4H26v-7.2H10.6L1 0h-3Z" fill="#fff"/><path d="M-1 1.6 10.2 10H26v4H10.2L-1 22.4V20l9.4-8L-1 4Z" fill="#007749"/><path d="M-1 5.2 9.3 12-1 18.8Z" fill="#ffb81c"/><path d="M-1 6.8 7 12l-8 5.2Z" fill="#000"/></g></svg>
+              <span>+27</span>
+            </span>
+            <label class="num"><span class="sr">Mobile number</span><input id="mobile" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="Mobile number" maxlength="13"></label>
+          </div>
+          <button class="hgo" id="hgo" type="submit" disabled>Join the waiting list</button>
+          <p class="hdone" id="hdone" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+    <div class="hart">
+      <div class="stage" id="stage" aria-hidden="true">
+        <div class="world">
+          <div class="bx trm">
+            <i class="bk"></i><i class="lt"></i><i class="rt"></i><i class="tp"></i>
+            <i class="fr"><span class="tscr" style="display:block">
+              <svg class="arcs" viewBox="0 0 260 260"><g fill="none" stroke="#8a46a8" stroke-width="10"><circle cx="130" cy="130" r="50" stroke-opacity=".75"/><circle cx="130" cy="130" r="82" stroke-opacity=".5"/><circle cx="130" cy="130" r="114" stroke-opacity=".28"/></g></svg>
+              <span class="th"><svg class="ic"><use href="#i-back"/></svg><b>EngenXT</b></span>
+              <span class="tv"><b>60 L</b><small>Scan the QR to pay</small></span>
+            </span><span class="tnav"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span></i>
+          </div>
+          <div class="bx ped"><i class="bk"></i><i class="lt"></i><i class="rt"></i><i class="tp"></i><i class="fr"></i></div>
+          <div class="bx tile">
+            <i class="bk"></i><i class="lt"></i><i class="rt"></i><i class="tp"></i>
+            <i class="fr"><span class="tb"><b>EngenXT</b><small>FUEL PASS</small></span><span class="tm"><span class="tw"><b>CA 482-913</b><small>Diesel 50 · up to 60 L</small></span><span class="tq"><svg class="qr" data-seed="482913"></svg></span></span></i>
+          </div>
+          <div class="bx dock"><i class="lt"></i><i class="rt"></i><i class="tp"></i><i class="fr"></i></div>
+          <div class="bx gls"><i class="bk"></i><i class="lt"></i><i class="rt"></i><i class="tp"></i><i class="fr"></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec center" id="how">
+    <div class="wrap">
+      <h2>More than a way to pay for fuel</h2>
+      <p class="lead">Set up EngenXT yourself. Add your vehicles and drivers, set the rules once and every request is checked for you.</p>
+      <a class="pill" href="#top" data-focus="mobile">Join the waiting list</a>
+      <ul class="cards3">
+        <li><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><h3>Set the rules</h3><p>Decide how much fuel each driver and vehicle can buy and how often.</p></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-qr"/></svg><h3>Ask and pay</h3><p>Drivers ask in the app and pay with a QR code at the Engen till.</p></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg><h3>Track every fill</h3><p>See each fill by driver and vehicle on the day it happens.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="bleed" id="check" data-par>
+    <div class="bg" data-layer><img src="img/pay-nozzle.jpg" alt="" loading="lazy"></div>
+    <div class="wrap copy fadein">
+      <h2>Every fill checked before the pump starts</h2>
+      <p>Tank size, fills a day and fuel type are checked against your rules the moment a driver asks. Approved with a limit or declined. Never after the fact.</p>
+      <p class="fine">Screens are illustrative. Engen service stations in South Africa.</p>
+      <a class="pill inv" href="#top" data-focus="mobile">Join the waiting list</a>
+    </div>
+    <div class="float" aria-hidden="true">
+      <small>Approved</small>
+      <b>60 L</b>
+      <span class="chip">Diesel 50 <svg class="ic"><use href="#i-chev"/></svg></span>
+      <span class="row"><svg><use href="#orb"/></svg><span>CA 482-913<br><small>T. Mokoena</small></span><em>Engen</em></span>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap split">
+      <div class="stack" aria-hidden="true">
+        <div class="s-head"><img src="img/manager-tablet.jpg" alt=""><svg class="o"><use href="#orb"/></svg><b>Rules for CA 482-913</b><small>Bakkie · T. Mokoena</small></div>
+        <div><div class="s-row"><span>Tank size<small>Up to 80 L a fill</small></span><span class="s-btn ink">Set 80 L</span></div></div>
+        <div>
+          <div class="s-row"><span>Fills a day</span><span class="s-btn li">1 a day</span></div>
+          <div class="s-row"><span>Fuel</span><span class="s-btn li">Diesel 50</span></div>
+          <div class="s-row"><span>Where</span><span class="s-btn li">Any Engen</span></div>
+        </div>
+      </div>
+      <div class="txt">
+        <h2>Rules made personal</h2>
+        <p>Give every driver and vehicle their own rules. How much, how often and which fuel. Change a rule and it holds from the next request.</p>
+        <p>Drivers only see the answer. <a class="u" href="#faq">Never your rules or your balance.</a></p>
+        <a class="pill" href="#top" data-focus="mobile">Join the waiting list</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="till">
+    <div class="wrap split rev">
+      <div class="txt">
+        <h2>Pay at the till with a QR</h2>
+        <p>Drivers show a QR code at the Engen till and it's paid from your prepaid wallet. No bank card, no cash and no PIN to share.</p>
+        <p>Coming to Engen service stations across South Africa.</p>
+        <a class="pill" href="#top" data-focus="mobile">Join the waiting list</a>
+      </div>
+      <div class="till" aria-hidden="true">
+        <div class="world">
+          <i class="floor"></i>
+          <div class="bx trm">
+            <i class="bk"></i><i class="lt"></i><i class="rt"></i><i class="tp"></i>
+            <i class="fr"><span class="tscr" style="display:block">
+              <svg class="arcs" viewBox="0 0 260 260"><g fill="none" stroke="#8a46a8" stroke-width="10"><circle cx="130" cy="130" r="50" stroke-opacity=".75"/><circle cx="130" cy="130" r="82" stroke-opacity=".5"/><circle cx="130" cy="130" r="114" stroke-opacity=".28"/></g></svg>
+              <span class="th"><svg class="ic"><use href="#i-back"/></svg><b>EngenXT</b></span>
+              <span class="tv"><b>60 L</b><small>Scan the QR to pay</small></span>
+            </span><span class="tnav"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span></i>
+          </div>
+          <div class="bx phn">
+            <i class="bk"></i><i class="lt"></i><i class="rt"></i>
+            <i class="fr"><span class="pscr" style="display:block"><span class="pb"><b>EngenXT</b><small>DIESEL 50 · 60 L</small></span><span class="pq" style="display:block"><svg class="qr" data-seed="771204"></svg></span><span class="pc">Show at the till</span></span></i>
+          </div>
+          <i class="beam"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="black" id="view" data-par>
+    <div class="wrap copy fadein">
+      <h2>A full view of every fill</h2>
+      <p>See every request and every fill by driver and vehicle on the day it happens. Spot an odd fill straight away, not at month end.</p>
+      <a class="pill inv" href="#top" data-focus="mobile">Join the waiting list</a>
+    </div>
+    <div class="lay" data-layer aria-hidden="true">
+      <div class="slab"><div class="face"><div class="glass">
+        <div class="ring">
+          <svg viewBox="0 0 200 200"><g fill="none" stroke-width="12" stroke-linecap="round">
+            <circle cx="100" cy="100" r="86" stroke="#2a2330"/>
+            <circle cx="100" cy="100" r="86" stroke="#5f2766" stroke-dasharray="190 540"/>
+            <circle cx="100" cy="100" r="86" stroke="#8a3a8c" stroke-dasharray="120 540" stroke-dashoffset="-198"/>
+            <circle cx="100" cy="100" r="86" stroke="#c27fc4" stroke-dasharray="86 540" stroke-dashoffset="-326"/>
+            <circle cx="100" cy="100" r="86" stroke="#f0c9f1" stroke-dasharray="44 540" stroke-dashoffset="-420"/>
+          </g></svg>
+          <div><small>Approved</small><b>412 L</b><small>This week</small></div>
+        </div>
+      </div></div></div>
+    </div>
+  </section>
+
+  <section class="sec center" id="steps">
+    <div class="wrap">
+      <h2>Set up EngenXT in three steps</h2>
+      <p class="lead">EngenXT is coming soon. Join the waiting list and we'll message you the day it opens.</p>
+      <a class="pill" href="#top" data-focus="mobile">Join the waiting list</a>
+      <ol class="steps">
+        <li><span class="n">1</span><h3>Add your company, then your bakkies and vans</h3></li>
+        <li><span class="n">2</span><h3>Add your drivers and set the rules for each one</h3></li>
+        <li><span class="n">3</span><h3>Drivers ask in the app and pay with a QR code at the till</h3><p>Every fill shows in your report the same day.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec center faq" id="faq">
+    <div class="wrap">
+      <p class="faq-k">Need a little more help?</p>
+      <h2>Your questions answered</h2>
+      <div class="qs">
+        <div class="q"><button type="button" aria-expanded="true" aria-controls="a1">What is EngenXT?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a1"><p>EngenXT is a rules engine with a driver app. You set fuel rules for each driver and vehicle. Drivers ask for fuel in the app and pay with a QR code at the Engen till.</p><p>It replaces bank cards for your bakkies and vans. EngenXT is a TFN product, built on TruckersHub.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a2">Do my drivers need a bank card?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a2" hidden><p>No. Drivers ask for fuel in the driver app and pay with a QR code at the till. Your rules decide every request.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a3">What happens when a request breaks a rule?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a3" hidden><p>It's declined before the pump starts. The driver sees that it was declined. You see why.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a4">Can drivers see my rules or my balance?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a4" hidden><p>No. Drivers only see whether a request is approved (with the limit) or declined.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a5">Where can drivers fill up?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a5" hidden><p>At Engen service stations across South Africa.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a6">Which vehicles is it for?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a6" hidden><p>Bakkies, vans and other light commercial vehicles. Running trucks? TFN has <a href="tfn-on-road.html">CRT Onroad</a> at 270+ truck stops.</p></div></div>
+        <div class="q"><button type="button" aria-expanded="false" aria-controls="a7">When can I sign up?<span class="qi" aria-hidden="true"></span></button><div class="a" id="a7" hidden><p>EngenXT is coming soon. Leave your number at the top of this page and we'll message you when it opens.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="more" aria-labelledby="moreH">
+    <div class="wrap">
+      <h2 class="sr" id="moreH">More from TFN</h2>
+      <ul>
+        <li><a href="tfn-page-examples.html#fam"><h3>TruckersHub</h3><em>Live now</em><p>Every TFN product on one screen: what needs you, what you saved and what to add.</p><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        <li><a href="tfn-on-road.html"><h3>CRT Onroad</h3><em>For trucks</em><p>Cheaper diesel at 270+ truck stops, every fill logged at the pump.</p><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        <li><a href="tfn-credit.html"><h3>Credit products</h3><em>Treasury</em><p>Fuel on credit, paid back each month.</p><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        <li><a href="tfn-homebase.html"><h3>Homebase management</h3><em>Your own tank</em><p>Diesel delivered to your own tank, every fill recorded.</p><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        <li><a href="tfn-africa.html"><h3>Cross Border</h3><em>Five countries</em><p>Fill up in five countries, paid in rand.</p><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div><h4>EngenXT</h4><ul><li><a href="#how">How it works</a></li><li><a href="#rules">Rules</a></li><li><a href="#till">At the till</a></li><li><a href="#faq">Questions</a></li></ul></div>
+      <div><h4>TFN</h4><ul><li><a href="tfn-page-examples.html#fam">All products</a></li><li><a href="tfn-on-road.html">CRT Onroad</a></li><li><a href="tfn-credit.html">Credit products</a></li><li><a href="tfn-homebase.html">Homebase</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About TFN</a></li><li><a href="tfn-page-examples.html#partners">Our partners</a></li><li><a href="#">Contact us</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Support</a></li><li><a href="#">Terms and conditions</a></li><li><a href="#">Privacy</a></li></ul></div>
+    </div>
+    <div class="legal">
+      <svg class="wm" role="img" aria-label="TFN"><use href="#logo"/></svg>
+      <p>EngenXT is a TFN product. TFN, South Africa's largest independent on-road refuelling service provider, since April 2007.</p>
+      <p>Design concept: screens and figures in the mock-ups are illustrative.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Site / Brand guide / LCV site: the brand site's own switcher, with the step this page was in the story -->
+<nav class="views" aria-label="Views">
+  <a href="tfn-page-examples.html">Site</a>
+  <a href="tfn-page-examples.html#brand">Brand guide</a>
+  <a href="lcv-site.html" aria-current="page">LCV site</a>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" id="orgBtn" aria-expanded="false" aria-controls="origin"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg><span>Where it started</span></button>
+</nav>
+<section class="origin" id="origin" aria-labelledby="orgH" hidden>
+  <h2 id="orgH">Where it started</h2>
+  <ol>
+    <li class="here"><b>First, the LCV site</b>One product and one purple: a rules engine with a driver app, in place of bank cards.</li>
+    <li><b>Then the TFN brand site</b>The same type, orb and pill buttons, grown into one site for every TFN product.</li>
+  </ol>
+  <a class="go" href="tfn-page-examples.html">Open the brand site <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+</section>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* light and dark */
+  var tg = document.getElementById('theme');
+  function syncTheme() {
+    var dark = root.dataset.theme === 'dark';
+    tg.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    tg.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  tg.addEventListener('click', function () {
+    var t = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = t;
+    try { localStorage.setItem('tfn-theme', t); } catch (e) {}
+    syncTheme();
+  });
+  syncTheme();
+
+  /* the menu on narrow screens */
+  var mb = document.getElementById('menuBtn'), links = document.getElementById('links');
+  mb.addEventListener('click', function () { mb.setAttribute('aria-expanded', links.classList.toggle('open') ? 'true' : 'false'); });
+  links.addEventListener('click', function (e) { if (e.target.closest('a')) { links.classList.remove('open'); mb.setAttribute('aria-expanded', 'false'); } });
+
+  /* QR codes: drawn, not scanned. Three finder squares, a timing line and seeded modules */
+  function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  [].forEach.call(document.querySelectorAll('svg.qr'), function (svg) {
+    var n = 25, r = rng(+svg.dataset.seed || 7), m = [], x, y;
+    for (y = 0; y < n; y++) { m[y] = []; for (x = 0; x < n; x++) m[y][x] = r() > .5; }
+    function finder(ox, oy) {
+      for (y = -1; y < 8; y++) for (x = -1; x < 8; x++) {
+        var X = ox + x, Y = oy + y; if (X < 0 || Y < 0 || X >= n || Y >= n) continue;
+        m[Y][X] = x >= 0 && x <= 6 && y >= 0 && y <= 6 && (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4));
+      }
+    }
+    finder(0, 0); finder(n - 7, 0); finder(0, n - 7);
+    for (x = 8; x < n - 8; x++) { m[6][x] = x % 2 === 0; m[x][6] = x % 2 === 0; }
+    for (y = -2; y <= 2; y++) for (x = -2; x <= 2; x++) m[18 + y][18 + x] = Math.max(Math.abs(x), Math.abs(y)) !== 1;
+    var d = '';
+    for (y = 0; y < n; y++) for (x = 0; x < n; x++) if (m[y][x]) d += 'M' + x + ' ' + y + 'h1v1h-1z';
+    svg.setAttribute('viewBox', '0 0 25 25');
+    svg.innerHTML = '<path fill="currentColor" d="' + d + '"/>';
+  });
+
+  /* the render is drawn at 1440 by 900 and scaled to the window */
+  var hero = document.querySelector('.hero');
+  function fit() {
+    var w = innerWidth, k = w > 1060 ? Math.min(1.12, Math.max(.72, Math.min(w / 1440, hero.offsetHeight / 900))) : Math.min(.86, (w - 8) / 760);
+    hero.style.setProperty('--k', k.toFixed(3));
+  }
+  addEventListener('resize', fit); fit();
+  requestAnimationFrame(function () { hero.classList.add(reduce ? 'still' : 'go'); });
+
+  /* the mobile number: digits only, grouped 82 123 4567; the button wakes at nine digits */
+  var mob = document.getElementById('mobile'), go = document.getElementById('hgo'), done = document.getElementById('hdone');
+  mob.addEventListener('input', function () {
+    var d = mob.value.replace(/\D/g, '').replace(/^0/, '').slice(0, 9);
+    mob.value = d.replace(/^(\d{2})(\d{0,3})(\d{0,4}).*/, function (m, a, b, c) { return [a, b, c].filter(Boolean).join(' '); });
+    go.disabled = d.length < 9; done.textContent = '';
+  });
+  document.getElementById('hform').addEventListener('submit', function (e) {
+    e.preventDefault(); if (go.disabled) return;
+    done.textContent = "You're on the list. We'll message you on WhatsApp when EngenXT opens.";
+    mob.value = ''; go.disabled = true;
+  });
+  [].forEach.call(document.querySelectorAll('[data-focus="mobile"]'), function (a) {
+    a.addEventListener('click', function () { setTimeout(function () { mob.focus({ preventScroll: true }); }, 400); });
+  });
+
+  /* questions open in place */
+  [].forEach.call(document.querySelectorAll('.q button'), function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.getElementById(b.getAttribute('aria-controls')).hidden = !open;
+    });
+  });
+
+  /* where it started */
+  var ob = document.getElementById('orgBtn'), org = document.getElementById('origin');
+  function setOrg(open) { org.hidden = !open; ob.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+  ob.addEventListener('click', function () { setOrg(org.hidden); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !org.hidden) { setOrg(false); ob.focus(); } });
+  document.addEventListener('click', function (e) { if (!org.hidden && !org.contains(e.target) && !ob.contains(e.target)) setOrg(false); });
+
+  if (reduce) return;
+
+  /* the two picture sections: the picture moves a sixth of the scroll, the heading fades in once */
+  var par = [].slice.call(document.querySelectorAll('[data-par]'));
+  function drift() {
+    par.forEach(function (s) {
+      var top = s.getBoundingClientRect().top, l = s.querySelector('[data-layer]');
+      if (top < innerHeight && top > -s.offsetHeight) l.style.transform = 'translate3d(0,' + (-top / 6).toFixed(1) + 'px,0)';
+    });
+  }
+  addEventListener('scroll', function () { requestAnimationFrame(drift); }, { passive: true }); drift();
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.querySelector('.fadein').classList.add('on'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -250px 0px' });
+  par.forEach(function (s) { io.observe(s); });
+})();
+</script>
+<noscript><style>.fadein { opacity: 1; } .tscr .arcs, .tscr .th, .tscr .tv { opacity: 1 !important; }</style></noscript>
+</body>
+</html>
