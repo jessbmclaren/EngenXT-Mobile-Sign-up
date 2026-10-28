@@ -72,7 +72,10 @@
   /* ---------- hero: a portrait behind an outlined card. The first scroll sets off one 1.08s move: the headline lifts away,
      the photograph pulls back, a sheet opens out of the card to fill the screen, the card shrinks into the middle of a row
      of three and the other two slide in. Scrolling back to the top plays it in reverse (script: "the hero switch") ---------- */
-  .rh { --e: cubic-bezier(.35, 0, 0, 1); --t: 1.08s; --d: .1s; position: relative; height: 100vh; min-height: 640px; margin-top: -72px; overflow: hidden; background: #0d1a22; }
+  .rh { --e: cubic-bezier(.35, 0, 0, 1); --t: 1.08s; --d: .1s; position: sticky; top: 0; height: 100vh; min-height: 640px; overflow: hidden; background: #0d1a22; }
+  /* the hero holds still for a stretch of scroll once it has switched, so the three cards are seen before the page moves on */
+  .rh-pin { height: calc(max(100vh, 640px) + 70vh); margin-top: -72px; }
+  @media (prefers-reduced-motion: reduce) { .rh-pin { height: auto; } .rh { position: relative; } }
   .rh-back, .rh-front { position: absolute; inset: 0; }
   .rh-ph, .rh-in { background: url(img/hero-manager.jpg) var(--bp, -1336px 262px) / var(--bs, 2477px 1242px) no-repeat #0d1a22; transform-origin: 50% 100%; }
   .rh-in { background-position: var(--ibp, -1336px 262px); background-size: var(--ibs, 2477px 1242px); }
@@ -1114,6 +1117,7 @@ html[data-theme="dark"] .xnt-stage { box-shadow: 0 0 0 1px rgba(184,186,238,.06)
 </header>
 
 <main id="main">
+  <div class="rh-pin">
   <section class="rh" id="top" aria-label="EngenXT">
     <div class="rh-back">
       <i class="rh-ph" aria-hidden="true"></i>
@@ -1148,6 +1152,7 @@ html[data-theme="dark"] .xnt-stage { box-shadow: 0 0 0 1px rgba(184,186,238,.06)
       </div>
     </div>
   </section>
+  </div>
 
   <!-- light band under the hero: six marks, each with a caption; EngenXT's own facts only -->
     <section class="xaw-sec" aria-labelledby="xawH">
